@@ -39,6 +39,11 @@ Each project subdirectory has its own CLAUDE.md with setup instructions and conv
 
 Reading, ideas, beliefs, and conversations are shared across projects. Experiments can live in project directories (`fer/experiments/`, `glp/experiments/`), but may be consolidated later.
 
+## Conversation transcripts
+- Claude Code transcripts are symlinked into `conversations/claude-code-transcripts/`.
+- Before parsing prior conversations, run `python3 conversations/parse_transcripts.py` to generate `INDEX.md` and `readable/` markdowns from the raw JSONL files.
+- Read `conversations/claude-code-transcripts/INDEX.md` first to find the relevant session, then read the specific `readable/<session>.md` file.
+
 ## Notes
 - Please don't use Explore subagents. These use Claude Haiku, which is too small of a model to be useful. Opt for Sonnet or Opus explore agents/subagents instead.
 
