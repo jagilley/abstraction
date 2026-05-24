@@ -1,0 +1,92 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.eggs/
+dist/
+build/
+*.so
+
+# Environments
+.env
+.venv/
+venv/
+env/
+
+# Model checkpoints and large experiment artifacts
+**/*.pt
+**/*.pth
+**/*.ckpt
+**/*.safetensors
+**/*.npy
+**/*.npz
+**/*.pkl
+**/*.pickle
+**/*.h5
+**/*.hdf5
+
+# Large logs (keep small ones)
+**/experiments/**/*.log
+
+# Data artifacts
+**/*.parquet
+**/*.arrow
+**/wandb/
+**/runs/
+**/data/
+
+# Audio/video
+*.wav
+*.mp3
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.asd
+
+# Generated presentation files
+**/*.srt
+**/snapshots/
+manim-videos/videos/**/*.html
+
+# Large experiment outputs (images, text dumps)
+**/experiments/**/*.gif
+**/experiments/**/*.png
+**/experiments/**/train_output.txt
+**/experiments/**/output*.txt
+
+# Manim generated media
+manim-videos/media/
+
+# Frontend
+**/node_modules/
+**/frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code
+.claude/worktrees/
+
+# GLP specific
+glp/glp.egg-info/
+glp/leaderboard.db
+
+# FER specific
+fer/cppnx
+fer/**/param_trajectory*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large generated PDFs (fer paper assets — weight sweep plots)
+fer/assets/weight_sweeps*.pdf
