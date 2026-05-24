@@ -39,6 +39,9 @@ Each project subdirectory has its own CLAUDE.md with setup instructions and conv
 
 Reading, ideas, beliefs, and conversations are shared across projects. Experiments can live in project directories (`fer/experiments/`, `glp/experiments/`), but may be consolidated later.
 
+## Notes
+- Please don't use Explore subagents. These use Claude Haiku, which is too small of a model to be useful. Opt for Sonnet or Opus explore agents/subagents instead.
+
 ## Quotes
 
 - "If an explanation is long, there's a high chance that it's wrong" -- Ilya Sutskever
