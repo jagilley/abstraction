@@ -12,12 +12,6 @@ A small forward model learns to predict a larger model's activations from its cu
 
 ## The problem, progressively stated
 
-### Starting point: CLS in AI needs a fast-learning complement
-
-Complementary learning systems theory says fast learning (hippocampus) and slow learning (neocortex) serve different roles. The hippocampus performs novelty detection and sparse coding, allowing immediate encoding of new experiences that are later consolidated into cortical representations without catastrophic interference. AI has no such system. We want one.
-
-A meta-model over activations (like the GLP) can detect novelty: project OOD activations onto the learned manifold, and the residual captures what's new. We've shown these residuals are semantically meaningful. But the GLP has a deeper limitation than we originally identified.
-
 ### The real limitation: unconditional manifold modeling
 
 The original CNB doc diagnosed the GLP's problem as a lack of weight-space grounding — activation residuals tell you "this is far from typical" but not "this deviates from a specific computational mechanism." That diagnosis was partially right about the symptom but wrong about the cure.
@@ -27,8 +21,6 @@ The GLP models P(activations) — the unconditional distribution of activations 
 1. **It's enormous.** The Llama 1B GLP has ~3B parameters. This is suspicious — the hippocampus is tiny relative to the cortex. A novelty detector should be smaller than the thing it monitors.
 
 2. **It doesn't distinguish expected from unexpected variation.** It knows what's statistically typical, but not what the model *should* compute for *this specific input*. An unusual-but-correct activation and a wrong-but-plausible activation look the same to the manifold.
-
-3. **A moving reference follows the model into collapse.** When the GLP tracked the empirical activation distribution during grokking, it followed the model wherever it went — including into Sisyphean collapse. The GLP's reference is the manifold shape, and if the manifold shifts (because the model is memorizing), the GLP shifts with it. There is no structural anchor.
 
 The right question isn't "what do activations typically look like?" It's "what should this model compute given this input?" That's a forward prediction problem, not a density estimation problem.
 
