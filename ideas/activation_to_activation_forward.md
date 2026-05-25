@@ -1,4 +1,4 @@
-# Cerebellar Forward Models: Self-Regulation and Progressive Abstraction via Activation Prediction
+# Activation-to-Activation Forward Modeling
 
 **Status**: Idea (partially validated in grokking; not yet implemented at scale)
 **Date**: 2026-05-24
