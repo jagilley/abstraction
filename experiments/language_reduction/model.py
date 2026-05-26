@@ -124,7 +124,9 @@ class GPT(nn.Module):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, idx, targets=None, return_intermediates=False):
+    def forward(self, idx, targets=None, return_intermediates=False,
+                cerebellar_fn=None, cerebellar_input_block=0,
+                cerebellar_inject_block=1):
         B, T = idx.size()
         assert T <= self.block_size
 
@@ -140,10 +142,16 @@ class GPT(nn.Module):
         if return_intermediates:
             intermediates["post_embed"] = x
 
+        cerebellar_injection = None
         for i, block in enumerate(self.transformer.h):
             x = block(x)
             if return_intermediates:
                 intermediates[f"post_block{i}"] = x
+            if cerebellar_fn is not None and i == cerebellar_input_block:
+                cerebellar_injection = cerebellar_fn(x)
+            if cerebellar_injection is not None and i == cerebellar_inject_block:
+                x = x + cerebellar_injection
+                cerebellar_injection = None
 
         x = self.transformer.ln_f(x)
         logits = self.lm_head(x)

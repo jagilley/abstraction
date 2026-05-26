@@ -71,6 +71,31 @@ class ForwardBlock(nn.Module):
         return x
 
 
+class CerebellarGate(nn.Module):
+    """Learned gated projection for injecting forward model predictions.
+
+    Zero-initialized so the injection starts at exactly zero.
+    The projection learns to transform the forward model's prediction
+    into a useful signal for the main model's residual stream (thalamic
+    relay analog). Injection magnitude grows from zero as training
+    discovers useful structure.
+    """
+
+    def __init__(self, d_model: int):
+        super().__init__()
+        self.projection = nn.Linear(d_model, d_model)
+        nn.init.zeros_(self.projection.weight)
+        nn.init.zeros_(self.projection.bias)
+        print(f"CerebellarGate: {sum(p.numel() for p in self.parameters())/1e3:.1f}K "
+              f"parameters (d_model={d_model})")
+
+    def forward(self, fwd_pred):
+        return self.projection(fwd_pred)
+
+    def injection_norm(self):
+        return self.projection.weight.norm().item()
+
+
 class TransformerForwardModel(nn.Module):
     def __init__(self, d_model: int, d_head: int = 64, n_head: int = 1,
                  n_layer: int = 1, mlp_mult: int = 2, block_size: int = 128):

@@ -218,12 +218,31 @@ Residual-LM correlation remains near zero (-0.03), consistent with the 1-layer r
 
 **Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-train --n-tokens 10000000 --n-steps 10000 --fwd-n-layer 2 --predict-from post_block0 --predict-to post_block3`
 
+## Run 4: Closed-loop cerebellar training (2026-05-25)
+
+**Full writeup**: [CLOSED_LOOP_README.md](CLOSED_LOOP_README.md)
+
+Closed the cerebellar loop: the 2-layer forward model's predictions (post_block0 → post_block3) are fed back into the main model's residual stream via a learned gated projection (`CerebellarGate`, 65.8K params, zero-initialized). Injected after block 1. Forward model trains on MSE only (no LM gradient); main model + gate train on LM loss.
+
+**Key results**:
+
+1. **The injection helps LM loss**: Δ = -0.05 to -0.08 nats consistently (1.6% relative, ~9% perplexity reduction). Negative at every eval step across 10K training steps.
+
+2. **The gate opens wide**: projection weight norm grew linearly 0.08 → 3.03 throughout training, never saturating. The model never stopped finding useful structure in the prediction.
+
+3. **Forward model quality degrades**: cosine 0.935 (open-loop) → 0.897 (closed-loop). The injection changes the model's computation, creating a moving target the forward model can't fully track.
+
+4. **The model develops novelty awareness**: Linear probes predicting the forward model's residual (actual - predicted) from post_block3 show R²=0.44 for the closed-loop model vs R²=0.28 for the open-loop baseline — a 59% improvement. The co-trained model's later layers encode substantially more information about what was surprising in its own computation.
+
+**Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-loop-train --n-tokens 10000000 --n-steps 10000 --lr 3e-4 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
+
 ## Next steps
 
-1. **Head 3 investigation**: what does head 3 attend to that the forward model can't capture? This is the most distinctive computation and likely the richest source of novelty signal.
-2. **Wider layer gaps**: predict post_block0 → post_block3 (3 layers) or post_embed → post_block3 (full model). More computation to approximate = harder capacity bottleneck = richer residual.
-3. **Feedback loop**: feed the forward model's predictions back into the main model's residual stream. The idea doc describes injecting at each recurrence step (for looped transformers) or at intermediate layers.
-4. **Self-regulation**: freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
-5. **Scaling**: try on larger models (more layers, wider) where the capacity gap between main and forward model is more pronounced.
+1. **Controlled comparison**: Retrain open-loop and closed-loop with identical lr/seed to eliminate the training quality confound from the Run 4 probe comparison.
+2. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. The current non-looped GPT only gets one injection point.
+3. **Sleep-style consolidation**: Periodically pause main model training and give the forward model extra gradient steps to catch up on the co-evolving computation.
+4. **Scaling**: Larger models where the capacity gap is more pronounced and the prediction signal's value may increase.
+5. **Self-regulation**: Freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
+6. **Head 3 investigation**: What does head 3 attend to that the forward model can't capture? (From Run 2 structure analysis.)
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

@@ -592,3 +592,258 @@ def a2a_analyze(
     volume.commit()
     print(f"\nResults saved to {results_path}")
     return results
+
+
+@app.function(
+    volumes={DATA_DIR: volume},
+    gpu="L4",
+    timeout=3600,
+    memory=32768,
+)
+def a2a_loop_analyze(
+    n_tokens: int = 10_000_000,
+    block_size: int = 128,
+    n_layer: int = 4,
+    n_head: int = 4,
+    n_embd: int = 256,
+    batch_size: int = 64,
+    n_eval_batches: int = 40,
+    predict_from: str = "post_block0",
+    predict_to: str = "post_block3",
+    inject_after_block: int = 1,
+    fwd_n_layer: int = 2,
+    fwd_d_head: int = 64,
+    fwd_n_head: int = 1,
+    fwd_mlp_mult: int = 2,
+    probe_steps: int = 500,
+    open_loop: bool = False,
+):
+    """Post-hoc analysis of closed-loop (or open-loop baseline) training.
+
+    Loads saved checkpoints and runs self-map probes:
+    1. Can post_block3 predict fwd_pred? (internalized forward model)
+    2. Does this differ with vs without injection active?
+    3. Can post_block3 predict the residual (actual - predicted)?
+
+    Set open_loop=True to analyze the open-loop baseline model instead.
+    """
+    import os
+    import glob
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    import numpy as np
+    from language_reduction.model import GPT
+    from language_reduction.experiments.a2a_forward.forward_model import (
+        TransformerForwardModel, CerebellarGate,
+    )
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    cerebellar_input_block = int(
+        predict_from.replace("post_block", "").replace("post_embed", "-1")
+    )
+    mode_label = "OPEN-LOOP baseline" if open_loop else "CLOSED-LOOP"
+    print(f"A2A {mode_label} analysis on {device}")
+
+    # --- Load data ---
+    data_dir = f"{DATA_DIR}/tokens"
+    meta = np.load(os.path.join(data_dir, "meta.npy"), allow_pickle=True).item()
+    vocab_size = meta["vocab_size"]
+
+    shard_paths = sorted(glob.glob(os.path.join(data_dir, "shard_*.npy")))
+    all_tokens = []
+    total = 0
+    for path in shard_paths:
+        tokens = np.load(path)
+        all_tokens.append(tokens)
+        total += len(tokens)
+        if total >= n_tokens:
+            break
+    data = np.concatenate(all_tokens)[:n_tokens]
+    data = torch.from_numpy(data.astype(np.int64))
+    split = int(0.9 * len(data))
+    val_data = data[split:]
+
+    def get_batch():
+        ix = torch.randint(len(val_data) - block_size - 1, (batch_size,))
+        x = torch.stack([val_data[i:i + block_size] for i in ix])
+        y = torch.stack([val_data[i + 1:i + block_size + 1] for i in ix])
+        return x.to(device), y.to(device)
+
+    # --- Load models ---
+    gap_tag = f"{predict_from}_to_{predict_to}"
+    if open_loop:
+        model_dir = (f"{DATA_DIR}/a2a_forward/transformer_L{fwd_n_layer}/"
+                     f"{gap_tag}/P_{n_tokens}")
+    else:
+        model_dir = (f"{DATA_DIR}/a2a_forward/loop_L{fwd_n_layer}/"
+                     f"{gap_tag}/inject{inject_after_block}/P_{n_tokens}")
+    print(f"Loading from {model_dir}")
+
+    model = GPT(vocab_size, block_size, n_layer, n_head, n_embd).to(device)
+    model.load_state_dict(torch.load(
+        os.path.join(model_dir, "model.pt"), map_location=device, weights_only=True,
+    ))
+    model.eval()
+
+    fwd_model = TransformerForwardModel(
+        d_model=n_embd, d_head=fwd_d_head, n_head=fwd_n_head,
+        n_layer=fwd_n_layer, mlp_mult=fwd_mlp_mult, block_size=block_size,
+    ).to(device)
+    fwd_model.load_state_dict(torch.load(
+        os.path.join(model_dir, "fwd_model.pt"), map_location=device, weights_only=True,
+    ))
+    fwd_model.eval()
+
+    gate = None
+    if not open_loop:
+        gate = CerebellarGate(n_embd).to(device)
+        gate.load_state_dict(torch.load(
+            os.path.join(model_dir, "gate.pt"), map_location=device, weights_only=True,
+        ))
+        gate.eval()
+        print(f"Gate injection norm: {gate.injection_norm():.4f}")
+    else:
+        print("Open-loop mode: no gate")
+
+    # --- Collect activations ---
+    print(f"Collecting activations ({n_eval_batches} batches)...")
+    early_acts = []        # post_block0
+    late_with_inj = []     # post_block3, injection active
+    late_no_inj = []       # post_block3, no injection
+    fwd_preds = []         # forward model predictions
+    residuals = []         # actual - predicted
+
+    with torch.no_grad():
+        for i in range(n_eval_batches):
+            vx, vy = get_batch()
+
+            if gate is not None:
+                def eval_cb_fn(act):
+                    return gate(fwd_model(act))
+
+                # With injection
+                _, _, vi_with = model(
+                    vx, vy, return_intermediates=True,
+                    cerebellar_fn=eval_cb_fn,
+                    cerebellar_input_block=cerebellar_input_block,
+                    cerebellar_inject_block=inject_after_block,
+                )
+            # Without injection (always computed)
+            _, _, vi_without = model(vx, vy, return_intermediates=True)
+
+            src = vi_without[predict_from]
+            pred = fwd_model(src)
+            actual_without = vi_without[predict_to]
+
+            if gate is not None:
+                actual_with = vi_with[predict_to]
+            else:
+                actual_with = actual_without
+
+            early_acts.append(src.cpu())
+            late_with_inj.append(actual_with.cpu())
+            late_no_inj.append(actual_without.cpu())
+            fwd_preds.append(pred.cpu())
+            residuals.append((actual_without - pred).cpu())
+
+            if i % 10 == 0:
+                print(f"  batch {i}/{n_eval_batches}")
+
+    # Flatten
+    early = torch.cat(early_acts, dim=0).reshape(-1, n_embd)
+    late_w = torch.cat(late_with_inj, dim=0).reshape(-1, n_embd)
+    late_wo = torch.cat(late_no_inj, dim=0).reshape(-1, n_embd)
+    fp = torch.cat(fwd_preds, dim=0).reshape(-1, n_embd)
+    res = torch.cat(residuals, dim=0).reshape(-1, n_embd)
+
+    n = early.shape[0]
+    n_train = int(0.8 * n)
+    perm = torch.randperm(n)
+    train_idx = perm[:n_train]
+    test_idx = perm[n_train:]
+
+    print(f"Probe dataset: {n} samples ({n_train} train, {n - n_train} test)")
+
+    # --- Run probes ---
+    def train_probe(X_name, X_data, Y_name, Y_data):
+        probe = nn.Linear(n_embd, n_embd).to(device)
+        opt = torch.optim.Adam(probe.parameters(), lr=1e-3)
+
+        X_tr = X_data[train_idx].to(device)
+        Y_tr = Y_data[train_idx].to(device)
+        X_te = X_data[test_idx].to(device)
+        Y_te = Y_data[test_idx].to(device)
+
+        probe_bs = min(4096, n_train)
+        for _ in range(probe_steps):
+            idx = torch.randint(n_train, (probe_bs,))
+            pred = probe(X_tr[idx])
+            loss = F.mse_loss(pred, Y_tr[idx])
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+
+        with torch.no_grad():
+            pred_test = probe(X_te)
+            mse = F.mse_loss(pred_test, Y_te).item()
+            var = Y_te.var().item()
+            r2 = 1.0 - mse / var if var > 0 else 0.0
+            cos = F.cosine_similarity(pred_test, Y_te, dim=-1).mean().item()
+
+        print(f"  {X_name} → {Y_name}: R²={r2:.4f}, cosine={cos:.4f}")
+        return {"r2": r2, "cosine": cos, "mse": mse}
+
+    results = {}
+
+    # Probe 1: post_block3 (with inj) → fwd_pred
+    print("\n=== Self-map probes: can post_block3 predict fwd_pred? ===")
+    results["late_with_inj__to__fwd_pred"] = train_probe(
+        "post_block3 (with inj)", late_w, "fwd_pred", fp,
+    )
+    # Probe 2: post_block3 (no inj) → fwd_pred
+    results["late_no_inj__to__fwd_pred"] = train_probe(
+        "post_block3 (no inj)", late_wo, "fwd_pred", fp,
+    )
+
+    # Probe 3: post_block3 (with inj) → residual
+    print("\n=== Novelty probes: can post_block3 predict the residual? ===")
+    results["late_with_inj__to__residual"] = train_probe(
+        "post_block3 (with inj)", late_w, "residual", res,
+    )
+    # Probe 4: post_block3 (no inj) → residual
+    results["late_no_inj__to__residual"] = train_probe(
+        "post_block3 (no inj)", late_wo, "residual", res,
+    )
+
+    # Probe 5-6: original self-map (post_block3 → post_block0)
+    print("\n=== Original self-map: can post_block3 predict post_block0? ===")
+    results["late_with_inj__to__early"] = train_probe(
+        "post_block3 (with inj)", late_w, "post_block0", early,
+    )
+    results["late_no_inj__to__early"] = train_probe(
+        "post_block3 (no inj)", late_wo, "post_block0", early,
+    )
+
+    # Baseline: how well does fwd_pred predict post_block3?
+    print("\n=== Forward model quality ===")
+    with torch.no_grad():
+        cos_with = F.cosine_similarity(
+            fp.to(device), late_w.to(device), dim=-1
+        ).mean().item()
+        cos_without = F.cosine_similarity(
+            fp.to(device), late_wo.to(device), dim=-1
+        ).mean().item()
+    results["fwd_pred_cosine_vs_late_with_inj"] = cos_with
+    results["fwd_pred_cosine_vs_late_no_inj"] = cos_without
+    print(f"  fwd_pred vs post_block3 (with inj):  cosine={cos_with:.4f}")
+    print(f"  fwd_pred vs post_block3 (no inj):    cosine={cos_without:.4f}")
+
+    # --- Save ---
+    tag = "openloop_analysis" if open_loop else "loop_analysis"
+    save_path = os.path.join(model_dir, f"{tag}.json")
+    with open(save_path, "w") as f:
+        json.dump(results, f, indent=2)
+    volume.commit()
+    print(f"\nSaved to {save_path}")
+    return results

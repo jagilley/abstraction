@@ -121,10 +121,10 @@ from language_reduction.experiments.continual_learning.stages import (  # noqa: 
     cl_sequential, cl_sequential_scaled,
 )
 from language_reduction.experiments.a2a_forward.stages import (  # noqa: F401
-    a2a_train,
+    a2a_train, a2a_loop_train,
 )
 from language_reduction.experiments.a2a_forward.analyze import (  # noqa: F401
-    a2a_analyze,
+    a2a_analyze, a2a_loop_analyze,
 )
 
 
@@ -155,6 +155,8 @@ def main(
     fwd_d_head: int = 64,
     fwd_n_head: int = 1,
     fwd_mlp_mult: int = 2,
+    inject_after_block: int = 1,
+    open_loop: bool = False,
 ):
     ms = max_shards if max_shards > 0 else None
 
@@ -510,6 +512,45 @@ def main(
         print(f"  CKA post-attn: {cka['post_attention_fwd_vs_block1']:.4f}")
         print(f"  CKA output: {cka['output_fwd_vs_block1']:.4f}")
 
+    elif stage == "a2a-loop-analyze":
+        result = a2a_loop_analyze.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
+            open_loop=open_loop,
+        )
+        print(f"A2A loop analysis complete:")
+        for k, v in result.items():
+            if isinstance(v, dict):
+                r2 = v.get('r2', v.get('cosine', ''))
+                cos = v.get('cosine', '')
+                print(f"  {k}: R²={r2:.4f}, cos={cos:.4f}" if isinstance(r2, float)
+                      else f"  {k}: {v}")
+            else:
+                print(f"  {k}: {v:.4f}" if isinstance(v, float) else f"  {k}: {v}")
+
+    elif stage == "a2a-loop-train":
+        result = a2a_loop_train.remote(
+            n_tokens=n_tokens, block_size=block_size, n_steps=n_steps, lr=lr,
+            fwd_lr=1e-3,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print(f"A2A closed-loop training complete:")
+        print(f"  best_val_loss={result['best_val_loss']:.4f}")
+        print(f"  final lm_loop={result['final_val_lm_loop']:.4f} "
+              f"lm_base={result['final_val_lm_base']:.4f}")
+        print(f"  final_fwd_cosine={result['final_val_cosine']:.4f}")
+        print(f"  gate_norm={result['final_gate_norm']:.4f}")
+        sm = result.get("selfmap_probe", {})
+        if sm:
+            print(f"  self-map R² with_inj={sm.get('r2_with_injection', 0):.4f} "
+                  f"without={sm.get('r2_without_injection', 0):.4f}")
+
     else:
         print(f"Unknown stage: {stage}")
         print("Available: tokenize, stats, spectral, denoise, vocab-reduce, "
@@ -529,4 +570,5 @@ def main(
               "vo-embedding-eval, vo-contextual-eval, vo-collapse, "
               "vo-recovery, vo-structure, vo-full, "
               "cl-curriculum, cl-finetune, cl-eval, cl-batch, cl-dimensions, "
-              "cl-sequential, cl-scaled, a2a-train, a2a-analyze")
+              "cl-sequential, cl-scaled, a2a-train, a2a-analyze, "
+              "a2a-loop-train, a2a-loop-analyze")
