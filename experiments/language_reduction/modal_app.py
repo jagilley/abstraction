@@ -123,6 +123,9 @@ from language_reduction.experiments.continual_learning.stages import (  # noqa: 
 from language_reduction.experiments.a2a_forward.stages import (  # noqa: F401
     a2a_train,
 )
+from language_reduction.experiments.a2a_forward.analyze import (  # noqa: F401
+    a2a_analyze,
+)
 
 
 @app.local_entrypoint()
@@ -492,6 +495,19 @@ def main(
             a = result["analysis"]
             print(f"  residual-LM correlation={a.get('residual_lm_loss_correlation', 0):.4f}")
 
+    elif stage == "a2a-analyze":
+        result = a2a_analyze.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print(f"A2A analysis complete:")
+        pca = result["residual_pca"]
+        print(f"  Residual effective rank: {pca['effective_rank_entropy']:.1f}")
+        print(f"  Rank for 90%: {pca['rank_90']}, 95%: {pca['rank_95']}")
+        cka = result["cka"]
+        print(f"  CKA post-attn: {cka['post_attention_fwd_vs_block1']:.4f}")
+        print(f"  CKA output: {cka['output_fwd_vs_block1']:.4f}")
+
     else:
         print(f"Unknown stage: {stage}")
         print("Available: tokenize, stats, spectral, denoise, vocab-reduce, "
@@ -511,4 +527,4 @@ def main(
               "vo-embedding-eval, vo-contextual-eval, vo-collapse, "
               "vo-recovery, vo-structure, vo-full, "
               "cl-curriculum, cl-finetune, cl-eval, cl-batch, cl-dimensions, "
-              "cl-sequential, cl-scaled, a2a-train")
+              "cl-sequential, cl-scaled, a2a-train, a2a-analyze")

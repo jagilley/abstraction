@@ -108,11 +108,103 @@ Note: `--fwd-type`, `--predict-from`, `--predict-to`, `--fwd-d-head`, `--fwd-n-h
 
 `model.py` was modified to add `return_intermediates=True` to `GPT.forward()`. When set, it returns a third value: a dict mapping `"post_embed"`, `"post_block0"`, ..., `"post_blockN"` to their activation tensors. This is backward-compatible — existing callers that don't pass the flag get the same `(logits, loss)` tuple.
 
+## Structure analysis (2026-05-25)
+
+**Code**: `analyze.py`
+
+After training, we characterized what the forward model actually learned: is it a learned weight decomposition (like SVD in grokking), or something else?
+
+### The headline: functional equivalence through different parameters
+
+The forward model achieves **near-perfect attention pattern cosine similarity** with block1's heads while having **zero weight cosine similarity** with them. It found a completely different parameterization that produces the same function.
+
+| Block1 head | Attention cosine | KL divergence | Q weight cosine | K weight cosine | V weight cosine |
+|---|---|---|---|---|---|
+| Head 0 | **0.989** | 0.039 | -0.022 | -0.056 | -0.005 |
+| Head 1 | **0.998** | 0.008 | +0.011 | -0.008 | -0.007 |
+| Head 2 | **0.995** | 0.007 | -0.031 | -0.041 | -0.011 |
+| Head 3 | **0.916** | 0.280 | +0.021 | +0.014 | +0.009 |
+
+The single forward model head replicates the attention patterns of heads 0–2 at >0.98 cosine, while all QKV weight cosines are indistinguishable from zero. Head 3 is the outlier (0.916 cosine, 37x higher KL divergence).
+
+Q subspace overlaps are moderate (0.58–0.67), confirming the forward model's projections live in a partially overlapping but rotated subspace relative to each block1 head.
+
+### Why zero weight cosine is expected
+
+Attention has a gauge symmetry: applying the same rotation R to both Q and K projections preserves the attention pattern, since (QR)(KR)^T = QK^T. Similarly, rotations in V are absorbed by the output projection. The forward model landed in a **rotated version of the same functional basin** — orthogonal in parameter space, identical in function space.
+
+This is directly analogous to the cerebellar circuit: the cerebellum builds its own weights (learned via climbing fiber supervised learning) that predict cortical dynamics without copying cortical parameters. The A2A model demonstrates this is achievable — a 330K-param model with different architecture can approximate a much larger model's layer computation with 0.972 cosine fidelity through entirely different weights.
+
+### The residual is full-rank and diffuse
+
+| Threshold | Rank (of 256) |
+|---|---|
+| 50% variance | 62 |
+| 75% variance | 128 |
+| 90% variance | 189 |
+| 95% variance | 217 |
+| 99% variance | 247 |
+| Effective rank (entropy) | **199.8** |
+
+Top-1 PC explains only 2.4%, top-5 explain 9.3%, top-10 explain 15.8%. The "missed computation" is spread uniformly across all dimensions — the forward model is slightly worse everywhere, not completely missing specific sub-circuits.
+
+This is the **opposite** of the grokking case (where SVD captured a low-rank Fourier solution). In language, the capacity bottleneck binds uniformly. The forward model hasn't learned "what mechanisms block1 uses" in a decomposition sense. It's learned to *be* a miniature block1 — same function, different weights, slightly lower fidelity everywhere.
+
+![Structure analysis](structure_analysis.png)
+*Row 1: Residual PCA (cumulative variance, SV spectrum, top PCs by position). Row 2: CKA alignment, attention pattern similarity, QKV weight comparison. Row 3: Residual conditioned on token frequency, position, and LM loss quartile.*
+
+### CKA confirms geometric equivalence
+
+| Comparison | CKA |
+|---|---|
+| Post-attention (fwd vs block1) | **0.980** |
+| Final output (fwd vs block1) | **0.982** |
+| Input → fwd output | 0.752 |
+| Input → block1 output | 0.740 |
+
+The forward model and block1 organize information nearly identically in activation space (CKA > 0.98). Both transform the input by similar amounts (CKA to input ~0.74–0.75), confirming the forward model applies a transformation of comparable magnitude, not a shallow approximation.
+
+### Residual correlates with token frequency, not prediction difficulty
+
+| Token frequency | Mean residual norm | Count |
+|---|---|---|
+| <1e-6 | 0.932 | 3,227 |
+| 1e-6–1e-5 | 0.923 | 42,424 |
+| 1e-5–1e-4 | 0.904 | 98,959 |
+| 1e-4–1e-3 | 0.878 | 97,033 |
+| 1e-3–1e-2 | 0.799 | 68,586 |
+| >1e-2 | 0.763 | 99,371 |
+
+| LM loss quartile | Mean residual norm |
+|---|---|
+| Q1 (low loss) | 0.863 |
+| Q2 | 0.851 |
+| Q3 | 0.837 |
+| Q4 (high loss) | 0.844 |
+
+The residual has a clear monotonic gradient by token frequency (rare tokens: 0.93, common: 0.76) but is essentially flat across LM loss quartiles (0.84–0.86). The forward model's error reflects **training exposure** (it learned common tokens' computations better because it saw them more), not computational complexity.
+
+### Why the forward model can use different weights
+
+Two factors explain why the forward model finds a novel parameterization:
+
+1. **Separation of concerns**: Block1's weights must encode both knowledge about language (what patterns exist) and a computational strategy (how to transform representations). The forward model's input (post_block0) already encodes the language knowledge. The forward model only needs to learn the *transformation*, not the data. Less to encode → more parametric freedom → a different, potentially more efficient parameterization.
+
+2. **Rotation symmetry**: Attention's gauge symmetry (QR · (KR)^T = Q · K^T) means many weight configurations implement the same function. Different training objectives (MSE on activations vs end-to-end LM loss) navigate different parts of the loss landscape but can converge on functionally equivalent solutions related by rotation.
+
+### Implication for self-regulation
+
+In grokking, SVD residuals detected collapse because the Fourier solution is low-rank — structural drift shows up as a change in the low-rank approximation. In language, the residual is full-rank and diffuse, so a simple MSE penalty would regularize all dimensions equally. This might still work for preventing general drift (as the grokking rank-128 ablation showed — even full-rank references prevent collapse when the checkpoint is clean), but it wouldn't selectively target specific mechanisms.
+
+The head 3 gap (0.916 vs >0.98) is the most natural place to look for mechanism-specific structure. Whatever head 3 does that the forward model can't replicate with a single compressed head may represent the genuinely "novel" computation a cerebellar-style monitor would be most informative about.
+
+**Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-analyze --n-tokens 10000000`
+
 ## Next steps
 
-1. **Wider layer gaps**: predict post_block0 → post_block3 (3 layers) or post_embed → post_block3 (full model). More computation to approximate = harder capacity bottleneck = richer residual.
-2. **Feedback loop**: feed the forward model's predictions back into the main model's residual stream. The idea doc describes injecting at each recurrence step (for looped transformers) or at intermediate layers.
-3. **Residual analysis**: characterize what the residual captures — does it correlate with token frequency, sequence position patterns, or specific attention head behaviors? The current per-position correlation with LM loss is near zero, but there may be structure in the residual's *direction* rather than its norm.
+1. **Head 3 investigation**: what does head 3 attend to that the forward model can't capture? This is the most distinctive computation and likely the richest source of novelty signal.
+2. **Wider layer gaps**: predict post_block0 → post_block3 (3 layers) or post_embed → post_block3 (full model). More computation to approximate = harder capacity bottleneck = richer residual.
+3. **Feedback loop**: feed the forward model's predictions back into the main model's residual stream. The idea doc describes injecting at each recurrence step (for looped transformers) or at intermediate layers.
 4. **Self-regulation**: freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
 5. **Scaling**: try on larger models (more layers, wider) where the capacity gap between main and forward model is more pronounced.
 

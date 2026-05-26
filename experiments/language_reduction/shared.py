@@ -15,6 +15,7 @@ image = (
         "torch==2.7.0",
         "transformers",
         "huggingface-hub",
+        "matplotlib",
     )
     .add_local_python_source("language_reduction")
 )
