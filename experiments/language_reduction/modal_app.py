@@ -151,6 +151,7 @@ def main(
     fwd_type: str = "transformer",
     predict_from: str = "post_block0",
     predict_to: str = "post_block1",
+    fwd_n_layer: int = 1,
     fwd_d_head: int = 64,
     fwd_n_head: int = 1,
     fwd_mlp_mult: int = 2,
@@ -485,6 +486,7 @@ def main(
         result = a2a_train.remote(
             n_tokens=n_tokens, block_size=block_size, n_steps=n_steps, lr=lr,
             fwd_type=fwd_type, predict_from=predict_from, predict_to=predict_to,
+            fwd_n_layer=fwd_n_layer,
             fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
         )
         print(f"A2A training complete:")

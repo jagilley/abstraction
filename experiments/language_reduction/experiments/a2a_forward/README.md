@@ -200,6 +200,24 @@ The head 3 gap (0.916 vs >0.98) is the most natural place to look for mechanism-
 
 **Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-analyze --n-tokens 10000000`
 
+### Run 3: 2-layer transformer forward model, 3-layer gap (2026-05-25)
+
+A 2-layer transformer (1 head/layer, 64-dim, 660K params) predicting post_block0 → post_block3 (3 main model layers).
+
+| Metric | 1L fwd, 1-layer gap | 2L fwd, 3-layer gap |
+|---|---|---|
+| Forward model params | 330K | 660K |
+| Final cosine sim | 0.972 | 0.935 |
+| Final MSE | 0.003 | 0.015 |
+| Residual norm | 0.85 | 1.93 |
+| Residual-LM corr | -0.05 | -0.03 |
+
+Despite doubling the forward model's parameters, cosine dropped from 0.972 to 0.935 — the 3-layer gap is genuinely harder to approximate. MSE bottomed at 0.013 (step ~4400) then climbed back to 0.015 by step 10K as the main model continued learning computation the forward model couldn't track. The main model also overfit during training (train LM loss 4.5 vs val 5.2), and the forward model's rising MSE tracked this divergence.
+
+Residual-LM correlation remains near zero (-0.03), consistent with the 1-layer result: forward model errors reflect capacity limits, not prediction difficulty.
+
+**Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-train --n-tokens 10000000 --n-steps 10000 --fwd-n-layer 2 --predict-from post_block0 --predict-to post_block3`
+
 ## Next steps
 
 1. **Head 3 investigation**: what does head 3 attend to that the forward model can't capture? This is the most distinctive computation and likely the richest source of novelty signal.

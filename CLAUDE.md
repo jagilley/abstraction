@@ -45,7 +45,7 @@ Reading, ideas, beliefs, and conversations are shared across projects. Experimen
 - Read `conversations/claude-code-transcripts/INDEX.md` first to find the relevant session, then read the specific `readable/<session>.md` file.
 
 ## Notes
-- Please don't use Explore subagents. These use Claude Haiku, which is too small of a model to be useful. Opt for Sonnet or Opus explore agents/subagents instead.
+- Please don't use Explore subagents. These use Claude Haiku, which is too small of a model to be useful. Opt for Sonnet or Opus explore agents/subagents instead if you like, but for short tasks often nothing beats just looking at the data/code yourself.
 
 ## Quotes
 

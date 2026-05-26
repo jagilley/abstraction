@@ -1,7 +1,7 @@
 """Forward models (cerebellum analog) for predicting transformer activations.
 
 ForwardModel: per-position MLP. Structurally blind to cross-position effects.
-TransformerForwardModel: small 1-layer transformer. Capacity-bottlenecked, not
+TransformerForwardModel: small transformer. Capacity-bottlenecked, not
 position-blind — the residual captures computational novelty, not attention's
 existence. Architecture mirrors the cerebellar circuit:
   - Causal attention with compressed projections (pontine relay)
@@ -32,11 +32,9 @@ class ForwardModel(nn.Module):
         return self.net(x)
 
 
-class TransformerForwardModel(nn.Module):
-    def __init__(self, d_model: int, d_head: int = 64, n_head: int = 1,
-                 mlp_mult: int = 2, block_size: int = 128):
+class ForwardBlock(nn.Module):
+    def __init__(self, d_model: int, d_head: int, n_head: int, mlp_mult: int):
         super().__init__()
-        self.d_model = d_model
         self.d_head = d_head
         self.n_head = n_head
 
@@ -54,19 +52,7 @@ class TransformerForwardModel(nn.Module):
             nn.Linear(mlp_hidden, d_model),
         )
 
-        self.register_buffer(
-            "causal_mask",
-            torch.tril(torch.ones(block_size, block_size)).view(
-                1, 1, block_size, block_size
-            ),
-        )
-
-        n_params = sum(p.numel() for p in self.parameters())
-        print(f"TransformerForwardModel: {n_params/1e3:.1f}K parameters "
-              f"(d_model={d_model}, d_head={d_head}, n_head={n_head}, "
-              f"mlp_hidden={mlp_hidden})")
-
-    def forward(self, x):
+    def forward(self, x, causal_mask):
         B, T, C = x.size()
 
         h = self.ln1(x)
@@ -75,11 +61,40 @@ class TransformerForwardModel(nn.Module):
         v = self.v_proj(h).view(B, T, self.n_head, self.d_head).transpose(1, 2)
 
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(self.d_head))
-        att = att.masked_fill(self.causal_mask[:, :, :T, :T] == 0, float("-inf"))
+        att = att.masked_fill(causal_mask[:, :, :T, :T] == 0, float("-inf"))
         att = F.softmax(att, dim=-1)
         y = att @ v
         y = y.transpose(1, 2).contiguous().view(B, T, self.d_head * self.n_head)
         x = x + self.out_proj(y)
 
         x = x + self.mlp(self.ln2(x))
+        return x
+
+
+class TransformerForwardModel(nn.Module):
+    def __init__(self, d_model: int, d_head: int = 64, n_head: int = 1,
+                 n_layer: int = 1, mlp_mult: int = 2, block_size: int = 128):
+        super().__init__()
+        self.d_model = d_model
+
+        self.register_buffer(
+            "causal_mask",
+            torch.tril(torch.ones(block_size, block_size)).view(
+                1, 1, block_size, block_size
+            ),
+        )
+
+        self.blocks = nn.ModuleList([
+            ForwardBlock(d_model, d_head, n_head, mlp_mult)
+            for _ in range(n_layer)
+        ])
+
+        n_params = sum(p.numel() for p in self.parameters())
+        print(f"TransformerForwardModel: {n_params/1e3:.1f}K parameters "
+              f"(d_model={d_model}, d_head={d_head}, n_head={n_head}, "
+              f"n_layer={n_layer}, mlp_hidden={d_model * mlp_mult})")
+
+    def forward(self, x):
+        for block in self.blocks:
+            x = block(x, self.causal_mask)
         return x

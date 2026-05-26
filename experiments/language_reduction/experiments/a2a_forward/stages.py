@@ -33,6 +33,7 @@ def a2a_train(
     predict_from: str = "post_block0",
     predict_to: str = "post_block1",
     fwd_type: str = "transformer",
+    fwd_n_layer: int = 1,
     fwd_d_head: int = 64,
     fwd_n_head: int = 1,
     fwd_mlp_mult: int = 2,
@@ -80,7 +81,7 @@ def a2a_train(
     if fwd_type == "transformer":
         fwd_model = TransformerForwardModel(
             d_model=n_embd, d_head=fwd_d_head, n_head=fwd_n_head,
-            mlp_mult=fwd_mlp_mult, block_size=block_size,
+            n_layer=fwd_n_layer, mlp_mult=fwd_mlp_mult, block_size=block_size,
         ).to(device)
     else:
         fwd_model = ForwardModel(n_embd, hidden_mult=fwd_mlp_mult).to(device)
@@ -193,7 +194,8 @@ def a2a_train(
             print(f"  {k}: {v:.4f}")
 
     # --- Save ---
-    save_dir = f"{DATA_DIR}/a2a_forward/{fwd_type}/P_{n_tokens}"
+    gap_tag = f"{predict_from}_to_{predict_to}"
+    save_dir = f"{DATA_DIR}/a2a_forward/{fwd_type}_L{fwd_n_layer}/{gap_tag}/P_{n_tokens}"
     os.makedirs(save_dir, exist_ok=True)
     torch.save(model.state_dict(), os.path.join(save_dir, "model.pt"))
     torch.save(fwd_model.state_dict(), os.path.join(save_dir, "fwd_model.pt"))
@@ -203,6 +205,7 @@ def a2a_train(
         "n_layer": n_layer, "n_head": n_head, "n_embd": n_embd,
         "predict_from": predict_from, "predict_to": predict_to,
         "fwd_type": fwd_type,
+        "fwd_n_layer": fwd_n_layer,
         "fwd_d_head": fwd_d_head, "fwd_n_head": fwd_n_head,
         "fwd_mlp_mult": fwd_mlp_mult,
         "best_val_loss": best_val_loss,
