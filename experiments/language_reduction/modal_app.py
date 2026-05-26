@@ -126,6 +126,12 @@ from language_reduction.experiments.a2a_forward.stages import (  # noqa: F401
 from language_reduction.experiments.a2a_forward.analyze import (  # noqa: F401
     a2a_analyze, a2a_loop_analyze,
 )
+from language_reduction.experiments.a2a_forward.behavioral_residual import (  # noqa: F401
+    a2a_behavioral_residual,
+)
+from language_reduction.experiments.a2a_forward.causal_substitution import (  # noqa: F401
+    a2a_causal_substitution,
+)
 
 
 @app.local_entrypoint()
@@ -512,6 +518,23 @@ def main(
         print(f"  CKA post-attn: {cka['post_attention_fwd_vs_block1']:.4f}")
         print(f"  CKA output: {cka['output_fwd_vs_block1']:.4f}")
 
+    elif stage == "a2a-behavioral-residual":
+        result = a2a_behavioral_residual.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A behavioral residual analysis complete:")
+        corr = result["F_correlations"]
+        print(f"  r(attn entropy, residual):   {corr['attn_entropy_vs_residual']:+.4f}")
+        print(f"  r(block1 contrib, residual): {corr['block1_contrib_vs_residual']:+.4f}")
+        print(f"  r(LM loss, residual):        {corr['lm_loss_vs_residual']:+.4f}")
+        print(f"  r(dist dominant, residual):  {corr['dist_dominant_vs_residual']:+.4f}")
+        for section in ["A_attention_categories", "B_syntactic_categories",
+                        "C_prediction_difficulty", "D_context_integration"]:
+            print(f"  {section}:")
+            for cat, stats in result[section].items():
+                print(f"    {cat}: mean={stats['mean']:.4f}, d={stats['cohen_d']:+.3f}")
+
     elif stage == "a2a-loop-analyze":
         result = a2a_loop_analyze.remote(
             n_tokens=n_tokens, block_size=block_size,
@@ -551,6 +574,22 @@ def main(
             print(f"  self-map R² with_inj={sm.get('r2_with_injection', 0):.4f} "
                   f"without={sm.get('r2_without_injection', 0):.4f}")
 
+    elif stage == "a2a-causal-sub":
+        result = a2a_causal_substitution.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A causal substitution analysis complete:")
+        ov = result["overall"]
+        print(f"  KL_sub={ov['kl_sub']:.4f}  KL_abl={ov['kl_abl']:.4f}")
+        print(f"  ΔCE_sub={ov['delta_ce_sub']:+.4f}  ΔCE_abl={ov['delta_ce_abl']:+.4f}")
+        print(f"  Acc_normal={ov['acc_normal']:.4f}  Acc_sub={ov['acc_sub']:.4f}  "
+              f"Acc_abl={ov['acc_abl']:.4f}")
+        print("  Per category (KL_sub / KL_abl):")
+        for cat, stats in result["per_category"].items():
+            if stats["n"] > 0:
+                print(f"    {cat:20s}: {stats['kl_sub']:.4f} / {stats['kl_abl']:.4f}")
+
     else:
         print(f"Unknown stage: {stage}")
         print("Available: tokenize, stats, spectral, denoise, vocab-reduce, "
@@ -571,4 +610,5 @@ def main(
               "vo-recovery, vo-structure, vo-full, "
               "cl-curriculum, cl-finetune, cl-eval, cl-batch, cl-dimensions, "
               "cl-sequential, cl-scaled, a2a-train, a2a-analyze, "
-              "a2a-loop-train, a2a-loop-analyze")
+              "a2a-loop-train, a2a-loop-analyze, a2a-causal-sub, "
+              "a2a-behavioral-residual")

@@ -72,7 +72,12 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 |---|---|
 | `forward_model.py` | `ForwardModel` (per-position MLP) and `TransformerForwardModel` (1-layer transformer) |
 | `stages.py` | Modal stage `a2a_train` — co-training loop with eval and analysis |
+| `analyze.py` | Structure analysis: PCA, CKA, attention pattern comparison, weight-space comparison |
+| `causal_substitution.py` | Causal substitution: replace block1 with forward model, measure per-behavior degradation |
+| `behavioral_residual.py` | Behavior-conditioned residual analysis: attention, syntactic, difficulty, context integration categories |
 | `README.md` | This file |
+
+**Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
 ## Modal volume
 
@@ -217,6 +222,82 @@ Despite doubling the forward model's parameters, cosine dropped from 0.972 to 0.
 Residual-LM correlation remains near zero (-0.03), consistent with the 1-layer result: forward model errors reflect capacity limits, not prediction difficulty.
 
 **Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-train --n-tokens 10000000 --n-steps 10000 --fwd-n-layer 2 --predict-from post_block0 --predict-to post_block3`
+
+### Causal substitution: replacing block1 with the forward model (2026-05-26)
+
+**Code**: `causal_substitution.py`
+
+How much does the model lose when we swap block1's actual output for the forward model's prediction, then continue the forward pass from block2 onward? This is a causal test — if the substitution is harmless, the forward model truly captures block1's computation. If specific behaviors break, the residual captures those specific mechanisms.
+
+Three modes: **Normal** (unmodified), **Substituted** (forward model replaces block1), **Ablated** (skip block1 entirely, output = input).
+
+| Mode | Accuracy | ΔCE vs Normal | KL vs Normal |
+|---|---|---|---|
+| Normal | 0.222 | — | — |
+| Substituted | 0.217 | +0.043 | 0.062 |
+| Ablated | 0.146 | +0.965 | 1.094 |
+
+The forward model recovers ~94% of block1's KL contribution. Ablating block1 entirely destroys 7.6pp of accuracy; substituting costs only 0.5pp.
+
+**Per-behavior breakdown**: degradation is strikingly uniform across behavioral categories.
+
+| Category | n | KL (sub) | KL (abl) | ΔCE (sub) | ΔAcc (sub) |
+|---|---|---|---|---|---|
+| Punctuation | 51,753 | 0.067 | 1.086 | +0.066 | -0.015 |
+| Bracket closing | 9,311 | 0.055 | 0.991 | +0.074 | -0.016 |
+| Repeated token (induction) | 69,338 | 0.064 | 1.075 | +0.028 | -0.005 |
+| High confidence (>0.5) | 32,487 | 0.041 | 1.275 | +0.069 | -0.008 |
+| Low confidence (<0.1) | 302,129 | 0.065 | 1.075 | +0.031 | +0.002 |
+| Content word (rare) | 2,246 | 0.065 | 1.155 | +0.026 | -0.001 |
+| Function word (common) | 303,983 | 0.062 | 1.088 | +0.047 | -0.007 |
+
+KL_sub ranges 0.04–0.07 across all categories — no behavior-specific catastrophic failure. The forward model is "slightly worse everywhere," consistent with the full-rank/diffuse residual structure. One slight signal: high-confidence predictions have the lowest KL_sub (0.041) but the highest KL_abl (1.275), meaning block1 matters most for confident predictions, and the forward model captures those best.
+
+**Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-causal-sub --n-tokens 10000000`
+
+### Behavior-conditioned residual analysis (2026-05-26)
+
+**Code**: `behavioral_residual.py`
+
+The structure analysis (Run 2) showed the residual correlates with token frequency but is flat across LM loss quartiles. But does the residual have structure when conditioned on *behavioral* context — what kind of computation block1 is doing?
+
+We categorize each token position by attention pattern, syntactic context, prediction difficulty, context integration, and block1 contribution magnitude, then measure residual norm statistics per category.
+
+**Strongest effects (Cohen's d vs overall mean):**
+
+| Category | Mean residual | Cohen's d | n |
+|---|---|---|---|
+| Before closer | 0.973 | **+0.84** | 1,924 |
+| Sentence start | 0.724 | **-0.85** | 16,754 |
+| After punctuation | 0.757 | **-0.62** | 36,665 |
+| After opener | 0.939 | **+0.62** | 3,531 |
+| Focused attention (max>0.5) | 0.758 | **-0.61** | 58,808 |
+| Block1 contrib Q4 (large) | 0.907 | +0.40 | 101,601 |
+| Block1 contrib Q1 (small) | 0.794 | -0.37 | 101,600 |
+| Distant attention (>10 back) | 0.874 | +0.18 | 63,512 |
+| Distributed attention (high entropy) | 0.869 | +0.14 | 202,947 |
+
+The residual has clear behavioral structure. The forward model struggles most before closing delimiters (d=+0.84) and after opening ones (d=+0.62) — exactly the kind of computation requiring long-range context (matching the opener). It handles sentence starts (d=-0.85) and focused attention (d=-0.61) easily — simple, local computations.
+
+**Prediction difficulty is NOT what drives the residual.** Easy vs hard predictions (d=+0.10 vs d=-0.03) and high vs low output entropy (d=-0.07 vs d=+0.07) show negligible effects. The residual reflects *computational complexity*, not *task difficulty*.
+
+**Key correlations:**
+
+| Correlation | Pearson r |
+|---|---|
+| Block1 contrib norm vs residual | +0.256 |
+| Distance to dominant attended token vs residual | +0.256 |
+| Attention entropy vs residual | +0.186 |
+| **Attention entropy vs residual/block1_contrib** | **+0.332** |
+| LM loss vs residual | -0.049 |
+| Output entropy vs residual | -0.124 |
+| LM loss vs residual/block1_contrib | -0.027 |
+
+The ratio correlation (r=+0.33) is the key result: even controlling for how much computation block1 does, the forward model fails *disproportionately* on distributed attention patterns. With only 1 compressed head (64-dim), the forward model specifically struggles with multi-source attention integration — it can match focused, single-source computations but not the complex mixing of multiple context positions.
+
+**What the residual captures**: The residual is not "noise" or a training frequency artifact. It reflects a specific capacity bottleneck: the forward model's single compressed attention head cannot fully represent computations that integrate information from multiple distant positions. This is most pronounced for delimiter tracking (matching openers to closers) and least pronounced for local/focused computations (previous token, sentence boundaries). The residual is a genuine signal of *computational novelty* — where the main model does something structurally beyond the forward model's capacity.
+
+**Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-behavioral-residual --n-tokens 10000000`
 
 ## Run 4: Closed-loop cerebellar training (2026-05-25)
 
