@@ -132,6 +132,18 @@ from language_reduction.experiments.a2a_forward.analyze import (  # noqa: F401
 from language_reduction.experiments.a2a_forward.behavioral_residual import (  # noqa: F401
     a2a_behavioral_residual,
 )
+from language_reduction.experiments.a2a_forward.novelty_probe import (  # noqa: F401
+    a2a_novelty_probe,
+)
+from language_reduction.experiments.a2a_forward.novelty_steer import (  # noqa: F401
+    a2a_novelty_steer,
+)
+from language_reduction.experiments.a2a_forward.injection_help import (  # noqa: F401
+    a2a_injection_help,
+)
+from language_reduction.experiments.a2a_forward.injection_help_structural import (  # noqa: F401
+    a2a_injection_help_structural,
+)
 from language_reduction.experiments.a2a_forward.causal_substitution import (  # noqa: F401
     a2a_causal_substitution,
 )
@@ -537,6 +549,88 @@ def main(
             print(f"  {section}:")
             for cat, stats in result[section].items():
                 print(f"    {cat}: mean={stats['mean']:.4f}, d={stats['cohen_d']:+.3f}")
+
+    elif stage == "a2a-novelty-probe":
+        result = a2a_novelty_probe.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A novelty probe complete:")
+        print("  AUC (open / closed / Δ) by category and layer:")
+        for cat, layers in result["auc"].items():
+            for lk, v in layers.items():
+                print(f"    {cat:>16s} {lk:>12s}: "
+                      f"{v['open_loop']:.4f} / {v['closed_loop']:.4f} / "
+                      f"{v['delta']:+.4f}")
+        print("  Linear probe R² (open / closed / Δ):")
+        for tgt, layers in result["scalar"].items():
+            for lk, v in layers.items():
+                print(f"    {tgt:>20s} {lk:>12s}: "
+                      f"{v['open_loop']['r2']:.4f} / {v['closed_loop']['r2']:.4f} / "
+                      f"{v['delta_r2']:+.4f}")
+
+    elif stage == "a2a-injection-help":
+        result = a2a_injection_help.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A injection-help analysis complete:")
+        print(f"  mean help (Δloss) = {result['mean_help']:+.5f}")
+        print(f"  corr(help, novelty) no-inj   = "
+              f"{result['corr_help_vs_residual_no_inj']:+.4f}")
+        print(f"  corr(help, novelty) with-inj = "
+              f"{result['corr_help_vs_residual_with_inj']:+.4f}")
+        print("  help by novelty quartile (abs / rel / base_loss):")
+        for k, v in result["help_by_novelty_quartile"].items():
+            print(f"    {k:>20s}: {v['mean_help']:+.5f} / {v['mean_rel_help']:+.4f}"
+                  f" / {v['mean_baseline_loss']:.3f}")
+        lc = result["loss_controlled"]
+        print(f"  loss-controlled: within-bin corr(help,novelty)="
+              f"{lc['stratified_corr_help_vs_novelty']:+.4f}, "
+              f"help Q4-Q1={lc['stratified_help_Q4_minus_Q1']:+.5f} "
+              f"(raw {lc['raw_help_Q4_minus_Q1']:+.5f})")
+
+    elif stage == "a2a-injection-help-structural":
+        result = a2a_injection_help_structural.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A structural injection-help complete:")
+        h = result["headline"]
+        print(f"  corr(help, norm) = {result['corr_help_vs_residual_norm']:+.4f}")
+        print(f"  eta² direction-clusters={h['cluster_eta2']:.4f}  "
+              f"norm-octiles={h['norm_octile_eta2']:.4f}  "
+              f"(structure>magnitude: {h['structure_beats_magnitude']})")
+        print("  help by attention distance:")
+        for k, v in result["help_by_attention_distance"].items():
+            print(f"    {k:>18s}: {v['mean_help']:+.5f}  (norm {v['mean_norm']:.3f})")
+        lr = result["longrange_vs_local_help"]
+        print(f"  long-range vs local help: within-decile={lr['within_norm_decile']:+.5f}"
+              f"  raw={lr['raw']:+.5f}")
+
+    elif stage == "a2a-novelty-steer":
+        result = a2a_novelty_steer.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A novelty steering complete:")
+        print(f"  corr(reliance, residual_norm) at s=0: "
+              f"{result['reliance_vs_residual_corr_at_s0']:+.4f}")
+        print("  Slope dR/ds (ΔKL per std of steering):")
+        for k, v in result["slopes"].items():
+            print(f"    {k:>16s}: {v:+.5f}")
 
     elif stage == "a2a-loop-analyze":
         result = a2a_loop_analyze.remote(

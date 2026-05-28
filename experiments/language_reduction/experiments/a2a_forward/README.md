@@ -335,6 +335,48 @@ Froze the main model and trained forward models at 5 capacity points (1% to 22% 
 
 **Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-scaling-sweep --n-tokens 10000000 --n-steps 10000 --predict-from post_block0 --predict-to post_block3`
 
+## Why activation predictions help LM loss, and why co-training must produce self-knowledge (speculative, not entirely verified yet)
+
+### Why predictions help
+
+The forward model predicts post_block3 from post_block0, and that prediction is injected after block1. Before blocks 2-3 have computed anything, the model receives an approximate preview of where its own computation is going to end up.
+
+This is useful because it lets the model allocate its remaining capacity differently. Without the prediction, blocks 2-3 have to do everything — both the predictable, routine components of the computation and the hard, input-specific components. With the prediction, the predictable components are partially pre-computed (cheaply, by the ~1% forward model). Blocks 2-3 can specialize on whatever the forward model *couldn't* capture — the genuinely hard part.
+
+This is a division of labor. The forward model handles the expected trajectory; the remaining layers handle the deviation from expectation. Since the forward model is cheap and the main model's layers are expensive, this is a good trade — you're getting the predictable part of the computation almost for free.
+
+### Why co-training must produce novelty awareness
+
+The prediction is imperfect (cosine 0.935, not 1.0). At some positions it's excellent, at others it's wrong. The model receives this prediction as an input and has to decide what to do with it at every position. There are three strategies:
+
+1. Always trust the prediction → hurts on positions where it's wrong
+2. Always ignore the prediction → wastes the information where it's right
+3. Trust it when it's good, override when it's bad → optimal, but requires *knowing which case you're in*
+
+Strategy 3 is the only one that minimizes NTP loss, and it's the one the gradient will push toward. But strategy 3 requires an internal representation of *prediction quality at this position* — a signal that says "the prediction I received is reliable here" versus "it's unreliable here, compute harder."
+
+That signal is exactly the novelty signal. Positions where the forward model's prediction matches the main model's actual computation are low-novelty (trust the prediction). Positions where they diverge are high-novelty (override). The model must learn to represent this discrepancy to use the prediction optimally.
+
+### This isn't optional — it's forced by the NTP gradient
+
+The gate opened wide and never saturated (0.08 → 3.03). The model found the prediction useful and kept increasing its reliance on it. But increasing reliance on an imperfect prediction creates increasing pressure to know *where* it's imperfect. The more you trust the prediction, the more it costs you when the prediction is wrong, and the stronger the gradient signal toward representing prediction quality.
+
+There's a positive feedback loop: use the prediction more → need better novelty awareness to avoid errors → develop richer self-representations → which enable even more targeted use of the prediction → which enables relying on it even more. The gate growth and the novelty awareness growth should be coupled, and the probe results (R²=0.44 closed-loop vs 0.28 open-loop) are consistent with this — the model that actually uses the prediction develops substantially richer representations of prediction quality.
+
+### Why novelty awareness becomes a self-map rather than just a scalar quality signal
+
+Because "the prediction was wrong" is less useful for NTP than "the prediction was wrong *because this position requires distributed attention that the forward model can't capture*." The more structured the novelty representation, the more precisely the model can redirect its computation to compensate.
+
+The behavioral residual results show the residual has clear structure — it's large before closing delimiters, small at sentence starts, correlated with attention entropy. If the model can represent not just *that* the prediction failed but *how* it failed (what kind of computation was missed), it can allocate its remaining layers' capacity more precisely to exactly the kind of computation the forward model dropped.
+
+So the NTP gradient doesn't just push toward "know whether the prediction is good." It pushes toward "know *what's missing* from the prediction." And representing what's missing from a prediction of your own activations is representing your own computational structure — which is the self-map.
+
+### The whole argument in a paragraph
+
+A model that receives predictions about its own future computation, and is trained on NTP, is under direct gradient pressure to evaluate those predictions — trusting them when accurate (saving compute) and overriding them when wrong (avoiding errors). The optimal evaluation is not a scalar quality estimate but a structured representation of *what the prediction captures and what it misses*, because this enables the model to precisely target its remaining capacity at the missing components. This structured evaluation is, by definition, a representation of the model's own computational states — which components are predictable from low-capacity approximation and which require full computation. That's the self-map. It emerges not as a side effect but as the loss-minimizing strategy for any model learning to use imperfect predictions about itself.
+
+**Self-knowledge is the optimal solution to the credit assignment problem of "when to trust a cheap approximation of your own computation."** You get it for free from NTP the moment you close the loop.
+
 ## Next steps
 
 1. **Closed-loop with 10% forward model**: The scaling sweep shows the 10% model saturates on the main model's computation. Running closed-loop with this model (instead of the 2.7% model from Run 4) tests whether a better prediction produces larger LM improvement — directly testing whether the prediction or the residual is the load-bearing signal.
@@ -342,5 +384,6 @@ Froze the main model and trained forward models at 5 capacity points (1% to 22% 
 3. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free.
 4. **Controlled comparison**: Retrain open-loop and closed-loop with identical lr/seed to eliminate the training quality confound from the Run 4 probe comparison.
 5. **Self-regulation**: Freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
+6. **Wake-sleep consolidation**: The closed-loop model relies on the injection at inference time — removing it degrades performance. The brain solves this by alternating regimes: during waking, the cerebellar loop is active; during sleep, the cortex consolidates via offline replay without real-time cerebellar correction. The engineering analog: interleave closed-loop training (with injection) and open-loop training (without injection). The open-loop phases provide direct gradient pressure for the main model to internalize the predicted computation into its own weights. Could also anneal injection strength over a cycle (full → gradual reduction → none → re-introduce) to mimic wake-sleep alternation. Test: train closed-loop for N steps, then open-loop for M steps, check whether the model retains the closed-loop benefit.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
