@@ -123,6 +123,9 @@ from language_reduction.experiments.continual_learning.stages import (  # noqa: 
 from language_reduction.experiments.a2a_forward.stages import (  # noqa: F401
     a2a_train, a2a_loop_train,
 )
+from language_reduction.experiments.a2a_forward.scaling_sweep import (  # noqa: F401
+    a2a_scaling_sweep,
+)
 from language_reduction.experiments.a2a_forward.analyze import (  # noqa: F401
     a2a_analyze, a2a_loop_analyze,
 )
@@ -590,6 +593,25 @@ def main(
             if stats["n"] > 0:
                 print(f"    {cat:20s}: {stats['kl_sub']:.4f} / {stats['kl_abl']:.4f}")
 
+    elif stage == "a2a-scaling-sweep":
+        result = a2a_scaling_sweep.remote(
+            n_tokens=n_tokens, block_size=block_size, n_steps=n_steps,
+            predict_from=predict_from, predict_to=predict_to,
+        )
+        print("A2A scaling sweep complete:")
+        mm = result["main_model"]
+        print(f"  Main model: {mm['n_params']:,} params, "
+              f"best_val_loss={mm['best_val_loss']:.4f}")
+        print(f"  {'Config':>8s} {'Ratio':>7s} {'r(res,LM)':>10s} "
+              f"{'EffRank':>8s} {'d_SS':>6s} {'d_BC':>6s}")
+        for c in result["configs"]:
+            print(f"  {c['config_name']:>8s} "
+                  f"{c['capacity_ratio']:>6.1%} "
+                  f"{c['residual_lm_loss_correlation']:>+10.4f} "
+                  f"{c['residual_pca']['effective_rank']:>8.1f} "
+                  f"{c['behavioral_effects']['cohen_d_sentence_start']:>+6.3f} "
+                  f"{c['behavioral_effects']['cohen_d_before_closer']:>+6.3f}")
+
     else:
         print(f"Unknown stage: {stage}")
         print("Available: tokenize, stats, spectral, denoise, vocab-reduce, "
@@ -611,4 +633,4 @@ def main(
               "cl-curriculum, cl-finetune, cl-eval, cl-batch, cl-dimensions, "
               "cl-sequential, cl-scaled, a2a-train, a2a-analyze, "
               "a2a-loop-train, a2a-loop-analyze, a2a-causal-sub, "
-              "a2a-behavioral-residual")
+              "a2a-behavioral-residual, a2a-scaling-sweep")

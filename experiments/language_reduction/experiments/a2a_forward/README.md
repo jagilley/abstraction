@@ -317,13 +317,30 @@ Closed the cerebellar loop: the 2-layer forward model's predictions (post_block0
 
 **Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-loop-train --n-tokens 10000000 --n-steps 10000 --lr 3e-4 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
 
+## Run 5: Forward model capacity scaling sweep (2026-05-28)
+
+**Full writeup**: [SCALING_SWEEP_README.md](SCALING_SWEEP_README.md)
+
+Froze the main model and trained forward models at 5 capacity points (1% to 22% of main model) on the same frozen activations, all predicting post_block0 → post_block3. Tests the bias-to-variance transition: does the residual shift from capturing computational novelty to epistemic novelty as capacity increases?
+
+**Key results**:
+
+1. **The forward model saturates at ~10% capacity**: Both 10% (3.2M params) and 22% (6.3M params) reach cosine 0.999 with identical residual norms. The capacity-sufficient regime begins around 10%, consistent with the main model's transformer blocks being only ~2.4M params.
+
+2. **Computational novelty effects shrink**: Delimiter tracking (d_BC) drops from +0.78 at 1% to +0.30 at 10%. Sentence-start effects (d_SS) drop from -0.58 to -0.37. The bias term is shrinking as predicted.
+
+3. **r(res,LM) stays at zero — but this is the wrong metric**: The residual-LM loss correlation never becomes positive. However, the closed-loop experiment (Run 4) already showed the prediction signal improves LM loss through downstream processing. The residual's informativeness lives in its 256-dimensional direction, not its scalar norm. Collapsing to a norm discards the signal.
+
+4. **The residual is inherently high-rank in language**: Effective rank stays above 235/256 at all capacity points. Unlike grokking (where the Fourier solution is low-rank), language computation is distributed across all dimensions. Biologically consistent: the cerebellum's output is high-dimensional; the thalamus filters it before cortex processes it.
+
+**Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-scaling-sweep --n-tokens 10000000 --n-steps 10000 --predict-from post_block0 --predict-to post_block3`
+
 ## Next steps
 
-1. **Controlled comparison**: Retrain open-loop and closed-loop with identical lr/seed to eliminate the training quality confound from the Run 4 probe comparison.
-2. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. The current non-looped GPT only gets one injection point.
-3. **Sleep-style consolidation**: Periodically pause main model training and give the forward model extra gradient steps to catch up on the co-evolving computation.
-4. **Scaling**: Larger models where the capacity gap is more pronounced and the prediction signal's value may increase.
+1. **Closed-loop with 10% forward model**: The scaling sweep shows the 10% model saturates on the main model's computation. Running closed-loop with this model (instead of the 2.7% model from Run 4) tests whether a better prediction produces larger LM improvement — directly testing whether the prediction or the residual is the load-bearing signal.
+2. **Thalamic filtering**: Replace the linear `CerebellarGate` with a learned nonlinear gate (MLP). This mirrors the thalamus's filtering of cerebellar output and may help extract directional structure from the high-rank residual.
+3. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free.
+4. **Controlled comparison**: Retrain open-loop and closed-loop with identical lr/seed to eliminate the training quality confound from the Run 4 probe comparison.
 5. **Self-regulation**: Freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
-6. **Head 3 investigation**: What does head 3 attend to that the forward model can't capture? (From Run 2 structure analysis.)
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

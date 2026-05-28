@@ -22,6 +22,7 @@ Each project subdirectory has its own CLAUDE.md with setup instructions and conv
 - We prefer solutions that generalize across domains.
 
 ## Good practices
+- We must keep all prior results reproducible. You're welcome to edit the code used in prior experiments, as long as you keep it backwards-compatible (within reason). If we're making too many backwards-compatible modifications, it's probably time to copy things over to a new folder/file. Keeping folders and files semantically meaningful is more important than not duplicating code.
 - Document everything you do to the filesystem. If you're not sure where it should go, ask.
 - Controlling variables is absolutely essential for good science.
 - Please always discuss results with me before writing a new README. These things can be difficult to interpret sometimes.
