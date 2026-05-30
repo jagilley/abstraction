@@ -80,6 +80,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `novelty_steer.py` | Causal steering of the novelty direction; reliance measurement |
 | `injection_help.py` | Per-token Δloss analysis: where does the injection help? |
 | `injection_help_structural.py` | Structural analysis: help by residual direction / attention shape |
+| `directional_steer.py` | Directional causal steering: multivariate probe, per-cluster-direction sweep |
 | `README.md` | This file |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
@@ -398,13 +399,29 @@ Causal follow-ups testing how the self-map works and how the injection helps. Ke
 - **Help is organized by residual direction, not magnitude**: Residual direction clusters organize injection help 5× more than norm octiles (η²=0.0017 vs 0.0003). The injection helps most at focused-attention positions (mean help = +0.153, nearly 2× average).
 - **The directional form of self-knowledge is untested causally**: The scalar/1-D causal tests were blind to directional structure. A directional causal test (steering/patching along residual vector clusters) would test whether the model's directional self-knowledge is functionally used.
 
+## Directional causal steering (2026-05-30)
+
+**Full writeup**: [DIRECTIONAL_STEER_README.md](DIRECTIONAL_STEER_README.md)
+
+Tests whether the directional self-knowledge is causally used, not just encoded. Derives per-cluster steering directions from a multivariate probe (post_block1 → residual vector, R²=0.23), then steers along each direction and measures whether the effect on injection help is cluster-specific.
+
+**Result: Outcome B with partial A for specific clusters.** The model partially uses directional self-knowledge, with strongest selectivity for the focused-attention error type.
+
+- **Steering produces real effects**: Cluster direction slopes are ~4× larger than random controls (mean ~0.004 vs std ~0.001). Not noise.
+- **Partial diagonality**: |diag|/|off| ratio = 1.33, diagonal enrichment = 0.160 (uniform = 0.125). Four of eight clusters show selectivity >1.5.
+- **Focused-attention cluster is the standout**: Cluster 4 (the focused-attention cluster, frac max_attn>0.5 = 0.21) has selectivity = 2.41 — the strongest direction-specific effect. This is the same cluster with the highest baseline injection help (+0.126, 2× average). The model has learned to discriminate the error type where the injection is most useful.
+- **Caveat — direction overlap**: The W@c steering directions have mean off-diagonal cosine 0.41. Steering along one direction partially steers along others, attenuating the diagonal signal. The 1.33 ratio likely underestimates the true selectivity.
+- **Interpretation**: The 4-layer non-looped GPT has only 2 layers downstream of the injection to act on directional self-knowledge. It learned the highest-value discrimination (focused attention) and left the rest coarse. The looped transformer would give the model more computational depth to act on the information it already encodes.
+
+**Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-directional-steer --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
+
 ## Next steps
 
 1. **Wake-sleep consolidation**: The model becomes dependent on the injection rather than internalizing it (Run 6). The brain solves this by alternating regimes: cerebellar loop active during waking, offline consolidation during sleep. Engineering analog: interleave closed-loop training (with injection) and open-loop training (without injection), forcing the main model to internalize the predicted computation into its own weights. Anneal injection strength over cycles.
-2. **Directional causal test**: Steer or patch along residual *direction* clusters (not the scalar norm) to test whether the directional self-knowledge is functionally used by the model. This is the main open question about the self-map mechanism.
+2. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. Would give the model more computational depth to act on its self-knowledge at inference time. The directional steering results specifically motivate this: the model encodes directional self-knowledge it can only partially use with 2 downstream layers.
 3. **Closed-loop with 10% forward model**: The scaling sweep shows the 10% model saturates on the main model's computation. Running closed-loop with this model (instead of the 2.7% model from Run 4) tests whether a better prediction produces larger LM improvement.
-4. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. Would give the model more computational depth to act on its self-knowledge at inference time.
-5. **Thalamic filtering**: Replace the linear `CerebellarGate` with a learned nonlinear gate (MLP). May help extract directional structure from the high-rank residual.
-6. **Self-regulation**: Freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
+4. **Thalamic filtering**: Replace the linear `CerebellarGate` with a learned nonlinear gate (MLP). May help extract directional structure from the high-rank residual.
+5. **Self-regulation**: Freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
+6. **Orthogonalized directional test**: Re-run the directional steering with Gram-Schmidt-orthogonalized W@c directions to control for the 0.41 mean cosine overlap. Would give a cleaner estimate of true directional selectivity.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

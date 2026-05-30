@@ -150,6 +150,9 @@ from language_reduction.experiments.a2a_forward.causal_substitution import (  # 
 from language_reduction.experiments.a2a_forward.controlled_retrain import (  # noqa: F401
     a2a_controlled_retrain,
 )
+from language_reduction.experiments.a2a_forward.directional_steer import (  # noqa: F401
+    a2a_directional_steer,
+)
 
 
 @app.local_entrypoint()
@@ -733,6 +736,27 @@ def main(
             d = vec[lk]["delta_r2"]
             print(f"    {lk}: Δ R² = {d:+.4f}")
 
+    elif stage == "a2a-directional-steer":
+        result = a2a_directional_steer.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A directional steering complete:")
+        diag = result["diagonality"]
+        print(f"  Full vector probe R2: {result['probe_r2_full_vector']:.4f}")
+        print(f"  |diag|/|off| ratio:   {diag['diag_to_off_ratio']:.3f}")
+        print(f"  Diagonal enrichment:  {diag['diagonal_enrichment']:.4f} "
+              f"(uniform: {diag['uniform_enrichment']:.4f})")
+        print(f"  Signed diag: {diag['mean_signed_diagonal']:+.6f}, "
+              f"off: {diag['mean_signed_off_diagonal']:+.6f}")
+        print("  Per-direction selectivity:")
+        for k, v in diag["per_direction_selectivity"].items():
+            print(f"    {k}: {v:.3f}")
+
     else:
         print(f"Unknown stage: {stage}")
         print("Available: tokenize, stats, spectral, denoise, vocab-reduce, "
@@ -755,4 +779,4 @@ def main(
               "cl-sequential, cl-scaled, a2a-train, a2a-analyze, "
               "a2a-loop-train, a2a-loop-analyze, a2a-causal-sub, "
               "a2a-behavioral-residual, a2a-scaling-sweep, "
-              "a2a-controlled-retrain")
+              "a2a-controlled-retrain, a2a-directional-steer")
