@@ -147,6 +147,9 @@ from language_reduction.experiments.a2a_forward.injection_help_structural import
 from language_reduction.experiments.a2a_forward.causal_substitution import (  # noqa: F401
     a2a_causal_substitution,
 )
+from language_reduction.experiments.a2a_forward.controlled_retrain import (  # noqa: F401
+    a2a_controlled_retrain,
+)
 
 
 @app.local_entrypoint()
@@ -706,6 +709,30 @@ def main(
                   f"{c['behavioral_effects']['cohen_d_sentence_start']:>+6.3f} "
                   f"{c['behavioral_effects']['cohen_d_before_closer']:>+6.3f}")
 
+    elif stage == "a2a-controlled-retrain":
+        result = a2a_controlled_retrain.remote(
+            n_tokens=n_tokens, block_size=block_size, n_steps=n_steps,
+            lr=lr if lr != 1e-4 else 3e-4,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A controlled retrain complete:")
+        lm = result["lm_loss"]
+        print(f"  Open-loop LM:              {lm['open_final']:.4f}")
+        print(f"  Closed-loop LM (with inj): {lm['closed_with_inj_final']:.4f}")
+        print(f"  Closed-loop LM (no inj):   {lm['closed_no_inj_final']:.4f}")
+        fq = result["fwd_quality"]
+        print(f"  Fwd cosine — open: {fq['open']['cosine']:.4f}, "
+              f"closed: {fq['closed']['cosine']:.4f}")
+        print("\n  Localization test (Δ R² = closed − open):")
+        vec = result["probe_results"]["vector"]["residual"]
+        for lk in sorted(vec.keys()):
+            d = vec[lk]["delta_r2"]
+            print(f"    {lk}: Δ R² = {d:+.4f}")
+
     else:
         print(f"Unknown stage: {stage}")
         print("Available: tokenize, stats, spectral, denoise, vocab-reduce, "
@@ -727,4 +754,5 @@ def main(
               "cl-curriculum, cl-finetune, cl-eval, cl-batch, cl-dimensions, "
               "cl-sequential, cl-scaled, a2a-train, a2a-analyze, "
               "a2a-loop-train, a2a-loop-analyze, a2a-causal-sub, "
-              "a2a-behavioral-residual, a2a-scaling-sweep")
+              "a2a-behavioral-residual, a2a-scaling-sweep, "
+              "a2a-controlled-retrain")

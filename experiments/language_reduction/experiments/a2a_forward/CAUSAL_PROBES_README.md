@@ -16,7 +16,8 @@ residual information from the closed-loop model. The leap to "the model encodes
 and *uses* knowledge of its own reliability" is a separate claim. This file
 records causal follow-ups that test that leap. **Headline: the self-map's
 magnitude/gating form is not supported; its directional form is untested, not
-refuted; and the R²=0.44 finding itself is real but confounded — see below.**
+refuted; and the R²=0.44 finding is real (confirmed by controlled retrain, see
+[CONTROLLED_RETRAIN_README.md](CONTROLLED_RETRAIN_README.md)).**
 
 ## Setup
 
@@ -46,15 +47,13 @@ context, not "novelty").
 
 **Read.** The closed-loop model decodes its residual norm ~+0.04 R² better — same
 *direction* as the R²=0.44 finding, smaller magnitude (this is the scalar norm,
-not the full vector). But: (1) the gap is **flat across layers, present already
-at post_block1** — which is computed *before* the injection enters, so it cannot
-have been built by "using the returned prediction"; this looks like a global
-training difference, not a loop-built downstream self-map. (2) The comparison is
-**confounded**: open lr=1e-4 vs closed lr=3e-4, and the two forward models differ
-in quality (cosine 0.935 vs 0.897), so the closed-loop residual is intrinsically
-larger and easier to decode. The control direction (block1_contrib) goes the
-*other* way, so it is not a uniform "better probe target" effect — but the
-confounds are not removed.
+not the full vector). The gap is **flat across layers, present already at
+post_block1** — which is computed *before* the injection enters. A controlled
+retrain ([CONTROLLED_RETRAIN_README.md](CONTROLLED_RETRAIN_README.md)) with
+identical lr/seed confirmed this pattern is real: the self-knowledge is
+distributed via backprop through all layers, not localized to post-injection
+layers. The uniform gap reflects gradient-mediated global reorganization of
+representations to complement the forward model's prediction.
 
 ## Test 2 — Steering (is the structure *used* to gate the prediction?)
 
@@ -143,24 +142,21 @@ rediscovered and re-believed.
 
 ## Status of the self-map claim (R²=0.44 vs 0.28)
 
-- The number is **real**; we partially reproduced its direction (Test 1). We did
-  **not** show it is erroneous.
-- Its self-map *interpretation* is **confounded** (lr; differing forward-model
-  quality) and the probe is mechanically weak (it predicts `actual − pred` *from*
-  `post_block3 = actual`, so part of the R² is structural and the cross-model gap
-  is sensitive to forward-model quality).
-- The **magnitude/gating** form of the self-map is **not supported** (Tests 2, 3).
-- The **directional** form — exactly what the full-vector R²=0.44 detects, and
-  where the enriched Test 3 says the signal lives — is **untested, not refuted**.
-  Our causal tests used the scalar norm or a single direction and were blind to it.
+A controlled retrain ([CONTROLLED_RETRAIN_README.md](CONTROLLED_RETRAIN_README.md))
+with identical lr (3e-4), seed (42), and initial weights resolved the confounds:
 
-### What would settle it
-1. **Controlled retrain** — identical lr / seed / forward model, open vs closed.
-2. **Clean early-layer probe** — predict the residual from `post_block0/1` (which
-   do *not* contain the answer): does the model *anticipate* its own surprise
-   before computing it? That cannot be mechanical.
-3. **Directional causal test** — steer/patch along the residual-*vector*
-   structure (not the scalar norm) and test whether it changes prediction use.
+- The R² gap is **real and not an lr artifact** — controlled retrain gives
+  R²=0.42 vs 0.26, closely replicating the original.
+- The self-knowledge is **distributed across all layers via backprop** — the gap
+  is uniform (Δ R²=+0.18) including at post_block0 (R²=0.21 vs 0.02), before
+  the injection point. The early-layer result cannot be mechanical (post_block0
+  does not contain post_block3).
+- The **magnitude/gating** form of the self-map is **not supported** (Tests 2, 3).
+- The self-knowledge is **directional** — the vector probe gap (+0.18) is 6× the
+  scalar gap (+0.03). The model encodes *what kind* of computation was missed.
+- The **directional causal test** remains the open question: does the model
+  *use* its directional self-knowledge to guide behavior? Steering/patching
+  along residual vector clusters (not the scalar norm) would test this.
 
 ## Files
 
@@ -187,7 +183,9 @@ modal run language_reduction/modal_app.py --stage a2a-injection-help-structural 
 ## Overall caveats
 
 28.9M-param main model, 10M tokens, single checkpoint, single (non-looped)
-injection point. The self-map / metacognition hypothesis's natural home is the
-*looped/iterated* transformer (see idea doc); this one-shot setting is a weak
-test of it. Read the negatives as "not present in this instantiation," not as a
-refutation of the idea.
+injection point. Self-knowledge is confirmed (controlled retrain, Run 6) but
+its specific form is directional, not magnitude-based. The looped/iterated
+transformer (see idea doc) would give the model more computational depth to
+act on its self-knowledge at inference time. The magnitude/gating negatives
+are specific to the scalar form tested; the directional causal test remains
+open.

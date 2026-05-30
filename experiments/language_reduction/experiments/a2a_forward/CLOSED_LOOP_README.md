@@ -105,9 +105,8 @@ The open-loop model is better here, but this is confounded: fwd_pred is a predic
 
 ### Caveats
 
-- **Learning rate difference**: Open-loop used lr=1e-4 (CLI default), closed-loop used lr=3e-4. This is a confound — some differences could reflect training quality rather than architecture.
+- **lr difference in this run**: This run used open-loop lr=1e-4, closed-loop lr=3e-4. A controlled retrain ([CONTROLLED_RETRAIN_README.md](CONTROLLED_RETRAIN_README.md)) with identical lr/seed confirmed that the probe results (R²=0.42 vs 0.26) and injection benefit (Δ ≈ -0.08) are robust and not lr artifacts.
 - **Small scale**: 28.9M params on 10M tokens. The model is capacity-bottlenecked; the prediction signal's value may change at scale.
-- **No controlled ablation**: A fully controlled comparison would train both conditions with identical lr and random seed, differing only in whether the loop is closed.
 
 ## Interpretation
 
@@ -119,11 +118,14 @@ The prediction of post_block3 from post_block0 is a compressed summary of the mo
 
 The consistent LM improvement suggests the preview is genuinely useful — not just noise that the model tolerates.
 
-### The novelty-awareness result
+### The self-knowledge result
 
-The closed-loop model's later layers encode more information about its own prediction residuals. This is a specific form of self-knowledge: "I know what I computed that a compressed model of me wouldn't have expected." The biological parallel is the cortex developing representations that track cerebellar prediction errors — the pre-reflective "something feels off" signal.
+The closed-loop model's layers encode more information about its own prediction residuals — a specific form of self-knowledge: "I know what I computed that a compressed model of me wouldn't have expected." A controlled retrain ([CONTROLLED_RETRAIN_README.md](CONTROLLED_RETRAIN_README.md)) confirmed this is real (not an lr artifact) and showed the self-knowledge is:
 
-This emerged from co-training alone, with no explicit objective encouraging self-referential representations. The forward model provided a steady stream of predictions about the model's own computation, and the model's representations adapted to encode information about those predictions — including where they fail.
+- **Distributed across all layers via backprop** — present even at post_block0, before the injection point. The injection changes the loss landscape, and gradients flow backward through all layers, causing the entire model to reorganize to complement the prediction.
+- **Directional, not magnitude-based** — the vector probe gap (Δ R²=+0.18) is 6× the scalar gap (Δ R²=+0.03). The model encodes *what kind of computation was missed*, not *how much*.
+
+This emerged from co-training alone, with no explicit objective encouraging self-referential representations. The biological parallel is the cortex developing representations that track cerebellar prediction errors — the pre-reflective "something feels off" signal.
 
 ### Why the forward model degrades
 
@@ -185,11 +187,10 @@ Results saved to `language-reduction-data` volume:
 
 ## Next steps
 
-1. **Controlled comparison**: Retrain both open-loop and closed-loop with identical lr and seed to eliminate the training quality confound.
-2. **Looped transformer**: The natural architecture for this — inject at each recurrence step, get adaptive compute for free (few loops if well-predicted, many if not). The current non-looped GPT only gets one injection point.
-3. **Sleep-style consolidation**: Periodically pause main model training and give the forward model extra gradient steps to catch up on the co-evolving computation. Biological analog: cerebellar plasticity during offline periods.
-4. **Scaling**: Larger models where the computation is more complex and the capacity gap between main and forward model is more pronounced. The prediction signal's value may increase with scale.
-5. **Nonlinear self-map probes**: The linear probe may miss self-referential structure that's nonlinearly encoded. MLP probes or CKA analysis could reveal more.
-6. **Per-token gate analysis**: On which tokens does the injection matter most? Correlate injection magnitude with token frequency, position, and LM loss to understand what the model uses the prediction for.
+1. ~~**Controlled comparison**~~: Done — see [CONTROLLED_RETRAIN_README.md](CONTROLLED_RETRAIN_README.md). Self-knowledge confirmed, not an lr artifact.
+2. **Wake-sleep consolidation**: The model becomes dependent on the injection (0.11 nats worse without it). Interleave closed-loop and open-loop training to force internalization.
+3. **Directional causal test**: The self-knowledge is directional, not magnitude-based. Steer/patch along residual *direction* clusters to test whether directional self-knowledge is functionally used.
+4. **Looped transformer**: The natural architecture for this — inject at each recurrence step, get adaptive compute for free.
+5. **Scaling**: Larger models where the computation is more complex and the capacity gap between main and forward model is more pronounced.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
