@@ -81,7 +81,9 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `injection_help.py` | Per-token Δloss analysis: where does the injection help? |
 | `injection_help_structural.py` | Structural analysis: help by residual direction / attention shape |
 | `directional_steer.py` | Directional causal steering: multivariate probe, per-cluster-direction sweep |
+| `llama_cache_acts.py` | Cache Llama 3.2 1B activations for scale-up experiment |
 | `README.md` | This file |
+| `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 

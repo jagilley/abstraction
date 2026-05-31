@@ -153,6 +153,9 @@ from language_reduction.experiments.a2a_forward.controlled_retrain import (  # n
 from language_reduction.experiments.a2a_forward.directional_steer import (  # noqa: F401
     a2a_directional_steer,
 )
+from language_reduction.experiments.a2a_forward.llama_cache_acts import (  # noqa: F401
+    a2a_cache_llama_acts,
+)
 
 
 @app.local_entrypoint()
@@ -184,6 +187,11 @@ def main(
     fwd_mlp_mult: int = 2,
     inject_after_block: int = 1,
     open_loop: bool = False,
+    source_layer: int = 7,
+    target_layer: int = 8,
+    llama_model: str = "unsloth/Llama-3.2-1B",
+    seq_len: int = 2048,
+    shard_size: int = 1_000_000,
 ):
     ms = max_shards if max_shards > 0 else None
 
@@ -757,6 +765,21 @@ def main(
         for k, v in diag["per_direction_selectivity"].items():
             print(f"    {k}: {v:.3f}")
 
+    elif stage == "a2a-cache-llama":
+        result = a2a_cache_llama_acts.remote(
+            n_tokens=n_tokens,
+            model_name=llama_model,
+            source_layer=source_layer,
+            target_layer=target_layer,
+            seq_len=seq_len,
+            shard_size=shard_size,
+        )
+        print(f"Llama activation caching complete:")
+        print(f"  Tokens: {result['n_tokens_cached']:,}")
+        print(f"  Shards: {result['n_shards']}")
+        print(f"  Storage: ~{result['storage_gb_approx']:.0f} GB")
+        print(f"  Throughput: {result['tokens_per_sec']:,.0f} tok/s")
+
     else:
         print(f"Unknown stage: {stage}")
         print("Available: tokenize, stats, spectral, denoise, vocab-reduce, "
@@ -779,4 +802,5 @@ def main(
               "cl-sequential, cl-scaled, a2a-train, a2a-analyze, "
               "a2a-loop-train, a2a-loop-analyze, a2a-causal-sub, "
               "a2a-behavioral-residual, a2a-scaling-sweep, "
-              "a2a-controlled-retrain, a2a-directional-steer")
+              "a2a-controlled-retrain, a2a-directional-steer, "
+              "a2a-cache-llama")
