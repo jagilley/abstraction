@@ -156,6 +156,12 @@ from language_reduction.experiments.a2a_forward.directional_steer import (  # no
 from language_reduction.experiments.a2a_forward.llama_cache_acts import (  # noqa: F401
     a2a_cache_llama_acts,
 )
+from language_reduction.experiments.a2a_forward.llama_train_fwd import (  # noqa: F401
+    a2a_train_llama_fwd,
+)
+from language_reduction.experiments.a2a_forward.extended_training import (  # noqa: F401
+    a2a_extended_training,
+)
 
 
 @app.local_entrypoint()
@@ -765,6 +771,30 @@ def main(
         for k, v in diag["per_direction_selectivity"].items():
             print(f"    {k}: {v:.3f}")
 
+    elif stage == "a2a-extended-training":
+        result = a2a_extended_training.remote(
+            n_tokens=n_tokens, block_size=block_size, n_steps=n_steps,
+            lr=lr if lr != 1e-4 else 3e-4,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A extended training complete:")
+        lm = result["final_lm_loss"]
+        print(f"  Open-loop LM:              {lm['open']:.4f}")
+        print(f"  Closed-loop LM (with inj): {lm['closed_with_inj']:.4f}")
+        print(f"  Closed-loop LM (no inj):   {lm['closed_no_inj']:.4f}")
+        fq = result["fwd_quality"]
+        print(f"  Fwd cosine — open: {fq['open']['cosine']:.4f}, "
+              f"closed: {fq['closed']['cosine']:.4f}")
+        print("\n  Final probe results (Δ R² = closed − open):")
+        vec = result["probe_results"]["vector"]["residual"]
+        for lk in sorted(vec.keys()):
+            d = vec[lk]["delta_r2"]
+            print(f"    {lk}: Δ R² = {d:+.4f}")
+
     elif stage == "a2a-cache-llama":
         result = a2a_cache_llama_acts.remote(
             n_tokens=n_tokens,
@@ -779,6 +809,29 @@ def main(
         print(f"  Shards: {result['n_shards']}")
         print(f"  Storage: ~{result['storage_gb_approx']:.0f} GB")
         print(f"  Throughput: {result['tokens_per_sec']:,.0f} tok/s")
+
+    elif stage == "a2a-train-llama":
+        result = a2a_train_llama_fwd.remote(
+            source_layer=source_layer,
+            target_layer=target_layer,
+            seq_len=seq_len,
+            batch_size=16,
+            fwd_lr=1e-3,
+            n_steps=n_steps,
+            fwd_n_layer=fwd_n_layer,
+            fwd_n_head=fwd_n_head,
+            fwd_d_head=fwd_d_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print(f"Llama forward model training complete:")
+        print(f"  Capacity: {result['fwd_n_params']:,} params "
+              f"({result['capacity_ratio']:.2%} of main)")
+        print(f"  Cosine: {result['final_val_cosine']:.4f}")
+        print(f"  MSE: {result['final_val_mse']:.6f}")
+        print(f"  Residual norm: {result['final_val_residual_norm']:.3f}")
+        pca = result["residual_pca"]
+        print(f"  Effective rank: {pca['effective_rank']:.1f}/{pca['max_rank']}")
+        print(f"  Training time: {result['training_seconds']:.0f}s")
 
     else:
         print(f"Unknown stage: {stage}")
@@ -803,4 +856,5 @@ def main(
               "a2a-loop-train, a2a-loop-analyze, a2a-causal-sub, "
               "a2a-behavioral-residual, a2a-scaling-sweep, "
               "a2a-controlled-retrain, a2a-directional-steer, "
-              "a2a-cache-llama")
+              "a2a-extended-training, "
+              "a2a-cache-llama, a2a-train-llama")

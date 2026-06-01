@@ -81,6 +81,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `injection_help.py` | Per-token Δloss analysis: where does the injection help? |
 | `injection_help_structural.py` | Structural analysis: help by residual direction / attention shape |
 | `directional_steer.py` | Directional causal steering: multivariate probe, per-cluster-direction sweep |
+| `extended_training.py` | Extended co-training (50K steps): does the closed-loop model resist overfitting differently? |
 | `llama_cache_acts.py` | Cache Llama 3.2 1B activations for scale-up experiment |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
