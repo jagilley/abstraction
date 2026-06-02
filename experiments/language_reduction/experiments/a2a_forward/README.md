@@ -81,7 +81,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `injection_help.py` | Per-token Δloss analysis: where does the injection help? |
 | `injection_help_structural.py` | Structural analysis: help by residual direction / attention shape |
 | `directional_steer.py` | Directional causal steering: multivariate probe, per-cluster-direction sweep |
-| `extended_training.py` | Extended co-training (50K steps): does the closed-loop model resist overfitting differently? |
+| `extended_training.py` | Extended co-training (50K steps): injection benefit trajectory, overfitting comparison |
 | `llama_cache_acts.py` | Cache Llama 3.2 1B activations for scale-up experiment |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
@@ -417,6 +417,24 @@ Tests whether the directional self-knowledge is causally used, not just encoded.
 - **Interpretation**: The 4-layer non-looped GPT has only 2 layers downstream of the injection to act on directional self-knowledge. It learned the highest-value discrimination (focused attention) and left the rest coarse. The looped transformer would give the model more computational depth to act on the information it already encodes.
 
 **Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-directional-steer --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
+
+## Run 7: Extended co-training — 50K steps (2026-06-01)
+
+**Full writeup**: [EXTENDED_TRAINING_README.md](EXTENDED_TRAINING_README.md)
+
+Same controlled retrain design (identical lr/seed/init) but trained for 50K steps (~45 epochs) to observe long-run dynamics.
+
+**Key results**:
+
+1. **The injection benefit grows monotonically — 6× over training**: -0.08 nats at 10K → -0.48 nats at 50K, with no sign of saturation. The forward model's cosine drops (0.93 → 0.82) while the benefit grows — the model extracts increasing value from a less accurate prediction. The prediction is being used as a structured reference frame, not a literal preview.
+
+2. **No differential overfitting**: Both models overfit at the same rate (train-val gap: -4.86 at 50K for both). Validation loss on a static dataset measures compression of a fixed distribution, not representational quality.
+
+3. **Self-knowledge probes narrow but persist at early layers**: Vector Δ R² drops from +0.185 to +0.094 at post_block0, disappears at post_block3. Scalar probes flip sign (the overfit open-loop model's memorized token statistics correlate with residual norm).
+
+4. **Co-specialization deepens without saturating**: Injection benefit, dependency, and forward model cosine all evolve monotonically over 50K steps with no convergence.
+
+**Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-extended-training --n-tokens 10000000 --n-steps 50000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2`
 
 ## Next steps
 
