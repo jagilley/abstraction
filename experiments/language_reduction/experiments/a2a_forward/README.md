@@ -83,8 +83,10 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `directional_steer.py` | Directional causal steering: multivariate probe, per-cluster-direction sweep |
 | `extended_training.py` | Extended co-training (50K steps): injection benefit trajectory, overfitting comparison |
 | `llama_cache_acts.py` | Cache Llama 3.2 1B activations for scale-up experiment |
+| `representational_divergence.py` | Representational divergence: CKA, diff PCA, self-knowledge alignment between open- and closed-loop models |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
+| `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -417,6 +419,24 @@ Tests whether the directional self-knowledge is causally used, not just encoded.
 - **Interpretation**: The 4-layer non-looped GPT has only 2 layers downstream of the injection to act on directional self-knowledge. It learned the highest-value discrimination (focused attention) and left the rest coarse. The looped transformer would give the model more computational depth to act on the information it already encodes.
 
 **Reproduction**: `modal run language_reduction/modal_app.py --stage a2a-directional-steer --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
+
+## Representational divergence analysis (2026-06-02)
+
+**Full writeup**: [REPRESENTATIONAL_DIVERGENCE_README.md](REPRESENTATIONAL_DIVERGENCE_README.md)
+
+Uses CKA, PCA on activation differences, and subspace alignment to characterize *how* the closed-loop model's representations differ from the open-loop model — not just whether self-knowledge is present (Run 6), but whether the dominant representational change *is* the self-knowledge.
+
+**Key results**:
+
+1. **CKA diverges monotonically**: 0.972 at post_embed → 0.727 at post_block3. Even post_block0 (pre-injection) drops to 0.882.
+
+2. **Early-layer change is concentrated, late-layer change is diffuse**: Post_block0 has the lowest effective rank (164.6/256) and highest top-10 concentration (16.7%). Later layers approach full-rank (eff_rank 219-227).
+
+3. **Divergence-to-self-knowledge alignment grows through the network**: At post_block3, the top-5 divergence PCs capture 2.42x more residual variance than random directions. At post_block0, the ratio is barely above 1 (1.10x). The extra-self-knowledge overlap at post_block0 is actually *below* random (0.49x) — the early-layer change is orthogonal to self-knowledge.
+
+4. **Two distinct reorganization phenomena**: Early layers changed extensively via backprop for general-purpose reasons (self-knowledge is a side-effect in low-variance directions). Late layers reorganized primarily along self-knowledge dimensions (the dominant change *is* the self-knowledge). This resolves the apparent contradiction from Run 6, where Δ R² was uniform across layers — the *amount* of self-knowledge is uniform, but its *relationship to the dominant representational change* differs qualitatively by layer.
+
+**Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-rep-divergence --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
 
 ## Run 7: Extended co-training — 50K steps (2026-06-01)
 

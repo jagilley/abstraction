@@ -1,14 +1,14 @@
 # Activation-to-Activation Forward Modeling
 
-**Status**: Idea (partially validated in grokking; not yet implemented at scale)
-**Date**: 2026-05-24
+**Status**: Core mechanism validated (grokking self-regulation, LLM co-training, Llama scale-up); self-knowledge demonstrated; internalization untested
+**Date**: 2026-05-24 (updated 2026-06-02)
 **Supersedes**: [conditional_novelty_bottleneck.md](conditional_novelty_bottleneck.md)
 **Builds on**: GLP residual semantics, VPD (Goodfire/Sharkey et al., 2026), CLS theory, CNB grokking experiments, cerebellar neuroscience
 **Validated component**: Activation-matching self-regulation prevents Sisyphean collapse (see fer/experiments/zipfian_grokking/cnb_self_regulation/)
 
 ## One-liner
 
-A small forward model learns to predict a larger model's activations from its current state; the prediction residual is a novelty signal, and feeding predictions back into the main model gives it learned self-knowledge of its own computational structure.
+A small auxiliary model learns to predict a larger model's activations from its current state; feeding predictions back into the main model causes all layers to develop representations encoding the auxiliary model's error structure — a form of learned self-knowledge, distributed via backprop.
 
 ## The problem, progressively stated
 
@@ -66,14 +66,18 @@ For transformers: the residual stream has uniform dimensionality throughout. A s
 
 This is the key emergent property. Because the cerebellum constantly sends predictions about cortical states back to the cortex, and the cortex processes these through its own weights, over time the cortex develops representations that are *about its own computational states*. The cerebellar return signal is statistically informative about cortical dynamics, and the cortex is a good enough learner to extract that structure.
 
-The result: the cortex acquires a compressed, manipulable index of its own knowledge and capabilities — a self-map. It can activate and compose these self-representations *without* running the full cerebellar loop, because it has internalized the map. The cerebellum was the teacher, but the student can operate semi-independently.
+**What the experiments show**: Co-training a main model with an auxiliary predictor causes all layers — including layers before the injection point — to develop representations encoding the auxiliary model's error structure. The self-knowledge is directional (the model encodes *what kind* of computation was missed, not *how much*) and is partially causally used (the model discriminates the error type where the injection is most useful). This is a plausible mechanism for how a system could develop forward-pass-embedded knowledge of its own computational structure — "self-interpretability" — without requiring explicit introspection.
 
-This explains several otherwise puzzling aspects of human cognition:
-- Fast metacognitive judgments ("I know something relevant to this") that feel too fast for full prediction-error loops
-- Approximate, imperfect self-knowledge that degrades gracefully (the self-map is lossy)
-- Flexible recombination of existing knowledge for novel concept formation (creativity as self-indexed recombination)
+The representational divergence analysis (REPRESENTATIONAL_DIVERGENCE_README.md) revealed that the uniform Δ R² ~+0.18 across layers masks qualitatively different reorganizations at early vs late layers:
 
-For AI systems, this means a co-trained forward model doesn't just give you novelty detection — it gives the main model *privileged access to its own internal structure* as a learnable representation, usable for downstream reasoning about what it knows and doesn't know.
+- **Early layers (post_block0)**: Large, concentrated change (75% of activation norm, effective rank 164.6). But this dominant change is *orthogonal* to self-knowledge (extra-SK overlap 0.49x, *below* random). The layer reorganized extensively via backprop for general-purpose input formatting. Self-knowledge lives in quieter, orthogonal directions — a distinct signal, not a byproduct of the dominant change.
+- **Late layers (post_block2, post_block3)**: More diffuse change, but strongly *aligned* with self-knowledge (2.42x ratio at post_block3). The dominant representational change at late layers IS the self-knowledge — these layers reorganized primarily along directions encoding what the auxiliary model misses.
+
+This functional hierarchy — input formatting at early layers, self-representation at late layers — is a natural prediction of the self-knowledge framework and a less obvious prediction of pure gradient-mediated co-adaptation. It suggests the self-knowledge at late layers is not incidental to some other reorganization; it is the primary axis of change.
+
+**What remains hypothetical**: Whether this representation is *manipulable* — whether the model can flexibly compose or query its self-knowledge for downstream reasoning, as opposed to using it only for credit assignment over the injection signal. The biological analogy suggests this should be possible (fast metacognitive judgments, approximate self-knowledge, flexible recombination), but the current experiments test only the credit-assignment form of self-knowledge use.
+
+For AI systems, co-training with a self-predictor gives the main model representations encoding its own computational structure as a learnable, forward-pass-accessible signal. Whether this scales from "one useful discrimination about focused-attention positions" to a rich, general-purpose self-model is an empirical question — but the mechanism that would produce it (backprop-mediated reorganization in response to processing self-predictions) is demonstrated, and the representational divergence results show that late-layer reorganization is dominated by self-knowledge rather than being a side-effect of other changes.
 
 ### The abstraction ratchet
 
@@ -92,6 +96,8 @@ Not all prediction errors are worth learning from. The brain distinguishes them 
 **Structural analysis**: expected uncertainty (known unknowns — acetylcholine) vs. unexpected uncertainty (the model itself is wrong — norepinephrine). The signature of unexpected uncertainty is that errors are *structured* — correlated across time or features in ways noise wouldn't be. Engineering analog: low-rank, temporally persistent errors are informative; diffuse, transient errors are noise.
 
 **Learned valence tagging** (amygdala, dopamine): fast classification of error patterns as informative/rewarding vs. meaningless/aversive, based on lifetime experience with similar errors. Engineering analog: a small auxiliary classifier predicting whether a given error will prove *reducible* over subsequent training. This is recursive — training a system to predict which of its own prediction errors are worth learning from — but it's exactly what the brain appears to do.
+
+**Status relative to experiments**: The LLM experiments (Runs 2, 5) showed the residual is full-rank and diffuse at every capacity point (effective rank >235/256), with no low-rank structure corresponding to identifiable mechanisms. The prescription "low-rank residuals are more informative than diffuse residuals" does not apply in the language setting — the residual is inherently high-rank because language computation is distributed across all dimensions. The residual does have meaningful structure when conditioned on *behavioral* categories (delimiter tracking, focused attention, sentence boundaries), but this structure lives in the residual's direction, not its rank. The precision weighting and learned valence tagging ideas remain untested. Whether richer residual structure emerges at wider layer gaps or larger scale is an open question.
 
 ## The experimental proof of concept: Zipfian grokking
 
@@ -144,11 +150,11 @@ Over co-training:
 
 ### Why the bottleneck lives in the forward model's capacity, not in an explicit decomposition
 
-The forward model must be small — otherwise it's just distilling the main model, which is redundant and expensive. This capacity constraint forces the forward model to discover compressed representations of the main model's computation. Under its parameter budget, it can only capture the highest-leverage regularities — which are the model's actual computational mechanisms, because mechanisms are the structures that most efficiently predict activations across diverse inputs.
+The forward model must be small — otherwise it's just distilling the main model, which is redundant and expensive. This capacity constraint forces the forward model to approximate the main model's computation under a parameter budget.
 
-If the main model uses universal low-rank structure (like grokking), the forward model discovers something SVD-like. If it uses sparse input-dependent circuits (like language models in superposition), it discovers something VPD-like. The prediction objective + capacity constraint selects the right decomposition without committing to a specific algorithm.
+In grokking, where the main model's computation is low-rank (Fourier), the forward model's approximation naturally captures that structure. In language, the scaling sweep (Run 5) showed the opposite: the forward model is "slightly worse everywhere" — uniform approximation, not mechanism discovery. The residual is full-rank and diffuse (effective rank >235/256) at every capacity point tested. The capacity constraint doesn't force discovery of discrete mechanisms; it forces uniform compression. Whether this changes at larger scale (wider layer gaps, more complex computation to approximate) is an open question.
 
-This is the original CNB doc's core argument ("the parameter budget becomes the grounding mechanism") applied at the right location — the forward model's learned representations, not an external decomposition pipeline.
+The important point is that the forward model doesn't need to discover mechanisms for the co-training loop to produce useful self-knowledge. What matters is that the forward model's error structure varies systematically by input type (it's better at focused-attention positions, worse at delimiter tracking), and this variation is what the main model learns to represent.
 
 ### The looped transformer as natural home
 
@@ -176,13 +182,13 @@ Progressing from validated to speculative:
 
 1. **Self-regulation** (validated in grokking): prevent collapse under distributional pressure by penalizing deviation from a frozen reference. No domain knowledge required. The mechanism is insensitive to hyperparameters.
 
-2. **Novelty detection** (partially validated): large residual = "the model is computing something its forward model didn't predict." The residual is semantically richer than the GLP's because it's conditioned on the input — it captures input-specific computational novelty, not just statistical atypicality.
+2. **LM improvement from self-prediction** (validated in LLM co-training): the injection consistently reduces LM loss (-0.05 to -0.48 nats over training), and the benefit grows monotonically even as the forward model's prediction accuracy degrades. The model uses the prediction as a structured reference frame, not a literal preview. The forward model's approximation error varies systematically by input type (focused attention vs delimiter tracking vs distributed computation), and this position-dependent reliability is what the main model learns to exploit.
 
-3. **Adaptive compute** (architecturally plausible in looped transformers): prediction quality gates the number of recurrence loops. Well-predicted inputs converge fast; novel inputs need more computation.
+3. **Learned self-knowledge** (validated, directional form): co-training causes all layers — including layers before the injection point — to develop representations encoding the forward model's error structure, distributed via backprop (R²=0.21 vs 0.02 at post_block0 in controlled retrain). The self-knowledge is directional (vector probe gap 6× scalar gap) and partially causally used (focused-attention cluster selectivity = 2.41 in directional steering). Whether this representation is *manipulable* — usable for flexible reasoning about what the model knows — is untested.
 
-4. **Self-indexing / metacognition** (speculative): co-training gives the main model representations of its own computational states. The model develops a learned self-map — approximate, manipulable knowledge of what it knows and can do.
+4. **Adaptive compute** (architecturally plausible in looped transformers): prediction quality gates the number of recurrence loops. Well-predicted inputs converge fast; poorly-predicted inputs need more computation.
 
-5. **Progressive abstraction** (speculative): the compression ratchet from forward-model predictions enables hierarchical concept formation. Multi-step computations get compressed into single primitives that serve as inputs to higher-order operations.
+5. **Progressive abstraction** (speculative): the compression ratchet from forward-model predictions enables hierarchical concept formation. Multi-step computations get compressed into single primitives that serve as inputs to higher-order operations. Requires wake-sleep consolidation (internalization of offloaded computation) which is untested.
 
 ## Key design questions
 
@@ -194,10 +200,10 @@ Progressing from validated to speculative:
 
 4. **The lag problem**: after the main model learns something new, the forward model's predictions are temporarily wrong — spurious novelty signals. This may be phenomenologically recognizable as the feeling of familiar things seeming strange after an insight. Feature or bug? Probably both: the lag is informative (the model changed in a way not yet captured by the forward model) but could be noisy if updates are frequent.
 
-5. **Good vs. bad novelty engineering**: three tiers of discrimination:
-   - **Hardcoded structural priors**: low-rank residuals > diffuse residuals. Temporally persistent errors > transient ones. High-confidence errors > low-confidence ones. Derivable from information theory.
-   - **Precision weighting**: normalize residuals by estimated variance, either learned or running-average. Large residuals in high-variance regions are uninformative.
-   - **Learned error classification**: a small auxiliary network predicting whether a given error will prove reducible over subsequent training. The amygdala analog — learned valence tagging over error features.
+5. **Residual structure engineering**: The residual is full-rank and diffuse in language (effective rank >235/256 at all capacity points). The original expectation of low-rank residuals corresponding to discrete missed mechanisms did not materialize. However, the residual has meaningful structure when conditioned on behavioral categories (delimiter tracking, focused attention), and the closed-loop model's directional self-knowledge captures this. Open questions:
+   - **Precision weighting**: normalize residuals by estimated variance, either learned or running-average. Untested.
+   - **Learned error classification**: a small auxiliary network predicting whether a given error will prove reducible over subsequent training. Untested.
+   - Whether richer residual structure (low-rank, mechanism-specific) emerges at wider layer gaps or larger scale.
 
 6. **How does the delta-residual interact with the prediction residual?** At coarse forward-model capacity, some of the main model's computation is inherently unpredictable — it falls outside what the forward model can represent. Inputs that rely heavily on this unpredictable remainder are themselves a novelty signal.
 
@@ -208,8 +214,8 @@ Progressing from validated to speculative:
 This doesn't invalidate the original CNB idea — it refines its core arguments and corrects its architectural commitments.
 
 **What carries over**:
-- The size constraint as grounding mechanism — small meta-model forced to discover concepts
-- The information bottleneck framing — compress activations conditioned on existing knowledge, transmit only surprise
+- The size constraint as a meaningful architectural choice — a small auxiliary model that approximates the main model's computation under a capacity budget
+- The conditional framing — predict activations conditioned on current state, not model the unconditional activation distribution (validated: 200× cheaper than GLP at Llama scale)
 - The CLS motivation — AI needs a structurally distinct fast-learning complement
 - The recognition that the GLP's unconditional manifold modeling is the wrong approach
 

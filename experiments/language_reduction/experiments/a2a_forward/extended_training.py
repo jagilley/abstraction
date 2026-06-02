@@ -142,8 +142,9 @@ def a2a_extended_training(
 
     # --- Output directory ---
     gap_tag = f"{predict_from}_to_{predict_to}"
+    fwd_tag = f"fwd{fwd_n_layer}L{fwd_n_head}H{fwd_d_head}d_mlp{fwd_mlp_mult}"
     save_root = (f"{DATA_DIR}/a2a_forward/extended/"
-                 f"{gap_tag}/inject{inject_after_block}/P_{n_tokens}")
+                 f"{gap_tag}/inject{inject_after_block}/{fwd_tag}/P_{n_tokens}")
 
     layer_keys = [f"post_block{i}" for i in range(n_layer)]
 

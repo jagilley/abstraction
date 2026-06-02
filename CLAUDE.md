@@ -51,6 +51,7 @@ Reading, ideas, beliefs, and conversations are shared across projects. Experimen
     2. Wait a minute or two, then check back in and make sure it's running
     3. Then, don't monitor any further and just wait for the notification that the job has completed. I can always go look at Modal logs myself if I want to see the status.
 - Please don't use Explore subagents. These use Claude Haiku, which is too small of a model to be useful. Opt for Sonnet or Opus explore agents/subagents instead if you like, but for short tasks often nothing beats just looking at the data/code yourself.
+- For reading background/context files, please also avoid using subagents. Consuming the relevant context directly is often load-bearing for interpreting results properly. Subagents, especially those that run smaller models, risk misinterpreting results given a lack of context.
 
 ## Quotes
 

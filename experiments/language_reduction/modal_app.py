@@ -162,6 +162,9 @@ from language_reduction.experiments.a2a_forward.llama_train_fwd import (  # noqa
 from language_reduction.experiments.a2a_forward.extended_training import (  # noqa: F401
     a2a_extended_training,
 )
+from language_reduction.experiments.a2a_forward.representational_divergence import (  # noqa: F401
+    a2a_representational_divergence,
+)
 
 
 @app.local_entrypoint()
@@ -794,6 +797,29 @@ def main(
         for lk in sorted(vec.keys()):
             d = vec[lk]["delta_r2"]
             print(f"    {lk}: Δ R² = {d:+.4f}")
+
+    elif stage == "a2a-rep-divergence":
+        result = a2a_representational_divergence.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+        )
+        print("A2A representational divergence analysis complete:")
+        print("\n  CKA (open vs closed):")
+        for k, v in result["step1_cka"].items():
+            print(f"    {k:>15s}: {v:.6f}")
+        print("\n  Diff PCA:")
+        for k, v in result["step2_pca"].items():
+            print(f"    {k:>15s}: eff_rank={v['effective_rank']:.1f}, "
+                  f"top10={v['top10_frac']:.3f}")
+        print("\n  Alignment (residual var in diff PCs):")
+        for k, v in result["step3_alignment"].items():
+            r10 = v["residual_var_in_diff_pcs"].get("top_10", {})
+            print(f"    {k:>15s}: Δ R²={v['delta_r2']:+.4f}, "
+                  f"ratio(top10)={r10.get('ratio', 0):.2f}x")
 
     elif stage == "a2a-cache-llama":
         result = a2a_cache_llama_acts.remote(
