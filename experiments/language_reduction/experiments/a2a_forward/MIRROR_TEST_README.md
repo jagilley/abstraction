@@ -167,3 +167,166 @@ modal run --detach language_reduction/modal_app.py --stage a2a-mirror-geometry \
   --fwd-n-layer 3 --fwd-d-head 128 --fwd-n-head 4 --fwd-mlp-mult 4 \
   --inject-after-block 1
 ```
+
+## Mirror test v2: compensatory response and perturbation discrimination (2026-06-03)
+
+**Code**: `mirror_test_v2.py`
+
+The original mirror test (above) defines a self-knowledge subspace via divergence PCs between the CL and OL models, then tests whether perturbation responses are channeled through that subspace. This has a circularity concern: the subspace is defined by the CL-OL difference and then tested for CL-OL differential engagement. The geometry control partially addressed this but showed the CL-M result is largely explained by general activation geometry.
+
+Mirror test v2 avoids subspace cherry-picking entirely with two tests that depend on no externally-defined directions.
+
+### Test 1 — Compensatory response ("reaching for the mark")
+
+Applies random perturbations at post_block1 and measures the downstream response R at post_block3. Two metrics: response norm ||R|| (does the model dampen the perturbation?) and cos(R, δ) (does the response oppose or preserve the perturbation direction?).
+
+| Condition | \|\|R\|\| (s=2) | \|\|R\|\|/OL | cos(R, δ) | Δloss |
+|---|---|---|---|---|
+| CL+M | 2.421 | 0.919 | +0.788 | +0.011 |
+| CL-M | 2.438 | 0.925 | +0.778 | +0.010 |
+| OL | 2.635 | 1.000 | +0.715 | +0.023 |
+
+**The dampening is robust**: CL models absorb ~8% of perturbation magnitude that the OL model doesn't, consistent across all perturbation strengths (ratios 0.918–0.920 for CL+M). Loss degradation is 2× lower for CL models, replicating the robustness gap without any subspace cherry-picking.
+
+**The CL model does not "reach for the mark"**: cos(R, δ) is *higher* for CL models (+0.788) than OL (+0.715). The response is more aligned with the perturbation direction, not less. The model produces a *smaller, more organized* response — direction-preserving but magnitude-dampened. The OL model's response is more chaotic: the perturbation scatters across many directions (lower cosine), causing more total damage.
+
+**Interpretation**: The self-knowledge representations provide structural scaffolding that constrains perturbation propagation into coherent, low-damage pathways. This is passive absorption, not active correction — more like "the model's skin is tougher" than "the model reaches for the mark." The Gallup mirror test analogy (deliberate, targeted self-correction) may not be the right frame; what we see is structural regularization emerging from self-knowledge training.
+
+### Test 2 — Perturbation discrimination at the logit level (null result)
+
+Applies 8 different perturbation directions and measures whether the model's output distribution shift (Δlogits) distinguishes which perturbation was applied (off-diagonal cosine of mean logit shift vectors).
+
+| Condition | Off-diag cosine | \|\|shift\|\| | KL div |
+|---|---|---|---|
+| CL+M | 0.007 | 54.1 | 0.023 |
+| CL-M | 0.010 | 52.3 | 0.022 |
+| OL | 0.001 | 74.2 | 0.049 |
+
+Off-diagonal cosine is near zero for all conditions. Random perturbation directions in 256-D space are nearly orthogonal by construction, so the model's approximately linear response produces naturally uncorrelated logit shifts regardless of self-knowledge. The metric doesn't distinguish conditions.
+
+The magnitude comparison replicates the robustness gap: OL logit shifts are 37% larger and KL divergence is 2× higher.
+
+**Future work**: This test would become informative with semantically structured perturbation directions (e.g., residual directions grouped by behavioral category — delimiter tracking vs focused attention) rather than random directions, and at larger model scale where the output channel can express richer concept-specific effects. See Vogel (2025), "Small Models Can Introspect, Too" for the approach at 32B scale with concept-specific steering vectors.
+
+### Test 3 — Position-level compensation structure
+
+Compensation varies by sequence position:
+
+| Position | CL+M/OL | CL-M/OL |
+|---|---|---|
+| 0 | 0.965 | 1.003 |
+| 15 | 0.929 | 0.940 |
+| 63 | 0.916 | 0.921 |
+| 126 | 0.914 | 0.919 |
+
+At position 0 (no context), CL-M provides no dampening (ratio 1.003) but CL+M does (0.965) — the real-time mirror helps where internal context is minimal. At later positions, both converge to ~0.92 as the weight-based self-knowledge dominates. This is consistent with the behavioral residual finding that self-knowledge effects are position-dependent.
+
+### Reproduction
+
+```bash
+modal run --detach language_reduction/modal_app.py --stage a2a-mirror-test-v2 \
+  --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 \
+  --fwd-n-layer 2 --inject-after-block 1
+```
+
+## Mirror test v3: topic-level perturbation discrimination (2026-06-03)
+
+**Code**: `mirror_test_v3.py`
+**Inspired by**: Vogel (2025), "Small Models Can Introspect, Too"
+
+### Motivation
+
+Mirror test v2's perturbation discrimination (Test 2) was a null result: random perturbation directions in 256-D are nearly orthogonal by construction, producing trivially uncorrelated logit shifts regardless of self-knowledge. The off-diagonal cosine metric was floor-effected — it couldn't distinguish "perfect discrimination" from "no discrimination" for orthogonal perturbations.
+
+Vogel (2025) showed that concept-specific steering vectors (e.g. "cat", "bread") produce concept-specific logit shifts in Qwen2.5-Coder-32B — the model can identify *what* was injected, not just *that* something was. The key insight: semantically coherent perturbation directions produce semantically identifiable output effects.
+
+However, Vogel's test relies on instruction-tuning, elaborate prompting, and ~20 downstream layers — none of which our 4-layer, 28.9M-param model has. We adapt the core idea (structured perturbation directions → concept-specific output measurement) to our setting, testing not whether the model can "introspect" in the verbal-report sense, but whether the CL model's representational reorganization produces more topic-specific perturbation responses at the logit level.
+
+### Design
+
+**Phase 1 — Topic directions**: Classify eval sequences by topic via keyword matching in decoded text (math, biology, history — language and geography had insufficient data). Compute contrastive post_block1 directions per topic using the OL model:
+
+```
+d_topic = normalize(mean(post_block1 | topic) - mean(post_block1))
+```
+
+Topic direction pairwise cosine (near-orthogonal, mean off-diagonal: -0.077):
+
+| | math | biology | history |
+|---|---|---|---|
+| math | 1.000 | -0.082 | -0.149 |
+| biology | -0.082 | 1.000 | -0.001 |
+| history | -0.149 | -0.001 | 1.000 |
+
+**Phase 2 — Perturbation discrimination**: Perturb at post_block1 along each topic direction (s=2.0) and measure the mean logit boost at each topic's vocabulary tokens (82–97 token IDs per topic, 424 total unique across topics). This produces a perturbation × topic logit matrix. Diagonal enrichment (each perturbation preferentially boosts its own topic's tokens) measures topic-specific discrimination at the output level.
+
+**Controls**: 5 random perturbation directions (same metric — should show no diagonal structure).
+
+### Results (1% forward model, controlled retrain checkpoints)
+
+**Logit boost matrices** (rows = perturbation direction, columns = measured topic):
+
+CL+M:
+
+| | math | biology | history |
+|---|---|---|---|
+| math | **+0.430** | -0.112 | -0.281 |
+| biology | +0.131 | **+0.699** | -0.107 |
+| history | -0.134 | -0.177 | **+0.645** |
+
+CL-M:
+
+| | math | biology | history |
+|---|---|---|---|
+| math | **+0.403** | -0.093 | -0.252 |
+| biology | +0.131 | **+0.668** | -0.084 |
+| history | -0.123 | -0.164 | **+0.604** |
+
+OL:
+
+| | math | biology | history |
+|---|---|---|---|
+| math | **+0.665** | -0.194 | -0.370 |
+| biology | +0.226 | **+0.997** | -0.203 |
+| history | -0.244 | -0.323 | **+0.900** |
+
+All three conditions show clear diagonal structure. Perturbing in the "biology" direction boosts biology tokens while suppressing math and history tokens, etc. Random perturbation directions produce near-zero topic variance (0.005–0.008), confirming the topic directions capture real structure. This fixes v2's null result — the problem was random orthogonal directions, not absence of discrimination.
+
+**Summary metrics:**
+
+| Condition | Diag mean | Off-diag mean | Enrichment (Δ) | Diag / \|off-diag\| | Mean Δloss |
+|---|---|---|---|---|---|
+| CL+M | +0.591 | -0.113 | +0.705 | 5.22 | +0.051 |
+| CL-M | +0.558 | -0.097 | +0.656 | 5.73 | +0.047 |
+| OL | +0.854 | -0.185 | +1.039 | 4.62 | +0.112 |
+
+### Interpretation
+
+**Raw magnitude: OL > CL.** The OL model shows higher absolute diagonal enrichment (+1.04 vs +0.70) because it responds ~1.5× more to all perturbations (the robustness gap: OL Δloss = 0.112 vs CL+M = 0.051, ratio 2.21×). This magnitude difference is the same robustness gap seen in v2 Test 1 and is not specific to topic discrimination.
+
+**Proportional specificity: CL > OL.** The diag/|off-diag| ratio — how much on-target signal per unit of off-target leakage — is 13–24% higher for CL models (5.22–5.73 vs 4.62). The CL model dampens perturbation responses non-uniformly: it retains 69.2% of OL's on-target (diagonal) signal but only 61.1% of OL's off-target (off-diagonal) leakage. Cross-topic noise is suppressed 8pp more than topic-specific signal. This is not uniform compression — it is selective preservation of topic-relevant information.
+
+**The effect is in the weights, not the mirror.** CL-M shows the highest proportional specificity (5.73), consistent with v2's finding that CL-M ≥ CL+M for self-knowledge metrics. The representational organization was needed during training but is fully internalized.
+
+### What this does and does not show
+
+**This is not introspection.** Vogel's test requires an instruction-tuned model with ~20 downstream layers and elaborate prompting to elicit verbal reports about injected concepts. Our 4-layer vanilla model cannot do that, and both the CL and OL models show strong diagonal logit structure — any model with topic-specific representations will produce topic-specific Jacobians. The diagonal structure itself is a linear-approximation property, not evidence of self-awareness.
+
+**This is evidence for more organized internal representations.** The CL model's perturbation response is smaller (robustness gap) and proportionally more topic-specific (higher diag/|off-diag| ratio). Perturbations are channeled into coherent, low-damage, topic-preserving pathways rather than scattering across all dimensions. This is consistent with the representational reorganization documented by the linear probes (Run 6: R²=0.42 vs 0.26), the robustness gap (v2 Test 1: 2–3× less loss degradation), and the directional steering selectivity (Run 8: focused-attention cluster at 2.41×).
+
+The proportional specificity result adds one new piece to the picture: the CL model's organized representations don't just preserve forward-model-error structure — they also preserve topic-level semantic structure more effectively under perturbation. This is a downstream consequence of the same representational reorganization, not a separate capability.
+
+### Limitations
+
+1. **Only 3 of 5 topics survived** — "language" (2 sequences) and "geography" (8 sequences) had insufficient data in the 40-batch eval window. FineWeb-Edu is heavily weighted toward math/science/history.
+2. **Topic directions are nearly orthogonal** (mean off-diag cosine: -0.077). This partially recapitulates the v2 problem — with more overlapping directions, the discrimination test would be harder and more informative.
+3. **No error bars** — the 13–24% proportional specificity advantage is consistent across topics but could be noise with only 3 topics. A larger-scale replication with more topics and explicit bootstrap confidence intervals would strengthen the finding.
+4. **Small topic samples** for direction computation (10–38 sequences per topic). The topic directions may be noisy estimates of the true topic centroids.
+
+### Reproduction
+
+```bash
+modal run --detach language_reduction/modal_app.py --stage a2a-mirror-test-v3 \
+  --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 \
+  --fwd-n-layer 2 --inject-after-block 1
+```

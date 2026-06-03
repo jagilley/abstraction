@@ -85,6 +85,8 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `llama_cache_acts.py` | Cache Llama 3.2 1B activations for scale-up experiment |
 | `representational_divergence.py` | Representational divergence: CKA, diff PCA, self-knowledge alignment between open- and closed-loop models |
 | `mirror_test.py` | Mirror test: perturbation response channeling through self-knowledge subspace |
+| `mirror_test_v2.py` | Mirror test v2: compensatory response and perturbation discrimination (no subspace cherry-picking) |
+| `mirror_test_v3.py` | Mirror test v3: topic-level perturbation discrimination (Vogel-inspired, semantic directions) |
 | `mirror_test_geometry_control.py` | Geometry control: SK fraction of general activation variance vs perturbation response |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
@@ -456,6 +458,28 @@ Analog of the biological mirror test (Gallup, 1970). Applies arbitrary perturbat
 3. **Self-knowledge is in the weights, not the real-time mirror**: CL-M ≥ CL+M for raw SK-fraction. But the geometry control reveals the CL+M condition (with injection) has a *perturbation-specific* enrichment the CL-M condition lacks — the mirror may matter for how the model handles novel perturbations, even though the general self-knowledge is internalized.
 
 **Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-mirror-test --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
+
+### Mirror test v2: compensatory response (2026-06-03)
+
+**Full writeup**: [MIRROR_TEST_README.md](MIRROR_TEST_README.md) (v2 section)
+
+Redesigned mirror test avoiding the subspace cherry-picking problem of the original. Two tests that depend on no externally-defined directions: (1) compensatory response — does the model dampen perturbations? (2) perturbation discrimination at the logit level — does the model's output distinguish which perturbation was applied?
+
+**Key results**: CL models dampen perturbation magnitude by 8% (||R||/OL = 0.919, consistent across all perturbation strengths) and take 2× less loss degradation — replicating the robustness gap without any subspace definition. However, the CL model does not "reach for the mark": its response is *more* aligned with the perturbation direction (cos = +0.788 vs +0.715 for OL), not less. The model produces a smaller, more organized response rather than actively opposing the perturbation. The Gallup mirror test analogy (deliberate self-correction) may not apply; what we see is structural regularization — passive absorption through organized representations. The perturbation discrimination test was a null result (all models produce naturally uncorrelated logit shifts for random perturbation directions); future work should use semantically structured perturbation directions.
+
+**Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-mirror-test-v2 --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
+
+### Mirror test v3: topic-level perturbation discrimination (2026-06-03)
+
+**Full writeup**: [MIRROR_TEST_README.md](MIRROR_TEST_README.md) (v3 section)
+
+Fixes the v2 null result on perturbation discrimination by replacing random perturbation directions with topic-specific directions (math, biology, history) derived from contrastive post_block1 activations. Inspired by Vogel (2025), "Small Models Can Introspect, Too," which showed concept-specific steering vectors produce concept-specific logit shifts in a 32B model.
+
+**Key results**: All three conditions (CL+M, CL-M, OL) show clear diagonal structure in the perturbation × topic logit matrix — perturbing in the "biology" direction preferentially boosts biology tokens, etc. The OL model shows higher absolute diagonal enrichment (+1.04 vs +0.70) due to the robustness gap (OL responds ~1.5× more to all perturbations). However, the CL model's response is proportionally more topic-specific: diag/|off-diag| ratio is 5.22 (CL+M) and 5.73 (CL-M) vs 4.62 (OL). The CL model retains 69.2% of OL's on-target signal but only 61.1% of off-target leakage — cross-topic noise is suppressed 8pp more than topic-specific signal.
+
+This is not evidence for introspection (which requires instruction-following and many downstream layers), but it is further evidence that cerebellar co-training produces more organized internal representations that preserve semantic structure under perturbation. The effect is in the weights (CL-M > CL+M), consistent with earlier findings.
+
+**Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-mirror-test-v3 --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
 
 ## Run 7: Extended co-training — 50K steps (2026-06-01)
 

@@ -171,6 +171,12 @@ from language_reduction.experiments.a2a_forward.mirror_test import (  # noqa: F4
 from language_reduction.experiments.a2a_forward.mirror_test_geometry_control import (  # noqa: F401
     a2a_mirror_test_geometry_control,
 )
+from language_reduction.experiments.a2a_forward.mirror_test_v2 import (  # noqa: F401
+    a2a_mirror_test_v2,
+)
+from language_reduction.experiments.a2a_forward.mirror_test_v3 import (  # noqa: F401
+    a2a_mirror_test_v3,
+)
 
 
 @app.local_entrypoint()
@@ -875,6 +881,70 @@ def main(
                       f"perturb={c['perturbation_sk_frac']:.4f} "
                       f"Δ={c['difference']:+.4f}")
 
+    elif stage == "a2a-mirror-test-v2":
+        ckpt_source = "controlled"
+        ckpt_step = 0
+        if fwd_n_layer > 2 or fwd_d_head > 64 or fwd_n_head > 1 or fwd_mlp_mult > 2:
+            ckpt_source = "extended"
+            ckpt_step = n_steps
+        result = a2a_mirror_test_v2.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+            ckpt_source=ckpt_source, ckpt_step=ckpt_step,
+        )
+        print("Mirror test v2 complete:")
+        t1 = result["test1_compensatory"]
+        print("\n  Test 1 — Compensatory response (s=2.0):")
+        # Handle float vs string keys from JSON serialization
+        def _get(d, k):
+            return d.get(k, d.get(str(k), d.get(float(k) if isinstance(k, str) else k)))
+        ol_norm = _get(t1["OL"], 2.0)["response_norm"]
+        for cond in ["CL+M", "CL-M", "OL"]:
+            r = _get(t1[cond], 2.0)
+            ratio = r["response_norm"] / ol_norm if ol_norm > 0 else 0
+            print(f"    {cond:>6s}: ||R||={r['response_norm']:.4f} "
+                  f"({ratio:.3f}x OL), "
+                  f"cos(R,δ)={r['cosine_with_delta']:+.4f}")
+        t2 = result["test2_discrimination"]
+        print("\n  Test 2 — Perturbation discrimination:")
+        for cond in ["CL+M", "CL-M", "OL"]:
+            r = t2[cond]
+            print(f"    {cond:>6s}: off-diag cos={r['off_diag_cosine']:.4f}")
+
+    elif stage == "a2a-mirror-test-v3":
+        ckpt_source = "controlled"
+        ckpt_step = 0
+        if fwd_n_layer > 2 or fwd_d_head > 64 or fwd_n_head > 1 or fwd_mlp_mult > 2:
+            ckpt_source = "extended"
+            ckpt_step = n_steps
+        result = a2a_mirror_test_v3.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+            ckpt_source=ckpt_source, ckpt_step=ckpt_step,
+        )
+        print("Mirror test v3 (topic discrimination) complete.")
+        r = result["results"]
+        topics = result["topic_directions"]["topics"]
+        n_t = len(topics)
+        uniform = 1.0 / n_t if n_t > 0 else 0
+        print(f"\n  Topics: {topics}")
+        print(f"  Direction overlap: {result['topic_directions']['mean_off_diag_cosine']:.4f}")
+        print(f"\n  {'Condition':>8s}  {'Diag enrich':>12s}  {'Diag frac':>10s}  "
+              f"{'Uniform':>8s}")
+        print("  " + "-" * 45)
+        for cond in ["CL+M", "CL-M", "OL"]:
+            cr = r[cond]
+            print(f"  {cond:>8s}  {cr['diag_enrichment']:>+12.5f}  "
+                  f"{cr['diag_fraction']:>10.4f}  {uniform:>8.4f}")
+
     elif stage == "a2a-cache-llama":
         result = a2a_cache_llama_acts.remote(
             n_tokens=n_tokens,
@@ -937,4 +1007,5 @@ def main(
               "a2a-behavioral-residual, a2a-scaling-sweep, "
               "a2a-controlled-retrain, a2a-directional-steer, "
               "a2a-extended-training, "
+              "a2a-mirror-test-v2, a2a-mirror-test-v3, "
               "a2a-cache-llama, a2a-train-llama")
