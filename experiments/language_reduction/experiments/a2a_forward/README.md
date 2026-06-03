@@ -88,10 +88,12 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `mirror_test_v2.py` | Mirror test v2: compensatory response and perturbation discrimination (no subspace cherry-picking) |
 | `mirror_test_v3.py` | Mirror test v3: topic-level perturbation discrimination (Vogel-inspired, semantic directions) |
 | `mirror_test_geometry_control.py` | Geometry control: SK fraction of general activation variance vs perturbation response |
+| `model_scale_experiment.py` | Model scale experiment: residual structure vs main model size (29M vs 77M) |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment |
 | `MIRROR_TEST_README.md` | [Mirror test for neural self-knowledge](MIRROR_TEST_README.md) — perturbation response channeling, robustness gap |
+| `MODEL_SCALE_README.md` | [Model scale experiment](MODEL_SCALE_README.md) — residual structure vs main model size, connection to grokking |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -481,6 +483,34 @@ This is not evidence for introspection (which requires instruction-following and
 
 **Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-mirror-test-v3 --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
 
+## Model scale experiment: residual structure vs main model size (2026-06-03)
+
+**Full writeup**: [MODEL_SCALE_README.md](MODEL_SCALE_README.md)
+
+Tests whether the full-rank, diffuse residual observed at 29M params is a property of language or of small models on language. Trains 29M (4L/4H/256D) and 77M (8L/8H/512D) models on identical data (100M tokens), with capacity-matched forward models (~1–1.5%), predicting post_block0 → post_block1.
+
+**Key results**:
+
+1. **Every rank-normalized metric points the same direction**: The 77M residual is more concentrated — lower relative effective rank (91.8% vs 93.8%), lower proportional rank-for-50%/90% variance, and 64% higher top-1 PC variance (2.86% vs 1.74%). Seven independent measures, all consistent.
+
+2. **The 77M model's computation is much more predictable**: Cosine 0.994 vs 0.980, despite 2× tighter attention compression in the forward model (8x vs 4x). A bigger model develops more regular layer computation.
+
+3. **Sentence-start effects collapse at 77M**: d=-0.35 vs d=-1.05. The forward model no longer struggles with sentence starts — the main model's sentence-start processing is regular enough to compress. Delimiter tracking persists as the dominant residual signal at both scales.
+
+4. **Early-training rank dip at 77M**: The 77M model shows a transient rank decrease (69.8% → 66.9%) at step 500 before climbing — a weak echo of grokking's rank compression during the phase transition. The 29M model does not show this.
+
+5. **Consistent direction, small magnitude**: The rank reduction (93.8% → 91.8%) is modest, as expected for a 2.7× scale-up on a DGP as complex as language. The grokking analogy holds in direction if not magnitude — the Fourier solution concentrates in ~15/128 dimensions; language computation concentrates very slowly as the model improves.
+
+**Reproduction**:
+```bash
+# 29M
+modal run --detach language_reduction/modal_app.py --stage a2a-model-scale \
+  --n-tokens 100000000 --n-steps 30000 --n-layer 4 --n-head 4 --n-embd 256
+# 77M
+modal run --detach language_reduction/modal_app.py --stage a2a-model-scale \
+  --n-tokens 100000000 --n-steps 30000 --n-layer 8 --n-head 8 --n-embd 512
+```
+
 ## Run 7: Extended co-training — 50K steps (2026-06-01)
 
 **Full writeup**: [EXTENDED_TRAINING_README.md](EXTENDED_TRAINING_README.md)
@@ -527,5 +557,6 @@ Same controlled retrain design but with a 10% forward model (3L, 4H, 128D, 3.2M 
 4. **Thalamic filtering**: Replace the linear `CerebellarGate` with a learned nonlinear gate (MLP). May help extract directional structure from the high-rank residual.
 5. **Self-regulation**: Freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
 6. **Orthogonalized directional test**: Re-run the directional steering with Gram-Schmidt-orthogonalized W@c directions to control for the 0.41 mean cosine overlap. Would give a cleaner estimate of true directional selectivity.
+7. **Model scale 350M**: Third data point for the model scale experiment. The 29M → 77M comparison shows consistent residual concentration across all metrics. A 350M model (~24L/16H/1024D on 500M+ tokens) tests whether the trend continues, accelerates, or saturates. See [MODEL_SCALE_README.md](MODEL_SCALE_README.md).
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

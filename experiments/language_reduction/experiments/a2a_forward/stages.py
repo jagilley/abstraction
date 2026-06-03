@@ -195,7 +195,8 @@ def a2a_train(
 
     # --- Save ---
     gap_tag = f"{predict_from}_to_{predict_to}"
-    save_dir = f"{DATA_DIR}/a2a_forward/{fwd_type}_L{fwd_n_layer}/{gap_tag}/P_{n_tokens}"
+    model_tag = f"gpt_{n_layer}L_{n_head}H_{n_embd}D"
+    save_dir = f"{DATA_DIR}/a2a_forward/{model_tag}/{fwd_type}_L{fwd_n_layer}/{gap_tag}/P_{n_tokens}"
     os.makedirs(save_dir, exist_ok=True)
     torch.save(model.state_dict(), os.path.join(save_dir, "model.pt"))
     torch.save(fwd_model.state_dict(), os.path.join(save_dir, "fwd_model.pt"))

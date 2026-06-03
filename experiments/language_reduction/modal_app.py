@@ -177,6 +177,9 @@ from language_reduction.experiments.a2a_forward.mirror_test_v2 import (  # noqa:
 from language_reduction.experiments.a2a_forward.mirror_test_v3 import (  # noqa: F401
     a2a_mirror_test_v3,
 )
+from language_reduction.experiments.a2a_forward.model_scale_experiment import (  # noqa: F401
+    a2a_model_scale,
+)
 
 
 @app.local_entrypoint()
@@ -199,6 +202,9 @@ def main(
     mode: str = "spectral",
     ordering: str = "clustered",
     n_cl_tokens: int = 100,
+    n_layer: int = 4,
+    n_head: int = 4,
+    n_embd: int = 256,
     fwd_type: str = "transformer",
     predict_from: str = "post_block0",
     predict_to: str = "post_block1",
@@ -543,6 +549,7 @@ def main(
     elif stage == "a2a-train":
         result = a2a_train.remote(
             n_tokens=n_tokens, block_size=block_size, n_steps=n_steps, lr=lr,
+            n_layer=n_layer, n_head=n_head, n_embd=n_embd,
             fwd_type=fwd_type, predict_from=predict_from, predict_to=predict_to,
             fwd_n_layer=fwd_n_layer,
             fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head, fwd_mlp_mult=fwd_mlp_mult,
@@ -983,6 +990,32 @@ def main(
         print(f"  Effective rank: {pca['effective_rank']:.1f}/{pca['max_rank']}")
         print(f"  Training time: {result['training_seconds']:.0f}s")
 
+    elif stage == "a2a-model-scale":
+        result = a2a_model_scale.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            n_layer=n_layer, n_head=n_head, n_embd=n_embd,
+            n_steps=n_steps, lr=lr,
+            predict_from=predict_from, predict_to=predict_to,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+        )
+        mm = result["main_model"]
+        fm = result["forward_model"]
+        a = result["analysis"]
+        pca = a["residual_pca"]
+        beh = a["behavioral_effects"]
+        print(f"Model scale experiment complete:")
+        print(f"  Main: {mm['n_params']:,} params, val_loss={mm['final_val_loss']:.4f}")
+        print(f"  Fwd:  {fm['n_params']:,} params ({fm['capacity_ratio']:.1%})")
+        print(f"  Cosine: {a['basic_quality']['mean_cosine_sim']:.4f}")
+        print(f"  Effective rank: {pca['effective_rank']:.1f}/{pca['max_rank']}")
+        print(f"  Top-1/5/10 PC var: {pca['top1_pc_variance']:.3f}/"
+              f"{pca['top5_pc_variance']:.3f}/{pca['top10_pc_variance']:.3f}")
+        print(f"  r(res,LM): {a['residual_lm_loss_correlation']:+.4f}")
+        print(f"  d(sentence_start): {beh['cohen_d_sentence_start']:+.3f}")
+        print(f"  d(before_closer): {beh['cohen_d_before_closer']:+.3f}")
+
     else:
         print(f"Unknown stage: {stage}")
         print("Available: tokenize, stats, spectral, denoise, vocab-reduce, "
@@ -1008,4 +1041,4 @@ def main(
               "a2a-controlled-retrain, a2a-directional-steer, "
               "a2a-extended-training, "
               "a2a-mirror-test-v2, a2a-mirror-test-v3, "
-              "a2a-cache-llama, a2a-train-llama")
+              "a2a-cache-llama, a2a-train-llama, a2a-model-scale")
