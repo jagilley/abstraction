@@ -456,11 +456,31 @@ Same controlled retrain design (identical lr/seed/init) but trained for 50K step
 
 **Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-extended-training --n-tokens 10000000 --n-steps 50000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2`
 
+## Run 7b: 10% forward model, 15K steps (2026-06-02)
+
+**Full writeup**: [EXTENDED_TRAINING_README.md](EXTENDED_TRAINING_README.md) (Run 7b section)
+
+Same controlled retrain design but with a 10% forward model (3L, 4H, 128D, 3.2M params) instead of the 2.7% model (660K params). Trained for 15K steps. Tests whether a capacity-sufficient forward model changes the dynamics.
+
+**Key results**:
+
+1. **Train-val gaps still identical**: Even with a forward model exceeding each main model block's 2.4M params, the gaps differ by only 0.02–0.05 nats. The injection does not interact with memorization dynamics at any forward model capacity.
+
+2. **Zero net val loss benefit — pure computation relocation**: The closed-loop model with injection achieves the same val loss as the open-loop model (5.569 vs 5.573 at 15K). The injection benefit (-0.213) is exactly offset by dependency (+0.210). The 10% model enables full offloading rather than supplementation.
+
+3. **U-shaped injection benefit**: -0.27 at step 500 (huge early benefit), contracts to -0.08 at step 5K, then recovers to -0.21 at 15K. Opposite of the 1% model's monotonic growth.
+
+4. **Self-knowledge probes 2× stronger**: Vector Δ R² = +0.34 at post_block0, +0.47 at post_block3 (vs +0.19 and +0.16 with 1% model). Scalar probes also show large gaps (+0.33 to +0.45), unlike the 1% model where scalar gaps were negligible. When the forward model captures 99.7% of computation, the residual magnitude itself becomes informative.
+
+5. **Capacity sweet spot for net benefit**: The 1% model is imperfect enough that the main model can't fully offload, yielding a small net benefit. The 10% model is too capable — the main model offloads aggressively and becomes fully dependent with no net gain. The optimal capacity for injection benefit lies between 1% and 10%.
+
+**Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-extended-training --n-tokens 10000000 --n-steps 15000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 3 --fwd-d-head 128 --fwd-n-head 4 --fwd-mlp-mult 4`
+
 ## Next steps
 
-1. **Wake-sleep consolidation**: The model becomes dependent on the injection rather than internalizing it (Run 6). The brain solves this by alternating regimes: cerebellar loop active during waking, offline consolidation during sleep. Engineering analog: interleave closed-loop training (with injection) and open-loop training (without injection), forcing the main model to internalize the predicted computation into its own weights. Anneal injection strength over cycles.
+1. **Wake-sleep consolidation**: The model becomes dependent on the injection rather than internalizing it (Run 6, Run 7b). The brain solves this by alternating regimes: cerebellar loop active during waking, offline consolidation during sleep. Engineering analog: interleave closed-loop training (with injection) and open-loop training (without injection), forcing the main model to internalize the predicted computation into its own weights. Anneal injection strength over cycles.
 2. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. Would give the model more computational depth to act on its self-knowledge at inference time. The directional steering results specifically motivate this: the model encodes directional self-knowledge it can only partially use with 2 downstream layers.
-3. **Closed-loop with 10% forward model**: The scaling sweep shows the 10% model saturates on the main model's computation. Running closed-loop with this model (instead of the 2.7% model from Run 4) tests whether a better prediction produces larger LM improvement.
+3. **Continual learning / transfer evaluation**: The 10% model produces 2× stronger self-knowledge with zero val loss benefit — the reorganization is invisible to NTP on a static dataset. A plausible natural test: freeze both models (open-loop and closed-loop trained), fine-tune on a novel task, and measure adaptation speed and interference. This could test whether the self-knowledge translates to functional capability that validation loss can't detect.
 4. **Thalamic filtering**: Replace the linear `CerebellarGate` with a learned nonlinear gate (MLP). May help extract directional structure from the high-rank residual.
 5. **Self-regulation**: Freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
 6. **Orthogonalized directional test**: Re-run the directional steering with Gram-Schmidt-orthogonalized W@c directions to control for the 0.41 mean cosine overlap. Would give a cleaner estimate of true directional selectivity.

@@ -108,14 +108,113 @@ The injection benefit, dependency, and forward model cosine all evolve monotonic
 
 The identical overfitting trajectories don't mean the two models are equivalent. They mean both models are equally good at compressing a fixed 10M-token distribution, which is a separate question from whether their representations are organized differently. The growing injection benefit (0.48 nats, visible only when you compare with-injection vs without-injection) is invisible to standard val loss but reflects a large and growing structural difference between the two models.
 
+## Run 7b: 10% forward model, 15K steps (2026-06-02)
+
+Same controlled design (identical lr/seed/init), but with a 10% forward model (3.2M params) instead of the 2.7% model (660K params). Trained for 15K steps (~13.7 epochs). Tests whether a capacity-sufficient forward model changes the overfitting dynamics or the injection benefit pattern.
+
+| Parameter | Run 7 (this file, above) | Run 7b (this section) |
+|---|---|---|
+| Forward model | 2L, 1H, 64D (660K, 2.3%) | 3L, 4H, 128D (3.2M, 10.9%) |
+| Steps | 50,000 | 15,000 |
+| Open-loop fwd cosine (final) | 0.863 | 0.997 |
+
+The 10% forward model reaches 0.997 cosine in open-loop — it captures essentially all of the main model's computation (consistent with the scaling sweep saturation result). This lets us test: what happens when the injection carries nearly perfect information rather than a noisy approximation?
+
+### Train-val gaps are still identical
+
+| Step | Open-loop gap | Closed-loop gap | Difference |
+|---|---|---|---|
+| 5,000 | -0.727 | -0.716 | 0.011 |
+| 10,000 | -1.524 | -1.501 | 0.023 |
+| 15,000 | -2.134 | -2.082 | 0.052 |
+
+Even with a forward model that exceeds each main model block's parameter count (3.2M vs 2.4M per block), the train-val gap dynamics are indistinguishable. The closed-loop gap is consistently ~0.02–0.05 nats smaller, but this is within noise and doesn't grow systematically. The injection does not interact with memorization dynamics regardless of forward model capacity.
+
+### The injection relocates computation without improving it
+
+| Step | Open val | Closed val (with inj) | Closed val (no inj) | Injection Δ |
+|---|---|---|---|---|
+| 500 | 6.302 | 6.334 | 6.603 | -0.268 |
+| 5,000 | 5.172 | 5.198 | 5.278 | -0.080 |
+| 10,000 | 5.338 | 5.360 | 5.509 | -0.149 |
+| 15,000 | 5.573 | 5.569 | 5.782 | -0.213 |
+
+The closed-loop model WITH injection is never meaningfully better than the open-loop model (at best -0.004 nats at step 15K). The injection benefit (-0.213 at 15K) is almost exactly offset by the dependency cost (+0.210). The model offloads computation to the forward model rather than genuinely improving.
+
+Contrast with the 1% model, where closed-with-injection was consistently ~0.05–0.08 nats better than open-loop at comparable training steps. The 10% model enables more aggressive offloading, but the net effect is zero — pure relocation of computation, not improvement.
+
+### U-shaped injection benefit trajectory
+
+| Step | Δ (10% model) | Δ (1% model, from above) |
+|---|---|---|
+| 500 | **-0.268** | ~-0.03 |
+| 5,000 | -0.080 | -0.048 |
+| 10,000 | -0.149 | -0.082 |
+| 15,000 | -0.213 | -0.121 |
+
+The 10% model shows a large early benefit (-0.27 at step 500) that contracts sharply and then recovers. The 1% model shows monotonic growth. The interpretation: the 10% model quickly learns a high-quality approximation that the main model immediately relies on heavily. As training continues, the main model's computation diverges from the prediction (closed-loop cosine drops from 0.93 to 0.94 initially, then down to 0.937), and the benefit temporarily shrinks. Then co-specialization deepens and the benefit resumes growing.
+
+### Self-knowledge probes are 2× stronger
+
+**Vector probes (Δ R² = closed − open):**
+
+| Layer | 10% fwd, 15K | 1% fwd, 10K (controlled retrain) |
+|---|---|---|
+| post_block0 | **+0.340** | +0.185 |
+| post_block1 | **+0.393** | +0.200 |
+| post_block2 | **+0.426** | +0.185 |
+| post_block3 | **+0.472** | +0.161 |
+
+The self-knowledge signal is roughly 2× stronger with the 10% forward model, and increases monotonically through the layers (unlike the 1% model where it was approximately uniform).
+
+**Scalar probes also show large gaps (new pattern):**
+
+| Layer | Scalar Δ R² (10% fwd) | Scalar Δ R² (1% fwd, 10K) |
+|---|---|---|
+| post_block0 | **+0.326** | +0.026 |
+| post_block3 | **+0.449** | +0.035 |
+
+With the 1% model, the scalar gap was 6× smaller than the vector gap — the model encoded *what kind* of computation was missed (direction) but not *how much* (magnitude). With the 10% model, scalar and vector gaps are comparable. This makes sense: when the forward model captures 99.7% of the computation, the residual magnitude itself becomes informative. What the 10% model misses is genuinely the hard part, so "how much was missed" correlates meaningfully with computational difficulty.
+
+### Forward model quality
+
+| | Cosine | MSE |
+|---|---|---|
+| Open-loop (15K) | 0.997 | 0.005 |
+| Closed-loop (15K) | 0.937 | 0.247 |
+
+The open-loop 10% model reaches near-perfect prediction (0.997), confirming the scaling sweep result. The closed-loop model drops to 0.937 — the injection creates a moving target that prevents the forward model from fully tracking the main model's computation, even with sufficient capacity. The 50× MSE gap (0.005 vs 0.247) reflects how much the injection changes the downstream computation.
+
+### Interpretation: capacity-sufficient injection as pure relocation
+
+The 1% forward model's injection helps because it's imperfect — the main model receives an approximate preview and can use blocks 2–3 to correct the approximation, achieving better results than pure open-loop computation. The improvement comes from the *gap* between prediction and reality being useful working material.
+
+The 10% forward model's injection doesn't help because it's too good — the main model receives a near-perfect preview and offloads nearly all predictable computation to it, becoming fully dependent. The injection carries enough information to substitute for the model's own computation rather than supplement it. The result is architectural relocation (computation moves from the main model to the forward model) without functional improvement.
+
+This suggests a capacity sweet spot for net injection benefit: the forward model must be imperfect enough that the main model can't fully depend on it, but accurate enough to provide useful structure. The 1% model (~0.93 cosine) appears closer to this sweet spot than the 10% model (~0.997 cosine in open-loop).
+
+### On validation loss as a metric
+
+The self-knowledge probes are 2× stronger with the 10% model, yet val loss shows zero benefit. This is consistent with the view that validation loss on a static dataset measures compression quality, not representational structure. The closed-loop model's representations are dramatically reorganized (it encodes rich directional and magnitude information about its own computation that the open-loop model doesn't), but this reorganization doesn't manifest as better NTP on the same distribution. The true test of whether this representational quality translates to functional capability would require a continual learning or transfer evaluation — teaching both models something novel and measuring interference.
+
+### Reproduction
+
+```bash
+cd experiments/
+modal run --detach language_reduction/modal_app.py --stage a2a-extended-training \
+  --n-tokens 10000000 --n-steps 15000 \
+  --predict-from post_block0 --predict-to post_block3 \
+  --fwd-n-layer 3 --fwd-d-head 128 --fwd-n-head 4 --fwd-mlp-mult 4
+```
+
 ## Files
 
 | File | Purpose |
 |---|---|
-| `extended_training.py` | Extended co-training: 50K steps with intermediate checkpoints |
+| `extended_training.py` | Extended co-training with intermediate checkpoints |
 | `EXTENDED_TRAINING_README.md` | This file |
 
-## Reproduction
+## Reproduction (Run 7, 1% forward model)
 
 ```bash
 cd experiments/
@@ -131,17 +230,21 @@ Results saved to `language-reduction-data` volume:
 ```
 /data/a2a_forward/extended/
 └── post_block0_to_post_block3/
-    └── inject1/P_10000000/
-        ├── results.json
-        ├── open_loop/
-        │   ├── history.json
-        │   └── step_*/          # Checkpoints at 10K, 20K, 30K, 40K, 50K
-        │       ├── model.pt
-        │       └── fwd_model.pt
-        └── closed_loop/
-            ├── history.json
-            └── step_*/
-                ├── model.pt
-                ├── fwd_model.pt
-                └── gate.pt
+    └── inject1/
+        ├── P_10000000/                          # Run 7 (1% fwd, old path)
+        │   ├── results.json
+        │   ├── open_loop/
+        │   │   ├── history.json
+        │   │   └── step_*/
+        │   └── closed_loop/
+        │       ├── history.json
+        │       └── step_*/
+        └── fwd3L4H128d_mlp4/P_10000000/        # Run 7b (10% fwd)
+            ├── results.json
+            ├── open_loop/
+            │   ├── history.json
+            │   └── step_*/
+            └── closed_loop/
+                ├── history.json
+                └── step_*/
 ```
