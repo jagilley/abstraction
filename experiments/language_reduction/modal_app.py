@@ -165,6 +165,12 @@ from language_reduction.experiments.a2a_forward.extended_training import (  # no
 from language_reduction.experiments.a2a_forward.representational_divergence import (  # noqa: F401
     a2a_representational_divergence,
 )
+from language_reduction.experiments.a2a_forward.mirror_test import (  # noqa: F401
+    a2a_mirror_test,
+)
+from language_reduction.experiments.a2a_forward.mirror_test_geometry_control import (  # noqa: F401
+    a2a_mirror_test_geometry_control,
+)
 
 
 @app.local_entrypoint()
@@ -820,6 +826,54 @@ def main(
             r10 = v["residual_var_in_diff_pcs"].get("top_10", {})
             print(f"    {k:>15s}: Δ R²={v['delta_r2']:+.4f}, "
                   f"ratio(top10)={r10.get('ratio', 0):.2f}x")
+
+    elif stage == "a2a-mirror-test":
+        ckpt_source = "controlled"
+        ckpt_step = 0
+        if fwd_n_layer > 2 or fwd_d_head > 64 or fwd_n_head > 1 or fwd_mlp_mult > 2:
+            ckpt_source = "extended"
+            ckpt_step = n_steps
+        result = a2a_mirror_test.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+            ckpt_source=ckpt_source, ckpt_step=ckpt_step,
+        )
+        print("A2A mirror test complete:")
+        v = result["verdicts"]
+        for cond, d in v.items():
+            print(f"  {cond:>6s}: SK frac = {d['mean_sk_frac']:.4f} "
+                  f"({d['ratio_vs_random']:.2f}x random)")
+        print(f"  PASSES: {result['passes_mirror_test']}")
+
+    elif stage == "a2a-mirror-geometry":
+        ckpt_source = "controlled"
+        ckpt_step = 0
+        if fwd_n_layer > 2 or fwd_d_head > 64 or fwd_n_head > 1 or fwd_mlp_mult > 2:
+            ckpt_source = "extended"
+            ckpt_step = n_steps
+        result = a2a_mirror_test_geometry_control.remote(
+            n_tokens=n_tokens, block_size=block_size,
+            predict_from=predict_from, predict_to=predict_to,
+            inject_after_block=inject_after_block,
+            fwd_n_layer=fwd_n_layer,
+            fwd_d_head=fwd_d_head, fwd_n_head=fwd_n_head,
+            fwd_mlp_mult=fwd_mlp_mult,
+            ckpt_source=ckpt_source, ckpt_step=ckpt_step,
+        )
+        print("Mirror test geometry control complete:")
+        for cond, r in result["results"].items():
+            print(f"  {cond:>6s}: general SK = {r['per_position_sk_frac']:.4f} "
+                  f"({r['per_position_ratio']:.2f}x)")
+        if "comparison" in result:
+            print("\n  General vs perturbation:")
+            for cond, c in result["comparison"].items():
+                print(f"  {cond:>6s}: general={c['general_sk_frac']:.4f} "
+                      f"perturb={c['perturbation_sk_frac']:.4f} "
+                      f"Δ={c['difference']:+.4f}")
 
     elif stage == "a2a-cache-llama":
         result = a2a_cache_llama_acts.remote(

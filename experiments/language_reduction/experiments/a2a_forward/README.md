@@ -84,9 +84,12 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `extended_training.py` | Extended co-training (50K steps): injection benefit trajectory, overfitting comparison |
 | `llama_cache_acts.py` | Cache Llama 3.2 1B activations for scale-up experiment |
 | `representational_divergence.py` | Representational divergence: CKA, diff PCA, self-knowledge alignment between open- and closed-loop models |
+| `mirror_test.py` | Mirror test: perturbation response channeling through self-knowledge subspace |
+| `mirror_test_geometry_control.py` | Geometry control: SK fraction of general activation variance vs perturbation response |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment |
+| `MIRROR_TEST_README.md` | [Mirror test for neural self-knowledge](MIRROR_TEST_README.md) — perturbation response channeling, robustness gap |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -437,6 +440,22 @@ Uses CKA, PCA on activation differences, and subspace alignment to characterize 
 4. **Two distinct reorganization phenomena**: Early layers changed extensively via backprop for general-purpose reasons (self-knowledge is a side-effect in low-variance directions). Late layers reorganized primarily along self-knowledge dimensions (the dominant change *is* the self-knowledge). This resolves the apparent contradiction from Run 6, where Δ R² was uniform across layers — the *amount* of self-knowledge is uniform, but its *relationship to the dominant representational change* differs qualitatively by layer.
 
 **Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-rep-divergence --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
+
+## Mirror test for neural self-knowledge (2026-06-02)
+
+**Full writeup**: [MIRROR_TEST_README.md](MIRROR_TEST_README.md)
+
+Analog of the biological mirror test (Gallup, 1970). Applies arbitrary perturbations ("marks") to the model's computation at post_block1 and measures whether the downstream response at post_block3 is channeled through the self-knowledge subspace (top divergence PCs, which the representational divergence analysis showed carry 2.42× more residual variance than random). Tested on both the 1% forward model (Run 6) and 10% forward model (Run 7b).
+
+**Key results**:
+
+1. **SK-fraction signal**: Closed-loop models channel 20-28% more of their perturbation response through the self-knowledge subspace than the open-loop model (1.6-1.7× random baseline vs 1.3×). However, a geometry control showed that models' *general* activation variance is even more SK-aligned than perturbation responses, partially explaining the result. The CL+M condition (with injection) does show perturbation-specific enrichment beyond its general geometry (CL+M/OL ratio: 1.21× for perturbation vs 1.12× for general, rising to 1.24× vs 1.04× with the 10% model). The CL-M result is mostly explained by geometry.
+
+2. **Robustness gap (strongest finding)**: The open-loop model takes 2-3× more loss degradation from identical perturbations. The closed-loop model's response is both smaller in magnitude and more structured — it absorbs perturbations with less damage. This is not explained by activation geometry and may warrant follow-up as a form of structural regularization.
+
+3. **Self-knowledge is in the weights, not the real-time mirror**: CL-M ≥ CL+M for raw SK-fraction. But the geometry control reveals the CL+M condition (with injection) has a *perturbation-specific* enrichment the CL-M condition lacks — the mirror may matter for how the model handles novel perturbations, even though the general self-knowledge is internalized.
+
+**Reproduction**: `modal run --detach language_reduction/modal_app.py --stage a2a-mirror-test --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
 
 ## Run 7: Extended co-training — 50K steps (2026-06-01)
 
