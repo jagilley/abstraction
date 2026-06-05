@@ -1,4 +1,4 @@
 # Claude Code - experiment-specific guidance
 
 - Please use `modal run --detach` for any Modal jobs that we expect to take longer than 2 minutes. It can be easy to kill jobs when running in attached mode.
-- When running these jobs yourself, be sure to kick it off as a background process so it doesn't timeout and get accidentally canceled.
+- You need to run detached functions by invoking the function explicitly with e.g. `modal run --detach a2a_forward/permutation_test.py::a2a_permutation_test` rather than just `modal run --detach a2a_forward/permutation_test.py`. The `--detach` parameter only persists the most recently-created function, and normally you can't really control the order they get created in. So it's best to invoke explicitly.

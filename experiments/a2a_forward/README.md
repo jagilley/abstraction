@@ -89,11 +89,13 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `mirror_test_v3.py` | Mirror test v3: topic-level perturbation discrimination (Vogel-inspired, semantic directions) |
 | `mirror_test_geometry_control.py` | Geometry control: SK fraction of general activation variance vs perturbation response |
 | `model_scale_experiment.py` | Model scale experiment: residual structure vs main model size (29M vs 77M) |
+| `baseline_battery.py` | Baseline battery: 5-condition controlled comparison (forward, shifted, random_proj, autoencoder, open_loop) |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment |
 | `MIRROR_TEST_README.md` | [Mirror test for neural self-knowledge](MIRROR_TEST_README.md) — perturbation response channeling, robustness gap |
 | `MODEL_SCALE_README.md` | [Model scale experiment](MODEL_SCALE_README.md) — residual structure vs main model size, connection to grokking |
+| `BASELINE_BATTERY_README.md` | [Baseline battery](BASELINE_BATTERY_README.md) — is forward self-prediction uniquely useful? 5-condition controlled comparison |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -561,6 +563,24 @@ Same controlled retrain design but with a 10% forward model (3L, 4H, 128D, 3.2M 
 5. **Capacity sweet spot for net benefit**: The 1% model is imperfect enough that the main model can't fully offload, yielding a small net benefit. The 10% model is too capable — the main model offloads aggressively and becomes fully dependent with no net gain. The optimal capacity for injection benefit lies between 1% and 10%.
 
 **Reproduction**: `modal run --detach a2a_forward/extended_training.py --n-tokens 10000000 --n-steps 15000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 3 --fwd-d-head 128 --fwd-n-head 4 --fwd-mlp-mult 4`
+
+## Baseline battery: is forward self-prediction uniquely useful? (2026-06-04)
+
+**Full writeup**: [BASELINE_BATTERY_README.md](BASELINE_BATTERY_README.md)
+
+Tests whether the benefits of forward model injection are specific to injecting a prediction of the model's own future computation, or whether any structured injection produces the same effects. 5 conditions with identical lr/seed/init: open-loop, forward prediction, causally shifted prediction (k=10), frozen random projection of post_block0, and autoencoder (same architecture, reconstructing post_block0 instead of predicting post_block3).
+
+**Key results**:
+
+1. **Robustness is uniquely strong with forward prediction.** The forward model takes only 41% of open-loop's loss degradation from identical perturbations (2.4× improvement). The autoencoder and random projection produce 1.5–1.6× improvement — the forward model's robustness gain is nearly twice the baselines'.
+
+2. **Self-knowledge depth profile separates forward prediction from baselines.** All injections cause some representational reorganization at early layers (Δ R² ≈ +0.17–0.19 at post_block0). But only forward prediction maintains self-knowledge through the full depth of the model (+0.161 at post_block3). Baselines decay steeply (+0.055–0.068 at post_block3). The forward model's self-knowledge at the deepest layer is 2.4–2.9× the baselines'.
+
+3. **LM loss and robustness are dissociated.** The autoencoder produces the *largest* injection benefit (−0.092 nats, vs −0.084 for forward) but *worse* robustness (0.636 vs 0.413). Robustness is not a byproduct of receiving useful additional information — it's specifically a consequence of the injection being a prediction of the model's own future computation.
+
+4. **The shifted baseline validates position-specificity.** Shifting predictions by 10 positions destroys nearly all effects: zero injection benefit, minimal self-knowledge, lowest gate norm. The model learns that non-position-specific predictions aren't useful and ignores them.
+
+**Reproduction**: `modal run --detach a2a_forward/baseline_battery.py::a2a_baseline_battery --n-tokens 10000000 --n-steps 10000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
 
 ## Next steps
 
