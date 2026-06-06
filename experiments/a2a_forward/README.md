@@ -90,12 +90,14 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `mirror_test_geometry_control.py` | Geometry control: SK fraction of general activation variance vs perturbation response |
 | `model_scale_experiment.py` | Model scale experiment: residual structure vs main model size (29M vs 77M) |
 | `baseline_battery.py` | Baseline battery: 5-condition controlled comparison (forward, shifted, random_proj, autoencoder, open_loop) |
+| `jacobian_analysis.py` | Jacobian analysis: Hessian trace, gradient spectrum, SK subspace alignment at injection point |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment |
 | `MIRROR_TEST_README.md` | [Mirror test for neural self-knowledge](MIRROR_TEST_README.md) — perturbation response channeling, robustness gap |
 | `MODEL_SCALE_README.md` | [Model scale experiment](MODEL_SCALE_README.md) — residual structure vs main model size, connection to grokking |
 | `BASELINE_BATTERY_README.md` | [Baseline battery](BASELINE_BATTERY_README.md) — is forward self-prediction uniquely useful? 5-condition controlled comparison |
+| `JACOBIAN_ANALYSIS_README.md` | [Jacobian analysis](JACOBIAN_ANALYSIS_README.md) — Hessian trace predicts robustness; SK alignment null result |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -581,6 +583,26 @@ Tests whether the benefits of forward model injection are specific to injecting 
 4. **The shifted baseline validates position-specificity.** Shifting predictions by 10 positions destroys nearly all effects: zero injection benefit, minimal self-knowledge, lowest gate norm. The model learns that non-position-specific predictions aren't useful and ignores them.
 
 **Reproduction**: `modal run --detach a2a_forward/baseline_battery.py::a2a_baseline_battery --n-tokens 10000000 --n-steps 10000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
+
+## Jacobian analysis: spectral structure of robustness (2026-06-05)
+
+**Full writeup**: [JACOBIAN_ANALYSIS_README.md](JACOBIAN_ANALYSIS_README.md)
+
+Formalizes the robustness result via the Jacobian of the map from activations at the injection point through to the loss. Computes loss gradient norms, Hessian trace (via Hutchinson's estimator), gradient covariance spectrum, and self-knowledge subspace alignment — all on the controlled retrain models.
+
+**Key results**:
+
+1. **Hessian trace quantitatively predicts robustness.** tr(H) at the injection point is 0.453x OL for CL+M and 0.383x OL for CL-M. The Hessian prediction E[ΔL] = ε²/(2d) · tr(H) matches empirical ΔL to within 8% at every perturbation magnitude. The 2-2.5x robustness gap is fully explained by the curvature of the loss landscape at the injection point.
+
+2. **Loss gradient norms are 30% smaller.** CL+M = 0.694x OL, CL-M = 0.797x OL. First-order sensitivity is uniformly reduced.
+
+3. **Gradient spectrum is LESS concentrated for CL (negative result).** Effective rank: 170 (OL) → 178 (CL+M) → 183 (CL-M). The CL model's sensitivity is more uniformly distributed, not concentrated into fewer directions. This is the opposite of the original hypothesis.
+
+4. **Self-knowledge subspace does NOT align with sensitivity (negative result).** At every subspace dimension tested (10–128), the SK subspace captures ≤ random baseline fraction of gradient energy (enrichment 0.92–1.08x). The self-knowledge directions and loss-sensitivity directions are orthogonal.
+
+5. **The correct mechanism is a uniformly flatter loss landscape.** The robustness comes from total curvature being reduced everywhere, not from sensitivity being organized along self-knowledge directions. Consistent with the "division of labor" interpretation: the forward model pre-supplies predictable computation, leaving blocks 2-3 with less functional load and a smoother input-output mapping.
+
+**Reproduction**: `modal run --detach a2a_forward/jacobian_analysis.py::a2a_jacobian_analysis --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
 
 ## Next steps
 
