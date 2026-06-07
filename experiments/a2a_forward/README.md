@@ -91,6 +91,10 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `model_scale_experiment.py` | Model scale experiment: residual structure vs main model size (29M vs 77M) |
 | `baseline_battery.py` | Baseline battery: 5-condition controlled comparison (forward, shifted, random_proj, autoencoder, open_loop) |
 | `jacobian_analysis.py` | Jacobian analysis: Hessian trace, gradient spectrum, SK subspace alignment at injection point |
+| `vit.py` | Vision Transformer for MNIST (same intermediate/cerebellar interface as GPT) |
+| `mnist_experiment.py` | MNIST controlled retrain: open-loop vs closed-loop ViT, self-knowledge probes, robustness |
+| `mnist_analysis.py` | MNIST residual direction analysis (PCA, digit conditioning) + causal substitution |
+| `mnist_baseline_battery.py` | MNIST baseline battery: 5-condition controlled comparison |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment |
@@ -98,6 +102,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `MODEL_SCALE_README.md` | [Model scale experiment](MODEL_SCALE_README.md) — residual structure vs main model size, connection to grokking |
 | `BASELINE_BATTERY_README.md` | [Baseline battery](BASELINE_BATTERY_README.md) — is forward self-prediction uniquely useful? 5-condition controlled comparison |
 | `JACOBIAN_ANALYSIS_README.md` | [Jacobian analysis](JACOBIAN_ANALYSIS_README.md) — Hessian trace predicts robustness; SK alignment null result |
+| `MNIST_README.md` | [MNIST experiment](MNIST_README.md) — cross-domain validation: low-rank residual, digit-discriminative structure, 4x robustness gap |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -603,6 +608,36 @@ Formalizes the robustness result via the Jacobian of the map from activations at
 5. **The correct mechanism is a uniformly flatter loss landscape.** The robustness comes from total curvature being reduced everywhere, not from sensitivity being organized along self-knowledge directions. Consistent with the "division of labor" interpretation: the forward model pre-supplies predictable computation, leaving blocks 2-3 with less functional load and a smoother input-output mapping.
 
 **Reproduction**: `modal run --detach a2a_forward/jacobian_analysis.py::a2a_jacobian_analysis --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
+
+## MNIST experiment: cross-domain validation (2026-06-07)
+
+**Full writeup**: [MNIST_README.md](MNIST_README.md)
+
+Adapts the full A2A forward model experiment to MNIST classification via Vision Transformer (4L/4H/128D ViT, 4x4 patches, 0.80M params). Tests whether the cerebellar phenomena generalize from autoregressive language modeling to image classification. Includes controlled retrain, residual analysis, causal substitution, and baseline battery.
+
+**Key results**:
+
+1. **The residual is low-rank and digit-discriminative -- opposite of language.** Effective rank = 18.3/128 (vs 199.8/256 in language). Top-1 PC explains 15.7% (vs 2.4%). All top-5 PCs discriminate digit identity (eta^2 = 0.14--0.23). The forward model misses specific class-conditional computation, not a uniform capacity shortfall. Cross-digit residual cosine similarity mirrors visual similarity (3<->8 = 0.84, 1<->3 = -0.45).
+
+2. **Self-knowledge probes are 3x stronger.** Δ R^2 = +0.52 at post_block0 (vs +0.19 in language). The low-rank residual provides specific directions for the model to encode, making self-knowledge more precise. CL R^2 reaches 0.63 at the first layer (vs 0.21 in language).
+
+3. **Robustness gap is 4x (vs 2-2.5x in language).** CL/OL loss degradation ratio = 0.244 at eps=1.0. At eps=2.0, the gap widens to 12x. The MNIST model's loss landscape at the injection point is dramatically flatter.
+
+4. **Causal substitution shows non-uniform degradation.** The forward model recovers 85.6% of blocks 1-3 KL contribution (vs 94% for 1 block in language). Degradation varies 13x across digits (KL_sub from 0.004 for digit 0 to 0.053 for digit 4). In language, degradation was uniform across all behavioral categories.
+
+5. **Baseline battery: less differentiation than language.** Forward prediction and autoencoder produce identical robustness ratios (0.244 vs 0.245). Self-knowledge R^2 gaps between conditions are smaller. The low-rank residual (18 dimensions) is easily captured by any injection; in language, only forward prediction produces the organizational pressure for the model to encode all 200 residual dimensions.
+
+6. **Residual rank reflects DGP complexity.** Grokking (mod addition): rank ~15, Fourier-aligned. MNIST: rank 18, digit-discriminative. Language (29M): rank 200, diffuse. Language (77M): rank 235, slightly less diffuse. The forward model's residual dimensionality directly reflects the computational complexity of the task as modeled by the main model.
+
+**Reproduction**:
+```bash
+# Main experiment
+modal run --detach a2a_forward/mnist_experiment.py::main
+# Residual analysis + causal substitution
+modal run --detach a2a_forward/mnist_analysis.py::main
+# Baseline battery
+modal run --detach a2a_forward/mnist_baseline_battery.py::main
+```
 
 ## Next steps
 

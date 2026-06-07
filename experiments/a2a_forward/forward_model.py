@@ -98,16 +98,16 @@ class CerebellarGate(nn.Module):
 
 class TransformerForwardModel(nn.Module):
     def __init__(self, d_model: int, d_head: int = 64, n_head: int = 1,
-                 n_layer: int = 1, mlp_mult: int = 2, block_size: int = 128):
+                 n_layer: int = 1, mlp_mult: int = 2, block_size: int = 128,
+                 causal: bool = True):
         super().__init__()
         self.d_model = d_model
 
-        self.register_buffer(
-            "causal_mask",
-            torch.tril(torch.ones(block_size, block_size)).view(
-                1, 1, block_size, block_size
-            ),
-        )
+        if causal:
+            mask = torch.tril(torch.ones(block_size, block_size))
+        else:
+            mask = torch.ones(block_size, block_size)
+        self.register_buffer("causal_mask", mask.view(1, 1, block_size, block_size))
 
         self.blocks = nn.ModuleList([
             ForwardBlock(d_model, d_head, n_head, mlp_mult)
@@ -117,7 +117,8 @@ class TransformerForwardModel(nn.Module):
         n_params = sum(p.numel() for p in self.parameters())
         print(f"TransformerForwardModel: {n_params/1e3:.1f}K parameters "
               f"(d_model={d_model}, d_head={d_head}, n_head={n_head}, "
-              f"n_layer={n_layer}, mlp_hidden={d_model * mlp_mult})")
+              f"n_layer={n_layer}, mlp_hidden={d_model * mlp_mult}"
+              f"{', bidirectional' if not causal else ''})")
 
     def forward(self, x):
         for block in self.blocks:
