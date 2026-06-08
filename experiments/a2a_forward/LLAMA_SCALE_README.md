@@ -165,10 +165,99 @@ Note: the CLI default for `--fwd-d-head` is 64 (inherited from the toy model CLI
     └── results.json
 ```
 
+## Stage 3: Per-head decomposition (2026-06-08)
+
+**Code**: `llama_head_decomposition.py`
+
+Decompose layer 8's computation into its 32 attention head contributions + MLP contribution, then measure how each component relates to the forward model's prediction residual. The forward model's limited capacity forces it to prioritize certain components over others, and the capture profile reveals which aspects of the layer's computation are most predictable from the preceding layer state.
+
+### Method
+
+Llama 3.2 1B layer 8 uses GQA (32 query heads, 8 KV heads, d_head=64). The layer's output decomposes exactly as:
+
+```
+output = input + sum(head_i for i in range(32)) + mlp_out
+```
+
+where each `head_i = per_head_attn_output_i @ o_proj.weight[:, i*64:(i+1)*64].T` (since `o_proj` is linear and bias-free). We verify this decomposition has near-zero reconstruction error (0.007).
+
+For each of the 33 components (32 heads + MLP), we compute:
+- **Mean norm**: how large is this component's contribution
+- **cos(component, residual)**: directional alignment with what the forward model missed
+- **cos(component, fwd_delta)**: directional alignment with what the forward model predicted
+- **corr(‖component‖, ‖residual‖)**: when this component is large, is the forward model's error large?
+- **Residual variance fraction** (heads only): fraction of residual variance in each head's output subspace
+
+Evaluated on 80 batches (655K tokens) from the validation shards, using live Llama inference with hooks on `self_attn.o_proj` (to capture pre-projection attention outputs) and `mlp` (to capture the MLP contribution).
+
+### Results
+
+**The MLP dominates the forward model's residual, not attention.**
+
+Despite attention contributing 84% of layer 8's output norm, the MLP accounts for the vast majority of the forward model's prediction error:
+
+| | Norm (share of Δ) | cos(residual) | corr(‖comp‖, ‖r‖) |
+|---|---|---|---|
+| 32 attention heads (total) | 18.0 (84%) | 0.019 avg | 0.07 avg |
+| MLP | 3.4 (16%) | **0.477** | **0.675** |
+
+The MLP has 25x the directional alignment with the residual that the average attention head has (0.477 vs 0.019). The correlation between MLP magnitude and residual magnitude (0.675) means positions where the MLP does the most work are precisely where the forward model struggles most.
+
+**Attention heads are remarkably uniform.** cos(component, residual) ranges from -0.011 to +0.050 across all 32 heads. No single head is dramatically harder to capture than others. Residual variance fraction is nearly uniform across heads (3.6%–4.6%, vs null expectation of 3.1% for a 64-dim subspace in 2048-dim space). The forward model is slightly worse at every head, not missing specific heads.
+
+**By KV group:**
+
+| Group | Norm | cos(res) | cos(fwd) | corr |
+|---|---|---|---|---|
+| KV 0 | 0.554 | 0.021 | 0.031 | 0.122 |
+| KV 1 | 0.481 | 0.019 | 0.025 | 0.112 |
+| KV 2 | 0.636 | 0.027 | **0.169** | -0.022 |
+| KV 3 | 0.701 | 0.022 | 0.044 | 0.039 |
+| KV 4 | 0.431 | 0.010 | 0.056 | 0.042 |
+| KV 5 | 0.612 | 0.013 | 0.035 | 0.046 |
+| KV 6 | 0.460 | 0.032 | 0.077 | 0.030 |
+| KV 7 | 0.635 | 0.011 | 0.048 | 0.101 |
+| **MLP** | **3.404** | **0.477** | **0.570** | **0.675** |
+
+KV group 2 has the highest cos(fwd_delta) among attention groups (0.169) — the forward model's single head allocates the most capacity to matching this group's attention patterns. KV groups 0, 1, 7 have the highest norm-residual correlation (~0.10–0.12), meaning their contribution magnitudes weakly predict the forward model's error. But all attention effects are dwarfed by the MLP.
+
+### Key findings
+
+1. **Attention routing is compressible; the MLP is the bottleneck.** The forward model's single 128-dim head captures the aggregate effect of 32 × 64-dim heads at a 16x compression ratio. The MLP, despite being only 4x compressed (hidden 4096 vs Llama's 8192 SwiGLU), dominates the prediction error. Attention is inherently easier to approximate because the forward model can learn a "principal attention pattern" through the gauge freedom in Q/K space. The MLP's point-wise nonlinear transformation through a high-dimensional space is fundamentally harder to compress.
+
+2. **The empirical weight decomposition is real and interpretable.** The forward model has genuinely learned that attention is the "predictable" part of a transformer layer (capturable from the preceding state) while the MLP is the "novel" part (requiring capacity the forward model doesn't have). This is a concrete statement about the nature of computation in Llama's middle layers, obtained purely by training a small model to predict activations.
+
+3. **Within attention, the "slightly worse everywhere" pattern holds.** No specific head or KV group is dramatically harder to capture. The attention residual is uniformly distributed across all 32 heads' subspaces. The forward model misses a little of every head's computation rather than missing specific attention circuits. This is the per-head analog of the uniform degradation across behavioral categories observed in causal substitution.
+
+### CLI
+
+```bash
+cd experiments/
+
+# Default: analyze d_head=128 forward model on layers 7->8
+modal run --detach a2a_forward/llama_head_decomposition.py
+
+# Analyze d_head=64 checkpoint
+modal run --detach a2a_forward/llama_head_decomposition.py --fwd-d-head 64
+```
+
+### Modal volume
+
+```
+/data/a2a_llama/
+├── acts_L7_L8/                        # Stage 1
+├── fwd_1L_1H_128d_mlp2/L7_to_L8/     # Stage 2 (paper config)
+├── fwd_1L_1H_64d_mlp2/L7_to_L8/      # Stage 2 (original config)
+└── analysis/                          # Stage 3
+    ├── head_decomposition.json
+    └── head_decomposition.png
+```
+
 ### Files
 
 | File | Purpose |
 |---|---|
 | `llama_cache_acts.py` | Stage 1: cache Llama activations to volume |
 | `llama_train_fwd.py` | Stage 2: train forward model on cached activations |
+| `llama_head_decomposition.py` | Stage 3: per-head decomposition of forward model capture profile |
 | `LLAMA_SCALE_README.md` | This file |

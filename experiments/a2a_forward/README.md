@@ -83,6 +83,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `directional_steer.py` | Directional causal steering: multivariate probe, per-cluster-direction sweep |
 | `extended_training.py` | Extended co-training (50K steps): injection benefit trajectory, overfitting comparison |
 | `llama_cache_acts.py` | Cache Llama 3.2 1B activations for scale-up experiment |
+| `llama_head_decomposition.py` | Llama per-head decomposition: what the forward model captures vs misses per attention head and MLP |
 | `representational_divergence.py` | Representational divergence: CKA, diff PCA, self-knowledge alignment between open- and closed-loop models |
 | `mirror_test.py` | Mirror test: perturbation response channeling through self-knowledge subspace |
 | `mirror_test_v2.py` | Mirror test v2: compensatory response and perturbation discrimination (no subspace cherry-picking) |
@@ -96,7 +97,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `mnist_analysis.py` | MNIST residual direction analysis (PCA, digit conditioning) + causal substitution |
 | `mnist_baseline_battery.py` | MNIST baseline battery: 5-condition controlled comparison |
 | `README.md` | This file |
-| `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching and forward model training on Llama 3.2 1B |
+| `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching, forward model training, and per-head decomposition on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment |
 | `MIRROR_TEST_README.md` | [Mirror test for neural self-knowledge](MIRROR_TEST_README.md) — perturbation response channeling, robustness gap |
 | `MODEL_SCALE_README.md` | [Model scale experiment](MODEL_SCALE_README.md) — residual structure vs main model size, connection to grokking |

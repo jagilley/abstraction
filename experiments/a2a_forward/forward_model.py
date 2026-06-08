@@ -96,6 +96,61 @@ class CerebellarGate(nn.Module):
         return self.projection.weight.norm().item()
 
 
+class LossPredictor(nn.Module):
+    """Predicts per-token loss from early-layer activations (emotion analog).
+
+    Returns both a low-dimensional embedding (for injection via EmotionGate)
+    and a scalar loss prediction (for training via MSE against actual CE).
+    When embed_dim=1, the embedding IS the scalar prediction.
+    When embed_dim>1, a linear head maps the embedding to a scalar for training,
+    but the full embedding is what gets injected.
+    """
+
+    def __init__(self, d_model: int, embed_dim: int = 1, hidden: int = 128):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.encoder = nn.Sequential(
+            nn.LayerNorm(d_model),
+            nn.Linear(d_model, hidden),
+            nn.GELU(),
+            nn.Linear(hidden, embed_dim),
+        )
+        self.head = nn.Linear(embed_dim, 1) if embed_dim > 1 else None
+        n_params = sum(p.numel() for p in self.parameters())
+        print(f"LossPredictor: {n_params/1e3:.1f}K parameters "
+              f"(d_model={d_model}, embed_dim={embed_dim}, hidden={hidden})")
+
+    def forward(self, x):
+        embed = self.encoder(x)  # (B, T, embed_dim)
+        if self.head is not None:
+            loss_pred = self.head(embed).squeeze(-1)  # (B, T)
+        else:
+            loss_pred = embed.squeeze(-1)  # (B, T)
+        return embed, loss_pred
+
+
+class EmotionGate(nn.Module):
+    """Learned projection for injecting evaluative signals into the residual stream.
+
+    Zero-initialized like CerebellarGate. Projects from a low-dimensional
+    evaluative embedding to full residual stream dimensionality.
+    """
+
+    def __init__(self, embed_dim: int, d_model: int):
+        super().__init__()
+        self.projection = nn.Linear(embed_dim, d_model)
+        nn.init.zeros_(self.projection.weight)
+        nn.init.zeros_(self.projection.bias)
+        print(f"EmotionGate: {sum(p.numel() for p in self.parameters())/1e3:.1f}K "
+              f"parameters (embed_dim={embed_dim}, d_model={d_model})")
+
+    def forward(self, embed):
+        return self.projection(embed)
+
+    def injection_norm(self):
+        return self.projection.weight.norm().item()
+
+
 class TransformerForwardModel(nn.Module):
     def __init__(self, d_model: int, d_head: int = 64, n_head: int = 1,
                  n_layer: int = 1, mlp_mult: int = 2, block_size: int = 128,
