@@ -96,6 +96,8 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `mnist_experiment.py` | MNIST controlled retrain: open-loop vs closed-loop ViT, self-knowledge probes, robustness |
 | `mnist_analysis.py` | MNIST residual direction analysis (PCA, digit conditioning) + causal substitution |
 | `mnist_baseline_battery.py` | MNIST baseline battery: 5-condition controlled comparison |
+| `calibration_transfer.py` | Calibration transfer: competence probes (activations → own per-token loss) trained ID, evaluated frozen OOD; also caches OOD corpora |
+| `ood_robustness.py` | OOD robustness: perturbation Δloss + Hessian trace across distribution-shifted corpora |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching, forward model training, and per-head decomposition on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment |
@@ -104,6 +106,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `BASELINE_BATTERY_README.md` | [Baseline battery](BASELINE_BATTERY_README.md) — is forward self-prediction uniquely useful? 5-condition controlled comparison |
 | `JACOBIAN_ANALYSIS_README.md` | [Jacobian analysis](JACOBIAN_ANALYSIS_README.md) — Hessian trace predicts robustness; SK alignment null result |
 | `MNIST_README.md` | [MNIST experiment](MNIST_README.md) — cross-domain validation: low-rank residual, digit-discriminative structure, 4x robustness gap |
+| `OOD_ROBUSTNESS_README.md` | [OOD robustness & calibration transfer](OOD_ROBUSTNESS_README.md) — what kind of self-knowledge survives distribution shift |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -640,6 +643,25 @@ modal run --detach a2a_forward/mnist_analysis.py::main
 modal run --detach a2a_forward/mnist_baseline_battery.py::main
 ```
 
+## Calibration transfer & OOD robustness: what kind of self-knowledge survives distribution shift? (2026-06-09)
+
+**Full writeup**: [OOD_ROBUSTNESS_README.md](OOD_ROBUSTNESS_README.md)
+
+Two experiments taking the baseline battery models out of distribution (Wikipedia, Python code, French, open-web-math, shuffled tokens; 2M GPT-2 tokens each, cached to the volume). No retraining — all measurements on the existing checkpoints.
+
+**Experiment A — calibration transfer (negative)**: Linear competence probes (activations → the model's own forthcoming per-token loss; no forward model in the measurement) trained ID, evaluated frozen OOD. Closing the loop does not produce epistemic self-knowledge: all conditions are identical ID, OOD retention shows only the generic any-used-injection effect (forward ≈ random_proj ≈ autoencoder), and output entropy beats every activation probe both ID and OOD. The model does not transferably know where it will fail.
+
+**Experiment B — OOD robustness (positive, confirms the paper's §6 prediction)**: Identical perturbations (16 fixed directions at the injection point) and Hessian traces measured per corpus. The forward model's robustness is distribution-invariant (Δloss ratio 0.43–0.51, tr(H) ratio 0.38–0.45 on every natural corpus), while the autoencoder's collapses off-manifold — on code its advantage vanishes entirely (Δloss 0.93×, tr(H) **1.02×** = same curvature as open-loop). The forward/autoencoder gap widens with shift (1.51× ID → 1.81× code), as predicted by the computational-function vs activation-manifold account. The shifted condition inverts to worse-than-open-loop on code (1.11×). Robustness remains in the weights OOD (forward_inj ≈ forward).
+
+**Joint interpretation**: the self-knowledge from closing the loop is *computational, not epistemic; distribution-invariant, not data-bound*. First direct evidence for the paper's conclusion-section claim that forward prediction encodes the model's computational function while the autoencoder encodes the ID activation manifold.
+
+**Reproduction**:
+```bash
+modal run --detach a2a_forward/calibration_transfer.py::cache_ood_tokens
+modal run --detach a2a_forward/calibration_transfer.py::a2a_calibration_transfer
+modal run --detach a2a_forward/ood_robustness.py::a2a_ood_robustness
+```
+
 ## Next steps
 
 1. **Wake-sleep consolidation**: The model becomes dependent on the injection rather than internalizing it (Run 6, Run 7b). The brain solves this by alternating regimes: cerebellar loop active during waking, offline consolidation during sleep. Engineering analog: interleave closed-loop training (with injection) and open-loop training (without injection), forcing the main model to internalize the predicted computation into its own weights. Anneal injection strength over cycles.
@@ -649,5 +671,6 @@ modal run --detach a2a_forward/mnist_baseline_battery.py::main
 5. **Self-regulation**: Freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
 6. **Orthogonalized directional test**: Re-run the directional steering with Gram-Schmidt-orthogonalized W@c directions to control for the 0.41 mean cosine overlap. Would give a cleaner estimate of true directional selectivity.
 7. **Model scale 350M**: Third data point for the model scale experiment. The 29M → 77M comparison shows consistent residual concentration across all metrics. A 350M model (~24L/16H/1024D on 500M+ tokens) tests whether the trend continues, accelerates, or saturates. See [MODEL_SCALE_README.md](MODEL_SCALE_README.md).
+8. **Harden the OOD robustness result**: (a) direct manifold-displacement check — autoencoder reconstruction MSE per corpus should rise with shift severity and peak on code; (b) bootstrap CIs from the saved per-direction Δloss arrays; (c) a second baseline-battery seed to firm up the code-corpus numbers. See [OOD_ROBUSTNESS_README.md](OOD_ROBUSTNESS_README.md).
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
