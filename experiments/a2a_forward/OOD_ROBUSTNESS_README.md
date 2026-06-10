@@ -4,11 +4,13 @@
 
 **Code**: `calibration_transfer.py` (Experiment A), `ood_robustness.py` (Experiment B).
 
+**Paper**: Integrated as §5.7 ("Robustness under distribution shift") of papers/a2a_forward_paper.md[^private], 2026-06-09, with conclusion updates converting the former §6 hedge into a demonstrated result. Figure: `papers/figures/fig6_ood_robustness.png`.
+
 ## Motivation
 
 The paper shows the model "knows what it knows": closed-loop co-training makes every layer encode where the model's computation will surprise a compressed model of itself. Two follow-up questions, both answered by taking the trained baseline-battery models out of distribution:
 
-1. **Does the model know what it *doesn't* know?** (Experiment A) Epistemic self-knowledge — calibration about one's own competence — cannot be memorized: the boundary of your competence is by definition not in your training data. If closing the loop produced *epistemic* self-knowledge, competence probes should transfer across distribution shift better for the forward condition (cf. Kadavath et al. 2022, whose behaviorally-trained self-knowledge collapses OOD, Brier 0.15 → 0.43).
+1. **Does the model know what it *doesn't* know?** (Experiment A) Epistemic self-knowledge — calibration about one's own competence — cannot be memorized: the boundary of your competence is by definition not in your training data. If closing the loop produced *epistemic* self-knowledge, competence probes should transfer across distribution shift better for the forward condition (cf. Kadavath et al. 2022, whose finetuned P(IK) head generalizes only partially OOD: Brier 0.15 → up to 0.43, with uneven discrimination transfer).
 
 2. **Is forward prediction's robustness advantage made of something different from the baselines'?** (Experiment B) The paper's conclusion (§6) claims the forward model encodes the main model's *computational function* (weight-determined, distribution-invariant) while the autoencoder encodes the *activation manifold* (jointly determined by weights and data). On ID data this is unfalsifiable — forward 0.41× vs autoencoder 0.64× loss degradation is consistent with both "different kinds of flatness" and "more vs less of the same regularizer." The paper explicitly flags the test: *"If this account is correct, the gap should widen on novel inputs."* This experiment runs that test.
 
@@ -133,3 +135,5 @@ modal run --detach a2a_forward/calibration_transfer.py::a2a_calibration_transfer
 # Experiment B: OOD robustness
 modal run --detach a2a_forward/ood_robustness.py::a2a_ood_robustness
 ```
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
