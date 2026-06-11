@@ -85,6 +85,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `llama_cache_acts.py` | Cache Llama 3.2 1B activations for scale-up experiment |
 | `llama_head_decomposition.py` | Llama per-head decomposition: what the forward model captures vs misses per attention head and MLP |
 | `representational_divergence.py` | Representational divergence: CKA, diff PCA, self-knowledge alignment between open- and closed-loop models |
+| `prediction_trust.py` | Prediction trust: does the model's per-direction usage gain (gate + downstream sensitivity) track the forward model's reliability spectrum? Wiener-gain analysis + counterfactual error injection |
 | `mirror_test.py` | Mirror test: perturbation response channeling through self-knowledge subspace |
 | `mirror_test_v2.py` | Mirror test v2: compensatory response and perturbation discrimination (no subspace cherry-picking) |
 | `mirror_test_v3.py` | Mirror test v3: topic-level perturbation discrimination (Vogel-inspired, semantic directions) |
@@ -100,7 +101,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `ood_robustness.py` | OOD robustness: perturbation Δloss + Hessian trace across distribution-shifted corpora |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching, forward model training, and per-head decomposition on Llama 3.2 1B |
-| `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment |
+| `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment; + [Prediction trust](REPRESENTATIONAL_DIVERGENCE_README.md#prediction-trust-what-form-the-self-knowledge-takes-2026-06-10) appended section (innovation map / error-monitoring geometry) |
 | `MIRROR_TEST_README.md` | [Mirror test for neural self-knowledge](MIRROR_TEST_README.md) — perturbation response channeling, robustness gap |
 | `MODEL_SCALE_README.md` | [Model scale experiment](MODEL_SCALE_README.md) — residual structure vs main model size, connection to grokking |
 | `BASELINE_BATTERY_README.md` | [Baseline battery](BASELINE_BATTERY_README.md) — is forward self-prediction uniquely useful? 5-condition controlled comparison |
