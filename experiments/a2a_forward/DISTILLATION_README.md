@@ -151,3 +151,8 @@ modal run --detach a2a_forward/distillation.py::main \
   --predict-from post_block0 --predict-to post_block3 \
   --fwd-n-layer 2 --inject-after-block 1
 ```
+
+## Things to possibly try next
+
+- Scale up to bigger sizes and see if any distinct differences in behavior emerge
+- Run multiple nights' sleep in a row! Closed-loop training -> distillation -> closed-loop training, yada yada. What happens if you run this on the same amount of data as/compute matched with just closed loop training, no sleep? what about compared to just open loop training?
