@@ -99,6 +99,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `mnist_baseline_battery.py` | MNIST baseline battery: 5-condition controlled comparison |
 | `calibration_transfer.py` | Calibration transfer: competence probes (activations → own per-token loss) trained ID, evaluated frozen OOD; also caches OOD corpora |
 | `ood_robustness.py` | OOD robustness: perturbation Δloss + Hessian trace across distribution-shifted corpora |
+| `distillation.py` | Single-cycle wake-sleep distillation: absorb FM contribution into main model, retrain fresh FM, compare innovation structures |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching, forward model training, and per-head decomposition on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment; + [Prediction trust](REPRESENTATIONAL_DIVERGENCE_README.md#prediction-trust-what-form-the-self-knowledge-takes-2026-06-10) appended section (innovation map / error-monitoring geometry) |
@@ -108,6 +109,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `JACOBIAN_ANALYSIS_README.md` | [Jacobian analysis](JACOBIAN_ANALYSIS_README.md) — Hessian trace predicts robustness; SK alignment null result |
 | `MNIST_README.md` | [MNIST experiment](MNIST_README.md) — cross-domain validation: low-rank residual, digit-discriminative structure, 4x robustness gap |
 | `OOD_ROBUSTNESS_README.md` | [OOD robustness & calibration transfer](OOD_ROBUSTNESS_README.md) — what kind of self-knowledge survives distribution shift |
+| `DISTILLATION_README.md` | [Single-cycle distillation](DISTILLATION_README.md) — wake-sleep knowledge absorption, innovation migration test, ratchet assessment |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -663,9 +665,37 @@ modal run --detach a2a_forward/calibration_transfer.py::a2a_calibration_transfer
 modal run --detach a2a_forward/ood_robustness.py::a2a_ood_robustness
 ```
 
+## Single-cycle wake-sleep distillation (2026-06-11)
+
+**Full writeup**: [DISTILLATION_README.md](DISTILLATION_README.md)
+
+Tests whether knowledge distillation can force the main model to internalize the FM's contribution, and whether a fresh FM trained on the consolidated model finds different innovation structure (indicating genuine computational change) or the same structure (indicating re-equilibration).
+
+Loads the controlled retrain CL checkpoint. Phase 1: freeze teacher (CL+injection), train student (same weights, no injection) on KL + NTP loss for 5K steps. Phase 2: train fresh FM (seed=137) on consolidated model for 10K steps. Phase 3: compare innovation structures.
+
+**Key results**:
+
+1. **Distillation fully closed the dependency gap**: +0.083 → -0.005 nats (105.6% closed). The distilled model without injection slightly outperforms the teacher with injection. Cost vs OL: only +0.030 nats.
+
+2. **Innovation directions migrated**: Top PCs of original and fresh FM residuals are near-orthogonal (cos 0.04–0.33). Fresh FM's top-5 subspace captures only 4.7% of original FM's top-5 variance. But behavioral conditioning is stable (r=0.81) — the same positions are hard, just hard in different directional ways.
+
+3. **Residual became more diffuse**: Effective rank 212.3 → 227.9, top-1 PC 2.8% → 1.3%. No discrete abstraction was extracted on flat webtext — the ratchet grinds smoothly rather than clicking.
+
+4. **Robustness partially retained**: Distilled model ratio 0.942 vs OL (CL was 0.892). Roughly half the CL robustness advantage survived dissolving the two-model system.
+
+5. **Late-layer self-knowledge survived distillation**: The distilled model encodes the fresh FM's residual better than OL at late layers (Δ R² = +0.164 at post_block3) despite never training with the fresh FM. Early layers show no advantage (+0.001 at post_block0). Consistent with the representational divergence finding that late-layer reorganization aligns with self-knowledge while early-layer reorganization is orthogonal to it. Confound: probe target is defined on the distilled model's own activations; a cross-model control would eliminate this.
+
+**Reproduction**:
+```bash
+modal run --detach a2a_forward/distillation.py::main \
+  --n-tokens 10000000 --distill-steps 5000 --retrain-steps 10000
+```
+
 ## Next steps
 
-1. **Wake-sleep consolidation**: The model becomes dependent on the injection rather than internalizing it (Run 6, Run 7b). The brain solves this by alternating regimes: cerebellar loop active during waking, offline consolidation during sleep. Engineering analog: interleave closed-loop training (with injection) and open-loop training (without injection), forcing the main model to internalize the predicted computation into its own weights. Anneal injection strength over cycles.
+1. **Wake-sleep consolidation (partially validated)**: The single-cycle distillation experiment confirmed that distillation closes the dependency gap and produces genuine innovation migration. The next step is *iterated* cycles: re-run closed-loop training on the consolidated model, distill again, and test whether the ratchet clicks on a DGP with hierarchical structure (e.g. multi-step arithmetic or code). The model scale experiment predicts residual concentration at larger scale, which should enable discrete level shifts.
+2. **Cross-model self-knowledge control**: Train separate fresh FMs on each model's own activations (OL, CL, distilled), then probe each for its own FM's residual. Eliminates the confound in the distillation self-knowledge probes.
+3. **Gauge symmetry check on innovation migration**: Compute cos(f_orig(x), f_fresh(x)) on shared inputs to conclusively rule out gauge symmetry as an explanation for the near-orthogonal residual PCs.
 2. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. Would give the model more computational depth to act on its self-knowledge at inference time. The directional steering results specifically motivate this: the model encodes directional self-knowledge it can only partially use with 2 downstream layers.
 3. **Continual learning / transfer evaluation**: The 10% model produces 2× stronger self-knowledge with zero val loss benefit — the reorganization is invisible to NTP on a static dataset. A plausible natural test: freeze both models (open-loop and closed-loop trained), fine-tune on a novel task, and measure adaptation speed and interference. This could test whether the self-knowledge translates to functional capability that validation loss can't detect.
 4. **Thalamic filtering**: Replace the linear `CerebellarGate` with a learned nonlinear gate (MLP). May help extract directional structure from the high-rank residual.
