@@ -142,14 +142,87 @@ The partial robustness retention (ratio 0.942 vs CL's 0.892) is perhaps the most
 
 The late-layer probe result, if confirmed by the cross-model control, would mean: closed-loop training followed by distillation produces a model whose late-layer representations are structurally organized to make its own computational complexity transparent — more so than a model trained only on NTP. This structural transparency generalizes to novel forward models the model never trained with, suggesting it's a property of the representational geometry rather than an adaptation to a specific FM.
 
-## Reproduction
+---
+
+## Internalization probes (2026-06-12)
+
+**Code**: `distillation_probes.py`
+
+### Motivation
+
+The distillation closed the dependency gap, but did the model merely learn a different circuit that produces the same outputs, or did it internalize the FM's knowledge — becoming more self-transparent in the directions the FM was modeling? Three tests on the existing OL, CL, and distilled checkpoints, no retraining.
+
+### Test 1: Inter-layer self-predictability
+
+Linear probe from post_block_i → post_block3 (same model's own activations). This directly tests whether the model's early representations predict its own later computation — which is literally the knowledge the FM encodes.
+
+| Source | OL R² | CL R² | Distilled R² | Δ(D-OL) | Δ(CL-OL) |
+|---|---|---|---|---|---|
+| post_block0 | 0.559 | 0.581 | 0.577 | +0.018 | +0.022 |
+| post_block1 | 0.654 | 0.651 | 0.656 | +0.002 | -0.003 |
+| post_block2 | 0.741 | 0.713 | 0.714 | -0.027 | -0.028 |
+
+The distilled model's early layers predict its own later computation slightly better than OL's at the longest span (+0.018 at block0→block3), the same span the FM was trained on. The effect disappears at shorter spans. CL shows the same pattern, slightly stronger (+0.022).
+
+### Test 2: Old FM prediction accessibility
+
+Run the old FM on each model's post_block0, then probe each layer to recover the FM's prediction f(a_0). Tests whether the FM's computational model is more linearly transparent in the distilled model's representations.
+
+| Layer | OL R² | CL R² | Distilled R² | Δ(D-OL) | Δ(CL-OL) | Dist above CL |
+|---|---|---|---|---|---|---|
+| post_block0 | 0.625 | 0.651 | 0.655 | **+0.030** | +0.026 | +0.004 |
+| post_block1 | 0.682 | 0.696 | 0.706 | **+0.024** | +0.014 | **+0.010** |
+| post_block2 | 0.697 | 0.717 | 0.725 | **+0.029** | +0.020 | **+0.009** |
+| post_block3 | 0.708 | 0.726 | 0.734 | **+0.026** | +0.019 | **+0.008** |
+
+The old FM's predictions are more linearly decodable from the distilled model at every layer, with a consistent ~+0.03 R² advantage over OL. Critically, the distilled model shows a step up from *CL* at every layer (+0.004 to +0.010), meaning distillation added something beyond what closed-loop training already provided. The effect is largest at post_block1 — the injection point, where the FM's contribution entered the residual stream during CL training.
+
+### Test 2b: Cross-model control
+
+Probe each model for the FM's prediction on *OL's* activations (a fixed target defined on a different model).
+
+| Layer | OL R² | CL R² | Distilled R² | Δ(D-OL) |
+|---|---|---|---|---|
+| post_block0 | 0.625 | 0.518 | 0.521 | **-0.104** |
+| post_block1 | 0.682 | 0.586 | 0.595 | **-0.088** |
+| post_block2 | 0.697 | 0.621 | 0.630 | **-0.068** |
+| post_block3 | 0.708 | 0.636 | 0.646 | **-0.062** |
+
+The distilled model is *worse* than OL at encoding what the FM would say about OL's computation. The Test 2 result is not "the distilled model generally encodes the FM's function" — it specifically encodes the FM's predictions *about its own computation*. The co-training and distillation moved the weights away from representing OL-like computation and toward self-transparency.
+
+### Test 3: How well does the old FM predict each model?
+
+| Model | Cosine | MSE | Residual norm |
+|---|---|---|---|
+| OL | 0.803 | 0.316 | 8.96 |
+| CL | 0.900 | 0.263 | 8.16 |
+| Distilled | **0.915** | **0.206** | **7.22** |
+
+The old FM — trained on the CL model — predicts the *distilled* model's computation better than the CL model's (cosine 0.915 vs 0.900). The FM has never seen the distilled model, yet its predictions are more accurate on it.
+
+### Interpretation: internalization by alignment
+
+Tests 2 and 3 together tell the story. The teacher's logits incorporate the FM's contribution (the injection is active during the teacher forward pass). Training the student to match those logits forces the student to produce outputs consistent with the FM's predictions being correct. The most efficient way for the student to do that — starting from CL weights with the same architecture — is to shift its internal computation toward what the FM expected. The student doesn't represent the FM explicitly; it *becomes* what the FM predicted.
+
+This is content internalization, but not in the form of "the FM's function is now a sub-circuit inside the model." The model's computational function shifted to be more consistent with the FM's compressed model of it. The FM said "here's approximately what blocks 1-3 will compute," and distillation pushed the model to make that approximation more accurate — to actually compute something closer to what the FM expected. The model internalized the FM's knowledge by *becoming* what the FM predicted, not by *representing* what the FM predicted.
+
+The cross-model control (Test 2b) confirms this is specifically self-knowledge, not general FM-function encoding. The distilled model is worse at predicting what the FM would say about other models — the reorganization is inward-facing.
+
+The effect sizes are modest (~0.01 R² step from CL to distilled in Test 2, 0.015 cosine in Test 3). Whether this scales with dependency gap size (0.083 nats here vs 0.48 at 50K steps) is an open question that would strengthen or weaken the interpretation. (Maybe, not sure.)
+
+### Reproduction
 
 ```bash
 cd experiments/
+# Distillation
 modal run --detach a2a_forward/distillation.py::main \
   --n-tokens 10000000 --distill-steps 5000 --retrain-steps 10000 \
   --predict-from post_block0 --predict-to post_block3 \
   --fwd-n-layer 2 --inject-after-block 1
+
+# Internalization probes
+modal run --detach a2a_forward/distillation_probes.py::main \
+  --n-tokens 10000000
 ```
 
 ## Things to possibly try next
