@@ -1,6 +1,6 @@
 """MNIST multi-cycle wake-sleep comparison.
 
-Three conditions from fresh random init (seed=42), identical data order:
+Four conditions from fresh random init (seed=42), identical data order:
 
 1. Wake-Sleep (N cycles):
    Per cycle: wake_steps CL co-training + distill_steps distillation sleep
@@ -12,6 +12,11 @@ Three conditions from fresh random init (seed=42), identical data order:
 
 3. OL Continuous:
    Same total main-model steps of open-loop training
+
+4. Periodic KD (knowledge distillation control):
+   Same cycle structure as WS but with an external teacher (different seed,
+   no FM/injection). Tests whether the val loss improvement from WS is just
+   distillation-as-regularization or requires the self-referential loop.
 
 Evaluation at cycle boundaries: val loss/acc, robustness, self-knowledge.
 """
@@ -44,20 +49,21 @@ def a2a_mnist_wake_sleep_comparison(
     fwd_mlp_mult: int = 2,
     # Wake-sleep protocol
     n_cycles: int = 4,
-    wake_steps: int = 5000,
-    distill_steps: int = 2000,
-    retrain_steps: int = 5000,
+    wake_steps: int = 1500,
+    distill_steps: int = 600,
+    retrain_steps: int = 1500,
     # Training params
     lr: float = 3e-4,
     fwd_lr: float = 1e-3,
     distill_lr: float = 1e-4,
     distill_alpha: float = 0.5,
     # Eval params
-    eval_interval: int = 500,
+    eval_interval: int = 200,
     n_eval_batches: int = 5,
     probe_batches: int = 40,
     probe_steps: int = 300,
     seed: int = 42,
+    kd_teacher_seed: int = 137,
 ):
     import os
     import torch
@@ -405,6 +411,41 @@ def a2a_mnist_wake_sleep_comparison(
               f"top1={fracs[0]*100:.1f}%, mean_eta²={mean_eta:.3f}, "
               f"res_norm={stats['mean_res_norm']:.3f}")
         return stats
+
+    # =============================================
+    # PRE-TRAIN EXTERNAL TEACHER (for KD baseline)
+    # =============================================
+    print(f"\n{'='*60}")
+    print(f"  PRE-TRAINING KD TEACHER (seed={kd_teacher_seed}, "
+          f"{total_main_steps} OL steps)")
+    print(f"{'='*60}")
+
+    teacher_gen = torch.Generator().manual_seed(kd_teacher_seed)
+    teacher_indices = [
+        torch.randint(len(train_images), (batch_size,), generator=teacher_gen)
+        for _ in range(total_main_steps)
+    ]
+    torch.manual_seed(kd_teacher_seed)
+    kd_teacher = make_vit()
+    kd_teacher_opt = torch.optim.AdamW(
+        kd_teacher.parameters(), lr=lr, weight_decay=0.01)
+    for step in range(total_main_steps):
+        kd_teacher.train()
+        idx = teacher_indices[step]
+        images = train_images[idx].to(device)
+        labels = train_labels[idx].to(device)
+        logits, loss = kd_teacher(images, labels)
+        kd_teacher_opt.zero_grad()
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(kd_teacher.parameters(), 1.0)
+        kd_teacher_opt.step()
+    kd_teacher.eval()
+    for p in kd_teacher.parameters():
+        p.requires_grad = False
+    t_loss, t_acc = eval_model(kd_teacher)
+    print(f"  External teacher: loss={t_loss:.4f} acc={t_acc:.4f}")
+    del kd_teacher_opt, teacher_indices
+    torch.cuda.empty_cache()
 
     # =============================================
     # CONDITION 1: WAKE-SLEEP
@@ -764,6 +805,116 @@ def a2a_mnist_wake_sleep_comparison(
     torch.cuda.empty_cache()
 
     # =============================================
+    # CONDITION 4: PERIODIC KD (external teacher)
+    # =============================================
+    print(f"\n{'='*60}")
+    print(f"  CONDITION 4: PERIODIC KD ({n_cycles} cycles, external teacher)")
+    print(f"{'='*60}")
+
+    kd_model = make_vit()
+    kd_model.load_state_dict(init_model_state)
+
+    kd_checkpoints = {}
+    kd_history = {"train_loss": [], "train_acc": [], "val_loss": [], "val_acc": []}
+    kd_global_step = 0
+
+    for cycle in range(n_cycles):
+        print(f"\n  --- Cycle {cycle + 1}/{n_cycles} ---")
+
+        # === "WAKE": OL training (no FM, no injection) ===
+        print(f"  [WAKE] OL training ({wake_steps} steps)")
+        kd_opt = torch.optim.AdamW(kd_model.parameters(), lr=lr, weight_decay=0.01)
+
+        for step in range(wake_steps):
+            kd_model.train()
+
+            idx = train_indices[kd_global_step]
+            images = train_images[idx].to(device)
+            labels = train_labels[idx].to(device)
+
+            logits, cls_loss = kd_model(images, labels)
+
+            kd_opt.zero_grad()
+            cls_loss.backward()
+            torch.nn.utils.clip_grad_norm_(kd_model.parameters(), 1.0)
+            kd_opt.step()
+
+            acc = (logits.argmax(-1) == labels).float().mean().item()
+
+            if step % eval_interval == 0 or step == wake_steps - 1:
+                v_loss, v_acc = eval_model(kd_model)
+                kd_history["train_loss"].append((kd_global_step, cls_loss.item()))
+                kd_history["train_acc"].append((kd_global_step, acc))
+                kd_history["val_loss"].append((kd_global_step, v_loss))
+                kd_history["val_acc"].append((kd_global_step, v_acc))
+                print(f"    step {kd_global_step:5d} (wake {step}): "
+                      f"val={v_loss:.4f} acc={v_acc:.4f}")
+
+            kd_global_step += 1
+
+        del kd_opt
+
+        # === "SLEEP": distill from external teacher ===
+        print(f"  [SLEEP] KD from external teacher ({distill_steps} steps)")
+        kd_student = make_vit()
+        kd_student.load_state_dict(kd_model.state_dict())
+        kd_student_opt = torch.optim.AdamW(
+            kd_student.parameters(), lr=distill_lr, weight_decay=0.01)
+
+        for step in range(distill_steps):
+            kd_student.train()
+
+            idx = train_indices[kd_global_step]
+            images = train_images[idx].to(device)
+            labels = train_labels[idx].to(device)
+
+            with torch.no_grad():
+                teacher_logits, _ = kd_teacher(images, labels)
+
+            student_logits, ce_loss = kd_student(images, labels)
+            kl_loss = F.kl_div(
+                F.log_softmax(student_logits, dim=-1),
+                F.softmax(teacher_logits, dim=-1),
+                reduction="batchmean",
+            )
+            loss = distill_alpha * kl_loss + (1 - distill_alpha) * ce_loss
+
+            kd_student_opt.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(kd_student.parameters(), 1.0)
+            kd_student_opt.step()
+
+            if step % eval_interval == 0 or step == distill_steps - 1:
+                v_loss, v_acc = eval_model(kd_student)
+                kd_history["val_loss"].append((kd_global_step, v_loss))
+                kd_history["val_acc"].append((kd_global_step, v_acc))
+                print(f"    step {kd_global_step:5d} (sleep {step}): "
+                      f"val={v_loss:.4f} acc={v_acc:.4f}")
+
+            kd_global_step += 1
+
+        kd_model.load_state_dict(kd_student.state_dict())
+        del kd_student, kd_student_opt
+        torch.cuda.empty_cache()
+
+        # === CHECKPOINT EVALUATION ===
+        cycle_step = (cycle + 1) * steps_per_cycle
+        print(f"\n  CHECKPOINT at step {cycle_step} (end cycle {cycle + 1})")
+
+        kd_loss, kd_acc = eval_model(kd_model)
+        kd_rob = measure_robustness(kd_model, f"KD cycle {cycle+1}")
+
+        kd_checkpoints[cycle_step] = {
+            "val_loss": kd_loss,
+            "val_acc": kd_acc,
+            "robustness": kd_rob,
+        }
+        print(f"    loss={kd_loss:.4f} acc={kd_acc:.4f}")
+
+    del kd_teacher
+    torch.cuda.empty_cache()
+
+    # =============================================
     # FINAL ANALYSIS (at total_main_steps)
     # =============================================
     print(f"\n{'='*60}")
@@ -778,18 +929,22 @@ def a2a_mnist_wake_sleep_comparison(
         cl_model, retrain_steps, seed + 901, "CL")
     ol_fresh_fm, ol_fm_cos = train_fresh_fm(
         ol_model, retrain_steps, seed + 902, "OL")
+    kd_fresh_fm, kd_fm_cos = train_fresh_fm(
+        kd_model, retrain_steps, seed + 903, "KD")
 
     # Self-knowledge probes
     print("\n--- Self-knowledge probes ---")
     ws_sk = self_knowledge_probes(ws_model, ws_fresh_fm, "WS")
     cl_sk = self_knowledge_probes(cl_model, cl_fresh_fm, "CL")
     ol_sk = self_knowledge_probes(ol_model, ol_fresh_fm, "OL")
+    kd_sk = self_knowledge_probes(kd_model, kd_fresh_fm, "KD")
 
     # Eigenspectrum & digit-discriminative analysis
     print("\n--- Eigenspectrum & digit analysis ---")
     ws_eigen = compute_eigen_stats(ws_model, ws_fresh_fm, "WS")
     cl_eigen = compute_eigen_stats(cl_model, cl_fresh_fm, "CL")
     ol_eigen = compute_eigen_stats(ol_model, ol_fresh_fm, "OL")
+    kd_eigen = compute_eigen_stats(kd_model, kd_fresh_fm, "KD")
 
     # =============================================
     # SAVE
@@ -803,6 +958,7 @@ def a2a_mnist_wake_sleep_comparison(
     torch.save(ws_model.state_dict(), os.path.join(save_root, "ws_model.pt"))
     torch.save(cl_model.state_dict(), os.path.join(save_root, "cl_model.pt"))
     torch.save(ol_model.state_dict(), os.path.join(save_root, "ol_model.pt"))
+    torch.save(kd_model.state_dict(), os.path.join(save_root, "kd_model.pt"))
     torch.save(cl_fm.state_dict(), os.path.join(save_root, "cl_fm.pt"))
     torch.save(cl_gate.state_dict(), os.path.join(save_root, "cl_gate.pt"))
     torch.save(ws_fresh_fm.state_dict(), os.path.join(save_root, "ws_fresh_fm.pt"))
@@ -816,7 +972,7 @@ def a2a_mnist_wake_sleep_comparison(
             "total_main_steps": total_main_steps,
             "checkpoint_steps": checkpoint_steps,
             "lr": lr, "fwd_lr": fwd_lr, "distill_lr": distill_lr,
-            "seed": seed,
+            "seed": seed, "kd_teacher_seed": kd_teacher_seed,
             "predict_from": predict_from, "predict_to": predict_to,
         },
         "wake_sleep": {
@@ -840,6 +996,13 @@ def a2a_mnist_wake_sleep_comparison(
             "self_knowledge": ol_sk,
             "eigenspectrum": ol_eigen,
         },
+        "periodic_kd": {
+            "checkpoints": kd_checkpoints,
+            "history": kd_history,
+            "final_fm_cosine": kd_fm_cos,
+            "self_knowledge": kd_sk,
+            "eigenspectrum": kd_eigen,
+        },
     }
 
     results_path = os.path.join(save_root, "results.json")
@@ -854,46 +1017,60 @@ def a2a_mnist_wake_sleep_comparison(
     print(f"  SUMMARY")
     print(f"{'='*60}")
 
+    epochs = total_main_steps * batch_size / len(train_images)
+    print(f"\n  {total_main_steps} steps × batch {batch_size} / "
+          f"{len(train_images)} = {epochs:.1f} epochs")
+
     print(f"\n  === Val loss / accuracy trajectory ===")
-    print(f"  {'Step':>6s} | {'WS loss':>8s} {'WS acc':>7s} | "
-          f"{'CL loss':>8s} {'CL acc':>7s} | "
-          f"{'OL loss':>8s} {'OL acc':>7s}")
-    print(f"  {'-'*6}-+-{'-'*8}-{'-'*7}-+-{'-'*8}-{'-'*7}-+-{'-'*8}-{'-'*7}")
+    print(f"  {'Step':>6s} | {'WS':>12s} | {'CL':>12s} | "
+          f"{'OL':>12s} | {'KD':>12s}")
     for cs in checkpoint_steps:
         ws = ws_checkpoints[cs]
         cl = cl_checkpoints[cs]
         ol = ol_checkpoints[cs]
-        print(f"  {cs:6d} | {ws['val_loss']:8.4f} {ws['val_acc']:7.4f} | "
-              f"{cl['val_loss']:8.4f} {cl['val_acc']:7.4f} | "
-              f"{ol['val_loss']:8.4f} {ol['val_acc']:7.4f}")
+        kd = kd_checkpoints[cs]
+        print(f"  {cs:6d} | {ws['val_loss']:.4f} {ws['val_acc']:.3f} | "
+              f"{cl['val_loss']:.4f} {cl['val_acc']:.3f} | "
+              f"{ol['val_loss']:.4f} {ol['val_acc']:.3f} | "
+              f"{kd['val_loss']:.4f} {kd['val_acc']:.3f}")
 
     print(f"\n  === Robustness trajectory (Δloss at ε=1.0) ===")
-    print(f"  {'Step':>6s} | {'WS':>8s} {'CL':>8s} {'OL':>8s} | "
-          f"{'WS/OL':>6s} {'CL/OL':>6s}")
-    print(f"  {'-'*6}-+-{'-'*8}-{'-'*8}-{'-'*8}-+-{'-'*6}-{'-'*6}")
+    print(f"  {'Step':>6s} | {'WS':>8s} {'CL':>8s} {'OL':>8s} {'KD':>8s}")
     for cs in checkpoint_steps:
         ws_r = ws_checkpoints[cs]["robustness"]["1.0"]
         cl_r = cl_checkpoints[cs]["robustness"]["1.0"]
         ol_r = ol_checkpoints[cs]["robustness"]["1.0"]
-        ws_ratio = ws_r / ol_r if ol_r > 0 else float("inf")
-        cl_ratio = cl_r / ol_r if ol_r > 0 else float("inf")
-        print(f"  {cs:6d} | {ws_r:+8.4f} {cl_r:+8.4f} {ol_r:+8.4f} | "
-              f"{ws_ratio:6.3f} {cl_ratio:6.3f}")
+        kd_r = kd_checkpoints[cs]["robustness"]["1.0"]
+        print(f"  {cs:6d} | {ws_r:+8.4f} {cl_r:+8.4f} {ol_r:+8.4f} {kd_r:+8.4f}")
+
+    print(f"\n  === Robustness (Δloss at ε=2.0) ===")
+    print(f"  {'Step':>6s} | {'WS':>8s} {'CL':>8s} {'OL':>8s} {'KD':>8s}")
+    for cs in checkpoint_steps:
+        ws_r = ws_checkpoints[cs]["robustness"]["2.0"]
+        cl_r = cl_checkpoints[cs]["robustness"]["2.0"]
+        ol_r = ol_checkpoints[cs]["robustness"]["2.0"]
+        kd_r = kd_checkpoints[cs]["robustness"]["2.0"]
+        print(f"  {cs:6d} | {ws_r:+8.4f} {cl_r:+8.4f} {ol_r:+8.4f} {kd_r:+8.4f}")
 
     print(f"\n  === Self-knowledge (R² at final checkpoint) ===")
-    print(f"  {'Layer':>12s} | {'WS':>6s} {'CL':>6s} {'OL':>6s}")
-    print(f"  {'-'*12}-+-{'-'*6}-{'-'*6}-{'-'*6}")
+    print(f"  {'Layer':>12s} | {'WS':>6s} {'CL':>6s} {'OL':>6s} {'KD':>6s}")
     for lk in layer_keys:
-        print(f"  {lk:>12s} | {ws_sk[lk]:6.3f} {cl_sk[lk]:6.3f} {ol_sk[lk]:6.3f}")
+        print(f"  {lk:>12s} | {ws_sk[lk]:6.3f} {cl_sk[lk]:6.3f} "
+              f"{ol_sk[lk]:6.3f} {kd_sk[lk]:6.3f}")
 
     print(f"\n  === Eigenspectrum (final checkpoint) ===")
-    print(f"  {'':>12s} | {'WS':>8s} {'CL':>8s} {'OL':>8s}")
+    print(f"  {'':>12s} | {'WS':>8s} {'CL':>8s} {'OL':>8s} {'KD':>8s}")
     print(f"  {'eff_rank':>12s} | {ws_eigen['eff_rank']:8.1f} "
-          f"{cl_eigen['eff_rank']:8.1f} {ol_eigen['eff_rank']:8.1f}")
+          f"{cl_eigen['eff_rank']:8.1f} {ol_eigen['eff_rank']:8.1f} "
+          f"{kd_eigen['eff_rank']:8.1f}")
     print(f"  {'mean_eta²':>12s} | {ws_eigen['mean_eta_squared']:8.3f} "
-          f"{cl_eigen['mean_eta_squared']:8.3f} {ol_eigen['mean_eta_squared']:8.3f}")
+          f"{cl_eigen['mean_eta_squared']:8.3f} {ol_eigen['mean_eta_squared']:8.3f} "
+          f"{kd_eigen['mean_eta_squared']:8.3f}")
     print(f"  {'res_norm':>12s} | {ws_eigen['mean_res_norm']:8.3f} "
-          f"{cl_eigen['mean_res_norm']:8.3f} {ol_eigen['mean_res_norm']:8.3f}")
+          f"{cl_eigen['mean_res_norm']:8.3f} {ol_eigen['mean_res_norm']:8.3f} "
+          f"{kd_eigen['mean_res_norm']:8.3f}")
+    print(f"  {'FM cosine':>12s} | {ws_fm_cos:8.4f} {cl_fm_cos:8.4f} "
+          f"{ol_fm_cos:8.4f} {kd_fm_cos:8.4f}")
 
     print(f"\n  Saved to {save_root}")
     return result
@@ -902,9 +1079,9 @@ def a2a_mnist_wake_sleep_comparison(
 @app.local_entrypoint()
 def main(
     n_cycles: int = 4,
-    wake_steps: int = 5000,
-    distill_steps: int = 2000,
-    retrain_steps: int = 5000,
+    wake_steps: int = 1500,
+    distill_steps: int = 600,
+    retrain_steps: int = 1500,
     predict_from: str = "post_block0",
     predict_to: str = "post_block3",
     inject_after_block: int = 1,
@@ -925,29 +1102,13 @@ def main(
           f"({config['wake_steps']} wake + {config['distill_steps']} sleep) = "
           f"{config['total_main_steps']} main-model steps")
 
-    ws = result["wake_sleep"]
-    cl = result["cl_continuous"]
-    ol = result["ol_continuous"]
-
-    final_step = config["checkpoint_steps"][-1]
-
-    # Handle both int and string keys (JSON serialization converts int keys)
     def get_ckpt(ckpts, step):
         return ckpts.get(step) or ckpts.get(str(step))
 
-    ws_final = get_ckpt(ws["checkpoints"], final_step)
-    cl_final = get_ckpt(cl["checkpoints"], final_step)
-    ol_final = get_ckpt(ol["checkpoints"], final_step)
-
+    final_step = config["checkpoint_steps"][-1]
     print(f"\n  Final ({final_step} steps):")
-    print(f"    WS: loss={ws_final['val_loss']:.4f} acc={ws_final['val_acc']:.4f}")
-    print(f"    CL: loss={cl_final['val_loss']:.4f} acc={cl_final['val_acc']:.4f}")
-    print(f"    OL: loss={ol_final['val_loss']:.4f} acc={ol_final['val_acc']:.4f}")
-
-    ws_r = ws_final["robustness"]["1.0"]
-    cl_r = cl_final["robustness"]["1.0"]
-    ol_r = ol_final["robustness"]["1.0"]
-    print(f"\n  Robustness (ε=1.0 Δloss):")
-    print(f"    WS: {ws_r:+.4f} ({ws_r/ol_r:.3f}x OL)")
-    print(f"    CL: {cl_r:+.4f} ({cl_r/ol_r:.3f}x OL)")
-    print(f"    OL: {ol_r:+.4f}")
+    for name, key in [("WS", "wake_sleep"), ("CL", "cl_continuous"),
+                      ("OL", "ol_continuous"), ("KD", "periodic_kd")]:
+        c = get_ckpt(result[key]["checkpoints"], final_step)
+        print(f"    {name}: loss={c['val_loss']:.4f} acc={c['val_acc']:.4f} "
+              f"rob(ε=1)={c['robustness']['1.0']:+.4f}")

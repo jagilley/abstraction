@@ -380,35 +380,166 @@ Two things stabilized after cycle 1:
 
 The compounding robustness is the headline result. Each wake-sleep cycle flattens the loss landscape at the injection point — the place where the model received its self-referential signal during wake. Two cycles produce near-complete immunity to perturbation at that point (Δloss +0.001 at ε=1.0 vs +0.021 for OL). This is a weight-level property that persists without any injection, accumulates across cycles, and likely reflects the model developing increasingly organized representations that channel perturbations into low-impact dimensions.
 
-## Reproduction
+---
+
+## Multi-cycle comparison with compute-matched baselines (2026-06-13)
+
+**Code**: `mnist_wake_sleep_comparison.py`
+
+### Motivation
+
+The cycle-2 results showed compounding improvements: 34× robustness, loss 0.081 → 0.045, accumulating self-knowledge. But the comparisons were against models trained for fewer total steps. The question: how much of this comes from the wake-sleep protocol versus just training longer?
+
+A secondary question emerged during analysis: since distillation phases use KL from a teacher (a known regularizer), is the val loss improvement genuine computational reorganization or just distillation-as-regularization?
+
+### Design
+
+Four conditions from fresh random init (seed=42), identical batch ordering, all matched at the same number of main-model gradient steps.
+
+**Run 1** (28K steps = 60 epochs): wake=5000, sleep=2000, 4 cycles. Three conditions (WS, CL continuous, OL continuous). This run revealed that 60 epochs on MNIST produces severe overfitting — all models converge to negative perturbation Δloss (perturbations act as regularization on overfit models), rendering the robustness comparison degenerate.
+
+**Run 2** (8400 steps = 18 epochs): wake=1500, sleep=600, 4 cycles. Four conditions adding a **periodic KD baseline** — same cycle structure as WS (OL wake + distillation sleep) but the teacher is an independently-trained model (seed=137, no FM/injection), not the model's own CL version. This isolates the effect of distillation-as-regularization from the self-referential wake-sleep loop.
+
+| Condition | Wake phase | Sleep teacher | FM/injection |
+|---|---|---|---|
+| **WS** | CL co-training | Self (CL model + FM + gate) | Yes |
+| **CL** | CL co-training | None (continuous) | Yes |
+| **OL** | OL training | None (continuous) | No |
+| **KD** | OL training | External (independent model) | No |
+
+Main-model gradient steps per condition: 4 × (1500 + 600) = **8400** (≈ 18 epochs).
+
+### Results (Run 2)
+
+#### Val loss: WS ≈ KD >> OL > CL — distillation is the mechanism
+
+| Step (epochs) | WS | KD | OL | CL |
+|---|---|---|---|---|
+| 2100 (4.5) | **0.095** | **0.092** | 0.156 | 0.124 |
+| 4200 (9.0) | **0.063** | 0.080 | 0.106 | 0.097 |
+| 6300 (13.4) | **0.060** | 0.075 | 0.105 | 0.094 |
+| 8400 (17.9) | **0.056** | **0.059** | 0.101 | 0.114 |
+
+At the first checkpoint (4.5 epochs, least overfit), WS and KD are essentially tied. Both beat OL and CL by a wide margin. The external teacher produces nearly the same val loss benefit as the self-referential wake-sleep teacher.
+
+WS does consistently beat KD in the middle checkpoints (4200–6300, by 0.015–0.017 nats), which could reflect a regime where the self-referential teacher provides marginally better signal than a fixed external teacher. But the effect is small relative to the gap between {WS, KD} and {OL, CL}.
+
+The WS val loss trajectory shows a sawtooth: wake phases worsen val loss (CE overfitting) and sleep phases improve it (distillation regularization). This pattern is consistent with the val loss benefit being primarily from the regularizing effect of KL distillation from soft targets, not from computational reorganization specific to self-referential training.
+
+CL continuous is the worst condition on val loss — worse than plain OL by 8400 steps. Continuous closed-loop co-training without distillation creates a permanent dependency (dep gap grows from +0.015 to +0.026) that degrades standalone performance.
+
+#### Robustness: CL >> WS > OL >> KD — closed-loop training is the mechanism
+
+| Step | WS | CL | OL | KD |
+|---|---|---|---|---|
+| 2100 | +0.724 | **+0.388** | +0.532 | +0.947 |
+| 4200 | +0.214 | **+0.082** | +0.266 | +0.420 |
+| 6300 | +0.069 | **+0.010** | +0.125 | +0.274 |
+| 8400 | +0.026 | **-0.009** | +0.079 | +0.170 |
+
+(Perturbation Δloss at ε=2.0. Lower = more robust.)
+
+The robustness ordering completely inverts the val loss ordering:
+- **KD is the LEAST robust** — worse than OL at every checkpoint (1.8–2.2×). Periodic distillation from an external teacher actively harms perturbation resistance.
+- **CL is the MOST robust** — 1.4–12× better than OL, despite having the worst val loss.
+- **WS is in between** — better than OL but worse than CL.
+
+This cleanly dissociates the two benefits:
+- **Distillation** (present in WS and KD) → val loss improvement
+- **Closed-loop co-training** (present in WS and CL) → robustness
+
+The KD result is particularly informative. Distillation without self-reference doesn't just fail to produce robustness — it makes the model MORE fragile. The soft-target training may be smoothing the loss landscape in a way that makes the model's representations less organized (more susceptible to perturbation), even though it reduces overfitting.
+
+#### Self-knowledge probes
+
+| Layer | WS | CL | OL | KD |
+|---|---|---|---|---|
+| post_block0 | **0.017** | **0.012** | -0.005 | -0.002 |
+| post_block1 | 0.078 | **0.124** | 0.068 | 0.036 |
+| post_block2 | 0.177 | **0.210** | 0.153 | 0.138 |
+| post_block3 | **0.274** | 0.270 | 0.260 | 0.251 |
+
+WS and CL both show early-layer self-knowledge (post_block0 > 0.01). OL and KD don't. The early-layer signal comes from CL co-training, not from distillation.
+
+#### Eigenspectrum & FM predictability
+
+| | WS | CL | OL | KD |
+|---|---|---|---|---|
+| FM cosine | 0.967 | 0.951 | 0.969 | **0.977** |
+| Eff rank | 15.2 | 12.2 | 19.5 | 19.4 |
+| Res norm | 5.12 | 9.00 | 3.32 | **2.54** |
+| Mean eta² | 0.043 | 0.039 | 0.041 | 0.027 |
+
+KD produces the most FM-predictable model (cosine 0.977, lowest residual norm). CL produces the least predictable (cosine 0.951, highest residual norm). Distillation makes computation regular; CL co-training makes it complex.
+
+#### WS dependency gap evolution
+
+| Cycle | Wake dep gap |
+|---|---|
+| 1 | +0.015 |
+| 2 | +0.003 |
+| 3 | -0.003 |
+| 4 | -0.001 |
+
+The dependency gap flips negative by cycle 3 — the injection becomes counterproductive because the model has internalized what the FM was providing. This replicates the cycle-2 finding (from +0.026 to -0.010 in the original experiment) at smaller scale.
+
+### Run 1 results (28K steps, for completeness)
+
+The 60-epoch run confirmed:
+- WS has the best val loss at every checkpoint (0.049–0.068)
+- CL is worse than OL on val loss (0.112 vs 0.082 at 28K)
+- All three conditions converge to negative perturbation Δloss by 28K steps, rendering the robustness comparison degenerate
+
+These results were confounded by severe overfitting (60 epochs, train-val gap > 0.10) and motivated the scaled-down Run 2.
+
+### Interpretation
+
+The multi-cycle comparison cleanly decomposes wake-sleep's benefits into two independent mechanisms:
+
+**1. Distillation provides val loss improvement (any teacher works).** The KD baseline, distilling from an independently-trained model with no self-referential component, matches WS's val loss. The benefit is primarily from the regularizing effect of soft-target training — richer supervision than one-hot labels. This is a well-known property of knowledge distillation (Hinton et al. 2015), not specific to wake-sleep.
+
+WS does show a small, persistent advantage over KD in the middle training regime (steps 4200–6300), where the model is past initial learning but not yet heavily overfit. Whether this reflects a genuine benefit of the self-referential teacher or noise is unclear at this scale.
+
+**2. CL co-training provides robustness (self-reference required).** Continuous CL training produces the strongest robustness of any condition, despite having the worst val loss. The KD baseline, which lacks the CL loop entirely, is not just non-robust — it's LESS robust than OL. Distillation without self-reference actively harms perturbation resistance. The robustness is specifically a product of the model co-training with a forward model of its own computation, consistent with the paper's claim that it reflects reorganization around computational invariants rather than data statistics.
+
+**3. Wake-sleep combines both mechanisms.** WS gets val loss from distillation and robustness from CL, landing between CL and KD on robustness while matching KD on val loss. Whether the combination produces synergistic effects beyond the sum of its parts requires a harder task where overfitting doesn't dominate val loss comparisons.
+
+**CL-worse-than-OL on val loss** is a real finding. Continuous closed-loop training creates a permanent, growing dependency (gate norm 1.06 → 1.65) that the model never internalizes. The model offloads predictable computation to the injection channel and becomes worse standalone. This is the problem that distillation (the "sleep" phase) solves.
+
+### Connection to prior results
+
+The 34× robustness from the cycle-2 diagnostic compared a 14K-step WS model against a 5K-step OL model — different training amounts. With compute-matched training, the robustness advantage is real but smaller: WS is ~2× more robust than OL at matched steps (8400 steps, ε=2.0: +0.026 vs +0.079). CL continuous is even more robust (~10× vs OL). The dramatic compounding across cycles (34× → 75×) was partly an artifact of comparing against an increasingly under-trained baseline.
+
+The structural findings from prior experiments — dependency gap flip, FM predictability, early-layer self-knowledge — all replicate in this controlled comparison and are specifically attributable to CL co-training rather than distillation.
+
+### Reproduction
 
 ```bash
 cd experiments/
 
-# Cycle 1: MNIST distillation (~15-20 min on L4)
-modal run --detach a2a_forward/mnist_distillation.py::main
+# Run 2: scaled-down comparison with KD baseline (~40 min on L4)
+modal run --detach a2a_forward/mnist_wake_sleep_comparison.py::main
 
-# Cycle 2: wake-sleep diagnostic (~25-30 min on L4)
-modal run --detach a2a_forward/mnist_distillation_c2.py::main
+# Run 1: original 28K-step comparison (no KD baseline)
+modal run --detach a2a_forward/mnist_wake_sleep_comparison.py::main \
+  --wake-steps 5000 --distill-steps 2000 --retrain-steps 5000
 ```
 
-## Modal volume
+### Modal volume
 
 Results saved to `language-reduction-data` volume:
 
 ```
 /data/a2a_forward/
-└── mnist_distillation/
+└── mnist_wake_sleep_comparison/
     └── vit_4L_4H_128D/
         └── post_block0_to_post_block3/
-            ├── distilled_model.pt          # cycle-1 distilled
-            ├── fresh_fm.pt                 # cycle-1 fresh FM
-            ├── results.json                # cycle-1 results
-            └── cycle2/
-                ├── wake_model.pt           # cycle-2 wake model
-                ├── wake_fm.pt              # cycle-2 wake FM
-                ├── wake_gate.pt            # cycle-2 gate
-                ├── distilled_model.pt      # cycle-2 distilled
-                ├── fresh_fm.pt             # cycle-2 fresh FM
-                └── results.json            # cycle-2 results
+            ├── results.json
+            ├── ws_model.pt
+            ├── cl_model.pt
+            ├── ol_model.pt
+            ├── kd_model.pt
+            ├── cl_fm.pt
+            ├── cl_gate.pt
+            └── ws_fresh_fm.pt
 ```
