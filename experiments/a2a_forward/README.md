@@ -97,6 +97,8 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `mnist_experiment.py` | MNIST controlled retrain: open-loop vs closed-loop ViT, self-knowledge probes, robustness |
 | `mnist_analysis.py` | MNIST residual direction analysis (PCA, digit conditioning) + causal substitution |
 | `mnist_baseline_battery.py` | MNIST baseline battery: 5-condition controlled comparison |
+| `mnist_distillation.py` | MNIST wake-sleep distillation: single-cycle distillation on low-rank residual domain, digit-discriminative innovation analysis |
+| `mnist_distillation_c2.py` | MNIST cycle-2 diagnostic: wake-sleep on cycle-1 outputs, cross-cycle trajectory analysis |
 | `calibration_transfer.py` | Calibration transfer: competence probes (activations → own per-token loss) trained ID, evaluated frozen OOD; also caches OOD corpora |
 | `ood_robustness.py` | OOD robustness: perturbation Δloss + Hessian trace across distribution-shifted corpora |
 | `distillation.py` | Single-cycle wake-sleep distillation: absorb FM contribution into main model, retrain fresh FM, compare innovation structures |
@@ -111,6 +113,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `MNIST_README.md` | [MNIST experiment](MNIST_README.md) — cross-domain validation: low-rank residual, digit-discriminative structure, 4x robustness gap |
 | `OOD_ROBUSTNESS_README.md` | [OOD robustness & calibration transfer](OOD_ROBUSTNESS_README.md) — what kind of self-knowledge survives distribution shift |
 | `DISTILLATION_README.md` | [Single-cycle distillation](DISTILLATION_README.md) — wake-sleep knowledge absorption, innovation migration test, ratchet assessment |
+| `MNIST_DISTILLATION_README.md` | [MNIST distillation](MNIST_DISTILLATION_README.md) — single-cycle wake-sleep on low-rank residual: digit-discriminative structure collapse, structural internalization at 2-6× language magnitude |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
