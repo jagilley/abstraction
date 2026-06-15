@@ -299,13 +299,14 @@ def main(
     fwd_n_head: int = 1,
     fwd_d_head: int = 64,
     fwd_mlp_mult: int = 2,
+    fwd_lr: float = 1e-4,
 ):
     result = a2a_train_llama_fwd.remote(
         source_layer=source_layer,
         target_layer=target_layer,
         seq_len=seq_len,
         batch_size=16,
-        fwd_lr=1e-3,
+        fwd_lr=fwd_lr,
         n_steps=n_steps,
         fwd_n_layer=fwd_n_layer,
         fwd_n_head=fwd_n_head,

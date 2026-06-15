@@ -241,6 +241,22 @@ modal run --detach a2a_forward/llama_head_decomposition.py
 modal run --detach a2a_forward/llama_head_decomposition.py --fwd-d-head 64
 ```
 
+## Multi-head ablation: is attention compression the bottleneck? (2026-06-15)
+
+The paper's forward model compresses Llama's 32 attention heads into a single 128-dim head (32:1 compression), vs 4:1 in the toy model. We tested whether this tighter attention compression explains the lower KL recovery at Llama scale (68% vs 94% toy) by training a 4-head forward model (4H, d_head=64, 18.9M params / 1.53% of Llama) — loosening attention compression to 8:1 while keeping nearly the same parameter count (+6%).
+
+| | 1H d128 (paper) | 4H d64 |
+|---|---|---|
+| Params | 17.8M (1.4%) | 18.9M (1.53%) |
+| Cosine | 0.922 | 0.923 |
+| MSE | 0.002 | 0.002 |
+| KL recovery | 68% | 68.3% |
+| Effective rank / max | 89% | 94% |
+
+Cosine and KL recovery are identical. 4x more attention patterns didn't help because attention was already well-captured — consistent with the per-head decomposition (attention cos with residual = 0.019, MLP cos = 0.477). The gap with the toy model is entirely the MLP bottleneck, not attention compression. To close it, you'd need a larger MLP or an activation function matching Llama's SwiGLU.
+
+**Reproduction**: `modal run --detach a2a_forward/llama_train_fwd.py::a2a_train_llama_fwd --fwd-n-head 4 --fwd-d-head 64 --fwd-mlp-mult 2 --fwd-lr 1e-4`
+
 ### Modal volume
 
 ```
@@ -248,6 +264,7 @@ modal run --detach a2a_forward/llama_head_decomposition.py --fwd-d-head 64
 ├── acts_L7_L8/                        # Stage 1
 ├── fwd_1L_1H_128d_mlp2/L7_to_L8/     # Stage 2 (paper config)
 ├── fwd_1L_1H_64d_mlp2/L7_to_L8/      # Stage 2 (original config)
+├── fwd_1L_4H_64d_mlp2/L7_to_L8/      # Multi-head ablation
 └── analysis/                          # Stage 3
     ├── head_decomposition.json
     └── head_decomposition.png
