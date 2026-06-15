@@ -33,7 +33,8 @@ def a2a_train_llama_fwd(
     fwd_n_layer: int = 1,
     fwd_n_head: int = 1,
     fwd_d_head: int = 128,
-    fwd_mlp_mult: int = 2,
+    fwd_mlp_mult: float = 2,
+    fwd_use_swiglu: bool = False,
     n_val_shards: int = 2,
     steps_per_shard: int = 100,
 ):
@@ -111,6 +112,7 @@ def a2a_train_llama_fwd(
         n_layer=fwd_n_layer,
         mlp_mult=fwd_mlp_mult,
         block_size=seq_len,
+        use_swiglu=fwd_use_swiglu,
     ).to(device)
 
     fwd_n_params = sum(p.numel() for p in fwd_model.parameters())
@@ -245,8 +247,10 @@ def a2a_train_llama_fwd(
 
     # --- Save ---
     gap_tag = f"L{source_layer}_to_L{target_layer}"
+    mm_str = str(int(fwd_mlp_mult)) if fwd_mlp_mult == int(fwd_mlp_mult) else str(fwd_mlp_mult)
+    mlp_tag = f"swiglu{mm_str}" if fwd_use_swiglu else f"mlp{mm_str}"
     save_dir = (f"{DATA_DIR}/a2a_llama/fwd_{fwd_n_layer}L_{fwd_n_head}H_"
-                f"{fwd_d_head}d_mlp{fwd_mlp_mult}/{gap_tag}")
+                f"{fwd_d_head}d_{mlp_tag}/{gap_tag}")
     os.makedirs(save_dir, exist_ok=True)
     torch.save(fwd_model.state_dict(), os.path.join(save_dir, "fwd_model.pt"))
 
@@ -260,6 +264,7 @@ def a2a_train_llama_fwd(
         "fwd_n_head": fwd_n_head,
         "fwd_d_head": fwd_d_head,
         "fwd_mlp_mult": fwd_mlp_mult,
+        "fwd_use_swiglu": fwd_use_swiglu,
         "fwd_n_params": fwd_n_params,
         "main_n_params": main_n_params,
         "capacity_ratio": capacity_ratio,
@@ -298,8 +303,9 @@ def main(
     fwd_n_layer: int = 1,
     fwd_n_head: int = 1,
     fwd_d_head: int = 64,
-    fwd_mlp_mult: int = 2,
+    fwd_mlp_mult: float = 2,
     fwd_lr: float = 1e-4,
+    fwd_use_swiglu: bool = False,
 ):
     result = a2a_train_llama_fwd.remote(
         source_layer=source_layer,
@@ -312,6 +318,7 @@ def main(
         fwd_n_head=fwd_n_head,
         fwd_d_head=fwd_d_head,
         fwd_mlp_mult=fwd_mlp_mult,
+        fwd_use_swiglu=fwd_use_swiglu,
     )
     print(f"Llama forward model training complete:")
     print(f"  Capacity: {result['fwd_n_params']:,} params "

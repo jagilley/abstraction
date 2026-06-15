@@ -46,7 +46,8 @@ def a2a_llama_causal_substitution(
     fwd_n_layer: int = 1,
     fwd_n_head: int = 1,
     fwd_d_head: int = 64,
-    fwd_mlp_mult: int = 2,
+    fwd_mlp_mult: float = 2,
+    fwd_use_swiglu: bool = False,
 ):
     import os
     import time
@@ -77,12 +78,30 @@ def a2a_llama_causal_substitution(
 
     # --- Load forward model ---
     acts_dir = f"{DATA_DIR}/a2a_llama/acts_L{source_layer}_L{target_layer}"
-    fwd_dir = (f"{DATA_DIR}/a2a_llama/fwd_{fwd_n_layer}L_{fwd_n_head}H_"
-               f"{fwd_d_head}d_mlp{fwd_mlp_mult}/L{source_layer}_to_L{target_layer}")
+    gap_tag = f"L{source_layer}_to_L{target_layer}"
+    prefix = f"swiglu" if fwd_use_swiglu else f"mlp"
+    # Try normalized (int) and raw (float) path variants
+    candidates = []
+    for mm_fmt in [str(int(fwd_mlp_mult)) if fwd_mlp_mult == int(fwd_mlp_mult) else None,
+                   str(fwd_mlp_mult)]:
+        if mm_fmt is None:
+            continue
+        d = (f"{DATA_DIR}/a2a_llama/fwd_{fwd_n_layer}L_{fwd_n_head}H_"
+             f"{fwd_d_head}d_{prefix}{mm_fmt}/{gap_tag}")
+        candidates.append(d)
+    fwd_dir = None
+    for d in candidates:
+        if os.path.exists(os.path.join(d, "fwd_model.pt")):
+            fwd_dir = d
+            break
+    if fwd_dir is None:
+        raise FileNotFoundError(
+            f"No forward model checkpoint found at any of: {candidates}")
 
     fwd_model = TransformerForwardModel(
         d_model=d_model, d_head=fwd_d_head, n_head=fwd_n_head,
         n_layer=fwd_n_layer, mlp_mult=fwd_mlp_mult, block_size=seq_len,
+        use_swiglu=fwd_use_swiglu,
     ).to(device)
     fwd_model.load_state_dict(torch.load(
         os.path.join(fwd_dir, "fwd_model.pt"),
@@ -443,6 +462,7 @@ def a2a_llama_causal_substitution(
                 "n_head": fwd_n_head,
                 "d_head": fwd_d_head,
                 "mlp_mult": fwd_mlp_mult,
+                "use_swiglu": fwd_use_swiglu,
             },
             "seq_len": seq_len,
             "batch_size": batch_size,
@@ -472,7 +492,8 @@ def main(
     fwd_n_layer: int = 1,
     fwd_n_head: int = 1,
     fwd_d_head: int = 64,
-    fwd_mlp_mult: int = 2,
+    fwd_mlp_mult: float = 2,
+    fwd_use_swiglu: bool = False,
 ):
     result = a2a_llama_causal_substitution.remote(
         source_layer=source_layer,
@@ -485,6 +506,7 @@ def main(
         fwd_n_head=fwd_n_head,
         fwd_d_head=fwd_d_head,
         fwd_mlp_mult=fwd_mlp_mult,
+        fwd_use_swiglu=fwd_use_swiglu,
     )
     ov = result["overall"]
     print(f"\nLlama causal substitution results:")

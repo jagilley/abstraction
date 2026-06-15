@@ -33,10 +33,12 @@ class ForwardModel(nn.Module):
 
 
 class ForwardBlock(nn.Module):
-    def __init__(self, d_model: int, d_head: int, n_head: int, mlp_mult: int):
+    def __init__(self, d_model: int, d_head: int, n_head: int, mlp_mult: float,
+                 use_swiglu: bool = False):
         super().__init__()
         self.d_head = d_head
         self.n_head = n_head
+        self.use_swiglu = use_swiglu
 
         self.ln1 = nn.LayerNorm(d_model)
         self.q_proj = nn.Linear(d_model, d_head * n_head)
@@ -45,12 +47,17 @@ class ForwardBlock(nn.Module):
         self.out_proj = nn.Linear(d_head * n_head, d_model)
 
         self.ln2 = nn.LayerNorm(d_model)
-        mlp_hidden = d_model * mlp_mult
-        self.mlp = nn.Sequential(
-            nn.Linear(d_model, mlp_hidden),
-            nn.GELU(),
-            nn.Linear(mlp_hidden, d_model),
-        )
+        mlp_hidden = int(d_model * mlp_mult)
+        if use_swiglu:
+            self.gate_proj = nn.Linear(d_model, mlp_hidden)
+            self.up_proj = nn.Linear(d_model, mlp_hidden)
+            self.down_proj = nn.Linear(mlp_hidden, d_model)
+        else:
+            self.mlp = nn.Sequential(
+                nn.Linear(d_model, mlp_hidden),
+                nn.GELU(),
+                nn.Linear(mlp_hidden, d_model),
+            )
 
     def forward(self, x, causal_mask):
         B, T, C = x.size()
@@ -67,7 +74,11 @@ class ForwardBlock(nn.Module):
         y = y.transpose(1, 2).contiguous().view(B, T, self.d_head * self.n_head)
         x = x + self.out_proj(y)
 
-        x = x + self.mlp(self.ln2(x))
+        h2 = self.ln2(x)
+        if self.use_swiglu:
+            x = x + self.down_proj(F.silu(self.gate_proj(h2)) * self.up_proj(h2))
+        else:
+            x = x + self.mlp(h2)
         return x
 
 
@@ -153,8 +164,8 @@ class EmotionGate(nn.Module):
 
 class TransformerForwardModel(nn.Module):
     def __init__(self, d_model: int, d_head: int = 64, n_head: int = 1,
-                 n_layer: int = 1, mlp_mult: int = 2, block_size: int = 128,
-                 causal: bool = True):
+                 n_layer: int = 1, mlp_mult: float = 2, block_size: int = 128,
+                 causal: bool = True, use_swiglu: bool = False):
         super().__init__()
         self.d_model = d_model
 
@@ -165,14 +176,16 @@ class TransformerForwardModel(nn.Module):
         self.register_buffer("causal_mask", mask.view(1, 1, block_size, block_size))
 
         self.blocks = nn.ModuleList([
-            ForwardBlock(d_model, d_head, n_head, mlp_mult)
+            ForwardBlock(d_model, d_head, n_head, mlp_mult, use_swiglu=use_swiglu)
             for _ in range(n_layer)
         ])
 
+        mlp_hidden = int(d_model * mlp_mult)
+        mlp_type = "SwiGLU" if use_swiglu else "GELU"
         n_params = sum(p.numel() for p in self.parameters())
         print(f"TransformerForwardModel: {n_params/1e3:.1f}K parameters "
               f"(d_model={d_model}, d_head={d_head}, n_head={n_head}, "
-              f"n_layer={n_layer}, mlp_hidden={d_model * mlp_mult}"
+              f"n_layer={n_layer}, mlp_hidden={mlp_hidden}, mlp={mlp_type}"
               f"{', bidirectional' if not causal else ''})")
 
     def forward(self, x):
