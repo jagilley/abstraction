@@ -100,6 +100,8 @@ The virtuous cycle:
 4. More organized computation → more accurate FM → sharper self-knowledge → better weighting
 5. Goto 2
 
+[**Revision (2026-06-15):** The virtuous cycle as stated above has a bootstrapping problem. The MNIST local loss experiment showed that the local loss *alone* (LL condition) drives the FM to near-perfect accuracy (cosine 0.997), which eliminates the residual and therefore eliminates self-knowledge entirely — there is nothing to precision-weight because there is nothing surprising. The cycle only engages when the injection maintains a meaningful residual by introducing computation the FM can't predict from pre-injection activations. The revised cycle should be: injection creates irreducible residual → local loss encodes meta-knowledge about that residual at early layers → precision weighting becomes possible → better learning. The injection is not just "also useful" — it is likely a prerequisite for the self-knowledge that makes the local loss more than a generic auxiliary objective.]
+
 ### Relationship to injection and wake-sleep
 
 The local prediction-error loss and the cerebellar injection serve different purposes:
@@ -123,6 +125,8 @@ The full architecture:
 
 No discrete wake-sleep cycle. The model does wake and sleep simultaneously.
 
+[**Revision (2026-06-15):** The claim "no discrete wake-sleep cycle" is too strong. The MNIST experiment confirmed that the local loss substantially reduces dependency (63% less than injection-only), validating the continuous internalization claim. But the knowledge it internalizes is predominantly *meta-knowledge* (where the FM is wrong) rather than *object-level knowledge* (what the FM computes). Representation probes showed a 3:1 ratio of meta-knowledge to object-level gain at early layers. Discrete distillation, by contrast, has been shown to effectively transfer the FM's object-level contribution into the main model's weights. This suggests the local loss and distillation may be complementary rather than substitutive: the local loss handles continuous meta-knowledge absorption (preventing dependency buildup in real time), while periodic distillation handles object-level knowledge transfer (absorbing what the FM actually computes). The full architecture may still need all three mechanisms, with the local loss reducing but not eliminating the need for discrete sleep phases.]
+
 ## The degenerate solution and why it might be real
 
 If the local loss ("be predictable") is too strong relative to NTP ("be useful"), the model converges on trivially predictable computation — the FM accurately predicts everything because the model stopped doing anything complex. This is representational collapse.
@@ -133,6 +137,8 @@ Interestingly, this degenerate solution may correspond to a real failure mode of
 
 The precision weighting from §7 of the cerebellar ratchet doc is the natural safeguard. If the model's error expectations are well-calibrated (large expected variance in complex directions, small expected variance in routine directions), the local loss won't over-penalize genuinely complex computation — only computation that violates tight predictions gets strong gradient. This requires the self-knowledge (innovation map) to be established before the local loss becomes a dominant learning signal, suggesting a curriculum: start with injection-only training to develop the innovation map, then gradually introduce the local loss.
 
+[**Revision (2026-06-15):** The representational collapse predicted above did not occur at λ=1.0 on MNIST — task performance actually improved. But a different failure mode appeared: *precision without robustness*. The local loss trained a tight block0→block3 mapping that amplifies perturbations at intermediate points. This is not collapse (the model is doing useful computation) but brittleness (the computation is fragile to noise). The injection appears to provide exactly this — it acts as a form of structured noise injection during training, teaching the model to absorb perturbations. The precision weighting safeguard proposed above may address the brittleness too, by leaving genuinely complex (high-variance) directions alone rather than compressing them, but this is untested.]
+
 ## Connection to the generalization problem
 
 Ilya's core observation: models generalize dramatically worse than humans despite seeing orders of magnitude more data. Our hypothesis for why local prediction-error learning helps:
@@ -140,6 +146,8 @@ Ilya's core observation: models generalize dramatically worse than humans despit
 **Sample efficiency**: Each training example provides not just one output error but structured intermediate supervision at multiple depths. A chess grandmaster looking at a novel position gets depth-localized, direction-specific, precision-weighted signals — "piece recognition was routine, tactical patterns slightly novel but expected, strategic evaluation deeply surprising in an unusual direction — learn from THAT." One position, dense supervision. This is the sample efficiency advantage of cerebellar-cortical credit assignment.
 
 **Robustness**: The local loss continuously compresses routine computation, producing flatter loss landscapes (demonstrated: Hessian trace 0.45× OL). Flatter landscapes → more conservative updates under distribution shift → less catastrophic forgetting → better OOD generalization. The OOD robustness experiment already showed this is distribution-invariant for the perturbation case.
+
+[**Revision (2026-06-15):** The robustness claim above is wrong, or at least the causal chain is. The MNIST experiment showed that the local loss alone makes the model *more* sensitive to perturbations, not less — computational regularity does not produce flatter loss landscapes. The Hessian trace reduction observed in prior closed-loop models comes specifically from the injection experience (training with structured additive signals at the perturbation point), not from the division of labor or the regularity of computation. A model can have perfectly regular, FM-compressible computation and still be brittle if it was never exposed to perturbations during training. The robustness → OOD generalization argument may still hold, but the mechanism must run through injection experience rather than through computational regularity. Whether precision-weighted local losses (which would selectively compress only routine directions) avoid this brittleness remains an open question.]
 
 **The "it" factor**: The routine/novel decomposition, driven by the FM's prediction errors and precision-weighted by the innovation map, is a concrete operationalization of "knowing what you need to learn." The model doesn't update all parameters equally — it preferentially updates the circuits responsible for genuinely novel computation, as identified by its own self-model. This is what makes the 100-hour student different from the 10,000-hour one: not more practice, but more targeted practice, directed by self-knowledge.
 
@@ -200,3 +208,64 @@ Repeat Experiment 1 at 77M+ parameters where layers are more differentiated and 
 5. **Multiple depth spans**: Should FMs predict one layer ahead (fine-grained credit assignment, more FMs needed) or multiple layers ahead (coarser credit assignment, fewer FMs, but spanning more computation)? The brain has cerebellar projections at multiple cortical levels with varying topographic specificity — suggesting a mix.
 
 6. **Relationship to synthetic gradients**: Jaderberg et al. (2016) proposed learned modules that predict gradients at intermediate layers, enabling decoupled training. The local prediction-error loss is structurally similar but uses a self-model (predicting activations, not gradients) rather than a gradient predictor. The self-model grounds the local signal in the model's actual computational dynamics rather than in gradient statistics. Whether this grounding matters empirically is an open question.
+
+## The learning gate: from automatic to goal-directed selective learning
+
+### Motivation: backprop doesn't know what to learn
+
+The precision-weighted local loss (§ Precision weighting) replaces raw FM error with calibrated, direction-specific signals: large errors violating tight predictions get strong gradient, large errors in always-noisy directions get weak gradient. This is automatic selectivity — the weights come from error covariance statistics, not from any deliberate choice by the model.
+
+But the model already *knows* more than the error covariance. The innovation map (directional self-knowledge, demonstrated in the prediction trust analysis) gives the model an input-specific, high-dimensional representation of what's novel about each data point. The CerebellarGate learned to selectively use different directions of the FM prediction during inference — per-direction selectivity driven by what's useful for the task. The model has awareness of what's novel and the capacity for selective use. What's missing is the connection between this awareness and the learning rule.
+
+Currently, a data point arrives, and backprop computes ∂L/∂θ uniformly across all parameters. The precision-weighted local loss improves on this by weighting different error directions differently — but the weights are fixed functions of running statistics, blind to the specific input. A model that encounters a data point with unusual delimiter patterns and unusual semantic content gets the same precision weights regardless of whether the delimiter novelty or the semantic novelty is more useful to learn from right now. The model can *see* the difference (via the innovation map) but can't *act on it* in its own learning.
+
+### The proposal: a differentiable gate on the local loss
+
+Replace the fixed precision weights `1/σ²_d` with a small learned network — the **learning gate** — that outputs per-direction weights for the local loss, conditioned on the model's current representations.
+
+Architecture: structurally identical to the CerebellarGate (which gates the inference signal), but applied to the backward pass. The learning gate takes as input:
+
+- Current-layer activations (what the model is computing)
+- FM error vector (what the FM found surprising)
+- Running innovation map statistics (what's typically surprising vs. atypical)
+
+And outputs per-direction scalar weights on the local loss. Directions that receive high weight produce strong gradients into the main model; directions that receive low weight produce weak or zero gradients.
+
+The gate's parameters are updated by NTP loss through the standard chain rule: FM error → gate → weighted local loss → gradient into main model → weight update → NTP performance. No meta-learning objective, no held-out set. The main task itself teaches the gate what's worth learning — directions where acting on the FM error improves NTP performance cause the gate to open; directions where the FM error is noise cause it to close.
+
+This is the same mechanism by which the CerebellarGate learned to selectively use FM predictions during inference. The CerebellarGate answers "which aspects of the FM's prediction are useful for processing this input?" The learning gate answers "which aspects of the FM's error are useful for updating my weights on this input?" Same architecture, different pass.
+
+### FM reinitialization as diversity pressure
+
+The learning gate trained end-to-end with a single FM risks co-adaptation: the gate and FM settle into a comfortable equilibrium, always weighting the same directions. The gate memorizes specific error directions rather than learning general criteria for "what makes an error direction worth acting on."
+
+FM reinitialization breaks this co-adaptation. Each fresh FM, trained from new random init on the current model's activations, discovers residual structure from a genuinely novel perspective — the MNIST distillation showed near-orthogonal residual PCs and qualitatively different digit-pair groupings across cycles. Each reinitialization challenges the gate with a new error decomposition:
+
+- **Cycle 1**: FM-1 discovers residual structure R1. Gate learns to weight certain directions of R1. Model internalizes those directions.
+- **FM reinitialization**: Fresh FM-2 trains on the reorganized model. Discovers R2, near-orthogonal to R1 — aspects of the computation FM-1 wasn't tracking.
+- **Cycle 2**: Gate must handle R2's qualitatively different directions. It can't replay its cycle-1 policy. It must generalize — learn something about *what makes an error direction worth acting on*, not just *which specific directions to act on*.
+
+Over many cycles, the gate accumulates a general-purpose policy for selective learning. Each FM reinitialization is a new teacher arriving with a different pedagogical perspective; the gate learns to be a good student of any teacher.
+
+This produces a second ratchet operating on the learning rule itself. The original cerebellar ratchet compresses computation (routine → chunked → capacity freed → repeat). The learning-gate ratchet refines the learning policy (selective weights → internalization → new FM perspective → better selective weights → repeat). The model learns not just what to compute but what to learn.
+
+### Biological plausibility: the reticular thalamus
+
+The learning gate maps onto the reticular nucleus of the thalamus. The reticular nucleus provides inhibitory gating of thalamocortical transmission — it controls which aspects of thalamic relay (including cerebellar output via VL/VA nuclei) reach cortex. Critically, its gating is modulated by cortical feedback: the cortex influences which aspects of the cerebellar signal it receives. This is exactly the architecture described above — the model (cortex) controls, via the gate (reticular thalamus), which aspects of the FM error (cerebellar prediction error) drive learning. The gate is not a passive relay but a cortically-modulated filter on the teaching signal.
+
+### Connection to instruction-directed learning
+
+If the learning gate takes activations as input, and those activations progressively encode more semantic content through ratchet cycles (the abstraction ratchet's core claim — procedures become percepts, computations become primitives), then the gate's selectivity criteria will naturally move from computational to semantic. Early in training, the gate learns things like "upweight errors in the distributed-attention direction when attention entropy is high." After many ratchet cycles, the same gate architecture conditions on more abstract features because that's what the representations encode.
+
+In the limit, this converges toward a system where the model's own representational understanding of "what kind of regularity this is" drives the gating of its own learning signals. The gap between "upweight delimiter-matching errors" and "learn the formatting from this" is the same gap the ratchet closes everywhere else — turning multi-step computational criteria into single-step semantic pattern matches. Whether this can eventually interface with language-level instructions (making the learning gate responsive to textual descriptions of what to learn) is an open question, but the architectural path is clear: the gate already conditions on the model's representations, and those representations already encode semantic content.
+
+### Experimental plan
+
+**Experiment 2b: Learned learning gate** (after Experiment 2, precision-weighted local loss)
+
+Same 4-condition setup as Experiment 1, but replace the fixed precision weights with a small learned gate network. The gate takes (post_block1 activations, FM error vector) and outputs per-direction weights on the local loss. Gate parameters trained end-to-end via NTP loss.
+
+Compare against Experiment 2 (fixed precision weights) to test whether learned selectivity outperforms statistical selectivity. Key measures:
+- Does the gate learn interpretable direction preferences? (Do gate weights correlate with behavioral categories from the behavioral residual analysis?)
+- Does the gate's policy generalize across FM reinitializations? (Train gate with FM-1, reinitialize FM, measure gate adaptation speed with FM-2 vs. from-scratch)
+- Does the gate reduce dependency more than fixed precision weights? (The gate should learn to not upweight directions that create injection dependency)

@@ -257,17 +257,94 @@ Cosine and KL recovery are identical. 4x more attention patterns didn't help bec
 
 **Reproduction**: `modal run --detach a2a_forward/llama_train_fwd.py::a2a_train_llama_fwd --fwd-n-head 4 --fwd-d-head 64 --fwd-mlp-mult 2 --fwd-lr 1e-4`
 
+## SwiGLU activation function matching (2026-06-15)
+
+The multi-head ablation confirmed the MLP is the bottleneck. The paper's forward model uses a GELU MLP, while Llama's MLP uses SwiGLU (gated: `down_proj(silu(gate_proj(x)) * up_proj(x))`). We tested whether matching Llama's activation function improves KL recovery by training a SwiGLU forward model (1H, d_head=128, SwiGLU hidden=4096, 26.2M params / 2.1% of Llama / 43% of predicted layer). The SwiGLU architecture adds a third matrix (gate_proj), increasing MLP capacity by 50% at the same hidden dim.
+
+| | 1H d128 GELU (paper) | 4H d64 GELU | 1H d128 SwiGLU |
+|---|---|---|---|
+| Params | 17.8M (1.4%) | 18.9M (1.53%) | 26.2M (2.1%) |
+| % of predicted layer | 29% | 31% | 43% |
+| Cosine | 0.922 | 0.923 | **0.937** |
+| MSE | 0.002 | 0.002 | **0.0018** |
+| KL recovery | 68% | 68.3% | **73.5%** |
+| Effective rank / max | 89% | 94% | 93% |
+
+KL recovery improved from 68% to 73.5% (+5.5pp). KL_sub dropped 18% (0.114 → 0.093). Training was completely stable at lr=1e-4 (no lr spike, unlike the original GELU run). Per-category degradation remains uniform (KL_sub 0.061–0.107 across punctuation, high/low confidence, function words).
+
+The activation function mismatch was a real contributor but not the dominant one. The remaining gap with the toy model (73.5% vs 94%) is primarily raw MLP capacity: the forward model's SwiGLU MLP (hidden=4096) is still a 2x compression of Llama's MLP (SwiGLU hidden=8192). To reach the toy model's recovery level would require approximately matching the target layer's MLP size (~50M params), at which point the forward model would exceed the predicted layer's parameter count and the compression framing breaks down.
+
+**Reproduction**:
+```bash
+# Train
+modal run --detach a2a_forward/llama_train_fwd.py::a2a_train_llama_fwd \
+  --fwd-d-head 128 --fwd-mlp-mult 2 --fwd-use-swiglu --fwd-lr 1e-4
+# Causal substitution
+modal run --detach a2a_forward/llama_causal_substitution.py::a2a_llama_causal_substitution \
+  --fwd-d-head 128 --fwd-mlp-mult 2 --fwd-use-swiglu
+```
+
+## Per-head decomposition with SwiGLU forward model (2026-06-16)
+
+Re-ran the per-head decomposition (Stage 3) using the SwiGLU forward model instead of the original GELU model, to confirm the attention/MLP boundary finding holds with the improved checkpoint. This is now the paper's primary Llama result.
+
+### Results
+
+| | GELU (17.8M, 1.4%) | SwiGLU (26.2M, 2.1%) |
+|---|---|---|
+| Cosine | 0.922 | **0.938** |
+| MSE | 0.002 | **0.0018** |
+| Attn avg cos(residual) | 0.019 | 0.019 |
+| MLP cos(residual) | 0.477 | **0.410** |
+| MLP corr(‖comp‖, ‖r‖) | 0.675 | **0.577** |
+| Attn total norm share | 84% | 84% |
+| Head cos(residual) range | -0.011 to +0.050 | -0.009 to +0.048 |
+| Head residual var fraction | 3.6%–4.6% | 3.5%–4.9% |
+
+The qualitative finding is unchanged: MLP dominates the residual by 22x over the average attention head (vs 25x with GELU). The MLP's share decreased as expected — the SwiGLU model better approximates Llama's MLP because it matches the activation function. Attention heads remain uniformly captured, with no single head or KV group standing out.
+
+By KV group (SwiGLU):
+
+| Group | Norm | cos(res) | cos(fwd) | corr |
+|---|---|---|---|---|
+| KV 0 | 0.554 | 0.020 | 0.031 | 0.187 |
+| KV 1 | 0.481 | 0.020 | 0.024 | 0.174 |
+| KV 2 | 0.636 | 0.024 | 0.165 | 0.026 |
+| KV 3 | 0.701 | 0.022 | 0.044 | 0.101 |
+| KV 4 | 0.431 | 0.008 | 0.055 | 0.069 |
+| KV 5 | 0.612 | 0.014 | 0.034 | 0.109 |
+| KV 6 | 0.460 | 0.029 | 0.077 | 0.045 |
+| KV 7 | 0.635 | 0.011 | 0.046 | 0.160 |
+| **MLP** | **3.404** | **0.410** | **0.615** | **0.577** |
+
+KV group pattern is nearly identical to the GELU decomposition. KV group 2 still has the highest cos(fwd) among attention groups (0.165), meaning the forward model's single head allocates the most capacity to this group.
+
+### Interpretation
+
+The GELU → SwiGLU comparison forms a two-point ablation confirming the MLP is the genuine capacity bottleneck:
+
+1. **Matching the activation function** (GELU → SwiGLU) reduced MLP cos(residual) from 0.477 to 0.410 and improved KL recovery from 68% to 73.5%.
+2. **Adding more attention heads** (1H → 4H, multi-head ablation above) had zero effect on cosine or KL recovery.
+3. **Attention is already well-captured** — cos(residual) for heads is unchanged at 0.019 across both forward model variants.
+
+The remaining gap with the toy model (73.5% vs 94% KL recovery) is raw MLP capacity: SwiGLU hidden 4096 vs Llama's 8192 (2x compression). The paper now uses the SwiGLU model as the primary Llama result.
+
+**Reproduction**: `modal run --detach a2a_forward/llama_head_decomposition.py::a2a_llama_head_decomposition --fwd-d-head 128 --fwd-mlp-mult 2 --fwd-use-swiglu`
+
 ### Modal volume
 
 ```
 /data/a2a_llama/
 ├── acts_L7_L8/                        # Stage 1
-├── fwd_1L_1H_128d_mlp2/L7_to_L8/     # Stage 2 (paper config)
+├── fwd_1L_1H_128d_mlp2/L7_to_L8/     # Stage 2 (paper config, original GELU)
 ├── fwd_1L_1H_64d_mlp2/L7_to_L8/      # Stage 2 (original config)
 ├── fwd_1L_4H_64d_mlp2/L7_to_L8/      # Multi-head ablation
+├── fwd_1L_1H_128d_swiglu2.0/L7_to_L8/ # SwiGLU (now the paper's primary config)
 └── analysis/                          # Stage 3
-    ├── head_decomposition.json
-    └── head_decomposition.png
+    ├── head_decomposition.json        # GELU decomposition
+    ├── head_decomposition.png
+    ├── head_decomposition_swiglu.json # SwiGLU decomposition
+    └── head_decomposition_swiglu.png
 ```
 
 ### Files
@@ -277,4 +354,5 @@ Cosine and KL recovery are identical. 4x more attention patterns didn't help bec
 | `llama_cache_acts.py` | Stage 1: cache Llama activations to volume |
 | `llama_train_fwd.py` | Stage 2: train forward model on cached activations |
 | `llama_head_decomposition.py` | Stage 3: per-head decomposition of forward model capture profile |
+| `llama_causal_substitution.py` | Causal substitution: replace layer 8 with forward model, measure per-behavior degradation |
 | `LLAMA_SCALE_README.md` | This file |

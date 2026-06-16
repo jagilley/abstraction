@@ -105,6 +105,8 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `ood_robustness.py` | OOD robustness: perturbation Δloss + Hessian trace across distribution-shifted corpora |
 | `distillation.py` | Single-cycle wake-sleep distillation: absorb FM contribution into main model, retrain fresh FM, compare innovation structures |
 | `distillation_probes.py` | Post-distillation internalization probes: inter-layer self-predictability, old FM prediction accessibility, cross-model control |
+| `mnist_local_loss.py` | MNIST local prediction-error learning: 4-condition comparison (OL, CL, LL, CL+LL) with FM prediction error as auxiliary loss |
+| `mnist_local_loss_probes.py` | Representation probes: object-level vs meta-knowledge absorption (prediction probe, orthogonalized residual probe) |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching, forward model training, and per-head decomposition on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment; + [Prediction trust](REPRESENTATIONAL_DIVERGENCE_README.md#prediction-trust-what-form-the-self-knowledge-takes-2026-06-10) appended section (innovation map / error-monitoring geometry) |
@@ -117,6 +119,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `DISTILLATION_README.md` | [Single-cycle distillation](DISTILLATION_README.md) — wake-sleep knowledge absorption, innovation migration test, ratchet assessment |
 | `MNIST_DISTILLATION_README.md` | [MNIST distillation](MNIST_DISTILLATION_README.md) — single-cycle wake-sleep on low-rank residual: digit-discriminative structure collapse, structural internalization at 2-6× language magnitude; + [multi-cycle comparison](MNIST_DISTILLATION_README.md#multi-cycle-comparison-with-compute-matched-baselines-2026-06-13) with compute-matched baselines decomposing val loss (distillation) from robustness (CL co-training) |
 | `MNIST_ADAPTATION_README.md` | [MNIST OOD adaptation](MNIST_ADAPTATION_README.md) — rotated MNIST fine-tuning: zero-shot OOD tracks distillation, adaptation speed is uninformative, forgetting resistance tracks CL co-training (three-way dissociation) |
+| `MNIST_LOCAL_LOSS_README.md` | [MNIST local prediction-error learning](MNIST_LOCAL_LOSS_README.md) — local loss as auxiliary training signal: regularity ≠ robustness dissociation, 3:1 meta-knowledge dominance, first high-fwd-cos closed-loop condition |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -696,6 +699,32 @@ Loads the controlled retrain CL checkpoint. Phase 1: freeze teacher (CL+injectio
 ```bash
 modal run --detach a2a_forward/distillation.py::main \
   --n-tokens 10000000 --distill-steps 5000 --retrain-steps 10000
+```
+
+## MNIST local prediction-error learning (2026-06-15)
+
+**Full writeup**: [MNIST_LOCAL_LOSS_README.md](MNIST_LOCAL_LOSS_README.md)
+
+Tests the simplest version of the [local prediction-error learning](../../ideas/local_prediction_error_learning.md) idea: use `λ · MSE(sg(FM(post_block0)), post_block3)` as an auxiliary loss for the main model. The FM prediction is a frozen target (stop-gradient); gradient flows through post_block3 into the main model. Four conditions with identical seed/lr/init: OL, CL (injection only), LL (local loss only, λ=1.0), CL_LL (both).
+
+**Key results**:
+
+1. **LL learns faster** (+2.5pp accuracy at step 500, +1.4pp final). The local loss gives gradient to all 50 positions × 128 dims per example; the classification loss only gives gradient to [CLS]. Final val_loss is 31% lower (0.088 vs 0.127). FM cosine reaches 0.997 — the "be predictable" pressure made computation nearly perfectly FM-compressible, and this was beneficial.
+
+2. **CL_LL reduces dependency by 63%** (0.008 vs 0.022). The continuous internalization pressure counteracts offloading. Injection benefit is also 5× smaller — the model needs the injection less.
+
+3. **Regularity ≠ robustness** (strong negative). LL is **13× more sensitive** to perturbations than OL. The local loss makes computation precise but brittle. CL's robustness comes specifically from injection experience (training with structured additive signals), not from computational regularity. This revises the Jacobian analysis interpretation.
+
+4. **CL_LL has the highest self-knowledge** (R² = 0.76–0.79, vs CL 0.63–0.73, OL 0.11–0.38). LL has zero self-knowledge — the FM residual is too small to predict. Self-knowledge requires a meaningful residual, which requires the injection to introduce irreducible unpredictability.
+
+5. **CL_LL is the first high-fwd-cos closed-loop condition** (0.985 vs 0.903 for CL). The local loss stabilizes co-training by pushing the model toward FM-predictable computation, preventing the moving-target problem.
+
+6. **The absorbed knowledge is predominantly meta-knowledge** (3:1 over object-level at early layers). Representation probes distinguishing "what the FM predicts" (prediction probe) from "where the FM is wrong, ⊥ prediction direction" (orthogonalized residual probe) show CL_LL's advantage over CL at post_block0 is Δ R² = +0.31 for ortho_residual vs +0.10 for prediction. The local loss gradient literally carries the meta-knowledge signal: `∂post_block3/∂early_act · (post_block3 − FM_pred)`.
+
+**Reproduction**:
+```bash
+modal run --detach a2a_forward/mnist_local_loss.py::a2a_mnist_local_loss
+modal run --detach a2a_forward/mnist_local_loss_probes.py::a2a_mnist_ll_probes
 ```
 
 ## Next steps

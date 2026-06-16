@@ -56,7 +56,8 @@ def a2a_llama_head_decomposition(
     fwd_n_layer: int = 1,
     fwd_n_head: int = 1,
     fwd_d_head: int = 128,
-    fwd_mlp_mult: int = 2,
+    fwd_mlp_mult: float = 2,
+    fwd_use_swiglu: bool = False,
 ):
     import os
     import time
@@ -88,32 +89,38 @@ def a2a_llama_head_decomposition(
 
     # --- Load forward model ---
     acts_dir = f"{DATA_DIR}/a2a_llama/acts_L{source_layer}_L{target_layer}"
-    fwd_dir = (f"{DATA_DIR}/a2a_llama/fwd_{fwd_n_layer}L_{fwd_n_head}H_"
-               f"{fwd_d_head}d_mlp{fwd_mlp_mult}/L{source_layer}_to_L{target_layer}")
+    gap_tag = f"L{source_layer}_to_L{target_layer}"
+    prefix = "swiglu" if fwd_use_swiglu else "mlp"
+
+    def find_checkpoint(d_h):
+        """Try normalized (int) and raw (float) path variants."""
+        for mm_fmt in [str(int(fwd_mlp_mult)) if fwd_mlp_mult == int(fwd_mlp_mult) else None,
+                       str(fwd_mlp_mult)]:
+            if mm_fmt is None:
+                continue
+            d = (f"{DATA_DIR}/a2a_llama/fwd_{fwd_n_layer}L_{fwd_n_head}H_"
+                 f"{d_h}d_{prefix}{mm_fmt}/{gap_tag}")
+            if os.path.exists(os.path.join(d, "fwd_model.pt")):
+                return d
+        return None
+
+    fwd_dir = find_checkpoint(fwd_d_head)
+    if fwd_dir is None:
+        print(f"  WARNING: checkpoint not found for d_head={fwd_d_head}")
+        print(f"  Checking for d_head=64 fallback...")
+        fwd_dir = find_checkpoint(64)
+        if fwd_dir is not None:
+            fwd_d_head = 64
+        else:
+            raise FileNotFoundError(
+                f"No forward model checkpoint found for d_head={fwd_d_head} or 64")
 
     fwd_model = TransformerForwardModel(
         d_model=d_model, d_head=fwd_d_head, n_head=fwd_n_head,
         n_layer=fwd_n_layer, mlp_mult=fwd_mlp_mult, block_size=seq_len,
+        use_swiglu=fwd_use_swiglu,
     ).to(device)
     ckpt_path = os.path.join(fwd_dir, "fwd_model.pt")
-    if not os.path.exists(ckpt_path):
-        print(f"  WARNING: checkpoint not found at {ckpt_path}")
-        print(f"  Checking for d_head=64 fallback...")
-        fwd_dir_alt = (f"{DATA_DIR}/a2a_llama/fwd_{fwd_n_layer}L_{fwd_n_head}H_"
-                       f"64d_mlp{fwd_mlp_mult}/L{source_layer}_to_L{target_layer}")
-        ckpt_path_alt = os.path.join(fwd_dir_alt, "fwd_model.pt")
-        if os.path.exists(ckpt_path_alt):
-            print(f"  Found d_head=64 checkpoint, rebuilding model...")
-            fwd_d_head = 64
-            fwd_dir = fwd_dir_alt
-            ckpt_path = ckpt_path_alt
-            fwd_model = TransformerForwardModel(
-                d_model=d_model, d_head=64, n_head=fwd_n_head,
-                n_layer=fwd_n_layer, mlp_mult=fwd_mlp_mult, block_size=seq_len,
-            ).to(device)
-        else:
-            raise FileNotFoundError(
-                f"No forward model checkpoint found at {ckpt_path} or {ckpt_path_alt}")
 
     fwd_model.load_state_dict(torch.load(
         ckpt_path, map_location=device, weights_only=True,
@@ -502,7 +509,8 @@ def a2a_llama_head_decomposition(
 
     save_dir = f"{DATA_DIR}/a2a_llama/analysis"
     os.makedirs(save_dir, exist_ok=True)
-    fig_path = os.path.join(save_dir, "head_decomposition.png")
+    suffix = "_swiglu" if fwd_use_swiglu else ""
+    fig_path = os.path.join(save_dir, f"head_decomposition{suffix}.png")
     fig.savefig(fig_path, dpi=150, bbox_inches="tight")
     plt.close()
     print(f"Figure saved to {fig_path}")
@@ -538,6 +546,7 @@ def a2a_llama_head_decomposition(
             "n_model_params": int(n_params),
             "fwd_n_params": int(fwd_n_params),
             "fwd_d_head": fwd_d_head,
+            "fwd_use_swiglu": fwd_use_swiglu,
             "seq_len": seq_len,
             "batch_size": batch_size,
             "n_eval_batches": n_batches,
@@ -545,7 +554,7 @@ def a2a_llama_head_decomposition(
         },
     }
 
-    results_path = os.path.join(save_dir, "head_decomposition.json")
+    results_path = os.path.join(save_dir, f"head_decomposition{suffix}.json")
     with open(results_path, "w") as f:
         json.dump(results, f, indent=2, cls=NumpyEncoder)
 
@@ -565,7 +574,8 @@ def main(
     fwd_n_layer: int = 1,
     fwd_n_head: int = 1,
     fwd_d_head: int = 128,
-    fwd_mlp_mult: int = 2,
+    fwd_mlp_mult: float = 2,
+    fwd_use_swiglu: bool = False,
 ):
     result = a2a_llama_head_decomposition.remote(
         source_layer=source_layer,
@@ -578,6 +588,7 @@ def main(
         fwd_n_head=fwd_n_head,
         fwd_d_head=fwd_d_head,
         fwd_mlp_mult=fwd_mlp_mult,
+        fwd_use_swiglu=fwd_use_swiglu,
     )
 
     ov = result["overall"]
