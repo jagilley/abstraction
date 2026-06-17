@@ -212,8 +212,192 @@ modal run --detach a2a_forward/mnist_local_loss_probes.py::a2a_mnist_ll_probes
 
 1. **λ sweep**: Test λ ∈ {0.01, 0.1, 1.0, 10.0} to find the robustness crossover. At some λ, the precision pressure should be small enough that the injection's robustness dominates. The optimal λ for CL_LL balances learning speed and robustness.
 2. **Language domain**: Run the same 4-condition experiment on the GPT language model. Language has a full-rank residual (200/256 effective rank), so the local loss dynamics may differ from MNIST's low-rank (18/128) case. The learning speed prediction is less clear in language where each token already provides a dense NTP signal.
-3. **Precision weighting**: Replace the raw MSE local loss with a precision-weighted version (Experiment 2 in the idea doc). Weight each direction by the FM's expected error variance — this should selectively compress routine computation while leaving genuinely complex computation alone, potentially avoiding the brittleness of the uniform MSE.
-4. **OOD adaptation**: The [MNIST adaptation experiment](MNIST_ADAPTATION_README.md) showed a three-way dissociation between distillation, adaptation speed, and forgetting. Test where LL and CL_LL conditions fall on all three measures — the learning speed advantage may translate to faster OOD adaptation.
+3. ~~**Precision weighting**~~: Done — see below. Precision weighting (Mahalanobis distance) reduced brittleness by only 29% (9.5× vs 13.4×) and made no difference when combined with injection (CL_PW ≈ CL_LL). The brittleness is geometric (compression of most dimensions), not directional (compressing the wrong dimensions). Precision weighting addresses a non-bottleneck.
+4. ~~**Learning gate (bilevel optimization)**~~: Done — see below. A learned gate trained via bilevel optimization (MAML-style) to select which dimensions to compress. Maintains LL's learning speed, reduces brittleness by 35%, and produces record self-knowledge (CL_LG R²=0.83 at post_block0, beating CL_LL's 0.76). The gate's selectivity doesn't correlate with digit discrimination or FM error variance — the bilevel signal discovers a more abstract task-relevant criterion.
+5. **CL_LG → distillation**: CL_LG produces the highest self-knowledge and injection dependency of any condition — potentially the ideal pre-distillation checkpoint. Test whether distilling CL_LG produces better post-distillation models than distilling CL_LL.
+6. **OOD adaptation**: The [MNIST adaptation experiment](MNIST_ADAPTATION_README.md) showed a three-way dissociation between distillation, adaptation speed, and forgetting. Test where LL and CL_LL conditions fall on all three measures — the learning speed advantage may translate to faster OOD adaptation.
+
+## Precision-weighted local loss (2026-06-16)
+
+**Code**: `mnist_precision_weighted.py`
+
+Tests whether precision-weighting the local loss fixes the brittleness of the raw MSE version. The raw MSE compressed all 128 dimensions uniformly, making the model 13× more sensitive to perturbations. Precision weighting replaces MSE with the Mahalanobis distance under the FM's error covariance: directions where the FM always errs (high variance, ~11 dimensions on MNIST) get low weight, directions where it's usually accurate (~117 dimensions) get high weight. The model is pushed to "be predictable" only where the FM is already good.
+
+Implementation: EMA (β=0.99) of the FM error covariance (128×128), eigendecomposed each step. Each eigendirection weighted by `mean_eigenvalue / (eigenvalue + eps)`, clamped to max ratio 100. Overall scale matches raw MSE at λ=1.0.
+
+Four conditions with identical seed (42), lr (3e-4), init weights as the raw MSE experiment: OL, CL, PW (precision-weighted local loss only), CL_PW (injection + precision-weighted local loss).
+
+### Results
+
+**Final metrics:**
+
+| Condition | val_loss | val_acc | fwd_cos | (raw MSE comparison) |
+|---|---|---|---|---|
+| OL | 0.127 | 0.958 | 0.973 | — |
+| CL | 0.118 | 0.961 | 0.903 | — |
+| PW | 0.101 | 0.972 | 0.995 | LL: 0.088 / 0.972 / 0.997 |
+| CL_PW | 0.141 | 0.958 | 0.986 | CL_LL: 0.129 / 0.969 / 0.985 |
+
+PW learns faster than OL (+1.4pp accuracy), matching LL. FM cosine reaches 0.995 — slightly lower than LL's 0.997 but still near-perfect. The precision weighting correctly identified ~11 high-variance directions and stopped pushing on them, but the remaining ~117 routine directions were compressed just as tightly as with raw MSE.
+
+**Robustness (Δloss at eps=1.0):**
+
+| Condition | Δloss | Ratio vs OL | (raw MSE comparison) |
+|---|---|---|---|
+| OL | +0.012 | 1.00 | — |
+| CL | +0.003 | 0.24 | 0.24 |
+| PW | +0.113 | 9.53 | LL: 13.4 |
+| CL_PW | +0.045 | 3.85 | CL_LL: 3.84 |
+
+PW is 29% less brittle than LL (9.5× vs 13.4×), but still dramatically more fragile than OL. Leaving ~11/128 directions unconstrained doesn't help much when random perturbations land mostly in the other 117 tightly constrained directions. CL_PW ≈ CL_LL — the injection dominates.
+
+**Residual structure (CLS token):**
+
+| Condition | eff_rank | top5 var | |res| | eta² (top 5 PCs) |
+|---|---|---|---|---|
+| OL | 17.4 | 0.595 | 3.48 | 0.31, 0.21, 0.24, 0.18, 0.12 |
+| CL | 11.6 | 0.687 | 13.99 | 0.74, 0.73, 0.56, 0.58, 0.55 |
+| PW | 10.4 | 0.731 | 2.17 | 0.08, 0.13, 0.04, 0.09, 0.06 |
+| CL_PW | 10.6 | 0.711 | 4.35 | 0.73, 0.54, 0.64, 0.55, 0.48 |
+
+PW preserves a non-zero residual (|res|=2.17 vs effectively 0 for LL), confirming that precision weighting correctly left high-variance directions unconstrained. But the residual is NOT digit-discriminative (eta² = 0.04–0.13 vs OL's 0.17–0.31). The high-variance FM error directions don't correspond to class-conditional computation — the FM's capacity limits in this regime are not digit-specific. CL_PW's residual IS digit-discriminative (eta² 0.47–0.73), because the injection creates class-conditional prediction errors.
+
+**Self-knowledge probes (R²):**
+
+| Layer | OL | CL | PW | CL_PW | (raw MSE LL / CL_LL) |
+|---|---|---|---|---|---|
+| post_block0 | 0.11 | 0.63 | 0.02 | 0.70 | -0.03 / 0.76 |
+| post_block3 | 0.38 | 0.73 | 0.19 | 0.74 | -0.05 / 0.79 |
+
+PW has near-zero self-knowledge (R² = 0.02 at post_block0), same as LL despite having a non-zero residual. The residual isn't structured enough to predict. CL_PW ≈ CL_LL — injection dominates.
+
+**Representation probes (object-level vs meta-knowledge, R²):**
+
+| Layer | OL pred/ortho | CL pred/ortho | PW pred/ortho | CL_PW pred/ortho |
+|---|---|---|---|---|
+| post_block0 | 0.89 / 0.10 | 0.86 / 0.42 | 0.96 / 0.02 | 0.95 / 0.61 |
+| post_block3 | 0.95 / 0.34 | 0.94 / 0.73 | 0.97 / 0.17 | 0.97 / 0.69 |
+
+PW encodes high object-level knowledge (prediction R² = 0.96) but near-zero meta-knowledge (ortho_residual R² = 0.02), mirroring LL. CL_PW has strong meta-knowledge (0.61 at block0), similar to CL_LL (0.73). Again, the injection drives meta-knowledge, not the local loss variant.
+
+**Precision spectrum evolution (PW condition):** The error covariance effective rank dropped from 27 (step 0, identity prior) → 11.4 (step 5000) as the FM's errors concentrated into fewer directions. The precision ratio (max/min weight) grew from ~400 (step 200) → ~1100 (step 5000). The precision weighting progressively sharpened its discrimination of routine vs complex directions throughout training.
+
+### Interpretation: precision weighting is the wrong fix for brittleness
+
+Precision weighting correctly identifies which directions are routine (FM-predictable) vs complex (FM-limited) and differentially weights the local loss accordingly. But this doesn't meaningfully reduce brittleness because:
+
+1. **The problem is geometric, not directional.** Random perturbations land in all 128 dimensions. Leaving ~11 dimensions unconstrained while tightly constraining ~117 still amplifies most of a random perturbation. The brittleness comes from compression of most of the activation space, regardless of which specific directions are exempt.
+
+2. **Precision weighting addresses the wrong distinction.** In Friston's predictive coding, precision weighting distinguishes signal from noise — "this prediction error is informative" vs "this is expected variability, ignore it." But the FM's high-variance directions aren't noise; they're structured capacity limits. And the FM's low-variance directions aren't "unexpectedly informative" — they're just directions where the FM already works well, so the errors and gradients are already small. Weighting small errors more heavily doesn't produce qualitatively different learning.
+
+3. **CL_PW ≈ CL_LL on every metric.** The injection dominates the dynamics. The precision weighting makes essentially no difference when combined with injection — the injection creates a meaningful residual, self-knowledge, and robustness regardless of how the local loss is weighted.
+
+4. **Robustness requires perturbation experience**, not smarter compression. This replicates and strengthens the key finding from the raw MSE experiment: the CL model's robustness comes specifically from training with structured additive signals at the perturbation point. No variant of the local loss — uniform or precision-weighted — produces robustness without injection.
+
+The precision weighting idea (from predictive coding theory) maps cleanly onto the A2A system in principle, but the empirical result shows it addresses a non-bottleneck. The local loss's failure mode isn't "compressing the wrong directions" — it's "compression itself, in most directions, creates fragility."
+
+**Reproduction:**
+```bash
+modal run --detach a2a_forward/mnist_precision_weighted.py::a2a_mnist_precision_weighted
+```
+
+## Learning gate: bilevel-optimized local loss (2026-06-16)
+
+**Code**: `mnist_learning_gate.py`
+
+The precision-weighted local loss failed because it used the FM's error structure to decide what to compress — and the FM's error structure is unrelated to task relevance on MNIST. Precision weighting was almost adversarial: it compressed the task-relevant directions (where the FM is accurate → high precision weight) and exempted the task-irrelevant ones (where the FM fails → low precision weight).
+
+The learning gate replaces the fixed per-dimension weights with a learned network trained by the task loss itself. A small MLP (256→64→128, ~25K params) takes post_block0 CLS activations concatenated with the FM error at CLS, outputs per-dimension weights in [0,1] via sigmoid, and is trained via bilevel optimization: each step, the gate's weights determine the local loss, which determines the inner gradient, which determines a virtual parameter update, and the gate is trained to minimize classification loss *after* that virtual update. This is MAML applied to the local loss weighting.
+
+The key implementation detail: the gate parameters enter L_total linearly (they just multiply r²), so the "second-order" terms in the meta-gradient are mixed partials ∂²L/(∂θ ∂gate), not the model Hessian — much cheaper than general MAML. The meta-gradient flows: gate_params → gate_w → gated_local_loss → inner_grad (via `create_graph=True`) → virtual_params (via `functional_call`) → cls_loss' → gate update.
+
+Six conditions with identical seed (42), lr (3e-4), init weights: OL, CL, LL (raw MSE), CL_LL, LG (learning-gated local loss, no injection), CL_LG (injection + learning-gated local loss).
+
+### Results
+
+**Final metrics:**
+
+| Condition | val_loss | val_acc | fwd_cos | Δloss (ε=1.0) | Rob ratio | SK R² (blk0) | SK R² (blk3) |
+|---|---|---|---|---|---|---|---|
+| OL | 0.127 | 0.958 | 0.973 | +0.012 | 1.00 | 0.11 | 0.39 |
+| CL | 0.118 | 0.961 | 0.903 | +0.003 | 0.24 | 0.63 | 0.72 |
+| LL | 0.088 | 0.972 | 0.997 | +0.158 | 13.4 | -0.03 | -0.03 |
+| CL_LL | 0.129 | 0.969 | 0.985 | +0.045 | 3.84 | 0.76 | 0.79 |
+| LG | 0.101 | 0.972 | 0.996 | +0.103 | 8.68 | 0.10 | 0.12 |
+| CL_LG | 0.117 | 0.969 | 0.975 | +0.030 | 2.55 | **0.83** | **0.86** |
+
+**Dependency:**
+
+| Condition | Dependency | Injection benefit |
+|---|---|---|
+| CL | +0.022 | −0.031 |
+| CL_LL | +0.008 | −0.006 |
+| CL_LG | +0.019 | −0.028 |
+
+### Finding 1: Learning speed maintained, brittleness reduced 35%
+
+LG matches LL's accuracy exactly (0.972), confirming the gate preserves the full learning speed benefit of the local loss. At every checkpoint, both LL and LG are ~1.4pp ahead of OL. The bilevel optimization doesn't improve learning speed beyond raw MSE, but it doesn't hurt it either.
+
+Brittleness dropped from 13.4× (LL) to 8.68× (LG), a 35% reduction. CL_LG likewise dropped from 3.84× (CL_LL) to 2.55×, a 34% reduction. The gate consistently helps robustness when applied. But LG is still 8.7× more fragile than OL — the gate reduced but didn't solve the brittleness problem. Compression itself, in most of the activation space, remains the core issue.
+
+### Finding 2: CL_LG produces record self-knowledge
+
+CL_LG's self-knowledge probes are the highest ever measured in this project:
+
+| Layer | OL | CL | CL_LL | CL_LG |
+|---|---|---|---|---|
+| post_block0 | 0.11 | 0.63 | 0.76 | **0.83** |
+| post_block3 | 0.39 | 0.72 | 0.79 | **0.86** |
+
+CL_LG beats CL_LL by 7–8pp at every layer. LG alone has near-zero self-knowledge (R² ≈ 0.10), same as LL — the injection is still required for self-knowledge.
+
+Why? In CL_LL, the local loss gradient is uniform across all dimensions — it pushes the model to encode the FM's error structure everywhere equally. In CL_LG, the bilevel optimization selectively amplifies the local loss in dimensions where compressing helps classification. The gradient signal into early layers is *filtered* — it carries only the meta-knowledge that matters for the task, rather than the full FM error structure. Early layers can encode this more precisely because it's a cleaner signal.
+
+### Finding 3: the gate's selectivity is not about digit discrimination
+
+The gate learns strong per-dimension differentiation: mean weight 0.56 (LG) / 0.60 (CL_LG), std 0.42 / 0.43, range [0.11, 0.92] / [0.14, 0.95]. Some dimensions are heavily compressed (gate ≈ 0.9), others nearly exempt (gate ≈ 0.1). The gate IS genuinely input-conditioned: per-dimension std across inputs is 0.38–0.40, meaning different inputs get meaningfully different weights.
+
+But the gate's selectivity does not correspond to any pre-computed per-dimension statistic:
+
+| Correlation | LG | CL_LG |
+|---|---|---|
+| Corr(gate weight, FM error variance) | −0.18 | −0.16 |
+| Corr(gate weight, digit eta²) | +0.02 | +0.14 |
+
+The predicted anti-correlation with digit discriminability (gate exempts task-relevant dimensions) did not materialize. The near-zero digit eta² correlation means the gate is NOT sorting "digit-relevant vs digit-irrelevant" dimensions. The weak negative FM error variance correlation is slightly similar to precision weighting (less weight on high-FM-error directions) but much weaker. The bilevel signal discovered a selectivity criterion that doesn't map onto either of our pre-computed measures — something more abstract about which directions of compression help classification performance after one gradient step.
+
+### Finding 4: high dependency is a feature, not a bug
+
+CL_LG has 2.4× the dependency of CL_LL (0.019 vs 0.008), approaching standard CL (0.022). The gate learned to open for dimensions where the injection helps classification, which naturally creates more injection dependency. CL_LL's "be predictable everywhere" pressure forces indiscriminate partial internalization, reducing dependency but also reducing the precision of what the model learns about the injection.
+
+High dependency + record self-knowledge is potentially the ideal pre-distillation state: the model extracts maximal structured value from the injection (high dependency) while encoding maximally precise information about where it needs the injection (record self-knowledge). Distillation can then internalize this precisely structured knowledge. This makes CL_LG the natural candidate for the next distillation experiment.
+
+### Gate weight dynamics
+
+The gate starts at uniform 0.5 (sigmoid(0) initialization) and progressively differentiates over training:
+
+| Step | Mean gate weight | Std | fwd_cos |
+|---|---|---|---|
+| 0 | 0.500 | 0.000 | 0.264 |
+| 500 | 0.271 | 0.214 | 0.965 |
+| 1000 | 0.280 | 0.219 | 0.972 |
+| 2500 | 0.320 | 0.268 | 0.986 |
+| 5000 | 0.548 | 0.418 | 0.996 |
+
+The mean drops initially (the gate learns to reduce overall local loss pressure while the FM is still inaccurate), then rises as the FM improves and the gate discovers which dimensions benefit from compression. The std grows monotonically from 0 to 0.42 — increasing per-dimension differentiation throughout training. The FM cosine reaches 0.996, intermediate between LL (0.997) and OL (0.973).
+
+### Interpretation
+
+The learning gate validates the hypothesis that task-informed weighting beats FM-informed weighting: it maintains LL's learning speed while reducing brittleness and producing record self-knowledge when combined with injection. But the mechanism isn't what we predicted.
+
+We expected the gate to discover "exempt digit-relevant directions, compress the rest." Instead, it discovered a more abstract selectivity based on which dimensions of the FM error, when compressed, improve classification after one gradient step. This is the bilevel signal — it can't be reduced to any per-dimension statistic we can pre-compute, because it depends on the model's current parameter configuration and the downstream effect of each dimension's gradient on classification.
+
+The progression from precision weighting → learning gate parallels the general lesson of this project: the FM error structure (what the FM captures vs misses) and the task structure (what matters for classification) are largely orthogonal. Precision weighting uses FM structure; the learning gate uses task structure through the bilevel optimization. The 35% brittleness reduction and 7pp self-knowledge improvement are the quantitative returns on switching from one to the other.
+
+**Reproduction:**
+```bash
+modal run --detach a2a_forward/mnist_learning_gate.py::a2a_mnist_learning_gate
+```
 
 ## Modal volume
 
@@ -228,4 +412,22 @@ Results saved to `language-reduction-data` volume:
     ├── CL_LL_model.pt, CL_LL_fwd.pt, CL_LL_gate.pt
     ├── results.json
     └── probe_results.json
+
+/data/a2a_forward/mnist_precision_weighted/
+└── vit_4L_4H_128D/post_block0_to_post_block3/lambda_1.0/
+    ├── OL_model.pt, OL_fwd.pt
+    ├── CL_model.pt, CL_fwd.pt, CL_gate.pt
+    ├── PW_model.pt, PW_fwd.pt
+    ├── CL_PW_model.pt, CL_PW_fwd.pt, CL_PW_gate.pt
+    └── results.json
+
+/data/a2a_forward/mnist_learning_gate/
+└── vit_4L_4H_128D/post_block0_to_post_block3/lambda_1.0/
+    ├── OL_model.pt, OL_fwd.pt
+    ├── CL_model.pt, CL_fwd.pt, CL_cgate.pt
+    ├── LL_model.pt, LL_fwd.pt
+    ├── CL_LL_model.pt, CL_LL_fwd.pt, CL_LL_cgate.pt
+    ├── LG_model.pt, LG_fwd.pt, LG_lgate.pt
+    ├── CL_LG_model.pt, CL_LG_fwd.pt, CL_LG_cgate.pt, CL_LG_lgate.pt
+    └── results.json
 ```

@@ -1,0 +1,203 @@
+# Open-Loop Analysis: Structure, Causal Substitution, Behavioral Residual
+
+Detailed results from the initial open-loop (no injection) experiments. These informed the closed-loop design but are largely superseded by later controlled experiments.
+
+## Run 1: Per-position MLP forward model (negative result, 2026-05-25)
+
+A per-position MLP (256 → 512 → 256, 263K params) predicting post_embed → post_block1.
+
+| Metric | Value |
+|---|---|
+| Final cosine sim | 0.788 |
+| Final MSE | 0.021 |
+| Residual norm | 2.28 |
+| Residual-LM corr | +0.02 (none) |
+
+**Why it failed**: A per-position forward model is structurally blind to cross-position effects. Post-embedding activations at position t contain only `wte(token_t) + wpe(t)` — they know nothing about other positions. The target (post-block1) contains information mixed in by two rounds of attention. The residual was dominated by "what attention contributed" rather than "what the forward model's capacity couldn't represent." The 0.788 cosine ceiling reflects structural blindness, not a capacity bottleneck.
+
+The cosine similarity peaked at 0.895 (step 400) then steadily declined as the main model learned increasingly attention-dependent representations.
+
+## Run 2: Transformer forward model (positive result, 2026-05-25)
+
+A 1-layer transformer (1 head, 64-dim, 330K params) predicting post_block0 → post_block1.
+
+| Metric | Value |
+|---|---|
+| Final cosine sim | 0.972 |
+| Final MSE | 0.003 |
+| Residual norm | 0.85 |
+| Residual-LM corr | -0.05 (slight negative) |
+
+The transformer forward model captures 97% of the computation in direction, with 7x lower MSE and 2.7x lower residual norm than the MLP. Cosine declined only 1.2pp over training (0.984 → 0.972) vs 10.7pp for the MLP.
+
+The slight negative residual-LM correlation suggests that positions where the forward model struggles most tend to have *lower* LM loss — the main model's most complex computation happens where it's confidently aggregating context.
+
+Late-training MSE uptick (0.002 → 0.003 from step 5K to 10K) shows the capacity bottleneck is binding — the main model develops computation the forward model can't fully track.
+
+## Structure analysis (2026-05-25)
+
+**Code**: `analyze.py`
+
+After training, we characterized what the forward model actually learned: is it a learned weight decomposition (like SVD in grokking), or something else?
+
+### The headline: functional equivalence through different parameters
+
+The forward model achieves **near-perfect attention pattern cosine similarity** with block1's heads while having **zero weight cosine similarity** with them. It found a completely different parameterization that produces the same function.
+
+| Block1 head | Attention cosine | KL divergence | Q weight cosine | K weight cosine | V weight cosine |
+|---|---|---|---|---|---|
+| Head 0 | **0.989** | 0.039 | -0.022 | -0.056 | -0.005 |
+| Head 1 | **0.998** | 0.008 | +0.011 | -0.008 | -0.007 |
+| Head 2 | **0.995** | 0.007 | -0.031 | -0.041 | -0.011 |
+| Head 3 | **0.916** | 0.280 | +0.021 | +0.014 | +0.009 |
+
+The single forward model head replicates the attention patterns of heads 0–2 at >0.98 cosine, while all QKV weight cosines are indistinguishable from zero. Head 3 is the outlier (0.916 cosine, 37x higher KL divergence).
+
+Q subspace overlaps are moderate (0.58–0.67), confirming the forward model's projections live in a partially overlapping but rotated subspace relative to each block1 head.
+
+### Why zero weight cosine is expected
+
+Attention has a gauge symmetry: applying the same rotation R to both Q and K projections preserves the attention pattern, since (QR)(KR)^T = QK^T. Similarly, rotations in V are absorbed by the output projection. The forward model landed in a **rotated version of the same functional basin** — orthogonal in parameter space, identical in function space.
+
+This is directly analogous to the cerebellar circuit: the cerebellum builds its own weights (learned via climbing fiber supervised learning) that predict cortical dynamics without copying cortical parameters. The A2A model demonstrates this is achievable — a 330K-param model with different architecture can approximate a much larger model's layer computation with 0.972 cosine fidelity through entirely different weights.
+
+### The residual is full-rank and diffuse
+
+| Threshold | Rank (of 256) |
+|---|---|
+| 50% variance | 62 |
+| 75% variance | 128 |
+| 90% variance | 189 |
+| 95% variance | 217 |
+| 99% variance | 247 |
+| Effective rank (entropy) | **199.8** |
+
+Top-1 PC explains only 2.4%, top-5 explain 9.3%, top-10 explain 15.8%. The "missed computation" is spread uniformly across all dimensions — the forward model is slightly worse everywhere, not completely missing specific sub-circuits.
+
+This is the **opposite** of the grokking case (where SVD captured a low-rank Fourier solution). In language, the capacity bottleneck binds uniformly. The forward model hasn't learned "what mechanisms block1 uses" in a decomposition sense. It's learned to *be* a miniature block1 — same function, different weights, slightly lower fidelity everywhere.
+
+![Structure analysis](structure_analysis.png)
+*Row 1: Residual PCA (cumulative variance, SV spectrum, top PCs by position). Row 2: CKA alignment, attention pattern similarity, QKV weight comparison. Row 3: Residual conditioned on token frequency, position, and LM loss quartile.*
+
+### CKA confirms geometric equivalence
+
+| Comparison | CKA |
+|---|---|
+| Post-attention (fwd vs block1) | **0.980** |
+| Final output (fwd vs block1) | **0.982** |
+| Input → fwd output | 0.752 |
+| Input → block1 output | 0.740 |
+
+The forward model and block1 organize information nearly identically in activation space (CKA > 0.98). Both transform the input by similar amounts (CKA to input ~0.74–0.75), confirming the forward model applies a transformation of comparable magnitude, not a shallow approximation.
+
+### Residual correlates with token frequency, not prediction difficulty
+
+| Token frequency | Mean residual norm | Count |
+|---|---|---|
+| <1e-6 | 0.932 | 3,227 |
+| 1e-6–1e-5 | 0.923 | 42,424 |
+| 1e-5–1e-4 | 0.904 | 98,959 |
+| 1e-4–1e-3 | 0.878 | 97,033 |
+| 1e-3–1e-2 | 0.799 | 68,586 |
+| >1e-2 | 0.763 | 99,371 |
+
+| LM loss quartile | Mean residual norm |
+|---|---|
+| Q1 (low loss) | 0.863 |
+| Q2 | 0.851 |
+| Q3 | 0.837 |
+| Q4 (high loss) | 0.844 |
+
+The residual has a clear monotonic gradient by token frequency (rare tokens: 0.93, common: 0.76) but is essentially flat across LM loss quartiles (0.84–0.86). The forward model's error reflects **training exposure** (it learned common tokens' computations better because it saw them more), not computational complexity.
+
+### Why the forward model can use different weights
+
+Two factors explain why the forward model finds a novel parameterization:
+
+1. **Separation of concerns**: Block1's weights must encode both knowledge about language (what patterns exist) and a computational strategy (how to transform representations). The forward model's input (post_block0) already encodes the language knowledge. The forward model only needs to learn the *transformation*, not the data. Less to encode → more parametric freedom → a different, potentially more efficient parameterization.
+
+2. **Rotation symmetry**: Attention's gauge symmetry (QR · (KR)^T = Q · K^T) means many weight configurations implement the same function. Different training objectives (MSE on activations vs end-to-end LM loss) navigate different parts of the loss landscape but can converge on functionally equivalent solutions related by rotation.
+
+### Implication for self-regulation
+
+In grokking, SVD residuals detected collapse because the Fourier solution is low-rank — structural drift shows up as a change in the low-rank approximation. In language, the residual is full-rank and diffuse, so a simple MSE penalty would regularize all dimensions equally. This might still work for preventing general drift (as the grokking rank-128 ablation showed — even full-rank references prevent collapse when the checkpoint is clean), but it wouldn't selectively target specific mechanisms.
+
+The head 3 gap (0.916 vs >0.98) is the most natural place to look for mechanism-specific structure. Whatever head 3 does that the forward model can't replicate with a single compressed head may represent the genuinely "novel" computation a cerebellar-style monitor would be most informative about.
+
+**Reproduction**: `modal run a2a_forward/analyze.py::analyze --n-tokens 10000000`
+
+## Causal substitution: replacing block1 with the forward model (2026-05-26)
+
+**Code**: `causal_substitution.py`
+
+How much does the model lose when we swap block1's actual output for the forward model's prediction, then continue the forward pass from block2 onward? This is a causal test — if the substitution is harmless, the forward model truly captures block1's computation. If specific behaviors break, the residual captures those specific mechanisms.
+
+Three modes: **Normal** (unmodified), **Substituted** (forward model replaces block1), **Ablated** (skip block1 entirely, output = input).
+
+| Mode | Accuracy | ΔCE vs Normal | KL vs Normal |
+|---|---|---|---|
+| Normal | 0.222 | — | — |
+| Substituted | 0.217 | +0.043 | 0.062 |
+| Ablated | 0.146 | +0.965 | 1.094 |
+
+The forward model recovers ~94% of block1's KL contribution. Ablating block1 entirely destroys 7.6pp of accuracy; substituting costs only 0.5pp.
+
+**Per-behavior breakdown**: degradation is strikingly uniform across behavioral categories.
+
+| Category | n | KL (sub) | KL (abl) | ΔCE (sub) | ΔAcc (sub) |
+|---|---|---|---|---|---|
+| Punctuation | 51,753 | 0.067 | 1.086 | +0.066 | -0.015 |
+| Bracket closing | 9,311 | 0.055 | 0.991 | +0.074 | -0.016 |
+| Repeated token (induction) | 69,338 | 0.064 | 1.075 | +0.028 | -0.005 |
+| High confidence (>0.5) | 32,487 | 0.041 | 1.275 | +0.069 | -0.008 |
+| Low confidence (<0.1) | 302,129 | 0.065 | 1.075 | +0.031 | +0.002 |
+| Content word (rare) | 2,246 | 0.065 | 1.155 | +0.026 | -0.001 |
+| Function word (common) | 303,983 | 0.062 | 1.088 | +0.047 | -0.007 |
+
+KL_sub ranges 0.04–0.07 across all categories — no behavior-specific catastrophic failure. The forward model is "slightly worse everywhere," consistent with the full-rank/diffuse residual structure. One slight signal: high-confidence predictions have the lowest KL_sub (0.041) but the highest KL_abl (1.275), meaning block1 matters most for confident predictions, and the forward model captures those best.
+
+**Reproduction**: `modal run a2a_forward/causal_substitution.py --n-tokens 10000000`
+
+## Behavior-conditioned residual analysis (2026-05-26)
+
+**Code**: `behavioral_residual.py`
+
+The structure analysis (Run 2) showed the residual correlates with token frequency but is flat across LM loss quartiles. But does the residual have structure when conditioned on *behavioral* context — what kind of computation block1 is doing?
+
+We categorize each token position by attention pattern, syntactic context, prediction difficulty, context integration, and block1 contribution magnitude, then measure residual norm statistics per category.
+
+**Strongest effects (Cohen's d vs overall mean):**
+
+| Category | Mean residual | Cohen's d | n |
+|---|---|---|---|
+| Before closer | 0.973 | **+0.84** | 1,924 |
+| Sentence start | 0.724 | **-0.85** | 16,754 |
+| After punctuation | 0.757 | **-0.62** | 36,665 |
+| After opener | 0.939 | **+0.62** | 3,531 |
+| Focused attention (max>0.5) | 0.758 | **-0.61** | 58,808 |
+| Block1 contrib Q4 (large) | 0.907 | +0.40 | 101,601 |
+| Block1 contrib Q1 (small) | 0.794 | -0.37 | 101,600 |
+| Distant attention (>10 back) | 0.874 | +0.18 | 63,512 |
+| Distributed attention (high entropy) | 0.869 | +0.14 | 202,947 |
+
+The residual has clear behavioral structure. The forward model struggles most before closing delimiters (d=+0.84) and after opening ones (d=+0.62) — exactly the kind of computation requiring long-range context (matching the opener). It handles sentence starts (d=-0.85) and focused attention (d=-0.61) easily — simple, local computations.
+
+**Prediction difficulty is NOT what drives the residual.** Easy vs hard predictions (d=+0.10 vs d=-0.03) and high vs low output entropy (d=-0.07 vs d=+0.07) show negligible effects. The residual reflects *computational complexity*, not *task difficulty*.
+
+**Key correlations:**
+
+| Correlation | Pearson r |
+|---|---|
+| Block1 contrib norm vs residual | +0.256 |
+| Distance to dominant attended token vs residual | +0.256 |
+| Attention entropy vs residual | +0.186 |
+| **Attention entropy vs residual/block1_contrib** | **+0.332** |
+| LM loss vs residual | -0.049 |
+| Output entropy vs residual | -0.124 |
+| LM loss vs residual/block1_contrib | -0.027 |
+
+The ratio correlation (r=+0.33) is the key result: even controlling for how much computation block1 does, the forward model fails *disproportionately* on distributed attention patterns. With only 1 compressed head (64-dim), the forward model specifically struggles with multi-source attention integration — it can match focused, single-source computations but not the complex mixing of multiple context positions.
+
+**What the residual captures**: The residual is not "noise" or a training frequency artifact. It reflects a specific capacity bottleneck: the forward model's single compressed attention head cannot fully represent computations that integrate information from multiple distant positions. This is most pronounced for delimiter tracking (matching openers to closers) and least pronounced for local/focused computations (previous token, sentence boundaries). The residual is a genuine signal of *computational novelty* — where the main model does something structurally beyond the forward model's capacity.
+
+**Reproduction**: `modal run a2a_forward/behavioral_residual.py --n-tokens 10000000`

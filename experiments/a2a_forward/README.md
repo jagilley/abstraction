@@ -30,37 +30,11 @@ The architecture mirrors the cerebellar circuit:
 
 ## Results (2026-05-25)
 
-### Run 1: Per-position MLP forward model (negative result)
+### Runs 1-2: MLP vs transformer forward model
 
-A per-position MLP (256 → 512 → 256, 263K params) predicting post_embed → post_block1.
+**Details**: [OPEN_LOOP_ANALYSIS_README.md](OPEN_LOOP_ANALYSIS_README.md)
 
-| Metric | Value |
-|---|---|
-| Final cosine sim | 0.788 |
-| Final MSE | 0.021 |
-| Residual norm | 2.28 |
-| Residual-LM corr | +0.02 (none) |
-
-**Why it failed**: A per-position forward model is structurally blind to cross-position effects. Post-embedding activations at position t contain only `wte(token_t) + wpe(t)` — they know nothing about other positions. The target (post-block1) contains information mixed in by two rounds of attention. The residual was dominated by "what attention contributed" rather than "what the forward model's capacity couldn't represent." The 0.788 cosine ceiling reflects structural blindness, not a capacity bottleneck.
-
-The cosine similarity peaked at 0.895 (step 400) then steadily declined as the main model learned increasingly attention-dependent representations.
-
-### Run 2: Transformer forward model (positive result)
-
-A 1-layer transformer (1 head, 64-dim, 330K params) predicting post_block0 → post_block1.
-
-| Metric | Value |
-|---|---|
-| Final cosine sim | 0.972 |
-| Final MSE | 0.003 |
-| Residual norm | 0.85 |
-| Residual-LM corr | -0.05 (slight negative) |
-
-The transformer forward model captures 97% of the computation in direction, with 7x lower MSE and 2.7x lower residual norm than the MLP. Cosine declined only 1.2pp over training (0.984 → 0.972) vs 10.7pp for the MLP.
-
-The slight negative residual-LM correlation suggests that positions where the forward model struggles most tend to have *lower* LM loss — the main model's most complex computation happens where it's confidently aggregating context.
-
-Late-training MSE uptick (0.002 → 0.003 from step 5K to 10K) shows the capacity bottleneck is binding — the main model develops computation the forward model can't fully track.
+Run 1 (per-position MLP, post_embed → post_block1): cosine 0.788, structurally blind to cross-position effects. Run 2 (1-layer transformer, post_block0 → post_block1): cosine 0.972, 7× lower MSE. The transformer forward model captures 97% of the computation in direction through entirely different weights.
 
 ### Key lesson: capacity bottleneck vs structural blindness
 
@@ -107,6 +81,10 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `distillation_probes.py` | Post-distillation internalization probes: inter-layer self-predictability, old FM prediction accessibility, cross-model control |
 | `mnist_local_loss.py` | MNIST local prediction-error learning: 4-condition comparison (OL, CL, LL, CL+LL) with FM prediction error as auxiliary loss |
 | `mnist_local_loss_probes.py` | Representation probes: object-level vs meta-knowledge absorption (prediction probe, orthogonalized residual probe) |
+| `mnist_geometry.py` | MNIST computational property geometry: probe orthogonality, compositionality, vector arithmetic across OL/CL/Distilled |
+| `language_geometry.py` | Language computational property geometry: same tests as MNIST on GPT models |
+| `mnist_precision_weighted.py` | MNIST precision-weighted local loss: Mahalanobis distance replaces MSE, 4-condition comparison (OL, CL, PW, CL_PW) |
+| `mnist_learning_gate.py` | MNIST learning gate: bilevel-optimized per-dimension local loss weights via MAML-style virtual update, 6-condition comparison (OL, CL, LL, CL_LL, LG, CL_LG) |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching, forward model training, and per-head decomposition on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment; + [Prediction trust](REPRESENTATIONAL_DIVERGENCE_README.md#prediction-trust-what-form-the-self-knowledge-takes-2026-06-10) appended section (innovation map / error-monitoring geometry) |
@@ -119,7 +97,9 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `DISTILLATION_README.md` | [Single-cycle distillation](DISTILLATION_README.md) — wake-sleep knowledge absorption, innovation migration test, ratchet assessment |
 | `MNIST_DISTILLATION_README.md` | [MNIST distillation](MNIST_DISTILLATION_README.md) — single-cycle wake-sleep on low-rank residual: digit-discriminative structure collapse, structural internalization at 2-6× language magnitude; + [multi-cycle comparison](MNIST_DISTILLATION_README.md#multi-cycle-comparison-with-compute-matched-baselines-2026-06-13) with compute-matched baselines decomposing val loss (distillation) from robustness (CL co-training) |
 | `MNIST_ADAPTATION_README.md` | [MNIST OOD adaptation](MNIST_ADAPTATION_README.md) — rotated MNIST fine-tuning: zero-shot OOD tracks distillation, adaptation speed is uninformative, forgetting resistance tracks CL co-training (three-way dissociation) |
-| `MNIST_LOCAL_LOSS_README.md` | [MNIST local prediction-error learning](MNIST_LOCAL_LOSS_README.md) — local loss as auxiliary training signal: regularity ≠ robustness dissociation, 3:1 meta-knowledge dominance, first high-fwd-cos closed-loop condition |
+| `MNIST_LOCAL_LOSS_README.md` | [MNIST local prediction-error learning](MNIST_LOCAL_LOSS_README.md) — local loss as auxiliary training signal: regularity ≠ robustness dissociation, 3:1 meta-knowledge dominance, first high-fwd-cos closed-loop condition; + [precision weighting](MNIST_LOCAL_LOSS_README.md#precision-weighted-local-loss-2026-06-16) (negative: FM error structure ≠ task structure); + [learning gate](MNIST_LOCAL_LOSS_README.md#learning-gate-bilevel-optimized-local-loss-2026-06-16) (bilevel-optimized: 35% brittleness reduction, record self-knowledge R²=0.83) |
+| `GEOMETRY_README.md` | [Computational property geometry](GEOMETRY_README.md) — probe orthogonality, compositionality, vector arithmetic: distillation converts entangled meta-knowledge into orthogonal object-level knowledge (cross-domain, MNIST + language) |
+| `OPEN_LOOP_ANALYSIS_README.md` | [Open-loop analysis details](OPEN_LOOP_ANALYSIS_README.md) — detailed tables/discussion for Runs 1-2, structure analysis, causal substitution, behavioral residual |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
 
@@ -172,93 +152,9 @@ modal run --detach a2a_forward/model_scale_experiment.py --n-tokens 100000000 --
 
 ## Structure analysis (2026-05-25)
 
-**Code**: `analyze.py`
+**Code**: `analyze.py` | **Details**: [OPEN_LOOP_ANALYSIS_README.md](OPEN_LOOP_ANALYSIS_README.md#structure-analysis-2026-05-25)
 
-After training, we characterized what the forward model actually learned: is it a learned weight decomposition (like SVD in grokking), or something else?
-
-### The headline: functional equivalence through different parameters
-
-The forward model achieves **near-perfect attention pattern cosine similarity** with block1's heads while having **zero weight cosine similarity** with them. It found a completely different parameterization that produces the same function.
-
-| Block1 head | Attention cosine | KL divergence | Q weight cosine | K weight cosine | V weight cosine |
-|---|---|---|---|---|---|
-| Head 0 | **0.989** | 0.039 | -0.022 | -0.056 | -0.005 |
-| Head 1 | **0.998** | 0.008 | +0.011 | -0.008 | -0.007 |
-| Head 2 | **0.995** | 0.007 | -0.031 | -0.041 | -0.011 |
-| Head 3 | **0.916** | 0.280 | +0.021 | +0.014 | +0.009 |
-
-The single forward model head replicates the attention patterns of heads 0–2 at >0.98 cosine, while all QKV weight cosines are indistinguishable from zero. Head 3 is the outlier (0.916 cosine, 37x higher KL divergence).
-
-Q subspace overlaps are moderate (0.58–0.67), confirming the forward model's projections live in a partially overlapping but rotated subspace relative to each block1 head.
-
-### Why zero weight cosine is expected
-
-Attention has a gauge symmetry: applying the same rotation R to both Q and K projections preserves the attention pattern, since (QR)(KR)^T = QK^T. Similarly, rotations in V are absorbed by the output projection. The forward model landed in a **rotated version of the same functional basin** — orthogonal in parameter space, identical in function space.
-
-This is directly analogous to the cerebellar circuit: the cerebellum builds its own weights (learned via climbing fiber supervised learning) that predict cortical dynamics without copying cortical parameters. The A2A model demonstrates this is achievable — a 330K-param model with different architecture can approximate a much larger model's layer computation with 0.972 cosine fidelity through entirely different weights.
-
-### The residual is full-rank and diffuse
-
-| Threshold | Rank (of 256) |
-|---|---|
-| 50% variance | 62 |
-| 75% variance | 128 |
-| 90% variance | 189 |
-| 95% variance | 217 |
-| 99% variance | 247 |
-| Effective rank (entropy) | **199.8** |
-
-Top-1 PC explains only 2.4%, top-5 explain 9.3%, top-10 explain 15.8%. The "missed computation" is spread uniformly across all dimensions — the forward model is slightly worse everywhere, not completely missing specific sub-circuits.
-
-This is the **opposite** of the grokking case (where SVD captured a low-rank Fourier solution). In language, the capacity bottleneck binds uniformly. The forward model hasn't learned "what mechanisms block1 uses" in a decomposition sense. It's learned to *be* a miniature block1 — same function, different weights, slightly lower fidelity everywhere.
-
-![Structure analysis](structure_analysis.png)
-*Row 1: Residual PCA (cumulative variance, SV spectrum, top PCs by position). Row 2: CKA alignment, attention pattern similarity, QKV weight comparison. Row 3: Residual conditioned on token frequency, position, and LM loss quartile.*
-
-### CKA confirms geometric equivalence
-
-| Comparison | CKA |
-|---|---|
-| Post-attention (fwd vs block1) | **0.980** |
-| Final output (fwd vs block1) | **0.982** |
-| Input → fwd output | 0.752 |
-| Input → block1 output | 0.740 |
-
-The forward model and block1 organize information nearly identically in activation space (CKA > 0.98). Both transform the input by similar amounts (CKA to input ~0.74–0.75), confirming the forward model applies a transformation of comparable magnitude, not a shallow approximation.
-
-### Residual correlates with token frequency, not prediction difficulty
-
-| Token frequency | Mean residual norm | Count |
-|---|---|---|
-| <1e-6 | 0.932 | 3,227 |
-| 1e-6–1e-5 | 0.923 | 42,424 |
-| 1e-5–1e-4 | 0.904 | 98,959 |
-| 1e-4–1e-3 | 0.878 | 97,033 |
-| 1e-3–1e-2 | 0.799 | 68,586 |
-| >1e-2 | 0.763 | 99,371 |
-
-| LM loss quartile | Mean residual norm |
-|---|---|
-| Q1 (low loss) | 0.863 |
-| Q2 | 0.851 |
-| Q3 | 0.837 |
-| Q4 (high loss) | 0.844 |
-
-The residual has a clear monotonic gradient by token frequency (rare tokens: 0.93, common: 0.76) but is essentially flat across LM loss quartiles (0.84–0.86). The forward model's error reflects **training exposure** (it learned common tokens' computations better because it saw them more), not computational complexity.
-
-### Why the forward model can use different weights
-
-Two factors explain why the forward model finds a novel parameterization:
-
-1. **Separation of concerns**: Block1's weights must encode both knowledge about language (what patterns exist) and a computational strategy (how to transform representations). The forward model's input (post_block0) already encodes the language knowledge. The forward model only needs to learn the *transformation*, not the data. Less to encode → more parametric freedom → a different, potentially more efficient parameterization.
-
-2. **Rotation symmetry**: Attention's gauge symmetry (QR · (KR)^T = Q · K^T) means many weight configurations implement the same function. Different training objectives (MSE on activations vs end-to-end LM loss) navigate different parts of the loss landscape but can converge on functionally equivalent solutions related by rotation.
-
-### Implication for self-regulation
-
-In grokking, SVD residuals detected collapse because the Fourier solution is low-rank — structural drift shows up as a change in the low-rank approximation. In language, the residual is full-rank and diffuse, so a simple MSE penalty would regularize all dimensions equally. This might still work for preventing general drift (as the grokking rank-128 ablation showed — even full-rank references prevent collapse when the checkpoint is clean), but it wouldn't selectively target specific mechanisms.
-
-The head 3 gap (0.916 vs >0.98) is the most natural place to look for mechanism-specific structure. Whatever head 3 does that the forward model can't replicate with a single compressed head may represent the genuinely "novel" computation a cerebellar-style monitor would be most informative about.
+The forward model achieves near-perfect attention pattern cosine similarity with block1's heads (0.989–0.998 for heads 0–2) while having zero weight cosine similarity — it found a completely different parameterization that produces the same function, explained by attention's gauge symmetry ((QR)(KR)^T = QK^T). CKA between forward model and block1 outputs is 0.98. The residual is full-rank and diffuse (effective rank 199.8/256, top-1 PC explains only 2.4%) — the opposite of grokking's low-rank Fourier solution. Residual correlates with token frequency (training exposure) but is flat across LM loss quartiles (prediction difficulty).
 
 **Reproduction**: `modal run a2a_forward/analyze.py::analyze --n-tokens 10000000`
 
@@ -282,77 +178,17 @@ Residual-LM correlation remains near zero (-0.03), consistent with the 1-layer r
 
 ### Causal substitution: replacing block1 with the forward model (2026-05-26)
 
-**Code**: `causal_substitution.py`
+**Code**: `causal_substitution.py` | **Details**: [OPEN_LOOP_ANALYSIS_README.md](OPEN_LOOP_ANALYSIS_README.md#causal-substitution-replacing-block1-with-the-forward-model-2026-05-26)
 
-How much does the model lose when we swap block1's actual output for the forward model's prediction, then continue the forward pass from block2 onward? This is a causal test — if the substitution is harmless, the forward model truly captures block1's computation. If specific behaviors break, the residual captures those specific mechanisms.
-
-Three modes: **Normal** (unmodified), **Substituted** (forward model replaces block1), **Ablated** (skip block1 entirely, output = input).
-
-| Mode | Accuracy | ΔCE vs Normal | KL vs Normal |
-|---|---|---|---|
-| Normal | 0.222 | — | — |
-| Substituted | 0.217 | +0.043 | 0.062 |
-| Ablated | 0.146 | +0.965 | 1.094 |
-
-The forward model recovers ~94% of block1's KL contribution. Ablating block1 entirely destroys 7.6pp of accuracy; substituting costs only 0.5pp.
-
-**Per-behavior breakdown**: degradation is strikingly uniform across behavioral categories.
-
-| Category | n | KL (sub) | KL (abl) | ΔCE (sub) | ΔAcc (sub) |
-|---|---|---|---|---|---|
-| Punctuation | 51,753 | 0.067 | 1.086 | +0.066 | -0.015 |
-| Bracket closing | 9,311 | 0.055 | 0.991 | +0.074 | -0.016 |
-| Repeated token (induction) | 69,338 | 0.064 | 1.075 | +0.028 | -0.005 |
-| High confidence (>0.5) | 32,487 | 0.041 | 1.275 | +0.069 | -0.008 |
-| Low confidence (<0.1) | 302,129 | 0.065 | 1.075 | +0.031 | +0.002 |
-| Content word (rare) | 2,246 | 0.065 | 1.155 | +0.026 | -0.001 |
-| Function word (common) | 303,983 | 0.062 | 1.088 | +0.047 | -0.007 |
-
-KL_sub ranges 0.04–0.07 across all categories — no behavior-specific catastrophic failure. The forward model is "slightly worse everywhere," consistent with the full-rank/diffuse residual structure. One slight signal: high-confidence predictions have the lowest KL_sub (0.041) but the highest KL_abl (1.275), meaning block1 matters most for confident predictions, and the forward model captures those best.
+The forward model recovers ~94% of block1's KL contribution (KL_sub=0.062 vs KL_abl=1.094). Degradation is strikingly uniform across all behavioral categories (KL_sub ranges 0.04–0.07) — no behavior-specific catastrophic failure, consistent with the full-rank/diffuse residual.
 
 **Reproduction**: `modal run a2a_forward/causal_substitution.py --n-tokens 10000000`
 
 ### Behavior-conditioned residual analysis (2026-05-26)
 
-**Code**: `behavioral_residual.py`
+**Code**: `behavioral_residual.py` | **Details**: [OPEN_LOOP_ANALYSIS_README.md](OPEN_LOOP_ANALYSIS_README.md#behavior-conditioned-residual-analysis-2026-05-26)
 
-The structure analysis (Run 2) showed the residual correlates with token frequency but is flat across LM loss quartiles. But does the residual have structure when conditioned on *behavioral* context — what kind of computation block1 is doing?
-
-We categorize each token position by attention pattern, syntactic context, prediction difficulty, context integration, and block1 contribution magnitude, then measure residual norm statistics per category.
-
-**Strongest effects (Cohen's d vs overall mean):**
-
-| Category | Mean residual | Cohen's d | n |
-|---|---|---|---|
-| Before closer | 0.973 | **+0.84** | 1,924 |
-| Sentence start | 0.724 | **-0.85** | 16,754 |
-| After punctuation | 0.757 | **-0.62** | 36,665 |
-| After opener | 0.939 | **+0.62** | 3,531 |
-| Focused attention (max>0.5) | 0.758 | **-0.61** | 58,808 |
-| Block1 contrib Q4 (large) | 0.907 | +0.40 | 101,601 |
-| Block1 contrib Q1 (small) | 0.794 | -0.37 | 101,600 |
-| Distant attention (>10 back) | 0.874 | +0.18 | 63,512 |
-| Distributed attention (high entropy) | 0.869 | +0.14 | 202,947 |
-
-The residual has clear behavioral structure. The forward model struggles most before closing delimiters (d=+0.84) and after opening ones (d=+0.62) — exactly the kind of computation requiring long-range context (matching the opener). It handles sentence starts (d=-0.85) and focused attention (d=-0.61) easily — simple, local computations.
-
-**Prediction difficulty is NOT what drives the residual.** Easy vs hard predictions (d=+0.10 vs d=-0.03) and high vs low output entropy (d=-0.07 vs d=+0.07) show negligible effects. The residual reflects *computational complexity*, not *task difficulty*.
-
-**Key correlations:**
-
-| Correlation | Pearson r |
-|---|---|
-| Block1 contrib norm vs residual | +0.256 |
-| Distance to dominant attended token vs residual | +0.256 |
-| Attention entropy vs residual | +0.186 |
-| **Attention entropy vs residual/block1_contrib** | **+0.332** |
-| LM loss vs residual | -0.049 |
-| Output entropy vs residual | -0.124 |
-| LM loss vs residual/block1_contrib | -0.027 |
-
-The ratio correlation (r=+0.33) is the key result: even controlling for how much computation block1 does, the forward model fails *disproportionately* on distributed attention patterns. With only 1 compressed head (64-dim), the forward model specifically struggles with multi-source attention integration — it can match focused, single-source computations but not the complex mixing of multiple context positions.
-
-**What the residual captures**: The residual is not "noise" or a training frequency artifact. It reflects a specific capacity bottleneck: the forward model's single compressed attention head cannot fully represent computations that integrate information from multiple distant positions. This is most pronounced for delimiter tracking (matching openers to closers) and least pronounced for local/focused computations (previous token, sentence boundaries). The residual is a genuine signal of *computational novelty* — where the main model does something structurally beyond the forward model's capacity.
+The residual reflects *computational complexity*, not *task difficulty*. The forward model struggles most at delimiter tracking (before closers: d=+0.84) and distributed attention, and least at local/focused computations (sentence starts: d=-0.85). Even controlling for block1 contribution magnitude, attention entropy correlates with residual norm (r=+0.33) — the single compressed head specifically fails on multi-source attention integration. Prediction difficulty has negligible effect (d < 0.1).
 
 **Reproduction**: `modal run a2a_forward/behavioral_residual.py --n-tokens 10000000`
 
@@ -486,41 +322,11 @@ Uses CKA, PCA on activation differences, and subspace alignment to characterize 
 
 ## Mirror test for neural self-knowledge (2026-06-02)
 
-**Full writeup**: [MIRROR_TEST_README.md](MIRROR_TEST_README.md)
+**Full writeup**: [MIRROR_TEST_README.md](MIRROR_TEST_README.md) (covers v1, v2, v3)
 
-Analog of the biological mirror test (Gallup, 1970). Applies arbitrary perturbations ("marks") to the model's computation at post_block1 and measures whether the downstream response at post_block3 is channeled through the self-knowledge subspace (top divergence PCs, which the representational divergence analysis showed carry 2.42× more residual variance than random). Tested on both the 1% forward model (Run 6) and 10% forward model (Run 7b).
-
-**Key results**:
-
-1. **SK-fraction signal**: Closed-loop models channel 20-28% more of their perturbation response through the self-knowledge subspace than the open-loop model (1.6-1.7× random baseline vs 1.3×). However, a geometry control showed that models' *general* activation variance is even more SK-aligned than perturbation responses, partially explaining the result. The CL+M condition (with injection) does show perturbation-specific enrichment beyond its general geometry (CL+M/OL ratio: 1.21× for perturbation vs 1.12× for general, rising to 1.24× vs 1.04× with the 10% model). The CL-M result is mostly explained by geometry.
-
-2. **Robustness gap (strongest finding)**: The open-loop model takes 2-3× more loss degradation from identical perturbations. The closed-loop model's response is both smaller in magnitude and more structured — it absorbs perturbations with less damage. This is not explained by activation geometry and may warrant follow-up as a form of structural regularization.
-
-3. **Self-knowledge is in the weights, not the real-time mirror**: CL-M ≥ CL+M for raw SK-fraction. But the geometry control reveals the CL+M condition (with injection) has a *perturbation-specific* enrichment the CL-M condition lacks — the mirror may matter for how the model handles novel perturbations, even though the general self-knowledge is internalized.
+Three iterations of a perturbation-based mirror test (Gallup, 1970 analog). v1 measured SK-subspace channeling (partially explained by geometry); v2 dropped subspace dependence and measured compensatory response (8% dampening, 2× robustness gap, but no active opposition — structural regularization, not deliberate self-correction); v3 used topic-specific perturbation directions and found CL models produce proportionally more topic-specific responses (diag/off-diag ratio 5.2–5.7 vs 4.6 OL). The robust finding across all three versions is the 2-3× robustness gap — CL models absorb perturbations with less loss degradation. The self-knowledge is in the weights (CL-M ≥ CL+M), though CL+M shows perturbation-specific enrichment beyond its general geometry.
 
 **Reproduction**: `modal run --detach a2a_forward/mirror_test.py --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
-
-### Mirror test v2: compensatory response (2026-06-03)
-
-**Full writeup**: [MIRROR_TEST_README.md](MIRROR_TEST_README.md) (v2 section)
-
-Redesigned mirror test avoiding the subspace cherry-picking problem of the original. Two tests that depend on no externally-defined directions: (1) compensatory response — does the model dampen perturbations? (2) perturbation discrimination at the logit level — does the model's output distinguish which perturbation was applied?
-
-**Key results**: CL models dampen perturbation magnitude by 8% (||R||/OL = 0.919, consistent across all perturbation strengths) and take 2× less loss degradation — replicating the robustness gap without any subspace definition. However, the CL model does not "reach for the mark": its response is *more* aligned with the perturbation direction (cos = +0.788 vs +0.715 for OL), not less. The model produces a smaller, more organized response rather than actively opposing the perturbation. The Gallup mirror test analogy (deliberate self-correction) may not apply; what we see is structural regularization — passive absorption through organized representations. The perturbation discrimination test was a null result (all models produce naturally uncorrelated logit shifts for random perturbation directions); future work should use semantically structured perturbation directions.
-
-**Reproduction**: `modal run --detach a2a_forward/mirror_test_v2.py --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
-
-### Mirror test v3: topic-level perturbation discrimination (2026-06-03)
-
-**Full writeup**: [MIRROR_TEST_README.md](MIRROR_TEST_README.md) (v3 section)
-
-Fixes the v2 null result on perturbation discrimination by replacing random perturbation directions with topic-specific directions (math, biology, history) derived from contrastive post_block1 activations. Inspired by Vogel (2025), "Small Models Can Introspect, Too," which showed concept-specific steering vectors produce concept-specific logit shifts in a 32B model.
-
-**Key results**: All three conditions (CL+M, CL-M, OL) show clear diagonal structure in the perturbation × topic logit matrix — perturbing in the "biology" direction preferentially boosts biology tokens, etc. The OL model shows higher absolute diagonal enrichment (+1.04 vs +0.70) due to the robustness gap (OL responds ~1.5× more to all perturbations). However, the CL model's response is proportionally more topic-specific: diag/|off-diag| ratio is 5.22 (CL+M) and 5.73 (CL-M) vs 4.62 (OL). The CL model retains 69.2% of OL's on-target signal but only 61.1% of off-target leakage — cross-topic noise is suppressed 8pp more than topic-specific signal.
-
-This is not evidence for introspection (which requires instruction-following and many downstream layers), but it is further evidence that cerebellar co-training produces more organized internal representations that preserve semantic structure under perturbation. The effect is in the weights (CL-M > CL+M), consistent with earlier findings.
-
-**Reproduction**: `modal run --detach a2a_forward/mirror_test_v3.py --n-tokens 10000000 --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2 --inject-after-block 1`
 
 ## Model scale experiment: residual structure vs main model size (2026-06-03)
 
@@ -725,6 +531,30 @@ Tests the simplest version of the [local prediction-error learning](../../ideas/
 ```bash
 modal run --detach a2a_forward/mnist_local_loss.py::a2a_mnist_local_loss
 modal run --detach a2a_forward/mnist_local_loss_probes.py::a2a_mnist_ll_probes
+```
+
+## Computational property geometry probes (2026-06-16)
+
+**Full writeup**: [GEOMETRY_README.md](GEOMETRY_README.md)
+
+Tests whether CL and post-distillation models develop more compositionally structured representations — the analog of classic word embedding geometry (king − man + woman = queen) applied to computational properties. Probes for data identity (digit/token frequency), FM residual norm/direction, block contribution, and prediction difficulty at each layer, then measures probe direction orthogonality, centroid additivity, and vector arithmetic accuracy. Three conditions (OL, CL, Distilled) on both MNIST and language models.
+
+**Key results**:
+
+1. **Distilled has the most orthogonal early-layer representations** (both domains). Mean pairwise |cos| between probe directions at post_block0: MNIST 0.085 (vs 0.172 OL, 0.233 CL), language 0.067 (vs 0.093 OL, 0.107 CL). The distilled model encodes data identity and computational properties in more independent directions.
+
+2. **CL has the least orthogonal late-layer representations** (both domains). Mean |cos| at post_block3: MNIST 0.125 (vs 0.109 OL), language 0.246 (vs 0.124 OL). CL meta-knowledge creates entanglement — in language, fm_res_norms × block_contrib reaches |cos| = 0.618 at post_block3. The FM's reliability is entangled with block contribution and token frequency.
+
+3. **Vector arithmetic improves with distillation at the final layer** (both domains). Analogy completion cosine (high_res_category_A − low_res_category_A + low_res_category_B ≈ high_res_category_B): MNIST 0.970 Distilled vs 0.911 OL; language 0.773 Distilled vs 0.743 OL. The "computational state" direction is more consistent across data categories after distillation.
+
+4. **Compositionality direction flips between domains.** CL is least compositional in MNIST (0.830 vs 0.937 Distilled, digit × residual R²) but most compositional in language (0.892 vs 0.867 OL, freq × residual R²). Reflects the residual structure: MNIST's low-rank, digit-discriminative residual entangles digit and residual; language's full-rank, diffuse residual keeps frequency and residual naturally independent.
+
+5. **The dissociation rules out "more self-knowledge → more organized."** CL has the strongest self-knowledge R² (0.63–0.73 in MNIST) yet the worst orthogonality. Distillation converts entangled meta-knowledge into orthogonal object-level knowledge — the geometric consequence of the meta vs object-level distinction from the local loss probes.
+
+**Reproduction**:
+```bash
+modal run --detach a2a_forward/mnist_geometry.py::a2a_mnist_geometry
+modal run --detach a2a_forward/language_geometry.py::a2a_language_geometry
 ```
 
 ## Next steps
