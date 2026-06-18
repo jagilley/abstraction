@@ -273,3 +273,84 @@ Compare against Experiment 2 (fixed precision weights) to test whether learned s
 - Does the gate learn interpretable direction preferences? (Do gate weights correlate with behavioral categories from the behavioral residual analysis?)
 - Does the gate's policy generalize across FM reinitializations? (Train gate with FM-1, reinitialize FM, measure gate adaptation speed with FM-2 vs. from-scratch)
 - Does the gate reduce dependency more than fixed precision weights? (The gate should learn to not upweight directions that create injection dependency)
+
+[**Revision (2026-06-16):** Experiment 2b was run on MNIST as a FOMAML bilevel optimization (see MNIST_LOCAL_LOSS_README.md, "Learning gate" section). Key findings that update the above:
+
+1. The gate's selectivity does NOT correspond to digit discriminability (eta² correlation +0.02) or FM error variance (correlation -0.18). The bilevel optimization discovers a selectivity criterion that can't be reduced to any per-dimension statistic we can pre-compute — it depends on the interaction between the local loss gradient, the current parameter configuration, and the downstream classification effect. This is the strongest evidence that heuristic approaches (precision weighting, gradient alignment) are fundamentally insufficient: the relevant structure lives in the bilevel interaction, not in any first-order statistic of the FM error.
+
+2. CL_LG produces record self-knowledge (R² = 0.83 at post_block0, vs 0.76 for CL_LL and 0.63 for CL) while maintaining near-full injection dependency (0.019 vs CL's 0.022). High dependency + record self-knowledge is potentially the optimal pre-distillation state: the model extracts maximum value from the injection while encoding maximally precise information about where it needs it. CL_LL's indiscriminate "be predictable" pressure forces partial internalization that reduces dependency but also reduces the precision of the self-knowledge. The gate allows the model to be *selectively* dependent.
+
+3. The dependency prediction in the experimental plan above was wrong: the gate does NOT learn to reduce dependency. It learns to *maximize the value extracted from the injection*, which increases dependency. This reframes dependency as a feature of well-structured self-knowledge, not a failure mode to be minimized — at least when distillation is available to subsequently internalize the structured dependency.]
+
+[**Revision (2026-06-17):** The multi-cycle gated ratchet experiment (GATED_RATCHET_README.md) ran 4 cycles of WS_LG (injection + bilevel gate + distillation + FM reinit) on MNIST. Key findings that update the learning gate section:
+
+1. The gate **opens** across cycles (mean weight 0.31 → 0.77) rather than closing. On MNIST at ~18 epochs, the bilevel signal always endorses more compression because the val set is distributionally identical to the train set. The gate correctly concludes: compress everything, it always helps. The "plasticity closes with maturity" prediction requires novel inputs that over-compression would damage — a condition that never holds on a fixed, fully-seen dataset. The biological analogy: a child raised in a single room with 10 toys for 18 years has no reason to restrict plasticity because there's nothing rare worth protecting.
+
+2. WS_LG produces **monotonically compounding val loss improvement** (34% → 48% gap vs OL over 4 cycles). Neither distillation alone (WS stalls at cycle 2) nor gated local loss alone (CL_LG stalls) sustains improvement. The mechanism is implicit regularization: the gate selects among parameter configurations for the one whose intermediate computation is most compressible by a self-model, in directions the task loss endorses. The model finds solutions that are maximally legible to a compressed version of its own computation — analogous to deep understanding vs surface-level pattern matching.
+
+3. The gate doesn't extract structure from the data (which is exhausted by epoch 18). It extracts **computational regularity from the model's own processing**. The FM provides a mirror, and the gated local loss pushes the model to be more like its reflection. This signal never exhausts on a fixed dataset because there's always more regularization possible. The absorbing state is: residual → 0, FM near-perfect, gate weights plateau at high values (not closed — irrelevant, because gate_w × r² ≈ 0 regardless of gate_w).
+
+4. The gate-closing prediction requires the bilevel outer loop to evaluate on a distribution that differs from the inner loop. On a fixed dataset, inner = outer, so more compression is always beneficial. The human genome builds in the prior that "the outer loop WILL contain novelty" even when the current experience stream doesn't show it yet — this is the missing prior in our current setup.]
+
+## From dataset regularities to process regularities
+
+The learning gate + ratchet framework points toward a distinction between two kinds of learning that may be important for understanding generalization:
+
+**Current models learn the regularities of a dataset** — a fixed, replayable collection. The learning rule (backprop + SGD) doesn't need to be selective because you get unlimited passes. If a regularity is in the data, you'll eventually absorb it.
+
+**Biological learners learn the regularities of an experience-generating process** — one you can only sample from, never replay, and where some samples are existentially consequential. You get one pass through each experience. This puts enormous pressure on selecting which regularities to extract from each sample, because you can't afford to waste a rare experience learning something redundant, and you can't afford to miss a critical pattern because you were learning the wrong thing.
+
+The learning gate's bilevel optimization is a crude version of this: "which regularities, if internalized from this batch, will help on the next batch I haven't seen yet?" That's one-step-lookahead into an unknown future corpus. FM reinitialization extends the horizon — each fresh FM provides a genuinely novel perspective on the model's computation, and the gate must extract regularities that are robust across perspectives. Regularities that hold across multiple FM decompositions are more likely to be properties of the underlying process, not artifacts of any particular sample.
+
+The cerebellar connection: the cerebellum isn't modeling the data either — it's modeling the *cortex's dynamics*, which is the process that generates internal experiences. Each new input is a one-shot sample from this process. The ratchet extracts regularities that are stable properties of how you think, not of what you've seen. Those are the regularities that transfer across domains.
+
+### Asymmetric loss and the missing prior
+
+Biological experience-generating processes have a feature that training corpora don't: some samples are lethal. This creates asymmetric loss — you need to get the high-stakes regularities right on the *first* encounter. The amygdala-mediated valence tagging described in §7 of the cerebellar ratchet doc serves exactly this function: a fast, evolutionarily-prior-loaded system that triages experiences by stakes before the learning gate decides what to learn from them. The genome provides a prior over "which types of novelty are high-stakes" that doesn't need to be learned from scratch.
+
+Our current system has no analog of this — the learning gate treats all batches as equally important. For MNIST this is fine. For a system that needs to generalize robustly under distribution shift, some form of stakes-weighted meta-learning may be necessary: not just "which regularities help classification" but "which regularities help classification *when it matters most*."
+
+
+### 8. Self-directed learning: learning from your own thoughts
+
+The pieces described in §§1–7 of ideas/cerebellar_abstraction_ratchet.md, together with the learning gate mechanism, may be jointly sufficient for a capability that current AI systems lack: *self-directed learning*, where the system generates its own learning objectives from novel thoughts and selectively updates its own knowledge in response.
+
+**The mechanism.** During a forward pass — processing an input, reasoning about a problem, generating a response — the cortex produces novel activation patterns. The cerebellar forward model (§1–2) flags these as novel: they deviate from the predicted trajectory in specific directions (the innovation map). The cortex, which has self-knowledge baked into its representations through co-training (§5), recognizes the novelty and its character.
+
+The novel thought then becomes a *learning objective*. The cortex retrieves or activates relevant stored knowledge — from its own weights (implicit statistical knowledge), from hippocampal episodic memory (specific past experiences), from associative activation (related concepts). This retrieved knowledge serves as the learning signal. The learning gate (reticular thalamic gating, §7 + local prediction error doc) selects which regularities from the retrieved knowledge to internalize, using the novel thought as the meta-learning objective: "which regularities from my stored knowledge, if strengthened, would help me process this kind of novel thought?"
+
+The result: the system updates its own weights to better handle the class of novelty it just encountered, using its own stored knowledge as the training signal, without any external supervision.
+
+**The meta-learning framing.** This maps onto a bilevel optimization where:
+
+- **Corpus A** (the meta-objective): the novel thought — what the system wants to get better at processing. Not a dataset, but a single activation pattern held in working memory / active cortical state.
+- **Corpus B** (the learning signal): stored knowledge relevant to the novel thought — retrieved from cortical weights, hippocampal replay, associative activation. Not a fixed dataset, but a dynamically generated set shaped by Corpus A itself. The novel thought determines what gets retrieved.
+- **The meta-learning question**: "which regularities from B, if internalized, help with A?"
+
+The learning gate answers this question by selectively gating which aspects of the Corpus B learning signal drive plasticity, with the Corpus A objective determining the gating policy (via the bilevel optimization described in the local prediction error doc).
+
+Importantly, Corpus A and B are not two data points held simultaneously in mind. Corpus A is an *active objective* (maintained in prefrontal/working memory state), and Corpus B is an *ongoing stream* of experience and memory whose processing is shaped by A. The meta-learning happens as a process — the objective shapes retrieval, retrieval provides learning signal, the gate filters the signal, plasticity occurs — not as a comparison between two stored items.
+
+**Why this requires all the pieces.**
+
+| Component | Role in self-directed learning | Without it |
+|---|---|---|
+| FM + injection (§1–2) | Recognizes novel thoughts as novel; provides directional characterization of what's surprising | No novelty detection — system can't distinguish novel from routine thoughts |
+| Self-knowledge / innovation map (§5) | Knows what it knows; provides the prior over own knowledge state | Can detect novelty but can't characterize it — "something is new" but not "what kind of new" |
+| Learning gate (bilevel) | Selects which regularities from Corpus B to internalize given the Corpus A objective | Either learns everything indiscriminately (brittle) or nothing (stagnant) |
+| Rich cortical priors | Generates novel thoughts worth learning from; provides the Corpus B knowledge base; evaluates learning quality | Nothing to learn from; nowhere to retrieve relevant knowledge; no sense of "this is going well" |
+| Distillation / ratchet (§3–4) | Internalizes what was learned, freeing capacity for the next level of novelty | Learning from novel thoughts doesn't compound; no hierarchical abstraction |
+
+**Waking learning vs. sleep consolidation.** The meta-learning backward pass — selecting regularities from Corpus B to internalize via a bilevel objective — is energy-intensive, requiring both a forward pass (to generate the novel thought) and a meta-learning update (to modify the learning gate and cortical weights). This happens during waking cognition, when metabolic resources are available.
+
+Sleep serves a different function: distillation (§4). The ratchet's compression step — transferring cerebellar predictions into cortical weights, clearing the FM for the next cycle — produces the discrete jumps in capability observed after sleep. Sleep doesn't generate novel thoughts or execute meta-learning backward passes; it consolidates the results of waking meta-learning into the weight structure, preparing the system for the next round.
+
+The "clicking" phenomenology — when something suddenly makes sense — may correspond to a successful waking meta-learning step: the system found regularities in Corpus B that resolve the Corpus A novelty. The subsequent sleep consolidation internalizes this resolution, producing the common experience of understanding deepening overnight without conscious effort.
+
+**Open questions specific to self-directed learning.**
+
+1. *How literally does the Corpus A/B framing map onto cortical learning?* The bilevel optimization is a computational-level description (Marr's Level 1). The biological implementation likely involves neuromodulatory gating of plasticity (dopamine, acetylcholine, norepinephrine) rather than literal backpropagation. These neuromodulatory systems are themselves learned — dopamine neurons learn to predict rewards, the LC-NE system learns what constitutes surprising context — so they constitute a learned system modulating a learning process, which is meta-learning by definition. The most plausible biological approximation of the bilevel optimization is timescale separation: fast synaptic plasticity (Hebbian/STDP, milliseconds) serves as the inner loop, slower neuromodulatory dynamics (seconds-minutes) as the outer loop, approximating meta-gradient descent via something closer to a bandit problem over gating configurations. This is noisier and slower than MAML but converges to a functionally similar outcome: the system learns what to learn from, and that meta-policy improves with experience. Existing theories of cortical learning — Hebbian plasticity, STDP, predictive coding — describe the *mechanism* of weight updates; the meta-learning framing describes *what modulates* those updates. The learning gate would need to interface with these mechanisms, perhaps through neuromodulatory systems that selectively enable/disable Hebbian plasticity in specific circuits based on the cerebellar/thalamic novelty signal. Whether the biological approximation converges to the same solution as exact bilevel optimization, or a qualitatively different one, is genuinely open.
+
+2. *What determines Corpus B retrieval?* The novel thought (Corpus A) shapes what gets retrieved, but through what mechanism? Hippocampal pattern completion is one candidate: the novel activation pattern partially matches stored episodes, triggering replay of the most relevant memories. Cortical associative activation is another: the novel pattern excites related representations through learned connection weights. The quality of Corpus B retrieval may be a major bottleneck on self-directed learning — if the wrong memories/knowledge are retrieved, the meta-learning optimizes the wrong objective.
+
+3. *Can this be demonstrated in the A2A system?* The learning gate bilevel optimization already performs a one-step version: it selects which FM error directions to learn from based on classification improvement. The extension to self-directed learning would require the model to (a) generate novel activations, (b) recognize them as novel, and (c) use them as meta-learning objectives for updating its own processing. Steps (a) and (b) are already present in the closed-loop system. Step (c) would require the model's own novel activations to replace the classification loss as the bilevel outer objective — a significant but architecturally straightforward modification.

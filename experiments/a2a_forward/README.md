@@ -85,6 +85,10 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `language_geometry.py` | Language computational property geometry: same tests as MNIST on GPT models |
 | `mnist_precision_weighted.py` | MNIST precision-weighted local loss: Mahalanobis distance replaces MSE, 4-condition comparison (OL, CL, PW, CL_PW) |
 | `mnist_learning_gate.py` | MNIST learning gate: bilevel-optimized per-dimension local loss weights via MAML-style virtual update, 6-condition comparison (OL, CL, LL, CL_LL, LG, CL_LG) |
+| `mnist_gated_ratchet.py` | MNIST multi-cycle gated ratchet: 4-cycle WS_LG (injection + bilevel gate + distillation + FM reinit) vs WS, CL_LG, OL |
+| `mnist_extended_ratchet.py` | MNIST extended gated ratchet: 16-cycle WS_LG convergence test (+ lightweight OL), also used for 1.6% FM capacity experiment |
+| `extended_ratchet_analysis.py` | Activation norm analysis: confirms growing residual is from activation magnitude inflation at post_block3 |
+| `gate_structure_analysis.py` | Gate structure analysis: digit-conditional selectivity, FM error anti-correlation, static vs adaptive decomposition |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching, forward model training, and per-head decomposition on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment; + [Prediction trust](REPRESENTATIONAL_DIVERGENCE_README.md#prediction-trust-what-form-the-self-knowledge-takes-2026-06-10) appended section (innovation map / error-monitoring geometry) |
@@ -98,6 +102,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `MNIST_DISTILLATION_README.md` | [MNIST distillation](MNIST_DISTILLATION_README.md) — single-cycle wake-sleep on low-rank residual: digit-discriminative structure collapse, structural internalization at 2-6× language magnitude; + [multi-cycle comparison](MNIST_DISTILLATION_README.md#multi-cycle-comparison-with-compute-matched-baselines-2026-06-13) with compute-matched baselines decomposing val loss (distillation) from robustness (CL co-training) |
 | `MNIST_ADAPTATION_README.md` | [MNIST OOD adaptation](MNIST_ADAPTATION_README.md) — rotated MNIST fine-tuning: zero-shot OOD tracks distillation, adaptation speed is uninformative, forgetting resistance tracks CL co-training (three-way dissociation) |
 | `MNIST_LOCAL_LOSS_README.md` | [MNIST local prediction-error learning](MNIST_LOCAL_LOSS_README.md) — local loss as auxiliary training signal: regularity ≠ robustness dissociation, 3:1 meta-knowledge dominance, first high-fwd-cos closed-loop condition; + [precision weighting](MNIST_LOCAL_LOSS_README.md#precision-weighted-local-loss-2026-06-16) (negative: FM error structure ≠ task structure); + [learning gate](MNIST_LOCAL_LOSS_README.md#learning-gate-bilevel-optimized-local-loss-2026-06-16) (bilevel-optimized: 35% brittleness reduction, record self-knowledge R²=0.83) |
+| `GATED_RATCHET_README.md` | [MNIST multi-cycle gated ratchet](GATED_RATCHET_README.md) — 4-cycle WS_LG: compounding val loss improvement (48% gap vs OL), gate opens rather than closes on fixed dataset, implicit regularization from bilevel-gated self-compression; + [extended ratchet](GATED_RATCHET_README.md#extended-ratchet-16-cycles-with-10-fm-2026-06-17) (16 cycles: FM compression ceiling → activation norm inflation, robustness is measurement artifact; 1.6% FM: gate rationally closes for noisy FM error dimensions) |
 | `GEOMETRY_README.md` | [Computational property geometry](GEOMETRY_README.md) — probe orthogonality, compositionality, vector arithmetic: distillation converts entangled meta-knowledge into orthogonal object-level knowledge (cross-domain, MNIST + language) |
 | `OPEN_LOOP_ANALYSIS_README.md` | [Open-loop analysis details](OPEN_LOOP_ANALYSIS_README.md) — detailed tables/discussion for Runs 1-2, structure analysis, causal substitution, behavioral residual |
 
@@ -557,17 +562,55 @@ modal run --detach a2a_forward/mnist_geometry.py::a2a_mnist_geometry
 modal run --detach a2a_forward/language_geometry.py::a2a_language_geometry
 ```
 
+## MNIST multi-cycle gated ratchet (2026-06-17)
+
+**Full writeup**: [GATED_RATCHET_README.md](GATED_RATCHET_README.md)
+
+Tests whether multi-cycle CL_LG (injection + bilevel-gated local loss) with periodic distillation and FM reinitialization produces compounding improvement beyond standard wake-sleep. Four compute-matched conditions (8400 main-model steps = 4 cycles × 2100): WS_LG (the full gated ratchet), WS (injection-only ratchet), CL_LG (continuous gated training, no distillation), OL (baseline).
+
+**Key results**:
+
+1. **Compounding val loss improvement, widening gap.** WS_LG achieves the best final val loss (0.0522) with monotonically decreasing loss across all 4 cycles. The WS_LG → OL gap widens from 34% (cycle 1) to 48% (cycle 4). Neither distillation alone (WS stalls at 0.063) nor gated local loss alone (CL_LG stalls at 0.090) sustains improvement past cycle 2. The compounding requires both components.
+
+2. **The gate opens rather than closes.** Mean gate weight rises from 0.31 (cycle 1) to 0.77 (cycle 4), the opposite of the "plasticity closes with maturity" prediction. On MNIST at ~18 epochs, the bilevel signal always endorses more compression because the val set is distributionally identical to the train set — more regular computation always helps within-distribution. The gate correctly concludes: compress everything. Selective closing requires novel inputs that would be damaged by over-compression. Gate weights are stable across FM reinitializations (post-wake ≈ post-repoint), confirming the gate's policy generalizes across FM perspectives.
+
+3. **Implicit regularization from self-compression.** The val loss improvement is genuine generalization (val, not train). The mechanism: the gated local loss selects among the many parameter configurations that achieve high accuracy for the one whose intermediate computation is most compressible by a self-model, filtered by the bilevel optimization to include only directions where compression helps classification. This is a new form of implicit regularization — the model finds solutions that are maximally legible to a compressed version of its own computation, analogous to an expert who can explain their domain in simple terms.
+
+4. **Residual rank increases (opposite of WS).** WS_LG effective rank grows (27.8 → 30.2) while WS's shrinks (23.9 → 13.5). Digit discriminability increases for WS_LG (eta² 0.049 → 0.083) and decreases for WS (0.054 → 0.035). The gated local loss prevents computation from concentrating into fewer dimensions.
+
+5. **Robustness improves across cycles but WS still dominates.** WS_LG improves 5× from cycle 1→4 (0.363 → 0.073) but remains worse than WS (0.004). The local loss creates perturbation sensitivity that the ratchet partially mitigates over cycles but doesn't eliminate.
+
+**Reproduction**:
+```bash
+modal run --detach a2a_forward/mnist_gated_ratchet.py::a2a_mnist_gated_ratchet
+```
+
+### Extended ratchet: FM compression ceiling and activation norm inflation (2026-06-17)
+
+**Full writeup**: [GATED_RATCHET_README.md](GATED_RATCHET_README.md#extended-ratchet-16-cycles-with-10-fm-2026-06-17)
+
+Extended WS_LG to 16 cycles to test the absorbing state prediction (residual → 0). Found two-phase dynamics: genuine compression during cycles 1-5 (residual 0.58 → 0.37, FM cosine → 0.999), then activation norm inflation (residual 0.37 → 1.14) after the FM hits its compression ceiling. Post_block3 activation norms grew 8.5× in WS_LG vs 2.2× in OL, concentrated specifically at the FM prediction target. The raw robustness improvement (450×) is a measurement artifact — with norm-scaled perturbations, WS_LG is 16× MORE sensitive than OL.
+
+A rerun with a smaller FM (1.6% / 13K params, vs 10% / 83K) made the problem worse: the FM hit a lower ceiling earlier (cycle 2), and the bilevel gate rationally closed (0.96 → 0.38) because the small FM's prediction errors were too noisy to provide useful gradients. Gate structure analysis showed the gate is highly digit-selective (eta² = 0.82 at closing) and anti-correlates with FM error (r = -0.79) — it closes exactly where the FM is unreliable.
+
+The FM capacity sweet spot is narrow on a fixed dataset: too large and the FM captures everything (no compression pressure), too small and the gate closes to avoid noisy gradients. A continual learning setting would sidestep this by providing novel data that sustains compression pressure regardless of FM capacity.
+
+**Reproduction**:
+```bash
+# 16-cycle with 10% FM
+modal run --detach a2a_forward/mnist_extended_ratchet.py::a2a_mnist_extended_ratchet --n-cycles 16
+# 10-cycle with 1.6% FM
+modal run --detach a2a_forward/mnist_extended_ratchet.py::a2a_mnist_extended_ratchet --n-cycles 10 --fwd-d-head 8 --fwd-mlp-mult 0.25
+```
+
 ## Next steps
 
-1. **Wake-sleep consolidation (partially validated)**: The single-cycle distillation experiment confirmed that distillation closes the dependency gap and produces genuine innovation migration. The next step is *iterated* cycles: re-run closed-loop training on the consolidated model, distill again, and test whether the ratchet clicks on a DGP with hierarchical structure (e.g. multi-step arithmetic or code). The model scale experiment predicts residual concentration at larger scale, which should enable discrete level shifts.
-2. **Cross-model self-knowledge control**: Train separate fresh FMs on each model's own activations (OL, CL, distilled), then probe each for its own FM's residual. Eliminates the confound in the distillation self-knowledge probes.
-3. **Gauge symmetry check on innovation migration**: Compute cos(f_orig(x), f_fresh(x)) on shared inputs to conclusively rule out gauge symmetry as an explanation for the near-orthogonal residual PCs.
-2. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. Would give the model more computational depth to act on its self-knowledge at inference time. The directional steering results specifically motivate this: the model encodes directional self-knowledge it can only partially use with 2 downstream layers.
-3. **Continual learning / transfer evaluation**: The 10% model produces 2× stronger self-knowledge with zero val loss benefit — the reorganization is invisible to NTP on a static dataset. A plausible natural test: freeze both models (open-loop and closed-loop trained), fine-tune on a novel task, and measure adaptation speed and interference. This could test whether the self-knowledge translates to functional capability that validation loss can't detect.
-4. **Thalamic filtering**: Replace the linear `CerebellarGate` with a learned nonlinear gate (MLP). May help extract directional structure from the high-rank residual.
-5. **Self-regulation**: Freeze the forward model at a checkpoint and use the residual as a regularization signal (as validated in grokking). Test whether this prevents overfitting or distributional drift.
-6. **Orthogonalized directional test**: Re-run the directional steering with Gram-Schmidt-orthogonalized W@c directions to control for the 0.41 mean cosine overlap. Would give a cleaner estimate of true directional selectivity.
-7. **Model scale 350M**: Third data point for the model scale experiment. The 29M → 77M comparison shows consistent residual concentration across all metrics. A 350M model (~24L/16H/1024D on 500M+ tokens) tests whether the trend continues, accelerates, or saturates. See [MODEL_SCALE_README.md](MODEL_SCALE_README.md).
-8. **Harden the OOD robustness result**: (a) direct manifold-displacement check — autoencoder reconstruction MSE per corpus should rise with shift severity and peak on code; (b) bootstrap CIs from the saved per-direction Δloss arrays; (c) a second baseline-battery seed to firm up the code-corpus numbers. See [OOD_ROBUSTNESS_README.md](OOD_ROBUSTNESS_README.md).
+1. **Language gated ratchet**: Language's full-rank residual (200/256 dimensions) and rich behavioral decomposition (delimiter tracking, distributed attention, focused retrieval) would make the gate's selectivity much more interpretable than MNIST's 10 digits. The gate might develop per-behavioral-category selectivity — compressing routine computation while leaving novel semantic composition alone. Language is inherently multi-task, so the gate-closing prediction might hold within a single training run without needing an explicit distribution shift.
+2. **OOD gate-closing test**: Train the gated ratchet on a subset of MNIST (digits 0-6), then introduce digits 7-9 as a continual stream with the bilevel outer loop evaluating on both old and new digits. The gate should close on 0-6 dimensions (protect existing knowledge) and stay open on novel-digit dimensions. This directly tests the developmental prediction in a regime where it should hold.
+3. **OOD adaptation post-ratchet**: Freeze WS_LG and OL models after 4 cycles. Fine-tune on rotated MNIST or Fashion-MNIST. Measure adaptation speed and forgetting. The "maximally regular computation" from the gated ratchet should produce better zero-shot OOD (from regularity) and potentially better adaptation (from organized representations). The MNIST adaptation experiment's three-way dissociation predicts WS_LG should win on both axes.
+4. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. Would give the model more computational depth to act on its self-knowledge at inference time. The directional steering results specifically motivate this: the model encodes directional self-knowledge it can only partially use with 2 downstream layers.
+5. **Cross-model self-knowledge control**: Train separate fresh FMs on each model's own activations (OL, CL, distilled), then probe each for its own FM's residual. Eliminates the confound in the distillation self-knowledge probes.
+6. **Model scale 350M**: Third data point for the model scale experiment. The 29M → 77M comparison shows consistent residual concentration across all metrics. A 350M model (~24L/16H/1024D on 500M+ tokens) tests whether the trend continues, accelerates, or saturates. See [MODEL_SCALE_README.md](MODEL_SCALE_README.md).
+7. **Harden the OOD robustness result**: (a) direct manifold-displacement check — autoencoder reconstruction MSE per corpus should rise with shift severity and peak on code; (b) bootstrap CIs from the saved per-direction Δloss arrays; (c) a second baseline-battery seed to firm up the code-corpus numbers. See [OOD_ROBUSTNESS_README.md](OOD_ROBUSTNESS_README.md).
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
