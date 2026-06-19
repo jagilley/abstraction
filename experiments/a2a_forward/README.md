@@ -89,6 +89,8 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `mnist_extended_ratchet.py` | MNIST extended gated ratchet: 16-cycle WS_LG convergence test (+ lightweight OL), also used for 1.6% FM capacity experiment |
 | `extended_ratchet_analysis.py` | Activation norm analysis: confirms growing residual is from activation magnitude inflation at post_block3 |
 | `gate_structure_analysis.py` | Gate structure analysis: digit-conditional selectivity, FM error anti-correlation, static vs adaptive decomposition |
+| `mnist_ood_gate.py` | OOD meta-learning: digit shift (0-6 → 0-9) with per-digit-group gate analysis |
+| `mnist_fashion_gate.py` | OOD meta-learning: MNIST → Fashion-MNIST (20-class) with per-dataset gate analysis |
 | `README.md` | This file |
 | `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching, forward model training, and per-head decomposition on Llama 3.2 1B |
 | `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment; + [Prediction trust](REPRESENTATIONAL_DIVERGENCE_README.md#prediction-trust-what-form-the-self-knowledge-takes-2026-06-10) appended section (innovation map / error-monitoring geometry) |
@@ -104,6 +106,7 @@ The per-position MLP's residual captures "attention exists" — a trivially pred
 | `MNIST_LOCAL_LOSS_README.md` | [MNIST local prediction-error learning](MNIST_LOCAL_LOSS_README.md) — local loss as auxiliary training signal: regularity ≠ robustness dissociation, 3:1 meta-knowledge dominance, first high-fwd-cos closed-loop condition; + [precision weighting](MNIST_LOCAL_LOSS_README.md#precision-weighted-local-loss-2026-06-16) (negative: FM error structure ≠ task structure); + [learning gate](MNIST_LOCAL_LOSS_README.md#learning-gate-bilevel-optimized-local-loss-2026-06-16) (bilevel-optimized: 35% brittleness reduction, record self-knowledge R²=0.83) |
 | `GATED_RATCHET_README.md` | [MNIST multi-cycle gated ratchet](GATED_RATCHET_README.md) — 4-cycle WS_LG: compounding val loss improvement (48% gap vs OL), gate opens rather than closes on fixed dataset, implicit regularization from bilevel-gated self-compression; + [extended ratchet](GATED_RATCHET_README.md#extended-ratchet-16-cycles-with-10-fm-2026-06-17) (16 cycles: FM compression ceiling → activation norm inflation, robustness is measurement artifact; 1.6% FM: gate rationally closes for noisy FM error dimensions) |
 | `GEOMETRY_README.md` | [Computational property geometry](GEOMETRY_README.md) — probe orthogonality, compositionality, vector arithmetic: distillation converts entangled meta-knowledge into orthogonal object-level knowledge (cross-domain, MNIST + language) |
+| `OOD_GATE_README.md` | [OOD gate experiments](OOD_GATE_README.md) — meta-learning under distribution shift: digit shift (selective opening, novel > known) vs MNIST→Fashion (gate closes globally, selectivity vanishes); FM error decomposition is the gate's vocabulary |
 | `OPEN_LOOP_ANALYSIS_README.md` | [Open-loop analysis details](OPEN_LOOP_ANALYSIS_README.md) — detailed tables/discussion for Runs 1-2, structure analysis, causal substitution, behavioral residual |
 
 **Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
@@ -603,11 +606,30 @@ modal run --detach a2a_forward/mnist_extended_ratchet.py::a2a_mnist_extended_rat
 modal run --detach a2a_forward/mnist_extended_ratchet.py::a2a_mnist_extended_ratchet --n-cycles 10 --fwd-d-head 8 --fwd-mlp-mult 0.25
 ```
 
+## OOD gate experiments: meta-learning under distribution shift (2026-06-18)
+
+**Full writeup**: [OOD_GATE_README.md](OOD_GATE_README.md)
+
+Two experiments testing whether the bilevel learning gate does genuine meta-learning under non-stationary data distributions: a digit shift (0-6 → 0-9, same visual manifold) and a domain shift (MNIST → Fashion-MNIST, different visual manifold). Three conditions each (WS_LG_shift, WS_LG_full stationary control, OL_shift mechanism control).
+
+**Key results**:
+
+1. **Digit shift: the gate is input-selective.** The known-novel gate weight gap is +0.13 to +0.17 in the shift condition vs +0.02 in the stationary control (6-8× amplification). Novel digits get higher gate weights. But the selectivity is in the opening direction — the gate opens more for novel, rather than closing for known. On MNIST, compression never hurts because all digits share the same visual manifold.
+
+2. **Fashion shift: the gate closes globally and selectivity vanishes.** On the harder combined task, the gate opens then closes (0.30 → 0.48 → 0.36) and the MNIST-Fashion difference converges to zero (diff: +0.27 → −0.00). The gate doesn't selectively protect MNIST features — it retreats uniformly when over-compression hurts.
+
+3. **The FM's error decomposition is the gate's vocabulary.** The gate can only be selective over distinctions that the FM's error structure encodes. On a within-manifold shift (digits), the FM error decomposition remains valid for novel inputs, so the gate can discriminate. On a cross-manifold shift (MNIST → Fashion), the FM error dimensions don't align with domain boundaries, so the gate has no domain-selective lever. The gate's meta-learning operates over the model's own computational structure as decomposed by the FM — not over data domains.
+
+**Reproduction**:
+```bash
+modal run --detach a2a_forward/mnist_ood_gate.py::a2a_mnist_ood_gate
+modal run --detach a2a_forward/mnist_fashion_gate.py::a2a_mnist_fashion_gate
+```
+
 ## Next steps
 
 1. **Language gated ratchet**: Language's full-rank residual (200/256 dimensions) and rich behavioral decomposition (delimiter tracking, distributed attention, focused retrieval) would make the gate's selectivity much more interpretable than MNIST's 10 digits. The gate might develop per-behavioral-category selectivity — compressing routine computation while leaving novel semantic composition alone. Language is inherently multi-task, so the gate-closing prediction might hold within a single training run without needing an explicit distribution shift.
-2. **OOD gate-closing test**: Train the gated ratchet on a subset of MNIST (digits 0-6), then introduce digits 7-9 as a continual stream with the bilevel outer loop evaluating on both old and new digits. The gate should close on 0-6 dimensions (protect existing knowledge) and stay open on novel-digit dimensions. This directly tests the developmental prediction in a regime where it should hold.
-3. **OOD adaptation post-ratchet**: Freeze WS_LG and OL models after 4 cycles. Fine-tune on rotated MNIST or Fashion-MNIST. Measure adaptation speed and forgetting. The "maximally regular computation" from the gated ratchet should produce better zero-shot OOD (from regularity) and potentially better adaptation (from organized representations). The MNIST adaptation experiment's three-way dissociation predicts WS_LG should win on both axes.
+2. **OOD adaptation post-ratchet**: Freeze WS_LG and OL models after 4 cycles. Fine-tune on rotated MNIST or Fashion-MNIST. Measure adaptation speed and forgetting. The "maximally regular computation" from the gated ratchet should produce better zero-shot OOD (from regularity) and potentially better adaptation (from organized representations). The MNIST adaptation experiment's three-way dissociation predicts WS_LG should win on both axes.
 4. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. Would give the model more computational depth to act on its self-knowledge at inference time. The directional steering results specifically motivate this: the model encodes directional self-knowledge it can only partially use with 2 downstream layers.
 5. **Cross-model self-knowledge control**: Train separate fresh FMs on each model's own activations (OL, CL, distilled), then probe each for its own FM's residual. Eliminates the confound in the distillation self-knowledge probes.
 6. **Model scale 350M**: Third data point for the model scale experiment. The 29M → 77M comparison shows consistent residual concentration across all metrics. A 350M model (~24L/16H/1024D on 500M+ tokens) tests whether the trend continues, accelerates, or saturates. See [MODEL_SCALE_README.md](MODEL_SCALE_README.md).
