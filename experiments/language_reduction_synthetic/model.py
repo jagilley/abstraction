@@ -82,17 +82,28 @@ class GPT(nn.Module):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, idx, targets=None):
+    def forward(self, idx, targets=None, return_intermediates=False):
         B, T = idx.size()
         assert T <= self.block_size
         tok_emb = self.transformer.wte(idx)
         pos_emb = self.transformer.wpe(torch.arange(T, device=idx.device))
         x = self.transformer.drop(tok_emb + pos_emb)
-        for block in self.transformer.h:
+
+        intermediates = {}
+        if return_intermediates:
+            intermediates["post_embed"] = x
+
+        for i, block in enumerate(self.transformer.h):
             x = block(x)
+            if return_intermediates:
+                intermediates[f"post_block{i}"] = x
+
         x = self.transformer.ln_f(x)
         logits = self.lm_head(x)
         loss = None
         if targets is not None:
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+
+        if return_intermediates:
+            return logits, loss, intermediates
         return logits, loss
