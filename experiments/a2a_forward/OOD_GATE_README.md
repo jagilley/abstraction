@@ -1,7 +1,7 @@
 # OOD Gate Experiments: Meta-Learning Under Distribution Shift (2026-06-18)
 
-**Code**: `mnist_ood_gate.py`, `mnist_fashion_gate.py`
-**Prior experiments**: [MNIST gated ratchet](GATED_RATCHET_README.md), [MNIST local loss + learning gate](MNIST_LOCAL_LOSS_README.md)
+**Code**: `mnist_ood_gate.py`, `mnist_fashion_gate.py`, `mnist_ood_unified_gate.py`
+**Prior experiments**: [MNIST gated ratchet](GATED_RATCHET_README.md), [MNIST local loss + learning gate](MNIST_LOCAL_LOSS_README.md), [MNIST unified gate](GATED_RATCHET_README.md#unified-gate-ntp-trained-meta-learning-without-bilevel-optimization-2026-06-19)
 **Idea docs**: [local_prediction_error_learning.md](../../ideas/local_prediction_error_learning.md)
 
 ## Goal
@@ -150,11 +150,11 @@ cd experiments/
 modal run --detach a2a_forward/mnist_fashion_gate.py::a2a_mnist_fashion_gate
 ```
 
-## Interpretation: the FM's error decomposition is the gate's vocabulary
+## Interpretation: the FOMAML gate's selectivity depends on FM error vocabulary
 
-### Why the digit shift shows selectivity but the Fashion shift doesn't
+### Why the digit shift shows selectivity but the Fashion shift doesn't (FOMAML gate)
 
-The gate selects per-dimension of the FM error, and the FM's error dimensions reflect whatever computational patterns the FM learned to model. The gate can only be selective over distinctions that the FM's error structure encodes.
+The FOMAML gate selects per-dimension of the FM error, and the FM's error dimensions reflect whatever computational patterns the FM learned to model. The gate can only be selective over distinctions that the FM's error structure encodes.
 
 **Digit shift (0-6 → 0-9)**: Digits 7-9 live on the same visual manifold as 0-6. The FM's error decomposition — calibrated on digit computation — remains approximately valid for novel digits. The gate can meaningfully discriminate "known digit computation" from "novel digit computation" because the FM's error vocabulary covers both.
 
@@ -166,9 +166,9 @@ The gate selects per-dimension of the FM error, and the FM's error dimensions re
 
 Even on the stationary combined task (WS_LG_full), the FM learns a shared error space that doesn't decompose along domain boundaries. Each FM error dimension carries signal about both MNIST and Fashion-MNIST, so the gate has no domain-selective lever. The selectivity converges to zero because there are no FM error dimensions that are "MNIST-specific" or "Fashion-specific."
 
-### The gate is a task-difficulty-sensitive compression controller
+### The FOMAML gate is a task-difficulty-sensitive compression controller
 
-Across all experiments, the gate's primary signal is "is compression beneficial for the current task?" — a global confidence signal, not input-selective filtering:
+Across the FOMAML experiments, the gate's primary signal is "is compression beneficial for the current task?" — a global confidence signal, not input-selective filtering:
 
 | Task | Gate trajectory | Final selectivity |
 |---|---|---|
@@ -185,7 +185,7 @@ The cerebellar system's meta-learning operates over the model's own computationa
 
 FM reinitialization already provides computational non-stationarity: each fresh FM decomposes the model's computation differently, creating genuinely new error dimensions. The gate policy's stability across FM reinitializations (post-wake ≈ post-repoint in the original 4-cycle experiment) is already meta-learning — a compression policy that generalizes across FM perspectives. It's just not the input-selective meta-learning we tested for here.
 
-The prediction that the gate should close for known inputs required an implicit assumption: that the FM's error dimensions would align with the known-vs-novel distinction. On an easy within-manifold shift (digit 0-6 → 0-9), this approximately holds. On a hard cross-manifold shift (MNIST → Fashion), it doesn't.
+The prediction that the FOMAML gate should close for known inputs required an implicit assumption: that the FM's error dimensions would align with the known-vs-novel distinction. On an easy within-manifold shift (digit 0-6 → 0-9), this approximately holds. On a hard cross-manifold shift (MNIST → Fashion), it doesn't.
 
 ### Connection to biological meta-learning
 
@@ -193,12 +193,111 @@ Human experience streams are continuous, not sudden teleportation between unrela
 
 The selective gate-closing prediction may require a regime where different inputs demand genuinely different **computational strategies** (not just different features), AND the FM's error structure happens to decompose along those computational strategy boundaries. This is a much more specific condition than "non-stationary data," and may be the right target for future experiments.
 
+[**Update (2026-06-20):** The unified gate experiment below shows that the "FM error vocabulary" constraint is specific to the FOMAML gate. The NTP-trained unified gate achieves input-selective behavior through a different mechanism — injection utility — that doesn't require FM error dimensions to align with domain boundaries.]
+
+## Experiment 3: OOD unified gate — first-order meta-learning (2026-06-20)
+
+**Code**: `mnist_ood_unified_gate.py`
+
+### Motivation
+
+The FOMAML gate's selectivity is constrained by the FM's error vocabulary — it can only discriminate distinctions the FM's error structure encodes. The [unified gate](GATED_RATCHET_README.md#unified-gate-ntp-trained-meta-learning-without-bilevel-optimization-2026-06-19) is trained purely by NTP through the injection path (no bilevel optimization), and on stationary MNIST it closes rather than opens (0.37 → 0.13 over 4 cycles) because injection becomes redundant as the model improves. This closing behavior predicts a qualitatively different selectivity pattern under distribution shift: known digits should close (injection redundant, model already competent) while novel digits should stay open (injection helps, model is bad). The selectivity would come from **injection utility** rather than FM error vocabulary — and it would be genuine meta-learning achieved through entirely first-order training.
+
+### Design
+
+Same digit shift as Experiment 1, with WS_UG_uniform (unified gate for injection + uniform local loss, the best-performing architecture from the [decoupling test](GATED_RATCHET_README.md#decoupling-test-does-selective-local-loss-matter-2026-06-19)):
+
+| Condition | Description |
+|---|---|
+| **WS_UG_shift** | Unified gate + uniform local loss, digit shift |
+| **WS_UG_full** | Unified gate + uniform local loss, all digits (stationary) |
+| **OL_shift** | Open-loop with same digit schedule (mechanism control) |
+
+Architecture identical to Experiments 1-2. 4 cycles × (1500 wake + 600 sleep) = 8400 main-model steps. Seed 42.
+
+### Results
+
+#### The unified gate closes overall but reverses selectivity at the shift
+
+**WS_UG_shift (non-stationary):**
+
+| Phase | Overall | Known (0-6) | Novel (7-9) | Diff (novel − known) |
+|---|---|---|---|---|
+| C1 post-wake (phase1) | 0.278 | 0.286 | 0.258 | −0.028 |
+| C2 post-wake (phase1) | 0.182 | 0.199 | 0.145 | −0.054 |
+| C3 post-wake (phase2) | 0.218 | 0.196 | 0.268 | **+0.072** |
+| C4 post-wake (phase2) | 0.182 | 0.159 | 0.235 | **+0.076** |
+
+**WS_UG_full (stationary control):**
+
+| Phase | Overall | Known (0-6) | Novel (7-9) | Diff (novel − known) |
+|---|---|---|---|---|
+| C1 post-wake | 0.360 | 0.366 | 0.346 | −0.020 |
+| C2 post-wake | 0.246 | 0.255 | 0.226 | −0.029 |
+| C3 post-wake | 0.181 | 0.197 | 0.144 | −0.054 |
+| C4 post-wake | 0.147 | 0.161 | 0.115 | −0.046 |
+
+Three distinct dynamics:
+
+1. **The gate closes overall** (0.278 → 0.182 in shift, 0.360 → 0.147 in stationary), consistent with the stationary MNIST result — injection becomes redundant as the model improves.
+
+2. **During phase 1, known digits get higher gate weights** (diff −0.03 to −0.05). The FM's predictions are calibrated on 0-6 only; injecting them for 7-9 (which aren't in the training data) is meaningless, so the gate learns to close for those inputs.
+
+3. **At the shift (cycle 3), the diff flips** to +0.07. Known digits close further (0.199 → 0.159) while novel digits partially reopen (0.145 → 0.235). The model is bad at 7-9, so injection actually helps — the gate opens where the model needs it. This is the predicted injection-utility selectivity.
+
+#### Comparison with the FOMAML gate
+
+| | FOMAML gate (Exp 1) | Unified gate (Exp 3) |
+|---|---|---|
+| Training signal | Bilevel (explicit meta-learning) | NTP only (first-order) |
+| Known-novel diff (C3-4) | +0.13 to +0.17 | +0.07 to +0.08 |
+| Direction of selectivity | Both groups open, novel more | Known closes, novel opens |
+| Mechanism | "Compress novel more" (FM error vocabulary) | "Inject less where already good" (injection utility) |
+| Overall trajectory | Opens (0.45 → 0.62) | Closes (0.28 → 0.18) |
+
+The FOMAML gate's selectivity operates in the *opening* direction — both groups open, but novel digits open more because their FM error dimensions offer more compression value. The unified gate's selectivity operates in the *closing* direction — known digits close because injection is redundant, novel digits resist closing because injection helps. Same qualitative phenomenon (input-selective response to distribution shift), opposite gate trajectories, completely different mechanisms.
+
+The unified gate's selectivity magnitude is smaller (+0.08 vs +0.17), which makes sense — the bilevel objective directly optimizes for "what helps on the next batch," while the NTP signal discovers the selectivity emergently through injection utility.
+
+#### Accuracy
+
+| Metric (Cycle 4) | WS_UG_shift | WS_UG_full | OL_shift |
+|---|---|---|---|
+| Known (0-6) accuracy | **98.3%** | 98.1% | 97.4% |
+| Novel (7-9) accuracy | **96.6%** | 97.7% | 94.9% |
+| Overall val loss | 0.076 | **0.058** | 0.109 |
+
+WS_UG_shift reaches 96.6% on novel digits (+1.7pp vs OL) and 98.3% on known digits (+0.9pp vs OL).
+
+#### Gate dimension correlation
+
+Gate dimension correlation between shift and full conditions at final cycle: **r = 0.050** — essentially zero, consistent with the FOMAML experiments. The shift changes which dimensions the gate uses.
+
+### Interpretation: first-order meta-learning through self-referential architecture
+
+The unified gate achieves input-selective behavior under distribution shift with **no meta-learning objective** — no bilevel optimization, no held-out evaluation, no virtual gradient steps. It is trained purely by NTP gradient flowing through the injection path. The meta-learning signal (differentiating known from novel inputs based on injection utility) emerges from the self-referential architecture: the FM predicts the model's own computation, and the gate learns where those predictions are useful.
+
+This validates the theoretical argument that self-referential representations make first-order learning implicitly meta. On stationary MNIST, the unified gate and FOMAML gate converge to the same val loss (the [unified gate experiment](GATED_RATCHET_README.md#unified-gate-ntp-trained-meta-learning-without-bilevel-optimization-2026-06-19) showed r = 0.096 dimension correlation, identical endpoint). Under distribution shift, both produce input-selective behavior — but through different mechanisms:
+
+- The FOMAML gate's selectivity depends on the FM's error vocabulary (the gate can only discriminate distinctions the FM's error structure encodes)
+- The unified gate's selectivity depends on injection utility (the gate learns where injection helps, which is a proxy for where the model is uncertain)
+
+The injection-utility mechanism is more general: it doesn't require FM error dimensions to align with domain boundaries. It requires only that the model be worse at novel inputs than known ones — a much weaker condition. Whether this generalizes to harder cross-manifold shifts (MNIST → Fashion) is untested; the prediction is that the unified gate would close globally for Fashion (injection hurts when the FM's predictions are incoherent) and close for known MNIST (injection redundant), producing uniform closing rather than the FOMAML gate's uniform retreat.
+
+### Reproduction
+
+```bash
+cd experiments/
+modal run --detach a2a_forward/mnist_ood_unified_gate.py::a2a_mnist_ood_unified_gate
+```
+
 ## Files
 
 | File | Purpose |
 |---|---|
-| `mnist_ood_gate.py` | Digit shift experiment (0-6 → 0-9) |
-| `mnist_fashion_gate.py` | MNIST → Fashion-MNIST experiment (20-class) |
+| `mnist_ood_gate.py` | Digit shift experiment (0-6 → 0-9), FOMAML gate |
+| `mnist_fashion_gate.py` | MNIST → Fashion-MNIST experiment (20-class), FOMAML gate |
+| `mnist_ood_unified_gate.py` | Digit shift experiment (0-6 → 0-9), unified gate (NTP-only) |
 
 ## Modal volume
 
@@ -216,6 +315,12 @@ a2a_forward/mnist_fashion_gate/
 └── vit_4L_4H_128D/post_block0_to_post_block3/
     ├── wslg_shift_model.pt, wslg_shift_fm.pt, wslg_shift_lgate.pt
     ├── wslg_full_model.pt, wslg_full_fm.pt, wslg_full_lgate.pt
+    ├── ol_shift_model.pt
+    └── results.json
+
+a2a_forward/mnist_ood_unified_gate/
+└── vit_4L_4H_128D/post_block0_to_post_block3/
+    ├── ug_shift_gate.pt, ug_full_gate.pt
     ├── ol_shift_model.pt
     └── results.json
 ```

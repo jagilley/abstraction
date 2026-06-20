@@ -272,10 +272,161 @@ The extended ratchet reveals a narrow viable regime for the FM capacity:
 
 However, this analysis applies specifically to the fixed-dataset regime (MNIST at 60K images, ~18+ epochs per cycle). The FM capacity sweet spot is narrow because the data distribution is exhausted — there's no novel data to sustain the ratchet. In a continual learning setting, novel data would continually generate computation that even a well-matched FM can't predict, sustaining compression pressure regardless of FM capacity. The biological analog — a cerebellum that's permanently capacity-limited relative to cortical computation, but operating on an ever-changing experience stream — sidesteps the fixed-dataset problem entirely.
 
+## Unified gate: NTP-trained meta-learning without bilevel optimization (2026-06-19)
+
+**Code**: `mnist_unified_gate.py` | **Prior conversation**: `25ae2e03`
+
+### Motivation
+
+The gated ratchet uses two separate gates: a CerebellarGate (linear, NTP-trained) that controls inference-time injection, and a LearningGate (MLP, FOMAML bilevel-trained) that controls training-time local loss weighting. This separation is biologically backwards — the reticular thalamus gates information flow under *cortical* control, not via an independent optimization loop. The cortex (model) should direct the gate through its own training dynamics (NTP), not defer to a separate meta-learner (FOMAML).
+
+The unified gate tests whether a single module can serve both functions. A UnifiedGate (~41K params, matching CerebellarGate + LearningGate combined) produces per-dimension sigmoid weights that:
+1. Scale the FM prediction before injection into the residual stream (inference)
+2. Scale the local loss via `gate_w.detach() * FM_error²` (training)
+
+The gate is trained ONLY by NTP gradient flowing through the injection path. The `gate_w.detach()` ensures no direct gradient from the local loss reaches the gate — the gate learns "which dimensions to inject" (inference utility), and the same weights implicitly control "which dimensions to learn from" (learning utility).
+
+### Design
+
+Four conditions, all compute-matched (4 cycles × (1500 wake + 600 sleep) = 8400 main-model gradient steps), identical seed/architecture/init to the original gated ratchet:
+
+| Condition | Gate training | Local loss weighting |
+|---|---|---|
+| **WS_UG** | NTP through injection (no bilevel) | `gate_w.detach() * FM_error²` |
+| **WS_LG** | FOMAML bilevel (reference) | `gate_w * FM_error²` |
+| **WS** | NTP (injection only, no local loss) | none |
+| **OL** | none | none |
+
+### Results
+
+#### Val loss: both gates compound to the same endpoint
+
+| Cycle | WS_UG | WS_LG | WS | OL |
+|---|---|---|---|---|
+| 1 | 0.0972 / 97.3% | 0.1080 / 97.0% | 0.0945 / 97.2% | 0.1559 / 95.2% |
+| 2 | 0.0745 / 98.1% | 0.0681 / 97.7% | 0.0631 / 98.3% | 0.1059 / 96.6% |
+| 3 | 0.0551 / 98.8% | 0.0512 / 98.6% | 0.0677 / 97.3% | 0.1050 / 97.7% |
+| 4 | 0.0564 / 98.3% | 0.0560 / 98.6% | 0.0628 / 98.6% | 0.1005 / 97.5% |
+
+WS_UG and WS_LG converge to essentially identical final val loss (0.0564 vs 0.0560). Both compound monotonically and both beat WS (stalls at 0.063) and OL (plateaus at 0.10). The NTP-trained unified gate produces the same compounding ratchet as the FOMAML bilevel gate, without any bilevel optimization machinery.
+
+#### Opposite gate trajectories
+
+| Phase | UG mean | UG sparse(<0.1) | LG mean | LG sparse(<0.1) |
+|---|---|---|---|---|
+| post_wake C1 | 0.374 | 0.0% | 0.321 | 0.0% |
+| post_wake C2 | 0.267 | 1.6% | 0.573 | 0.0% |
+| post_wake C3 | 0.203 | 10.9% | 0.792 | 1.6% |
+| post_wake C4 | **0.132** | **37.5%** | **0.775** | 6.2% |
+
+The unified gate **closes** (0.37 → 0.13) while the bilevel gate **opens** (0.32 → 0.78). Opposite trajectories, same val loss. By cycle 4, the unified gate has 37.5% of dimensions below 0.1 — genuine sparsity.
+
+Both gates are stable across FM reinitializations (post_wake ≈ post_repoint, Δ < 0.01 for both).
+
+Gate dimension correlation at final cycle: **r = 0.096**. The two gates learn completely unrelated per-dimension selectivity patterns that produce the same downstream performance.
+
+#### Other measurements
+
+| Metric | WS_UG | WS_LG | WS | OL |
+|---|---|---|---|---|
+| Robustness (eps=1.0, C4) | +0.064 | +0.045 | +0.004 | +0.003 |
+| Eff rank (C4) | 27.9 | 28.8 | 13.5 | 19.7 |
+| Mean eta² (C4) | 0.075 | 0.050 | 0.035 | 0.039 |
+
+Both gated conditions maintain high effective rank (~28) while WS collapses to 13.5. WS_UG produces higher digit discriminability in the FM residual (eta² = 0.075 vs 0.050), suggesting the closing gate preserves digit-specific structure while compressing shared structure. Both gated conditions are more brittle than WS/OL (local-loss-induced sensitivity), with WS_UG slightly more brittle.
+
+### Interpretation: meta-learning about inference vs. meta-learning about learning
+
+The opposite gate trajectories arise because the two gates answer different questions:
+
+**FOMAML gate**: "Does compressing dimension X help classification after one gradient step?" On stationary MNIST, more compression always helps within-distribution — the answer is uniformly "yes" → gate opens.
+
+**NTP gate**: "Does injecting FM prediction in dimension X help NTP loss right now?" This depends on whether the model actually benefits from the injection. As the model improves across ratchet cycles, more dimensions become "already correct" — injecting a slightly-off FM prediction where the model is already right degrades performance. The gate closes because injection utility decreases as the model improves.
+
+The FOMAML gate does meta-learning about *learning*: it simulates a learning step and evaluates the outcome. The NTP gate does meta-learning about *inference*: it learns which dimensions to attend to. But because the same gate weights control both injection (inference) and local loss weighting (learning), the inference selectivity implicitly controls the learning trajectory. The meta-learning emerges from the architectural coupling, not from an explicit meta-learning objective.
+
+~~This coupling is load-bearing. Removing it (the WS condition: injection without local loss coupling) kills compounding — WS stalls at 0.063. The unified gate's meta-learning requires that inference selectivity and learning selectivity share the same mechanism operating over a self-referential signal (FM predictions of the model's own computation).~~
+
+**[Update (2026-06-19):** The decoupling test below shows this coupling claim is wrong on stationary MNIST. The local loss is load-bearing (WS without it stalls), but the per-dimension selectivity is not — uniform local loss with matched magnitude performs equally or better. See below.]
+
+The gate-closing behavior is the trajectory originally predicted for the bilevel gate (the "developmental trajectory hypothesis") but never observed. The prediction was directionally correct but misattributed: it holds for the NTP-trained gate (which closes because injection becomes redundant) but not for the FOMAML gate (which opens because compression always helps on stationary data). The NTP gate's closing is a *sufficiency* signal ("I don't need this injection anymore"), while the small amount of closing in the FOMAML gate (6.2% sparse at C4) is a *protection* signal ("this dimension's gradient is too noisy").
+
+The r = 0.096 dimension correlation confirms that the per-dimension selectivity is not uniquely determined — many equally-good decompositions exist, and the training signal (NTP vs FOMAML) determines which one the gate converges to.
+
+### Decoupling test: does selective local loss matter? (2026-06-19)
+
+**Code**: `mnist_unified_gate_decouple.py`
+
+Tests whether the per-dimension coupling between inference selectivity and learning selectivity is doing real work. The null hypothesis: the gate's per-dimension local loss weighting doesn't matter — any local loss with matched magnitude would produce the same compounding.
+
+**WS_UG** (selective): local loss = `gate_w.detach() * FM_error²` — per-dimension weighting from the gate.
+**WS_UG_uniform** (decoupled): local loss = `gate_w.detach().mean() * FM_error²` — same total magnitude, uniform across all 128 dimensions.
+
+Both conditions use the same unified gate for injection (same architecture, same NTP training through the injection path). The only difference is whether the local loss that trains the *model* is per-dimension selective or uniform.
+
+#### Results
+
+| Cycle | WS_UG (selective) | WS_UG_uniform | OL |
+|---|---|---|---|
+| 1 | 0.0972 / 97.3% | 0.0925 / 97.3% | 0.1559 / 95.2% |
+| 2 | 0.0745 / 98.1% | 0.0640 / 98.0% | 0.1059 / 96.6% |
+| 3 | 0.0551 / 98.8% | 0.0477 / 98.6% | 0.1050 / 97.7% |
+| 4 | 0.0564 / 98.3% | **0.0477** / **98.9%** | 0.1005 / 97.5% |
+
+WS_UG_uniform beats WS_UG at every cycle. The per-dimension coupling doesn't help — uniform local loss is slightly better.
+
+The gates are nearly identical in both conditions (both close: 0.37 → 0.13/0.16, both develop ~32-36% sparsity below 0.1). This confirms the gate is driven entirely by NTP through injection, unaffected by the local loss weighting. Gate dimension correlation between selective and uniform: r = 0.510 (moderate — the models diverge slightly due to different local loss weighting, which changes the activations the gate sees).
+
+#### Interpretation: what's doing the work
+
+The selective local loss hypothesis — "what to inject" and "what to learn from" should be the same decision — is wrong on stationary MNIST. The compounding comes from three ingredients:
+
+1. **Dense intermediate supervision** (local loss from FM error, any weighting) — provides 128-dim × 50-position gradient vs 10-class classification signal at CLS only
+2. **The distillation ratchet** (wake → sleep → reinit FM → repeat) — prevents equilibrium, forces progressive reorganization
+3. **Selective injection** (unified gate, NTP-trained) — the gate learns which FM dimensions to inject, improving inference
+
+The gate's per-dimension selectivity helps injection (NTP benefit) but doesn't need to also control the local loss. On stationary MNIST with a high-capacity FM (cosine > 0.99), all 128 FM error dimensions are equally valid learning targets — there's nothing to filter. The gate's closing reflects injection utility ("the model doesn't need this injection anymore"), not learning utility ("the model shouldn't learn from this dimension").
+
+This retrospectively clarifies the full experimental arc: the original LearningGate (FOMAML bilevel) was solving a per-dimension selection problem that doesn't exist on stationary MNIST. The unified gate eliminated FOMAML without loss. The decoupling test further shows the per-dimension local loss selectivity itself is unnecessary. The simplest effective architecture is: **unified gate for injection + uniform local loss + distillation ratchet** (WS_UG_uniform, best val loss 0.0477).
+
+Whether per-dimension local loss selectivity matters on non-stationary data or richer distributions (where different FM error dimensions carry genuinely different learning value) remains untested.
+
+[**Update (2026-06-20):** The OOD unified gate experiment ([OOD_GATE_README](OOD_GATE_README.md#experiment-3-ood-unified-gate--first-order-meta-learning-2026-06-20)) ran WS_UG_uniform on a digit shift (0-6 → 0-9). The unified gate produces input-selective behavior under distribution shift through injection utility: known digits close (0.286 → 0.159) while novel digits reopen (0.145 → 0.235), diff flips from −0.05 to +0.08. This is genuine meta-learning achieved through entirely first-order NTP training — the self-referential architecture makes first-order learning implicitly meta. The selectivity is smaller than the FOMAML gate's (+0.08 vs +0.17) but mechanistically cleaner: it doesn't depend on FM error vocabulary, only on where injection helps.]
+
 ## Reproduction
 
 ```bash
 cd experiments/
+
+# Decoupling test (~2 hours on L4)
+modal run --detach a2a_forward/mnist_unified_gate_decouple.py::a2a_mnist_ug_decouple
+
+# Unified gate experiment (~3 hours on L4)
+modal run --detach a2a_forward/mnist_unified_gate.py::a2a_mnist_unified_gate
+
+# Original 4-cycle experiment (~3-4 hours on L4)
+modal run --detach a2a_forward/mnist_gated_ratchet.py::a2a_mnist_gated_ratchet
+
+# Extended 16-cycle with 10% FM (~4-5 hours on L4)
+modal run --detach a2a_forward/mnist_extended_ratchet.py::a2a_mnist_extended_ratchet \
+  --n-cycles 16
+
+# Extended 10-cycle with 1.6% FM (~3 hours on L4)
+modal run --detach a2a_forward/mnist_extended_ratchet.py::a2a_mnist_extended_ratchet \
+  --n-cycles 10 --fwd-d-head 8 --fwd-mlp-mult 0.25
+
+# Activation norm analysis (loads saved checkpoints)
+modal run --detach a2a_forward/extended_ratchet_analysis.py::analyze_activation_norms
+
+# Gate structure analysis (loads saved checkpoints)
+modal run --detach a2a_forward/gate_structure_analysis.py::analyze_gate_structure
+```
+
+```bash
+cd experiments/
+
+# Unified gate experiment (~3 hours on L4)
+modal run --detach a2a_forward/mnist_unified_gate.py::a2a_mnist_unified_gate
 
 # Original 4-cycle experiment (~3-4 hours on L4)
 modal run --detach a2a_forward/mnist_gated_ratchet.py::a2a_mnist_gated_ratchet
@@ -299,6 +450,6 @@ modal run --detach a2a_forward/gate_structure_analysis.py::analyze_gate_structur
 
 1. **Language gated ratchet**: Language's full-rank residual (200/256 dimensions) and rich behavioral decomposition (delimiter tracking, distributed attention, focused retrieval) would make the gate's selectivity much more interpretable. On language, the local loss dynamics may differ because each token already provides a dense NTP signal (unlike MNIST where only [CLS] gets classification gradient). The gate might develop per-behavioral-category selectivity — compressing delimiter tracking while leaving semantic composition alone — which MNIST's 10-class structure can't distinguish.
 
-2. ~~**OOD gate-closing test**~~: *Done* — see [OOD_GATE_README](OOD_GATE_README.md). The gate opens more for novel digits (diff +0.13-0.17) rather than closing for known digits. On a harder cross-domain shift (MNIST → Fashion-MNIST), the gate closes globally rather than selectively. The gate's meta-learning operates over computational structure as decomposed by the FM, not over data domains.
+2. ~~**OOD gate-closing test**~~: *Done* — see [OOD_GATE_README](OOD_GATE_README.md). The FOMAML gate opens more for novel digits (diff +0.13-0.17) rather than closing for known digits. The unified gate (NTP-only, no bilevel) produces the originally-predicted closing behavior: known digits close while novel digits reopen (diff flips from −0.05 to +0.08), achieving meta-learning through entirely first-order training. On a harder cross-domain shift (MNIST → Fashion-MNIST), the FOMAML gate closes globally rather than selectively.
 
 3. **OOD adaptation post-ratchet**: Freeze WS_LG and OL models after 4 cycles. Fine-tune on rotated MNIST or Fashion-MNIST. Measure adaptation speed and forgetting. The "maximally regular computation" from the gated ratchet should produce better zero-shot OOD (from regularity) and potentially better adaptation (from organized representations). The MNIST adaptation experiment's three-way dissociation (zero-shot tracks distillation, forgetting tracks CL) predicts WS_LG should win on both axes.

@@ -44,6 +44,8 @@ Reading, ideas, beliefs, and conversations are shared across projects. Experimen
 - Claude Code transcripts are symlinked into `conversations/claude-code-transcripts/`.
 - Before parsing prior conversations, run `python3 conversations/parse_transcripts.py` to generate `INDEX.md` and `readable/` markdowns from the raw JSONL files.
 - Read `conversations/claude-code-transcripts/INDEX.md` first to find the relevant session, then read the specific `readable/<session>.md` file.
+- Be sure to run the `conversations/parse_transcripts.py` script prior to reading the file, even if the file already exists. If you don't, you may read an out-of-date version of the convo.
+- To get the id of the current Claude Code conversation, you can run `echo $CLAUDE_CODE_SESSION_ID`
 
 ## Notes
 - For long-running e.g. training jobs (long running = anything that takes more than 5 mins), please follow this procedure to manage things:
