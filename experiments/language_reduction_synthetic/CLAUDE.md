@@ -19,35 +19,125 @@ We train autoregressive transformers on concatenated RHM sequences and measure e
 - **s** (branching factor): size of each compositional tuple. Controls sequence length (s^L) and correlation scale spacing.
 - **v** (vocabulary size): number of token types. Channel intervention — should change β but not γ.
 
-## Running
+## Architecture
 
-All stages run on Modal (workspace `jagilley`). Data lives on the `rhm-scaling-data` volume.
+- `shared.py` — Modal infrastructure (app, volume, image, utilities)
+- `stages.py` — Reusable experiment primitives (Modal functions)
+- `rhm.py` — RHM data generation
+- `model.py` — GPT-2 model
+- `measure.py` — Scaling exponent fitting
 
-Via local entrypoint:
+All computation runs on Modal (workspace `jagilley`). Data lives on the `rhm-scaling-data` volume.
+
+## Primitives
+
+All primitives are Modal functions in `stages.py`. Invoke directly, or import into experiment scripts.
+
+### `generate_corpus`
+
+Generate RHM rules and corpus for a given (v, s, L, m) setting.
+
 ```
-modal run language_reduction_synthetic/modal_app.py --stage generate --depth 6 --mult 4
-modal run language_reduction_synthetic/modal_app.py --stage train --depth 6 --mult 4 --n-tokens 100000
-modal run language_reduction_synthetic/modal_app.py --stage sweep --depth 6 --mult 4
-modal run language_reduction_synthetic/modal_app.py --stage full-sweep
+modal run --detach language_reduction_synthetic/stages.py::generate_corpus \
+    --v 8 --s 2 --depth 6 --m 4 --n-tokens 20000000
 ```
 
-Via direct function invocation (for `--detach`):
+Saves `corpus.npy`, `rules_L*.npy`, and `meta.json` to `/data/v{v}_s{s}_L{L}_m{m}/`.
+
+### `train_model`
+
+Train an autoregressive transformer on a generated corpus. Requires `generate_corpus` to have been run first for the same setting.
+
 ```
-modal run --detach language_reduction_synthetic/modal_app.py::full_sweep --l-values "4,6,8" --m-values "2,4,8"
-modal run --detach language_reduction_synthetic/modal_app.py::sweep --L 6 --m 4
+modal run --detach language_reduction_synthetic/stages.py::train_model \
+    --v 8 --s 2 --depth 6 --m 4 --n-tokens 100000 \
+    --n-layer 4 --n-head 4 --n-embd 128
 ```
 
-## Initial results (2026-06-20)
+Saves model checkpoint and `results.json` to `/data/v{v}_s{s}_L{L}_m{m}/models/P_{n_tokens}/`.
+Auto-scales training steps based on corpus size (5 epochs, floor 2000, cap 20000).
 
-First run with v=8, s=2, 4-layer 128-dim GPT-2. Three of nine settings completed:
+### `sweep`
+
+Train at multiple P values for one (v, s, L, m) setting and compute the empirical scaling exponent α_D. Generates corpus if needed, then spawns parallel `train_model` calls.
+
+```
+modal run --detach language_reduction_synthetic/stages.py::sweep \
+    --v 8 --s 2 --depth 6 --m 4
+```
+
+Uses 7 P values spanning ~3 orders of magnitude (capped at 20M tokens). Saves `scaling.json` with fitted α_D and R².
+
+### `measure_scaling`
+
+Compute empirical α_D from already-trained models (post-hoc, no GPU needed).
+
+```
+modal run --detach language_reduction_synthetic/stages.py::measure_scaling \
+    --v 8 --s 2 --depth 6 --m 4
+```
+
+## Writing experiment scripts
+
+Experiment scripts import primitives from `stages.py` and the Modal app from `shared.py`. Example — sweep across DGP parameters:
+
+```python
+"""Sweep across L and m values to compare scaling exponents."""
+
+from language_reduction_synthetic.shared import app, volume, DATA_DIR, setting_key
+from language_reduction_synthetic.stages import generate_corpus, sweep
+
+@app.function(volumes={DATA_DIR: volume}, timeout=7200, memory=4096)
+def dgp_sweep(l_values: str = "4,6,8", m_values: str = "2,4,8",
+              v: int = 8, s: int = 2):
+    Ls = [int(x) for x in l_values.split(",")]
+    ms = [int(x) for x in m_values.split(",")]
+
+    # Phase 1: generate all corpora in parallel
+    gen_handles = []
+    for L in Ls:
+        for m in ms:
+            seq_len = s ** L
+            max_p = min(20_000_000, int(max(1000, 50 * seq_len) * 10 ** 3.0))
+            h = generate_corpus.spawn(v=v, s=s, depth=L, m=m,
+                                      n_tokens=int(max_p * 1.2))
+            gen_handles.append(h)
+    for h in gen_handles:
+        h.get()
+
+    # Phase 2: run sweeps in parallel
+    sweep_handles = []
+    for L in Ls:
+        for m in ms:
+            h = sweep.spawn(v=v, s=s, depth=L, m=m)
+            sweep_handles.append((L, m, h))
+
+    for L, m, h in sweep_handles:
+        result = h.get()
+        alpha = result["scaling"]["alpha_empirical"]
+        r2 = result["scaling"]["r2"]
+        print(f"  L={L}, m={m}: alpha={alpha:.4f}, R²={r2:.4f}")
+```
+
+Run with:
+```
+modal run --detach language_reduction_synthetic/my_experiment.py::dgp_sweep
+```
+
+## Results (2026-06-20)
+
+All results with v=8, s=2, 4-layer 128-dim GPT-2 (~0.8M params). Two independent runs reproduce within ~0.01:
 
 | Setting | L | m | α_D | R² |
 |---------|---|---|-----|-----|
-| v8_s2_L4_m2 | 4 | 2 | 0.485 | 0.957 |
-| v8_s2_L4_m8 | 4 | 8 | 0.324 | 0.931 |
+| v8_s2_L4_m2 | 4 | 2 | 0.498 | 0.978 |
+| v8_s2_L4_m8 | 4 | 8 | 0.327 | 0.975 |
 | v8_s2_L6_m4 | 6 | 4 | 0.217 | 0.953 |
+| v8_s2_L8_m2 | 8 | 2 | 0.438 | 0.987 |
 
-α clearly varies with both L and m — simpler DGPs (shallow depth, few synonyms) scale more steeply. Six settings failed due to a volume sync race condition (now fixed — `volume.reload()` added to `train_model`).
+Both L and m reduce α, but **m dominates by ~3:1**. At fixed L=4, quadrupling m (2→8) cuts α by 34%. At fixed m=2, doubling L (4→8) cuts α by only 12%. The effects compound: L=6/m=4 (α=0.217) is lower than either L=8/m=2 (0.438) or L=4/m=8 (0.327). The scaling bottleneck is synonymic multiplicity (per-level entropy), not hierarchy depth.
+
+See `SWEEP_README.md` for full experimental details.
 
 ## Prior experiment
 

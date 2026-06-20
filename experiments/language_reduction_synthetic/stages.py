@@ -1,61 +1,37 @@
-"""Modal app for synthetic RHM scaling law experiments.
+"""RHM scaling law experiment primitives.
 
-Stages:
-  generate      — generate RHM rules and corpus for a given (v, s, L, m)
-  train         — train AR model at a given (L, m, P)
-  sweep         — train at multiple P values for one (L, m) setting
-  full-sweep    — sweep across multiple L and m values
-  measure       — compute empirical alpha from trained models
+Reusable Modal functions for RHM-based scaling experiments. Each function
+can be invoked directly:
 
-Usage (via local entrypoint):
-  modal run language_reduction_synthetic/modal_app.py --stage generate --depth 6 --mult 4
-  modal run language_reduction_synthetic/modal_app.py --stage train --depth 6 --mult 4 --n-tokens 100000
-  modal run language_reduction_synthetic/modal_app.py --stage sweep --depth 6 --mult 4
-  modal run language_reduction_synthetic/modal_app.py --stage full-sweep
+  modal run --detach language_reduction_synthetic/stages.py::generate_corpus --v 8 --s 2 --depth 6 --m 4
+  modal run --detach language_reduction_synthetic/stages.py::train_model --depth 6 --m 4 --n-tokens 100000
+  modal run --detach language_reduction_synthetic/stages.py::sweep --depth 6 --m 4
+  modal run --detach language_reduction_synthetic/stages.py::measure_scaling --depth 6 --m 4
 
-Usage (direct function invocation, for --detach):
-  modal run --detach language_reduction_synthetic/modal_app.py::full_sweep --l-values "4,6,8" --m-values "2,4,8"
-  modal run --detach language_reduction_synthetic/modal_app.py::sweep --L 6 --m 4
+Or imported by experiment scripts:
+
+  from language_reduction_synthetic.stages import generate_corpus, train_model, sweep
 """
 
 import json
-import modal
 
-DATA_DIR = "/data"
-
-image = (
-    modal.Image.debian_slim(python_version="3.11")
-    .pip_install(
-        "numpy==1.26.4",
-        "scipy==1.16.3",
-        "torch==2.7.0",
-    )
-    .add_local_python_source("language_reduction_synthetic")
-)
-
-volume = modal.Volume.from_name("rhm-scaling-data", create_if_missing=True)
-app = modal.App("rhm-scaling", image=image)
+from language_reduction_synthetic.shared import app, volume, DATA_DIR, setting_key
 
 
-def _setting_key(v, s, L, m):
-    return f"v{v}_s{s}_L{L}_m{m}"
-
-
-# ---------------------------------------------------------------------------
-# Stage 1: Generate corpus
-# ---------------------------------------------------------------------------
 @app.function(
     volumes={DATA_DIR: volume},
     timeout=600,
     memory=16384,
 )
-def generate_corpus(v: int = 8, s: int = 2, L: int = 6, m: int = 4,
+def generate_corpus(v: int = 8, s: int = 2, depth: int = 6, m: int = 4,
                     n_tokens: int = 20_000_000, rule_seed: int = 0):
+    """Generate RHM rules and corpus for a given (v, s, L, m) setting."""
     import os
     import numpy as np
     from language_reduction_synthetic.rhm import make_corpus
 
-    key = _setting_key(v, s, L, m)
+    L = depth
+    key = setting_key(v, s, L, m)
     out_dir = f"{DATA_DIR}/{key}"
     os.makedirs(out_dir, exist_ok=True)
 
@@ -74,27 +50,26 @@ def generate_corpus(v: int = 8, s: int = 2, L: int = 6, m: int = 4,
     return meta
 
 
-# ---------------------------------------------------------------------------
-# Stage 2: Train model
-# ---------------------------------------------------------------------------
 @app.function(
     volumes={DATA_DIR: volume},
     gpu="T4",
     timeout=3600,
     memory=16384,
 )
-def train_model(v: int = 8, s: int = 2, L: int = 6, m: int = 4,
+def train_model(v: int = 8, s: int = 2, depth: int = 6, m: int = 4,
                 n_tokens: int = 100_000,
                 n_layer: int = 4, n_head: int = 4, n_embd: int = 128,
                 batch_size: int = 64, lr: float = 3e-4,
                 n_steps: int = 10_000, eval_interval: int = 200,
                 n_eval_batches: int = 10):
+    """Train an autoregressive transformer on a generated RHM corpus."""
     import os
     import torch
     import numpy as np
     from language_reduction_synthetic.model import GPT
 
-    key = _setting_key(v, s, L, m)
+    L = depth
+    key = setting_key(v, s, L, m)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     seq_len = s ** L
     block_size = seq_len
@@ -102,7 +77,7 @@ def train_model(v: int = 8, s: int = 2, L: int = 6, m: int = 4,
     volume.reload()
     corpus_path = f"{DATA_DIR}/{key}/corpus.npy"
     if not os.path.exists(corpus_path):
-        raise FileNotFoundError(f"Corpus not found at {corpus_path}. Run 'generate' first.")
+        raise FileNotFoundError(f"Corpus not found at {corpus_path}. Run generate_corpus first.")
 
     data = np.load(corpus_path)
     data = torch.from_numpy(data[:n_tokens].astype(np.int64))
@@ -113,7 +88,6 @@ def train_model(v: int = 8, s: int = 2, L: int = 6, m: int = 4,
     train_data = data[:split]
     val_data = data[split:]
 
-    # auto-scale steps: 5 epochs, floor 2000, cap 20000
     tokens_per_step = batch_size * block_size
     tokens_per_epoch = len(train_data)
     steps_per_epoch = max(1, tokens_per_epoch // tokens_per_step)
@@ -185,64 +159,57 @@ def train_model(v: int = 8, s: int = 2, L: int = 6, m: int = 4,
     return result
 
 
-# ---------------------------------------------------------------------------
-# Stage 3: Sweep over P values for one setting
-# ---------------------------------------------------------------------------
 @app.function(
     volumes={DATA_DIR: volume},
     timeout=3600,
     memory=4096,
 )
-def sweep(v: int = 8, s: int = 2, L: int = 6, m: int = 4,
+def sweep(v: int = 8, s: int = 2, depth: int = 6, m: int = 4,
           n_layer: int = 4, n_head: int = 4, n_embd: int = 128):
     """Train at multiple P values and compute empirical scaling exponent."""
+    import os
+
+    L = depth
     seq_len = s ** L
     min_p = max(1000, 50 * seq_len)
-    # 6 P values spanning ~3 orders of magnitude
     p_values = []
     for exp in [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]:
         p = int(min_p * 10 ** exp)
         p_values.append(p)
-    # cap at 20M to keep compute reasonable
     p_values = [p for p in p_values if p <= 20_000_000]
 
-    print(f"Sweep for {_setting_key(v, s, L, m)}: P = {p_values}")
+    key = setting_key(v, s, L, m)
+    print(f"Sweep for {key}: P = {p_values}")
     print(f"  Model: {n_layer}L {n_head}H {n_embd}D, block_size={seq_len}")
 
-    # ensure corpus exists (skip if already generated by full_sweep)
-    import os
     volume.reload()
-    corpus_path = f"{DATA_DIR}/{_setting_key(v, s, L, m)}/corpus.npy"
+    corpus_path = f"{DATA_DIR}/{key}/corpus.npy"
     if not os.path.exists(corpus_path):
         max_p = max(p_values)
-        generate_corpus.remote(v=v, s=s, L=L, m=m, n_tokens=int(max_p * 1.2))
+        generate_corpus.remote(v=v, s=s, depth=L, m=m, n_tokens=int(max_p * 1.2))
 
-    # train in parallel
     handles = []
     for p in p_values:
         h = train_model.spawn(
-            v=v, s=s, L=L, m=m, n_tokens=p,
+            v=v, s=s, depth=L, m=m, n_tokens=p,
             n_layer=n_layer, n_head=n_head, n_embd=n_embd,
         )
         handles.append(h)
 
     results = [h.get() for h in handles]
 
-    # compute empirical scaling
     loss_vs_P = [(r["n_tokens"], r["best_val_loss"]) for r in results]
     from language_reduction_synthetic.measure import measure_empirical_scaling
     scaling = measure_empirical_scaling(loss_vs_P)
 
     summary = {
-        "setting": _setting_key(v, s, L, m),
+        "setting": key,
         "v": v, "s": s, "L": L, "m": m,
         "p_values": p_values,
         "loss_vs_P": loss_vs_P,
         "scaling": scaling,
     }
 
-    import os
-    key = _setting_key(v, s, L, m)
     results_dir = f"{DATA_DIR}/{key}/results"
     os.makedirs(results_dir, exist_ok=True)
     with open(os.path.join(results_dir, "scaling.json"), "w") as f:
@@ -260,97 +227,20 @@ def sweep(v: int = 8, s: int = 2, L: int = 6, m: int = 4,
     return summary
 
 
-# ---------------------------------------------------------------------------
-# Stage 4: Full sweep across DGP parameters
-# ---------------------------------------------------------------------------
-@app.function(
-    volumes={DATA_DIR: volume},
-    timeout=7200,
-    memory=4096,
-)
-def full_sweep(
-    l_values: str = "4,6,8",
-    m_values: str = "2,4,8",
-    v: int = 8, s: int = 2,
-    n_layer: int = 4, n_head: int = 4, n_embd: int = 128,
-):
-    """Sweep across L (depth) and m (multiplicity) values."""
-    Ls = [int(x) for x in l_values.split(",")]
-    ms = [int(x) for x in m_values.split(",")]
-
-    print(f"Full sweep: L={Ls}, m={ms}, v={v}, s={s}")
-
-    # Phase 1: generate all corpora (parallel, wait for all)
-    print("Phase 1: generating corpora...")
-    gen_handles = []
-    for L in Ls:
-        for m in ms:
-            seq_len = s ** L
-            min_p = max(1000, 50 * seq_len)
-            max_p = int(min_p * 10 ** 3.0)
-            max_p = min(max_p, 20_000_000)
-            h = generate_corpus.spawn(v=v, s=s, L=L, m=m,
-                                      n_tokens=int(max_p * 1.2))
-            gen_handles.append((L, m, h))
-    for L, m, h in gen_handles:
-        h.get()
-        print(f"  Corpus ready: {_setting_key(v, s, L, m)}")
-
-    # Phase 2: run all sweeps (parallel)
-    print("Phase 2: running sweeps...")
-    handles = []
-    for L in Ls:
-        for m in ms:
-            h = sweep.spawn(v=v, s=s, L=L, m=m,
-                           n_layer=n_layer, n_head=n_head, n_embd=n_embd)
-            handles.append((L, m, h))
-
-    all_results = {}
-    for L, m, h in handles:
-        key = _setting_key(v, s, L, m)
-        try:
-            result = h.get()
-            all_results[key] = result
-            alpha = result["scaling"]["alpha_empirical"]
-            print(f"  {key}: alpha={alpha:.4f}")
-        except Exception as e:
-            print(f"  {key}: FAILED — {e}")
-
-    import os
-    results_dir = f"{DATA_DIR}/sweep_results"
-    os.makedirs(results_dir, exist_ok=True)
-    with open(os.path.join(results_dir, "full_sweep.json"), "w") as f:
-        json.dump(all_results, f, indent=2)
-    volume.commit()
-
-    print(f"\n{'='*60}")
-    print("FULL SWEEP RESULTS")
-    print(f"{'Setting':<20} {'alpha_D':>8} {'R²':>6}")
-    print("-" * 36)
-    for key, result in sorted(all_results.items()):
-        alpha = result["scaling"]["alpha_empirical"]
-        r2 = result["scaling"]["r2"]
-        print(f"{key:<20} {alpha:>8.4f} {r2:>6.3f}")
-    print(f"{'='*60}")
-
-    return all_results
-
-
-# ---------------------------------------------------------------------------
-# Stage 5: Measure scaling from existing trained models
-# ---------------------------------------------------------------------------
 @app.function(
     volumes={DATA_DIR: volume},
     timeout=300,
     memory=4096,
 )
-def measure_scaling(v: int = 8, s: int = 2, L: int = 6, m: int = 4):
+def measure_scaling(v: int = 8, s: int = 2, depth: int = 6, m: int = 4):
     """Compute empirical alpha from already-trained models."""
     import os
     import glob
     from language_reduction_synthetic.measure import measure_empirical_scaling
 
-    key = _setting_key(v, s, L, m)
+    L = depth
+    key = setting_key(v, s, L, m)
+    volume.reload()
     models_dir = f"{DATA_DIR}/{key}/models"
     if not os.path.exists(models_dir):
         print(f"No models found at {models_dir}")
@@ -372,43 +262,3 @@ def measure_scaling(v: int = 8, s: int = 2, L: int = 6, m: int = 4):
     scaling = measure_empirical_scaling(loss_vs_P)
     print(f"{key}: alpha={scaling['alpha_empirical']:.4f}, R²={scaling['r2']:.4f}")
     return scaling
-
-
-# ---------------------------------------------------------------------------
-# CLI entrypoint
-# ---------------------------------------------------------------------------
-@app.local_entrypoint()
-def main(
-    stage: str = "generate",
-    vocab: int = 8,
-    branch: int = 2,
-    depth: int = 6,
-    mult: int = 4,
-    n_tokens: int = 20_000_000,
-    n_layer: int = 4,
-    n_head: int = 4,
-    n_embd: int = 128,
-    rule_seed: int = 0,
-    depths: str = "4,6,8",
-    mults: str = "2,4,8",
-):
-    """CLI entrypoint. RHM params: --vocab (v), --branch (s), --depth (L), --mult (m)."""
-    v, s, L, m = vocab, branch, depth, mult
-    if stage == "generate":
-        generate_corpus.remote(v=v, s=s, L=L, m=m, n_tokens=n_tokens,
-                              rule_seed=rule_seed)
-    elif stage == "train":
-        train_model.remote(v=v, s=s, L=L, m=m, n_tokens=n_tokens,
-                          n_layer=n_layer, n_head=n_head, n_embd=n_embd)
-    elif stage == "sweep":
-        sweep.remote(v=v, s=s, L=L, m=m,
-                    n_layer=n_layer, n_head=n_head, n_embd=n_embd)
-    elif stage == "full-sweep":
-        full_sweep.remote(l_values=depths, m_values=mults,
-                         v=v, s=s,
-                         n_layer=n_layer, n_head=n_head, n_embd=n_embd)
-    elif stage == "measure":
-        measure_scaling.remote(v=v, s=s, L=L, m=m)
-    else:
-        print(f"Unknown stage: {stage}")
-        print("Available: generate, train, sweep, full-sweep, measure")
