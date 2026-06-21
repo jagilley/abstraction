@@ -40,7 +40,7 @@ All primitives are Modal functions in `stages.py`. Invoke directly, or import in
 Generate RHM rules and corpus for a given (v, s, L, m) setting.
 
 ```
-modal run --detach language_reduction_synthetic/stages.py::generate_corpus \
+modal run --detach rhm/stages.py::generate_corpus \
     --v 8 --s 2 --depth 6 --m 4 --n-tokens 20000000
 ```
 
@@ -51,7 +51,7 @@ Saves `corpus.npy`, `rules_L*.npy`, and `meta.json` to `/data/v{v}_s{s}_L{L}_m{m
 Train an autoregressive transformer on a generated corpus. Requires `generate_corpus` to have been run first for the same setting.
 
 ```
-modal run --detach language_reduction_synthetic/stages.py::train_model \
+modal run --detach rhm/stages.py::train_model \
     --v 8 --s 2 --depth 6 --m 4 --n-tokens 100000 \
     --n-layer 4 --n-head 4 --n-embd 128
 ```
@@ -64,7 +64,7 @@ Auto-scales training steps based on corpus size (5 epochs, floor 2000, cap 20000
 Train at multiple P values for one (v, s, L, m) setting and compute the empirical scaling exponent α_D. Generates corpus if needed, then spawns parallel `train_model` calls.
 
 ```
-modal run --detach language_reduction_synthetic/stages.py::sweep \
+modal run --detach rhm/stages.py::sweep \
     --v 8 --s 2 --depth 6 --m 4
 ```
 
@@ -75,7 +75,7 @@ Uses 7 P values spanning ~3 orders of magnitude (capped at 20M tokens). Saves `s
 Compute empirical α_D from already-trained models (post-hoc, no GPU needed).
 
 ```
-modal run --detach language_reduction_synthetic/stages.py::measure_scaling \
+modal run --detach rhm/stages.py::measure_scaling \
     --v 8 --s 2 --depth 6 --m 4
 ```
 
@@ -86,8 +86,8 @@ Experiment scripts import primitives from `stages.py` and the Modal app from `sh
 ```python
 """Sweep across L and m values to compare scaling exponents."""
 
-from language_reduction_synthetic.shared import app, volume, DATA_DIR, setting_key
-from language_reduction_synthetic.stages import generate_corpus, sweep
+from rhm.shared import app, volume, DATA_DIR, setting_key
+from rhm.stages import generate_corpus, sweep
 
 @app.function(volumes={DATA_DIR: volume}, timeout=7200, memory=4096)
 def dgp_sweep(l_values: str = "4,6,8", m_values: str = "2,4,8",
@@ -123,7 +123,7 @@ def dgp_sweep(l_values: str = "4,6,8", m_values: str = "2,4,8",
 
 Run with:
 ```
-modal run --detach language_reduction_synthetic/my_experiment.py::dgp_sweep
+modal run --detach rhm/my_experiment.py::dgp_sweep
 ```
 
 ## Results (2026-06-20)

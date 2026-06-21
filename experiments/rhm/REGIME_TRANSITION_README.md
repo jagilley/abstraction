@@ -115,10 +115,10 @@ The deeper question is whether the RHM at any tractable scale produces the kind 
 cd experiments/
 
 # 1-block gap (Run 1)
-modal run --detach language_reduction_synthetic/rhm_regime_transition.py::rhm_regime_transition
+modal run --detach rhm/rhm_regime_transition.py::rhm_regime_transition
 
 # 3-block gap (Run 2)
-modal run --detach language_reduction_synthetic/rhm_regime_transition.py::rhm_regime_transition \
+modal run --detach rhm/rhm_regime_transition.py::rhm_regime_transition \
   --predict-from post_block0 --predict-to post_block3 --fwd-n-layer 2
 ```
 
@@ -176,7 +176,7 @@ The settings that produce a meaningful cosine gap (low m, high L) are exactly th
 ### Reproduction
 
 ```bash
-modal run --detach language_reduction_synthetic/rhm_cosine_sweep.py::rhm_cosine_sweep
+modal run --detach rhm/rhm_cosine_sweep.py::rhm_cosine_sweep
 ```
 
 ---
@@ -239,10 +239,10 @@ The m=3 experiment confirms that scaling up the model was the right move: the 0.
 cd experiments/
 
 # m=3, current model
-modal run --detach language_reduction_synthetic/rhm_regime_trajectory.py::run_m3_current
+modal run --detach rhm/rhm_regime_trajectory.py::run_m3_current
 
 # m=4, scaled model
-modal run --detach language_reduction_synthetic/rhm_regime_trajectory.py::run_m4_scaled
+modal run --detach rhm/rhm_regime_trajectory.py::run_m4_scaled
 ```
 
 Results saved to `rhm-scaling-data` volume at `/data/rhm_regime_trajectory/v8_s2_L6_m3_4L4H128D.json` and `/data/rhm_regime_trajectory/v8_s2_L6_m4_6L6H192D.json`.

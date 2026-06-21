@@ -124,20 +124,20 @@ The per-level loss decomposition provides the mechanistic picture behind the Lâ†
 cd experiments/
 
 # Experiment 1: m=2, small model
-modal run --detach language_reduction_synthetic/rhm_per_level_loss.py::per_level_trajectory \
+modal run --detach rhm/rhm_per_level_loss.py::per_level_trajectory \
     --depth 6 --m 2
 
 # Experiment 2: m=4, scaled model
-modal run --detach language_reduction_synthetic/rhm_per_level_loss.py::per_level_trajectory \
+modal run --detach rhm/rhm_per_level_loss.py::per_level_trajectory \
     --depth 6 --m 4 --n-tokens 20000000 \
     --n-layer 6 --n-head 6 --n-embd 192
 
 # Single-setting evaluation (no trajectory)
-modal run --detach language_reduction_synthetic/rhm_per_level_loss.py::per_level_single \
+modal run --detach rhm/rhm_per_level_loss.py::per_level_single \
     --depth 6 --m 2
 
 # Cross-setting sweep
-modal run --detach language_reduction_synthetic/rhm_per_level_loss.py::per_level_sweep \
+modal run --detach rhm/rhm_per_level_loss.py::per_level_sweep \
     --settings "L4_m2,L4_m8,L6_m2,L6_m4,L8_m2"
 ```
 

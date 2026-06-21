@@ -26,12 +26,12 @@ import json
 import os
 import modal
 
-from language_reduction_synthetic.shared import volume, DATA_DIR, NumpyEncoder, setting_key
+from rhm.shared import volume, DATA_DIR, NumpyEncoder, setting_key
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install("numpy==1.26.4", "torch==2.7.0")
-    .add_local_python_source("language_reduction_synthetic")
+    .add_local_python_source("rhm")
 )
 
 app = modal.App("rhm-per-level-loss", image=image)
@@ -125,7 +125,7 @@ def _eval_per_level(model, eval_seqs, seq_len, s, L, v, batch_size, device):
 
 def _ensure_corpus(v, s, L, m, n_tokens):
     import numpy as np
-    from language_reduction_synthetic.rhm import make_corpus
+    from rhm.rhm import make_corpus
 
     key = setting_key(v, s, L, m)
     corpus_path = f"{DATA_DIR}/{key}/corpus.npy"
@@ -161,8 +161,8 @@ def per_level_single(
     """Train a model and evaluate per-level loss at convergence."""
     import torch
     import numpy as np
-    from language_reduction_synthetic.model import GPT
-    from language_reduction_synthetic.rhm import generate_sequences_batched
+    from rhm.model import GPT
+    from rhm.rhm import generate_sequences_batched
 
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -259,8 +259,8 @@ def per_level_trajectory(
     """Track per-level loss over training to reveal bottom-up learning."""
     import torch
     import numpy as np
-    from language_reduction_synthetic.model import GPT
-    from language_reduction_synthetic.rhm import generate_sequences_batched
+    from rhm.model import GPT
+    from rhm.rhm import generate_sequences_batched
 
     torch.manual_seed(seed)
     np.random.seed(seed)

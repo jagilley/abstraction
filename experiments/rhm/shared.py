@@ -12,7 +12,7 @@ image = (
         "scipy==1.16.3",
         "torch==2.7.0",
     )
-    .add_local_python_source("language_reduction_synthetic")
+    .add_local_python_source("rhm")
 )
 
 volume = modal.Volume.from_name("rhm-scaling-data", create_if_missing=True)

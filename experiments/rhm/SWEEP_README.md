@@ -58,7 +58,7 @@ This is consistent with natural-language intuitions: languages with extensive sy
 
 ```bash
 cd experiments/
-modal run --detach language_reduction_synthetic/hparam_sweep.py::hparam_sweep
+modal run --detach rhm/hparam_sweep.py::hparam_sweep
 ```
 
 ## Modal volume

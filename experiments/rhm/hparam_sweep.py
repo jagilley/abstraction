@@ -10,13 +10,13 @@ relative to min_p). Fits alpha_D from trained models directly rather than using
 the sweep primitive (which spawns 7 jobs per setting).
 
 Usage:
-    modal run --detach language_reduction_synthetic/hparam_sweep.py::hparam_sweep
+    modal run --detach rhm/hparam_sweep.py::hparam_sweep
 """
 
 import json
 
-from language_reduction_synthetic.shared import app, volume, DATA_DIR, setting_key, NumpyEncoder
-from language_reduction_synthetic.stages import generate_corpus, train_model
+from rhm.shared import app, volume, DATA_DIR, setting_key, NumpyEncoder
+from rhm.stages import generate_corpus, train_model
 
 SETTINGS = [
     {"L": 4, "m": 2},
@@ -40,7 +40,7 @@ def p_values_for_setting(s, L):
 @app.function(volumes={DATA_DIR: volume}, timeout=7200, memory=4096)
 def hparam_sweep():
     import os
-    from language_reduction_synthetic.measure import measure_empirical_scaling
+    from rhm.measure import measure_empirical_scaling
 
     all_jobs = []
     for cfg in SETTINGS:

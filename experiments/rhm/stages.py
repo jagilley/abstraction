@@ -3,19 +3,19 @@
 Reusable Modal functions for RHM-based scaling experiments. Each function
 can be invoked directly:
 
-  modal run --detach language_reduction_synthetic/stages.py::generate_corpus --v 8 --s 2 --depth 6 --m 4
-  modal run --detach language_reduction_synthetic/stages.py::train_model --depth 6 --m 4 --n-tokens 100000
-  modal run --detach language_reduction_synthetic/stages.py::sweep --depth 6 --m 4
-  modal run --detach language_reduction_synthetic/stages.py::measure_scaling --depth 6 --m 4
+  modal run --detach rhm/stages.py::generate_corpus --v 8 --s 2 --depth 6 --m 4
+  modal run --detach rhm/stages.py::train_model --depth 6 --m 4 --n-tokens 100000
+  modal run --detach rhm/stages.py::sweep --depth 6 --m 4
+  modal run --detach rhm/stages.py::measure_scaling --depth 6 --m 4
 
 Or imported by experiment scripts:
 
-  from language_reduction_synthetic.stages import generate_corpus, train_model, sweep
+  from rhm.stages import generate_corpus, train_model, sweep
 """
 
 import json
 
-from language_reduction_synthetic.shared import app, volume, DATA_DIR, setting_key
+from rhm.shared import app, volume, DATA_DIR, setting_key
 
 
 @app.function(
@@ -28,7 +28,7 @@ def generate_corpus(v: int = 8, s: int = 2, depth: int = 6, m: int = 4,
     """Generate RHM rules and corpus for a given (v, s, L, m) setting."""
     import os
     import numpy as np
-    from language_reduction_synthetic.rhm import make_corpus
+    from rhm.rhm import make_corpus
 
     L = depth
     key = setting_key(v, s, L, m)
@@ -66,7 +66,7 @@ def train_model(v: int = 8, s: int = 2, depth: int = 6, m: int = 4,
     import os
     import torch
     import numpy as np
-    from language_reduction_synthetic.model import GPT
+    from rhm.model import GPT
 
     L = depth
     key = setting_key(v, s, L, m)
@@ -199,7 +199,7 @@ def sweep(v: int = 8, s: int = 2, depth: int = 6, m: int = 4,
     results = [h.get() for h in handles]
 
     loss_vs_P = [(r["n_tokens"], r["best_val_loss"]) for r in results]
-    from language_reduction_synthetic.measure import measure_empirical_scaling
+    from rhm.measure import measure_empirical_scaling
     scaling = measure_empirical_scaling(loss_vs_P)
 
     summary = {
@@ -236,7 +236,7 @@ def measure_scaling(v: int = 8, s: int = 2, depth: int = 6, m: int = 4):
     """Compute empirical alpha from already-trained models."""
     import os
     import glob
-    from language_reduction_synthetic.measure import measure_empirical_scaling
+    from rhm.measure import measure_empirical_scaling
 
     L = depth
     key = setting_key(v, s, L, m)

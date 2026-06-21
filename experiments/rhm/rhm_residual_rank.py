@@ -16,7 +16,7 @@ because the main model's inter-layer computation is more varied/distributed.
 import json
 import modal
 
-from language_reduction_synthetic.shared import volume, DATA_DIR, NumpyEncoder, setting_key
+from rhm.shared import volume, DATA_DIR, NumpyEncoder, setting_key
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
@@ -25,7 +25,7 @@ image = (
         "scipy==1.16.3",
         "torch==2.7.0",
     )
-    .add_local_python_source("language_reduction_synthetic")
+    .add_local_python_source("rhm")
     .add_local_python_source("a2a_forward")
 )
 
@@ -36,7 +36,7 @@ def _ensure_corpus(v, s, L, m, n_tokens):
     """Generate corpus inline if it doesn't exist."""
     import os
     import numpy as np
-    from language_reduction_synthetic.rhm import make_corpus
+    from rhm.rhm import make_corpus
 
     key = setting_key(v, s, L, m)
     corpus_path = f"{DATA_DIR}/{key}/corpus.npy"
@@ -82,7 +82,7 @@ def train_and_analyze(
     import torch
     import torch.nn.functional as F
     import numpy as np
-    from language_reduction_synthetic.model import GPT
+    from rhm.model import GPT
     from a2a_forward.forward_model import TransformerForwardModel
 
     L = depth
@@ -456,7 +456,7 @@ def train_main_model(
     import os
     import torch
     import numpy as np
-    from language_reduction_synthetic.model import GPT
+    from rhm.model import GPT
 
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -569,7 +569,7 @@ def train_matched_fm(
     import torch
     import torch.nn.functional as F
     import numpy as np
-    from language_reduction_synthetic.model import GPT
+    from rhm.model import GPT
     from a2a_forward.forward_model import TransformerForwardModel
 
     torch.manual_seed(seed)

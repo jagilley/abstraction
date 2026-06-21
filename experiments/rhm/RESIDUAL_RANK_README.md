@@ -154,16 +154,16 @@ Residual norm is a scalar, though — it collapses 128 dimensions into one numbe
 cd experiments/
 
 # DGP sweep (9 settings, ~30 min each on T4, parallel)
-modal run --detach language_reduction_synthetic/rhm_residual_rank.py::rhm_residual_rank_sweep
+modal run --detach rhm/rhm_residual_rank.py::rhm_residual_rank_sweep
 
 # FM capacity sweep (8 jobs: 2 settings x 4 capacities, mismatched architecture)
-modal run --detach language_reduction_synthetic/rhm_residual_rank.py::capacity_sweep
+modal run --detach rhm/rhm_residual_rank.py::capacity_sweep
 
 # Architecture-matched FM sweep (2 main models + 8 FM jobs)
-modal run --detach language_reduction_synthetic/rhm_residual_rank.py::architecture_matched_sweep
+modal run --detach rhm/rhm_residual_rank.py::architecture_matched_sweep
 
 # Single setting (useful for testing)
-modal run language_reduction_synthetic/rhm_residual_rank.py::train_and_analyze \
+modal run rhm/rhm_residual_rank.py::train_and_analyze \
   --depth 4 --m 2 --n-tokens 5000000
 ```
 

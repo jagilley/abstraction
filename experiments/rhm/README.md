@@ -64,7 +64,7 @@ Measures how the empirical scaling exponent alpha_D depends on L (hierarchy dept
 
 **m dominates by ~3:1**. At fixed L=4, quadrupling m (2 to 8) cuts alpha by 34%. At fixed m=2, doubling L (4 to 8) cuts alpha by only 12%. The scaling bottleneck is synonymic multiplicity (per-level entropy), not hierarchy depth.
 
-**Reproduction**: `modal run --detach language_reduction_synthetic/hparam_sweep.py::hparam_sweep`
+**Reproduction**: `modal run --detach rhm/hparam_sweep.py::hparam_sweep`
 
 ### FM residual rank experiments (2026-06-20)
 
@@ -78,7 +78,7 @@ Tests whether the effective rank of a forward model's residual reflects DGP comp
 
 3. **Architecture-matched FM sweep** (key result): 4H FMs matching the main model block, 25% to 100% capacity. Residual norm drops 17x (0.57 to 0.03) while rank barely moves (90-96%). The residual's shape is invariant to FM capacity — rank structure is a property of the main model's computation, not the FM.
 
-**Reproduction**: `modal run --detach language_reduction_synthetic/rhm_residual_rank.py::rhm_residual_rank_sweep`
+**Reproduction**: `modal run --detach rhm/rhm_residual_rank.py::rhm_residual_rank_sweep`
 
 ### Regime transition experiment (2026-06-21)
 
@@ -88,7 +88,7 @@ Tests whether the FM residual transitions from diffuse to rule-conditioned as th
 
 **Result: not testable at this scale.** The FM captures 99%+ of the computation at seq_len=16 (cosine 0.994 vs 0.903 on MNIST where the structured phenomena emerge). The eta^2 measurement correctly reports no structure because there is none to find — the residual is architectural mismatch noise, not computational gap.
 
-**Reproduction**: `modal run --detach language_reduction_synthetic/rhm_regime_transition.py::rhm_regime_transition`
+**Reproduction**: `modal run --detach rhm/rhm_regime_transition.py::rhm_regime_transition`
 
 ### Cosine sweep and regime trajectory (2026-06-21)
 
@@ -104,7 +104,7 @@ Tests whether the FM residual transitions from diffuse to rule-conditioned as th
 
 3. **Cosine enters the sweet spot**: 0.969 at step 7000, 0.921 at step 20000.
 
-**Reproduction**: `modal run --detach language_reduction_synthetic/rhm_regime_trajectory.py::run_m4_scaled`
+**Reproduction**: `modal run --detach rhm/rhm_regime_trajectory.py::run_m4_scaled`
 
 ### Per-level loss decomposition (2026-06-21)
 
@@ -118,7 +118,7 @@ Since every position maps to a hierarchy level via its s-adic valuation, we deco
 
 This provides the mechanistic picture behind the L-to-m transition: the bottom-up learning wave drives the monotonic rise in feature eta^2, and the composition depth ceiling explains why the transition saturates.
 
-**Reproduction**: `modal run --detach language_reduction_synthetic/rhm_per_level_loss.py::per_level_trajectory --depth 6 --m 2`
+**Reproduction**: `modal run --detach rhm/rhm_per_level_loss.py::per_level_trajectory --depth 6 --m 2`
 
 ## CLI
 
@@ -128,15 +128,15 @@ Primitives in `stages.py` can be used directly or imported into experiment scrip
 cd experiments/
 
 # Generate corpus
-modal run --detach language_reduction_synthetic/stages.py::generate_corpus \
+modal run --detach rhm/stages.py::generate_corpus \
     --v 8 --s 2 --depth 6 --m 4 --n-tokens 20000000
 
 # Train single model
-modal run --detach language_reduction_synthetic/stages.py::train_model \
+modal run --detach rhm/stages.py::train_model \
     --v 8 --s 2 --depth 6 --m 4 --n-tokens 100000
 
 # Full scaling sweep (7 P values, parallel)
-modal run --detach language_reduction_synthetic/stages.py::sweep \
+modal run --detach rhm/stages.py::sweep \
     --v 8 --s 2 --depth 6 --m 4
 ```
 
