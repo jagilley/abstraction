@@ -1,5 +1,7 @@
 # Language Reduction: Synthetic (RHM)
 
+**Centralized writeup**: [README.md](README.md)
+
 Controlled scaling law experiments using the Random Hierarchy Model (Cagnetta & Wyart, 2024).
 
 ## Motivation
@@ -138,6 +140,25 @@ All results with v=8, s=2, 4-layer 128-dim GPT-2 (~0.8M params). Two independent
 Both L and m reduce α, but **m dominates by ~3:1**. At fixed L=4, quadrupling m (2→8) cuts α by 34%. At fixed m=2, doubling L (4→8) cuts α by only 12%. The effects compound: L=6/m=4 (α=0.217) is lower than either L=8/m=2 (0.438) or L=4/m=8 (0.327). The scaling bottleneck is synonymic multiplicity (per-level entropy), not hierarchy depth.
 
 See `SWEEP_README.md` for full experimental details.
+
+## Regime transition experiment (2026-06-21)
+
+Tested whether the FM residual transitions from diffuse to rule-conditioned as the main model learns (the "L-regime → m-regime" hypothesis). Three settings (m=2,4,8) at L=4, with ground-truth hierarchy-conditioned eta² at each checkpoint. Result: **not testable at this scale** — the FM captures 99%+ of the computation at seq_len=16, leaving only architectural mismatch noise in the residual (cosine 0.994 vs 0.903 on MNIST where the structured phenomena emerge). The eta² measurement correctly reports no structure because there is none to find.
+
+See `REGIME_TRANSITION_README.md` for full details. Key takeaway: the A2A meta-learning machinery requires the FM to genuinely struggle (cosine 0.90–0.97), which requires computational complexity that 16-token RHM sequences don't provide.
+
+**Follow-up (2026-06-21)**: Cosine sweep at L=5,6 found L=6/m=2 with matched FM (14% of gap) gives cos=0.963 — in the sweet spot. But higher m makes the FM's job EASIER (model barely learns, computation is trivially predictable). Scaling up to 6L/6H/192D (~2.7M params) at m=4 produced the **L→m transition**: feature eta² rises monotonically (fL4*: 0.006→0.074, 12×; fL3*: 0.002→0.050, 25×) as the model learns hierarchical composition over 20K steps. Top1 PC shows a non-monotonic signature (rises to 33% then drops to 12%), confirming the shift from one generic FM error mode to multiple structured rule/feature discriminations. Code: `rhm_cosine_sweep.py`, `rhm_regime_trajectory.py`.
+
+## Per-level loss decomposition (2026-06-21)
+
+Since we know the DGP, each next-token prediction maps to a hierarchy level via the s-adic valuation of the position. Level 0 = within an s-tuple (easiest), level L-1 = root boundary (hardest). Two trajectory experiments at L=6:
+
+- **m=2, 4L/128D**: Loss monotonically increases with level. Model learns bottom-up — level 0 drops from 2.04→0.67 in 200 steps while levels 3-5 barely budge. At convergence: L0=0.37 (82% below uniform), L1-2≈1.15 (44%), L3-5≈1.80 (15%). 4-layer model plateaus at ~2-3 levels of learned composition.
+- **m=4, 6L/192D**: Same bottom-up pattern but m=4 makes every level harder. Even with 3.3× more params, levels 2-5 are all bunched near baseline (~1.93 vs uniform 2.08). Model can only really compose 1-2 levels at m=4.
+
+This provides the mechanistic picture behind the L→m transition: the bottom-up learning wave is what drives the monotonic rise in feature eta² — the FM residual gains structure as the model learns each successive level.
+
+See `PER_LEVEL_LOSS_README.md` for full results. Code: `rhm_per_level_loss.py`.
 
 ## Prior experiment
 
