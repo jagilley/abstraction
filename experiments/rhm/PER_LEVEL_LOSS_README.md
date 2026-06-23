@@ -142,3 +142,247 @@ modal run --detach rhm/rhm_per_level_loss.py::per_level_sweep \
 ```
 
 Results saved to `rhm-scaling-data` volume at `/data/rhm_per_level_loss/`.
+
+---
+
+## FM as DGP approximation (2026-06-21)
+
+**Code**: `rhm_dgp_approximation.py`
+**Prior experiments**: [Per-level loss decomposition](#per-level-loss-decomposition-2026-06-21) (above), [Regime trajectory](REGIME_TRANSITION_README.md), Forward self-models paper[^private]
+
+### Motivation
+
+The forward self-models paper claims FMs dissociate representation from computation: by conditioning on the main model's intermediate representations, the FM approximates the computational function that the intervening layers implement. On RHM data, the main model's computation IS hierarchical composition — applying rules to compose level-l features from level-(l-1) features. If the dissociation claim is true, and the main model has learned good representations, then the FM should approximate the RHM's composition rules themselves.
+
+The RHM is the one setting where we can directly test this, because we know the ground-truth rules and feature identities at every level. The per-level loss decomposition (above) told us which levels the model has learned. Now we ask: at those levels, has the FM also learned the composition rules?
+
+### Design
+
+Three measurements at each hierarchy level, all using eta² (fraction of variance explained by group membership):
+
+1. **eta²(actual activations, rule/feature identity)** — ground truth: how much does the model's actual computation (post_block3) vary by which rule/feature was used at level l?
+2. **eta²(FM predictions, rule/feature identity)** — does the FM predict differently depending on which composition rule was used?
+3. **eta²(source activations, rule/feature identity)** — baseline: what rule/feature structure is already in the FM's input (post_block0)?
+
+The FM "approximates the DGP" to the extent that (2) ≈ (1) and (2) > (3): the FM adds rule-conditioned structure beyond its input, matching what the model actually computes.
+
+Also: per-hierarchy-level cosine similarity. If the FM approximates the DGP, it should predict best at levels the main model has learned.
+
+Uses the converged 2.7M model (6L/6H/192D) at L=6/m=4 from the [regime trajectory](REGIME_TRANSITION_README.md), step 20000. FM: 2L/1H/24d/mlp1 (187K params, ~14% of gap capacity). 10K traced evaluation sequences with ground-truth ancestry at each level.
+
+### Results
+
+#### Global metrics
+
+| Metric | Value |
+|--------|-------|
+| FM cosine | 0.923 |
+| 1 − cosine | 7.7% |
+| Residual norm | 1.063 |
+
+The FM is in the "meaningful gap" regime (comparable to MNIST/language in the A2A experiments).
+
+#### Per-hierarchy-level cosine
+
+| Level | Cosine | 1−cos | Positions |
+|-------|--------|-------|-----------|
+| 0 (within s-tuple) | 0.935 | 6.5% | 33 |
+| 1 | 0.907 | 9.3% | 16 |
+| 2 | 0.910 | 9.0% | 8 |
+| 3 | 0.918 | 8.2% | 4 |
+| 4 | 0.911 | 8.9% | 2 |
+| 5 (root boundary) | 0.909 | 9.1% | 1 |
+
+Cosine is surprisingly flat — the FM predicts roughly equally well at all hierarchy levels. The interesting structure is not in *how much* the FM captures, but in *what kind of structure* its predictions carry.
+
+#### Feature eta² at last position (maximum causal context)
+
+This is the key table. Each row shows how much the activations at the last sequence position vary by which feature was active at level l.
+
+| Level | Source (post_block0) | FM prediction | Actual (post_block3) | FM/actual ratio |
+|-------|---------------------|---------------|---------------------|-----------------|
+| 0 (root) | 0.001 | 0.002 | 0.002 | **0.95** |
+| 1 | 0.002 | 0.007 | 0.007 | **0.97** |
+| 2 | 0.006 | 0.023 | 0.026 | **0.91** |
+| 3 | 0.018 | 0.075 | 0.082 | **0.92** |
+| 4 | 0.092 | 0.336 | 0.266 | 1.26 |
+| 5 (leaf-adj) | 0.492 | 0.318 | 0.241 | 1.32 |
+
+Rule eta² shows the same pattern (82–105% recovery at levels 0–3).
+
+#### Structure added beyond the source
+
+The delta between FM predictions and source shows how much rule/feature structure the FM's computation adds beyond what's already in its input, compared to what the actual blocks 1–3 add.
+
+| Level | Actual added | FM added | FM/actual |
+|-------|-------------|----------|-----------|
+| 0 | +0.0012 | +0.0011 | 92% |
+| 1 | +0.0054 | +0.0052 | 96% |
+| 2 | +0.0200 | +0.0178 | 89% |
+| 3 | +0.0641 | +0.0576 | 90% |
+| 4 | +0.1742 | +0.2440 | 140% |
+| 5 | −0.2519 | −0.1741 | 69% |
+
+### Interpretation
+
+**At levels 0–3 (learned levels), the FM captures 91–97% of the feature-conditioned structure.** The per-level loss decomposition showed the 2.7M model at m=4 has learned ~1–2 levels of composition. At those levels, the FM's predictions vary by feature identity almost exactly as much as the model's actual computation does. The FM adds almost exactly the same delta of feature structure beyond its input as the actual blocks 1–3. This is direct evidence that the FM has learned the composition rules at the levels the model has internalized.
+
+**At levels 4–5, the FM overshoots — its predictions are *more* feature-conditioned than the actual activations.** This is a compression artifact that's actually informative:
+
+- The FM optimizes MSE, so it approximates E[post_block3 | post_block0] — the conditional expectation given its input. This preserves systematic (group-conditioned) variation while smoothing idiosyncratic (within-group) variation, mechanically inflating eta².
+- At levels 0–3, the FM also captures most of the within-group computation, so the filtering effect is small (slight undershoot).
+- At levels 4–5, the main model's blocks 1–3 perform complex representational reorganization: they build compositional features at lower levels, and in doing so dilute the "raw" high-level feature encoding from block 0. The FM can't replicate this reorganization with limited capacity, so it retains more of the source's feature structure than the actual model.
+- Level 5 makes this clearest: block 0 encodes the root feature at 49% eta² (it determines the entire sequence). The actual blocks 1–3 cut this to 24% as they reorganize representations. The FM can only cut it to 32% — the 8pp gap is representational reorganization the FM's capacity couldn't replicate.
+
+The FM is, in a sense, a *purer* approximation of the DGP than the model's own computation: it captures the composition rules without the representational side-effects of the model's full computation. At learned levels, this aligns with the actual model (because the actual computation is mostly rule application). At unlearned levels, the FM can only do the rule-conditioned part, and overshoots because the actual model is doing additional computation that dilutes rule structure.
+
+### Connection to the paper's dissociation claim
+
+The forward self-models paper argues that conditioning on representation and modeling computation allows for a dissociation between these two aspects. This experiment provides the strongest evidence yet for that claim:
+
+1. **The FM captures computation, not statistics.** The FM's predictions carry rule-conditioned structure that closely matches the actual layer computation (91–97% at learned levels). This is not a statistical summary of the target activations — it's an executable approximation of the compositional function.
+
+2. **The FM captures *only* computation.** At levels beyond the model's learning horizon, the FM can't approximate what doesn't exist. It defaults to a less-transformed version of its input, retaining the source's feature structure rather than inventing non-existent computation. The overshoot is the fingerprint of this: the FM's limited capacity means it captures the DGP-aligned component while missing the representational reorganization.
+
+3. **The boundary between captured and missed computation aligns with the learning wave.** The per-level loss decomposition showed the model learns bottom-up: levels 0–3 are learned, levels 4–5 are near baseline. The FM's recovery ratio drops at exactly this boundary. The FM tracks the model's actual computational capacity, not the DGP's full depth.
+
+### Reproduction
+
+```bash
+cd experiments/
+
+# Single checkpoint (converged model, step 20K)
+modal run --detach -m rhm.rhm_dgp_approximation::dgp_approximation
+
+# Training trajectory (5 checkpoints)
+modal run --detach -m rhm.rhm_dgp_approximation::dgp_approximation_trajectory
+```
+
+Results saved to `rhm-scaling-data` volume at `/data/rhm_dgp_approximation/`.
+
+---
+
+## FM intermediate probing (2026-06-21)
+
+**Code**: `rhm_fm_intermediate_probing.py`
+**Prior experiment**: [FM as DGP approximation](#fm-as-dgp-approximation-2026-06-21) (above)
+
+### Motivation
+
+The DGP approximation experiment showed that the FM's *output* carries the same rule-conditioned structure as the main model's actual computation (91–97% recovery at learned levels). But does the FM just produce the right answer, or does it compute the answer via the same intermediate steps?
+
+A 2-layer FM predicting post_block0 → post_block3 has an intermediate representation (between its two layers) with no explicit training target. If the FM mirrors the main model's computation step by step, this intermediate should encode progressively higher-level hierarchy features — the same bottom-up trajectory the main model's blocks follow.
+
+### Design
+
+Same converged 2.7M model (6L/6H/192D) at L=6/m=4, step 20000. FM: 2L/1H/24d/mlp1 (187K params). Three measurements at each representation point (all main model layers + all FM layers):
+
+1. **Feature/rule eta²** at each hierarchy level
+2. **Linear probe accuracy** for feature classification at each level (v=8 classes, chance=0.125)
+3. **Linear CKA** between FM layers and main model layers
+
+Representation points:
+- Main model: post_embed, post_block0, ..., post_block5
+- FM: fm_layer0 (= post_block0), fm_layer1 (after FM block 0), fm_layer2 (FM output)
+
+5K traced evaluation sequences with ground-truth ancestry.
+
+### Results
+
+#### Feature eta²
+
+| Representation | L0 | L1 | L2 | L3 | L4 | L5 |
+|---|---|---|---|---|---|---|
+| post_embed | .00002 | .00147 | .00224 | .00171 | .01254 | .13381 |
+| post_block0 | .00003 | .00708 | .00792 | .00295 | .01392 | .08976 |
+| post_block1 | .00004 | .00552 | .00663 | .00408 | .01848 | .08709 |
+| post_block2 | .00008 | .00409 | .00614 | .00698 | .02498 | .06305 |
+| post_block3 | .00007 | .00233 | .00459 | .00525 | .02268 | .06901 |
+| post_block4 | .00004 | .00068 | .00186 | .00256 | .01455 | .07715 |
+| post_block5 | .00003 | .00041 | .00119 | .00191 | .01377 | .09034 |
+| **fm_layer0** | .00003 | .00708 | .00792 | .00295 | .01392 | .08976 |
+| **fm_layer1** | .00003 | .00574 | .00679 | .00342 | .01855 | .09721 |
+| **fm_layer2** | .00005 | .00261 | .00474 | .00463 | .02218 | .07800 |
+
+fm_layer0 = post_block0 exactly (sanity check). fm_layer2 tracks post_block3 (training target).
+
+#### Linear probe accuracy
+
+| Representation | L0 | L1 | L2 | L3 | L4 | L5 |
+|---|---|---|---|---|---|---|
+| post_embed | .122 | .213 | .206 | .258 | .277 | .452 |
+| post_block0 | .125 | .202 | .185 | .267 | .393 | .743 |
+| post_block1 | .123 | .200 | .188 | .283 | .478 | .757 |
+| post_block2 | .127 | .191 | .203 | .318 | .523 | .765 |
+| post_block3 | .128 | .199 | .206 | .320 | .548 | .767 |
+| post_block4 | .129 | .184 | .204 | .320 | .536 | .777 |
+| post_block5 | .126 | .176 | .178 | .302 | .543 | .773 |
+| **fm_layer0** | .130 | .209 | .191 | .266 | .388 | .745 |
+| **fm_layer1** | .127 | .201 | .198 | .291 | .458 | .756 |
+| **fm_layer2** | .124 | .197 | .196 | .315 | .526 | .756 |
+
+#### CKA: FM layers vs main model layers
+
+| | post_embed | post_block0 | post_block1 | post_block2 | post_block3 | post_block4 | post_block5 |
+|---|---|---|---|---|---|---|---|
+| fm_layer0 | 0.402 | **1.000** | 0.914 | 0.787 | 0.424 | 0.275 | 0.279 |
+| fm_layer1 | 0.382 | 0.954 | **0.909** | 0.807 | 0.481 | 0.332 | 0.336 |
+| fm_layer2 | 0.250 | 0.432 | 0.450 | 0.595 | **0.949** | 0.835 | 0.787 |
+
+fm_layer2 snaps to post_block3 (CKA=0.949). fm_layer1 sits between post_block0 (0.954) and post_block1 (0.909), having moved toward post_block2 (0.807 vs 0.787 at the input).
+
+#### Delta analysis: FM block 0 mirrors main model block 1
+
+Feature eta² added by each block (positive = block added hierarchy structure):
+
+| | L1 | L2 | L3 | L4 | L5 |
+|---|---|---|---|---|---|
+| FM_blk0 | −.00134 | −.00113 | +.00047 | +.00463 | +.00745 |
+| Main_blk1 | −.00156 | −.00129 | +.00113 | +.00456 | −.00267 |
+| FM_blk1 | −.00313 | −.00204 | +.00121 | +.00363 | −.01921 |
+| Main_blk2 | −.00143 | −.00050 | +.00290 | +.00650 | −.02404 |
+
+FM_blk0 and Main_blk1 do the same thing: decrease abstract feature encoding (L1–L2) and increase local feature encoding (L3–L4) by nearly identical amounts. At L4, the deltas are +.00463 vs +.00456. FM_blk1 then does work resembling Main_blk2.
+
+Probe accuracy deltas confirm the same pattern:
+
+| | L3 | L4 | L5 |
+|---|---|---|---|
+| FM_blk0 | +.025 | +.071 | +.012 |
+| Main_blk1 | +.016 | +.084 | +.014 |
+
+#### FM intermediate position on the main model trajectory
+
+Interpolation fraction: where does fm_layer1 fall between post_block0 (0.0) and post_block3 (1.0)?
+
+| Metric | L0 | L1 | L2 | L3 | L4 | L5 |
+|---|---|---|---|---|---|---|
+| feat_eta² | 0.17 | 0.28 | 0.34 | 0.20 | 0.53 | −0.36 |
+| probe_acc | 0.70 | 0.44 | 0.58 | 0.44 | 0.42 | 0.55 |
+
+Probe accuracy fractions cluster around 0.4–0.6: the FM intermediate is roughly halfway between input and target. For a 2-layer FM compressing 3 main model blocks, this means FM_blk0 does slightly more than one block's worth of computation.
+
+### Key finding: FM intermediate is more DGP-aligned than the main model
+
+The most interesting result is at L5 (leaf-adjacent features). Comparing matched pairs:
+
+| | L5 feature eta² |
+|---|---|
+| fm_layer1 | **.09721** |
+| post_block1 | .08709 |
+| | |
+| fm_layer2 | **.07800** |
+| post_block3 | .06901 |
+
+The FM's representations are 12–13% more conditioned on local feature identity than the main model's corresponding layers. This extends the "purer DGP approximation" finding from the [output-level analysis](#fm-as-dgp-approximation-2026-06-21) inward to the FM's intermediate computation: the FM is more DGP-aligned than the main model not just at its output, but at every stage of its computation. The main model trades off some feature encoding for representational reorganization that serves downstream layers; the FM, freed from this constraint, retains more of the DGP's hierarchical structure.
+
+### Reproduction
+
+```bash
+cd experiments/
+modal run --detach rhm/rhm_fm_intermediate_probing.py::fm_intermediate_probing
+```
+
+Results saved to `rhm-scaling-data` volume at `/data/rhm_fm_intermediate_probing/`.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

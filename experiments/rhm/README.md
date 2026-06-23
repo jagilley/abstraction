@@ -41,6 +41,8 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `rhm_cosine_sweep.py` | Cosine sweep: finding FM capacity settings where the FM genuinely struggles |
 | `rhm_regime_trajectory.py` | Regime trajectory: the L-to-m transition at scale (2.7M model, m=4) |
 | `rhm_per_level_loss.py` | Per-level loss decomposition: cross-entropy by hierarchy level over training |
+| `rhm_dgp_approximation.py` | FM as DGP approximation: does the FM learn the RHM composition rules? |
+| `rhm_fm_intermediate_probing.py` | FM intermediate probing: does the FM's internal computation mirror the hierarchy? |
 | `README.md` | This file |
 | `SWEEP_README.md` | [Scaling exponent sweep](SWEEP_README.md) |
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
@@ -120,6 +122,18 @@ This provides the mechanistic picture behind the L-to-m transition: the bottom-u
 
 **Reproduction**: `modal run --detach rhm/rhm_per_level_loss.py::per_level_trajectory --depth 6 --m 2`
 
+### FM as DGP approximation (2026-06-21)
+
+**Full writeup**: [PER_LEVEL_LOSS_README.md](PER_LEVEL_LOSS_README.md) (appended section)
+
+Tests whether the FM learns the RHM's composition rules, not just a statistical summary of the target activations. Compares eta^2(FM predictions, rule/feature identity) to eta^2(actual activations, rule/feature identity) at each hierarchy level, using the converged 2.7M model at L=6/m=4.
+
+At levels 0-3 (where the per-level loss decomposition showed the model has learned the hierarchy), the FM captures **91-97% of the feature-conditioned structure** in the actual activations. The FM adds almost exactly the same delta of feature structure beyond its input as the actual blocks 1-3 (89-96% match). At levels 4-5 (barely learned), the FM **overshoots** — its predictions are more feature-conditioned than the actual activations, because the FM's limited capacity captures the DGP-aligned component while missing the representational reorganization that the actual model's computation produces as a side-effect.
+
+This provides direct evidence for the dissociation claim in the forward self-models paper: the FM captures the compositional function (the DGP's rules) while remaining agnostic to the representational side-effects of the model's full computation.
+
+**Reproduction**: `modal run --detach -m rhm.rhm_dgp_approximation::dgp_approximation`
+
 ## CLI
 
 Primitives in `stages.py` can be used directly or imported into experiment scripts:
@@ -156,7 +170,8 @@ Results saved to `rhm-scaling-data` volume:
 │   └── regime_transition/           # Regime transition checkpoints
 ├── hparam_sweep_compact.json        # Scaling sweep aggregate results
 ├── rhm_regime_trajectory/           # Regime trajectory results
-└── rhm_per_level_loss/              # Per-level decomposition results
+├── rhm_per_level_loss/              # Per-level decomposition results
+└── rhm_dgp_approximation/          # FM as DGP approximation results
 ```
 
 ## Next steps

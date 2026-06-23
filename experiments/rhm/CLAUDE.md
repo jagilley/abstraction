@@ -160,6 +160,14 @@ This provides the mechanistic picture behind the L→m transition: the bottom-up
 
 See `PER_LEVEL_LOSS_README.md` for full results. Code: `rhm_per_level_loss.py`.
 
+## FM as DGP approximation (2026-06-21)
+
+Tests whether the FM learns the RHM composition rules themselves. Compares eta²(FM predictions, rule/feature identity) to eta²(actual activations, rule/feature identity) at each hierarchy level, using the converged 2.7M model at L=6/m=4.
+
+Key result: at levels 0–3 (learned), the FM captures 91–97% of the feature-conditioned structure. The FM adds almost exactly the same delta of feature structure beyond its input as the actual computation (89–96% match). At levels 4–5 (barely learned), the FM overshoots — its predictions are more feature-conditioned than the actual activations, because it captures the DGP-aligned component while missing the representational reorganization that the actual model performs as a side-effect.
+
+See `PER_LEVEL_LOSS_README.md` (appended section) for full results. Code: `rhm_dgp_approximation.py`.
+
 ## Prior experiment
 
 See `../language_reduction/STATUS.md` for the natural-language results that motivated this.

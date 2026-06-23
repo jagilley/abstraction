@@ -4,6 +4,9 @@ This is a research monorepo consolidating several projects.
 
 ## Structure
 
+- `experiments/` - All experiments
+    - `experiments/a2a_forward` is our main experiment for training forward self-models for decomposing activations
+    - `experiments/rhm` is a controlled setup for generating language-like data with a known data generating process
 - `reading/` — Papers, notes, and reference material (shared across projects)
 - `ideas/` — Research ideas and hypotheses (shared)
 - `beliefs/` — Crystallized beliefs about how things work (shared)
