@@ -24,7 +24,7 @@ Because we know the full generative process, every next-token prediction maps to
 
 All computation runs on Modal (workspace `jagilley`). Data lives on the `rhm-scaling-data` volume.
 
-Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences, from 4L/4H/128D (~0.8M params) up to 6L/6H/192D (~2.7M params). Forward models: TransformerForwardModel (same as in the A2A experiments), predicting later-layer activations from earlier-layer activations.
+Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences, from 4L/4H/128D (~0.8M params) up to 8L/8H/256D (~6.3M params). Forward models: TransformerForwardModel (same as in the A2A experiments), predicting later-layer activations from earlier-layer activations.
 
 ## Files
 
@@ -32,7 +32,7 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 |---|---|
 | `shared.py` | Modal infrastructure (app, volume, image, utilities) |
 | `stages.py` | Reusable experiment primitives: `generate_corpus`, `train_model`, `sweep`, `measure_scaling` |
-| `rhm.py` | RHM data generation (hierarchy rules + corpus sampling) |
+| `rhm_data.py` | RHM data generation (hierarchy rules + corpus sampling) |
 | `model.py` | GPT-2 with `return_intermediates` support |
 | `measure.py` | Scaling exponent fitting (log-log regression) |
 | `hparam_sweep.py` | L x m scaling exponent sweep |
@@ -43,11 +43,16 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `rhm_per_level_loss.py` | Per-level loss decomposition: cross-entropy by hierarchy level over training |
 | `rhm_dgp_approximation.py` | FM as DGP approximation: does the FM learn the RHM composition rules? |
 | `rhm_fm_intermediate_probing.py` | FM intermediate probing: does the FM's internal computation mirror the hierarchy? |
+| `rhm_label_smoothing.py` | Label smoothing sweep: does softening NTP shift learning from m to L? |
+| `rhm_focal_loss.py` | Focal loss sweep: does confidence-based position weighting shift learning from m to L? |
+| `rhm_confidence_threshold.py` | Confidence threshold sweep: aggressive gradient reallocation + scaled model |
 | `README.md` | This file |
 | `SWEEP_README.md` | [Scaling exponent sweep](SWEEP_README.md) |
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
 | `REGIME_TRANSITION_README.md` | [Regime transition, cosine sweep, and trajectory](REGIME_TRANSITION_README.md) |
 | `PER_LEVEL_LOSS_README.md` | [Per-level loss decomposition](PER_LEVEL_LOSS_README.md) |
+| `LABEL_SMOOTHING_README.md` | [Label smoothing experiment](LABEL_SMOOTHING_README.md) |
+| `FOCAL_LOSS_README.md` | [Focal loss & confidence threshold experiments](FOCAL_LOSS_README.md) |
 
 ## Results
 
@@ -96,9 +101,11 @@ Tests whether the FM residual transitions from diffuse to rule-conditioned as th
 
 **Full writeup**: [REGIME_TRANSITION_README.md](REGIME_TRANSITION_README.md) (appended sections)
 
-**Cosine sweep**: Swept L in {5,6}, m in {2,4,8}, two FM sizes. Found that higher m makes the FM's job *easier* (the model barely learns, so computation is trivially predictable). L=6/m=2 with a 14%-capacity FM gives cosine 0.963 — in the sweet spot where the A2A meta-learning phenomena emerge.
+**Cosine sweep**: Swept L in {5,6}, m in {2,4,8}, two FM sizes. Found that higher m makes the FM's job *easier* (the model barely learns, so computation is trivially predictable). L=6/m=2 with a 14%-capacity FM gives cosine 0.963 — in the sweet spot where the A2A meta-learning phenomena emerge. We also scaled up to seqlen = 64.
 
-**Regime trajectory** (the main positive result): Scaled up to 6L/6H/192D (~2.7M params) at L=6/m=4, tracking FM residual structure over 20K steps. Three signatures of the L-to-m transition:
+**Regime trajectory** (the main positive result): Scaled up to 6L/6H/192D (~2.7M params) at L=6/m=4, tracking FM residual structure over 20K steps. Key finding: we saw the L-to-m transition. **This should be the default RHM model size/hparams we use for all future experiments.**
+
+Three signatures of the L-to-m transition:
 
 1. **Feature eta^2 rises monotonically**: fL4* goes 0.006 to 0.074 (12x), fL3* goes 0.002 to 0.050 (25x). The FM's errors become increasingly conditioned on hierarchical feature identity, propagating up the hierarchy (local composition learned first, abstract later).
 
@@ -133,6 +140,30 @@ At levels 0-3 (where the per-level loss decomposition showed the model has learn
 This provides direct evidence for the dissociation claim in the forward self-models paper: the FM captures the compositional function (the DGP's rules) while remaining agnostic to the representational side-effects of the model's full computation.
 
 **Reproduction**: `modal run --detach -m rhm.rhm_dgp_approximation::dgp_approximation`
+
+### Label smoothing experiment (2026-06-22)
+
+**Full writeup**: [LABEL_SMOOTHING_README.md](LABEL_SMOOTHING_README.md)
+
+Tests whether the NTP objective's sharpness bias causes the composition depth ceiling. The hypothesis: cross-entropy's geometric position weighting (level 0 gets ~51% of gradient) combined with the reward for sharpening creates an incentive for m-learning over L-learning. Label smoothing (ε ∈ {0.0, 0.05, 0.1, 0.2, 0.4}) should cap the sharpening reward and free capacity for deeper composition.
+
+**Result: the composition depth ceiling is a capacity constraint, not an objective-induced bias.** Label smoothing hurts at every hierarchy level — L0 loss increases from 0.89 to 1.18 at ε=0.4, but levels 2-5 also get worse (not better). Accuracy is essentially identical across all ε values at every level (~0.587 at L0, ~0.213 at L2, ~0.200 at L3-5). The model learns exactly the same compositional depth regardless of smoothing intensity. Output entropy rises dramatically (L0: 0.91 → 1.69) confirming the model produces softer distributions, but the compositional structure is unchanged.
+
+FM residual analysis shows smaller norms (14.3 → 11.1) but flat cosine (~0.92). The FM finds smoothed models equally hard to predict — activations are just smaller in magnitude.
+
+**Reproduction**: `modal run --detach -m rhm.rhm_label_smoothing::label_smoothing_sweep`
+
+### Focal loss & confidence threshold experiments (2026-06-22)
+
+**Full writeup**: [FOCAL_LOSS_README.md](FOCAL_LOSS_README.md)
+
+Tests the *position weighting* axis (complementing label smoothing's *sharpness* axis). Focal loss (FL(p_t) = -(1-p_t)^γ · log(p_t)) downweights confident positions; confidence thresholding (zero gradient for p(correct) > τ) is the extreme version. Both are DGP-agnostic. Two experiments: focal sweep at 2.7M params, threshold sweep at 6.3M params (8L/8H/256D).
+
+**Result: gradient reallocation preserves compositional learning while reducing m-sharpening overhead and improving FM legibility.** At τ=0.3 (6.3M model), L0 learning drops 26.5% but L2-L3 retain 100% of baseline learning. At γ=2, L2-L3 *slightly improve* (101% retained) with minimal L0 cost (98% retained). FM cosine improves monotonically (0.940 → 0.955 at 6.3M), meaning the model's computation becomes more predictable to a compressed self-model. At τ=0.3, fL4* increases 31% — the FM's errors become more structured around the hierarchy. This is qualitatively different from label smoothing, where FM cosine was flat.
+
+**Implication for meta-learning**: focal loss (γ≈2) during pretraining could prime models for the A2A self-knowledge loop by making computation more legible to a forward self-model, at minimal NTP performance cost.
+
+**Reproduction**: `modal run --detach -m rhm.rhm_focal_loss::focal_loss_sweep` and `modal run --detach -m rhm.rhm_confidence_threshold::confidence_threshold_sweep`
 
 ## CLI
 
@@ -171,7 +202,10 @@ Results saved to `rhm-scaling-data` volume:
 ├── hparam_sweep_compact.json        # Scaling sweep aggregate results
 ├── rhm_regime_trajectory/           # Regime trajectory results
 ├── rhm_per_level_loss/              # Per-level decomposition results
-└── rhm_dgp_approximation/          # FM as DGP approximation results
+├── rhm_dgp_approximation/          # FM as DGP approximation results
+├── rhm_label_smoothing/            # Label smoothing sweep results
+├── rhm_focal_loss/                 # Focal loss sweep results
+└── rhm_confidence_threshold/       # Confidence threshold sweep results
 ```
 
 ## Next steps

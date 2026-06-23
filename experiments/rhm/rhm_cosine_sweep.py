@@ -36,7 +36,7 @@ FM_CONFIGS = {
 
 def _ensure_corpus(v, s, L, m, n_tokens):
     import numpy as np
-    from rhm.rhm import make_corpus
+    from rhm.rhm_data import make_corpus
 
     key = setting_key(v, s, L, m)
     corpus_path = f"{DATA_DIR}/{key}/corpus.npy"

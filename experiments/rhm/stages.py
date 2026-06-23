@@ -28,7 +28,7 @@ def generate_corpus(v: int = 8, s: int = 2, depth: int = 6, m: int = 4,
     """Generate RHM rules and corpus for a given (v, s, L, m) setting."""
     import os
     import numpy as np
-    from rhm.rhm import make_corpus
+    from rhm.rhm_data import make_corpus
 
     L = depth
     key = setting_key(v, s, L, m)
