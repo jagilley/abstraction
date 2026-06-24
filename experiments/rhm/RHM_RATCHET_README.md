@@ -209,6 +209,8 @@ Results saved to `rhm-scaling-data` volume at `/data/rhm_ratchet/results.json`.
 
 ## Next steps
 
-1. **Lower-m ratchet (m=2)**: The m=4 model is capacity-saturated at 1-2 hierarchy levels. At m=2, the same 2.7M model learns 3-4 levels (per-level loss shows L0-L2 well below baseline at m=2). This tests whether the ratchet can deepen composition when there's actual compositional headroom — and would distinguish the capacity-floor explanation from the dense-NTP explanation for the null compositional result.
+1. ~~**Lower-m ratchet (m=2)**~~: *Done* — see [RHM_RATCHET_M2_README](RHM_RATCHET_M2_README.md). No compositional depth improvement at m=2 either. OL wins at every cycle.
 
 2. **Domain shift on RHM**: The stationary-data ratchet shows dynamics without magnitude. The RHM's controllable DGP enables a clean domain shift test — e.g., train on one rule set then shift to new rules at the same (L, m). This would test whether the ratchet's meta-learning dynamics produce genuine adaptation advantages, as seen in the MNIST OOD experiments.
+
+3. ~~**Supervision density as causal variable**~~: *Done* — see [RHM_SPARSITY_SWEEP_README](RHM_SPARSITY_SWEEP_README.md). Monotonic crossover from LL-hurts (−0.9% at mask=0.0) to LL-helps (+1.6% at mask=0.95). The ratchet's null result on compositional depth was specific to the dense-NTP regime — at 95% NTP masking, process supervision improves compositional levels L1 and L2.

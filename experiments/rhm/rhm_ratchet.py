@@ -906,7 +906,7 @@ def rhm_ratchet_sweep(
         }
 
         # Save WS model to volume (after OL is done for this tau)
-        save_dir = f"{DATA_DIR}/rhm_ratchet"
+        save_dir = f"{DATA_DIR}/rhm_ratchet/{key}"
         os.makedirs(save_dir, exist_ok=True)
         torch.save(ws_model_state,
                     os.path.join(save_dir, f"ws_model_{tau_label}.pt"))
@@ -919,7 +919,7 @@ def rhm_ratchet_sweep(
     # ==================================================================
     # Save combined results
     # ==================================================================
-    save_dir = f"{DATA_DIR}/rhm_ratchet"
+    save_dir = f"{DATA_DIR}/rhm_ratchet/{key}"
     os.makedirs(save_dir, exist_ok=True)
 
     result = {

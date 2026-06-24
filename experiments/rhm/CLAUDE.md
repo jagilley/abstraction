@@ -8,7 +8,7 @@ Controlled scaling law experiments using the Random Hierarchy Model (Cagnetta & 
 
 Our natural-language experiments showed that vocab-only reduction is a channel intervention (changes β, not γ), and spectral denoising was entangled with the statistics being measured. We couldn't find a clean way to genuinely change the DGP of natural language. The RHM gives us a generative process with fully controllable hierarchical depth, where we know ground truth and can cleanly separate DGP vs channel interventions.
 
-## Setup
+## The Random Hierarchy Model
 
 The RHM generates sequences of length s^L from vocabulary {0, ..., v-1} via a hierarchy of composition rules. Each feature at level ℓ has m rules, each mapping to an s-tuple of level-(ℓ-1) features. This creates multi-scale correlations: tokens at distance s^ℓ are correlated through level-(ℓ+1) structure.
 
@@ -21,12 +21,16 @@ We train autoregressive transformers on concatenated RHM sequences and measure e
 - **s** (branching factor): size of each compositional tuple. Controls sequence length (s^L) and correlation scale spacing.
 - **v** (vocabulary size): number of token types. Channel intervention — should change β but not γ.
 
+## Default hyperparameters
+
+For experiments that need language-like complexity, use: **L=6, m=4, v=8, s=2** with a **6L/6H/192D model (~2.7M params)**. This setting produces a rich enough hierarchy that the model learns 1-2 compositional levels but not all of them, placing it in the regime where FM residual structure and the L→m transition are observable. Smaller models (4L/128D) at this (L, m) plateau too early; lower m (e.g. m=2) is too easy and higher m (e.g. m=8) makes the model barely learn beyond level 0.
+
 ## Architecture
 
 - `shared.py` — Modal infrastructure (app, volume, image, utilities)
 - `stages.py` — Reusable experiment primitives (Modal functions)
-- `rhm.py` — RHM data generation
-- `model.py` — GPT-2 model
+- `rhm_data.py` — RHM data generation (hierarchy rules + corpus sampling)
+- `model.py` — GPT-2 with `return_intermediates` and cerebellar callback support
 - `measure.py` — Scaling exponent fitting
 
 All computation runs on Modal (workspace `jagilley`). Data lives on the `rhm-scaling-data` volume.
@@ -125,49 +129,3 @@ Run with:
 ```
 modal run --detach rhm/my_experiment.py::dgp_sweep
 ```
-
-## Results (2026-06-20)
-
-All results with v=8, s=2, 4-layer 128-dim GPT-2 (~0.8M params). Two independent runs reproduce within ~0.01:
-
-| Setting | L | m | α_D | R² |
-|---------|---|---|-----|-----|
-| v8_s2_L4_m2 | 4 | 2 | 0.498 | 0.978 |
-| v8_s2_L4_m8 | 4 | 8 | 0.327 | 0.975 |
-| v8_s2_L6_m4 | 6 | 4 | 0.217 | 0.953 |
-| v8_s2_L8_m2 | 8 | 2 | 0.438 | 0.987 |
-
-Both L and m reduce α, but **m dominates by ~3:1**. At fixed L=4, quadrupling m (2→8) cuts α by 34%. At fixed m=2, doubling L (4→8) cuts α by only 12%. The effects compound: L=6/m=4 (α=0.217) is lower than either L=8/m=2 (0.438) or L=4/m=8 (0.327). The scaling bottleneck is synonymic multiplicity (per-level entropy), not hierarchy depth.
-
-See `SWEEP_README.md` for full experimental details.
-
-## Regime transition experiment (2026-06-21)
-
-Tested whether the FM residual transitions from diffuse to rule-conditioned as the main model learns (the "L-regime → m-regime" hypothesis). Three settings (m=2,4,8) at L=4, with ground-truth hierarchy-conditioned eta² at each checkpoint. Result: **not testable at this scale** — the FM captures 99%+ of the computation at seq_len=16, leaving only architectural mismatch noise in the residual (cosine 0.994 vs 0.903 on MNIST where the structured phenomena emerge). The eta² measurement correctly reports no structure because there is none to find.
-
-See `REGIME_TRANSITION_README.md` for full details. Key takeaway: the A2A meta-learning machinery requires the FM to genuinely struggle (cosine 0.90–0.97), which requires computational complexity that 16-token RHM sequences don't provide.
-
-**Follow-up (2026-06-21)**: Cosine sweep at L=5,6 found L=6/m=2 with matched FM (14% of gap) gives cos=0.963 — in the sweet spot. But higher m makes the FM's job EASIER (model barely learns, computation is trivially predictable). Scaling up to 6L/6H/192D (~2.7M params) at m=4 produced the **L→m transition**: feature eta² rises monotonically (fL4*: 0.006→0.074, 12×; fL3*: 0.002→0.050, 25×) as the model learns hierarchical composition over 20K steps. Top1 PC shows a non-monotonic signature (rises to 33% then drops to 12%), confirming the shift from one generic FM error mode to multiple structured rule/feature discriminations. Code: `rhm_cosine_sweep.py`, `rhm_regime_trajectory.py`.
-
-## Per-level loss decomposition (2026-06-21)
-
-Since we know the DGP, each next-token prediction maps to a hierarchy level via the s-adic valuation of the position. Level 0 = within an s-tuple (easiest), level L-1 = root boundary (hardest). Two trajectory experiments at L=6:
-
-- **m=2, 4L/128D**: Loss monotonically increases with level. Model learns bottom-up — level 0 drops from 2.04→0.67 in 200 steps while levels 3-5 barely budge. At convergence: L0=0.37 (82% below uniform), L1-2≈1.15 (44%), L3-5≈1.80 (15%). 4-layer model plateaus at ~2-3 levels of learned composition.
-- **m=4, 6L/192D**: Same bottom-up pattern but m=4 makes every level harder. Even with 3.3× more params, levels 2-5 are all bunched near baseline (~1.93 vs uniform 2.08). Model can only really compose 1-2 levels at m=4.
-
-This provides the mechanistic picture behind the L→m transition: the bottom-up learning wave is what drives the monotonic rise in feature eta² — the FM residual gains structure as the model learns each successive level.
-
-See `PER_LEVEL_LOSS_README.md` for full results. Code: `rhm_per_level_loss.py`.
-
-## FM as DGP approximation (2026-06-21)
-
-Tests whether the FM learns the RHM composition rules themselves. Compares eta²(FM predictions, rule/feature identity) to eta²(actual activations, rule/feature identity) at each hierarchy level, using the converged 2.7M model at L=6/m=4.
-
-Key result: at levels 0–3 (learned), the FM captures 91–97% of the feature-conditioned structure. The FM adds almost exactly the same delta of feature structure beyond its input as the actual computation (89–96% match). At levels 4–5 (barely learned), the FM overshoots — its predictions are more feature-conditioned than the actual activations, because it captures the DGP-aligned component while missing the representational reorganization that the actual model performs as a side-effect.
-
-See `PER_LEVEL_LOSS_README.md` (appended section) for full results. Code: `rhm_dgp_approximation.py`.
-
-## Prior experiment
-
-See `../language_reduction/STATUS.md` for the natural-language results that motivated this.
