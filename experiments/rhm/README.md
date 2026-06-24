@@ -33,7 +33,7 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `shared.py` | Modal infrastructure (app, volume, image, utilities) |
 | `stages.py` | Reusable experiment primitives: `generate_corpus`, `train_model`, `sweep`, `measure_scaling` |
 | `rhm_data.py` | RHM data generation (hierarchy rules + corpus sampling) |
-| `model.py` | GPT-2 with `return_intermediates` support |
+| `model.py` | GPT-2 with `return_intermediates` and cerebellar callback support |
 | `measure.py` | Scaling exponent fitting (log-log regression) |
 | `hparam_sweep.py` | L x m scaling exponent sweep |
 | `rhm_residual_rank.py` | FM residual rank experiments: DGP sweep, FM capacity sweep, architecture-matched sweep |
@@ -46,13 +46,16 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `rhm_label_smoothing.py` | Label smoothing sweep: does softening NTP shift learning from m to L? |
 | `rhm_focal_loss.py` | Focal loss sweep: does confidence-based position weighting shift learning from m to L? |
 | `rhm_confidence_threshold.py` | Confidence threshold sweep: aggressive gradient reallocation + scaled model |
+| `rhm_fm_weighted_ntp.py` | FM-surprise-weighted NTP: principled gradient reallocation via self-model surprise |
+| `rhm_ratchet.py` | Unified gate ratchet with confidence thresholding: meta-learning signature vs m-sharpening |
 | `README.md` | This file |
 | `SWEEP_README.md` | [Scaling exponent sweep](SWEEP_README.md) |
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
 | `REGIME_TRANSITION_README.md` | [Regime transition, cosine sweep, and trajectory](REGIME_TRANSITION_README.md) |
 | `PER_LEVEL_LOSS_README.md` | [Per-level loss decomposition](PER_LEVEL_LOSS_README.md) |
 | `LABEL_SMOOTHING_README.md` | [Label smoothing experiment](LABEL_SMOOTHING_README.md) |
-| `FOCAL_LOSS_README.md` | [Focal loss & confidence threshold experiments](FOCAL_LOSS_README.md) |
+| `LOSS_WEIGHTING_README.md` | [Loss weighting experiments: focal loss, confidence threshold, FM-surprise NTP](LOSS_WEIGHTING_README.md) |
+| `RHM_RATCHET_README.md` | [Unified gate ratchet with confidence thresholding](RHM_RATCHET_README.md) |
 
 ## Results
 
@@ -155,7 +158,7 @@ FM residual analysis shows smaller norms (14.3 → 11.1) but flat cosine (~0.92)
 
 ### Focal loss & confidence threshold experiments (2026-06-22)
 
-**Full writeup**: [FOCAL_LOSS_README.md](FOCAL_LOSS_README.md)
+**Full writeup**: [LOSS_WEIGHTING_README.md](LOSS_WEIGHTING_README.md)
 
 Tests the *position weighting* axis (complementing label smoothing's *sharpness* axis). Focal loss (FL(p_t) = -(1-p_t)^γ · log(p_t)) downweights confident positions; confidence thresholding (zero gradient for p(correct) > τ) is the extreme version. Both are DGP-agnostic. Two experiments: focal sweep at 2.7M params, threshold sweep at 6.3M params (8L/8H/256D).
 
@@ -164,6 +167,23 @@ Tests the *position weighting* axis (complementing label smoothing's *sharpness*
 **Implication for meta-learning**: focal loss (γ≈2) during pretraining could prime models for the A2A self-knowledge loop by making computation more legible to a forward self-model, at minimal NTP performance cost.
 
 **Reproduction**: `modal run --detach -m rhm.rhm_focal_loss::focal_loss_sweep` and `modal run --detach -m rhm.rhm_confidence_threshold::confidence_threshold_sweep`
+
+### FM-surprise-weighted NTP (2026-06-23)
+
+**Full writeup**: [LOSS_WEIGHTING_README.md](LOSS_WEIGHTING_README.md) (Experiments 3-4)
+
+Replaces the heuristic focal loss γ with a principled, self-scheduling signal: co-train an FM alongside the model and weight each position's NTP loss by the FM's angular prediction error (1-cosine). The FM defines "boring" via its own learned compression of the model's computation — no hyperparameter needed.
+
+**FM-surprise NTP alone** (fm_weighted): the weights go through three phases — (1) the FM overshoot (FM converges instantly, gives more gradient to L0 where computation is most active), (2) transition (model's computation outgrows FM), (3) focal-loss-like (L0 weight drops, L2-L5 rise). The phase 1→3 flip takes ~14000 steps. FM cosine reaches 0.966 (vs 0.940 focal, 0.925 ce), but L1-L2 performance costs from the Phase 1 overshoot.
+
+**FM-surprise NTP + uniform local loss** (fm_wt_ll): adding λ=0.1 local loss (MSE between actual and FM-predicted intermediates, gradient through main model only) fixes Phase 1 by keeping the FM accurate throughout (MSE stable at ~0.01 vs growing to 0.72). The weight flip happens at step ~2000 instead of ~14000. Results:
+- Val loss cost 5× smaller than focal (+0.002 vs +0.011)
+- First L2 improvement of any objective modification (-0.001)
+- L3-L4 also improve, matching focal
+- FM cosine **0.995** — prediction gap drops from 7.5% (ce) to 0.5%, residual norm drops 10×
+- Caveat: the tiny residual (norm 1.3) is likely dominated by architectural mismatch noise (1-head FM vs 6-head model), so rank/eta² comparisons with other conditions at 10× higher norm aren't well-controlled
+
+**Reproduction**: `modal run --detach -m rhm.rhm_fm_weighted_ntp::fm_weighted_ntp_sweep` and `modal run --detach -m rhm.rhm_fm_weighted_ntp::fm_weighted_ll_run`
 
 ## CLI
 
@@ -210,8 +230,10 @@ Results saved to `rhm-scaling-data` volume:
 
 ## Next steps
 
-1. **Closed-loop A2A on RHM**: Now that the L=6/m=4 scaled model produces a meaningful FM cosine gap (~0.92-0.96), inject the FM prediction back into the main model's residual stream. Test whether the gate/self-knowledge/robustness phenomena from MNIST and language replicate, with the advantage that the RHM provides ground-truth rule identity for interpreting gate selectivity.
+1. ~~**Closed-loop A2A on RHM**~~: *Done* — see [RHM_RATCHET_README](RHM_RATCHET_README.md). The WS_UG_uniform ratchet replicates on RHM in dynamics (gate closing, FM tracking, robustness dissociation, crossover timing) but not in magnitude (0.3% vs MNIST's 48%). Confidence thresholding keeps the gate 1.8x more open at tau=0.3 but doesn't amplify the val loss gap. FM capacity must be matched (~2% of model) for meaningful dynamics — an oversized FM (12.5%) masks the gate-closing behavior.
 
-2. **Scale model to learn higher m**: The m=4 model at 2.7M params can only compose 1-2 levels. A larger model that learns 3-4 levels at m=4 would produce a richer m-regime with higher absolute eta^2 values and more interpretable gate structure.
+2. **Domain shift on RHM**: The stationary-data ratchet shows meta-learning dynamics without learning magnitude. The RHM's controllable DGP enables a clean domain shift test — e.g., train on one rule set then shift to new rules at the same (L, m). This would test whether the ratchet's dynamics produce genuine adaptation advantages, as seen in the MNIST OOD experiments.
 
-3. **Vocabulary as channel intervention**: Sweep v at fixed (L, m) to test the prediction that v changes beta (overall difficulty) but not gamma (scaling exponent shape). The RHM makes this a clean test — v changes the observation alphabet without changing the hierarchical composition structure.
+3. **Scale model to learn higher m**: The m=4 model at 2.7M params can only compose 1-2 levels. A larger model that learns 3-4 levels at m=4 would produce a richer m-regime with higher absolute eta^2 values and more interpretable gate structure.
+
+4. **Vocabulary as channel intervention**: Sweep v at fixed (L, m) to test the prediction that v changes beta (overall difficulty) but not gamma (scaling exponent shape). The RHM makes this a clean test — v changes the observation alphabet without changing the hierarchical composition structure.

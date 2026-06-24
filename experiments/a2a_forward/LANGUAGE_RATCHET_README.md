@@ -101,7 +101,7 @@ Full-rank residual throughout (~226-230/256 at final cycle), consistent with all
 
 ### Open questions
 
-1. **Is this just "distillation helps with overfitting"?** A WS condition (distillation without local loss) would disentangle. On MNIST, WS alone stalled while WS_UG_uniform kept compounding. If WS ≈ WS_UG_uniform on language, the local loss contributes nothing beyond distillation-as-regularization.
+1. **Is this just "distillation helps with overfitting"?** On MNIST, this was already answered: the [multi-cycle comparison](MNIST_DISTILLATION_README.md#multi-cycle-comparison-with-compute-matched-baselines-2026-06-13) showed WS ≈ KD (external teacher) for val loss — distillation from *any* teacher works — while robustness requires self-referential CL co-training (KD is worse than OL). A WS condition (distillation without local loss) on language would test whether the same decomposition holds here. On MNIST, WS alone stalled while WS_UG_uniform kept compounding; if WS ≈ WS_UG_uniform on language, the local loss contributes nothing beyond distillation-as-regularization.
 
 2. **Dataset size confound.** 10M tokens with 10K steps is deep in the overfitting regime. On 100M tokens, the regularization benefit shrinks. The question is whether the ratchet helps with genuine generalization or only with overfitting resistance.
 

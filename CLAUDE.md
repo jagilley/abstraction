@@ -48,11 +48,10 @@ Reading, ideas, beliefs, and conversations are shared across projects. Experimen
 - Before parsing prior conversations, run `python3 conversations/parse_transcripts.py` to generate `INDEX.md` and `readable/` markdowns from the raw JSONL files.
 - Read `conversations/claude-code-transcripts/INDEX.md` first to find the relevant session, then read the specific `readable/<session>.md` file.
 - Be sure to run the `conversations/parse_transcripts.py` script prior to reading the file, even if the file already exists. If you don't, you may read an out-of-date version of the convo.
-- To get the id of the current Claude Code conversation, you can run `echo $CLAUDE_CODE_SESSION_ID`
 
 ## Notes
 - For long-running e.g. training jobs (long running = anything that takes more than 2 mins), please follow this procedure to manage things:
-    1. Kick off the job, make sure it runs, etc. You can do this by using a detached Modal run with a 2-minute timeout before the process is auto-backgrounded by the Claude Code harness.
+    1. Kick off the job, make sure it runs, etc. You can do this by using a detached Modal run with a 2-minute timeout and then auto-backgrounding the shell.
     2. Then, don't monitor any further, halt your work, and just wait for the background notification that the job has completed. Under no circumstances should you read logs in consecutive tool calls as a means of waiting for the run to finish.
 - Please don't use Explore subagents. These use Claude Haiku, which is too small of a model to be useful. Opt for Sonnet or Opus explore agents/subagents instead if you like, but for short tasks often nothing beats just looking at the data/code yourself.
 - For reading background/context files, please also avoid using subagents. Consuming the relevant context directly is often load-bearing for interpreting results properly. Subagents, especially those that run smaller models, risk misinterpreting results given a lack of context.
