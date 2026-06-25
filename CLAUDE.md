@@ -53,7 +53,7 @@ Reading, ideas, beliefs, and conversations are shared across projects. Experimen
 - For long-running e.g. training jobs (long running = anything that takes more than 2 mins), please follow this procedure to manage things:
     1. Kick off the job, make sure it runs, etc. You can do this by using a detached Modal run with a 2-minute timeout and then auto-backgrounding the shell.
     2. Then, don't monitor any further, halt your work, and just wait for the background notification that the job has completed. Under no circumstances should you read logs in consecutive tool calls as a means of waiting for the run to finish.
-- If you're going to use an Explore subagent, please use Sonnet as the executor model. But for short tasks often nothing beats just looking at the data/code yourself.
+- If you're going to use an Explore subagent, please use Sonnet or Opus as the executor model. But for short tasks often nothing beats just looking at the data/code yourself.
 - For reading background/context files, please also avoid using subagents. Consuming the relevant context directly is often load-bearing for interpreting results properly. Subagents, especially those that run smaller models, risk misinterpreting results given a lack of context.
 
 ## Quotes

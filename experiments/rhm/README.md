@@ -48,6 +48,7 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `rhm_confidence_threshold.py` | Confidence threshold sweep: aggressive gradient reallocation + scaled model |
 | `rhm_fm_weighted_ntp.py` | FM-surprise-weighted NTP: principled gradient reallocation via self-model surprise |
 | `rhm_ratchet.py` | Unified gate ratchet with confidence thresholding: meta-learning signature vs m-sharpening |
+| `rhm_sparse_ratchet.py` | Sparse ratchet: WS_UG_uniform with NTP masking, gated vs fixed local loss |
 | `README.md` | This file |
 | `SWEEP_README.md` | [Scaling exponent sweep](SWEEP_README.md) |
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
@@ -56,6 +57,8 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `LABEL_SMOOTHING_README.md` | [Label smoothing experiment](LABEL_SMOOTHING_README.md) |
 | `LOSS_WEIGHTING_README.md` | [Loss weighting experiments: focal loss, confidence threshold, FM-surprise NTP](LOSS_WEIGHTING_README.md) |
 | `RHM_RATCHET_README.md` | [Unified gate ratchet with confidence thresholding](RHM_RATCHET_README.md) |
+| `RHM_SPARSE_RATCHET_README.md` | [Sparse ratchet: wake-sleep with NTP masking](RHM_SPARSE_RATCHET_README.md) |
+| `RHM_L4_RATCHET_README.md` | [Sparse ratchet at L=4: overparameterization test](RHM_L4_RATCHET_README.md) |
 
 ## Results
 
@@ -225,15 +228,31 @@ Results saved to `rhm-scaling-data` volume:
 ├── rhm_dgp_approximation/          # FM as DGP approximation results
 ├── rhm_label_smoothing/            # Label smoothing sweep results
 ├── rhm_focal_loss/                 # Focal loss sweep results
-└── rhm_confidence_threshold/       # Confidence threshold sweep results
+├── rhm_confidence_threshold/       # Confidence threshold sweep results
+├── rhm_sparsity_sweep/            # Sparsity sweep results
+└── rhm_sparse_ratchet/            # Sparse ratchet results (gated + fixed)
 ```
+
+### Sparse ratchet at L=4: overparameterization test (2026-06-24)
+
+**Full writeup**: [RHM_L4_RATCHET_README.md](RHM_L4_RATCHET_README.md)
+
+Tests whether the ratchet's failure to compound is caused by the model being capacity-limited at higher compositional levels. Reduces L from 6 to 4 (seq_len 64 → 16), putting the 6L/6H/192D model in the overparameterized regime (~6 layers for ~4 compositional levels). Same code as the sparse ratchet, sweep over mask_rates = {0.0, 0.75, 0.90, 0.95}.
+
+**Result: the regularization headroom hypothesis is not supported.** Dense NTP (mask=0.0): OL wins at every cycle. Sparse NTP: WS shows improvements at mask≥0.90 (peak +2.0% at mask=0.90 cycle 1, +1.5% at mask=0.95 cycle 3) but the gap does not compound — it peaks mid-training and narrows by cycle 4. The FM cosine is very high (0.987–0.991 for WS), meaning the FM captures 98–99% of computation and the residual is dominated by architectural noise. Self-knowledge probes invert (OL > WS at post_block5: 0.42 vs 0.20), the opposite of MNIST and language, because the tiny residual has no structured signal to predict.
+
+Overparameterization does not produce MNIST-like compounding. The remaining unexplained differences between MNIST (which compounds) and RHM (which does not) involve task structure (classification vs autoregressive NTP), FM architecture (bidirectional vs causal), and/or residual structure (low-rank digit-discriminative vs high-rank diffuse).
+
+**Reproduction**: `modal run --detach -m rhm.rhm_sparse_ratchet::rhm_sparse_ratchet --depth 4 --mask-rates "0.0,0.75,0.90,0.95"`
 
 ## Next steps
 
-1. ~~**Closed-loop A2A on RHM**~~: *Done* — see [RHM_RATCHET_README](RHM_RATCHET_README.md). The WS_UG_uniform ratchet replicates on RHM in dynamics (gate closing, FM tracking, robustness dissociation, crossover timing) but not in magnitude (0.3% vs MNIST's 48%). Confidence thresholding keeps the gate 1.8x more open at tau=0.3 but doesn't amplify the val loss gap. FM capacity must be matched (~2% of model) for meaningful dynamics — an oversized FM (12.5%) masks the gate-closing behavior.
+1. ~~**Closed-loop A2A on RHM**~~: *Done* — see [RHM_RATCHET_README](RHM_RATCHET_README.md). The WS_UG_uniform ratchet replicates on RHM in dynamics (gate closing, FM tracking, robustness dissociation, crossover timing) but not in magnitude (0.3% vs MNIST's 48%). Confidence thresholding keeps the gate 1.8x more open at tau=0.3 but doesn't amplify the val loss gap. FM capacity must be matched (~2% of model) for meaningful dynamics — an oversized FM (12.5%) masks the gate-closing behavior. See also [RHM_SPARSE_RATCHET_README](RHM_SPARSE_RATCHET_README.md) — sparse NTP masking unlocks +1.2% val loss improvement and per-level compositional gains at L3-L5 in cycle 1.
 
-2. **Domain shift on RHM**: The stationary-data ratchet shows meta-learning dynamics without learning magnitude. The RHM's controllable DGP enables a clean domain shift test — e.g., train on one rule set then shift to new rules at the same (L, m). This would test whether the ratchet's dynamics produce genuine adaptation advantages, as seen in the MNIST OOD experiments.
+2. **Domain shift on RHM**: The stationary-data ratchet shows meta-learning dynamics without learning magnitude. The RHM's controllable DGP enables a clean domain shift test — e.g., train on one rule set then shift to new rules at the same (L, m). This would test whether the ratchet's dynamics produce genuine adaptation advantages, as seen in the MNIST OOD experiments. The sparse ratchet's non-compounding L3-L5 improvement (exhausted after cycle 1 on fixed data) motivates this especially — novel data would sustain the need for higher-level compositional learning.
 
 3. **Scale model to learn higher m**: The m=4 model at 2.7M params can only compose 1-2 levels. A larger model that learns 3-4 levels at m=4 would produce a richer m-regime with higher absolute eta^2 values and more interpretable gate structure.
 
 4. **Vocabulary as channel intervention**: Sweep v at fixed (L, m) to test the prediction that v changes beta (overall difficulty) but not gamma (scaling exponent shape). The RHM makes this a clean test — v changes the observation alphabet without changing the hierarchical composition structure.
+
+5. **Understand the MNIST-RHM ratchet gap**: The L=4 experiment ruled out capacity/overparameterization as the explanation for why the ratchet compounds on MNIST but not RHM. Remaining candidates: (a) classification vs NTP task structure (test: add per-position auxiliary losses to MNIST ViT, or add a classification head to RHM); (b) bidirectional vs causal FM (test: use a causal FM on MNIST or a bidirectional FM on RHM); (c) FM accuracy regime — the ratchet may require FM cosine in a specific range (~0.85–0.95) where predictions are informative but imperfect enough to generate useful teaching signal, and RHM falls outside this range.
