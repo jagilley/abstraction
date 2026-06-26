@@ -301,6 +301,7 @@ def rhm_rl_ratchet(
     lambda_ntp: float = 1.0,
     ntp_mask_rate: float = 0.95,
     only_rl_fm: bool = False,
+    run_tag: str = "",
     # Eval
     eval_interval: int = 500,
     n_eval_batches: int = 5,
@@ -933,67 +934,72 @@ def rhm_rl_ratchet(
             rl_step_idx += 1
 
         # === SLEEP: Distillation ===
-        print(f"  [SLEEP] Distillation ({distill_steps} steps)")
-        teacher = make_gpt()
-        teacher.load_state_dict(model.state_dict())
-        teacher.eval()
-        for p in teacher.parameters():
-            p.requires_grad = False
-        teacher_fm = make_fm()
-        teacher_fm.load_state_dict(fm.state_dict())
-        teacher_fm.eval()
-        for p in teacher_fm.parameters():
-            p.requires_grad = False
-        teacher_ugate = UnifiedGate(n_embd, ug_hidden).to(device)
-        teacher_ugate.load_state_dict(ugate.state_dict())
-        teacher_ugate.eval()
-        for p in teacher_ugate.parameters():
-            p.requires_grad = False
-
-        student = make_gpt()
-        student.load_state_dict(model.state_dict())
-        opt_student = torch.optim.AdamW(
-            student.parameters(), lr=distill_lr, weight_decay=0.01)
-
-        ntp_step_offset = pretrain_steps + cycle * steps_per_cycle + wake_steps
-
-        for step in range(distill_steps):
-            student.train()
-            x = torch.stack([train_data[i:i + seq_len]
-                             for i in train_indices[ntp_step_offset + step]]).to(device)
-            y = torch.stack([train_data[i + 1:i + seq_len + 1]
-                             for i in train_indices[ntp_step_offset + step]]).to(device)
-
-            with torch.no_grad():
-                def t_cb(act):
-                    fp = teacher_fm(act)
-                    inj, _ = teacher_ugate(act, fp)
-                    return inj
-                teacher_logits, _, _ = teacher(
-                    x, return_intermediates=True,
-                    cerebellar_fn=t_cb,
-                    cerebellar_input_block=cerebellar_input_block,
-                    cerebellar_inject_block=inject_after_block,
-                )
-
-            student_logits, _ = student(x)
-            kl_loss = F.kl_div(
-                F.log_softmax(student_logits, dim=-1),
-                F.softmax(teacher_logits, dim=-1),
-                reduction="batchmean",
-            )
-            ce_loss = F.cross_entropy(
-                student_logits.view(-1, v), y.view(-1))
-            loss = distill_alpha * kl_loss + (1 - distill_alpha) * ce_loss
-
-            opt_student.zero_grad()
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(student.parameters(), 1.0)
-            opt_student.step()
-
-        model.load_state_dict(student.state_dict())
-        del teacher, teacher_fm, teacher_ugate, student, opt_student
         del opt_main, opt_fwd
+
+        if distill_steps > 0:
+            print(f"  [SLEEP] Distillation ({distill_steps} steps)")
+            teacher = make_gpt()
+            teacher.load_state_dict(model.state_dict())
+            teacher.eval()
+            for p in teacher.parameters():
+                p.requires_grad = False
+            teacher_fm = make_fm()
+            teacher_fm.load_state_dict(fm.state_dict())
+            teacher_fm.eval()
+            for p in teacher_fm.parameters():
+                p.requires_grad = False
+            teacher_ugate = UnifiedGate(n_embd, ug_hidden).to(device)
+            teacher_ugate.load_state_dict(ugate.state_dict())
+            teacher_ugate.eval()
+            for p in teacher_ugate.parameters():
+                p.requires_grad = False
+
+            student = make_gpt()
+            student.load_state_dict(model.state_dict())
+            opt_student = torch.optim.AdamW(
+                student.parameters(), lr=distill_lr, weight_decay=0.01)
+
+            ntp_step_offset = pretrain_steps + cycle * steps_per_cycle + wake_steps
+
+            for step in range(distill_steps):
+                student.train()
+                x = torch.stack([train_data[i:i + seq_len]
+                                 for i in train_indices[ntp_step_offset + step]]).to(device)
+                y = torch.stack([train_data[i + 1:i + seq_len + 1]
+                                 for i in train_indices[ntp_step_offset + step]]).to(device)
+
+                with torch.no_grad():
+                    def t_cb(act):
+                        fp = teacher_fm(act)
+                        inj, _ = teacher_ugate(act, fp)
+                        return inj
+                    teacher_logits, _, _ = teacher(
+                        x, return_intermediates=True,
+                        cerebellar_fn=t_cb,
+                        cerebellar_input_block=cerebellar_input_block,
+                        cerebellar_inject_block=inject_after_block,
+                    )
+
+                student_logits, _ = student(x)
+                kl_loss = F.kl_div(
+                    F.log_softmax(student_logits, dim=-1),
+                    F.softmax(teacher_logits, dim=-1),
+                    reduction="batchmean",
+                )
+                ce_loss = F.cross_entropy(
+                    student_logits.view(-1, v), y.view(-1))
+                loss = distill_alpha * kl_loss + (1 - distill_alpha) * ce_loss
+
+                opt_student.zero_grad()
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(student.parameters(), 1.0)
+                opt_student.step()
+
+            model.load_state_dict(student.state_dict())
+            del teacher, teacher_fm, teacher_ugate, student, opt_student
+        else:
+            print(f"  [SLEEP] Skipped (distill_steps=0)")
+
         torch.cuda.empty_cache()
 
         # === REPOINT ===
@@ -1016,7 +1022,8 @@ def rhm_rl_ratchet(
     if only_rl_fm:
         print("\n  [SKIP] Conditions RL, NTP_FM, OL (only_rl_fm=True)")
         # Jump to save results
-        save_dir = f"{DATA_DIR}/rhm_rl_ratchet/{key}_rl_fm_only"
+        tag_suffix = f"_{run_tag}" if run_tag else ""
+        save_dir = f"{DATA_DIR}/rhm_rl_ratchet/{key}_rl_fm_only{tag_suffix}"
         os.makedirs(save_dir, exist_ok=True)
         result = {
             "config": {
@@ -1035,6 +1042,7 @@ def rhm_rl_ratchet(
                 "lambda_ntp": lambda_ntp, "ntp_mask_rate": ntp_mask_rate,
                 "batch_size": batch_size, "seed": seed,
                 "only_rl_fm": True,
+                "run_tag": run_tag,
             },
             "pretrain": {
                 "per_level": pretrain_pl,
@@ -1387,7 +1395,8 @@ def rhm_rl_ratchet(
     # ==================================================================
     # Save results
     # ==================================================================
-    save_dir = f"{DATA_DIR}/rhm_rl_ratchet/{key}"
+    tag_suffix = f"_{run_tag}" if run_tag else ""
+    save_dir = f"{DATA_DIR}/rhm_rl_ratchet/{key}{tag_suffix}"
     os.makedirs(save_dir, exist_ok=True)
 
     result = {

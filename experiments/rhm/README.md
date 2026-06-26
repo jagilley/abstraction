@@ -49,6 +49,8 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `rhm_fm_weighted_ntp.py` | FM-surprise-weighted NTP: principled gradient reallocation via self-model surprise |
 | `rhm_ratchet.py` | Unified gate ratchet with confidence thresholding: meta-learning signature vs m-sharpening |
 | `rhm_sparse_ratchet.py` | Sparse ratchet: WS_UG_uniform with NTP masking, gated vs fixed local loss |
+| `rhm_rl_ratchet.py` | RL ratchet: REINFORCE with FM supervision for generation + FM cosine regime sweep |
+| `rhm_rl_gen_distill.py` | Generation-based distillation: KL on teacher-generated suffixes + CE on NTP |
 | `README.md` | This file |
 | `SWEEP_README.md` | [Scaling exponent sweep](SWEEP_README.md) |
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
@@ -59,6 +61,7 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `RHM_RATCHET_README.md` | [Unified gate ratchet with confidence thresholding](RHM_RATCHET_README.md) |
 | `RHM_SPARSE_RATCHET_README.md` | [Sparse ratchet: wake-sleep with NTP masking](RHM_SPARSE_RATCHET_README.md) |
 | `RHM_L4_RATCHET_README.md` | [Sparse ratchet at L=4: overparameterization test](RHM_L4_RATCHET_README.md) |
+| `RHM_RL_RATCHET_README.md` | [RL ratchet: REINFORCE with FM supervision](RHM_RL_RATCHET_README.md) |
 
 ## Results
 
@@ -245,6 +248,20 @@ Overparameterization does not produce MNIST-like compounding. The remaining unex
 
 **Reproduction**: `modal run --detach -m rhm.rhm_sparse_ratchet::rhm_sparse_ratchet --depth 4 --mask-rates "0.0,0.75,0.90,0.95"`
 
+### RL ratchet: REINFORCE with FM supervision (2026-06-25)
+
+**Full writeup**: [RHM_RL_RATCHET_README.md](RHM_RL_RATCHET_README.md)
+
+Tests whether RL's sparse-but-rich supervision (like classification) combined with FM process supervision unlocks the ratchet on RHM. The model generates the second half of RHM sequences autoregressively and receives a REINFORCE reward (fraction of correct tokens). 12 runs spanning NTP regularization, FM capacity, local loss, prediction gap, and DGP difficulty.
+
+**RL+FM improves generation by 40% at all hierarchy levels** (38.5% standalone vs 27.8% OL). Vanilla RL collapses representations (flat eta² across layers); the FM prevents this. Self-knowledge appears under RL for the first time on RHM (R²=0.633 vs OL's 0.544). The gate stays open (0.67-0.998) — injection is genuinely useful for generation, unlike NTP where it's redundant.
+
+**The ratchet doesn't compound because distillation is both load-bearing and destructive.** Without distillation, generation collapses to OL baseline (27.4%) — it's the only mechanism that transfers FM-assisted generation into standalone weights. But distillation destroys NTP (val loss 0.82 during wake → 2.3-3.5 after distillation) because the teacher's injected computation is too different from standalone computation. A systematic cosine regime sweep (runs 8-12) found that the FM cosine is controlled by distillation (not local loss or FM capacity), and a 3-block prediction gap (blk0→blk3) is the only configuration that achieves the 0.94 sweet spot — but activation norm inflation without local loss destabilizes training. Even λ_local=0.001 pushes cosine back to 0.987.
+
+**Generation-based distillation solves the NTP destruction problem** (run 13). Instead of distilling on NTP data (where the teacher's logits are ~100% injection-derived), the teacher generates suffixes autoregressively with FM injection, and the student matches those logits. NTP is preserved via separate CE on ground-truth data. Result: val loss 0.813 (vs 2.262 for NTP distillation, 0.789 for OL) while generation transfers equally well (39.1% vs 38.4%). Also unlocks sweet-spot FM cosine (0.911), 7× higher self-knowledge (0.572 vs 0.077), and progressive eta² (4.3× L5 decrease through the network). Outcome metrics (generation accuracy, NTP loss) don't compound, but L3 feature eta² at the final layer increases monotonically across cycles (+15% over 4 cycles, 0.389→0.449), suggesting representational deepening that may precede outcome improvement.
+
+**Reproduction**: `modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet --only-rl-fm --ntp-mask-rate 0.95` and `modal run --detach -m rhm.rhm_rl_gen_distill::rhm_rl_gen_distill`
+
 ## Next steps
 
 1. ~~**Closed-loop A2A on RHM**~~: *Done* — see [RHM_RATCHET_README](RHM_RATCHET_README.md). The WS_UG_uniform ratchet replicates on RHM in dynamics (gate closing, FM tracking, robustness dissociation, crossover timing) but not in magnitude (0.3% vs MNIST's 48%). Confidence thresholding keeps the gate 1.8x more open at tau=0.3 but doesn't amplify the val loss gap. FM capacity must be matched (~2% of model) for meaningful dynamics — an oversized FM (12.5%) masks the gate-closing behavior. See also [RHM_SPARSE_RATCHET_README](RHM_SPARSE_RATCHET_README.md) — sparse NTP masking unlocks +1.2% val loss improvement and per-level compositional gains at L3-L5 in cycle 1.
@@ -255,4 +272,8 @@ Overparameterization does not produce MNIST-like compounding. The remaining unex
 
 4. **Vocabulary as channel intervention**: Sweep v at fixed (L, m) to test the prediction that v changes beta (overall difficulty) but not gamma (scaling exponent shape). The RHM makes this a clean test — v changes the observation alphabet without changing the hierarchical composition structure.
 
-5. **Understand the MNIST-RHM ratchet gap**: The L=4 experiment ruled out capacity/overparameterization as the explanation for why the ratchet compounds on MNIST but not RHM. Remaining candidates: (a) classification vs NTP task structure (test: add per-position auxiliary losses to MNIST ViT, or add a classification head to RHM); (b) bidirectional vs causal FM (test: use a causal FM on MNIST or a bidirectional FM on RHM); (c) FM accuracy regime — the ratchet may require FM cosine in a specific range (~0.85–0.95) where predictions are informative but imperfect enough to generate useful teaching signal, and RHM falls outside this range.
+5. **Understand the MNIST-RHM ratchet gap**: The L=4 experiment ruled out capacity/overparameterization. The RL ratchet ruled out task structure (RL is sparse-but-rich like classification) and partially ruled out FM cosine regime (the 3-block gap achieves 0.944, but training is unstable). Gen-based distillation (run 13) resolved the distillation bottleneck (val loss 0.813 vs 2.262, generation 39.1%) and achieved sweet-spot FM cosine (0.911) — but the ratchet still doesn't compound. Remaining candidates: (a) bidirectional vs causal FM; (b) residual structure (MNIST's low-rank digit-discriminative residual vs RHM's higher-rank diffuse residual); (c) the ratchet may require novel data to sustain compression pressure (MNIST has 10 classes with varying difficulty; stationary RHM is exhausted after cycle 1).
+
+6. **Stabilize λ_local=0 training**: The 3-block gap at λ_local=0 achieved sweet-spot cosine (0.944) with excellent dynamics for 2 cycles before activation norm inflation destabilized it. Gradient clipping or activation norm regularization (penalizing ||post_block3||² > threshold) could prevent the explosion without creating FM-predictability pressure. This preserves the rich dynamics (2.9× eta² progression, 0.299 self-knowledge) that only appear at λ_local=0. Gen-distill + λ_local=0 is a promising combination: gen-distill already achieves cosine 0.911 with λ_local=1.0, so removing the local loss feedback loop might push it further into the sweet spot.
+
+7. **Self-model-driven grokking (north star)**: The gen-distill run 13 shows monotonically improving val loss and L3 feature eta² increasing +15% over 4 cycles at the final layer (0.389→0.449), with L4 also trending up (+4%). The ratchet is compounding at the representation level even though generation accuracy is flat — the compositional deepening hasn't yet crossed the threshold for behavioral improvement. The RHM's DGP is extremely compact (96 rules = 576 bits for L=6/m=2/v=8/s=2), and the 2.68M model is overparameterized by ~150,000× relative to this target — exactly the regime where grokking occurs. The FM captures 91-97% of the DGP's composition rules at learned levels, providing structured regularization pressure specifically toward the compact solution, unlike weight decay's generic L2 pressure. An extended gen-distill run (16-32+ cycles) could reveal whether the gradual L3 eta² improvement eventually produces a sudden phase transition — the model "clicking" on L3 composition rules, which would make L4 accessible and potentially trigger a cascade. This would be the first instance of self-model-driven grokking: a phase transition caused by a model's compressed self-model selecting for DGP-aligned computation, rather than by weight decay selecting for low-norm solutions.
