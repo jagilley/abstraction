@@ -51,6 +51,9 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `rhm_sparse_ratchet.py` | Sparse ratchet: WS_UG_uniform with NTP masking, gated vs fixed local loss |
 | `rhm_rl_ratchet.py` | RL ratchet: REINFORCE with FM supervision for generation + FM cosine regime sweep |
 | `rhm_rl_gen_distill.py` | Generation-based distillation: KL on teacher-generated suffixes + CE on NTP |
+| `rhm_rl_gen_distill_extended.py` | Extended gen-distill: 40-cycle ratchet + weight decay experiments |
+| `rhm_fomaml_ratchet.py` | FOMAML ratchet: bilevel meta-learning with dense NTP wake + NTP outer |
+| `rhm_fomaml_rl_ratchet.py` | FOMAML RL ratchet: bilevel meta-learning with RL wake + per-level NTP outer |
 | `README.md` | This file |
 | `SWEEP_README.md` | [Scaling exponent sweep](SWEEP_README.md) |
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
@@ -62,6 +65,8 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `RHM_SPARSE_RATCHET_README.md` | [Sparse ratchet: wake-sleep with NTP masking](RHM_SPARSE_RATCHET_README.md) |
 | `RHM_L4_RATCHET_README.md` | [Sparse ratchet at L=4: overparameterization test](RHM_L4_RATCHET_README.md) |
 | `RHM_RL_RATCHET_README.md` | [RL ratchet: REINFORCE with FM supervision](RHM_RL_RATCHET_README.md) |
+| `RHM_RL_GEN_DISTILL_EXTENDED_README.md` | [Gen-distill extended: 40-cycle ratchet + weight decay](RHM_RL_GEN_DISTILL_EXTENDED_README.md) |
+| `RHM_FOMAML_README.md` | [FOMAML ratchet: bilevel meta-learning diagnostic (3 outer objectives)](RHM_FOMAML_README.md) |
 
 ## Results
 
@@ -261,6 +266,24 @@ Tests whether RL's sparse-but-rich supervision (like classification) combined wi
 **Generation-based distillation solves the NTP destruction problem** (run 13). Instead of distilling on NTP data (where the teacher's logits are ~100% injection-derived), the teacher generates suffixes autoregressively with FM injection, and the student matches those logits. NTP is preserved via separate CE on ground-truth data. Result: val loss 0.813 (vs 2.262 for NTP distillation, 0.789 for OL) while generation transfers equally well (39.1% vs 38.4%). Also unlocks sweet-spot FM cosine (0.911), 7× higher self-knowledge (0.572 vs 0.077), and progressive eta² (4.3× L5 decrease through the network). Outcome metrics (generation accuracy, NTP loss) don't compound, but L3 feature eta² at the final layer increases monotonically across cycles (+15% over 4 cycles, 0.389→0.449), suggesting representational deepening that may precede outcome improvement.
 
 **Reproduction**: `modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet --only-rl-fm --ntp-mask-rate 0.95` and `modal run --detach -m rhm.rhm_rl_gen_distill::rhm_rl_gen_distill`
+
+### FOMAML ratchet: bilevel meta-learning diagnostic (2026-06-26)
+
+**Full writeup**: [RHM_FOMAML_README.md](RHM_FOMAML_README.md)
+
+Tests whether the MNIST gated ratchet's FOMAML bilevel meta-learning produces compounding on RHM, or whether the failure of first-order methods on RHM is domain-specific. Three experiments with different outer objectives on the FOMAML gate:
+
+1. **Dense NTP outer** (NTP wake): Gate closes to 0.002. NTP gradient at all 64 positions makes local loss redundant.
+2. **RL outer** (RL wake, REINFORCE): Gate stuck at 0.5. REINFORCE variance drowns the meta-gradient.
+3. **Per-level NTP outer** (RL wake, NTP at hierarchy levels >= 2): Gate closes to 0.000. Clean deterministic signal, and the answer is: local loss does not help compositional NTP.
+
+**The diagnostic question is answered: the problem is domain-specific.** FOMAML doesn't compound on RHM under any outer objective. The MNIST equivalence (FOMAML ≈ unified gate) was specific to a regime where the FM's low-rank, class-discriminative residual naturally aligned with the task objective. On RHM, the FM's higher-rank residual doesn't point in compositionally useful directions — compressing intermediate computation toward FM-predictability does not improve level-2+ NTP quality, even after one full FOMAML inner step with the information advantage of 64 × 192 dims of local loss vs ~3 sparse NTP positions.
+
+**Reproduction**:
+```bash
+modal run --detach -m rhm.rhm_fomaml_ratchet::rhm_fomaml_ratchet
+modal run --detach -m rhm.rhm_fomaml_rl_ratchet::rhm_fomaml_rl_ratchet
+```
 
 ## Next steps
 
