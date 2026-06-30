@@ -10,6 +10,9 @@ This is a research monorepo consolidating several projects.
 - `reading/` — Papers, notes, and reference material (shared across projects)
 - `ideas/` — Research ideas and hypotheses (shared)
 - `beliefs/` — Crystallized beliefs about how things work (shared)
+    - `beliefs/trees/` — Structured belief hierarchies (see `beliefs/SCHEMA.md`)
+    - `beliefs/*.md` — Deeper essay-format explorations of specific beliefs
+    - Use `/add-belief` to integrate new evidence; `/update-beliefs` to assess existing beliefs against new evidence
 - `conversations/` — Conversations with AI assistants and collaborators (shared)
 - `fer/` — Fractured Entangled Representations project (JAX/Flax, conda env: `fer`)
 - `glp/` — Generative Latent Prior project (PyTorch, conda env: `glp`)
