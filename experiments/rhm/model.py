@@ -10,11 +10,12 @@ import torch.nn.functional as F
 
 
 class CausalSelfAttention(nn.Module):
-    def __init__(self, n_embd, n_head, block_size):
+    def __init__(self, n_embd, n_head, block_size, causal=True):
         super().__init__()
         assert n_embd % n_head == 0
         self.n_head = n_head
         self.head_dim = n_embd // n_head
+        self.causal = causal
         self.c_attn = nn.Linear(n_embd, 3 * n_embd)
         self.c_proj = nn.Linear(n_embd, n_embd)
         self.register_buffer(
@@ -32,17 +33,18 @@ class CausalSelfAttention(nn.Module):
         v = v.view(B, T, self.n_head, self.head_dim).transpose(1, 2)
 
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(self.head_dim))
-        att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float("-inf"))
+        if self.causal:  # bidirectional encoder when causal=False (e.g. masked-span)
+            att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float("-inf"))
         att = F.softmax(att, dim=-1)
         y = att @ v
         return self.c_proj(y.transpose(1, 2).contiguous().view(B, T, C))
 
 
 class Block(nn.Module):
-    def __init__(self, n_embd, n_head, block_size):
+    def __init__(self, n_embd, n_head, block_size, causal=True):
         super().__init__()
         self.ln_1 = nn.LayerNorm(n_embd)
-        self.attn = CausalSelfAttention(n_embd, n_head, block_size)
+        self.attn = CausalSelfAttention(n_embd, n_head, block_size, causal=causal)
         self.ln_2 = nn.LayerNorm(n_embd)
         self.mlp = nn.Sequential(
             nn.Linear(n_embd, 4 * n_embd),
@@ -57,7 +59,7 @@ class Block(nn.Module):
 
 
 class GPT(nn.Module):
-    def __init__(self, vocab_size, block_size, n_layer, n_head, n_embd):
+    def __init__(self, vocab_size, block_size, n_layer, n_head, n_embd, causal=True):
         super().__init__()
         self.block_size = block_size
         self.transformer = nn.ModuleDict(dict(
@@ -65,7 +67,7 @@ class GPT(nn.Module):
             wpe=nn.Embedding(block_size, n_embd),
             drop=nn.Dropout(0.0),
             h=nn.ModuleList([
-                Block(n_embd, n_head, block_size) for _ in range(n_layer)
+                Block(n_embd, n_head, block_size, causal=causal) for _ in range(n_layer)
             ]),
             ln_f=nn.LayerNorm(n_embd),
         ))

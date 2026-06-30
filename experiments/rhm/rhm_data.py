@@ -26,6 +26,31 @@ def generate_rules(v, s, L, m, seed=0):
     return [rng.integers(0, v, size=(v, m, s)) for _ in range(L)]
 
 
+def generate_rules_distinct(v, s, L, m, seed=0):
+    """Sample composition rules with m DISTINCT s-tuples per feature.
+
+    Same shape/semantics as generate_rules ((v, m, s) per level), but the m rules
+    of each feature are guaranteed distinct (sampled without replacement from the
+    v^s possible s-tuples). generate_rules uses rng.integers (with replacement), so
+    a feature can hold repeated rules and the legal-tuple set is denser/collision-
+    prone. This "distinct" variant is the canonical RHM construction and is used to
+    control tuple-space occupancy m/v^(s-1), which governs how identifiable the
+    high-level features are from the leaves (see RHM_DEEP_COMPOSITION_README.md).
+
+    Kept separate from generate_rules so all prior experiments stay reproducible.
+    """
+    rng = np.random.default_rng(seed)
+    rules = []
+    for _ in range(L):
+        layer = np.empty((v, m, s), dtype=np.int64)
+        for f in range(v):
+            codes = rng.choice(v ** s, size=m, replace=False)  # m distinct tuples
+            for i in range(s):
+                layer[f, :, i] = (codes // (v ** i)) % v
+        rules.append(layer)
+    return rules
+
+
 def generate_sequences(rules, n_sequences, seed=0):
     """Generate sequences by traversing the hierarchy.
 

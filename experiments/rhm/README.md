@@ -54,6 +54,10 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `rhm_rl_gen_distill_extended.py` | Extended gen-distill: 40-cycle ratchet + weight decay experiments |
 | `rhm_fomaml_ratchet.py` | FOMAML ratchet: bilevel meta-learning with dense NTP wake + NTP outer |
 | `rhm_fomaml_rl_ratchet.py` | FOMAML RL ratchet: bilevel meta-learning with RL wake + per-level NTP outer |
+| `rhm_meta_learning.py` | Meta-learning: FOMAML with rule-set transfer for compositional learning |
+| `rhm_meta_learning_l2.py` | Meta-learning: L2+-only outer loss FOMAML with rule-set transfer |
+| `rhm_reptile.py` | Meta-learning: Reptile with rule-set transfer (dense inner loop) |
+| `rhm_reptile_sparse.py` | Meta-learning: Reptile with sparse L2+ inner loop + rule-set transfer |
 | `README.md` | This file |
 | `SWEEP_README.md` | [Scaling exponent sweep](SWEEP_README.md) |
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
@@ -67,6 +71,7 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `RHM_RL_RATCHET_README.md` | [RL ratchet: REINFORCE with FM supervision](RHM_RL_RATCHET_README.md) |
 | `RHM_RL_GEN_DISTILL_EXTENDED_README.md` | [Gen-distill extended: 40-cycle ratchet + weight decay](RHM_RL_GEN_DISTILL_EXTENDED_README.md) |
 | `RHM_FOMAML_README.md` | [FOMAML ratchet: bilevel meta-learning diagnostic (3 outer objectives)](RHM_FOMAML_README.md) |
+| `RHM_META_LEARNING_README.md` | [Meta-learning with rule-set transfer: FOMAML, Reptile, sparse L2+ inner](RHM_META_LEARNING_README.md) |
 
 ## Results
 
