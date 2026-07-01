@@ -1,6 +1,6 @@
 # RHM: m (not occupancy) gates the learnable frontier, and the FM residual tracks it (2026-06-30)
 
-**Code**: `rhm_occupancy_frontier.py` (NTP frontier vs occupancy), `rhm_fm_legibility.py` (FM residual-legibility over training), `rhm_local_signal_sweeps.py::occ_frontier_refs` (BP/greedy reference lines). Modal/GPU for the trained-model parts; reference lines are local CPU.
+**Code**: `rhm_occupancy_frontier.py` (NTP frontier vs occupancy), `rhm_fm_legibility.py` (FM residual-legibility over training), `rhm_local_signal_sweeps.py::occ_frontier_refs` (BP/greedy reference lines), `rhm_norm_trajectory.py` (weight/activation-norm probe over the legibility checkpoints), `rhm_wd_sweep.py` (Exp 3: weight-decay sweep, preemption-robust). Modal/GPU for the trained-model parts; reference lines are local CPU.
 **Prior experiment**: [RHM_DEEP_COMPOSITION_README.md](RHM_DEEP_COMPOSITION_README.md) (recoverable / representable / not-locally-SSL-learnable arc that motivated this)
 **Belief**: [beliefs/trees/rhm_compositional_learnability.md](../../beliefs/trees/rhm_compositional_learnability.md) (the occupancy-vs-m dissociation is persisted there)
 
@@ -154,6 +154,41 @@ modal run --detach -m rhm.rhm_fm_legibility::analyze_only
 
 ---
 
+## Experiment 3: weight-decay sweep — does the circuit compress, or just the norm? (2026-06-30)
+
+`rhm_wd_sweep.py` (preemption-robust: each training maintains a resumable `latest.pt` = model+optimizer+step committed every 2500 steps, so a preempted+auto-restarted call resumes from the last commit; analysis writes resumable per-(wd,checkpoint) parts and skips existing ones). Trains the **m2 substrate** (identical distinct-rule DGP, 8L/8H/256D) to **150k steps** at **WD ∈ {0.01, 0.1, 0.3, 1.0}**, measuring at each checkpoint: weight + activation norms, FM cosine / residual effective-rank / top1-PC / per-level feature η², and per-level **last-token knowledge-probe accuracy** (the BP gate). Motivated by Exp 2's norm-trajectory finding that WD=0.01 is *zero* effective pressure (weight norm grows 2×): this asks whether **real** WD pressure forces a circuit collapse (rank↓, cosine↑, deep η² resolves) or merely compresses weight norm while functional rank stays put.
+
+### Final state (step 150k; BP root ceiling = 0.93)
+
+| WD | ‖W‖ | val | **d6 root acc** | FM cos | **resid rank%** | top1% | d4 η² | d6 η² |
+|---|---|---|---|---|---|---|---|---|
+| 0.01 | 238.8 | 0.819 | 0.86 | 0.914 | 88.8 | 5.4 | 0.356 | 0.183 |
+| 0.1 | 121.7 | 0.821 | **0.93** | 0.949 | 81.1 | 5.7 | 0.367 | 0.203 |
+| 0.3 | 74.1 | 0.827 | **0.94** | 0.950 | 76.8 | 5.6 | 0.318 | 0.172 |
+| 1.0 | 62.9 | 0.867 | 0.72 ✗ | 0.573 | 66.4 | 12.3 | 0.241 | 0.081 |
+
+(d1–d5 ≈ 1.00 in every condition except wd=1.0's damaged root; within-run rank is converged by ~step 15k and flat thereafter, so these are asymptotic, not cut short.)
+
+### Findings
+
+1. **Weight norm and functional rank dissociate sharply — rank is nearly incompressible.** Across the knowledge-preserving band (WD 0.01→0.3), **‖W‖ compresses 3.2× (239→74) at zero cost** (val +0.008 nats, root knowledge *improves*), but **effective residual rank falls only 13% (89→77%)**, top1-PC stays flat ~5–6% (no dominant-mode concentration), and deep η² does not resolve. At **matched root knowledge** (wd=0.1 vs 0.3, both d6≈0.93–0.94) the cleanest cut: ‖W‖ ÷1.6 buys just 81→77% rank (5%). Weight norm is ~25× more elastic than functional rank. **This is the predicted dissociation made empirical: a simple DGP need not have a simple weight-space circuit — the deep RHM inverse is (mostly) irreducibly distributed.**
+2. **No circuit-grok.** There is no phase transition — no sharp rank drop with a cosine spike and η² resolution — at any WD that preserves knowledge. The compression that does happen (rank 89→77, cosine 0.914→0.950) is smooth and modest. Weight decay is not *inert* on the circuit, but it cannot collapse RHM's deep solution the way it collapses modular addition's Fourier circuit — consistent with a structureless random-table inverse having no low-rank handle for ‖W‖²-minimization to exploit.
+3. **Mild WD helps the root; the 0.01 default was leaving knowledge on the table.** wd=0.1/0.3 reach d6 = 0.93–0.94 (= BP) vs wd=0.01's 0.86 (which peaked at 0.91 mid-run and drifted down — overfitting at the no-pressure end). **wd=0.1 is the new recommended default for this substrate**: full root knowledge, best-ish val, and 2× weight-norm compression over wd=0.01.
+4. **WD=1.0 confirms the mechanism by breaking it.** Pushed too hard, WD doesn't compress a *complete* circuit — it **stalls the model below the root** (d6 = 0.72 ≪ BP, val +0.05 nats). Its lower rank (66%) and rising top1 (12%) are the *never-learned* signature (a shallower function → the FM misses fewer, more concentrated modes), **not** circuit-grok — and its cosine craters to 0.57 (out of band; the FM cannot track the stunted, half-built hierarchy). Exactly the capacity-guard failure predicted: at fixed depth, enough WD eats the effective capacity the root needs.
+
+### Reading
+
+RHM's deep solution exhibits **knowledge-grok without circuit-grok even under strong regularization**: the model reaches the information ceiling via a high-rank distributed implementation that weight decay shrinks in *norm* (3×) but not in *functional rank* (≤13%, ≤5% at matched knowledge). This confirms the dissociation hypothesis — **low-description-length DGP ≠ low-L2 / low-rank circuit** — and isolates the missing ingredient for grokking-style collapse as the *algebraic compressibility of the target* (which RHM's random rules lack by construction), not its *description length*. The best WD achieves at preserved knowledge is **rank ≈ 77%**, the concrete floor a **structured (forward-model) regularizer** would have to beat to show "FM-driven compression succeeds where generic L2 fails."
+
+**Reproduction:**
+```bash
+cd experiments
+modal run --detach -m rhm.rhm_wd_sweep::wd_sweep      # train (resumable, 4 WD × 150k)
+modal run --detach -m rhm.rhm_wd_sweep::analyze_wd    # per-(wd,ckpt) norms + FM + knowledge gate
+```
+
+---
+
 ## What we learned (synthesis)
 
 1. **Learnability is m-gated, separably from recoverability (occupancy).** Plain NTP fully learns deep RHM composition at m=2 (given depth) and cannot at m≥4 — and no amount of occupancy-lowering moves that wall, even where the deep levels are ~100% recoverable. This refines the deep-composition arc's "not self-supervised-learnable at depth" to an **m≥4** statement.
@@ -161,6 +196,7 @@ modal run --detach -m rhm.rhm_fm_legibility::analyze_only
 3. **It explains the prior RHM A2A history.** Every earlier closed-loop/ratchet attempt ran at m≥4, where the deep residual is structureless — there was nothing for the FM to amplify.
 4. **Metric hygiene**: η² (hierarchy-conditioning) is head-robust; rank/top1 are head-contaminated and reflect computational complexity, not legibility per se. Legibility ≠ low-rank here.
 5. **Knowledge-grok ≠ circuit-grok.** m2 reaches the information ceiling (probe ≈ BP at every level, root 0.93) yet shows no circuit-complexity collapse (rank flat-high ~84%, top1 ~5%, target norms drifting up) — it learned the hierarchy via a distributed, uncompressed solution. So the rising residual norm/η² and falling cosine reflect ongoing deep learning *plus* a generic activation-norm drift — not a grokking-style simplification, which (if it happens at all) would need more training and/or stronger regularization.
+6. **The circuit is irreducibly distributed: weight norm compresses, functional rank does not (Exp 3).** A 150k WD sweep on m2 (the test point #5 called for) shows weight norm is highly elastic (‖W‖ ÷3.2 across WD 0.01→0.3 at zero knowledge cost) while effective rank is nearly incompressible (89→77%, ≤5% at matched root knowledge) — no circuit-grok. This makes empirical the "simple DGP ≠ simple circuit" claim: RHM's random-table deep inverse has no algebraic structure for ‖W‖²-minimization to collapse, unlike modular addition's Fourier circuit. The rank ≈ 77% WD floor is the bar a structured FM regularizer must beat.
 
 ## Caveats
 
@@ -173,6 +209,7 @@ modal run --detach -m rhm.rhm_fm_legibility::analyze_only
 ## Next steps
 
 1. **Closed-loop ratchet on the m2 substrate (the payoff test).** We finally have an RHM model with a genuinely legible, hierarchy-structured residual — the precondition the closed-loop work always lacked. Does the injection/ratchet now *compound* (as on MNIST)? Note the residual is legible-but-high-rank, unlike MNIST's low-rank case, so this is a genuine open question.
-2. **Extend m2 training past 50k** (~150–200k), **with stronger weight decay than the mild 0.01 used here**, to actively probe for the circuit-complexity collapse — grokking's simplification is the regularizer's doing, *after* the data is fit. Prediction if a collapse occurs: rank↓, cosine↑ (a compact circuit is FM-predictable), and the deep η² finally *resolves* (the "fall" we never captured); if it does not occur even then, RHM's deep solution is irreducibly distributed at this scale.
-3. **Curriculum over m (m=2 → m=4).** Train where NTP reaches the root, transfer toward where it cannot — the one untried constructive route to deep composition at hard m.
-4. *(Optional)* matched-checkpoint head-invariance recut; more rule seeds; the long low-occupancy m=4 run.
+2. ~~**Extend m2 past 50k with stronger weight decay** to probe for circuit-complexity collapse.~~ *Done — Exp 3 (WD sweep to 150k, WD up to 1.0).* **Answer: no circuit-grok.** Weight norm compresses 3.2× but functional rank only ≤13% (≤5% at matched knowledge); the deep solution is irreducibly distributed at this scale. WD=1.0 doesn't collapse the circuit, it stalls the root (capacity guard). The "fall"/η²-resolution was *not* observed under any knowledge-preserving WD.
+3. **FM-as-regularizer arm (the actual payoff of Exp 3).** Exp 3 established that generic L2 cannot push residual rank below ≈77% at preserved root knowledge. The north-star test: does co-training/distilling toward FM-predictability (structured pressure toward the DGP-aligned function) beat that floor — rank < 77% at d6 ≈ BP? This is the concrete form of "FM-driven compression succeeds where weight decay fails."
+4. **Curriculum over m (m=2 → m=4).** Train where NTP reaches the root, transfer toward where it cannot — the one untried constructive route to deep composition at hard m.
+5. *(Optional)* matched-checkpoint head-invariance recut; more rule seeds; the long low-occupancy m=4 run.
