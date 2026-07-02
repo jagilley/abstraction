@@ -1,7 +1,7 @@
 # Cerebellum and Cognitive Architecture
 
 *Domain: neuroscience, cognitive architecture, AI implications*
-*Last updated: 2026-06-29*
+*Last updated: 2026-07-01*
 
 
 ## The brain's cognitive power arises from multiple specialized subsystems teaching the cortex, not from cortical computation alone
@@ -28,6 +28,16 @@
 - The cerebellum receives efference copies of cortical state via the corticopontocerebellar tract, making it a conditional predictor: "given cortical state X, the cortex should transition to state Y" — discussed here[^private]
 - The cerebellum's predictions are conditioned on current cortical activations (via pontine relay), not on cortical weights directly — it must *learn* cortical dynamics by observing them — same source
 - This means the cerebellum's model necessarily lags after cortical learning, which may explain the brief post-insight "strangeness" where familiar things feel unfamiliar — same source
+
+#### Cerebellar output serves two complementary computational roles: dynamical bias (forward) and learning signal (backward)
+*Confidence: moderate*
+
+- The ccRNN paper (Pemberton et al. 2021) frames the cerebellum as a backward DNI predicting future loss gradients; the BP(λ) paper (Pemberton & Ponte Costa 2024) extends this with eligibility traces. Both acknowledge the forward DNI variant also works — the cerebellum outputs activations that the cortex can use either way — ccRNN[^private], BP(λ)[^private]
+- In our A2A experiments, the same FM prediction serves both roles with empirically separable effects: injection (forward role) produces robustness (0.24× OL sensitivity) and self-knowledge (R²=0.63–0.73) but not learning speed; local loss (backward role) produces learning speed (+1.4pp, 31% lower val loss) but 13× brittleness and zero self-knowledge — [local loss](../../experiments/a2a_forward/MNIST_LOCAL_LOSS_README.md)
+- The local loss gradient `∂post_block3/∂θ_early · (post_block3 − FM_pred)` is literally a synthetic gradient — the FM prediction error projected through the local Jacobian — functionally equivalent to what ccRNN's cerebellar module provides — same source
+- CL_LL (combining both roles) produces the best self-knowledge (R²=0.76–0.79) with 63% less dependency than injection alone, suggesting the biological system likely uses both simultaneously — same source
+
+See also: [Self-prediction and self-knowledge — injection vs local loss dissociation](self_prediction_and_self_knowledge.md#the-forward-activation-preview-and-backward-synthetic-gradient-roles-produce-distinct-representational-effects)
 
 #### Cerebellar prediction errors function as metacognitive monitoring signals
 *Confidence: moderate*
@@ -153,10 +163,12 @@
 - Hard parts: credit assignment between the two systems, stability of online updates, dimensionality of the prediction target — same source
 
 ### Error signals should be precision-weighted and structurally decomposed, not raw residual magnitude
-*Confidence: moderate*
+*Confidence: contested*
 
 - The neuroscience suggests: normalize errors by estimated variance, decompose residuals (treat low-rank structured errors differently from diffuse noise), track temporal persistence, gate by model confidence — developed here[^private]
 - The right stack is probably hardcoded structural priors (information-theoretic, like the genome's conserved value function) + learned error classification (domain-specific, like amygdala/cortical valence learning) — same source
+- **Negative result**: precision weighting the local loss (Mahalanobis distance, weighting each dimension by inverse FM error variance) reduced brittleness only 29% (9.5× vs 13.4×) and made no difference when combined with injection (CL_PW ≈ CL_LL on every metric). The FM's error structure is unrelated to task relevance — precision weighting addresses a non-bottleneck — [precision weighting](../../experiments/a2a_forward/MNIST_LOCAL_LOSS_README.md#precision-weighted-local-loss-2026-06-16)
+- **Positive result**: a bilevel-optimized learning gate (task-informed, not FM-informed weighting) reduced brittleness 35% and produced record self-knowledge (R²=0.83). The gate's selectivity doesn't correlate with FM error variance or digit discrimination — it discovers a more abstract task-relevant criterion via bilevel optimization — [learning gate](../../experiments/a2a_forward/MNIST_LOCAL_LOSS_README.md#learning-gate-bilevel-optimized-local-loss-2026-06-16)
 - See also: [Abstraction supervision as metacognitive control](../abstraction_supervision_as_metacognitive_control.md), [Metacognitive novelty learning](../metacognitive_novelty_learning.md)
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

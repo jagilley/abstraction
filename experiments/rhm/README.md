@@ -58,6 +58,7 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `rhm_meta_learning_l2.py` | Meta-learning: L2+-only outer loss FOMAML with rule-set transfer |
 | `rhm_reptile.py` | Meta-learning: Reptile with rule-set transfer (dense inner loop) |
 | `rhm_reptile_sparse.py` | Meta-learning: Reptile with sparse L2+ inner loop + rule-set transfer |
+| `rhm_fm_regularizer.py` | FM-as-regularizer: structured FM-predictability pressure vs weight decay (functional-complexity floor) |
 | `README.md` | This file |
 | `SWEEP_README.md` | [Scaling exponent sweep](SWEEP_README.md) |
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
@@ -72,6 +73,8 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `RHM_RL_GEN_DISTILL_EXTENDED_README.md` | [Gen-distill extended: 40-cycle ratchet + weight decay](RHM_RL_GEN_DISTILL_EXTENDED_README.md) |
 | `RHM_FOMAML_README.md` | [FOMAML ratchet: bilevel meta-learning diagnostic (3 outer objectives)](RHM_FOMAML_README.md) |
 | `RHM_META_LEARNING_README.md` | [Meta-learning with rule-set transfer: FOMAML, Reptile, sparse L2+ inner](RHM_META_LEARNING_README.md) |
+| `RHM_FRONTIER_AND_LEGIBILITY_README.md` | [m gates the learnable frontier; FM residual tracks it; WD sweep (norm vs rank)](RHM_FRONTIER_AND_LEGIBILITY_README.md) |
+| `RHM_FM_REGULARIZER_README.md` | [FM-as-regularizer beats weight decay's functional-complexity floor](RHM_FM_REGULARIZER_README.md) |
 
 ## Results
 
@@ -288,6 +291,21 @@ Tests whether the MNIST gated ratchet's FOMAML bilevel meta-learning produces co
 ```bash
 modal run --detach -m rhm.rhm_fomaml_ratchet::rhm_fomaml_ratchet
 modal run --detach -m rhm.rhm_fomaml_rl_ratchet::rhm_fomaml_rl_ratchet
+```
+
+### FM-as-regularizer beats weight decay's functional-complexity floor (2026-07-01)
+
+**Full writeup**: [RHM_FM_REGULARIZER_README.md](RHM_FM_REGULARIZER_README.md)
+
+The payoff of the frontier/WD arc ([RHM_FRONTIER_AND_LEGIBILITY_README.md](RHM_FRONTIER_AND_LEGIBILITY_README.md), Exp 3): on the m2 substrate, does *structured* FM-predictability pressure compress the functional circuit where generic L2 cannot? Co-train a matched-head FM and add an **open-loop** `λ·MSE(post_block6, FM(post_embed))` term (gradient through the main model only — **no injection/distillation/self-knowledge**), λ ∈ {0.03…3.0}, wd fixed at 0.1.
+
+**Yes, on the leakage-proof metric.** Weight decay cannot push `post_block6` activation effective-rank below ≈52.6% at any setting (even wd=1.0, which breaks the root); FM-reg reaches **42.9% at preserved knowledge (d6=0.94)** — ~10 points below WD's floor — and does so with deep η² *enhanced* (λ=1.0: d4 η² 0.463, +26% over the wd=0.1 baseline), not eroded as under strong WD. This is "L2-norm complexity ≠ functional complexity" made empirical, and it answers the session's opening question: **self-knowledge is not load-bearing for functional simplification** — the simplest open-loop pressure suffices. reg-gap residual rank only *ties* the WD floor (77%); the win is on FM-free activation rank and η². Benign through λ=3.0 (zero val cost); λ=1.0 is the legibility sweet spot; weight norm shows a mild grow-then-compress turnover WD never does. Caveats: compression is localized to the regularized region (b0→b4 unaffected), single rule seed, top1-PC concentrating at λ=3.0.
+
+**Reproduction**:
+```bash
+modal run --detach -m rhm.rhm_fm_regularizer::fm_reg_sweep --lams "0.3,1.0,3.0" --n-steps 300000
+modal run --detach -m rhm.rhm_fm_regularizer::analyze_reg --lams "0.03,0.1,0.3,1.0,3.0"
+modal run --detach -m rhm.rhm_fm_regularizer::wd_activation_rank
 ```
 
 ## Next steps
