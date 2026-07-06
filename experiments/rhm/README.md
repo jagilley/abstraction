@@ -59,6 +59,7 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `rhm_reptile.py` | Meta-learning: Reptile with rule-set transfer (dense inner loop) |
 | `rhm_reptile_sparse.py` | Meta-learning: Reptile with sparse L2+ inner loop + rule-set transfer |
 | `rhm_fm_regularizer.py` | FM-as-regularizer: structured FM-predictability pressure vs weight decay (functional-complexity floor) |
+| `rhm_latent_loop.py` | Latent-loop 2×2: target (token vs oracle-latent) × loop (open vs closed); λ_local sweep; fresh-FM ensemble |
 | `README.md` | This file |
 | `SWEEP_README.md` | [Scaling exponent sweep](SWEEP_README.md) |
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
@@ -75,6 +76,7 @@ Models: autoregressive GPT-2 transformers trained on concatenated RHM sequences,
 | `RHM_META_LEARNING_README.md` | [Meta-learning with rule-set transfer: FOMAML, Reptile, sparse L2+ inner](RHM_META_LEARNING_README.md) |
 | `RHM_FRONTIER_AND_LEGIBILITY_README.md` | [m gates the learnable frontier; FM residual tracks it; WD sweep (norm vs rank)](RHM_FRONTIER_AND_LEGIBILITY_README.md) |
 | `RHM_FM_REGULARIZER_README.md` | [FM-as-regularizer beats weight decay's functional-complexity floor](RHM_FM_REGULARIZER_README.md) |
+| `RHM_LATENT_LOOP_README.md` | [Latent target is load-bearing for generalizable self-knowledge on RHM](RHM_LATENT_LOOP_README.md) |
 
 ## Results
 
