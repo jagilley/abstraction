@@ -40,10 +40,30 @@ DGP: distinct-rule v=16, m=4, s=2, L=6 (occupancy 0.25) -- the thread_b regime w
 real learnable-but-unlearned frontier (M stalls ~d3.5; BP 0.98@d4, 0.80@root). Same
 BP/greedy reference lines as RHM_DEEP_COMPOSITION.
 
+Distillation extension (2026-07-06): a `+distill` suffix on any closed condition
+(e.g. "ntp_aux_cl@0.0+distill") appends a sleep phase after wake: teacher = the
+wake-final model WITH its co-trained FM+gate injection (frozen); student = the same
+weights continued WITHOUT injection, trained on α·KL(per-token, student||teacher) +
+(1−α)·CE(ground truth) (+ the aux term if the condition has it, so the latent anchor
+stays on). This is consolidation WITHOUT residual-compression pressure — the
+dissociation from local-loss consolidation (which compresses the residual and, on
+token targets, inverts fresh-FM SK). All final measurements (probes/residual/SK/
+ensemble) then run on the post-sleep model; the matching no-distill condition (same
+seed → identical wake) provides the pre-sleep numbers.
+
+With-injection probes (same date): for every closed condition we additionally
+measure val and per-level recovery on INJECTED forward passes at wake-final (and
+injected val again post-sleep for distill conditions) — the direct test of the
+"injection explores beyond the standalone frontier" claim, previously unmeasured.
+
 Run:
   modal run --detach -m rhm.rhm_latent_loop::latent_loop
   # token-only 2x1 quick check:
   modal run --detach -m rhm.rhm_latent_loop::latent_loop --conditions "ntp,ntp_cl"
+  # distillation-consolidation ablation (latent target, m4):
+  modal run --detach -m rhm.rhm_latent_loop::latent_loop \
+      --conditions "ntp_aux,ntp_aux_cl@1.0,ntp_aux_cl@0.0,ntp_aux_cl@0.0+distill,ntp_aux_cl@1.0+distill" \
+      --ensemble-n 4 --tag distill
 """
 
 import glob
@@ -338,7 +358,7 @@ def _ensemble_agreement(model, make_fm, get_ntp_batch, fresh_fm_steps, fwd_lr,
 # Main 2x2
 # ======================================================================
 
-@app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=28800, memory=32768)
+@app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=43200, memory=32768)
 def latent_loop(
     # DGP
     v: int = 16, s: int = 2, depth: int = 6, m: int = 4, rule_seed: int = 0,
@@ -356,8 +376,11 @@ def latent_loop(
     weight_decay: float = 0.01, fwd_lr: float = 1e-3,
     lam_aux: float = 1.0, lam_local: float = 1.0, ug_hidden: int = 64,
     pool_size: int = 200000, data_seed: int = 7,
-    # which of {ntp, ntp_aux, ntp_cl, ntp_aux_cl}
+    # which of {ntp, ntp_aux, ntp_cl, ntp_aux_cl}; closed conditions accept a
+    # "@<lam_local>" override and a "+distill" suffix (post-wake sleep phase)
     conditions: str = "ntp,ntp_aux,ntp_cl,ntp_aux_cl",
+    # Distillation sleep phase (a2a_forward/distillation.py recipe, per-token KL)
+    distill_steps: int = 5000, distill_lr: float = 1e-4, distill_alpha: float = 0.5,
     # Measurement
     fresh_fm_steps: int = 3000, eval_interval: int = 1000,
     ckpt_steps: str = "0,10000",
@@ -478,6 +501,56 @@ def latent_loop(
                 tot += loss.item()
         return tot / 10
 
+    def eval_ntp_injected(model, fm_, ugate_):
+        """Standalone eval_ntp's twin, with the co-trained FM+gate injection active."""
+        model.eval(); fm_.eval(); ugate_.eval()
+        gen = torch.Generator().manual_seed(eval_seed + 5)
+
+        def cb(act):
+            inj, _ = ugate_(act, fm_(act))
+            return inj
+
+        tot = 0.0
+        with torch.no_grad():
+            for _ in range(10):
+                x, y = get_ntp_batch(gen)
+                _, loss = model(x, y, cerebellar_fn=cb, cerebellar_input_block=cib,
+                                cerebellar_inject_block=inject_after_block)
+                tot += loss.item()
+        return tot / 10
+
+    def probe_injected(model, fm_, ugate_, label):
+        """Per-level recovery (linear+MLP, best-over-blocks) on INJECTED forward
+        passes -- what the injection contributes above the standalone frontier."""
+        model.eval(); fm_.eval(); ugate_.eval()
+
+        def cb(act):
+            inj, _ = ugate_(act, fm_(act))
+            return inj
+
+        acc = {b: [] for b in block_names}
+        with torch.no_grad():
+            for i in range(0, len(eval_x), 256):
+                _, _, inter = model(eval_x[i:i + 256], return_intermediates=True,
+                                    cerebellar_fn=cb, cerebellar_input_block=cib,
+                                    cerebellar_inject_block=inject_after_block)
+                for b in block_names:
+                    acc[b].append(inter[b][:, -1, :].float())
+        acts = {b: torch.cat(acc[b], 0) for b in block_names}
+        lin_best, mlp_best = {}, {}
+        for ell in range(L):
+            lin_best[ell] = max(
+                _probe_acc(acts[b], y_level[ell], v, device, probe_steps, probe_lr)
+                for b in block_names)
+            if mlp_hidden:
+                mlp_best[ell] = max(
+                    _probe_acc(acts[b], y_level[ell], v, device, mlp_steps, 1e-3,
+                               hidden=mlp_hidden, wd=1e-3) for b in block_names)
+        shown = mlp_best if mlp_hidden else lin_best
+        print(f"  [{label}] INJ {'MLP' if mlp_hidden else 'LIN'} best:  " +
+              "  ".join(f"d{L-ell}:{shown[ell]:.3f}" for ell in range(L)))
+        return {"linear_best": lin_best, "mlp_best": mlp_best}
+
     def train_fresh_fm(model):
         """Fresh FM (matched seed/capacity) on the frozen final model -- the
         apples-to-apples residual/SK measurement instrument for every condition."""
@@ -505,11 +578,14 @@ def latent_loop(
     # ==================================================================
     results = {}
     for cond in cond_list:
-        use_aux = "aux" in cond
-        use_loop = "cl" in cond
-        cl_lam = float(cond.split("@")[1]) if "@" in cond else lam_local
+        base_cond = cond[:-len("+distill")] if cond.endswith("+distill") else cond
+        use_distill = cond.endswith("+distill")
+        use_aux = "aux" in base_cond
+        use_loop = "cl" in base_cond
+        assert not (use_distill and not use_loop), f"{cond}: +distill needs a closed loop"
+        cl_lam = float(base_cond.split("@")[1]) if "@" in base_cond else lam_local
         print(f"\n{'='*60}\n  CONDITION: {cond}  (aux={use_aux}, loop={use_loop}, "
-              f"λ_local={cl_lam})\n{'='*60}")
+              f"λ_local={cl_lam}, distill={use_distill})\n{'='*60}")
 
         torch.manual_seed(seed)
         model = GPT(v, T, n_layer, n_head, n_embd).to(device)
@@ -529,7 +605,10 @@ def latent_loop(
             opt_fwd = torch.optim.AdamW(fm.parameters(), lr=fwd_lr, weight_decay=0.01)
         opt_main = torch.optim.AdamW(main_params, lr=lr, weight_decay=weight_decay)
 
-        ckpt_dir = f"{DATA_DIR}/rhm_latent_loop/{key}/{cond.replace('@', '_')}"
+        # Namespace ckpts by tag so concurrent runs with overlapping condition
+        # names (e.g. a distill-alpha control) can't clobber each other's files.
+        ckpt_dir = (f"{DATA_DIR}/rhm_latent_loop/{key}/"
+                    f"{(tag + '_') if tag else ''}{cond.replace('@', '_').replace('+', '_')}")
         os.makedirs(ckpt_dir, exist_ok=True)
         train_gen = torch.Generator().manual_seed(seed + 1)
         aux_gen = torch.Generator().manual_seed(seed + 2)
@@ -593,6 +672,75 @@ def latent_loop(
         saved = sorted(set(saved + [n_steps - 1]))
         volume.commit()
 
+        # --- with-injection measurements at wake-final (co-trained FM+gate) ---
+        injected = None
+        if use_loop:
+            injected = {"val_injected": eval_ntp_injected(model, fm, ugate),
+                        "probes_injected": probe_injected(model, fm, ugate,
+                                                          cond + "|inj")}
+            print(f"  [{cond}] wake-final val: injected={injected['val_injected']:.4f} "
+                  f"standalone={eval_ntp(model):.4f}")
+
+        # --- sleep phase: distill teacher(injection) -> student(standalone) ---
+        if use_distill:
+            print(f"  [{cond}] SLEEP: {distill_steps} steps, "
+                  f"α={distill_alpha} lr={distill_lr} (aux kept: {use_aux})")
+            teacher = GPT(v, T, n_layer, n_head, n_embd).to(device)
+            teacher.load_state_dict(model.state_dict())
+            teacher.eval()
+            for p in teacher.parameters():
+                p.requires_grad = False
+            fm.eval(); ugate.eval()
+            for p in list(fm.parameters()) + list(ugate.parameters()):
+                p.requires_grad = False
+
+            def teacher_cb(act):
+                inj, _ = ugate(act, fm(act))
+                return inj
+
+            sleep_params = list(model.parameters())
+            if use_aux:
+                sleep_params += list(aux_heads.parameters())
+            opt_sleep = torch.optim.AdamW(sleep_params, lr=distill_lr,
+                                          weight_decay=weight_decay)
+            sleep_gen = torch.Generator().manual_seed(seed + 31)
+            aux_sleep_gen = torch.Generator().manual_seed(seed + 32)
+            for dstep in range(distill_steps):
+                model.train()
+                x, y = get_ntp_batch(sleep_gen)
+                with torch.no_grad():
+                    t_logits, _, _ = teacher(
+                        x, return_intermediates=True, cerebellar_fn=teacher_cb,
+                        cerebellar_input_block=cib,
+                        cerebellar_inject_block=inject_after_block)
+                s_logits, _, _ = model(x, return_intermediates=True)
+                ce = F.cross_entropy(s_logits.reshape(-1, v), y.reshape(-1))
+                # per-token KL (reshape first) so alpha genuinely balances KL vs CE
+                kl = F.kl_div(F.log_softmax(s_logits.reshape(-1, v), dim=-1),
+                              F.softmax(t_logits.reshape(-1, v), dim=-1),
+                              reduction="batchmean")
+                sloss = distill_alpha * kl + (1 - distill_alpha) * ce
+                if use_aux:
+                    xa, labels = get_aux_batch(aux_sleep_gen)
+                    _, _, inter_a = model(xa, return_intermediates=True)
+                    sloss = sloss + lam_aux * aux_loss(inter_a, labels, aux_heads)
+                opt_sleep.zero_grad()
+                sloss.backward()
+                torch.nn.utils.clip_grad_norm_(sleep_params, 1.0)
+                opt_sleep.step()
+                if dstep % eval_interval == 0 or dstep == distill_steps - 1:
+                    print(f"    sleep {dstep:6d}: kl={kl.item():.4f} "
+                          f"ce={ce.item():.4f} val={eval_ntp(model):.4f}")
+            post_step = n_steps - 1 + distill_steps
+            torch.save(model.state_dict(), f"{ckpt_dir}/ckpt_step{post_step}.pt")
+            saved = sorted(set(saved + [post_step]))
+            injected["val_injected_postsleep"] = eval_ntp_injected(model, fm, ugate)
+            print(f"  [{cond}] post-sleep val: standalone={eval_ntp(model):.4f} "
+                  f"injected={injected['val_injected_postsleep']:.4f}")
+            del teacher, opt_sleep
+            torch.cuda.empty_cache()
+            volume.commit()
+
         # --- measurements (all on a fresh, matched FM for apples-to-apples) ---
         model.eval()
         probes = _probe_checkpoints(model, ckpt_dir, saved, eval_x, y_level, block_names,
@@ -618,7 +766,7 @@ def latent_loop(
                                       batch_size, device, ensemble_n, seed, cond)
         results[cond] = {"probes": probes, "residual_stats": res, "self_knowledge": sk,
                          "self_knowledge_cotrained": sk_ct, "ensemble": ens,
-                         "final_val": eval_ntp(model)}
+                         "injected": injected, "final_val": eval_ntp(model)}
         del model, meas_fm, opt_main
         if use_loop:
             del fm, ugate, opt_fwd
@@ -633,32 +781,45 @@ def latent_loop(
     print(f"greedy floor:             {greedy_line}")
     print(f"{'='*80}")
 
-    print(f"\n=== Per-level recovery (MLP best-over-blocks, final) ===")
-    print(f"{'cond':>12} | " + "  ".join(f"d{L-ell}" for ell in range(L)) + "   val")
+    print(f"\n=== Per-level recovery (MLP best-over-blocks, last ckpt = post-sleep for +distill) ===")
+    print(f"{'cond':>24} | " + "  ".join(f"d{L-ell}" for ell in range(L)) + "   val")
     for cond in cond_list:
-        pr = results[cond]["probes"].get(final, results[cond]["probes"][max(results[cond]["probes"])])
+        pr = results[cond]["probes"][max(results[cond]["probes"])]
         best = pr.get("mlp_best", pr["linear_best"])
-        print(f"{cond:>12} | " + "  ".join(f"{best[ell]:.3f}" for ell in range(L)) +
+        print(f"{cond:>24} | " + "  ".join(f"{best[ell]:.3f}" for ell in range(L)) +
               f"  {results[cond]['final_val']:.3f}")
 
+    print(f"\n=== With-injection (co-trained FM+gate) vs standalone, wake-final ===")
+    print(f"{'cond':>24} | {'val_inj':>7} {'val_inj_postsleep':>17} | "
+          + "  ".join(f"d{L-ell}" for ell in range(L)) + "  (injected MLP best)")
+    for cond in cond_list:
+        inj = results[cond].get("injected")
+        if not inj:
+            continue
+        best = inj["probes_injected"].get("mlp_best", inj["probes_injected"]["linear_best"])
+        ps = f"{inj['val_injected_postsleep']:17.3f}" if "val_injected_postsleep" in inj \
+             else f"{'--':>17}"
+        print(f"{cond:>24} | {inj['val_injected']:7.3f} {ps} | "
+              + "  ".join(f"{best[ell]:.3f}" for ell in range(L)))
+
     print(f"\n=== FM residual structure (fresh matched FM, final) ===")
-    print(f"{'cond':>12} | {'cos':>6} {'norm':>6} {'rank%':>6} {'top1%':>6} | "
+    print(f"{'cond':>24} | {'cos':>6} {'norm':>6} {'rank%':>6} {'top1%':>6} | "
           + "  ".join(f"d{L-ell}η²" for ell in range(L)))
     for cond in cond_list:
         rs = results[cond]["residual_stats"]
         e = rs["hierarchy_eta2"]
-        print(f"{cond:>12} | {rs['fwd_cosine']:6.3f} {rs['res_norm']:6.2f} "
+        print(f"{cond:>24} | {rs['fwd_cosine']:6.3f} {rs['res_norm']:6.2f} "
               f"{rs['eff_rank_pct']:6.1f} {rs['top1_pct']:6.1f} | "
               + "  ".join(f"{e[f'level_{ell}']['feature_eta2']:.3f}" for ell in range(L)))
 
     bN = f"post_block{n_layer-1}"
     print(f"\n=== Self-knowledge R² (fresh FM | co-trained FM), final ===")
-    print(f"{'cond':>12} | {'block0':>8} {bN:>10} | {'ct_block0':>9} {'ct_'+bN:>12}")
+    print(f"{'cond':>24} | {'block0':>8} {bN:>10} | {'ct_block0':>9} {'ct_'+bN:>12}")
     for cond in cond_list:
         sk = results[cond]["self_knowledge"]
         ct = results[cond].get("self_knowledge_cotrained")
         cts = (f"{ct['post_block0']:9.3f} {ct[bN]:12.3f}") if ct else f"{'--':>9} {'--':>12}"
-        print(f"{cond:>12} | {sk['post_block0']:8.3f} {sk[bN]:10.3f} | {cts}")
+        print(f"{cond:>24} | {sk['post_block0']:8.3f} {sk[bN]:10.3f} | {cts}")
 
     # The MNIST/language self-knowledge quantity is the CL-OL gap (positive there).
     # OL baseline is ntp for token-loop conditions, ntp_aux for latent-loop conditions.
@@ -669,10 +830,10 @@ def latent_loop(
         ol = "ntp_aux" if "aux" in cond else "ntp"
         if ol in results:
             d = results[cond]["self_knowledge"][bN] - results[ol]["self_knowledge"][bN]
-            print(f"  {cond:>16} (vs {ol}): Δ{bN}={d:+.3f}")
+            print(f"  {cond:>24} (vs {ol}): Δ{bN}={d:+.3f}")
 
     print(f"\n=== SWEEP SUMMARY: root(d6) recov | val | resNorm | d6η² | SK{bN} | ensemble ===")
-    hdr = f"{'cond':>16} | {'root':>5} {'val':>6} {'resNrm':>7} {'d6η²':>6} {'SKb7':>7}"
+    hdr = f"{'cond':>24} | {'root':>5} {'val':>6} {'resNrm':>7} {'d6η²':>6} {'SKb7':>7}"
     if ensemble_n > 0:
         hdr += f" | {'ens_cos':>7} {'shared':>7}"
     print(hdr)
@@ -680,7 +841,7 @@ def latent_loop(
         pr = results[cond]["probes"]; st = max(pr, key=lambda k: int(k))
         best = pr[st].get("mlp_best", pr[st]["linear_best"])
         rs = results[cond]["residual_stats"]
-        row = (f"{cond:>16} | {best[0]:5.3f} {results[cond]['final_val']:6.3f} "
+        row = (f"{cond:>24} | {best[0]:5.3f} {results[cond]['final_val']:6.3f} "
                f"{rs['res_norm']:7.2f} "
                f"{rs['hierarchy_eta2']['level_0']['feature_eta2']:6.3f} "
                f"{results[cond]['self_knowledge'][bN]:7.3f}")
@@ -698,7 +859,8 @@ def latent_loop(
                                   predict_to=predict_to, inject_after_block=inject_after_block,
                                   fwd=f"{fwd_n_layer}L{fwd_n_head}H{fwd_d_head}D",
                                   n_steps=n_steps, lam_aux=lam_aux, lam_local=lam_local,
-                                  chance=chance),
+                                  distill_steps=distill_steps, distill_lr=distill_lr,
+                                  distill_alpha=distill_alpha, chance=chance),
                    "conditions": results}, f, indent=2, cls=NumpyEncoder)
     volume.commit()
     print(f"\nSaved to {save_dir}/{fname}")

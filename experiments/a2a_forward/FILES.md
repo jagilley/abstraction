@@ -1,0 +1,90 @@
+# A2A Forward — File & Auxiliary-README Index
+
+Full file-by-file reference for the experiment. Summarized in [README.md](README.md#code--files); this is the complete listing. Auxiliary-README descriptions here duplicate the inline `Full writeup` links in the main README's per-experiment sections — kept together for navigation.
+
+## Code files
+
+| File | Purpose |
+|---|---|
+| `forward_model.py` | `ForwardModel` (per-position MLP) and `TransformerForwardModel` (1-layer transformer) |
+| `stages.py` | Modal stage `a2a_train` — co-training loop with eval and analysis |
+| `analyze.py` | Structure analysis: PCA, CKA, attention pattern comparison, weight-space comparison |
+| `causal_substitution.py` | Causal substitution: replace block1 with forward model, measure per-behavior degradation |
+| `behavioral_residual.py` | Behavior-conditioned residual analysis: attention, syntactic, difficulty, context integration categories |
+| `controlled_retrain.py` | Controlled retrain: identical lr/seed open-loop vs closed-loop, with layerwise self-map probes |
+| `novelty_probe.py` | Layerwise probes for named syntactic categories and residual norm, open vs closed |
+| `novelty_steer.py` | Causal steering of the novelty direction; reliance measurement |
+| `injection_help.py` | Per-token Δloss analysis: where does the injection help? |
+| `injection_help_structural.py` | Structural analysis: help by residual direction / attention shape |
+| `directional_steer.py` | Directional causal steering: multivariate probe, per-cluster-direction sweep |
+| `forward_model_swap.py` | Forward model swap test: is self-knowledge FM-specific or general? Ensemble probes, cross-model transfer |
+| `extended_training.py` | Extended co-training (50K steps): injection benefit trajectory, overfitting comparison |
+| `llama_cache_acts.py` | Cache Llama 3.2 1B activations for scale-up experiment |
+| `llama_head_decomposition.py` | Llama per-head decomposition: what the forward model captures vs misses per attention head and MLP |
+| `representational_divergence.py` | Representational divergence: CKA, diff PCA, self-knowledge alignment between open- and closed-loop models |
+| `prediction_trust.py` | Prediction trust: does the model's per-direction usage gain (gate + downstream sensitivity) track the forward model's reliability spectrum? Wiener-gain analysis + counterfactual error injection |
+| `mirror_test.py` | Mirror test: perturbation response channeling through self-knowledge subspace |
+| `mirror_test_v2.py` | Mirror test v2: compensatory response and perturbation discrimination (no subspace cherry-picking) |
+| `mirror_test_v3.py` | Mirror test v3: topic-level perturbation discrimination (Vogel-inspired, semantic directions) |
+| `mirror_test_geometry_control.py` | Geometry control: SK fraction of general activation variance vs perturbation response |
+| `model_scale_experiment.py` | Model scale experiment: residual structure vs main model size (29M vs 77M) |
+| `baseline_battery.py` | Baseline battery: 5-condition controlled comparison (forward, shifted, random_proj, autoencoder, open_loop) |
+| `jacobian_analysis.py` | Jacobian analysis: Hessian trace, gradient spectrum, SK subspace alignment at injection point |
+| `vit.py` | Vision Transformer for MNIST (same intermediate/cerebellar interface as GPT) |
+| `mnist_experiment.py` | MNIST controlled retrain: open-loop vs closed-loop ViT, self-knowledge probes, robustness |
+| `mnist_analysis.py` | MNIST residual direction analysis (PCA, digit conditioning) + causal substitution |
+| `mnist_baseline_battery.py` | MNIST baseline battery: 5-condition controlled comparison |
+| `mnist_distillation.py` | MNIST wake-sleep distillation: single-cycle distillation on low-rank residual domain, digit-discriminative innovation analysis |
+| `mnist_distillation_c2.py` | MNIST cycle-2 diagnostic: wake-sleep on cycle-1 outputs, cross-cycle trajectory analysis |
+| `mnist_wake_sleep_comparison.py` | MNIST multi-cycle wake-sleep vs compute-matched baselines (CL continuous, OL continuous, periodic KD from external teacher) |
+| `mnist_adaptation.py` | MNIST OOD adaptation speed: rotated MNIST fine-tuning learning curves, forgetting resistance, zero-shot OOD across 4 compute-matched conditions |
+| `calibration_transfer.py` | Calibration transfer: competence probes (activations → own per-token loss) trained ID, evaluated frozen OOD; also caches OOD corpora |
+| `ood_robustness.py` | OOD robustness: perturbation Δloss + Hessian trace across distribution-shifted corpora |
+| `distillation.py` | Single-cycle wake-sleep distillation: absorb FM contribution into main model, retrain fresh FM, compare innovation structures |
+| `distillation_probes.py` | Post-distillation internalization probes: inter-layer self-predictability, old FM prediction accessibility, cross-model control |
+| `mnist_local_loss.py` | MNIST local prediction-error learning: 4-condition comparison (OL, CL, LL, CL+LL) with FM prediction error as auxiliary loss |
+| `mnist_local_loss_probes.py` | Representation probes: object-level vs meta-knowledge absorption (prediction probe, orthogonalized residual probe) |
+| `mnist_geometry.py` | MNIST computational property geometry: probe orthogonality, compositionality, vector arithmetic across OL/CL/Distilled |
+| `language_geometry.py` | Language computational property geometry: same tests as MNIST on GPT models |
+| `mnist_precision_weighted.py` | MNIST precision-weighted local loss: Mahalanobis distance replaces MSE, 4-condition comparison (OL, CL, PW, CL_PW) |
+| `mnist_learning_gate.py` | MNIST learning gate: bilevel-optimized per-dimension local loss weights via MAML-style virtual update, 6-condition comparison (OL, CL, LL, CL_LL, LG, CL_LG) |
+| `mnist_gated_ratchet.py` | MNIST multi-cycle gated ratchet: 4-cycle WS_LG (injection + bilevel gate + distillation + FM reinit) vs WS, CL_LG, OL |
+| `mnist_extended_ratchet.py` | MNIST extended gated ratchet: 16-cycle WS_LG convergence test (+ lightweight OL), also used for 1.6% FM capacity experiment |
+| `extended_ratchet_analysis.py` | Activation norm analysis: confirms growing residual is from activation magnitude inflation at post_block3 |
+| `gate_structure_analysis.py` | Gate structure analysis: digit-conditional selectivity, FM error anti-correlation, static vs adaptive decomposition |
+| `mnist_ood_gate.py` | OOD meta-learning: digit shift (0-6 → 0-9) with per-digit-group gate analysis |
+| `mnist_fashion_gate.py` | OOD meta-learning: MNIST → Fashion-MNIST (20-class) with per-dataset gate analysis |
+| `mnist_ood_unified_gate.py` | OOD meta-learning: digit shift (0-6 → 0-9) with unified gate (NTP-only, no bilevel), first-order meta-learning test |
+| `mnist_ratchet_adaptation.py` | OOD adaptation after gated ratchet: rotated MNIST zero-shot, adaptation speed, forgetting across WS_LG, WS_UG_uniform, CL, OL |
+| `language_ratchet.py` | Language multi-cycle gated ratchet: 4-cycle WS_UG_uniform vs CL vs OL on GPT (28.9M params, 10M tokens) |
+| `synthetic_input.py` | Off-manifold learnability (Idea A): train forward models on a ladder of synthetic input distributions (iso/global/perpos Gaussian, perturb, real), evaluate on real pairs; update-space metrics |
+| `synthetic_input_manifold.py` | Manifold-matched rungs for `synthetic_input.py`: fitted GMM (K-means + per-cluster cov) and mixup (real-sequence interpolation); gate-verified against the saved ladder |
+| `README.md` | This file |
+
+## Auxiliary READMEs
+
+| File | Purpose |
+|---|---|
+| `LLAMA_SCALE_README.md` | [Llama-scale A2A experiment](LLAMA_SCALE_README.md) — activation caching, forward model training, and per-head decomposition on Llama 3.2 1B |
+| `REPRESENTATIONAL_DIVERGENCE_README.md` | [Representational divergence analysis](REPRESENTATIONAL_DIVERGENCE_README.md) — CKA, diff PCA, self-knowledge alignment; + [Prediction trust](REPRESENTATIONAL_DIVERGENCE_README.md#prediction-trust-what-form-the-self-knowledge-takes-2026-06-10) appended section (innovation map / error-monitoring geometry) |
+| `MIRROR_TEST_README.md` | [Mirror test for neural self-knowledge](MIRROR_TEST_README.md) — perturbation response channeling, robustness gap |
+| `MODEL_SCALE_README.md` | [Model scale experiment](MODEL_SCALE_README.md) — residual structure vs main model size, connection to grokking |
+| `BASELINE_BATTERY_README.md` | [Baseline battery](BASELINE_BATTERY_README.md) — is forward self-prediction uniquely useful? 5-condition controlled comparison |
+| `JACOBIAN_ANALYSIS_README.md` | [Jacobian analysis](JACOBIAN_ANALYSIS_README.md) — Hessian trace predicts robustness; SK alignment null result |
+| `MNIST_README.md` | [MNIST experiment](MNIST_README.md) — cross-domain validation: low-rank residual, digit-discriminative structure, 4x robustness gap |
+| `OOD_ROBUSTNESS_README.md` | [OOD robustness & calibration transfer](OOD_ROBUSTNESS_README.md) — what kind of self-knowledge survives distribution shift |
+| `DISTILLATION_README.md` | [Single-cycle distillation](DISTILLATION_README.md) — wake-sleep knowledge absorption, innovation migration test, ratchet assessment |
+| `MNIST_DISTILLATION_README.md` | [MNIST distillation](MNIST_DISTILLATION_README.md) — single-cycle wake-sleep on low-rank residual: digit-discriminative structure collapse, structural internalization at 2-6× language magnitude; + [multi-cycle comparison](MNIST_DISTILLATION_README.md#multi-cycle-comparison-with-compute-matched-baselines-2026-06-13) with compute-matched baselines decomposing val loss (distillation) from robustness (CL co-training) |
+| `MNIST_ADAPTATION_README.md` | [MNIST OOD adaptation](MNIST_ADAPTATION_README.md) — rotated MNIST fine-tuning: zero-shot OOD tracks distillation, adaptation speed is uninformative, forgetting resistance tracks CL co-training (three-way dissociation) |
+| `MNIST_LOCAL_LOSS_README.md` | [MNIST local prediction-error learning](MNIST_LOCAL_LOSS_README.md) — local loss as auxiliary training signal: regularity ≠ robustness dissociation, 3:1 meta-knowledge dominance, first high-fwd-cos closed-loop condition; + [precision weighting](MNIST_LOCAL_LOSS_README.md#precision-weighted-local-loss-2026-06-16) (negative: FM error structure ≠ task structure); + [learning gate](MNIST_LOCAL_LOSS_README.md#learning-gate-bilevel-optimized-local-loss-2026-06-16) (bilevel-optimized: 35% brittleness reduction, record self-knowledge R²=0.83) |
+| `GATED_RATCHET_README.md` | [MNIST multi-cycle gated ratchet](GATED_RATCHET_README.md) — 4-cycle WS_LG: compounding val loss improvement (48% gap vs OL), gate opens rather than closes on fixed dataset, implicit regularization from bilevel-gated self-compression; + [extended ratchet](GATED_RATCHET_README.md#extended-ratchet-16-cycles-with-10-fm-2026-06-17) (16 cycles: FM compression ceiling → activation norm inflation, robustness is measurement artifact; 1.6% FM: gate rationally closes for noisy FM error dimensions) |
+| `GEOMETRY_README.md` | [Computational property geometry](GEOMETRY_README.md) — probe orthogonality, compositionality, vector arithmetic: distillation converts entangled meta-knowledge into orthogonal object-level knowledge (cross-domain, MNIST + language) |
+| `OOD_GATE_README.md` | [OOD gate experiments](OOD_GATE_README.md) — meta-learning under distribution shift: FOMAML gate (selective opening, FM error vocabulary) vs unified gate (selective closing, injection utility — first-order meta-learning without bilevel optimization); MNIST→Fashion (gate closes globally, selectivity vanishes); + [OOD adaptation after ratchet](OOD_GATE_README.md#experiment-4-ood-adaptation-after-gated-ratchet-2026-06-20) (WS_LG ≈ WS_UG_uniform: +8pp zero-shot, 25% faster adaptation vs OL — ratchet val loss improvement is genuine generalization) |
+| `LANGUAGE_RATCHET_README.md` | [Language gated ratchet](LANGUAGE_RATCHET_README.md) — 4-cycle WS_UG_uniform on GPT: compounding crossover at cycle 3 (+1.6% vs OL), 2.7× overfitting resistance, gate closes aggressively (90% sparse), replicated robustness dissociation (CL robust, local loss brittle) |
+| `FORWARD_MODEL_SWAP_README.md` | [Forward model swap test](FORWARD_MODEL_SWAP_README.md) — is self-knowledge FM-specific or general? 3× FM-original advantage, null ensemble result, injection-point crossover separating FM-specific meta-knowledge (post-injection) from FM-independent structural regularization (pre-injection) |
+| `OPEN_LOOP_ANALYSIS_README.md` | [Open-loop analysis details](OPEN_LOOP_ANALYSIS_README.md) — detailed tables/discussion for Runs 1-2, structure analysis, causal substitution, behavioral residual |
+| `SYNTHETIC_INPUT_README.md` | [Synthetic-input / off-manifold learnability](SYNTHETIC_INPUT_README.md) (Idea A) — can a forward self-model learn a frozen layer's *program* from off-manifold inputs? Ladder from noise→real over 2 program depths: recoverable off-manifold (pure noise → upd-R² 0.74/0.62; matched per-position stats → 0.88/0.78), gap doubles with depth; the residual gap is *joint cross-position structure* not the marginal (GMM ≈ perpos, mixup closes ~90%); `real` is the most manifold-specialized (bias/coverage tradeoff) |
+
+## Checkpoint compatibility note
+
+**Checkpoint compatibility note**: The `transformer/P_10000000` forward model checkpoint was saved with the original flat `TransformerForwardModel` API (top-level `ln1`, `q_proj`, etc.). The code was later refactored to use `ForwardBlock`/`blocks` for multi-layer support. The analysis scripts (`analyze.py`, `causal_substitution.py`, `behavioral_residual.py`) use a `_LegacyFwdModel` class to load this checkpoint correctly. New checkpoints saved with the current `TransformerForwardModel` will have `blocks.0.*` keys and won't be loadable with the legacy class.
