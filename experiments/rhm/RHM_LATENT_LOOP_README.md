@@ -111,7 +111,7 @@ Train 4 fresh FMs (different seeds) per final model; measure input-centered pair
 1. **The FM residual is a map of M's computational frontier.** Its per-level structure sits at whatever depth M reaches — shallow under token-NTP (m4), deep under a latent target or wherever token-NTP itself reaches deep (m2, language, MNIST-by-depth-1).
 2. **RHM self-knowledge existed but was mis-measured.** Against the *co-trained* FM it is positive in every closed condition (ct b7 0.31–0.96); the "blind spot" was reading it off *fresh* FMs, which only agree with M when the residual is DGP-aligned.
 3. **The latent target is the unique, non-substitutable route to *generalizable* positive self-knowledge on RHM** — not a token target at any frontier depth (m2/m4), not any λ_local. It alone makes the residual FM-invariant **and** anchors M to encode it. Language/MNIST get generalizable SK from a plain token target because *their* task densely/shallowly supervises the deep computation; RHM's diluted NTP never does, so it needs the latent anchor.
-4. **The closed loop decomposes**: injection = offload/preview (wake-like division of labor), local loss = consolidation/internalization (sleep-like), with a real tension between consolidation and fresh-FM-measured self-knowledge.
+4. **The closed loop decomposes**: injection = offload/preview (wake-like division of labor), local loss = consolidation/internalization (sleep-like), with a real tension between consolidation and fresh-FM-measured self-knowledge. **[Update 2026-07-06: the distillation ablation refines both labels. "Preview" is unsupported where measured — injected passes carry *less* deep structure, not more (ablation finding 4, ceiling caveat noted there). And internalization of the NTP function turns out to be cheap — a 5K injection-off fine-tune recovers standalone val fully without local loss (finding 1) — so the local loss's distinctive contribution is not function-consolidation but keeping the SK encoding through consolidation (finding 2, pending decomposition).]**
 
 ## Connections to our beliefs (discussion, not yet crystallized)
 
@@ -126,7 +126,7 @@ We are **not** crystallizing a belief yet — single-seed (below), and the compo
 
 - **Single rule seed, single run per cell.** Directionally consistent across four runs and two regimes, and the harness is deterministic (the sweep's `ntp_cl@1.0` reproduced the m2 control's root/SK exactly), but **magnitudes are not hardened** — a 2–3 seed replicate is the precondition for any strong claim. Note the m4 SK magnitudes shift ~0.1 between an A10G and an L4 run (sign/direction stable), underscoring single-seed magnitude fragility.
 - **Latent target uses privileged latent values** (`oracle_aux`, Level-0). This is a diagnostic of *whether* self-knowledge can appear given a climbable target — **not** a self-supervised mechanism. The self-supervised version (EMA/data2vec-style own-lifted-latent target) is untested here.
-- **`ntp_aux_cl` has degraded standalone val (2.38 at m4)** — the aux+injection combination drives strong dependence; SK is real but read off a somewhat NTP-degenerate standalone model. A λ_local / FM-capacity sweet-spot sweep to get SK *without* the val hit is wanted.
+- **`ntp_aux_cl` has degraded standalone val (2.38 at m4)** — the aux+injection combination drives strong dependence; SK is real but read off a somewhat NTP-degenerate standalone model. A λ_local / FM-capacity sweet-spot sweep to get SK *without* the val hit is wanted. **[Resolved 2026-07-06: a 5K injection-off CE+aux sleep phase closes the val gap completely (1.535, marginally better than OL) while keeping SK positive — see the distillation-consolidation ablation, finding 3. No sweet-spot sweep needed.]**
 - **The fresh-vs-co-trained and ensemble geometries have subtleties** (SK measured on the injection-removed model; an FM-invariant residual need not be encoded by M). The load-bearing metric is the fresh-FM Δ R²(CL−OL); the co-trained and ensemble numbers are corroboration.
 
 ## Reproduction
@@ -153,9 +153,9 @@ Results on the `rhm-scaling-data` volume under `/rhm_latent_loop/`.
 ## Next steps
 
 1. **Seed replicate (precondition).** 2–3 rule seeds of the m4 2×2 to harden the Δ SK sign and the ensemble separation before any belief is crystallized.
-2. **Compounding — the "click" (the real next chapter).** `ntp_aux_cl` is the first genuine positive-self-knowledge setup on RHM. This finally makes the abstraction-ratchet question askable: **does this self-knowledge compound across wake–sleep cycles** (injection → distill/consolidate → re-point FM → repeat), or does it plateau like every prior RHM ratchet? Hypothetical, untested — but for the first time the precondition (self-knowledge exists) is met.
+2. **Compounding — the "click" (the real next chapter).** `ntp_aux_cl` is the first genuine positive-self-knowledge setup on RHM. This finally makes the abstraction-ratchet question askable: **does this self-knowledge compound across wake–sleep cycles** (injection → distill/consolidate → re-point FM → repeat), or does it plateau like every prior RHM ratchet? Hypothetical, untested — but for the first time the precondition (self-knowledge exists) is met. *[2026-07-06: the cycle recipe is now pinned by the distillation ablation — wake with injection + local loss, sleep with plain CE+aux fine-tuning (no teacher KL needed), seeded from the `@1.0+distill` state.]*
 3. **Drop the privilege.** Replace the oracle-latent aux with an EMA self-distilled own-lifted-latent target (data2vec-style, per the sleep-chunking line) and test whether generalizable self-knowledge survives without ground-truth labels — the self-supervised version of Experiment 1.
-4. **SK sweet spot.** λ_local / FM-capacity sweep on `ntp_aux_cl` to obtain positive Δ SK without the standalone-val degradation (the consolidation-vs-SK tension from Experiment 3).
+4. ~~**SK sweet spot.** λ_local / FM-capacity sweep on `ntp_aux_cl` to obtain positive Δ SK without the standalone-val degradation (the consolidation-vs-SK tension from Experiment 3).~~ *Superseded 2026-07-06: the distillation ablation resolves the val degradation directly (sleep phase closes it fully at unchanged SK sign); see finding 3.*
 
 ---
 
@@ -193,9 +193,228 @@ The structural novelty is on the **target side**. A token target is exogenous: a
 Two corollaries to keep honest:
 
 - **This experiment tested only the constraint half.** The aux target values are oracle-given, so target height was set by us, not by the model — undiluted deep signal without endogeneity. The freedom half (EMA/data2vec own-lifted-latent target, next-step 3) is where the characteristic risk enters: an endogenous target is free to *collapse* (predicting a constant is self-consistent), which is what the data2vec/DINO machinery exists to prevent. DEEP_COMPOSITION Exp 5b's invariance failures were early contact with exactly this. Prediction: the EMA-teacher version should succeed where 5b's constructions failed, because the teacher's already-consolidated levels give the target a floor to bootstrap from.
-- **The objective and the loop are complementary halves, not separate gadgets.** The latent objective supplies rungs; the loop climbs them — injection explores beyond the standalone frontier (offload/preview), the local loss consolidates that exploration into weights (Exp 3's decomposition), which is what would license the endogenous target to lift another level next cycle. This is the working hypothesis for the compounding experiment.
+- **The objective and the loop are complementary halves, not separate gadgets.** The latent objective supplies rungs; the loop climbs them — injection explores beyond the standalone frontier (offload/preview), the local loss consolidates that exploration into weights (Exp 3's decomposition), which is what would license the endogenous target to lift another level next cycle. This is the working hypothesis for the compounding experiment. **[Update 2026-07-06: the distillation ablation's with-injection probes found no support for the "explores beyond the frontier" half in the aux regime — injected passes have far *worse* deep-latent recovery than standalone ones (d6 0.18 vs 0.80), i.e. injection displaces depth at the probe position rather than adding it. Scope caveat: the aux conditions are at the BP ceiling, so that cell had no headroom for exploration to show; the fair test (token-CL, root 0.07) is queued. Treat "injection = exploration" as unsupported speculation until then. The consolidation half is also qualified: consolidation of the NTP function needs no local loss (a plain injection-off fine-tune closes the val gap identically — see the ablation's finding 1); what the local loss uniquely appears to preserve is the self-knowledge encoding (finding 2, itself not yet decomposed).]**
 
 ## 6. Refinements to [dimensionality_expansion](../../beliefs/dimensionality_expansion.md) (beyond the Connections section above)
 
 - **`R_res` needs a type label.** The health-triple treats residual rank as "frontier," but a high-rank residual can be either FM-idiosyncratic noise or a genuine DGP-aligned frontier (§1). The fresh-FM ensemble cosine is the discriminator the belief was missing; a health meter reading only `rank(residual)` will mistake capacity mush for frontier.
 - **Two novelties, only one of which moves depth.** On RHM, i.i.d. *sample*-novelty is unlimited yet the token frontier stays pinned at d3.5 — sample-novelty refills breadth only. What moves the frontier up the hierarchy is *abstraction-novelty*: a deeper target. This changes the belief's prescribed intervention — the curiosity signal should select harder *targets/levels*, not just novel *samples*.
+
+---
+
+# Distillation-consolidation ablation: sleep re-derives, it does not transfer (2026-07-06)
+
+**Code**: `rhm_latent_loop.py` — a `+distill` condition suffix (post-wake sleep phase) and with-injection probes, added to the same harness. Two Modal runs: the main 5-condition ablation (`--tag distill`) and a no-teacher control (`--tag distill-ce0`).
+**Motivation**: On MNIST, distillation was load-bearing for the ratchet (GATED_RATCHET: WS compounds, CL_LG stalls), and the MNIST local-loss probes showed local-loss consolidation absorbs meta-knowledge over object-level 3:1. Question here: in the `ntp_aux_cl` setup, is distillation the missing consolidation mechanism — does it close the standalone-val gap (2.38 vs OL 1.55) that local loss doesn't, and what happens to the self-knowledge?
+
+## Setup
+
+All at m4 (v16, 8L/8H/256D, same harness/seed as Exp 1; `ntp_aux` and `ntp_aux_cl@1.0` reproduce the canonical run exactly — val 1.545/2.383, SK 0.557/0.779).
+
+- **Sleep phase** (`+distill`): after the 20K-step wake, 5K steps at lr 1e-4. Teacher = wake-final model WITH its co-trained FM+gate injection (all frozen). Student = same weights continued WITHOUT injection. Loss = α·KL(per-token, student‖teacher) + (1−α)·CE(ground truth) + the aux term (kept on). α=0.5.
+- **α=0 control** (separate run, seed-identical wake): the identical sleep phase with the KL term removed — pure injection-off CE+aux fine-tuning. This is the attribution instrument for the +5K-step asymmetry: it distinguishes "the teacher's KL transfers knowledge" from "any standalone fine-tuning closes the gap." (The a2a language distillation result never had this control.)
+- **With-injection probes** (new, all closed conditions): val and per-level recovery measured on *injected* forward passes at wake-final, alongside the standalone measurements.
+
+## Results
+
+| condition | root | val (standalone) | resNorm | cos | d6η² | d5η² | SK b7 fresh (Δ vs OL) | ct b7 | ens_cos |
+|---|---|---|---|---|---|---|---|---|---|
+| `ntp_aux` (OL) | 0.796 | 1.545 | 24.1 | 0.836 | 0.295 | 0.381 | 0.557 | — | 0.984 |
+| `ntp_aux_cl@1.0` | 0.802 | 2.383 | 8.9 | 0.882 | 0.322 | 0.421 | 0.779 (+0.22) | 0.907 | 0.983 |
+| `ntp_aux_cl@0.0` | 0.800 | 2.577 | 15.1 | 0.877 | 0.313 | 0.396 | 0.746 (+0.19) | 0.593 | 0.984 |
+| `@0.0+distill` (α=0.5) | 0.793 | **1.540** | 23.2 | 0.858 | 0.317 | 0.403 | 0.522 (−0.04) | 0.609 | 0.984 |
+| `@1.0+distill` (α=0.5) | 0.802 | **1.535** | 4.9 | 0.942 | 0.346 | 0.445 | 0.726 (+0.17) | 0.800 | **0.992** |
+| `@0.0+distill` (α=0, control) | 0.795 | **1.537** | 23.6 | 0.851 | 0.316 | 0.404 | 0.530 (−0.03) | 0.599 | 0.984 |
+
+With-injection probes (wake-final; standalone values in parens):
+
+| condition | val_inj | d6 inj | d5 inj | d4 inj | val_inj post-sleep |
+|---|---|---|---|---|---|
+| `ntp_aux_cl@1.0` | 1.544 (2.383) | 0.153 (0.802) | 0.484 (0.955) | 0.902 (0.979) | 1.543 |
+| `ntp_aux_cl@0.0` | 1.546 (2.577) | 0.183 (0.800) | 0.591 (0.959) | 0.913 (0.978) | 1.569 |
+
+## Findings (stated conservatively)
+
+1. **The sleep phase fully closes the dependency gap — and the teacher's KL contributes nothing to that.** Both α=0.5 arms recover standalone val to marginally better than OL (1.535–1.540 vs 1.545), root stays at BP, and the residual returns to the OL-scale frontier map (`@0.0+distill` resNorm 23.2 ≈ OL's 24.1). But the α=0 control recovers **identically** (1.537) with no teacher signal: the gap closes within the first ~1K sleep steps (2.39 → 1.55), and the control's *unoptimized* KL falls to 0.026 on its own. So the standalone degradation was a shallow contextual adaptation to the injection's presence, and removing the injection lets dense CE+aux re-derive the function from data — nothing is transferred from the teacher. On this domain "distillation" reduces to "injection-off fine-tuning."
+   - *Consequence for the ratchet*: the sleep phase can be plain CE+aux fine-tuning — no teacher forward pass needed.
+   - *Retroactive qualification*: the a2a language distillation result (DISTILLATION_README, "105.6% of the gap closed") is attribution-ambiguous in the same way — it may also have been re-derivation, since dense NTP was in the distillation loss there too.
+   - *Hypothesis, untested*: the KL should become load-bearing exactly when supervision is sparse relative to what the teacher knows (MNIST's 1 label/image; masked NTP) — i.e. distillation's value ≈ teacher knowledge − what the data directly supervises. This is the candidate account of why distillation was load-bearing on MNIST but is inert here. Component test queued (sleep-CE-mask, below).
+
+2. **Sleep erases the loop's fresh-FM SK gain unless local loss ran during wake.** `@0.0`'s +0.19 washes out to −0.04 after sleep (α=0 control confirms the erasure is from the fine-tuning itself, not the KL), while `@1.0` keeps +0.17 of its +0.22 (fresh 0.726, ct 0.800). The thing being known persists through sleep (post-sleep residual η² essentially unchanged, ens_cos 0.984) — what washes out is M's *encoding* of it, and the wake-time local loss is what makes that encoding durable. Stated limits: the SK metric is a single aggregate R² (it cannot separate meta- from object-level components, per the MNIST local-loss-probes distinction), and `@1.0+distill`'s much smaller, highly FM-invariant residual (norm 4.9, ens_cos 0.992) plausibly inflates its direction-predictability. **Do not lean on this finding until the decomposition probes are ported** (component test below).
+
+3. **`@1.0+distill` resolves the standalone-val caveat from Exp 1 — the best cell on every axis at once.** Best val (1.535), root at BP (0.802), positive fresh SK (+0.17), the deepest residual η² of any condition (d6 0.346, d5 0.445), the highest FM-invariance (ens_cos 0.992), and the injection is fully redundant post-sleep (val_inj 1.543 ≈ standalone 1.535 — internalization complete). Wake with injection + local loss, sleep with plain CE+aux: this is the natural cycle-1 recipe for the compounding experiment.
+
+4. **The injection displaces deep-latent structure at the probe position rather than adding it.** Injected forward passes at wake-final have far *worse* deep recovery than standalone ones (d6: 0.18 vs 0.80; d5: 0.59 vs 0.96) while val improves (1.55 vs 2.58). Given the training structure (NTP passes injected, aux passes never injected), the deep representation is *mode-specific*: it is built by and lives in the non-injected aux pass. Note the strict scope: because the aux conditions are already at the BP root ceiling (0.80), this cell has **no headroom** and is structurally incapable of detecting positive "exploration beyond the frontier" — it only shows the injection is not depth-neutral where depth already exists. The fair exploration test is token-CL (standalone root 0.07, large headroom); queued below.
+
+## Caveats
+
+- **Single rule seed, single run per cell** (same status as Exp 1–4).
+- **+5K-step asymmetry** for the distill arms. Addressed for the val claim by the α=0 control (same step count, no teacher); the OL reference is plateaued by 20K (last 5K of wake bought ~0.01 nats).
+- **Single cycle.** The MNIST claim this ablation was aimed at ("distillation is load-bearing") was about *multi-cycle compounding*; this establishes only that the teacher-KL is not needed for single-cycle consolidation here. Whether CE+aux-only sleep sustains compounding across cycles is the ratchet question, untested.
+- **SK-survival finding is not yet interpretable** (see finding 2's stated limits).
+
+## Component tests (follow-ups from this ablation)
+
+1. **Injection component — fair exploration test**: token-CL at m4 (`ntp_cl@0.0`, `ntp_cl@1.0`) with the injected probes, where standalone root is 0.07 and there is real headroom. Does injection lift deep recovery above the standalone frontier during wake, or only relocate NTP?
+2. **Distillation component — sparse-supervision KL test**: rerun `@0.0+distill` (α=0.5 vs α=0) with the sleep-phase CE masked to 5% of positions while the KL stays dense (`--sleep-ce-mask-rate 0.95`). Wake identical (dense, deterministic). If finding 1's hypothesis is right, α=0.5 should recover standalone val where the α=0 control now cannot.
+3. **Local-loss component — SK decomposition**: port the meta-vs-object probe machinery (`a2a_forward/mnist_local_loss_probes.py`: prediction probe vs orthogonalized-residual probe) to interpret finding 2, additionally conditioned on hierarchy level (which MNIST could not offer). Not yet implemented.
+
+## Reproduction
+
+```bash
+cd experiments
+# main ablation (5 conditions + ensemble):
+modal run --detach -m rhm.rhm_latent_loop::latent_loop \
+    --conditions "ntp_aux,ntp_aux_cl@1.0,ntp_aux_cl@0.0,ntp_aux_cl@0.0+distill,ntp_aux_cl@1.0+distill" \
+    --ensemble-n 4 --tag distill
+# no-teacher control (identical sleep, KL removed):
+modal run --detach -m rhm.rhm_latent_loop::latent_loop \
+    --conditions "ntp_aux_cl@0.0+distill" --distill-alpha 0.0 --ensemble-n 4 --tag distill-ce0
+```
+
+Results: `/rhm_latent_loop/v16_s2_L6_m4_distinct_8L8H256D_S20000_distill{,-ce0}.json` on the volume.
+
+---
+
+# Meta/object decomposition: RHM self-knowledge is injection-generated meta-knowledge; object-level is not acquired (2026-07-07)
+
+**Code**: `rhm_latent_loop.py` — new `_meta_object_probes` (+ `_mo_probe`, `_position_levels_np`), wired into the harness (`--meta-object`, on by default) and printed as new summary tables. Ported verbatim from `a2a_forward/mnist_local_loss_probes.py` (family-A four-target probe), extended with a fresh-vs-co-trained axis and per-hierarchy-level conditioning.
+**Motivation**: every RHM self-knowledge number to date — the +0.22 latent gain, the −1.19 token inversion, the distill-ablation retention — was read off a **single composite** probe (`R²` of the raw FM residual `target − pred` direction), which **conflates two knowledge types** the a2a arc separates: *object-level* ("what the FM predicts", the `prediction` direction) and *meta* ("where the FM errs, ⊥ its prediction", the `ortho_residual` direction). On MNIST/language, closing the loop builds **meta** (3:1 over object at early layers, `MNIST_LOCAL_LOSS`) and only **distillation** converts meta→orthogonal object-level (`GEOMETRY`, `FORWARD_MODEL_SWAP`). This section ports that decomposition to disambiguate which type each RHM intervention builds.
+
+## The instrument
+
+Four probe targets, native (no-injection) activations, per-token orthogonalization off the FM prediction vector, **linear** probe, **no** input standardization, global-variance `R²` (exact `mnist_local_loss_probes.py` recipe):
+
+```
+prediction     = FM(post_block0)                      -> OBJECT-level
+residual       = post_block6 − prediction             -> composite (the old SK number)
+ortho_residual = residual − (residual·p̂)p̂            -> pure META
+target         = post_block6                           -> ceiling
+```
+
+Measured at **post_block0 (pre-injection), post_block1 (injection point), post_block7 (deep)**, for **both the fresh matched FM** (apples-to-apples, FM-general) **and the co-trained FM** (the one M learned to complement, FM-specific), and additionally **per hierarchy level** (v_s valuation → d-notation). Target variances (`pred_var`/`res_var`/`ortho_var`/`ortho_over_res`) are reported so a near-zero ortho `R²` in a tiny-residual condition reads as "no residual" (the LL failure mode) rather than "no meta". **Reproduction check**: every prior cell reproduced exactly (val 1.554/1.545/1.746/2.383, composite SK 0.516/0.557/−0.670/0.779, Δ SK token −1.19 / latent +0.22), so the decomposition sits on the validated harness.
+
+## Finding 1 — self-knowledge on RHM *is* meta-knowledge; object-level is a flat, un-acquired baseline
+
+Object-level (`prediction R²`) is **high and nearly condition-invariant** (~0.5–0.95, rising trivially with depth — the "shared reference frame byproduct" it was on MNIST). The entire composite Δ SK lives in the **meta** channel at the deep layer (m4 2×2, fresh FM):
+
+| Δ(CL−OL), fresh | ΔOBJ@b0 | ΔMETA@b0 | ΔOBJ@b7 | **ΔMETA@b7** |
+|---|---|---|---|---|
+| **token** (ntp_cl−ntp) | +0.464 | −0.037 | −0.120 | **−1.865** |
+| **latent** (ntp_aux_cl−ntp_aux) | +0.182 | −0.045 | +0.083 | **+0.284** |
+
+The −1.19 token inversion **is** a deep-meta collapse (−1.865); the +0.22 latent gain **is** deep meta (+0.284). Object barely moves in either. This is the RHM analog of MNIST's 3:1 meta-dominance — here the meta channel is essentially the *whole* story, not just the majority.
+
+## Finding 2 — the latent target converts FM-*specific* meta into FM-*general* meta
+
+The fresh-vs-co-trained split is the mechanism (m4, META@b7):
+
+| META (ortho) @b7 | **fresh FM** | **co-trained FM** |
+|---|---|---|
+| ntp_cl (token CL) | **−1.389** | −0.137 (but **+0.487 @b0**) |
+| ntp_aux_cl (latent CL) | **+0.741** | +0.868 |
+
+- **Token-CL builds FM-specific meta** (co-trained +0.487 @b0) that **does not generalize** — a fresh FM's error is *anti*-predicted (−1.389). The residual there is tiny FM-idiosyncratic noise (norm 1.22, cos 0.983, ens_cos 0.821). Worst of both worlds, now localized to the fresh-meta channel.
+- **Latent-CL builds FM-general meta** — fresh (+0.741) and co-trained (+0.868) both strongly positive, ens_cos 0.983. The latent target makes the residual a DGP-aligned inference gap every FM misses identically, **and** M encodes it.
+
+## Finding 3 — m2 control: token inversion is a meta collapse *even with a deep open-loop residual*; latent gives no meta gain without a frontier gap
+
+m2 is the regime where token-NTP already reaches the root (`ntp` root 0.819, deep OL residual d5η²=0.347). Decomposed (fresh Δ):
+
+| Δ(CL−OL), fresh | ΔOBJ@b0 | ΔMETA@b0 | ΔOBJ@b7 | **ΔMETA@b7** |
+|---|---|---|---|---|
+| token (ntp_cl) | +0.304 | −0.103 | −0.112 | **−2.427** |
+| latent (ntp_aux_cl) | +0.160 | +0.032 | +0.075 | **−0.040** |
+
+- Token inversion = deep fresh-**meta** collapse (−2.427), same as m4 — **a deep OL residual is not sufficient** (the doc's Exp 2 falsification, now at the decomposition level). Co-trained meta stays positive (+0.459 @b0): FM-specific meta is still built, it just doesn't generalize.
+- **The latent target gives no meta gain at m2** (ΔMETA@b7 −0.040) — because m2 has no frontier gap (`ntp_aux ≈ ntp`, both at root), so closing the loop can't newly represent deep structure. **Generalizable meta requires both (i) a DGP-aligned residual and (ii) a genuine frontier gap the loop helps close.** m4 has both; m2 has only (i). (The m2 co-trained meta is nonetheless huge — ct META@b7 0.927 — pure FM-specific consolidation.)
+
+## Finding 4 — λ_local sweep: injection *generates* meta, local-loss consolidation *destroys the generalizable part*
+
+m2 token, sweeping λ_local (λ=0 = injection-only). This isolates injection from local loss:
+
+| λ_local | val | resNorm | **fresh META@b7** | **ct META@b7** | fresh OBJ@b7 |
+|---|---|---|---|---|---|
+| ntp (OL) | 0.826 | 24.6 | +0.340 | — | 0.861 |
+| **@0.0 (inj only)** | 1.855 | 13.4 | **+0.284** | **+0.706** | 0.873 |
+| @0.1 | 1.777 | 2.0 | −0.365 | +0.644 | 0.881 |
+| @0.3 | 1.300 | 1.1 | −0.838 | +0.409 | 0.847 |
+| @1.0 | 1.047 | 0.8 | −2.087 | −0.356 | 0.749 |
+
+- **Injection alone (λ=0)** roughly preserves the shared-basis fresh meta (0.284 ≈ OL 0.340) **and** builds strong FM-specific meta (co-trained +0.706): **injection is the meta generator**, confirmed with local loss off.
+- As **local loss rises**, standalone val improves (1.855→1.047) and the residual compresses (13.4→0.8) — genuine consolidation — but fresh (generalizable) meta is **monotonically destroyed** (+0.284 → −2.087). Object stays high/flat throughout (no object acquisition without distillation). So on a token target, local-loss consolidation trades generalizable meta for standalone competence — the consolidation-vs-generalizable-SK tension, localized to the fresh-meta channel and shown to be λ-driven. (On a *latent* target the same consolidation preserves meta, because the residual it compresses toward is DGP-aligned.)
+
+## Finding 5 — sleep transfers nothing on RHM: the α=0 control kills the KL for representation too
+
+The distillation ablation showed a meta→object *shift* through sleep (co-trained META@b7 down, OBJ@b7 up). The α=0 control (identical sleep, teacher KL removed) reproduces it **identically** — the KL is inert for representation, not just val:
+
+| fresh FM, m4 | @0.0+distill α0.5 | @0.0+distill **α0** | @1.0+distill α0.5 | @1.0+distill **α0** |
+|---|---|---|---|---|
+| val | 1.540 | 1.536 | 1.535 | 1.531 |
+| META@b7 | 0.403 | 0.411 | 0.455 | 0.439 |
+| ΔOBJ@b0 (vs OL) | +0.005 | +0.008 | +0.229 | +0.229 |
+| ct META@b7 | 0.585 | 0.568 | 0.662 | 0.646 |
+| ct OBJ@b7 | 0.796 | 0.787 | 0.725 | 0.715 |
+| Δ SK@b7 | −0.035 | −0.028 | +0.169 | +0.162 |
+
+- **The KL relocates nothing.** Mechanistically expected: the FM predicts M's *own* `post_block6`, so there is no external FM knowledge to transfer — removing the injection crutch and re-consolidating on dense CE+aux is all that happens. Distillation on RHM = injection-off fine-tuning, for representation as for val.
+- **Refines the earlier "object appears after distillation" reading**: it appears after the **sleep**, KL-irrelevant, and is *not* a meta→object transmutation but **differential durability** — the injection-generated deep meta **washes in both arms** (ΔMETA@b7 → ≈0 once injection is gone), while a **shallow object-accessibility** (ΔOBJ@b0 **+0.229**) present only in the `@1.0` (local-loss-during-wake) arm **survives** consolidation. Consistent with LL→object on MNIST: the durable object signal is a local-loss product, not a distillation product.
+
+## Finding 6 — seed replicate: signs hold, latent magnitude is stable, token-inversion magnitude is not
+
+Second rule seed (m4 2×2), fresh Δ(CL−OL) @b7:
+
+| | seed-0 | **seed-1** |
+|---|---|---|
+| **latent** ΔMETA | +0.284 | **+0.329** |
+| latent ΔSK (composite) | +0.222 | **+0.224** |
+| **token** ΔMETA | −1.865 | **−0.836** |
+| token ΔSK (composite) | −1.186 | −0.570 |
+
+The headline is robust: latent → positive generalizable meta (+0.22 composite is near-identical across seeds), token → meta collapse (sign robust). Fresh-vs-co-trained reproduces (token co-trained META@b0 +0.234 positive / fresh negative; latent both positive). **Caveat exposed by the seed**: the token-inversion *magnitude* is unstable (−0.836 vs −1.865) because it is a *negative* `R²` fitting the tiny FM-noise residual — the *direction* (meta collapse) is the robust claim, not the number. The positive latent gain fits real DGP-aligned structure and is stable.
+
+## Synthesis — the causal chain, decomposed and seed-checked
+
+- **Injection generates meta-knowledge** (the "where my self-model errs" map). FM-specific by default; FM-general only under a DGP-aligned/latent target **and** a real frontier gap (m4, not m2).
+- **Local loss = consolidation.** It internalizes the injected computation into standalone weights (val↓, residual↓, dependency↓) but **erodes generalizable meta on token targets** (monotone with λ) and **preserves it on latent targets**; it independently seeds a durable **shallow object-accessibility**. It does *not* generate self-knowledge — injection does.
+- **Sleep/distillation transfers nothing on RHM** — pure re-derivation/reorganization (KL inert, α=0 ≈ α=0.5). Meta evaporates on injection removal; the local-loss shallow object survives.
+- **Object-level as an *acquired* knowledge type still has not appeared on RHM** the way MNIST/language get it from distillation — RHM's dense DGP makes the KL redundant. The MNIST prediction (KL load-bearing under *sparse* supervision) remains the open test (`--sleep-ce-mask-rate`, component test #2).
+
+Self-knowledge = meta = injection-generated; object-level = high-but-flat baseline, not built by any wake-only intervention, and not transferred by the (redundant) RHM sleep.
+
+## Caveats
+
+- **The MO composite `R²` slightly under-reads the `_sk_probes` composite** for tiny-residual conditions (300 vs 500 probe steps; MO drops the last, next-token-less position). Decomposition comparisons are internally consistent (all MO probes share settings); cross-comparison to the SK-table composite is not exact.
+- **Negative-meta magnitudes are noise-fits** (negative `R²` on a ~0-variance residual): interpret their *sign*, not their value (Finding 6).
+- **Two rule seeds** on the m4 2×2; m2 / λ-sweep / distillation are single-seed. Signs directionally consistent; magnitudes not hardened beyond the two-seed m4 headline.
+- **Latent target uses privileged oracle latents** (diagnostic, per Exp 1); the self-supervised (EMA) version is still untested.
+
+## Reproduction
+
+```bash
+cd experiments
+# canonical m4 2x2 + ensemble (decomposition on by default):
+modal run --detach -m rhm.rhm_latent_loop::latent_loop \
+    --conditions "ntp,ntp_aux,ntp_cl,ntp_aux_cl" --ensemble-n 4 --tag mo
+# m2 control:
+modal run --detach -m rhm.rhm_latent_loop::latent_loop --m 2 \
+    --conditions "ntp,ntp_aux,ntp_cl,ntp_aux_cl" --ensemble-n 4 --tag mo_m2 \
+    --bp-line "d1 1.00 d2 1.00 d3 1.00 d4 1.00 d5 .992 root .954" --greedy-line "(m2: no frontier gap)"
+# m2 lambda_local sweep (injection-vs-local-loss isolation):
+modal run --detach -m rhm.rhm_latent_loop::latent_loop --m 2 \
+    --conditions "ntp,ntp_cl@0.0,ntp_cl@0.1,ntp_cl@0.3,ntp_cl@1.0,ntp_aux_cl@1.0" \
+    --ensemble-n 4 --tag mo_lamsweep \
+    --bp-line "d1 1.00 d2 1.00 d3 1.00 d4 1.00 d5 .992 root .954" --greedy-line "(m2: no frontier gap)"
+# distillation + alpha=0 control (KL-inert-for-representation):
+modal run --detach -m rhm.rhm_latent_loop::latent_loop \
+    --conditions "ntp_aux,ntp_aux_cl@1.0,ntp_aux_cl@0.0,ntp_aux_cl@0.0+distill,ntp_aux_cl@1.0+distill" \
+    --ensemble-n 4 --tag mo_distill
+modal run --detach -m rhm.rhm_latent_loop::latent_loop \
+    --conditions "ntp_aux,ntp_aux_cl@0.0+distill,ntp_aux_cl@1.0+distill" \
+    --distill-alpha 0.0 --ensemble-n 4 --tag mo_distill_a0
+# second rule seed of the m4 2x2:
+modal run --detach -m rhm.rhm_latent_loop::latent_loop \
+    --conditions "ntp,ntp_aux,ntp_cl,ntp_aux_cl" --ensemble-n 4 --rule-seed 1 --tag mo_seed1
+```
+
+Results: `/rhm_latent_loop/v16_s2_L6_{m4,m2}_distinct_8L8H256D_S20000_mo{,_m2,_lamsweep,_distill,_distill_a0,_seed1}.json` on the volume.

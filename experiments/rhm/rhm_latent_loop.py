@@ -302,6 +302,143 @@ def _sk_probes(model, fm, eval_x, predict_from, predict_to, n_embd, n_layer,
     return r2
 
 
+def _position_levels_np(seq_len, s):
+    """s-adic valuation of each predicted position t+1 (matches
+    rhm_per_level_loss._position_levels). Entry t = v_s(t+1); level 0 = local,
+    level L-1 = root. d-notation used elsewhere: d = valuation + 1 (root = dL)."""
+    import numpy as np
+    levels = np.zeros(seq_len - 1, dtype=np.int64)
+    for t in range(seq_len - 1):
+        p, lv = t + 1, 0
+        while p % s == 0:
+            p //= s
+            lv += 1
+        levels[t] = lv
+    return levels
+
+
+def _mo_probe(X, Y, tr, te, device, steps, lr=1e-3):
+    """Linear probe (a2a_forward/mnist_local_loss_probes recipe): no input
+    standardization, MSE, global-variance R² + mean cosine. tr/te are absolute
+    row indices into the CPU tensors X, Y."""
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    Xtr, Ytr = X[tr].to(device), Y[tr].to(device)
+    Xte, Yte = X[te].to(device), Y[te].to(device)
+    probe = nn.Linear(Xtr.shape[1], Ytr.shape[1]).to(device)
+    opt = torch.optim.Adam(probe.parameters(), lr=lr)
+    n_train = Xtr.shape[0]
+    bs = min(4096, n_train)
+    for _ in range(steps):
+        idx = torch.randint(n_train, (bs,), device=device)
+        F.mse_loss(probe(Xtr[idx]), Ytr[idx]).backward()
+        opt.step(); opt.zero_grad()
+    with torch.no_grad():
+        pred = probe(Xte)
+        mse = F.mse_loss(pred, Yte).item()
+        var = Yte.var().item()
+        r2 = 1.0 - mse / var if var > 0 else 0.0
+        cos = F.cosine_similarity(pred, Yte, dim=-1).mean().item()
+    del Xtr, Ytr, Xte, Yte, probe, opt
+    torch.cuda.empty_cache()
+    return {"r2": r2, "cosine": cos}
+
+
+def _meta_object_probes(model, fm, eval_x, predict_from, predict_to, n_embd,
+                        n_layer, s, L, batch_size, device, probe_steps, seed,
+                        label, per_level=True):
+    """Decompose self-knowledge into OBJECT-level (prediction probe: encode what
+    the FM predicts) vs pure META (ortho_residual probe: encode where the FM errs,
+    ⊥ its prediction direction), per a2a_forward/mnist_local_loss_probes.py.
+
+    Four probe targets at each layer (native, no-injection activations):
+      prediction     = FM(post_block0)                  -> object-level
+      residual       = target - prediction              -> composite (meta+mag)
+      ortho_residual = residual - (residual·p̂)p̂        -> pure meta
+      target         = actual post_block{predict_to}    -> ceiling
+    Probed at post_block0 (pre-injection), post_block1 (injection point) and
+    post_block{n_layer-1} (deep); the object/meta split is organized by the
+    injection-point crossover (a2a forward_model_swap). Additionally conditioned
+    on hierarchy level (v_s valuation of the NTP position) -- the RHM extension
+    MNIST could not offer. Reports target variances so a near-zero ortho R² in a
+    tiny-residual condition reads as "no residual" not "no meta" (the LL failure).
+    The last sequence position (no next token) is dropped."""
+    import numpy as np
+    import torch
+    import torch.nn.functional as F
+    model.eval(); fm.eval()
+    T = s ** L
+    probe_layers = list(dict.fromkeys(
+        ["post_block0", "post_block1", f"post_block{n_layer - 1}"]))
+    acts = {k: [] for k in probe_layers}
+    preds, resids, orthos, targets = [], [], [], []
+    with torch.no_grad():
+        for i in range(0, len(eval_x), batch_size):
+            batch = eval_x[i:i + batch_size]
+            _, _, vi = model(batch, return_intermediates=True)
+            pred = fm(vi[predict_from])
+            tgt = vi[predict_to]
+            r = tgt - pred
+            pnorm = pred / (pred.norm(dim=-1, keepdim=True) + 1e-8)
+            r_perp = r - (r * pnorm).sum(-1, keepdim=True) * pnorm
+            preds.append(pred[:, :-1, :].reshape(-1, n_embd).cpu())
+            resids.append(r[:, :-1, :].reshape(-1, n_embd).cpu())
+            orthos.append(r_perp[:, :-1, :].reshape(-1, n_embd).cpu())
+            targets.append(tgt[:, :-1, :].reshape(-1, n_embd).cpu())
+            for k in probe_layers:
+                acts[k].append(vi[k][:, :-1, :].reshape(-1, n_embd).cpu())
+    tgts = {"prediction": torch.cat(preds), "residual": torch.cat(resids),
+            "ortho_residual": torch.cat(orthos), "target": torch.cat(targets)}
+    for k in probe_layers:
+        acts[k] = torch.cat(acts[k])
+    n_rows = tgts["prediction"].shape[0]
+    n_seq = n_rows // (T - 1)
+
+    stats = {f"{t}_var": float(Y.var().item()) for t, Y in tgts.items()}
+    stats["ortho_over_res"] = stats["ortho_residual_var"] / (stats["residual_var"] + 1e-12)
+    stats["pred_tgt_cos"] = float(
+        F.cosine_similarity(tgts["prediction"], tgts["target"], dim=-1).mean())
+    stats["mean_res_norm"] = float(tgts["residual"].norm(dim=-1).mean())
+
+    g = torch.Generator().manual_seed(seed)
+    perm = torch.randperm(n_rows, generator=g)
+    n_tr = int(0.8 * n_rows)
+    tr, te = perm[:n_tr], perm[n_tr:]
+    probe_types = ["prediction", "residual", "ortho_residual", "target"]
+
+    out = {"target_stats": stats, "aggregate": {}, "per_level": {}}
+    for lk in probe_layers:
+        out["aggregate"][lk] = {
+            pt: _mo_probe(acts[lk], tgts[pt], tr, te, device, probe_steps)
+            for pt in probe_types}
+
+    if per_level:
+        pos_lv = _position_levels_np(T, s)
+        row_lv = torch.from_numpy(np.tile(pos_lv, n_seq))
+        for lv in sorted(set(int(x) for x in pos_lv.tolist())):
+            d = f"d{lv + 1}"                       # v_s valuation lv -> d(lv+1)
+            rows = torch.nonzero(row_lv == lv, as_tuple=True)[0]
+            rows = rows[torch.randperm(rows.numel(), generator=g)]
+            k = int(0.8 * rows.numel())
+            ltr, lte = rows[:k], rows[k:]
+            out["per_level"][d] = {
+                lk: {pt: _mo_probe(acts[lk], tgts[pt], ltr, lte, device, probe_steps)
+                     for pt in probe_types}
+                for lk in probe_layers}
+
+    bN = f"post_block{n_layer - 1}"
+    print(f"  [{label}] MO stats: pred_var={stats['prediction_var']:.4f} "
+          f"res_var={stats['residual_var']:.4f} ortho_var={stats['ortho_residual_var']:.4f} "
+          f"ortho/res={stats['ortho_over_res']:.3f} |res|={stats['mean_res_norm']:.2f}")
+    for lk in probe_layers:
+        a = out["aggregate"][lk]
+        print(f"  [{label}]   {lk:12s}: OBJ(pred)={a['prediction']['r2']:+.3f}  "
+              f"META(ortho)={a['ortho_residual']['r2']:+.3f}  "
+              f"composite(res)={a['residual']['r2']:+.3f}")
+    return out
+
+
 def _ensemble_agreement(model, make_fm, get_ntp_batch, fresh_fm_steps, fwd_lr,
                         eval_x, predict_from, predict_to, n_embd, batch_size, device,
                         n_fm, base_seed, label):
@@ -387,6 +524,7 @@ def latent_loop(
     n_eval_sequences: int = 8000, eval_seed: int = 999,
     probe_steps: int = 600, probe_lr: float = 1e-2,
     mlp_hidden: int = 128, mlp_steps: int = 800, sk_probe_steps: int = 500,
+    meta_object: bool = True, mo_probe_steps: int = 300,
     ensemble_n: int = 0, tag: str = "",
     bp_line: str = "d1 .998 d2 .998 d3 .995 d4 .989 d5 .955 root .800",
     greedy_line: str = "d1 .887 d2 .845 d3 .751 d4 .708 d5 .476",
@@ -759,13 +897,25 @@ def latent_loop(
                                n_layer, batch_size, device, sk_probe_steps, seed,
                                cond + "|cotrained")
 
+        # --- meta/object decomposition (fresh + co-trained FM) ---
+        mo = None
+        if meta_object:
+            mo = {"fresh": _meta_object_probes(
+                model, meas_fm, eval_x, predict_from, predict_to, n_embd, n_layer,
+                s, L, batch_size, device, mo_probe_steps, seed, cond + "|fresh")}
+            if use_loop:
+                mo["cotrained"] = _meta_object_probes(
+                    model, fm, eval_x, predict_from, predict_to, n_embd, n_layer,
+                    s, L, batch_size, device, mo_probe_steps, seed, cond + "|cotrained")
+
         ens = None
         if ensemble_n > 0:
             ens = _ensemble_agreement(model, make_fm, get_ntp_batch, fresh_fm_steps,
                                       fwd_lr, eval_x, predict_from, predict_to, n_embd,
                                       batch_size, device, ensemble_n, seed, cond)
         results[cond] = {"probes": probes, "residual_stats": res, "self_knowledge": sk,
-                         "self_knowledge_cotrained": sk_ct, "ensemble": ens,
+                         "self_knowledge_cotrained": sk_ct, "meta_object": mo,
+                         "ensemble": ens,
                          "injected": injected, "final_val": eval_ntp(model)}
         del model, meas_fm, opt_main
         if use_loop:
@@ -831,6 +981,52 @@ def latent_loop(
         if ol in results:
             d = results[cond]["self_knowledge"][bN] - results[ol]["self_knowledge"][bN]
             print(f"  {cond:>24} (vs {ol}): Δ{bN}={d:+.3f}")
+
+    # --- meta/object decomposition summary ---
+    if meta_object:
+        for fmkind in ["fresh", "cotrained"]:
+            rows = [c for c in cond_list
+                    if results[c].get("meta_object") and fmkind in results[c]["meta_object"]]
+            if not rows:
+                continue
+            print(f"\n=== Object (pred R²) vs Meta (ortho_residual R²) — {fmkind} FM, "
+                  f"aggregate ===")
+            print(f"{'cond':>24} | {'OBJ@b0':>7} {'META@b0':>7} | {'OBJ@b1':>7} "
+                  f"{'META@b1':>7} | {'OBJ@'+bN[-2:]:>7} {'META@'+bN[-2:]:>7} | "
+                  f"{'ortho/res':>9}")
+            for cond in rows:
+                mo = results[cond]["meta_object"][fmkind]
+                ag = mo["aggregate"]
+
+                def g(layer, pt):
+                    return ag.get(layer, {}).get(pt, {}).get("r2", float("nan"))
+                o_r = mo["target_stats"]["ortho_over_res"]
+                print(f"{cond:>24} | {g('post_block0','prediction'):7.3f} "
+                      f"{g('post_block0','ortho_residual'):7.3f} | "
+                      f"{g('post_block1','prediction'):7.3f} "
+                      f"{g('post_block1','ortho_residual'):7.3f} | "
+                      f"{g(bN,'prediction'):7.3f} {g(bN,'ortho_residual'):7.3f} | "
+                      f"{o_r:9.3f}")
+
+        # Δ(CL − OL) split into object vs meta, fresh FM (the MNIST 3:1 quantity)
+        print(f"\n=== Δ(CL − OL) object vs meta [fresh FM] — MNIST: meta ≫ object ===")
+        print(f"{'cond':>24} (vs OL) | {'ΔOBJ@b0':>8} {'ΔMETA@b0':>9} | "
+              f"{'ΔOBJ@'+bN[-2:]:>8} {'ΔMETA@'+bN[-2:]:>9}")
+        for cond in cond_list:
+            if "cl" not in cond:
+                continue
+            ol = "ntp_aux" if "aux" in cond else "ntp"
+            if ol not in results or not results[cond].get("meta_object") \
+                    or not results[ol].get("meta_object"):
+                continue
+            a = results[cond]["meta_object"]["fresh"]["aggregate"]
+            b = results[ol]["meta_object"]["fresh"]["aggregate"]
+
+            def dg(layer, pt):
+                return a[layer][pt]["r2"] - b[layer][pt]["r2"]
+            print(f"{cond:>24} (vs {ol:>7}) | {dg('post_block0','prediction'):8.3f} "
+                  f"{dg('post_block0','ortho_residual'):9.3f} | "
+                  f"{dg(bN,'prediction'):8.3f} {dg(bN,'ortho_residual'):9.3f}")
 
     print(f"\n=== SWEEP SUMMARY: root(d6) recov | val | resNorm | d6η² | SK{bN} | ensemble ===")
     hdr = f"{'cond':>24} | {'root':>5} {'val':>6} {'resNrm':>7} {'d6η²':>6} {'SKb7':>7}"

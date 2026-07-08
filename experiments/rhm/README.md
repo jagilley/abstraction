@@ -271,6 +271,19 @@ modal run --detach -m rhm.rhm_fm_regularizer::analyze_reg --lams "0.03,0.1,0.3,1
 modal run --detach -m rhm.rhm_fm_regularizer::wd_activation_rank
 ```
 
+### Complexodynamics: the First Law of learning, with an attractor floor (2026-07-07)
+
+**Full writeup**: [RHM_COMPLEXODYNAMICS_README.md](RHM_COMPLEXODYNAMICS_README.md)
+
+Reads the saved m2 trajectories (FM-reg + WD-sweep per-checkpoint parts) as an empirical test of Aaronson's "First Law of Complexodynamics" (complexity rises then falls while entropy climbs; see `reading/complexodynamics.pdf`), with the capacity-bounded FM as the resource-bounded observer, and adds one new analysis-only run: `rhm_ensemble_trajectory.py`, fresh-FM-ensemble residual invariance measured over training checkpoints.
+
+**The rise-and-fall was already in the saved parts, with two amendments to Aaronson's picture.** (1) The descent requires an annealer: FM-free activation rank rises 36→63.5% then falls to 42.9% under FM-reg pressure, but arrests at ~55% without it — SGD alone freezes mid-descent (a glass, not a liquid). (2) The curve descends not to zero but to the **DGP's own sophistication relative to the bound**: shallow-level residual η² completes the full arc (d1 0.10→0.05) while deep-level η² rises and persists at every horizon (still climbing at 300k) — the deep "arrest" is the floor, not a truncated transient. **The new ensemble run confirms the decomposition**: residual FM-invariance rises 0.555 (random init) → ~0.83 late, the un-pressured control dips to 0.666 exactly at the sophistication peak (mid-training scaffolding is observer-idiosyncratic), and the ensemble-mean residual — the invariant core — is deep-DGP-structured, purifying monotonically (d4 η² 0.016→0.503, exceeding any single FM's) with pressure making it smaller *and* more invariant (norm 1.1 vs 9.3, ens_cos 0.834 vs 0.809). Hump = trajectory-owned scaffolding; floor = problem-owned complexity — the same DGP-aligned residual RHM_LATENT_LOOP identified as the precondition for generalizable self-knowledge. Single rule seed; ens_cos not comparable across FM configs/gaps.
+
+**Reproduction**:
+```bash
+modal run --detach -m rhm.rhm_ensemble_trajectory::ensemble_trajectory
+```
+
 ## Next steps
 
 1. ~~**Closed-loop A2A on RHM**~~: *Done* — see [RHM_RATCHET_README](RHM_RATCHET_README.md). The WS_UG_uniform ratchet replicates on RHM in dynamics (gate closing, FM tracking, robustness dissociation, crossover timing) but not in magnitude (0.3% vs MNIST's 48%). Confidence thresholding keeps the gate 1.8x more open at tau=0.3 but doesn't amplify the val loss gap. FM capacity must be matched (~2% of model) for meaningful dynamics — an oversized FM (12.5%) masks the gate-closing behavior. See also [RHM_SPARSE_RATCHET_README](RHM_SPARSE_RATCHET_README.md) — sparse NTP masking unlocks +1.2% val loss improvement and per-level compositional gains at L3-L5 in cycle 1.

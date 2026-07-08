@@ -36,6 +36,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `rhm_reptile_sparse.py` | Meta-learning: Reptile with sparse L2+ inner loop + rule-set transfer |
 | `rhm_fm_regularizer.py` | FM-as-regularizer: structured FM-predictability pressure vs weight decay (functional-complexity floor) |
 | `rhm_latent_loop.py` | Latent-loop 2×2: target (token vs oracle-latent) × loop (open vs closed); λ_local sweep; fresh-FM ensemble |
+| `rhm_ensemble_trajectory.py` | Fresh-FM-ensemble residual invariance over saved training checkpoints (complexodynamics: transient scaffolding vs DGP floor) |
 | `README.md` | This file |
 
 ## Auxiliary READMEs
@@ -58,3 +59,4 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `RHM_FRONTIER_AND_LEGIBILITY_README.md` | [m gates the learnable frontier; FM residual tracks it; WD sweep (norm vs rank)](RHM_FRONTIER_AND_LEGIBILITY_README.md) |
 | `RHM_FM_REGULARIZER_README.md` | [FM-as-regularizer beats weight decay's functional-complexity floor](RHM_FM_REGULARIZER_README.md) |
 | `RHM_LATENT_LOOP_README.md` | [Latent target is load-bearing for generalizable self-knowledge on RHM](RHM_LATENT_LOOP_README.md) |
+| `RHM_COMPLEXODYNAMICS_README.md` | [Complexodynamics: rise-then-fall of sophistication proxies; transient = FM-idiosyncratic scaffolding, floor = DGP-aligned](RHM_COMPLEXODYNAMICS_README.md) |
