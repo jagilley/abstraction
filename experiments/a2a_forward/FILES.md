@@ -35,6 +35,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `mnist_looped.py` | Looped-ViT phase 1 (no injection): trains the loop, convergence dynamics, accuracy-vs-eval-T sweep, deep supervision, FF baseline |
 | `mnist_looped_injection.py` | Looped-ViT phase 2: FM-injection 2×2 (`train_condition` OL/CL × last/deep-sup) + `aggregate`; supports injection form (update vs next_state), `predict_k`, dataset (mnist/fashion), damping, gate type (proj/scalar) |
 | `mnist_looped_fm_sweep.py` | FM-capacity sweep on a frozen confound-free loop: state-cos vs update-cos vs FM size (8 sizes), residual rank, loop-necessity (acc-vs-T); MNIST + Fashion |
+| `mnist_looped_probes.py` | Representational imprint probes (eval-only) for the looped baseline battery: future self-decodability, divergence imprint vs OL, channel-subspace alignment, + Control 1 (matched-subspace null), Control 2 (position-specificity), Control 3 (injection absorption/cancellation); reconstructs the frozen random_proj predictor by seed |
 | `mnist_experiment.py` | MNIST controlled retrain: open-loop vs closed-loop ViT, self-knowledge probes, robustness |
 | `mnist_analysis.py` | MNIST residual direction analysis (PCA, digit conditioning) + causal substitution |
 | `mnist_baseline_battery.py` | MNIST baseline battery: 5-condition controlled comparison |
