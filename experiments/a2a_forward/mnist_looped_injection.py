@@ -56,6 +56,11 @@ def _cfg_tag(n_loop_layers, train_steps_loop, n_head, n_embd,
 def train_condition(
     condition: str = "cl_last",
     dataset: str = "mnist",          # "mnist" or "fashion_mnist" (harder -> loop needed)
+    baseline_type: str = "forward",  # baseline battery: what gets injected --
+                                     # "forward" = FM(a_t) forecast (the real thing);
+                                     # "random_proj" = frozen random-init FM (structured
+                                     #   but not a forecast); "shifted" = FM forecast
+                                     #   rolled along positions (destroys alignment)
     injection_form: str = "update",  # "update" = gate*(FM-s_t) (vanishes at fixpt);
                                      # "next_state" = gate*FM (naive, unstable)
     predict_k: int = 3,              # FM predicts s_{t+k} (k>1 -> informative preview;
@@ -101,6 +106,7 @@ def train_condition(
     assert condition in CONDITIONS, f"unknown condition {condition}"
     assert gate_type in ("proj", "scalar"), gate_type
     assert injection_form in ("update", "next_state"), injection_form
+    assert baseline_type in ("forward", "random_proj", "shifted"), baseline_type
     closed_loop = condition.startswith("cl")
     deep_sup = condition.endswith("deep")
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -169,18 +175,35 @@ def train_condition(
     else:
         gate = None
 
+    # Baseline-battery injected-signal source. The FM (fwd) is always trained for
+    # measurement; only what gets INJECTED varies. random_proj injects a frozen
+    # random-init FM (structured, same magnitude, but not a trained forecast).
+    rand_predictor = None
+    if baseline_type == "random_proj":
+        torch.manual_seed(seed + 200)
+        rand_predictor = TransformerForwardModel(
+            d_model=n_embd, d_head=fwd_d_head, n_head=fwd_n_head,
+            n_layer=fwd_n_layer, mlp_mult=fwd_mlp_mult,
+            block_size=n_positions, causal=False,
+        ).to(device)
+        for pp in rand_predictor.parameters():
+            pp.requires_grad_(False)
+
     main_params = list(model.parameters()) + (list(gate.parameters()) if gate else [])
     opt_main = torch.optim.AdamW(main_params, lr=lr, weight_decay=0.01)
     opt_fwd = torch.optim.AdamW(fwd.parameters(), lr=fwd_lr, weight_decay=0.01)
 
-    def make_hook(cache=None):
-        """Build the per-step injection hook. Returns gate(signal.detach()) where
-        signal is the predicted next state (next_state form) or the predicted
-        update FM(a_t) - s_t (update form, which -> 0 at the fixed point)."""
+    def make_hook():
+        """Per-step injection hook. What is injected depends on baseline_type:
+        forward = FM(a_t); random_proj = frozen random FM(a_t); shifted = FM(a_t)
+        rolled along positions. injection_form controls next-state vs update."""
         def hook(t, operand, state):
-            pred = fwd(operand.detach())
-            if cache is not None:
-                cache[t] = pred
+            if baseline_type == "random_proj":
+                pred = rand_predictor(operand.detach())
+            else:
+                pred = fwd(operand.detach())
+                if baseline_type == "shifted":
+                    pred = torch.roll(pred, shifts=n_positions // 2, dims=1)
             signal = (pred - state) if injection_form == "update" else pred
             return gate(signal.detach())
         return hook
@@ -197,33 +220,27 @@ def train_condition(
         == post_step{t+k-1}.)"""
         return min(t + predict_k - 1, T - 1)
 
-    def run_model(images, train_fm=True):
-        """Forward the loop (with injection if CL); return logits, cls-CE inputs,
-        intermediates, and the FM loss (FM predicts s_{t+k})."""
+    def run_model(images):
+        """Forward the loop (with injection if CL); return logits, per-step logits,
+        intermediates, and the FM loss. The FM is trained/measured on the
+        (possibly injection-laden) transitions uniformly across all conditions."""
         if closed_loop:
-            fm_pred_cache = {}
             logits, _, inter, step_logits = model(
                 images, return_intermediates=True, readout_all_steps=True,
-                step_inject_fn=make_hook(fm_pred_cache),
+                step_inject_fn=make_hook(),
             )
-            fm_loss = 0.0
-            for t in range(T):
-                tgt = inter[f"post_step{tgt_idx(t)}"].detach()
-                fm_loss = fm_loss + F.mse_loss(fm_pred_cache[t], tgt)
-            fm_loss = fm_loss / T
         else:
             logits, _, inter, step_logits = model(
                 images, return_intermediates=True, readout_all_steps=True,
             )
-            p = inter["post_prelude"]
-            fm_loss = 0.0
-            for t in range(T):
-                s_prev = inter[f"post_step{t - 1}"] if t >= 1 else torch.zeros_like(p)
-                a_t = (s_prev + p).detach()
-                pred = fwd(a_t)
-                fm_loss = fm_loss + F.mse_loss(
-                    pred, inter[f"post_step{tgt_idx(t)}"].detach())
-            fm_loss = fm_loss / T
+        p = inter["post_prelude"]
+        fm_loss = 0.0
+        for t in range(T):
+            s_prev = inter[f"post_step{t - 1}"] if t >= 1 else torch.zeros_like(p)
+            a_t = (s_prev + p).detach()
+            fm_loss = fm_loss + F.mse_loss(
+                fwd(a_t), inter[f"post_step{tgt_idx(t)}"].detach())
+        fm_loss = fm_loss / T
         return logits, step_logits, inter, fm_loss
 
     # =============================================
@@ -414,6 +431,57 @@ def train_condition(
     fm_selfcons /= 20
 
     # =============================================
+    # Perturbation robustness / error-correction
+    # Perturb the recurrent state at a mid step (relative-scaled noise, identical
+    # across conditions via fixed seed), then let the loop finish. dloss_inj keeps
+    # the injection active (the self-forecast can pull the state back toward its
+    # trajectory); dloss_noinj runs the raw loop. error_correction = dloss_noinj -
+    # dloss_inj is how much the injection RECOVERS from the perturbation -- the
+    # axis where feedforward found forward-prediction uniquely special. A genuine
+    # forecast should correct; a random/misaligned injection should not.
+    # =============================================
+    pert_step = T // 2
+    robustness = {}
+    with torch.no_grad():
+        for eps in [0.5, 1.0, 2.0]:
+            di, dn = [], []
+            for bi in range(20):
+                eidx = eval_indices[bi % n_evals][0]
+                vim = test_images[eidx].to(device)
+                vlb = test_labels[eidx].to(device)
+                B = vim.shape[0]
+                if closed_loop:
+                    _, _, inter = model(vim, vlb, return_intermediates=True,
+                                        step_inject_fn=make_hook())
+                else:
+                    _, _, inter = model(vim, vlb, return_intermediates=True)
+                s_at = (inter[f"post_step{pert_step - 1}"] if pert_step >= 1
+                        else inter["post_prelude"])
+                snorm = s_at.norm(dim=-1, keepdim=True)
+                torch.manual_seed(seed + bi + 7000)
+                noise = torch.randn(B, n_positions, n_embd, device=device)
+                noise = noise / (noise.norm(dim=-1, keepdim=True) + 1e-8) * (eps * snorm)
+                if closed_loop:
+                    _, base_i = model(vim, vlb, step_inject_fn=make_hook())
+                    _, pert_i = model(vim, vlb, step_inject_fn=make_hook(),
+                                      perturbation=(pert_step, noise))
+                    di.append(pert_i.item() - base_i.item())
+                _, base_n = model(vim, vlb)
+                _, pert_n = model(vim, vlb, perturbation=(pert_step, noise))
+                dn.append(pert_n.item() - base_n.item())
+            entry = {"dloss_noinj": float(np.mean(dn))}
+            if closed_loop:
+                entry["dloss_inj"] = float(np.mean(di))
+                entry["error_correction"] = float(np.mean(dn) - np.mean(di))
+            robustness[str(eps)] = entry
+    print(f"  robustness (dloss @ pert step {pert_step}): " + ", ".join(
+        f"eps={e}: " + (f"inj={robustness[e]['dloss_inj']:.3f} "
+                        f"noinj={robustness[e]['dloss_noinj']:.3f} "
+                        f"corr={robustness[e]['error_correction']:+.3f}"
+                        if closed_loop else f"noinj={robustness[e]['dloss_noinj']:.3f}")
+        for e in ["0.5", "1.0", "2.0"]))
+
+    # =============================================
     # Save
     # =============================================
     tag = _cfg_tag(n_loop_layers, T, n_head, n_embd, prelude_layers, coda_layers,
@@ -424,6 +492,8 @@ def train_condition(
         tag += f"_damp{damping}"
     if gate_type != "proj":
         tag += f"_{gate_type}gate"
+    if baseline_type != "forward":
+        tag += f"_{baseline_type}"
     tag = f"{dataset}_{tag}"
     save_dir = f"{DATA_DIR}/a2a_forward/mnist_looped_injection/{tag}/{condition}"
     os.makedirs(save_dir, exist_ok=True)
@@ -436,7 +506,7 @@ def train_condition(
         "condition": condition,
         "closed_loop": closed_loop, "deep_sup": deep_sup,
         "injection_form": injection_form, "predict_k": predict_k,
-        "dataset": dataset, "damping": damping,
+        "dataset": dataset, "damping": damping, "baseline_type": baseline_type,
         "config": {
             "n_loop_layers": n_loop_layers, "prelude_layers": prelude_layers,
             "coda_layers": coda_layers, "n_head": n_head, "n_embd": n_embd,
@@ -453,6 +523,7 @@ def train_condition(
         "acc_vs_T": acc_T,
         "per_step_decode": per_step_decode,
         "fm_selfcons_per_step": fm_selfcons.tolist(),
+        "robustness": robustness,
     }
     if closed_loop:
         result["final_val_loss_no_inj"] = history["val_loss_no_inj"][-1][1]

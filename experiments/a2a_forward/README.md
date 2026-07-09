@@ -51,6 +51,7 @@ Full file-by-file reference (every `.py` and every auxiliary README with its one
 - **Wake-sleep / distillation / ratchet**: `distillation*.py`, `mnist_distillation*.py`, `*_ratchet*.py`, `*_gate*.py`, `mnist_local_loss*.py`, `*_precision_weighted.py`, `mnist_learning_gate.py`.
 - **Geometry & off-manifold**: `language_geometry.py`, `mnist_geometry.py`, `synthetic_input*.py`.
 - **MNIST / vision port**: `vit.py`, `mnist_experiment.py`, `mnist_analysis.py`, `mnist_baseline_battery.py`, `mnist_adaptation.py`, `mnist_ratchet_adaptation.py`.
+- **Looped transformer** (self-model-needs-a-loop): `looped_vit.py` (`LoopedViT`), `mnist_looped.py` (phase 1), `mnist_looped_injection.py` (injection 2×2 + `aggregate`), `mnist_looped_fm_sweep.py` (FM-capacity curve). See **[LOOPED_README.md](LOOPED_README.md)**.
 
 Each experiment section below links its own `Full writeup` auxiliary README; **[FILES.md](FILES.md)** collects those links in one table.
 
@@ -576,11 +577,37 @@ modal run --detach a2a_forward/mnist_fashion_gate.py::a2a_mnist_fashion_gate
 modal run --detach a2a_forward/mnist_ood_unified_gate.py::a2a_mnist_ood_unified_gate
 ```
 
+## Looped transformer with FM injection (2026-07-09)
+
+**Full writeup**: [LOOPED_README.md](LOOPED_README.md) | **Status**: in progress (single seed; baseline-battery control + discriminators 2–3 pending)
+
+Tests the [self_model_needs_a_loop.md](../../ideas/self_model_needs_a_loop.md) hypothesis: a *causally-used* self-forecast is forced only in a **weight-shared looped** model with per-step FM injection (`s_{t+1} = g(s_t + p + gate·FM(s_t))`), not feedforward. `looped_vit.py` (`LoopedViT`) is a recurrent-depth ViT; the FM predicts a future iterate and its gated forecast is injected each step.
+
+**Key results**:
+
+1. **The trajectory is the finding**: the loop's self-forecast is inert or destabilizing under every obvious setting, and only becomes a clean load-bearing channel once **four confounds** are removed. Plain loop overshoots (timed trajectory, not a fixed point) → deep supervision makes an attractor (but is itself a confound) → **naive `gate·FM` injection is unstable** (compounds over steps, gate runs 0.08→3.7, loop diverges) → **update-form `gate·(FM−s)` is stable but inert** (vanishes at fixed point; 1–3-step target trivially predictable, fm_cos 0.999) → FM-capacity sweep shows even a 1% FM predicts the loop *update* at cos 0.92 (loop transformation is intrinsically low-rank) → the inertness was **confounded** by (a) prelude/coda feedforward shortcut, (b) deep supervision, (c) over-capacity FM, (d) MNIST barely needing the loop.
+
+2. **Confound-free + bounded gate → causal necessity that scales with loop-necessity** (single seed). On **Fashion-MNIST** (loop load-bearing: T=1 40%→T=8 85%), ablating the injection from the CL model collapses accuracy 0.847 → **0.667** (+0.86 nats); on MNIST (loop ~idle) ablation costs only 0.04 — the dependency is **~5× larger on the task that needs the loop**. The self-forecast is causally used in proportion to how load-bearing the loop is.
+
+3. **Self-regulated gate**: the unbounded projection gate runs away and collapses the model; the **bounded scalar gate** (over-relaxation coefficient ∈ [0,1]) self-regulates to a small stable value (~0.016) and holds it, while the model becomes strongly dependent on that ~2% anticipatory signal.
+
+4. **No net loss benefit is expected, not a failure**: CL-with-injection ≈ OL. The injection adds a new self-referential input *modality* the model must parse in addition to the task (cf. the idea doc's efference-copy framing), so equal/slightly-worse loss is the natural outcome — the dependency is a *slot allocated for an expected modality*, and the discriminator is causal use, not lower loss.
+
+**Reproduction**:
+```bash
+# Headline: confound-free bounded-gate injection, MNIST vs Fashion
+for d in mnist fashion_mnist; do for c in ol_last cl_last; do
+  modal run --detach a2a_forward/mnist_looped_injection.py::train_condition \
+    --condition $c --dataset $d --prelude-layers 0 --coda-layers 0 \
+    --fwd-d-head 1 --fwd-mlp-mult 0.125 --predict-k 3 --injection-form update \
+    --gate-type scalar & done; done; wait
+```
+
 ## Next steps
 
 1. **Language gated ratchet**: Language's full-rank residual (200/256 dimensions) and rich behavioral decomposition (delimiter tracking, distributed attention, focused retrieval) would make the gate's selectivity much more interpretable than MNIST's 10 digits. The gate might develop per-behavioral-category selectivity — compressing routine computation while leaving novel semantic composition alone. Language is inherently multi-task, so the gate-closing prediction might hold within a single training run without needing an explicit distribution shift.
 2. ~~**OOD adaptation post-ratchet**~~: *Done* — see [OOD_GATE_README](OOD_GATE_README.md#experiment-4-ood-adaptation-after-gated-ratchet-2026-06-20). WS_LG ≈ WS_UG_uniform: +8pp zero-shot OOD at 45° (tracks distillation), ~25% faster adaptation speed (new vs prior null result). The two ratchet conditions produce nearly identical OOD behavior despite opposite gate mechanisms — the val loss improvement is genuine generalization. Forgetting mixed: all injection-trained conditions slightly better than OL at severe angles.
-4. **Looped transformer**: The natural architecture for cerebellar injection — inject at each recurrence step, get adaptive compute for free. Would give the model more computational depth to act on its self-knowledge at inference time. The directional steering results specifically motivate this: the model encodes directional self-knowledge it can only partially use with 2 downstream layers.
+4. ~~**Looped transformer**~~: *In progress* — see [LOOPED_README.md](LOOPED_README.md) and the section above. Confound-free bounded-gate injection is causally necessary and scales with loop-necessity (Fashion ablation 0.85→0.67, 5× MNIST); self-regulated gate. **Pending**: baseline-battery control (random-proj / shifted injection on Fashion — the decisive test of whether the effect is specific to the self-forecast), discriminators 2 (near-manifold counterfactual) & 3 (fixed-point self-consistency structure), and a seed replicate.
 5. **Cross-model self-knowledge control**: Train separate fresh FMs on each model's own activations (OL, CL, distilled), then probe each for its own FM's residual. Eliminates the confound in the distillation self-knowledge probes.
 6. **Model scale 350M**: Third data point for the model scale experiment. The 29M → 77M comparison shows consistent residual concentration across all metrics. A 350M model (~24L/16H/1024D on 500M+ tokens) tests whether the trend continues, accelerates, or saturates. See [MODEL_SCALE_README.md](MODEL_SCALE_README.md).
 7. **Harden the OOD robustness result**: (a) direct manifold-displacement check — autoencoder reconstruction MSE per corpus should rise with shift severity and peak on code; (b) bootstrap CIs from the saved per-direction Δloss arrays; (c) a second baseline-battery seed to firm up the code-corpus numbers. See [OOD_ROBUSTNESS_README.md](OOD_ROBUSTNESS_README.md).

@@ -6,7 +6,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 
 | File | Purpose |
 |---|---|
-| `forward_model.py` | `ForwardModel` (per-position MLP) and `TransformerForwardModel` (1-layer transformer) |
+| `forward_model.py` | `ForwardModel` (per-position MLP), `TransformerForwardModel` (1-layer transformer), gates (`CerebellarGate`, `EmotionGate`, `BoundedScalarGate` — bounded over-relaxation gate for looped injection), `LossPredictor` |
 | `stages.py` | Modal stage `a2a_train` — co-training loop with eval and analysis |
 | `analyze.py` | Structure analysis: PCA, CKA, attention pattern comparison, weight-space comparison |
 | `causal_substitution.py` | Causal substitution: replace block1 with forward model, measure per-behavior degradation |
@@ -31,6 +31,10 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `baseline_battery.py` | Baseline battery: 5-condition controlled comparison (forward, shifted, random_proj, autoencoder, open_loop) |
 | `jacobian_analysis.py` | Jacobian analysis: Hessian trace, gradient spectrum, SK subspace alignment at injection point |
 | `vit.py` | Vision Transformer for MNIST (same intermediate/cerebellar interface as GPT) |
+| `looped_vit.py` | `LoopedViT` — weight-shared recurrent-depth ViT (shared operator `G` × T; DEQ input re-injection; prelude/coda bookends; per-step readout for deep supervision; `step_inject_fn(t, operand, state)` hook for FM injection) |
+| `mnist_looped.py` | Looped-ViT phase 1 (no injection): trains the loop, convergence dynamics, accuracy-vs-eval-T sweep, deep supervision, FF baseline |
+| `mnist_looped_injection.py` | Looped-ViT phase 2: FM-injection 2×2 (`train_condition` OL/CL × last/deep-sup) + `aggregate`; supports injection form (update vs next_state), `predict_k`, dataset (mnist/fashion), damping, gate type (proj/scalar) |
+| `mnist_looped_fm_sweep.py` | FM-capacity sweep on a frozen confound-free loop: state-cos vs update-cos vs FM size (8 sizes), residual rank, loop-necessity (acc-vs-T); MNIST + Fashion |
 | `mnist_experiment.py` | MNIST controlled retrain: open-loop vs closed-loop ViT, self-knowledge probes, robustness |
 | `mnist_analysis.py` | MNIST residual direction analysis (PCA, digit conditioning) + causal substitution |
 | `mnist_baseline_battery.py` | MNIST baseline battery: 5-condition controlled comparison |
@@ -83,6 +87,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `LANGUAGE_RATCHET_README.md` | [Language gated ratchet](LANGUAGE_RATCHET_README.md) — 4-cycle WS_UG_uniform on GPT: compounding crossover at cycle 3 (+1.6% vs OL), 2.7× overfitting resistance, gate closes aggressively (90% sparse), replicated robustness dissociation (CL robust, local loss brittle) |
 | `FORWARD_MODEL_SWAP_README.md` | [Forward model swap test](FORWARD_MODEL_SWAP_README.md) — is self-knowledge FM-specific or general? 3× FM-original advantage, null ensemble result, injection-point crossover separating FM-specific meta-knowledge (post-injection) from FM-independent structural regularization (pre-injection) |
 | `OPEN_LOOP_ANALYSIS_README.md` | [Open-loop analysis details](OPEN_LOOP_ANALYSIS_README.md) — detailed tables/discussion for Runs 1-2, structure analysis, causal substitution, behavioral residual |
+| `LOOPED_README.md` | [Looped transformer with FM injection](LOOPED_README.md) (self-model-needs-a-loop) — weight-shared recurrent-depth ViT + per-step FM injection: full trajectory (plain loop overshoots → deep-sup attractor → naive injection unstable → update-form inert → confound diagnosis → Fashion + bounded gate). Headline: confound-free bounded-gate injection is causally necessary (Fashion ablation 0.85→0.67) and scales with loop-necessity (5× MNIST); self-regulated gate settles at ~0.016; baseline-battery control + discriminators 2–3 pending |
 | `SYNTHETIC_INPUT_README.md` | [Synthetic-input / off-manifold learnability](SYNTHETIC_INPUT_README.md) (Idea A) — can a forward self-model learn a frozen layer's *program* from off-manifold inputs? Ladder from noise→real over 2 program depths: recoverable off-manifold (pure noise → upd-R² 0.74/0.62; matched per-position stats → 0.88/0.78), gap doubles with depth; the residual gap is *joint cross-position structure* not the marginal (GMM ≈ perpos, mixup closes ~90%); `real` is the most manifold-specialized (bias/coverage tradeoff) |
 
 ## Checkpoint compatibility note
