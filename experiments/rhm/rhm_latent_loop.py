@@ -518,6 +518,7 @@ def latent_loop(
     conditions: str = "ntp,ntp_aux,ntp_cl,ntp_aux_cl",
     # Distillation sleep phase (a2a_forward/distillation.py recipe, per-token KL)
     distill_steps: int = 5000, distill_lr: float = 1e-4, distill_alpha: float = 0.5,
+    sleep_ce_mask_rate: float = 0.0,  # structural CE sparsity during sleep (KL stays dense)
     # Measurement
     fresh_fm_steps: int = 3000, eval_interval: int = 1000,
     ckpt_steps: str = "0,10000",
@@ -843,17 +844,46 @@ def latent_loop(
                                           weight_decay=weight_decay)
             sleep_gen = torch.Generator().manual_seed(seed + 31)
             aux_sleep_gen = torch.Generator().manual_seed(seed + 32)
+
+            # Structural CE sparsity: a FIXED random subset of absolute corpus
+            # target positions is CE-supervised; the rest are supervised only by
+            # the (dense) teacher KL. This starves the DATA channel to test whether
+            # the KL becomes load-bearing (distillation value = teacher − data).
+            # Masking by absolute corpus index (not window position) makes it true
+            # coverage-sparsity: the un-kept positions NEVER receive a hard label.
+            corpus_ce_keep = None
+            if sleep_ce_mask_rate > 0:
+                mgen = torch.Generator().manual_seed(seed + 77)
+                corpus_ce_keep = (torch.rand(n_corpus, generator=mgen)
+                                  >= sleep_ce_mask_rate)
+                print(f"  [{cond}] sleep CE mask: {corpus_ce_keep.float().mean()*100:.1f}% "
+                      f"of corpus positions CE-supervised (KL dense)")
+
+            def get_sleep_batch(gen):
+                ix = torch.randint(0, n_corpus - T - 1, (batch_size,), generator=gen)
+                win = ix[:, None] + arangeT[None, :]
+                tgt = win + 1
+                keep = corpus_ce_keep[tgt].to(device) if corpus_ce_keep is not None else None
+                return corpus[win].to(device), corpus[tgt].to(device), keep
+
             for dstep in range(distill_steps):
                 model.train()
-                x, y = get_ntp_batch(sleep_gen)
+                x, y, ce_keep = get_sleep_batch(sleep_gen)
                 with torch.no_grad():
                     t_logits, _, _ = teacher(
                         x, return_intermediates=True, cerebellar_fn=teacher_cb,
                         cerebellar_input_block=cib,
                         cerebellar_inject_block=inject_after_block)
                 s_logits, _, _ = model(x, return_intermediates=True)
-                ce = F.cross_entropy(s_logits.reshape(-1, v), y.reshape(-1))
-                # per-token KL (reshape first) so alpha genuinely balances KL vs CE
+                if ce_keep is not None:                  # masked (structural sparsity)
+                    ce_tok = F.cross_entropy(s_logits.reshape(-1, v), y.reshape(-1),
+                                             reduction="none")
+                    km = ce_keep.reshape(-1).float()
+                    ce = (ce_tok * km).sum() / km.sum().clamp_min(1.0)
+                else:
+                    ce = F.cross_entropy(s_logits.reshape(-1, v), y.reshape(-1))
+                # per-token KL (reshape first) so alpha genuinely balances KL vs CE.
+                # KL stays DENSE over all positions regardless of the CE mask.
                 kl = F.kl_div(F.log_softmax(s_logits.reshape(-1, v), dim=-1),
                               F.softmax(t_logits.reshape(-1, v), dim=-1),
                               reduction="batchmean")
@@ -1056,7 +1086,8 @@ def latent_loop(
                                   fwd=f"{fwd_n_layer}L{fwd_n_head}H{fwd_d_head}D",
                                   n_steps=n_steps, lam_aux=lam_aux, lam_local=lam_local,
                                   distill_steps=distill_steps, distill_lr=distill_lr,
-                                  distill_alpha=distill_alpha, chance=chance),
+                                  distill_alpha=distill_alpha,
+                                  sleep_ce_mask_rate=sleep_ce_mask_rate, chance=chance),
                    "conditions": results}, f, indent=2, cls=NumpyEncoder)
     volume.commit()
     print(f"\nSaved to {save_dir}/{fname}")

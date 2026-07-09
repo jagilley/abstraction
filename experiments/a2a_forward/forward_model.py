@@ -107,6 +107,33 @@ class CerebellarGate(nn.Module):
         return self.projection.weight.norm().item()
 
 
+class BoundedScalarGate(nn.Module):
+    """Bounded scalar mixing gate for looped update-form injection.
+
+    In the loop, s_{t+1} = G(a_t + gate*(FM(a_t) - s_t)); the gate is an
+    over-relaxation coefficient. An unbounded projection gate (CerebellarGate)
+    lets the optimizer push the coefficient past the stable region, so the
+    fixed-point iteration overshoots and the model collapses. This gate bounds
+    the coefficient to [0, max_gate] via a sigmoid, so gate<=1 keeps the update
+    a stable interpolation between the current state and the predicted future.
+
+    Starts near-closed (init sigmoid(-4) ~ 0.018) and opens only as far as useful.
+    """
+
+    def __init__(self, d_model: int, max_gate: float = 1.0, init: float = -4.0):
+        super().__init__()
+        self.max_gate = max_gate
+        self.theta = nn.Parameter(torch.tensor(float(init)))
+        print(f"BoundedScalarGate: max_gate={max_gate}, init_gate="
+              f"{max_gate * torch.sigmoid(torch.tensor(float(init))).item():.4f}")
+
+    def forward(self, signal):
+        return self.max_gate * torch.sigmoid(self.theta) * signal
+
+    def injection_norm(self):
+        return float(self.max_gate * torch.sigmoid(self.theta).item())
+
+
 class LossPredictor(nn.Module):
     """Predicts per-token loss from early-layer activations (emotion analog).
 

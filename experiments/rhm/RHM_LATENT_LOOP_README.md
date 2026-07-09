@@ -418,3 +418,66 @@ modal run --detach -m rhm.rhm_latent_loop::latent_loop \
 ```
 
 Results: `/rhm_latent_loop/v16_s2_L6_{m4,m2}_distinct_8L8H256D_S20000_mo{,_m2,_lamsweep,_distill,_distill_a0,_seed1}.json` on the volume.
+
+---
+
+# Sparse-supervision sleep: on RHM there is nothing for distillation to transfer (2026-07-08)
+
+**Code**: `rhm_latent_loop.py` — new `--sleep-ce-mask-rate`: during the sleep phase a **fixed** random subset of *absolute corpus positions* is CE-supervised, the rest supervised only by the (dense) teacher KL. Masking by absolute index (not window position) makes it true coverage-sparsity — the un-kept positions **never** receive a hard label.
+**Motivation**: the α=0 control (finding 5, prev section) showed the sleep phase transfers nothing on RHM — val/representation re-derive without the teacher KL. Open question: is that because RHM genuinely has **no transferable surplus**, or because *dense* supervision merely *masks* a real transfer? Component test #2: starve the data channel and see if the KL becomes load-bearing. **Framing caveat (from discussion): "KL load-bearing" is only a proxy.** The actual object of interest is whether the FM's contribution gets re-localized into M's weights (the MNIST/language internalization result); the sparse test is an instrument for that, not the goal.
+
+## Setup
+
+- **Regime chosen for a competent teacher + single data channel**: m2 **token** `ntp_cl@1.0` (no aux, so CE is the *only* data channel). Its teacher-with-injection is genuinely competent — injected val **0.824**, root **0.871** — vs the offloaded standalone wake model (val 1.047, root 0.448). So there is real injected competence available to transfer.
+- **2×2**: α ∈ {0.0, 0.5} × `sleep_ce_mask_rate` ∈ {0.0 (dense), 0.95 (5% of corpus positions CE-supervised)}. KL stays dense in all cells. Four separate detached runs (α and mask are global; wakes are seed-identical). Readout = **post-sleep standalone val + root(d6) recovery**.
+- **Prediction**: dense → α=0 ≈ α=0.5 (KL redundant, reproducing finding 5); sparse → α=0.5 ≫ α=0 (KL fills the 95% the labels never cover, transferring the teacher's root competence).
+
+## Result — the prediction is falsified: every cell recovers, KL adds ~nothing
+
+Post-sleep standalone `ntp_cl@1.0+distill` (ref: teacher-injected val 0.824 / root 0.871; OL `ntp` val 0.826 / root 0.819):
+
+| | mask=0.0 (dense CE) | mask=0.95 (sparse CE) |
+|---|---|---|
+| **α=0 (no KL)** | val 0.820, root 0.887 | val 0.831, root **0.855** |
+| **α=0.5 (KL)** | val 0.820, root 0.894 | val 0.825, root **0.866** |
+
+Sparse-CE-**no-KL** (`a0m95`) recovers to val 0.831 / root 0.855 — essentially matching dense. **95% structural masking did not starve the data channel.** KL's marginal contribution is tiny everywhere (≤ +0.011 root, ≤ +0.006 val). The predicted interaction (KL load-bearing under sparsity) does not appear.
+
+## Why — recoverability, not density, is the load-bearing variable
+
+I withheld 95% of *positions*, but RHM's DGP is a **compact, shared rule set** (m2/v16 ≈ 96 rules) reused at every position. Supervising even 5% of positions gives many examples of *every* rule; M infers the grammar and **generalizes to the 95% it was never labeled on**. The withheld supervision was *recoverable from the retained supervision* via the DGP's regularity, so the teacher had nothing to add. The sharpened principle:
+
+> **Distillation is load-bearing only when the withheld supervision carries information the student cannot reconstruct from the retained supervision.**
+
+MNIST clears this bar — each image's soft label is **per-instance** (this specific 7's ambiguity is not derivable from other images). RHM fails it — its labels are **samples from a shared grammar**, so sparse labels reconstruct the whole thing. RHM's distillation-redundancy is therefore *stronger* than finding 5 established: not merely "the data is dense" but "the DGP is **sample-efficient**, so the data channel can't easily be starved."
+
+## Ambivalent takeaways (from the accompanying discussion)
+
+- **The transfer surplus on RHM is a rounding error — by design.** The FM's entire content is a compression of the compact DGP, which M re-derives from data directly. There is no FM-knowledge M *can't* get elsewhere, so distillation-as-transfer is structurally vacuous here. On language/MNIST, where M's computation encodes something vast and expensive-to-acquire, the transfer question is substantive; on RHM it is not. This is a *feature*: RHM is the clean control proving a regime with **nothing to transfer**.
+- **Three senses of "self-knowledge," only one of which is vacuous here.** (1) *Computational meta-knowledge* (frontier map) — **found** on RHM (latent target, +0.28), not vacuous. (2) *Object-level transfer* (FM function internalized) — vacuous on RHM (this result). (3) *Epistemic "I know what I know"* — not produced by the loop even on language (a2a OOD calibration-transfer). So "self-knowledge is the wrong question on RHM" is true only for sense (2).
+- **The α=0 control already implied this.** Because every post-sleep number is α-independent, whatever standalone competence M gains through sleep is **re-derived, not absorbed from the FM**. "How much did M absorb *from the FM specifically*" on RHM ≈ nothing.
+- **We have not cleanly *measured* object-level absorption on RHM.** The prediction-probe object R² is **baseline-saturated** (~0.86–0.92 even in OL — activations trivially encode a function of themselves), so it does not isolate FM-absorption. The clean instrument — the MNIST cross-model internalization probe (does the *old/co-trained* FM predict the *distilled* model better than it predicts *OL*) — was **not ported** to RHM. Given the α=0 result, porting it to RHM is low-value; the informative place to run it is MNIST/language.
+- **The one directionally-correct signal**: under sparsity, KL *did* pull root toward the teacher's exact injected value (0.855 → 0.866, ceiling 0.871). Real transfer, but into a nearly-solved problem — tiny headroom, single-seed, not hardened. Distillation isn't broken on RHM; it's solving an already-solved problem.
+- **Recoverability ladder** (the cross-domain synthesis): MNIST (per-instance labels, non-recoverable → genuine transfer) › language (dense NTP in the distill loss → *attribution-ambiguous*; the DISTILLATION_README "105.6% closed" may also be re-derivation) › RHM (shared grammar, fully recoverable → provably no transfer). The sharp follow-up is **not** more RHM but an α=0 control + cross-model internalization probe on **MNIST/language**, to settle whether the internalization we believe in there is genuine transfer or re-derivation.
+
+## Caveats
+
+- **Single seed per cell**; the ~0.01 KL→root nudge is within plausible seed noise.
+- **The masking is coverage-sparsity, and RHM defeats it by construction** — this is the finding, but it also means the test never actually reached a starved regime, so it is a null-by-recoverability, not a null-under-genuine-starvation. Level-structured withholding (never CE-supervising the root) could force a starved regime, but that engineers the proxy positive without bearing on real transfer — deliberately not pursued.
+- **Token-CL post-sleep models** here carry the expected collapsed generalizable meta (fresh META@b7 −0.38 to −0.79) and baseline-high object — consistent with the prior sections, not the focus.
+
+## Reproduction
+
+```bash
+cd experiments
+# 2x2: alpha in {0.0,0.5} x sleep_ce_mask_rate in {0.0,0.95}, m2 token ntp_cl@1.0
+modal run --detach -m rhm.rhm_latent_loop::latent_loop --m 2 \
+    --conditions "ntp,ntp_cl@1.0+distill" --distill-alpha 0.5 --sleep-ce-mask-rate 0.95 \
+    --ensemble-n 0 --tag sparsekl_a5m95 \
+    --bp-line "d1 1.00 d2 1.00 d3 1.00 d4 1.00 d5 .992 root .954" --greedy-line "(m2: no frontier gap)"
+# ...repeat with (--distill-alpha 0.0 --sleep-ce-mask-rate 0.95 --tag sparsekl_a0m95),
+#              (--distill-alpha 0.0 --sleep-ce-mask-rate 0.0  --tag sparsekl_a0m0),
+#              (--distill-alpha 0.5 --sleep-ce-mask-rate 0.0  --tag sparsekl_a5m0)
+```
+
+Results: `/rhm_latent_loop/v16_s2_L6_m2_distinct_8L8H256D_S20000_sparsekl_a{0,5}m{0,95}.json` on the volume.

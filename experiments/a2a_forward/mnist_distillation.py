@@ -117,7 +117,8 @@ def a2a_mnist_distillation(
     gap_tag = f"{predict_from}_to_{predict_to}"
     model_tag = f"vit_{n_layer}L_{n_head}H_{n_embd}D"
     ckpt_root = f"{DATA_DIR}/a2a_forward/mnist/{model_tag}/{gap_tag}"
-    save_root = f"{DATA_DIR}/a2a_forward/mnist_distillation/{model_tag}/{gap_tag}"
+    save_root = (f"{DATA_DIR}/a2a_forward/mnist_distillation/{model_tag}/{gap_tag}"
+                 f"/alpha_{distill_alpha}")
 
     print(f"\nLoading checkpoints from {ckpt_root}")
 
