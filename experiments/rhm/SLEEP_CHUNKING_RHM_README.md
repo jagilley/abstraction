@@ -81,7 +81,7 @@ The **only** difference between anti-chunking and chunking is the waist's object
 
 ## Caveats
 
-- **One DGP setting, one rule seed, single waist pass.** Directionally clean and the staircase is not subtle, but replication (seeds, `span_height=3` for a 4-level staircase, other occupancies) is not yet done.
+- **One DGP setting, single waist pass.** Directionally clean and the staircase is not subtle. The generality axes not yet swept: `span_height=3` for a 4-level staircase, and other occupancies.
 - **`rule2` is a derived, nonlinear quantity** (a function of P2 + the two P1 children), so its low recovery under compression is partly linear-accessibility, not only information loss. The load-bearing evidence is the **P2 > P1 > leaf** ordering among the three *direct* quantities.
 - **Concatenation inflates leaf variance.** Concatenating the K position-vectors gives each leaf its own 128-d block, which handicaps the low-variance global P2 under the reconstruction waist specifically; mean-pooling is an untested secondary lever. It does not affect the external-role result (whose incentive is set by the objective, not variance).
 - **External target is the *next adjacent* span**, which mixes sibling pairs (strong, height-3-mediated) and cousin pairs (weaker). The learned decoder averages over both; a sibling-only target would be a cleaner (stronger) external signal.

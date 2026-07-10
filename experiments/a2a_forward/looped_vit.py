@@ -316,6 +316,15 @@ class GlimpseLoopedViT(nn.Module):
         pos = torch.arange(self.n_positions, device=patch_emb.device)
         return tokens + self.pos_embed(pos)
 
+    def empty_tokens(self, B, device):
+        """Per-step input with NO revealed content (cls + pos only) -- used during a
+        content delay, before/until a command's glimpse content arrives."""
+        revealed = torch.zeros(B, self.n_patches, self.n_embd, device=device)
+        cls = self.cls_token.expand(B, -1, -1)
+        tokens = torch.cat([cls, revealed], dim=1)
+        pos = torch.arange(self.n_positions, device=device)
+        return tokens + self.pos_embed(pos)
+
     def _apply_operator(self, x):
         for block in self.blocks:
             x = block(x)
@@ -333,26 +342,40 @@ class GlimpseLoopedViT(nn.Module):
             s_in = s_in + inject
         return self._apply_operator(s_in)
 
-    def forward(self, x, u_seq, targets=None, n_steps=None,
+    def forward(self, x, u_seq, targets=None, n_steps=None, content_delay=0,
                 return_intermediates=False, step_inject_fn=None):
         """Run the glimpse loop.
 
         Args:
-            u_seq: (T, B) long tensor of per-step window-center indices (the
+            u_seq: (n_cmd, B) long tensor of per-step window-center indices (the
                 sampled glimpse commands). For full_view mode the values are ignored.
+            content_delay: deliver command u_t's glimpse CONTENT d steps late (the
+                sensorimotor-delay analog). At step t the content shown is
+                glimpse(u_{t-d}) (empty until the first arrives), while the efference
+                copy u_t is available immediately to the injection hook -- so during
+                the gap the only signal about the pending look is the forecast. Run
+                n_steps = n_cmd + d to drain all commands. d=0 recovers the plain loop.
             step_inject_fn(t, operand, state) -> additive injection each step (the
-                gated FM forecast), same contract as LoopedViT.
+                gated FM forecast), same contract as LoopedViT. The hook receives t so
+                it can index the command u_seq[t] (and should return None for t>=n_cmd).
         """
         T = n_steps if n_steps is not None else self.n_steps
+        n_cmd = u_seq.shape[0]
         patch_emb = self._patch_embeds(x)
-        s = torch.zeros(x.shape[0], self.n_positions, self.n_embd, device=x.device)
+        B = x.shape[0]
+        s = torch.zeros(B, self.n_positions, self.n_embd, device=x.device)
 
         inter = {}
         if return_intermediates:
             inter["patch_emb"] = patch_emb
 
         for t in range(T):
-            s_in = s + self.glimpse_tokens(patch_emb, u_seq[t])
+            tc = t - content_delay
+            if 0 <= tc < n_cmd:
+                p_t = self.glimpse_tokens(patch_emb, u_seq[tc])
+            else:
+                p_t = self.empty_tokens(B, x.device)
+            s_in = s + p_t
             if step_inject_fn is not None:
                 inj = step_inject_fn(t, s_in, s)
                 if inj is not None:

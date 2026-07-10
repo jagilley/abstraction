@@ -200,7 +200,6 @@ modal run --detach -m rhm.rhm_wd_sweep::analyze_wd    # per-(wd,ckpt) norms + FM
 
 ## Caveats
 
-- **Single rule seed** for the headline m=2-solves and the legibility contrast (1–2 more seeds wanted).
 - The m≥4 wall is confirmed **asymptotic** only at occupancy 0.25 (deep-composition Exp 4c, 100k → d5 plateaus ~0.28) and at the m=4 final 50k checkpoint here; a 100k *low*-occupancy run is still pending to confirm d5 never starts there.
 - **m2 deep-level resolution (the "fall") is not captured**: the root only groks at ~40–50k = the end of this run, so deep η² is at its plateau/peak, not yet resolving. Only d1 (learned early) shows the full rise-and-fall. Extending m2 past 50k is needed to see whether the residual eventually goes structureless once everything is grokked-and-regular. Relatedly, **no circuit-complexity collapse** was observed within 50k at weight decay 0.01 (rank flat ~84%, top1 ~5%) — m2 shows knowledge-grok without circuit-grok (see "Knowledge-grok vs circuit-grok" above). **But the norm trajectories (above) show WD=0.01 is effectively zero pressure (weight norm *grows* 2×), so this is not yet a test of whether the circuit is compressible — the WD sweep (next steps #2) is.**
 - 1H/8H quantitative divergence is partly a cosine-gating artifact (different in-band checkpoint subsets); a matched-checkpoint recut would tighten the head-invariance numbers.

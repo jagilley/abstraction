@@ -113,11 +113,10 @@ Part 1's tables need no new compute — re-aggregate from the existing `rhm_fm_r
 
 ## Next steps
 
-1. **Seed replicate** (2–3 rule seeds of the m2 trajectory + ensemble pass) — precondition for hardening.
-2. **m4 ensemble trajectory** — prediction: lower late-time invariance at the stalled frontier (the un-reached deep levels contribute no invariant core; scaffolding share stays high).
-3. **fmreg:3.0 ensemble arm** — dose-response of purification (invariance/η² of the core vs λ).
-4. **Language-checkpoint ensemble test** — port to the a2a language FMs (the a2a distillation result's fresh-FM orthogonality suggests language residual directions are partly idiosyncratic; prediction: language sits mid-descent, invariance above scaffolding-regime values but below RHM's late-time 0.83). This also closes the "second efficiency constraint unverified on language" gap flagged against the paper's claims.
-5. **Residual-boosting null** (a2a SYNTHETIC_INPUT "Idea B"): train a second bounded FM on the first's residual — the textbook demonstration that the floor is incompressible at the bound, complementing invariance.
-6. **Peak-timing × DGP complexity** at matched learning quality (the RESIDUAL_RANK open question): turn "the wave stalls at the frontier" into "peak timing shifts with (L, m)" — the quantitative form of the First Law's DGP dependence.
+1. **m4 ensemble trajectory** — prediction: lower late-time invariance at the stalled frontier (the un-reached deep levels contribute no invariant core; scaffolding share stays high).
+2. **fmreg:3.0 ensemble arm** — dose-response of purification (invariance/η² of the core vs λ).
+3. **Language-checkpoint ensemble test** — port to the a2a language FMs (the a2a distillation result's fresh-FM orthogonality suggests language residual directions are partly idiosyncratic; prediction: language sits mid-descent, invariance above scaffolding-regime values but below RHM's late-time 0.83). This also closes the "second efficiency constraint unverified on language" gap flagged against the paper's claims.
+4. **Residual-boosting null** (a2a SYNTHETIC_INPUT "Idea B"): train a second bounded FM on the first's residual — the textbook demonstration that the floor is incompressible at the bound, complementing invariance.
+5. **Peak-timing × DGP complexity** at matched learning quality (the RESIDUAL_RANK open question): turn "the wave stalls at the frontier" into "peak timing shifts with (L, m)" — the quantitative form of the First Law's DGP dependence.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

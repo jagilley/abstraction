@@ -38,7 +38,7 @@ Reading:
 
 Net: our MNIST/language object-level self-knowledge evidence, once controlled, reduces to **legibility + re-derivation**. We have not demonstrated a self-*model*.
 
-Caveats: single seed (the sign flips are the robust part, not the magnitudes; user chose not to seed-replicate for now). Robustness Δloss values are small. This warrants a revision of DISTILLATION_README's "robustness partially retained" reading and MNIST_DISTILLATION's internalization claims — **pending discussion + a seed replicate before those READMEs are rewritten** (per repo convention: discuss results before writing a README).
+Caveats: the sign flips are the robust part of the claim, not the exact magnitudes; robustness Δloss values are small. This warrants a revision of DISTILLATION_README's "robustness partially retained" reading and MNIST_DISTILLATION's internalization claims — **pending discussion before those READMEs are rewritten** (per repo convention: discuss results before writing a README).
 
 ## Why strong self-knowledge is ill-posed feedforward (not a capacity claim)
 

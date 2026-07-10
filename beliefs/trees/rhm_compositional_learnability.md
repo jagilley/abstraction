@@ -27,7 +27,7 @@
 - At fixed m=4, lowering occupancy 0.50→0.0625 (v8→v64) raised the d4 frontier 0.43→0.93 and the BP root ceiling 0.40→0.96, but left d5/d6 near chance despite BP(d5/d6)≈1.0 and perfectly clean d1–d3 — occupancy improves quality at the frontier and raises the ceiling, but does not advance frontier *depth* — same source
 - Collapse-check kill shot: v16m2 and v32m4 share occupancy 0.125 and BP root ceiling ~0.92, yet learned root recovery is 0.93 vs 0.07 — identical recoverability, opposite learnability, so m (not occupancy) is the learnability control — same source
 - Refines the earlier "occupancy law" reading that attributed the scaling result "m dominates ~3:1" purely to occupancy/recoverability: m carries a learnability effect over and above its recoverability effect — [scaling sweep](../../experiments/rhm/README.md)
-- Caveats: single rule seed for the m=2-solves headline (1–2 more seeds wanted); the m=4 wall is confirmed asymptotic only at occ 0.25 (100k → d5 plateaus ~0.28), so a 100k low-occupancy run is pending to confirm d5 never starts there.
+- Caveats: the m=4 wall is confirmed asymptotic only at occ 0.25 (100k → d5 plateaus ~0.28), so a 100k low-occupancy run is pending to confirm d5 never starts there.
 
 #### Constructive implications: curriculum over m (not occupancy) is the lever, and m=2 is a ready single-task deep-hierarchy substrate
 *Confidence: speculative*
