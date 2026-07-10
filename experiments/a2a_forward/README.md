@@ -51,7 +51,8 @@ Full file-by-file reference (every `.py` and every auxiliary README with its one
 - **Wake-sleep / distillation / ratchet**: `distillation*.py`, `mnist_distillation*.py`, `*_ratchet*.py`, `*_gate*.py`, `mnist_local_loss*.py`, `*_precision_weighted.py`, `mnist_learning_gate.py`.
 - **Geometry & off-manifold**: `language_geometry.py`, `mnist_geometry.py`, `synthetic_input*.py`.
 - **MNIST / vision port**: `vit.py`, `mnist_experiment.py`, `mnist_analysis.py`, `mnist_baseline_battery.py`, `mnist_adaptation.py`, `mnist_ratchet_adaptation.py`.
-- **Looped transformer** (self-model-needs-a-loop): `looped_vit.py` (`LoopedViT`), `mnist_looped.py` (phase 1), `mnist_looped_injection.py` (injection 2×2 + baseline battery + `aggregate`), `mnist_looped_fm_sweep.py` (FM-capacity curve), `mnist_looped_probes.py` (representational imprint probes + controls). See **[LOOPED_README.md](LOOPED_README.md)**.
+- **Looped transformer** (self-model-needs-a-loop): `looped_vit.py` (`LoopedViT`, `GlimpseLoopedViT`), `mnist_looped.py` (phase 1), `mnist_looped_injection.py` (injection 2×2 + baseline battery + `aggregate`), `mnist_looped_fm_sweep.py` (FM-capacity curve), `mnist_looped_probes.py` (representational imprint probes + controls), `mnist_looped_extrapolation.py` (runnable-simulator / near-manifold extrapolation probe). See **[LOOPED_README.md](LOOPED_README.md)**.
+- **Active vision / the "missing u"** (efference copy): `mnist_active_vision.py` (glimpse loop + `FM_state` vs `FM_eff` capacity sweep + counterfactual eval). See **[ACTIVE_VISION_README.md](ACTIVE_VISION_README.md)**.
 
 Each experiment section below links its own `Full writeup` auxiliary README; **[FILES.md](FILES.md)** collects those links in one table.
 
@@ -603,11 +604,34 @@ for d in mnist fashion_mnist; do for c in ol_last cl_last; do
     --gate-type scalar & done; done; wait
 ```
 
+## Active-vision looped ViT: the "missing u" / efference-copy test (2026-07-09)
+
+**Full writeup**: [ACTIVE_VISION_README.md](ACTIVE_VISION_README.md) | **Status**: observational half done (single seed); causal/behavioral half pending
+
+Tests the [self_model_needs_a_loop.md](../../ideas/self_model_needs_a_loop.md) "missing u" thread: the a2a forward model predicts `f(s_t)`; a *cerebellar* forward model predicts `f(s_t, u_t)`, also conditioning on an **efference copy** of the command. The claim — **arity, not resolution**: a forward model of a *controlled* system must take the command as a second input (arity-2), and no amount of capacity lets a command-blind arity-1 model recover the command-driven dynamics. `GlimpseLoopedViT` gives the loop a real command `u` (where to look — a 3×3 patch-window glimpse each step, fixed stochastic policy), then trains `FM_state` (arity-1, `f(s)`) vs `FM_eff` (arity-2, `f(s,u)` via a spatial efference-copy marker) on the frozen loop.
+
+**Key results**:
+
+1. **The no-`u` control collapses the effect (decisive).** Full-view mode (reveal everything each step → command inert): `cmd_rel_spread` = **0.000**, command-conditional cos ≈ 0, `FM_eff` ≈ `FM_state` at every capacity. Autonomous dynamics → arity-1 sufficient. This is direct evidence that the earlier looped runnable-simulator negative was because MNIST-classification is *autonomous* (no command), not because of scale.
+
+2. **Add the `u` and arity beats resolution.** Glimpse mode: a quarter (MNIST, 0.24) to a third (Fashion, 0.31) of the update is command-driven; `FM_state` *saturates* with capacity (16× params buys +0.015) and the **smallest command-aware FM beats the largest command-blind one** (MNIST 0.911 > 0.901; Fashion 0.936 > 0.895). In the command-conditional subspace `FM_eff` recovers 54% (MNIST) / 67% (Fashion) of the direction; `FM_state` is structurally 0 at any capacity.
+
+3. **Scales with loop-necessity + internal control.** Fashion (harder, more sequential) shows ~2× MNIST's gap on every measure. Same-architecture `FM_state` predicts the *autonomous* full-view loop *better* (0.915) than the *controlled* glimpse loop (0.901) — confirming the ceiling is genuine command-blindness, not undertraining.
+
+**Boundary**: observational premise only (a real `u` makes dynamics that need arity-2, capacity can't fake it). Not yet shown: that the loop *causally uses* an efference-copy forecast, or can run a behavioral counterfactual. Single seed.
+
+**Reproduction**:
+```bash
+modal run --detach a2a_forward/mnist_active_vision.py::active_vision --dataset mnist
+modal run --detach a2a_forward/mnist_active_vision.py::active_vision --dataset fashion_mnist
+modal run --detach a2a_forward/mnist_active_vision.py::active_vision --dataset mnist --full-view
+```
+
 ## Next steps
 
 1. **Language gated ratchet**: Language's full-rank residual (200/256 dimensions) and rich behavioral decomposition (delimiter tracking, distributed attention, focused retrieval) would make the gate's selectivity much more interpretable than MNIST's 10 digits. The gate might develop per-behavioral-category selectivity — compressing routine computation while leaving novel semantic composition alone. Language is inherently multi-task, so the gate-closing prediction might hold within a single training run without needing an explicit distribution shift.
 2. ~~**OOD adaptation post-ratchet**~~: *Done* — see [OOD_GATE_README](OOD_GATE_README.md#experiment-4-ood-adaptation-after-gated-ratchet-2026-06-20). WS_LG ≈ WS_UG_uniform: +8pp zero-shot OOD at 45° (tracks distillation), ~25% faster adaptation speed (new vs prior null result). The two ratchet conditions produce nearly identical OOD behavior despite opposite gate mechanisms — the val loss improvement is genuine generalization. Forgetting mixed: all injection-trained conditions slightly better than OL at severe angles.
-4. ~~**Looped transformer**~~: *In progress* — see [LOOPED_README.md](LOOPED_README.md) and the section above. Confound-free bounded-gate injection is causally necessary and scales with loop-necessity (Fashion ablation 0.85→0.67, 5× MNIST); self-regulated gate. **Baseline battery + imprint probes now done (2026-07-09)**: absolute dependency is *not* forecast-specific (random_proj ≥ forward), but only forward's dependency *scales* with loop-necessity (3.6–5.4× vs 1.5× random, 0.5× shifted), and only forecast-shaped channels leave an imprint concentrated in their own directions (3.3–4.1× vs random_proj's 0.4×). The loop builds a **veridical, channel-specific self-map** (Control 2 separates forward from shifted; forward's map is veridical, shifted's faithfully maps a wrong future), used *additively* — no efference-copy cancellation (Control 3). **Pending**: seed-replicate the Control-2 separator, cross-decodability matrix, chase the cancellation signature across regimes, behavioral discriminator 2.
+4. ~~**Looped transformer**~~: *In progress* — see [LOOPED_README.md](LOOPED_README.md) and the section above. Confound-free bounded-gate injection is causally necessary and scales with loop-necessity (Fashion ablation 0.85→0.67, 5× MNIST); self-regulated gate. **Baseline battery + imprint probes now done (2026-07-09)**: absolute dependency is *not* forecast-specific (random_proj ≥ forward), but only forward's dependency *scales* with loop-necessity (3.6–5.4× vs 1.5× random, 0.5× shifted), and only forecast-shaped channels leave an imprint concentrated in their own directions (3.3–4.1× vs random_proj's 0.4×). The loop builds a **veridical, channel-specific self-map** (Control 2 separates forward from shifted; forward's map is veridical, shifted's faithfully maps a wrong future), used *additively* — no efference-copy cancellation (Control 3). A near-manifold **runnable-simulator** probe (`mnist_looped_extrapolation.py`) is **negative on MNIST**: self-consistency is a generic low-rank property (flat, non-forecast-specific), so the self-*map* does not behave like a runnable self-*simulator* here — consistent with the strong "self-execution" capability being a scale-plus-domain phenomenon. **Pending**: domain port (RHM / looped language) for the simulator question, seed-replicate the Control-2 separator, cross-decodability matrix, chase the cancellation signature.
 5. **Cross-model self-knowledge control**: Train separate fresh FMs on each model's own activations (OL, CL, distilled), then probe each for its own FM's residual. Eliminates the confound in the distillation self-knowledge probes.
 6. **Model scale 350M**: Third data point for the model scale experiment. The 29M → 77M comparison shows consistent residual concentration across all metrics. A 350M model (~24L/16H/1024D on 500M+ tokens) tests whether the trend continues, accelerates, or saturates. See [MODEL_SCALE_README.md](MODEL_SCALE_README.md).
 7. **Harden the OOD robustness result**: (a) direct manifold-displacement check — autoencoder reconstruction MSE per corpus should rise with shift severity and peak on code; (b) bootstrap CIs from the saved per-direction Δloss arrays; (c) a second baseline-battery seed to firm up the code-corpus numbers. See [OOD_ROBUSTNESS_README.md](OOD_ROBUSTNESS_README.md).

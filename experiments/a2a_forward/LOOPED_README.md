@@ -2,7 +2,7 @@
 
 **Idea doc**: [ideas/self_model_needs_a_loop.md](../../ideas/self_model_needs_a_loop.md)
 **Parent experiment**: [README.md](README.md) (the feedforward a2a arc)
-**Status**: In progress. The headline is single-seed; the baseline-battery control and the representational imprint probes (with matched-subspace / position-specificity / cancellation controls) are now **run and analyzed** (2026-07-09) — see the two dated sections after Caveats. Discriminators 2–3 partially probed; seed replication pending.
+**Status**: In progress. The headline is single-seed; the baseline-battery control and the representational imprint probes (matched-subspace / position-specificity / cancellation controls) are **run and analyzed** (2026-07-09). A near-manifold self-map extrapolation test (runnable-simulator probe) is also run — **negative on MNIST** (no forecast-specific extrapolation; consistent with the strong "self-execution" capability being a scale-plus-domain phenomenon). Discriminators 2–3 partially probed; seed replication and a self-referential-domain port pending.
 **Date**: 2026-07-09
 
 ## Goal
@@ -134,13 +134,29 @@ The map-vs-model distinction from the idea doc now **localizes across four separ
 - **Adjusted**: the **fixed-point self-consistency** mechanism is only half-right. There is a faint signature — the aligned forecast is the one that nearly vanishes at rest (inj rel-norm 0.012–0.017 vs shifted's 0.026) — but the loop never settles (≈15% from a fixed point) and the causal action lives in the *transient*. The forecast behaves more like a *trajectory the model organizes around* than a *fixed point it settles into agreement with*.
 - **Challenged**: the **efference-copy cancellation** prediction is not borne out — this architecture summates and amplifies the forecast rather than cancelling it (Control 3), and correspondingly amplifies rather than damps perturbations. The biology analogy holds at "distinct modality with its own slot" but breaks at "…that gets subtracted out."
 
+## Near-manifold self-map extrapolation — is the self-map a runnable *simulator*? (2026-07-09)
+
+**Code**: `mnist_looped_extrapolation.py`. Motivation: the strongest sense of self-knowledge in the idea doc is "execute a rough forward pass on yourself, off to the side" — a *runnable self-simulator*, not just a static self-*map*. Framing (from discussion): split "self-execution" into **(i) acceleration/halting** (use a rough self-forecast to reach your answer with less compute — the bounded gate is literally an over-relaxation coefficient, so a primitive form is already present) and **(ii) counterfactual query** ("what would I output if this input were slightly different?", run off to the side without committing — the strong sense). This test is the cheapest MNIST proxy for (ii): does the model's self-forecast stay valid on **near-manifold inputs it never trained on** (a simulator *extrapolates*; a static lookup *collapses*)?
+
+Four looped conditions (forward / OL / random_proj / shifted), all sharing init/seed/data with the FM co-trained in every one (FM-as-approximator held constant). Perturbations unseen in training: **rotation** (near-manifold) and **gaussian pixel noise** (graded off-manifold stress). Two metrics per condition × level:
+- **A (representational)** — off-manifold self-consistency `cos(FM(a'_t), s'_{t+k})` on the intrinsic (channel-off) perturbed run; retention = value(ε)/value(clean). A runnable simulator degrades slowly; a lookup collapses.
+- **B (behavioral)** — from the bare embedded input `a'_0 = prelude(embed(x'))`, FM → readout → label; agreement with the model's *actual* final output on x' ("can I predict my own output from a rough forward pass?").
+
+**Result: negative for the runnable-simulator hypothesis on MNIST — structurally, not noisily.**
+
+1. **Metric A is flat and non-discriminative.** Self-consistency retention stays 0.98–1.05 out to 45° / σ=0.75 for *every* condition, and forward is **not** better than OL (if anything slightly worse: MNIST σ=0.75 retention 0.978 vs OL 1.003, random_proj 1.050). The loop's per-step transformation is intrinsically low-rank (a 1% FM already predicts the update at cos 0.92), so self-consistency is a generic property of the dynamics that holds on *and* off manifold for all conditions — there is nothing for "simulator quality" to vary along. This is the clean, unconfounded part: **no extra off-manifold self-forecastability that forward earned over OL.**
+2. **Metric B is confounded by output-collapse and shows no forward advantage.** On-manifold agreement is weak for all (~0.15–0.27, near the majority-class rate) — the rough-forward-pass-from-raw-input is too lossy at this scale. Under heavy noise the metric inverts degenerately: OL/random/shifted agreement *rises* (retention 2.8–5.5×) because both the FM shortcut and the actual output collapse to the same majority class (agreement by mutual collapse), while forward's still-differentiated live output diverges from the collapsed shortcut. The only faint positive — Fashion under small rotations, injection-trained models retain agreement better than OL (rot_15 retention forward 1.18 / random 1.09 vs OL 0.56) — is the familiar *any-injection* effect, **not forecast-specific**.
+
+**Reading.** The cheapest test that could have revealed a runnable self-simulator didn't, and it failed for a *structural* reason: MNIST's loop is so low-rank that self-consistency is trivially maintained by everyone, so a simulator (if one existed) would be invisible — and MNIST classification applies no pressure to build one (cheap real computation, no early-commitment payoff, no continuation to rough out). The negative is consistent with **"MNIST cannot show the runnable-simulator (ii) capability," not with "it doesn't exist."** Net boundary: the looped model has a veridical, channel-specific self-*map* (imprint probes) but shows **no sign of a runnable self-*simulator*** on MNIST — the map→simulator gap is real and MNIST is where it taps out. Priors on the strong hypothesis are essentially unmoved; the question needs a domain where the loop's computation is expensive and self-reference is meaningful (RHM / looped language). Both the user and the analysis went in expecting (ii) to be a scale-plus-domain phenomenon; this result is consistent with that and does not disconfirm it.
+
 ## Next steps
 
 1. ~~**Baseline battery on Fashion**~~ *Done (2026-07-09)* — see the two sections above. The dependency is not forecast-specific; its *scaling* (behavioral) and the *imprint concentration* (representational) are.
 2. **Seed-replicate the Control-2 separator.** The forward-vs-shifted rolled-R² gap on Fashion (~0.12–0.17) is the one new result most in need of a second seed; Control 1 (8–10× separation) and Control 3 (large, consistent) are very likely seed-robust.
 3. **Cross-decodability matrix** — decode the aligned future in the shifted model and the shifted future in the forward model, to sharpen "veridical vs faithful-map-of-a-wrong-future" into a clean 2×2.
 4. **Chase the cancellation signature.** Its absence here (summation/amplification) is a real gap between this model and the biology; does *any* regime (damping, higher gate, deeper core, an explicit cancellation head) produce corollary-discharge? Ties directly to the robustness inversion.
-5. **Discriminator 2 (behavioral near-manifold counterfactual)** and **damping vs bounded-gate convergence** — whether the FM injection alone (bounded) provides the endogenous convergence that deep supervision faked (the "scrap deep-sup once self-knowledge suffices to halt" thread).
+5. **Domain port for the runnable-simulator (ii) question (the priority for the strong hypothesis).** The MNIST self-map extrapolation test came back negative *because MNIST cannot pressure a simulator*, not because none can exist (see section above). Move to a substrate where the loop's computation is expensive and self-reference is meaningful: RHM (recursive DGP, existing latent-loop machinery, and the idea doc's point that non-MNIST DGPs need a latent target to synthesize a deep moving frontier) as the controlled bridge, then a looped-language port. Optional first: salvage a collapse-controlled Metric B on MNIST/Fashion to make the negative airtight (expected to stay negative, since the unconfounded Metric A is structurally flat).
+6. **Discriminator 2 (behavioral near-manifold counterfactual)** and **damping vs bounded-gate convergence** — whether the FM injection alone (bounded) provides the endogenous convergence that deep supervision faked (the "scrap deep-sup once self-knowledge suffices to halt" thread).
 
 ## Reproduction
 
@@ -181,6 +197,10 @@ for d in mnist fashion_mnist; do for b in random_proj shifted; do
 #    runs Probes 1-3 + Controls 1 matched-subspace / 2 position-specificity / 3 cancellation)
 modal run --detach a2a_forward/mnist_looped_probes.py::probe_battery --dataset mnist
 modal run --detach a2a_forward/mnist_looped_probes.py::probe_battery --dataset fashion_mnist
+
+# 6. Near-manifold self-map extrapolation (runnable-simulator probe; eval-only)
+modal run --detach a2a_forward/mnist_looped_extrapolation.py::extrapolation --dataset mnist
+modal run --detach a2a_forward/mnist_looped_extrapolation.py::extrapolation --dataset fashion_mnist
 ```
 
 ## Files
@@ -190,6 +210,7 @@ modal run --detach a2a_forward/mnist_looped_probes.py::probe_battery --dataset f
 - `mnist_looped_injection.py` — phase 2: the injection 2×2 (`train_condition`) + `aggregate`. Supports injection form, `predict_k`, dataset (mnist/fashion), damping, gate type, FM capacity.
 - `mnist_looped_fm_sweep.py` — FM-capacity sweep on a frozen confound-free loop (state-cos vs update-cos vs size; loop-necessity).
 - `mnist_looped_probes.py` — representational imprint probes (eval-only): future self-decodability, divergence imprint (`D = s^{ablated} − s^{OL}`), channel-subspace alignment, + Control 1 (matched-subspace null), Control 2 (position-specificity: aligned vs rolled-future decodability), Control 3 (injection absorption / cancellation). Reconstructs the frozen `random_proj` predictor by seed (not saved).
+- `mnist_looped_extrapolation.py` — near-manifold self-map extrapolation / runnable-simulator probe (eval-only): off-manifold self-consistency retention (Metric A) and predict-your-own-output agreement (Metric B) under unseen rotation / noise perturbations, all four looped conditions. Negative on MNIST (see section).
 - `forward_model.py::BoundedScalarGate` — bounded over-relaxation gate ∈ [0, max_gate].
 
-Modal volume: `/data/a2a_forward/mnist_looped*/`; imprint-probe JSON at `/data/a2a_forward/mnist_looped_injection/probes/{mnist,fashion_mnist}_imprint_probes.json`.
+Modal volume: `/data/a2a_forward/mnist_looped*/`; probe JSON at `/data/a2a_forward/mnist_looped_injection/probes/{mnist,fashion_mnist}_{imprint_probes,extrapolation}.json`.

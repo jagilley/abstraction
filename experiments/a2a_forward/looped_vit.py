@@ -211,3 +211,160 @@ class LoopedViT(nn.Module):
         if readout_all_steps:
             out = out + (torch.stack(step_logits, dim=0),)  # (T, B, n_classes)
         return out
+
+
+class GlimpseLoopedViT(nn.Module):
+    """Active-vision looped ViT -- the "missing u" architecture.
+
+    Each step reveals only a G x G window of the patch grid at a sampled location
+    u_t (the glimpse *command* / efference copy). The shared operator G integrates
+    glimpses across T steps into the recurrent state, which is the ONLY memory of
+    past looks (previous glimpses are not re-injected -- they persist solely via s).
+    This introduces a genuine action degree of freedom that the plain LoopedViT
+    lacks:
+
+        s_0     = 0
+        s_{t+1} = G( s_t + glimpse(x, u_t) + inject_t )
+
+    Because the consequence s_{t+1} depends on the command u_t, a forward model of
+    the loop's own dynamics must be conditioned on u_t (arity-2, f(s, u)) to predict
+    it; an arity-1 f(s) can only predict the command-*averaged* next state. This is
+    the efference-copy structure the pure classification loop was missing (see
+    ideas/self_model_needs_a_loop.md, "what would a u be on MNIST").
+
+    The glimpse is a window of the *patch* grid (not a pixel fovea) so it reuses the
+    ViT's patch/pos structure exactly; u_t indexes the window center. Unrevealed
+    patch positions carry pos_embed only (zeroed content) so the model can tell
+    "seen" from "unseen". full_view=True reveals every patch each step (mask all
+    ones) => the command is inert and this reduces to the standard LoopedViT -- the
+    no-u control condition, same weights and code path.
+    """
+
+    def __init__(self, img_size=28, patch_size=4, in_channels=1, n_classes=10,
+                 glimpse_grid=3, full_view=False,
+                 n_loop_layers=1, n_head=4, n_embd=128, n_steps=8):
+        super().__init__()
+        self.patch_size = patch_size
+        self.grid = img_size // patch_size
+        self.n_patches = self.grid ** 2
+        self.n_positions = self.n_patches + 1
+        self.n_steps = n_steps
+        self.n_embd = n_embd
+        self.glimpse_grid = glimpse_grid
+        self.full_view = full_view
+
+        self.patch_proj = nn.Linear(patch_size * patch_size * in_channels, n_embd)
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, n_embd))
+        self.pos_embed = nn.Embedding(self.n_positions, n_embd)
+
+        self.blocks = nn.ModuleList([
+            ViTBlock(n_embd, n_head) for _ in range(n_loop_layers)
+        ])
+        self.ln_f = nn.LayerNorm(n_embd)
+        self.head = nn.Linear(n_embd, n_classes)
+
+        # Precompute, for every possible window center c, the boolean set of patch
+        # positions that a glimpse centered at c reveals: reveal_mask[c] is (n_patches,).
+        h = glimpse_grid // 2
+        M = torch.zeros(self.n_patches, self.n_patches)
+        for c in range(self.n_patches):
+            cr, cc = c // self.grid, c % self.grid
+            for dr in range(-h, h + 1):
+                for dc in range(-h, h + 1):
+                    r, k = cr + dr, cc + dc
+                    if 0 <= r < self.grid and 0 <= k < self.grid:
+                        M[c, r * self.grid + k] = 1.0
+        self.register_buffer("reveal_mask", M)
+
+        self.apply(self._init_weights)
+        nn.init.normal_(self.cls_token, std=0.02)
+
+        n_params = sum(p.numel() for p in self.parameters())
+        cover = int(M[0].sum().item())  # corner center coverage (min)
+        print(f"GlimpseLoopedViT: {n_params / 1e6:.2f}M params "
+              f"({n_loop_layers} block(s) x T={n_steps}, {n_head}H {n_embd}D, "
+              f"patch={patch_size}, {self.n_patches} patches, "
+              f"glimpse={glimpse_grid}x{glimpse_grid} (<= {(2*h+1)**2} patches/look), "
+              f"full_view={full_view})")
+
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            nn.init.normal_(module.weight, std=0.02)
+            if module.bias is not None:
+                nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            nn.init.normal_(module.weight, std=0.02)
+
+    def _patch_embeds(self, x):
+        B, C, H, W = x.shape
+        p = self.patch_size
+        x = x.reshape(B, C, H // p, p, W // p, p)
+        x = x.permute(0, 2, 4, 1, 3, 5).reshape(B, self.n_patches, -1)
+        return self.patch_proj(x)  # (B, n_patches, n_embd)
+
+    def glimpse_tokens(self, patch_emb, u_idx):
+        """Build the per-step input: revealed patch embeddings (+pos) at the window
+        positions, pos-only elsewhere, cls prepended. u_idx: (B,) window centers."""
+        B = patch_emb.shape[0]
+        if self.full_view:
+            mask = torch.ones(B, self.n_patches, device=patch_emb.device)
+        else:
+            mask = self.reveal_mask[u_idx]  # (B, n_patches)
+        revealed = patch_emb * mask.unsqueeze(-1)
+        cls = self.cls_token.expand(B, -1, -1)
+        tokens = torch.cat([cls, revealed], dim=1)
+        pos = torch.arange(self.n_positions, device=patch_emb.device)
+        return tokens + self.pos_embed(pos)
+
+    def _apply_operator(self, x):
+        for block in self.blocks:
+            x = block(x)
+        return x
+
+    def _readout(self, s):
+        return self.head(self.ln_f(s)[:, 0])
+
+    def one_step(self, s, patch_emb, u_idx, inject=None):
+        """Single controlled transition from an arbitrary state s under command
+        u_idx: s' = G(s + glimpse(x, u_idx) [+ inject]). Used for counterfactual
+        ('what if I looked at u_idx instead') consequence computation."""
+        s_in = s + self.glimpse_tokens(patch_emb, u_idx)
+        if inject is not None:
+            s_in = s_in + inject
+        return self._apply_operator(s_in)
+
+    def forward(self, x, u_seq, targets=None, n_steps=None,
+                return_intermediates=False, step_inject_fn=None):
+        """Run the glimpse loop.
+
+        Args:
+            u_seq: (T, B) long tensor of per-step window-center indices (the
+                sampled glimpse commands). For full_view mode the values are ignored.
+            step_inject_fn(t, operand, state) -> additive injection each step (the
+                gated FM forecast), same contract as LoopedViT.
+        """
+        T = n_steps if n_steps is not None else self.n_steps
+        patch_emb = self._patch_embeds(x)
+        s = torch.zeros(x.shape[0], self.n_positions, self.n_embd, device=x.device)
+
+        inter = {}
+        if return_intermediates:
+            inter["patch_emb"] = patch_emb
+
+        for t in range(T):
+            s_in = s + self.glimpse_tokens(patch_emb, u_seq[t])
+            if step_inject_fn is not None:
+                inj = step_inject_fn(t, s_in, s)
+                if inj is not None:
+                    s_in = s_in + inj
+            s = self._apply_operator(s_in)
+            if return_intermediates:
+                inter[f"post_step{t}"] = s
+
+        logits = self._readout(s)
+        loss = F.cross_entropy(logits, targets) if targets is not None else None
+
+        out = (logits, loss)
+        if return_intermediates:
+            out = out + (inter,)
+        return out
