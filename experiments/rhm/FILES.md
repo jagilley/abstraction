@@ -37,6 +37,9 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `rhm_fm_regularizer.py` | FM-as-regularizer: structured FM-predictability pressure vs weight decay (functional-complexity floor) |
 | `rhm_latent_loop.py` | Latent-loop 2×2: target (token vs oracle-latent) × loop (open vs closed); λ_local sweep; fresh-FM ensemble |
 | `rhm_ensemble_trajectory.py` | Fresh-FM-ensemble residual invariance over saved training checkpoints (complexodynamics: transient scaffolding vs DGP floor) |
+| `rhm_active_query.py` | Active-RHM laboratory: arity-2 query-conditioned belief FM vs arity-1 capacity sweep and frozen external planner |
+| `rhm_active_planning.py` | Active-RHM diagnosis: belief-Δ FM fidelity sweep + posterior-target FM + m sweep (shows fidelity isn't the planning bottleneck) |
+| `rhm_active_voi.py` | Active-RHM fix: value-of-information (expected-posterior-entropy) head + greedy-EIG planner vs belief-Δ/random/oracle |
 | `README.md` | This file |
 
 ## Auxiliary READMEs
@@ -60,3 +63,4 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `RHM_FM_REGULARIZER_README.md` | [FM-as-regularizer beats weight decay's functional-complexity floor](RHM_FM_REGULARIZER_README.md) |
 | `RHM_LATENT_LOOP_README.md` | [Latent target is load-bearing for generalizable self-knowledge on RHM](RHM_LATENT_LOOP_README.md) |
 | `RHM_COMPLEXODYNAMICS_README.md` | [Complexodynamics: rise-then-fall of sophistication proxies; transient = FM-idiosyncratic scaffolding, floor = DGP-aligned](RHM_COMPLEXODYNAMICS_README.md) |
+| `ACTIVE_RHM_README.md` | [Active RHM: mean-Δ FM can't plan epistemic queries (structural null); a value-of-information head can (m=2 positive, m=4 principled null); the controllability boundary is measurable](ACTIVE_RHM_README.md) |
