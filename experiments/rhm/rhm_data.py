@@ -51,6 +51,94 @@ def generate_rules_distinct(v, s, L, m, seed=0):
     return rules
 
 
+def generate_rules_invertible(v, s, L, m, seed=0):
+    """Sample composition rules that are COLLISION-FREE across features.
+
+    Same shape/semantics as generate_rules ((v, m, s) per level), but at each
+    level the m*v produced s-tuples are all DISTINCT across the whole level (not
+    just within a feature, as generate_rules_distinct guarantees). Sampled
+    without replacement from the v^s possible s-tuples, so every legal tuple maps
+    to exactly one (feature, rule) pair.
+
+    Consequence: the bottom-up parse (leaves -> root) is UNIQUE and EXACT — the
+    RHM becomes a properly invertible tree code. This is what the active-editing
+    control experiment needs so that "the true root of an (on-grammar) sequence"
+    is well-defined ground truth, closing the "the controller defines its own
+    target" loophole. Requires v*m <= v^s (always true for the canonical
+    v=8,s=2,m<=4: 8*m <= 64).
+
+    Kept separate from the other generators so all prior experiments stay
+    reproducible.
+    """
+    rng = np.random.default_rng(seed)
+    n_codes = v ** s
+    if v * m > n_codes:
+        raise ValueError(
+            f"collision-free rules require v*m <= v**s (got v*m={v * m}, v**s={n_codes})"
+        )
+    powers = v ** np.arange(s)
+    rules = []
+    for _ in range(L):
+        codes = rng.choice(n_codes, size=v * m, replace=False).reshape(v, m)  # all distinct
+        layer = np.empty((v, m, s), dtype=np.int64)
+        for i in range(s):
+            layer[:, :, i] = (codes // (v ** i)) % v
+        # sanity: decode round-trips
+        assert np.array_equal((layer * powers).sum(axis=2).reshape(-1),
+                              codes.reshape(-1)), "tuple encode/decode mismatch"
+        rules.append(layer)
+    return rules
+
+
+def build_inverse_maps(rules):
+    """Per-level table mapping an s-tuple code -> the feature that produces it.
+
+    rules[level] has shape (v, m, s) and maps level-(L-level) features down to
+    level-(L-level-1) features (rules[L-1] maps level-1 features to leaves).
+    inverse_maps[level][code] = f if some rule of feature f produces that tuple,
+    else -1 (off-grammar). For collision-free rules the assignment is unique; for
+    denser rule sets the LAST writer wins (parse is then only approximate).
+    """
+    v, m, s = rules[0].shape
+    powers = v ** np.arange(s)
+    maps = []
+    for layer in rules:
+        table = np.full(v ** s, -1, dtype=np.int64)
+        codes = (layer * powers).sum(axis=2)  # (v, m)
+        for f in range(v):
+            for r in range(m):
+                table[int(codes[f, r])] = f
+        maps.append(table)
+    return maps
+
+
+def parse_leaves(leaves, rules, inverse_maps=None):
+    """Batched bottom-up parse: leaf sequences -> (roots, valid).
+
+    leaves: (B, s^L) int array. Returns (roots (B,), valid (B,) bool) where
+    valid[i] is False if any s-tuple encountered on the way up is off-grammar
+    (produced by no feature). For collision-free rules (generate_rules_invertible)
+    a valid parse recovers the exact generating root. Off-grammar tuples are
+    replaced by feature 0 so the parse can continue (root is meaningless when
+    valid is False).
+    """
+    v, m, s = rules[0].shape
+    L = len(rules)
+    if inverse_maps is None:
+        inverse_maps = build_inverse_maps(rules)
+    powers = v ** np.arange(s)
+    current = np.asarray(leaves, dtype=np.int64)
+    valid = np.ones(current.shape[0], dtype=bool)
+    for level in range(L - 1, -1, -1):  # invert from leaves (L-1) up to root (0)
+        batch, width = current.shape
+        tuples = current.reshape(batch, width // s, s)
+        codes = (tuples * powers).sum(axis=2)  # (batch, width//s)
+        feats = inverse_maps[level][codes]
+        valid &= (feats >= 0).all(axis=1)
+        current = np.where(feats < 0, 0, feats)
+    return current[:, 0], valid
+
+
 def generate_sequences(rules, n_sequences, seed=0):
     """Generate sequences by traversing the hierarchy.
 

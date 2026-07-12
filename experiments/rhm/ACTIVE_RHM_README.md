@@ -1,8 +1,8 @@
 # Active RHM: turning an autonomous problem into a controlled one, and when that's even possible
 
-**Status**: Done. A clean negative (mean-Δ forward model can't plan epistemic queries), a clean positive (a value-of-information head can, at m=2), and a principled null (m=4) that sharpens the whole question into a measurable boundary.
-**Date**: 2026-07-10
-**Scripts**: [`rhm_active_query.py`](rhm_active_query.py) (arity test + first planner), [`rhm_active_planning.py`](rhm_active_planning.py) (three-way diagnosis of the null), [`rhm_active_voi.py`](rhm_active_voi.py) (the Bayesian fix)
+**Status**: Done. Phases 1–3: a clean negative (mean-Δ forward model can't plan epistemic queries), a clean positive (a value-of-information head can, at m=2), and a principled null (m=4) that sharpens the whole question into a measurable boundary. **Phase 4** (2026-07-11): the *internalized*-forward-model idea from the sibling reaching arc has **no headroom** here — two cheap diagnostic probes show the belief already saturates the observation-decodable value-of-information regardless of training objective, because active-query is an inference task in disguise where acting already builds the plannable representation (**act ≈ plan**). Single seed per setting.
+**Date**: 2026-07-10 (Phases 1–3); 2026-07-11 (Phase 4)
+**Scripts**: [`rhm_active_query.py`](rhm_active_query.py) (arity test + first planner), [`rhm_active_planning.py`](rhm_active_planning.py) (three-way diagnosis of the null), [`rhm_active_voi.py`](rhm_active_voi.py) (the Bayesian fix), [`rhm_active_internal.py`](rhm_active_internal.py) (Phase 4 Step 0: ceiling probe), [`rhm_active_headroom.py`](rhm_active_headroom.py) (Phase 4 Step 0.5: headroom probe)
 **Sibling / origin**: the reaching-control arity line in a2a_forward — [ACTIVE_VISION_README.md](../a2a_forward/ACTIVE_VISION_README.md), [REACHING_INTERNAL_README.md](../a2a_forward/REACHING_INTERNAL_README.md) — and the idea doc [self_model_needs_a_loop.md](../../ideas/self_model_needs_a_loop.md).
 
 ## The question
@@ -83,6 +83,51 @@ The **aggregate** Pearson is high at both m — but it is dominated by the coars
 
 **m=4 is a principled null, not a fixable failure.** At m=4 the expected-posterior-entropy targets have almost no variance across queries (head MSE collapses to ~0.001; everything sits near max entropy). The queries are *nearly equally informative given the belief state*, so no belief-conditioned planner can rank them. The oracle still wins only because it **peeks at true content** to see which reveal nails the root *for this instance* — a signal that is not a function of the belief and thus unpredictable by any forward model reading the belief.
 
+## Phase 4 — does the *internalized* forward-model idea port? (`rhm_active_internal.py`, `rhm_active_headroom.py`)
+
+Phases 1–3 used a fully **decoupled** apparatus (frozen controller, external planner) — the same Run-5 discipline the sibling reaching arc later *internalized*. [REACHING_INTERNAL](../a2a_forward/REACHING_INTERNAL_README.md) co-trains an endogenous self-forecast with the operator and finds it **reorganizes the operator to be more plannable**: a model-free operator only partly supports forward-model planning (a fresh external planner scores +0.56 on it), and internalization lifts that to +1.00. The natural next move is to port that here. Rather than build the full co-training first, two cheap diagnostic probes ask whether internalization has any **headroom** — any plannable signal a plain controller leaves on the table for it to capture.
+
+### Step 0 — the ceiling probe (`rhm_active_internal.py`): is the null belief-limited or fundamental?
+
+The m=4 null (Phase 2/3) could be **controller-limited** (the compressed belief is a weak sufficient statistic that discarded decodable VoI) or **fundamental** (the VoI genuinely lives in the hidden content). Decompose it with two VoI heads trained on the **same** target — realized posterior entropy `H(root | controller.state(next_obs))` — differing only in their input: the controller's pooled **belief `b`** vs a higher-capacity transformer reading the **raw revealed observation** (815K params, bypassing the compressed belief). The raw-obs head is the ceiling on what is decodable-from-observation *at all*.
+
+| m | belief-`b` corr | raw-obs **ceiling** corr | gap | random→oracle acc |
+|---|---|---|---|---|
+| 2 | 0.300 | 0.314 | +0.01 | 0.56 → 0.92 |
+| 3 | 0.380 | 0.332 | −0.05 | 0.33 → 0.85 |
+| 4 | 0.073 | 0.114 | +0.04 (→ **+1.5%** planning) | 0.20 → 0.66 |
+
+*(per-instance query-rank corr — the Phase-3 plannability diagnostic.)* **The belief already sits at the observation ceiling at every m.** A raw-observation reader with no pooling bottleneck extracts no more query-ranking signal than the compact belief. So the belief-pooling bottleneck is **not** the limiter, and at m=4 the ceiling itself is at the floor (+0.04 corr → only +1.5% of the oracle gap in planning): the residual VoI is **fundamentally content-carried**, reachable only by the content-peeking oracle. (The belief head reproduces Phase 3: corr 0.30 @m2 → 0.07 @m4.)
+
+### Step 0.5 — the headroom probe (`rhm_active_headroom.py`): is VoI-sufficiency a property of the *objective*?
+
+Step 0 rules out the pooling bottleneck but leaves one door ajar: the target is defined by the controller's *own* root head, so a controller with a different objective might carry VoI differently. Reaching's internalization headroom came precisely from its baseline being a **model-free policy** (not a sufficient statistic). So hold the VoI target and the observation-ceiling **fixed** (both from the root-predictor `C_root`) and vary the one thing — train a second controller `C_pol` whose belief is shaped **only by imitating good reveals** (a query policy, never trained to predict the root; the faithful `mf` analog) — and ask whether *its* belief carries less VoI.
+
+| m | `C_root` belief (root-predictor) | `C_pol` belief (model-free policy) | ceiling | ceiling − `C_pol` |
+|---|---|---|---|---|
+| 2 | 0.326 | 0.300 | 0.298 | ≈0 |
+| 3 | 0.370 | 0.355 | 0.351 | ≈0 |
+| 4 | 0.034 | 0.118 | 0.108 | ≈0 (all near floor) |
+
+Planning — fraction of the random→oracle gap closed (final root prediction always via `C_root`, so only the reveal-selection signal differs):
+
+| m | `voi_croot` planner | `voi_cpol` planner | **`policy_direct`** (raw policy) |
+|---|---|---|---|
+| 2 | 36% | 36% | **34%** |
+| 3 | 15% | 14% | **11%** |
+| 4 | ~0 | ~0 | ~0 |
+
+**No gap opens.** The model-free-policy belief carries essentially as much VoI as the root-predictor belief, and both sit at the observation ceiling — at every m. The cleanest tell is the last column: **the raw model-free policy (`policy_direct`) plans about as well as the explicit VoI forecaster** (34% vs 36% @m2; a small dip at m3, all at floor at m4), with no systematic advantage to having a separable forecast. Changing the objective does nothing; **VoI-sufficiency is objective-independent** — any *competent* belief on this task saturates the observation-decodable VoI. There is no plannable signal left for internalization to reorganize toward.
+
+### Why internalization has no purchase here — act ≈ plan
+
+This explains the whole reaching-vs-RHM difference. **Internalization reorganizes a representation only when *acting* and *forecasting* are distinct computations that a model-free learner can shortcut between.**
+
+- **Control (reaching)** genuinely has two separable objects: a **policy** (state → action) and a **dynamics model** (state, action → next state). Model-free learning can build a *reflex* policy — like an outfielder catching a ball by keeping it at a fixed visual angle — without ever building the dynamics model that planning needs. Internalization is the pressure that grows the missing model, and that gap is the headroom (+0.56 → +1.00).
+- **Active-query RHM is an inference task in disguise.** Its only state variable that matters is the belief about the hidden root; queries don't change the world, they only sharpen that one belief. To *act* well you must judge which query is most informative — which **is** the forecast a planner uses (value of information, as in choosing a medical test). There is no reflex shortcut that picks a good query without evaluating queries, so a competent actor already builds the plannable representation. One belief, read by acting and planning alike — nothing to split, nothing to shortcut, nothing to internalize.
+
+So active RHM was never going to showcase internalization, for two independent, stacked reasons: **where it is plannable (m=2), acting already plans** (no headroom); **where it is not (m=4), nobody plans** (no belief-carried signal). The reaching positive was the *exception* — a shortcut-able control task — not the rule.
+
 ## The insight (what this arc establishes)
 
 1. **The arity *impossibility* ports; the arity *usability* does not port naively.** Belief-only forward models can't represent query-conditional structure at any capacity (as in reaching). But having that structure in a mean-Δ FM does *not* yield a planner on an epistemic task.
@@ -93,16 +138,20 @@ The **aggregate** Pearson is high at both m — but it is dominated by the coars
 
 4. **Reaching vs RHM, precisely.** Reaching worked with a plain mean-Δ FM because control actions have content-independent consequences; RHM queries do not. The same apparatus succeeds or fails depending on whether the action's payoff is deterministic-given-belief (control) or variance-in-hidden-content (epistemic).
 
+5. **Internalizing the forward model has no headroom on an epistemic-query task, and the reason is structural (Phase 4).** Active-query RHM is inference in disguise: its only state is the belief-over-root, and acting optimally requires the same value-of-information a planner forecasts, so a plain controller — trained to predict the root *or* to imitate reveals — already saturates the observation-decodable VoI (belief corr = raw-obs ceiling at every m; a raw policy plans as well as a VoI forecaster). The reaching arc's internalization worked because control has a genuine policy-vs-world-model split a model-free learner can shortcut; querying has no such split. **Internalization reorganizes representations exactly when acting ≠ planning (control); it is redundant when acting = planning (inference).** This makes the autonomous-vs-controlled distinction sharper still: the *arity* structure ports (Phase 1), the *usability* needs the right forecast target (Phase 3), but the *internalization* phenomenon needs a control task — one where forecasting a consequence is a different computation from emitting an action.
+
 ## What this does and does not show
 
-- **Does show**: (a) the mean-Δ FM planner is a structural null on epistemic RHM queries, robust to FM fidelity, capacity, and prediction-space (belief vs logits); (b) a VoI/EIG head closes a large chunk of the oracle gap at m=2, the first genuine active-planning positive on RHM; (c) a computable diagnostic (per-instance query-rank corr) that predicts *in advance* whether a setting is plannable, validated by the m=2/m=4 split.
-- **Does not show**: multi-step / non-myopic planning (all planners here are greedy one-step); that m=4 is *fundamentally* content-bound rather than limited by this particular frozen controller's sufficiency (see next steps); more than a single controller seed per setting.
+- **Does show**: (a) the mean-Δ FM planner is a structural null on epistemic RHM queries, robust to FM fidelity, capacity, and prediction-space (belief vs logits); (b) a VoI/EIG head closes a large chunk of the oracle gap at m=2, the first genuine active-planning positive on RHM; (c) a computable diagnostic (per-instance query-rank corr) that predicts *in advance* whether a setting is plannable, validated by the m=2/m=4 split; (d) **(Phase 4)** internalizing the forward model has no headroom here — the belief saturates the observation-decodable VoI regardless of training objective (root-predictor = model-free-policy = raw-obs ceiling), and a raw policy plans as well as a VoI forecaster, i.e. active-query is inference-in-disguise (act ≈ plan), structurally unlike the shortcut-able control task where internalization reorganizes the operator.
+- **Does not show / caveats**: all planners here are greedy one-step; a single controller seed per setting per script. The Phase-4 "fundamental at m=4 / no-headroom" reading has one open loophole — the VoI target and the ceiling are both defined against the controller's *own* root posterior, so a fully controller-independent test (the **Bayes-optimal EIG** computed from the known grammar) would settle "fundamental" without that loophole. And the full internalized co-training (an endogenous `int_plan`-style planner) was deliberately **not** built: both diagnostic probes showed no headroom for it, so it was not worth the cost.
 
 ## Next steps
 
-1. **Sweep m ∈ {2,3,4} (and budget)** to trace the per-instance-corr → planner-gain curve: does controllability degrade smoothly as VoI migrates from belief-carried to content-carried?
-2. **Does a stronger controller rescue m=4?** The m=4 belief state may be a weak sufficient statistic; a larger / longer-trained controller might make more of the VoI belief-decodable — testing whether the m=4 null is fundamental (information-theoretic) or controller-limited.
-3. **Non-myopic VoI.** Greedy EIG is one-step; a multi-step planner (or a head predicting entropy after several reveals) tests whether look-ahead recovers anything m=4 loses to greedy myopia.
+1. **Sweep m ∈ {2,3,4} (and budget)** to trace the per-instance-corr → planner-gain curve: does controllability degrade smoothly as VoI migrates from belief-carried to content-carried? (Phase 4 added m=3, showing belief and ceiling converge at every m.)
+2. ~~**Does a stronger controller rescue m=4?**~~ *Substantially addressed by Phase 4*: the raw-observation ceiling head is a capacity-unbounded reader and it *also* floors at m=4, and Step 0.5 shows the result is objective-independent — so the null is not a weak-belief artifact. The remaining clean test is the controller-independent **Bayes-optimal EIG ceiling** computed from the known grammar (closes the "controller-defines-the-target" loophole).
+3. **Non-myopic VoI.** Greedy EIG is one-step; a multi-step planner (or a head predicting entropy after several reveals) tests whether look-ahead recovers anything m=4 loses to greedy myopia. (Note: at m=2 the oracle is *also* greedy, so the unclaimed gap there is content-peeking, not myopia — lookahead is unlikely to help.)
+4. **To see the internalization / self-model phenomenon in the RHM *domain*, it must be a genuine control task (act ≠ plan)** — e.g. an agent that *edits/writes* tokens toward a target root, where a forward model must simulate an edit's downstream effect — not information-gathering. This is a real departure ("reaching with RHM dynamics") and is the only way this domain would exhibit the reaching-style plannability reorganization. → **Being executed in [RHM_EDIT_CONTROL_README.md](RHM_EDIT_CONTROL_README.md)** (WIP, 2026-07-11): editing *is* plannable in belief space (arity usability ports, reversing the query null), but surfaced a *second* obstacle — off-manifold belief-gaming — that a generator-defined on-manifold action space + a cerebellar self-consistency veto largely fixes (gt≈0 → gt≈0.65, learned models only). Internalization itself still pending.
+5. **Seeds + crystallize.** Firm up the single-seed Phase-4 numbers with 1–2 more seeds, then crystallize the **act ≈ plan → no-internalization-headroom** characterization as a belief (it unifies the whole reaching-vs-RHM difference).
 
 ## Reproduction
 
@@ -116,6 +165,14 @@ modal run --detach rhm/rhm_active_planning.py::active_planning --m 4
 # Phase 3: the VoI fix (run both m in parallel)
 modal run --detach rhm/rhm_active_voi.py::voi_planning --m 2
 modal run --detach rhm/rhm_active_voi.py::voi_planning --m 4
+# Phase 4 Step 0: ceiling probe (run m in parallel)
+modal run --detach rhm/rhm_active_internal.py::ceiling_probe --m 2
+modal run --detach rhm/rhm_active_internal.py::ceiling_probe --m 3
+modal run --detach rhm/rhm_active_internal.py::ceiling_probe --m 4
+# Phase 4 Step 0.5: headroom probe (stagger launches ~25s apart to avoid the app-create rate limit)
+modal run --detach rhm/rhm_active_headroom.py::headroom_probe --m 2
+modal run --detach rhm/rhm_active_headroom.py::headroom_probe --m 3
+modal run --detach rhm/rhm_active_headroom.py::headroom_probe --m 4
 ```
 
-Results JSON on the `rhm-scaling-data` volume under `rhm_active_query/`, `rhm_active_planning/`, `rhm_active_voi/` (`v8_s2_L4_m{m}_seed0/results.json`). Both `rhm_active_planning.py` and `rhm_active_voi.py` take a `--quick` flag for fast smoke tests.
+Results JSON on the `rhm-scaling-data` volume under `rhm_active_query/`, `rhm_active_planning/`, `rhm_active_voi/`, `rhm_active_internal/`, `rhm_active_headroom/` (`v8_s2_L4_m{m}_seed0/results.json`). `rhm_active_planning.py`, `rhm_active_voi.py`, `rhm_active_internal.py`, and `rhm_active_headroom.py` all take a `--quick` flag for fast smoke tests.

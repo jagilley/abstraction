@@ -8,7 +8,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 |---|---|
 | `shared.py` | Modal infrastructure (app, volume, image, utilities) |
 | `stages.py` | Reusable experiment primitives: `generate_corpus`, `train_model`, `sweep`, `measure_scaling` |
-| `rhm_data.py` | RHM data generation (hierarchy rules + corpus sampling) |
+| `rhm_data.py` | RHM data generation (hierarchy rules + corpus sampling); `generate_rules_invertible` (collision-free rules → exact parse) + `build_inverse_maps` / `parse_leaves` (batched ground-truth bottom-up parser) |
 | `model.py` | GPT-2 with `return_intermediates` and cerebellar callback support |
 | `measure.py` | Scaling exponent fitting (log-log regression) |
 | `hparam_sweep.py` | L x m scaling exponent sweep |
@@ -40,6 +40,16 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `rhm_active_query.py` | Active-RHM laboratory: arity-2 query-conditioned belief FM vs arity-1 capacity sweep and frozen external planner |
 | `rhm_active_planning.py` | Active-RHM diagnosis: belief-Δ FM fidelity sweep + posterior-target FM + m sweep (shows fidelity isn't the planning bottleneck) |
 | `rhm_active_voi.py` | Active-RHM fix: value-of-information (expected-posterior-entropy) head + greedy-EIG planner vs belief-Δ/random/oracle |
+| `rhm_active_internal.py` | Active-RHM Phase 4 Step 0 (ceiling probe): belief-`b` VoI head vs raw-observation VoI head (ceiling) — decomposes the m=4 null into belief-carried / observation-decodable / fundamentally-content-carried |
+| `rhm_active_headroom.py` | Active-RHM Phase 4 Step 0.5 (headroom probe): root-predictor vs model-free-policy controller with VoI target+ceiling held fixed — shows VoI-sufficiency is objective-independent (no internalization headroom; act≈plan) |
+| `rhm_edit_control.py` | RHM-as-control Part 1: editing (block-edit) arity battery + reveal contrast on one controller + ground-truth judge — editing is plannable in belief space (mirror of the query null) but the belief is gameable off-manifold |
+| `rhm_generative_planner.py` | RHM-as-control Part 2: generator-defined (soft on-manifold) moves + cerebellar self-consistency veto — converts off-manifold belief-gaming (gt≈0) into majority true control (gt≈0.65) with learned models only |
+| `rhm_latent_planner.py` | RHM-as-control Part 3 / Stage 2: faithful MC value + latent cerebellar FM; instructive dead-end — a faithful verifier is too sparse to plan, a learned MC value is dense, but lookahead collapses because the corrupt-repair task is greedy-decomposable |
+| `rhm_sculpt_precheck.py` | Sculpting pre-check (perfect simulator, no learning): DP optimum vs myopic reflex proves the editing task has a depth-scaling lookahead prize at tight coupling (m=2/3), collapsing at m=4 |
+| `rhm_sculpt_planner.py` | Sculpting Stage 3a (learned): generator moves + MC value + beam planner; beam width 1 = reflex, wider = coordination — captures the lookahead prize (0.29→0.58, matches strong reflex) where greedy collapses |
+| `rhm_sculpt_latent.py` | Sculpting Stage 3b: latent-space beam (cerebellar FM over a richer per-block latent, re-grounded each step) vs the token-space beam — planning in latents reaches 92% of token-space at ~8× fewer materializations (efficient surrogate, not superior — *on the clean channel*) |
+| `rhm_sculpt_latent_po.py` | Sculpting Stage 3c: latent vs token beam under PARTIAL OBSERVABILITY (flickering block sensor, occlusion sweep `p`; latent carries a Kalman-filtered belief). Latent BEATS token once p≥0.25 — the token channel stops being a sufficient statistic. Reuses Stage-3b instruments; asserts p=0 anchor |
+| `rhm_sculpt_latent_stoch.py` | Sculpting Stage 3d: latent vs token beam under STOCHASTIC DYNAMICS (slippery actuator, slip sweep `q`; token samples once, latent ranks by stable FM). Latent BEATS token once q≥0.1, peak +0.075 — the mirror of the active-query null (payoff in the mean the token beam must sample). Reuses Stage-3b instruments; asserts q=0 anchor |
 | `README.md` | This file |
 
 ## Auxiliary READMEs
@@ -63,4 +73,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `RHM_FM_REGULARIZER_README.md` | [FM-as-regularizer beats weight decay's functional-complexity floor](RHM_FM_REGULARIZER_README.md) |
 | `RHM_LATENT_LOOP_README.md` | [Latent target is load-bearing for generalizable self-knowledge on RHM](RHM_LATENT_LOOP_README.md) |
 | `RHM_COMPLEXODYNAMICS_README.md` | [Complexodynamics: rise-then-fall of sophistication proxies; transient = FM-idiosyncratic scaffolding, floor = DGP-aligned](RHM_COMPLEXODYNAMICS_README.md) |
-| `ACTIVE_RHM_README.md` | [Active RHM: mean-Δ FM can't plan epistemic queries (structural null); a value-of-information head can (m=2 positive, m=4 principled null); the controllability boundary is measurable](ACTIVE_RHM_README.md) |
+| `ACTIVE_RHM_README.md` | [Active RHM: mean-Δ FM can't plan epistemic queries (structural null); a value-of-information head can (m=2 positive, m=4 principled null); the controllability boundary is measurable; and (Phase 4) internalizing the forward model has no headroom because active-query is inference-in-disguise (act≈plan)](ACTIVE_RHM_README.md) |
+| `RHM_EDIT_CONTROL_README.md` | **WIP** [RHM as a control task: editing is plannable in belief space (arity usability ports, reversing the query null) but the belief is gameable off-manifold — belief faithfulness is a second controllability axis beyond act≠plan; generator-defined on-manifold moves + a cerebellar self-consistency veto convert gt≈0 gaming into gt≈0.65 true control (learned models only). Part 3 (planning in latents) pending](RHM_EDIT_CONTROL_README.md) |
+| `RHM_SCULPTING_README.md` | **WIP** [Sculpting & planning in latents: a faithful verifier is too sparse to plan / a learned MC value is dense but the corrupt-repair task is greedy-decomposable (Stage-2 dead-end); the sculpting task genuinely requires coordination (DP optimum vs myopic reflex, depth-scaling prize); a learned beam captures it (0.29→0.58→0.61, passes strong reflex) where greedy collapses (Stage 3a); a re-grounded latent-space beam reaches 92% of token-space at ~8× lower cost — an efficient surrogate, not superior, *on the clean channel* (Stage 3b); but latent planning genuinely *beats* token-space once the token channel is lossy — partial observability (Stage 3c) and stochastic dynamics (Stage 3d) — because tokens stop being a sufficient statistic; the flip is width-gated by the FM's 0.36 top-1 pick](RHM_SCULPTING_README.md) |
+| `sculpting_control_task.md` | [The sculpting perfect-simulator pre-check (sub-note of RHM_SCULPTING): exact DP optimum vs myopic reflexes proves the editing task's lookahead prize scales with depth and tightness, collapses at m=4](sculpting_control_task.md) |
