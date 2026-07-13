@@ -63,6 +63,12 @@ def train_condition(
                                      #   rolled along positions (destroys alignment)
     injection_form: str = "update",  # "update" = gate*(FM-s_t) (vanishes at fixpt);
                                      # "next_state" = gate*FM (naive, unstable)
+    inject_mode: str = "add",        # how the injection combines with the operator:
+                                     # "add" = summation s_{t+1}=G(s_in+inj) (a2a arc
+                                     #   default); "cancel" = efference-copy/pred.-coding
+                                     #   s_{t+1}=G(s_in-inj)+inj (subtract forecast,
+                                     #   propagate residual, restore at read-out).
+                                     #   See ideas/efference_copy_cancellation.md.
     predict_k: int = 3,              # FM predicts s_{t+k} (k>1 -> informative preview;
                                      # k=1 next-step is trivially easy -> inert)
     damping: float = 1.0,            # <1.0 = damped update s+=alpha*(G-s) for
@@ -106,6 +112,7 @@ def train_condition(
     assert condition in CONDITIONS, f"unknown condition {condition}"
     assert gate_type in ("proj", "scalar"), gate_type
     assert injection_form in ("update", "next_state"), injection_form
+    assert inject_mode in ("add", "cancel"), inject_mode
     assert baseline_type in ("forward", "random_proj", "shifted"), baseline_type
     closed_loop = condition.startswith("cl")
     deep_sup = condition.endswith("deep")
@@ -118,6 +125,8 @@ def train_condition(
           f"deep_sup={deep_sup}) on {device}")
     print(f"  prelude={prelude_layers} core={n_loop_layers}xT={T} coda={coda_layers}"
           f" {n_head}H {n_embd}D")
+    print(f"  injection_form={injection_form} inject_mode={inject_mode} "
+          f"gate_type={gate_type} predict_k={predict_k}")
     if deep_sup:
         print(f"  deep supervision on steps {sup_start}..{T - 1}")
 
@@ -227,7 +236,7 @@ def train_condition(
         if closed_loop:
             logits, _, inter, step_logits = model(
                 images, return_intermediates=True, readout_all_steps=True,
-                step_inject_fn=make_hook(),
+                step_inject_fn=make_hook(), inject_mode=inject_mode,
             )
         else:
             logits, _, inter, step_logits = model(
@@ -289,7 +298,7 @@ def train_condition(
                     if closed_loop:
                         vlog, vl, vinter = model(
                             vim, vlb, return_intermediates=True,
-                            step_inject_fn=make_hook())
+                            step_inject_fn=make_hook(), inject_mode=inject_mode)
                         v_loss += vl.item()
                         v_acc += (vlog.argmax(-1) == vlb).float().mean().item()
                         vlog2, vl2, _ = model(vim, vlb, return_intermediates=True)
@@ -337,7 +346,7 @@ def train_condition(
             vim = test_images[eidx].to(device)
             if closed_loop:
                 _, _, traj = model(vim, return_trajectory=True,
-                                   step_inject_fn=make_hook())
+                                   step_inject_fn=make_hook(), inject_mode=inject_mode)
             else:
                 _, _, traj = model(vim, return_trajectory=True)
             conv += np.nan_to_num(np.array(traj["rel_delta"]))
@@ -357,7 +366,7 @@ def train_condition(
                     vlb = test_labels[eidx].to(device)
                     if use_injection and closed_loop:
                         vlog, vl = model(vim, vlb, n_steps=Te,
-                                         step_inject_fn=make_hook())
+                                         step_inject_fn=make_hook(), inject_mode=inject_mode)
                     else:
                         vlog, vl = model(vim, vlb, n_steps=Te)
                     a += (vlog.argmax(-1) == vlb).float().mean().item()
@@ -381,7 +390,7 @@ def train_condition(
             plb = test_labels[probe_indices[bi]]
             if closed_loop:
                 _, _, inter = model(pim, return_intermediates=True,
-                                    step_inject_fn=make_hook())
+                                    step_inject_fn=make_hook(), inject_mode=inject_mode)
             else:
                 _, _, inter = model(pim, return_intermediates=True)
             for t in range(T):
@@ -418,7 +427,7 @@ def train_condition(
             vim = test_images[eidx].to(device)
             if closed_loop:
                 _, _, inter = model(vim, return_intermediates=True,
-                                    step_inject_fn=make_hook())
+                                    step_inject_fn=make_hook(), inject_mode=inject_mode)
             else:
                 _, _, inter = model(vim, return_intermediates=True)
             p = inter["post_prelude"]
@@ -452,7 +461,7 @@ def train_condition(
                 B = vim.shape[0]
                 if closed_loop:
                     _, _, inter = model(vim, vlb, return_intermediates=True,
-                                        step_inject_fn=make_hook())
+                                        step_inject_fn=make_hook(), inject_mode=inject_mode)
                 else:
                     _, _, inter = model(vim, vlb, return_intermediates=True)
                 s_at = (inter[f"post_step{pert_step - 1}"] if pert_step >= 1
@@ -462,8 +471,9 @@ def train_condition(
                 noise = torch.randn(B, n_positions, n_embd, device=device)
                 noise = noise / (noise.norm(dim=-1, keepdim=True) + 1e-8) * (eps * snorm)
                 if closed_loop:
-                    _, base_i = model(vim, vlb, step_inject_fn=make_hook())
+                    _, base_i = model(vim, vlb, step_inject_fn=make_hook(), inject_mode=inject_mode)
                     _, pert_i = model(vim, vlb, step_inject_fn=make_hook(),
+                                      inject_mode=inject_mode,
                                       perturbation=(pert_step, noise))
                     di.append(pert_i.item() - base_i.item())
                 _, base_n = model(vim, vlb)
@@ -494,6 +504,8 @@ def train_condition(
         tag += f"_{gate_type}gate"
     if baseline_type != "forward":
         tag += f"_{baseline_type}"
+    if inject_mode != "add":
+        tag += f"_{inject_mode}"
     tag = f"{dataset}_{tag}"
     save_dir = f"{DATA_DIR}/a2a_forward/mnist_looped_injection/{tag}/{condition}"
     os.makedirs(save_dir, exist_ok=True)
@@ -505,7 +517,8 @@ def train_condition(
     result = {
         "condition": condition,
         "closed_loop": closed_loop, "deep_sup": deep_sup,
-        "injection_form": injection_form, "predict_k": predict_k,
+        "injection_form": injection_form, "inject_mode": inject_mode,
+        "predict_k": predict_k,
         "dataset": dataset, "damping": damping, "baseline_type": baseline_type,
         "config": {
             "n_loop_layers": n_loop_layers, "prelude_layers": prelude_layers,
@@ -563,6 +576,7 @@ def train_condition(
 def aggregate(
     dataset: str = "mnist",
     injection_form: str = "update",
+    inject_mode: str = "add",
     predict_k: int = 3,
     fwd_d_head: int = 32, fwd_mlp_mult: float = 2.0, damping: float = 1.0,
     gate_type: str = "proj",
@@ -579,6 +593,8 @@ def aggregate(
         tag += f"_damp{damping}"
     if gate_type != "proj":
         tag += f"_{gate_type}gate"
+    if inject_mode != "add":
+        tag += f"_{inject_mode}"
     tag = f"{dataset}_{tag}"
     base = f"{DATA_DIR}/a2a_forward/mnist_looped_injection/{tag}"
     T = train_steps_loop
@@ -626,5 +642,84 @@ def aggregate(
         if c not in rows:
             continue
         print(f"    {c:10s}: {[round(v, 3) for v in rows[c]['fm_selfcons_per_step']]}")
+
+    return rows
+
+
+@app.function(volumes={DATA_DIR: volume}, timeout=600)
+def compare_cancel(dataset: str = "fashion_mnist", train_steps_loop: int = 8,
+                   eval_t_max: int = 20):
+    """Cross-condition read for the efference-copy cancellation A/B (summation vs
+    cancellation, update vs next_state). The five conditions span three tag dirs, so
+    the standard `aggregate` (one tag) can't line them up. Tabulates the three
+    signatures the idea doc predicts differ under cancellation: gate self-regulation,
+    dependency (with-inj minus no-inj), and the perturbation restoring-force
+    (error_correction = dloss_noinj - dloss_inj; summation's was documented NEGATIVE
+    -- the loop amplifies the perturbation. Cancellation predicts it flips positive)."""
+    import os
+
+    def tagf(form, mode):
+        tag = _cfg_tag(1, train_steps_loop, 4, 128, 0, 0, form, 3) + "_fmd1m0.125_scalargate"
+        if mode != "add":
+            tag += f"_{mode}"
+        return f"{dataset}_{tag}"
+
+    root = f"{DATA_DIR}/a2a_forward/mnist_looped_injection"
+    T = train_steps_loop
+    # (name, tag, subdir)
+    conds = [
+        ("OL",               tagf("update", "add"),         "ol_last"),
+        ("sum_update",       tagf("update", "add"),         "cl_last"),
+        ("cancel_update",    tagf("update", "cancel"),      "cl_last"),
+        ("sum_nextstate",    tagf("next_state", "add"),     "cl_last"),
+        ("cancel_nextstate", tagf("next_state", "cancel"),  "cl_last"),
+    ]
+    rows = {}
+    for name, tag, sub in conds:
+        path = os.path.join(root, tag, sub, "results.json")
+        if os.path.exists(path):
+            with open(path) as f:
+                rows[name] = json.load(f)
+        else:
+            print(f"  MISSING: {name:16s} -> {path}")
+
+    order = [c for c, _, _ in conds if c in rows]
+    print(f"\n{'=' * 92}\n  CANCELLATION A/B ({dataset})  --  summation vs efference-copy cancellation\n{'=' * 92}")
+    hdr = (f"{'condition':17s} {'val_acc':>8s} {'accT8':>7s} {'no_inj':>7s} "
+           f"{'depend':>7s} {'inj_ben':>8s} {'gate':>6s} {'fm_cos':>7s}")
+    print(hdr)
+    for c in order:
+        r = rows[c]
+        at = r["acc_vs_T"]["with_injection"]
+        acc8 = at[str(T)]["acc"]
+        ni = r.get("acc_vs_T", {}).get("no_injection")
+        acc8_ni = ni[str(T)]["acc"] if ni else float("nan")
+        depend = (acc8 - acc8_ni) if ni else float("nan")
+        ib = r.get("injection_benefit", float("nan"))
+        gn = r.get("final_gate_norm", float("nan"))
+        print(f"{c:17s} {r['final_val_acc']:8.4f} {acc8:7.3f} {acc8_ni:7.3f} "
+              f"{depend:7.3f} {ib:8.4f} {gn:6.3f} {r['final_fm_cos']:7.4f}")
+
+    print("\n  Perturbation restoring force (error_correction = dloss_noinj - dloss_inj;")
+    print("  >0 = injection RECOVERS from perturbation; <0 = injection AMPLIFIES damage):")
+    print(f"    {'condition':17s} {'eps=0.5':>9s} {'eps=1.0':>9s} {'eps=2.0':>9s}")
+    for c in order:
+        rob = rows[c].get("robustness", {})
+        vals = []
+        for e in ["0.5", "1.0", "2.0"]:
+            ec = rob.get(e, {}).get("error_correction")
+            vals.append(f"{ec:+.3f}" if ec is not None else "   --")
+        print(f"    {c:17s} {vals[0]:>9s} {vals[1]:>9s} {vals[2]:>9s}")
+
+    print("\n  dloss under perturbation (inj active): >0 worse. Summation loop AMPLIFIES;")
+    print("  cancellation should DAMP (smaller dloss_inj):")
+    print(f"    {'condition':17s} {'eps=0.5':>9s} {'eps=1.0':>9s} {'eps=2.0':>9s}")
+    for c in order:
+        rob = rows[c].get("robustness", {})
+        vals = []
+        for e in ["0.5", "1.0", "2.0"]:
+            di = rob.get(e, {}).get("dloss_inj")
+            vals.append(f"{di:+.3f}" if di is not None else "   --")
+        print(f"    {c:17s} {vals[0]:>9s} {vals[1]:>9s} {vals[2]:>9s}")
 
     return rows

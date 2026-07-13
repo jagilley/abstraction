@@ -17,6 +17,8 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `rhm_cosine_sweep.py` | Cosine sweep: finding FM capacity settings where the FM genuinely struggles |
 | `rhm_regime_trajectory.py` | Regime trajectory: the L-to-m transition at scale (2.7M model, m=4) |
 | `rhm_per_level_loss.py` | Per-level loss decomposition: cross-entropy by hierarchy level over training |
+| `rhm_per_level_expansion.py` | Per-level expansion: controlled depth/width/m sweeps bracketing the composition ceiling (ceiling is signal-limited by m, not capacity) |
+| `plot_per_level_expansion.py` | Figure for the per-level expansion (capacity-invariance vs synonymity-ceiling vs root-reach) |
 | `rhm_dgp_approximation.py` | FM as DGP approximation: does the FM learn the RHM composition rules? |
 | `rhm_fm_intermediate_probing.py` | FM intermediate probing: does the FM's internal computation mirror the hierarchy? |
 | `rhm_label_smoothing.py` | Label smoothing sweep: does softening NTP shift learning from m to L? |
@@ -63,6 +65,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `RESIDUAL_RANK_README.md` | [FM residual rank experiments](RESIDUAL_RANK_README.md) |
 | `REGIME_TRANSITION_README.md` | [Regime transition, cosine sweep, and trajectory](REGIME_TRANSITION_README.md) |
 | `PER_LEVEL_LOSS_README.md` | [Per-level loss decomposition](PER_LEVEL_LOSS_README.md) |
+| `PER_LEVEL_EXPANSION_README.md` | [Per-level expansion: ceiling is set by synonymity, not capacity](PER_LEVEL_EXPANSION_README.md) |
 | `LABEL_SMOOTHING_README.md` | [Label smoothing experiment](LABEL_SMOOTHING_README.md) |
 | `LOSS_WEIGHTING_README.md` | [Loss weighting experiments: focal loss, confidence threshold, FM-surprise NTP](LOSS_WEIGHTING_README.md) |
 | `RHM_RATCHET_README.md` | [Unified gate ratchet with confidence thresholding](RHM_RATCHET_README.md) |

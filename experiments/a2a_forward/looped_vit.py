@@ -142,7 +142,7 @@ class LoopedViT(nn.Module):
 
     def forward(self, x, targets=None, n_steps=None, return_intermediates=False,
                 return_trajectory=False, step_inject_fn=None, perturbation=None,
-                readout_all_steps=False):
+                readout_all_steps=False, inject_mode="add"):
         """Run the loop.
 
         Args:
@@ -160,7 +160,17 @@ class LoopedViT(nn.Module):
             perturbation: (step_index, tensor) added to the state before that step.
             readout_all_steps: also return per-step logits (T, B, n_classes), the
                 shared readout applied to every iterate (for deep supervision).
+            inject_mode: how the injection combines with the operator.
+                "add" (default) -- summation/side-channel: s_{t+1} = G(s_in + inj).
+                    G sees the full forecast-boosted operand (the a2a arc's wiring).
+                "cancel" -- efference-copy / Rao-Ballard predictive coding: the
+                    forecast is *subtracted* from the forward path and only the
+                    residual propagates through G, with the forecast restored at
+                    read-out: s_{t+1} = G(s_in - inj) + inj. With a zero-init gate
+                    (inj->0) this reduces to the plain loop exactly, so it is a
+                    strict generalization. See ideas/efference_copy_cancellation.md.
         """
+        assert inject_mode in ("add", "cancel"), inject_mode
         T = n_steps if n_steps is not None else self.n_steps
         e = self._embed(x)
         p = self._prelude(e)  # post-prelude input, re-injected each step
@@ -176,14 +186,19 @@ class LoopedViT(nn.Module):
 
         for t in range(T):
             s_in = s + p if self.inject_input_each_step else (p if t == 0 else s)
-            if step_inject_fn is not None:
-                inj = step_inject_fn(t, s_in, s)
-                if inj is not None:
-                    s_in = s_in + inj
+            # FM reads the true operand s_t + input (pre-perturbation, pre-cancel).
+            inj = step_inject_fn(t, s_in, s) if step_inject_fn is not None else None
             if perturbation is not None and t == perturbation[0]:
                 s_in = s_in + perturbation[1]
 
-            s_new = self._apply_operator(s_in)
+            if inj is None:
+                s_new = self._apply_operator(s_in)
+            elif inject_mode == "cancel":
+                # Subtract the forecast, propagate only the residual through G,
+                # restore the forecast at read-out (efference copy / pred. coding).
+                s_new = self._apply_operator(s_in - inj) + inj
+            else:  # "add" -- summation (G sees the forecast-boosted operand)
+                s_new = self._apply_operator(s_in + inj)
 
             if return_trajectory:
                 d = (s_new - s).norm(dim=-1).mean().item()

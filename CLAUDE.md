@@ -61,11 +61,10 @@ Reading, ideas, beliefs, and conversations are shared across projects. Experimen
 
 ## Quotes
 
-- "If an explanation is long, there's a high chance that it's wrong" -- Ilya Sutskever
-- "human collaboration is a superintelligence technology" -- Ilya Sutskever
-- "It's not helpful to think of problems as of 'hard'. It's better to think that we merely don't know how to solve them yet." -- Ilya Sutskever
-- "Creativity is an inverse problem" -- Ilya Sutskever
-- "Creativity = novelty + value" -- Ilya Sutskever
-- "psychology should become more and more applicable to AI as it gets smarter" -- Ilya Sutskever
-- "The art of doing mathematics consists in finding that special case which contains all the germs of generality." -- David Hilbert
-- "The whole idea of Science is, simply, reflective reasoning about a more reliable process for making the contents of your mind mirror the contents of the world." -- Eliezer Yudkowsky
+- "If an explanation is long, there's a high chance that it's wrong" - Ilya Sutskever
+- "It's not helpful to think of problems as of 'hard'. It's better to think that we merely don't know how to solve them yet." - Ilya Sutskever
+- "Creativity is an inverse problem" - Ilya Sutskever
+- "Creativity = novelty + value" - Ilya Sutskever
+- "psychology should become more and more applicable to AI as it gets smarter" - Ilya Sutskever
+- "The art of doing mathematics consists in finding that special case which contains all the germs of generality." - David Hilbert
+- "The whole idea of Science is, simply, reflective reasoning about a more reliable process for making the contents of your mind mirror the contents of the world." - Eliezer Yudkowsky

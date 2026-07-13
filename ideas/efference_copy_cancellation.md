@@ -1,6 +1,6 @@
 # Cancellation, not summation: the forward-model injection as efference copy / predictive coding
 
-**Status**: Hypothesis (architectural proposal). No cancellation experiment run yet. This **deepens the efference-copy thread appended to [self_model_needs_a_loop.md](self_model_needs_a_loop.md) (2026-07-08)** from a *diagnostic* ("do summation-trained closed-loop models happen to cancel their self-generated component?") into a *prescription* ("wire the loop so it cancels — subtract the forecast, propagate the residual").
+**Status**: Architectural proposal — **tested on the looped ViT (2026-07-13): primary claim confirmed.** See [experiments/a2a_forward/CANCELLATION_README.md](../experiments/a2a_forward/CANCELLATION_README.md) and the "Experimental status" section below. This **deepens the efference-copy thread appended to [self_model_needs_a_loop.md](self_model_needs_a_loop.md) (2026-07-08)** from a *diagnostic* ("do summation-trained closed-loop models happen to cancel their self-generated component?") into a *prescription* ("wire the loop so it cancels — subtract the forecast, propagate the residual").
 **Date**: 2026-07-12
 **Builds on**: [self_model_needs_a_loop.md](self_model_needs_a_loop.md), [activation_to_activation_forward.md](activation_to_activation_forward.md), [local_prediction_error_learning.md](local_prediction_error_learning.md), [cerebellar_abstraction_ratchet.md](cerebellar_abstraction_ratchet.md)
 **Key experiments**: a2a_forward closed-loop arc — [CLOSED_LOOP_README](../experiments/a2a_forward/CLOSED_LOOP_README.md), [EXTENDED_TRAINING_README](../experiments/a2a_forward/EXTENDED_TRAINING_README.md) (Run 7b, net-zero benefit), [BASELINE_BATTERY_README](../experiments/a2a_forward/BASELINE_BATTERY_README.md), [DISTILLATION_README](../experiments/a2a_forward/DISTILLATION_README.md); the looped transformer [LOOPED_README](../experiments/a2a_forward/LOOPED_README.md); RHM sculpting Stage 3b/3c ([RHM_SCULPTING_README](../experiments/rhm/RHM_SCULPTING_README.md)) — the re-grounding + Kalman-filter patches this generalizes.
@@ -8,6 +8,16 @@
 ## One-liner
 
 Our forward-model loop currently **adds** the FM's prediction to the residual stream (`h + gate·p` — *summation*, a side-channel) and computes the novelty residual `r = actual − p` off to the side as a loss/probe target. It should instead **subtract** the prediction and propagate the residual (`f(h − gate·p) + p` — *cancellation*, the forward path): the efference-copy / predictive-coding wiring. Summation treats the FM as **optional help**, which produces *entangled* dependency, a runaway gate, and rollout drift. Cancellation treats the FM as a **permanent, modular component**: it makes the novelty residual the tensor the model actually computes on (giving the separable self-model that feedforward otherwise has no home for), adds a restoring force that self-corrects drift, and self-regulates the gate by forecast quality.
+
+## Experimental status (2026-07-13, looped ViT — single seed, Fashion-MNIST)
+
+Built cancellation in as a **one-flag strict generalization** on the looped ViT (`inject_mode=cancel`: `s_{t+1} = G(s_t − gate·inj) + gate·inj`, zero-init gate → identical to the plain loop at init), everything else held fixed against the summation baseline (whose re-run reproduces the [LOOPED](../experiments/a2a_forward/LOOPED_README.md) headline exactly). Full writeup: [CANCELLATION_README.md](../experiments/a2a_forward/CANCELLATION_README.md).
+
+- **Payoff 3 (restoring force) — CONFIRMED three ways.** The perturbation `error_correction` **flips −0.18 → +0.05** (summation amplifies a mid-loop perturbation; cancellation corrects it). The **mechanism is a directional cancellation of the forecast** — the net effect of the injection on the next state goes from `cos(Δ,inj)=+0.89` (summation, amplify) to `+0.095` (cancellation) — and it is **topological, not learned**: every operator, cancellation ones included, responds to a raw `+inj` identically (`cos ≈ 0.89`); only the subtract-then-re-add topology cancels ("restoring force by construction", as predicted). And on **OOD inputs** the summation injection turns actively harmful while cancellation's stays helpful.
+- **Payoff 4 (benefit tracks forecast quality) — MECHANISM CONFIRMED.** Corrupting the forecast directly (interpolate toward a garbage FM, magnitude-matched), cancellation's benefit **falls monotonically and flips negative** (+0.136 → −0.148) as forecast quality degrades, while summation stays positive (+0.176 → +0.037). This is the loss-landscape asymmetry that would drive gate self-closing (a wrong forecast *hurts* under cancellation, is *benign* under summation). The gate *dynamics* (whether a trainable input-conditioned gate actually closes) remains untested — only the pressure that would drive it is established.
+- **Payoff 1 (modular dependency) — SUBSTRATE-LIMITED / inconclusive.** The fresh-FM swap costs identical accuracy for both wirings, but only because the low-rank loop's FM is near-unique, so a "different but equally-good" FM barely exists to swap in — too weak a perturbation to test entanglement. Needs a gauge-free substrate (RHM / language).
+- **Cost — none.** Task accuracy is unchanged (cancel 0.850 vs sum 0.852), as the doc predicted ("no net loss benefit is expected").
+- **Refinement (honest):** the mechanism cancellation is **directional** (`cos(Δ,inj) → 0.095`), *not* a magnitude null — the operator amplifies (gain ~2–4), so cancellation *orthogonalizes* the forecast out of the forward path rather than zeroing its magnitude. The directional axis is the meaningful one (the a2a self-knowledge is directional throughout). Cleanest in the `update` (deviation) form; `next_state` cancels only partially.
 
 ## The two-line vocabulary this doc introduces
 
@@ -46,6 +56,8 @@ s_{t+1} = gate·FM(s_t)  +  g( s_t − gate·FM(s_t) )
 
 ## Payoff 1 — dependency becomes modular instead of entangled (this is the core fix)
 
+*Status (2026-07-13): **substrate-limited / inconclusive** on the looped ViT — the fresh-FM swap couldn't test it because the low-rank loop's FM is near-unique. Needs a gauge-free substrate (RHM / language).*
+
 Under cancellation the predictable computation lives **entirely and explicitly in `p`** (added back cleanly at read-out); downstream weights are shaped to compute *only the correction* `f(e)`. So:
 
 - The FM **owns** the predictable part; downstream **owns** the residual; they recombine at read-out. The reliance is **modular and explicit**, not entangled and implicit. Permanent reliance on the FM is now *correct* — the FM is a component of the model (its cerebellum), not optional help — and the pathology to guard against is no longer "can't run without it" but *instability*, which Payoff 3 addresses.
@@ -63,9 +75,13 @@ Note this is the *constructive* counterpart to the diagnostic test the parent do
 
 ## Payoff 3 — a restoring force that self-corrects drift (generalizes the re-grounding/Kalman patches)
 
+*Status (2026-07-13): **confirmed** on the looped ViT — perturbation `error_correction` flips −0.18 → +0.05; the forecast is directionally cancelled from the forward path (cos +0.89 → +0.095), topological not learned.*
+
 A predictive-coding loop is a **predictor–corrector**: predict the next state, then correct by `(observation − prediction)`. That is a Kalman filter — *exactly* what we hand-built in Stage 3c ("observed → re-encode; occluded → keep FM prediction") and the general form of the Stage-3b re-grounding. Cancellation gives the restoring force **by construction**: any drift of the state from what is actually true produces a larger residual `e`, which drives a stronger correction pulling it back. Additive injection has no such term — it just keeps adding prediction, so nothing pulls a drifting state home. **Rollout drift is fixed structurally instead of patched per-experiment.**
 
 ## Payoff 4 (prediction) — the gate self-regulates by forecast quality
+
+*Status (2026-07-13): **mechanism confirmed** on the looped ViT — a wrong forecast hurts cancellation (benefit +0.136 → −0.148 as the forecast degrades) but is benign under summation (+0.176 → +0.037), the loss-landscape asymmetry that would drive gate-closing. The gate **dynamics** themselves are untested (needs an input-conditioned gate).*
 
 Under summation, a *bad* added preview is cheap to ignore — downstream can set its effective weight low at near-zero cost — so there is no pressure for the gate to close on inputs the FM predicts poorly (hence the runaway). Under cancellation the asymmetry flips: subtracting a *wrong* forecast **actively corrupts the forward path** (downstream must both undo the bad subtraction *and* compute the real signal, from a higher-variance residual). So gate-opening is beneficial exactly where the forecast is accurate and *harmful* where it is not.
 
@@ -99,12 +115,14 @@ Re-wire the injection from `h + gate·p` to `f(h − gate·p) + p` on an existin
 
 RHM is the right substrate: ground-truth latents let us check whether downstream genuinely carries the *residual* structure and whether the recombined read-out matches the true `h_L`.
 
+**Done (2026-07-13) — on the looped ViT, not RHM.** (1) *Dependency*: the fresh-FM swap was **inconclusive** — the low-rank loop's FM is near-unique, so the swap is too weak a perturbation to separate modular from entangled (the RHM substrate, with a gauge-free FM, is still the right place for this). (2) *Gate dynamics*: the loss-landscape asymmetry is confirmed (a wrong forecast hurts cancellation, is benign under summation — Payoff-4 mechanism), but the **gate-closing dynamics themselves are untested** (the scalar gate can't express input-dependence; needs an input-conditioned gate). (3) *Drift/restoring force*: **confirmed** — the perturbation `error_correction` flips sign (−0.18 → +0.05), and the forecast is directionally cancelled from the forward path (cos +0.89 → +0.095). The RHM port (ground-truth-latent residual check + it generalizes the Stage-3b re-grounding / Kalman patches) is the natural next substrate.
+
 ## Predictions / falsification
 
-- **Falsified if** cancellation reproduces the same runaway gate and entangled dependency as summation (would mean the sign/topology is not what drives the pathology).
-- **Falsified if** the drift/self-correction and gate-self-closing predictions fail — i.e. the restoring force is not load-bearing.
-- **Confirmed strongly if** the OOD_GATE selective-closing behavior appears from the wiring alone (no bilevel), and rollout stabilizes without re-grounding.
-- **Open magnitude question**: how much raw LM-loss help is forfeited, and whether robustness/self-model quality gains dominate (Run 7b + BASELINE_BATTERY predict the trade is favorable).
+- **Falsified if** cancellation reproduces the same runaway gate and entangled dependency as summation (would mean the sign/topology is not what drives the pathology). → *Not falsified: the sign flip changes the mechanism (cos +0.89 → +0.095) and reverses the perturbation response, confirming the topology drives it. (The scalar gate's resting value is unchanged at ~0.017 under both — but that is the input-independent gate; the input-dependent closing pressure is present, see next.)*
+- **Falsified if** the drift/self-correction and gate-self-closing predictions fail — i.e. the restoring force is not load-bearing. → *Restoring force **confirmed** (error_correction −0.18 → +0.05). Gate-self-closing pressure **confirmed** (benefit flips negative on a bad forecast) but the gate **dynamics** are untested (needs an input-conditioned gate).*
+- **Confirmed strongly if** the OOD_GATE selective-closing behavior appears from the wiring alone (no bilevel), and rollout stabilizes without re-grounding. → *Partially: the loss-landscape asymmetry the OOD_GATE selective-closing rests on is present from the wiring alone; whether a trainable gate exploits it (no bilevel) is the open follow-up.*
+- **Open magnitude question**: how much raw LM-loss help is forfeited, and whether robustness/self-model quality gains dominate (Run 7b + BASELINE_BATTERY predict the trade is favorable). → *Resolved favorably on the looped ViT: **task accuracy is unchanged** (0.850 vs 0.852), so no help was forfeited, while the robustness/restoring-force gain is real.*
 
 ## Connections to beliefs / prior results
 

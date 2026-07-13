@@ -246,7 +246,7 @@ def per_level_single(
 # Training trajectory: per-level loss at each checkpoint
 # ---------------------------------------------------------------------------
 
-@app.function(volumes={DATA_DIR: volume}, gpu="T4", timeout=10800, memory=16384)
+@app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=21600, memory=16384)
 def per_level_trajectory(
     v: int = 8, s: int = 2, depth: int = 6, m: int = 2,
     n_tokens: int = 5_000_000,
@@ -255,6 +255,8 @@ def per_level_trajectory(
     n_eval_sequences: int = 5000,
     seed: int = 42,
     eval_interval: int = 200,
+    n_steps_override: int = 0,
+    weight_decay: float = 0.01,
 ):
     """Track per-level loss over training to reveal bottom-up learning."""
     import torch
@@ -281,6 +283,8 @@ def per_level_trajectory(
     tokens_per_step = batch_size * seq_len
     steps_per_epoch = max(1, len(train_data) // tokens_per_step)
     n_steps = min(20000, max(2000, 5 * steps_per_epoch))
+    if n_steps_override > 0:
+        n_steps = n_steps_override
 
     checkpoint_fracs = [0.0, 0.005, 0.01, 0.02, 0.05, 0.10, 0.20, 0.35, 0.50, 0.70, 0.85, 1.0]
     checkpoint_steps = sorted(set(
@@ -288,7 +292,7 @@ def per_level_trajectory(
     ))
 
     model = GPT(v, seq_len, n_layer, n_head, n_embd).to(device)
-    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.01)
+    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
     rules = [np.load(f"{DATA_DIR}/{key}/rules_L{ell}.npy") for ell in range(L)]
     eval_seqs = generate_sequences_batched(rules, n_eval_sequences, seed=12345)

@@ -82,6 +82,8 @@ from rhm.rhm_sculpt_deepbelief import (
     _belief_depth_probe,
     _block_ancestor_index,
     _participation_ratio,
+    _span_mask,
+    _subtree_mask,
 )
 
 
@@ -287,6 +289,118 @@ def _train_planner_internal(controller, block_fm, value, generator, train_leaves
             pacc = (logits.argmax(1) == kt).float().mean().item()
             print(f"  planner step {step:5d}/{n_steps}: root_acc={racc:.3f} "
                   f"loss_fm={loss_fm.item():.5f} plan_acc={pacc:.3f} (chance {1/n_regions:.3f})")
+
+
+# --------------------------------------------------------------------------- #
+# Unified belief trainer: base in {parser, mlm} x mode in {frozen, planner}
+# --------------------------------------------------------------------------- #
+
+def _train_belief(controller, generator, train_leaves, train_roots, train_leaves_np, canon,
+                  region_index, n_regions, *, base, mode, block_fm, value, gstates_np, groots_np,
+                  gkstar_np, batch_size, n_blocks, v, s, L, state_dim, n_corrupt, budget, n_steps,
+                  lr, lam_mlm, lam_fm, lam_plan, tau, mask_mode, device, p_full=0.5):
+    """One nested code path for the belief-quality x internalization 2x2. Loss assembled from:
+      root-CE anchor                          (always; identical masked-reveal schedule)
+      + lam_mlm * masked-infilling            (base == 'mlm': Stage-4's best non-privileged belief)
+      + lam_fm  * asymmetric FM local-loss    (mode == 'planner': endogenous predictability)
+      + lam_plan* grounded planner CE          (mode == 'planner': int_plan, imitate DP best-move)
+    So `parser_frozen` == the first-run frozen rung and `parser_planner` == its planner rung
+    (a built-in reproduction check), while `mlm_planner` composes the two positive axes."""
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+
+    controller.train()
+    params = list(controller.parameters())
+    mlm_head = None
+    if base == "mlm":
+        mlm_head = nn.Linear(state_dim, v).to(device)
+        mlm_head.train()
+        params += list(mlm_head.parameters())
+    elif base != "parser":
+        raise ValueError(base)
+    if mode == "planner":
+        block_fm.train(); value.train()
+        params += list(block_fm.parameters()) + list(value.parameters())
+        gstates = torch.from_numpy(gstates_np)
+        groots = torch.from_numpy(groots_np)
+        gk = torch.from_numpy(gkstar_np)
+        n_ground = gstates.shape[0]
+        arange_r = torch.arange(n_regions, device=device)
+    elif mode != "frozen":
+        raise ValueError(mode)
+
+    opt = torch.optim.AdamW(params, lr=lr, weight_decay=1e-4)
+    rng = np.random.default_rng(4242)
+    report = max(1, n_steps // 6)
+    n_pool = train_leaves.shape[0]
+    for step in range(1, n_steps + 1):
+        # --- root-CE anchor (masked reveals) ---
+        idx = torch.randint(0, n_pool, (batch_size,))
+        leaves = train_leaves[idx].to(device)
+        roots = train_roots[idx].to(device)
+        if torch.rand(()).item() < p_full:
+            n_rev = n_blocks
+        else:
+            n_rev = int(torch.randint(0, n_blocks + 1, ()).item())
+        order = torch.rand(batch_size, n_blocks, device=device).argsort(dim=1)
+        obs = _reveal_blocks(leaves, order[:, :n_rev], s, mask_token=-1)
+        root_logits = controller.root_logits(controller.block_state(obs).mean(dim=1))
+        loss = F.cross_entropy(root_logits, roots)
+        mlm_acc = plan_acc = -1.0
+
+        # --- base: masked-infilling (mlm belief) ---
+        if base == "mlm":
+            if mask_mode == "span":
+                pos_mask = _span_mask(batch_size, n_blocks * s, device)
+            else:
+                pos_mask = _subtree_mask(batch_size, n_blocks, s, L, device).repeat_interleave(s, dim=1)
+            mlm_logits = mlm_head(controller._encode(leaves.masked_fill(pos_mask, -1)))
+            loss = loss + lam_mlm * F.cross_entropy(mlm_logits[pos_mask], leaves[pos_mask])
+            mlm_acc = (mlm_logits[pos_mask].argmax(-1) == leaves[pos_mask]).float().mean().item()
+
+        # --- mode: internalization terms (FM-recon + grounded planner) ---
+        if mode == "planner":
+            cidx = rng.integers(0, train_leaves_np.shape[0], size=batch_size)
+            c = int(rng.integers(1, n_corrupt + 1))
+            x = torch.from_numpy(_corrupt(train_leaves_np[cidx], n_blocks, c, v, s, rng)).to(device)
+            g = int(rng.integers(0, budget + 1))
+            for _ in range(g):
+                kk = torch.randint(0, n_regions, (batch_size,), device=device)
+                x = _regenerate(generator, x, region_index[kk], canon, None, block_size=s, sample=False)
+            k = torch.randint(0, n_regions, (batch_size,), device=device)
+            x2 = _regenerate(generator, x, region_index[k], canon, None, block_size=s, sample=False)
+            z = controller.block_state(x)
+            z2 = controller.block_state(x2)
+            delta = z2 - z
+            loss_fm_train = F.mse_loss(block_fm(z.detach(), k), delta.detach())
+            loss_pred = F.mse_loss(delta, block_fm(z, k).detach())
+
+            pidx = torch.randint(0, n_ground, (batch_size,))
+            xp = gstates[pidx].to(device)
+            rp = groots[pidx].to(device)
+            kt = gk[pidx].to(device)
+            zp = controller.block_state(xp)
+            logits = torch.stack([
+                value((zp + block_fm(zp, arange_r[j].expand(batch_size))).mean(dim=1), rp)
+                for j in range(n_regions)
+            ], dim=1) / tau
+            loss_plan = F.cross_entropy(logits, kt)
+            loss = loss + lam_fm * (loss_fm_train + loss_pred) + lam_plan * loss_plan
+            plan_acc = (logits.argmax(1) == kt).float().mean().item()
+
+        opt.zero_grad(set_to_none=True)
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(params, 1.0)
+        opt.step()
+        if step % report == 0 or step == n_steps:
+            racc = (root_logits.argmax(-1) == roots).float().mean().item()
+            extra = ""
+            if mlm_acc >= 0:
+                extra += f" mlm_acc={mlm_acc:.3f}"
+            if plan_acc >= 0:
+                extra += f" plan_acc={plan_acc:.3f}"
+            print(f"  belief[{base}/{mode}] step {step:5d}/{n_steps}: root_acc={racc:.3f}{extra}")
 
 
 # --------------------------------------------------------------------------- #
@@ -547,6 +661,181 @@ def sculpt_internalize(
         "elapsed_seconds": time.time() - started,
     }
     tag = f"v{v}_s{s}_L{depth}_m{m}_c{n_corrupt}_seed{rule_seed}_{'-'.join(rung_list)}"
+    output_dir = f"{DATA_DIR}/rhm_sculpt_internalize/{tag}"
+    os.makedirs(output_dir, exist_ok=True)
+    with open(f"{output_dir}/results.json", "w") as handle:
+        json.dump(metrics, handle, indent=2, cls=NumpyEncoder)
+    volume.commit()
+    return metrics
+
+
+@app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=21600, memory=16384)
+def sculpt_compose(
+    v: int = 8, s: int = 2, depth: int = 4, m: int = 2, rule_seed: int = 0, train_seed: int = 1,
+    n_train_episodes: int = 100_000, n_eval_episodes: int = 2_048, n_probe: int = 3_000,
+    state_dim: int = 96, controller_steps: int = 12_000, generator_steps: int = 12_000,
+    value_steps: int = 12_000, fm_steps: int = 12_000, value_episodes: int = 40_000,
+    ground_states: int = 40_000, batch_size: int = 256, n_corrupt: int = 3, edit_budget: int = 6,
+    region_size: int = 1, beam_widths: str = "1,16,64,256", explore_eps: float = 0.3,
+    lam_mlm: float = 1.0, lam_fm: float = 1.0, lam_plan: float = 1.0, tau: float = 1.0,
+    mask_mode: str = "subtree",
+    conditions: str = "parser_frozen,parser_planner,mlm_frozen,mlm_planner", quick: bool = False,
+):
+    """Compose the two positive axes: belief quality (parser vs mlm) x internalization
+    (frozen vs grounded planner), a 2x2 through the identical frozen-downstream eval. Asks:
+    does grounded internalization STACK on a deeper static belief (mlm_planner best) or SUBSUME
+    the belief-quality lever (parser_planner ~= mlm_planner — the grounded planner recruits the
+    depth mlm supplied statically, making the hand-designed objective redundant)? Each condition
+    is `<base>_<mode>` with base in {parser, mlm}, mode in {frozen, planner}. `parser_planner`
+    reproduces the first run's `planner` rung as a built-in check."""
+    import time
+    import torch
+
+    if s != 2:
+        raise ValueError("This narrow experiment currently assumes binary RHM branching (s=2).")
+    sequence_length = s ** depth
+    n_blocks = sequence_length // s
+    L = depth
+    widths = [int(x) for x in beam_widths.split(",")]
+    cond_list = [c for c in conditions.split(",") if c]
+    for c in cond_list:
+        b, _, md = c.partition("_")
+        if b not in ("parser", "mlm") or md not in ("frozen", "planner"):
+            raise ValueError(f"condition must be <parser|mlm>_<frozen|planner>, got {c}")
+    if quick:
+        controller_steps = generator_steps = value_steps = fm_steps = 800
+        n_train_episodes, n_eval_episodes, value_episodes = 20_000, 1_024, 6_000
+        ground_states, n_probe = 6_000, 1_000
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch.set_float32_matmul_precision("high")
+    print(f"Sculpt-compose (belief-quality x internalization 2x2): v={v}, s={s}, L={depth}, m={m}, "
+          f"blocks={n_blocks}, c={n_corrupt}, budget={edit_budget}, widths={widths}, "
+          f"mask_mode={mask_mode}, conditions={cond_list}, device={device}")
+    started = time.time()
+
+    rules = generate_rules_distinct(v, s, depth, m, seed=rule_seed)
+    inverse_maps = build_inverse_maps(rules)
+    bottom_map = torch.from_numpy(inverse_maps[-1]).to(device)
+    canon_np = np.ascontiguousarray(rules[depth - 1][:, 0, :])
+    canon = torch.from_numpy(canon_np).to(device)
+    region_index, n_regions = _region_index(n_blocks, region_size, device)
+    anc_block_idx = _block_ancestor_index(n_blocks, s, L)
+
+    torch.manual_seed(train_seed)
+    np.random.seed(train_seed)
+    train_roots_np, train_leaves_np = _sample_pool(rules, n_train_episodes, s, train_seed)
+    train_leaves = torch.from_numpy(train_leaves_np)
+    train_roots = torch.from_numpy(train_roots_np)
+
+    probe_leaves_np, probe_lf, _ = _generate_with_traces(rules, n_probe, train_seed + 7)
+    probe_leaves = torch.from_numpy(probe_leaves_np.astype(np.int64))
+
+    RichController = _build_rich_controller()
+    BlockInfiller = _build_generator()
+    MCValueHead = _build_value_head()
+    BlockLatentFM = _build_block_fm()
+
+    generator = BlockInfiller(v, sequence_length, s, state_dim, n_head=4, n_layer=2,
+                              root_conditioned=False).to(device)
+    _train_generator(generator, train_leaves, train_roots, bottom_map, batch_size=batch_size,
+                     n_blocks=n_blocks, v=v, block_size=s, mask_min=1, mask_max=n_blocks,
+                     n_steps=generator_steps, lr=3e-4, device=device)
+    generator.eval()
+    for p in generator.parameters():
+        p.requires_grad_(False)
+
+    planner_batch = min(1024, n_eval_episodes)
+    eval_roots_np, eval_leaves_np = _sample_pool(rules, planner_batch, s, train_seed + 99)
+    rng = np.random.default_rng(train_seed + 2)
+    start_np = _corrupt(eval_leaves_np, n_blocks, n_corrupt, v, s, rng)
+    leaves0 = torch.from_numpy(start_np)
+    targets = torch.from_numpy(eval_roots_np)
+    dstar = nearest_derivation_cost(rules, start_np, eval_roots_np, s)
+    frac_solvable = float((dstar <= n_corrupt * s).mean())
+    print(f"Task DP frac_solvable={frac_solvable:.3f}")
+
+    if any(c.endswith("planner") for c in cond_list):
+        print("Precomputing grounded best-move buffer (DP over candidate moves)...")
+        gstates_np, groots_np, gkstar_np = _collect_grounded_moves(
+            generator, train_leaves_np, train_roots_np, canon, region_index, n_regions, rules,
+            n_states=ground_states, batch_size=1024, n_blocks=n_blocks, v=v, s=s,
+            n_corrupt=n_corrupt, budget=edit_budget, device=device)
+    else:
+        gstates_np = groots_np = gkstar_np = None
+
+    results = {}
+    for cond in cond_list:
+        base, _, mode = cond.partition("_")
+        print(f"\n{'#'*72}\n# CONDITION: {cond}  (base={base}, mode={mode})\n{'#'*72}")
+        torch.manual_seed(train_seed)      # identical controller init across conditions
+        controller = RichController(v, sequence_length, s, state_dim, n_head=4, n_layer=2).to(device)
+        block_fm_ct = BlockLatentFM(state_dim, n_blocks, n_head=4, n_layer=2).to(device) if mode == "planner" else None
+        value_ct = MCValueHead(state_dim, v).to(device) if mode == "planner" else None
+        _train_belief(controller, generator, train_leaves, train_roots, train_leaves_np, canon,
+                      region_index, n_regions, base=base, mode=mode, block_fm=block_fm_ct,
+                      value=value_ct, gstates_np=gstates_np, groots_np=groots_np,
+                      gkstar_np=gkstar_np, batch_size=batch_size, n_blocks=n_blocks, v=v, s=s, L=L,
+                      state_dim=state_dim, n_corrupt=n_corrupt, budget=edit_budget,
+                      n_steps=controller_steps, lr=3e-4, lam_mlm=lam_mlm, lam_fm=lam_fm,
+                      lam_plan=lam_plan, tau=tau, mask_mode=mask_mode, device=device)
+        results[cond] = _downstream_eval(
+            cond, controller, generator=generator, value_MC=MCValueHead, block_FM=BlockLatentFM,
+            rules=rules, canon=canon, region_index=region_index, n_regions=n_regions,
+            train_leaves_np=train_leaves_np, train_roots_np=train_roots_np, leaves0=leaves0,
+            targets=targets, widths=widths, probe_leaves=probe_leaves, probe_lf=probe_lf,
+            anc_block_idx=anc_block_idx, state_dim=state_dim, s=s, L=L, v=v, n_blocks=n_blocks,
+            n_corrupt=n_corrupt, edit_budget=edit_budget, value_episodes=value_episodes,
+            explore_eps=explore_eps, batch_size=batch_size, value_steps=value_steps,
+            fm_steps=fm_steps, device=device)
+
+    # summary: the 2x2 read (stack vs subsume) -----------------------------------------------
+    print(f"\n{'='*72}\n=== SUMMARY (m={m}, c={n_corrupt}) — belief-quality x internalization ===\n{'='*72}")
+    for cond in cond_list:
+        r = results[cond]; fc = r["block_fm_check"]
+        print(f"\n  [{cond}]  depth " + " ".join(f"{k}={v_:.2f}" for k, v_ in r["depth_probe"].items())
+              + f"  PR={r['participation_ratio']:.2f}")
+        print(f"           fresh FM delta_cos={fc['delta_cos']:.3f} top1={fc['value_top1_agree']:.3f} "
+              f"rank_corr={fc['value_rank_corr']:.3f}")
+        print("           token:  " + " | ".join(f"w{k}={v_:.3f}" for k, v_ in r["token_beam_success"].items()))
+        print("           latent: " + " | ".join(f"w{k}={v_:.3f}" for k, v_ in r["latent_beam_success"].items()))
+        print("           gap:    " + " | ".join(f"w{k}={v_:+.3f}" for k, v_ in r["gap"].items()))
+
+    def _delta(a, b, tag):
+        if a not in results or b not in results:
+            return
+        ra, rb = results[a], results[b]
+        w = str(widths[-1])
+        print(f"\n  Δ({a} − {b})  [{tag}]")
+        print("    depth " + " ".join(
+            f"{k}={ra['depth_probe'][k]-rb['depth_probe'][k]:+.3f}" for k in ra["depth_probe"])
+            + f"  ΔPR={ra['participation_ratio']-rb['participation_ratio']:+.2f}")
+        print(f"    fresh-FM Δtop1={ra['block_fm_check']['value_top1_agree']-rb['block_fm_check']['value_top1_agree']:+.3f}"
+              f"  Δrank_corr={ra['block_fm_check']['value_rank_corr']-rb['block_fm_check']['value_rank_corr']:+.3f}"
+              f"  Δdelta_cos={ra['block_fm_check']['delta_cos']-rb['block_fm_check']['delta_cos']:+.3f}")
+        print(f"    w{w}: Δlatent {ra['latent_beam_success'][w]-rb['latent_beam_success'][w]:+.3f}"
+              f"  Δtoken {ra['token_beam_success'][w]-rb['token_beam_success'][w]:+.3f}"
+              f"  gap {rb['gap'][w]:+.3f}->{ra['gap'][w]:+.3f}")
+
+    print(f"\n{'-'*60}\n  internalization effect within each belief base:")
+    _delta("parser_planner", "parser_frozen", "grounded internalization | parser base")
+    _delta("mlm_planner", "mlm_frozen", "grounded internalization | mlm base")
+    print(f"\n{'-'*60}\n  belief-quality effect within each mode (does mlm still help?):")
+    _delta("mlm_frozen", "parser_frozen", "mlm vs parser | frozen (static belief-quality lever)")
+    _delta("mlm_planner", "parser_planner", "mlm vs parser | planner (does mlm add AFTER internalizing?)")
+
+    metrics = {
+        "config": {"v": v, "s": s, "depth": depth, "m": m, "n_corrupt": n_corrupt,
+                   "move_budget": edit_budget, "beam_widths": widths, "state_dim": state_dim,
+                   "lam_mlm": lam_mlm, "lam_fm": lam_fm, "lam_plan": lam_plan, "tau": tau,
+                   "mask_mode": mask_mode, "value_episodes": value_episodes,
+                   "ground_states": ground_states, "conditions": cond_list,
+                   "controller_steps": controller_steps},
+        "dp_frac_solvable": frac_solvable,
+        "results": results,
+        "elapsed_seconds": time.time() - started,
+    }
+    tag = f"v{v}_s{s}_L{depth}_m{m}_c{n_corrupt}_seed{rule_seed}_compose_{mask_mode}"
     output_dir = f"{DATA_DIR}/rhm_sculpt_internalize/{tag}"
     os.makedirs(output_dir, exist_ok=True)
     with open(f"{output_dir}/results.json", "w") as handle:
