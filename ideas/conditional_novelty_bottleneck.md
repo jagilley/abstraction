@@ -38,6 +38,8 @@ This is a conditional information bottleneck. Compress the activation, but condi
 
 The key insight: **you don't need to externally specify what the model's concept axes are. The training procedure discovers them, because the bottleneck is pressured to exploit every regularity the base model already captures.**
 
+> **Related (2026-07-12): [efference_copy_cancellation.md](efference_copy_cancellation.md).** "Transmit only the surprise, conditioned on what's known" is the same principle that doc applies to the a2a forward-model loop — but as a *forward-path wiring* (subtract the FM's prediction, propagate the residual: predictive coding / efference copy) rather than a *detection/coding* read-out. This doc grounds the "condition" in weight space (VPD); that doc grounds it in the co-trained forward model's forecast. Two uses of the same conditional-information-bottleneck idea — a novelty *detector* here, a novelty *forward path* there.
+
 ### The size constraint as the grounding mechanism
 
 A large meta-model can afford to memorize activation statistics without discovering conceptual structure. A very small meta-model *cannot* — it must find compressions. The most efficient compressions of a model's activation space should be its actual concepts, because concepts are the high-leverage regularities that the model's weights impose on its activations.

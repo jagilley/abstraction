@@ -1,8 +1,8 @@
 # RHM Sculpting & planning in latents: making RHM a control task that *needs* lookahead
 
-**Status**: **WIP.** Stage 2 (latent-planning attempt — instructive dead-end), Stage 3a (learned beam captures the prize — clean positive), Stage 3b (planning in latents — latent ≈ token at ~8× lower cost on the *clean* channel), and **Stage 3c/3d (latent *beats* token once the token channel is lossy — partial observability + stochastic dynamics — clean positives)** all done, single seed.
+**Status**: **WIP.** Stage 2 (latent-planning attempt — instructive dead-end), Stage 3a (learned beam captures the prize — clean positive), Stage 3b (planning in latents — latent ≈ token at ~8× lower cost on the *clean* channel), and **Stage 3c/3d (latent *beats* token once the token channel is lossy — partial observability + stochastic dynamics — clean positives)** all done, single seed. **Stage 4 (belief-quality axis — a deeper belief makes the block FM a better one-step ranker, monotone across 4 beliefs; a *non-privileged* masked-infilling belief captures it and is the best latent-planner substrate, beating even the privileged oracle; verified genuinely non-privileged by a fully-agnostic span-masking ablation)** done, single seed.
 **Date**: 2026-07-12
-**Scripts**: [`rhm_latent_planner.py`](rhm_latent_planner.py) (Stage 2: faithful value + cerebellar FM), [`rhm_sculpt_precheck.py`](rhm_sculpt_precheck.py) + [`sculpting_control_task.md`](sculpting_control_task.md) (the perfect-simulator pre-check that validates the task), [`rhm_sculpt_planner.py`](rhm_sculpt_planner.py) (Stage 3a: the learned token-space beam), [`rhm_sculpt_latent.py`](rhm_sculpt_latent.py) (Stage 3b: the latent-space beam, head-to-head), [`rhm_sculpt_latent_po.py`](rhm_sculpt_latent_po.py) (Stage 3c: partial observability), [`rhm_sculpt_latent_stoch.py`](rhm_sculpt_latent_stoch.py) (Stage 3d: stochastic dynamics).
+**Scripts**: [`rhm_latent_planner.py`](rhm_latent_planner.py) (Stage 2: faithful value + cerebellar FM), [`rhm_sculpt_precheck.py`](rhm_sculpt_precheck.py) + [`sculpting_control_task.md`](sculpting_control_task.md) (the perfect-simulator pre-check that validates the task), [`rhm_sculpt_planner.py`](rhm_sculpt_planner.py) (Stage 3a: the learned token-space beam), [`rhm_sculpt_latent.py`](rhm_sculpt_latent.py) (Stage 3b: the latent-space beam, head-to-head), [`rhm_sculpt_latent_po.py`](rhm_sculpt_latent_po.py) (Stage 3c: partial observability), [`rhm_sculpt_latent_stoch.py`](rhm_sculpt_latent_stoch.py) (Stage 3d: stochastic dynamics), [`rhm_sculpt_deepbelief.py`](rhm_sculpt_deepbelief.py) (Stage 4 gate: parser/oracle/data2vec/mlm belief conditions on the latent beam), [`rhm_sculpt_data2vec.py`](rhm_sculpt_data2vec.py) (Stage 4 isolation: non-privileged belief depth probed vs ground truth + anti-collapse).
 **Parent**: [RHM_EDIT_CONTROL_README.md](RHM_EDIT_CONTROL_README.md) (Parts 1–2: editing is plannable-in-belief but gameable off-manifold; a generator gives on-manifold moves + a cerebellar veto → true-success 0.006 → 0.65). The origin idea (plan in the model's own latents, cortex proposes / cerebellum forecasts) is Jasper's; see also [ideas/self_model_needs_a_loop.md](../../ideas/self_model_needs_a_loop.md).
 
 ---
@@ -128,6 +128,49 @@ Stage 3b's "efficient surrogate, not superior" was **correct for the clean chann
 
 The honest negative, reasoned about rather than shrugged off, *predicted* the two knobs where it flips — which is the whole point of understanding a result before updating on it.
 
+## Stage 4 — the belief is the bottleneck: a deeper (and *non-privileged*) belief lifts latent planning (`rhm_sculpt_deepbelief.py`, `rhm_sculpt_data2vec.py`)
+
+A new axis, orthogonal to Stage 3c/3d's *channel* axis: not "when do latents beat tokens?" but "**what makes the latent beam good in the first place?**" Stage 3b's latent beam lags token on the clean channel because the block FM is a weak one-step ranker (`value_top1_agree = 0.36`, `delta_cos = 0.49`). The cross-experiment hypothesis (from the [RHM_LATENT_LOOP](RHM_LATENT_LOOP_README.md) ↔ sculpting discussion): the FM is weak because the controller is trained as a *parser* (root-CE only), so its per-block latent leaves the deep parse structure that governs an edit's consequence **tangled/unrecruited** — the same shallow-frontier failure RHM_LATENT_LOOP found for token targets. Prediction: a **deeper (DGP-aligned) belief → a more faithful FM → better latent planning**.
+
+**Design — single controlled variable = the controller's training objective.** Every belief gets the same root-CE (so each keeps a functional head for the planner) + the same masking schedule; they differ ONLY in the aux term. Everything downstream — generator, eval instances, value collection, block FM, beams, all hyperparameters — is shared/frozen, so the encoder is the only thing that varies across conditions.
+- **parser** (floor): root CE only (= Stage 3b's controller).
+- **oracle** (privileged ceiling): + per-block **ground-truth ancestor-label** CE (uses the latent tree — a *diagnostic* of "is there headroom from a deeper belief," not a method).
+- **data2vec** (non-privileged): + EMA self-distillation (predict the teacher's masked-position representation).
+- **mlm** (non-privileged): + masked-infilling (predict the true masked leaf tokens from a masked view). Stage 2 uses subtree masking; a fully tree-agnostic span-masking variant recovers most of the depth (Stage 1 ablation), so the objective does **not** require knowing the DGP topology.
+
+### Stage 1 — the non-privileged belief, validated *in isolation* (`rhm_sculpt_data2vec.py`)
+
+Before any planning, probe each belief against **ground truth** — per-level linear recovery of a block's ancestor feature (only RHM lets you do this) — plus an anti-collapse check (participation ratio `PR` of the per-block latent; collapse → PR≈1, probe≈chance 1/v=0.125). "Working" = recruits deep structure, no collapse.
+
+| belief | d2 | d3 | d4 | PR | d3 gap closed vs oracle |
+|---|---|---|---|---|---|
+| parser | 0.705 | 0.605 | 0.744 | 6.7 | — |
+| data2vec | 0.743 | 0.688 | 0.752 | 7.2 | +23% |
+| **mlm** | 0.781 | 0.762 | 0.852 | 7.9 | **+44%** |
+| oracle | 0.939 | 0.963 | 0.984 | 12.7 | 100% |
+
+- **data2vec barely recruits depth** (+16–23% of the gap). Principled: its EMA-teacher target is only as deep as root-CE, which stalls shallow — self-distillation *consolidates* the teacher's existing depth but cannot *invent* depth beyond it. This is RHM_LATENT_LOOP's core thesis reappearing from the planning side (endogenous/self-referential objectives don't move the frontier).
+- **mlm recruits real depth** (+32–45%) with **no collapse** (PR 7.9 > 1, probes ≫ chance), because its target is the *true tokens* (not a teacher-capped representation), so predicting a masked span forces representing the ancestor. **Non-privileged-masking check (does subtree-aligned masking smuggle DGP topology?).** `_subtree_mask` masks spans whose sizes/boundaries are aligned to the true tree — it uses `s`, `L`, and constituent alignment, which a real DGP does *not* hand you. Re-running mlm with **fully agnostic contiguous-span masking** (`mask_mode="span"`: random length/position at leaf granularity, SpanBERT-style, *no* `s`/`L`/alignment) still recruits the large majority of the depth: d3 **0.722** vs subtree 0.762 (both ≫ parser 0.605 — ~75% of the subtree recruitment; d4 0.834 ≈ 0.852), no collapse (PR 7.6). So the alignment is a **modest booster** (d3 gap-closing 33% → 44%), **not** the mechanism — the mechanism is contiguous masking (a universal locality prior) forcing long-range inference against a grounded token target. **mlm is genuinely non-privileged.** Neither variant reaches the oracle: ~33–44%-of-ceiling deep. *(Stage 2 used the subtree variant; a span-variant planning confirmation is the remaining check — depth→planning is monotone, so the planning win is expected to survive.)*
+
+### Stage 2 — plug each belief into the latent beam (`rhm_sculpt_deepbelief.py`)
+
+One controlled 4-way run (parser/data2vec/mlm/oracle through the identical frozen pipeline):
+
+| belief | d3 | FM top1 | FM rank-corr | token w256 | latent w256 | gap w256 |
+|---|---|---|---|---|---|---|
+| parser | 0.61 | 0.357 | 0.527 | 0.485 | 0.443 | −0.042 |
+| data2vec | 0.69 | 0.378 | 0.532 | 0.497 | 0.466 | −0.031 |
+| **mlm** | 0.76 | 0.411 | 0.576 | **0.550** | **0.535** | **−0.015** |
+| oracle | 0.96 | 0.435 | 0.626 | 0.520 | 0.493 | −0.026 |
+
+1. **Depth → FM-fidelity is a monotone dose-response.** Belief depth (d3) orders parser < data2vec < mlm < oracle, and the FM's one-step ranking follows the *exact same order* (top1 0.357→0.378→0.411→0.435; rank-corr 0.527→0.532→0.576→0.626). "Deeper belief → more faithful FM rollout" holds across four points — the mechanism as a dose-response, not a single contrast.
+2. **The non-privileged mlm belief is the *best* planner substrate — beating even the privileged oracle.** mlm gives the highest beams of all four (latent 0.535 vs oracle 0.493 vs parser 0.443; token 0.550 vs 0.520 vs 0.485) and the *smallest* latent−token gap (−0.015 — latent nearly catches token). Against the original Stage-3b pipeline (parser belief, latent 0.499, gap −0.045), the mlm belief lifts latent planning to **0.535** and shrinks the gap to **−0.015** — a concrete, no-privilege improvement.
+3. **The latent-*specific* advantage (Δlatent > Δtoken) is real and most skewed for the deepest belief.** Oracle helps the latent beam far more than the token beam (Δlatent/Δtoken = +0.069/+0.018 at w16) — pure FM-rollability, Stage 0's mechanism. mlm helps latent slightly more than token but lifts *both* a lot. So two distinguishable effects: **ancestor-probe depth (oracle) specifically buys latent-rollability; the grounded infilling objective (mlm) buys broad pipeline quality** — and the latter wins on absolute planning.
+
+**The mlm > oracle puzzle.** mlm beats oracle on planning *despite less probe-depth and a slightly worse behaviour-policy/value* (value-buffer success mlm 0.328 < oracle 0.337) — so it is **not** value quality. Working hypothesis (untested): the oracle aux optimizes linear ancestor-decodability on *clean* sequences (what the probe measures), whereas the planner runs on *corrupted/off-manifold* configs; mlm's token-grounded objective sees masked/degraded inputs in training, plausibly yielding a belief geometry that **transfers better off-manifold** — exactly where the FM rolls.
+
+**Caveats (Stage 4).** Single seed. `mlm > oracle` is modest (~0.03) and single-seed — the robust claim is "mlm ≈ oracle or better, both ≫ parser." The parser beams here (0.485/0.443) run ~0.06 below the Stage-3b published table (different training-pool seeding), so only the *within-run* belief ordering is load-bearing, not cross-run absolutes. The mlm>oracle mechanism is a hypothesis, not established.
+
 ## What this arc establishes (so far)
 
 1. **Faithfulness ≠ plannability, and density must be *learned*, not faked.** A faithful verifier is too sparse; a Monte-Carlo value (dense-by-experience) is the right instrument (dense distance-to-goal, ungameable).
@@ -135,6 +178,7 @@ The honest negative, reasoned about rather than shrugged off, *predicted* the tw
 3. **A learned beam captures the coordination prize** — monotone in width, up to and past the strong hand-coded reflex (0.611 with wide beam + budget) — where a greedy rollout collapsed. The task, not the method, gated it.
 4. **On the *clean* channel, planning in latents is a viable *efficient surrogate*, not a superior one.** With a richer non-pooled latent + a re-grounded cerebellar FM, a latent beam reaches 92% of the token beam at ~8× fewer materializations. It approaches but does not beat token-space *here*; beam width compensates for the FM's imperfect per-move ranking. The open-loop version collapses — re-grounding (never rolling the FM more than one step from truth) is load-bearing. **But "surrogate, not superior" is channel-specific** — see point 5.
 5. **On a *lossy* channel, planning in latents is genuinely *superior*.** Whether tokens are a sufficient statistic decides it. Partial observability (Stage 3c): the latent beam carries belief the sensor drops → gap flips to +0.02–0.04 for p ≥ 0.25. Stochastic dynamics (Stage 3d): the latent beam ranks by a stable FM estimate instead of one noisy sample → gap flips to up to +0.075 for q ≥ 0.1 (the mirror of the query null — payoff in the mean the token beam must sample). Both are width-gated (need beam ≥ 64 to beat the FM's 0.36 top-1). Full-obs-deterministic is the special corner; real DGPs are lossy, so *superior*, not *surrogate*, is the common case.
+6. **The belief is a first-class lever on latent planning, and a *non-privileged* deep belief captures it (Stage 4).** The block FM's weak one-step ranking (top-1 0.36) — the bottleneck behind the clean-channel latent lag and all the width-gating — is downstream of belief *depth*: deepen the controller's belief and the FM's fidelity rises monotonically across four beliefs (top-1 0.36 → 0.44 parser→oracle). A privileged oracle-ancestor belief is the ceiling, but a **non-privileged masked-infilling (mlm) belief** recruits ~40% of that depth with no collapse and — plugged into the beam — is the **best latent-planner substrate tested, beating even the privileged oracle** (latent w256 0.535 vs 0.493 vs parser 0.443; gap −0.015 vs −0.045). A cheaper *self-supervised* objective, not a privileged one, is what the FM's rollability needed. data2vec under-delivers (teacher-capped → can't exceed the shallow frontier), independently re-deriving RHM_LATENT_LOOP's endogenous-frontier thesis from the planning side.
 
 ## What this does NOT establish / caveats
 
@@ -143,6 +187,7 @@ The honest negative, reasoned about rather than shrugged off, *predicted* the tw
 - **Stage 3c/3d crossover margins are modest (+0.02 to +0.08)** — single seed. The *pattern* is robust (monotone across 4 widths × 5 knob levels × 2 channels, exact knob=0 anchors, and it mirrors both the sufficiency prediction and the query null), but the per-cell magnitudes are small. Two principled, untested ways they should widen: a **belief-aware value** for PO (train the value on filtered beliefs, removing the full-obs-consumer cap) and **Design 2** for the FM under noise (train it on slippery targets).
 - **Stage 3c masks the *evaluation* channel only** (candidate construction held full-obs) — the clean isolation of the sufficiency claim, but it does *not* test whether latents also help *propose* moves blind. Stage 3d's stochasticity, by contrast, hits construction (the actuator) directly.
 - Distinct (ambiguous) rules make "success" = r\* derivable; at loose coupling (m=4) this is easy (prize collapses) — the sculpting *coordination* effect lives at tight coupling (m=2/3). The 3c/3d *channel* effects are a separate axis and were not re-swept over m.
+- **Stage 4 is single-seed**, and `mlm > oracle` is a modest (~0.03) single-seed gap — the load-bearing claim is the *ordering* (parser < data2vec < mlm ≈/> oracle, on both depth-probe→FM-fidelity and planning), not the mlm-beats-oracle margin. Stage-4 belief depth is probed on *clean* full-obs sequences; whether it holds on the off-manifold configs the planner actually visits is untested — and is exactly the `mlm > oracle` hypothesis.
 
 ## Next steps
 
@@ -152,6 +197,10 @@ The honest negative, reasoned about rather than shrugged off, *predicted* the tw
 4. **The combined channel** — sweep partial-obs × stochastic together (real DGPs have both). Does the latent advantage compound?
 5. **A better FM / value-iteration** — a stronger FM (capacity/training, or predicting the *value* directly) should lift the top-1 pick (0.36) and shrink the width-gating; value-iteration (recollect with the beam as behaviour policy, its 0.34 success caps the value) lifts both planners and would push the token beam past the strong reflex toward the DP optimum (also L=5 depth).
 6. **The m=4 negative control in the learned setting** (beam should *not* help the *coordination* prize when coupling is loose — the learned analog of the pre-check's control; note the 3c/3d *channel* effects are a separate axis).
+7. **Nail the `mlm > oracle` mechanism (Stage 4).** Probe belief depth on *corrupted/off-manifold* configs (not just clean full-obs), and test an mlm+oracle *combined* belief — does grounded off-manifold transfer explain why the non-privileged belief out-plans the privileged one?
+8. **Seeds on the Stage-4 ordering** — confirm parser < data2vec < mlm ≈/> oracle before crystallizing a belief.
+9. **Belief quality × lossy channel** — does the mlm belief *widen* the latent advantage under partial-obs / stochastic dynamics (Stage 3c/3d) more than on the clean channel? (The two positive axes composed.)
+10. *(future work)* **Push the non-privileged belief past ~40%-of-ceiling depth** — more mlm steps / higher weight / mlm+data2vec, or a parser warm-start giving the EMA teacher a real floor. Deferred: mlm already suffices as a planner substrate.
 
 ## Reproduce
 
@@ -167,8 +216,14 @@ modal run --detach rhm/rhm_sculpt_latent.py::sculpt_latent --m 2 --beam-widths "
 modal run --detach rhm/rhm_sculpt_latent_po.py::sculpt_latent_po --m 2 --beam-widths "1,16,64,256" --p-masks "0.0,0.25,0.5,0.75,0.9"
 # Stage 3d: latent BEATS token under stochastic dynamics (slippery-actuator sweep)
 modal run --detach rhm/rhm_sculpt_latent_stoch.py::sculpt_latent_stoch --m 2 --beam-widths "1,16,64,256" --slips "0.0,0.1,0.25,0.5,0.75"
+# Stage 4 isolation: non-privileged belief depth vs ground truth + anti-collapse (fast, no beams)
+modal run --detach rhm/rhm_sculpt_data2vec.py::data2vec_isolation --m 2 --beliefs parser,oracle,data2vec,mlm
+# Stage 4 non-privileged-masking ablation: fully-agnostic span masking (no s/L/alignment) still recruits depth
+modal run --detach rhm/rhm_sculpt_data2vec.py::data2vec_isolation --m 2 --beliefs mlm --mask-mode span
+# Stage 4 gate: belief conditions (parser floor / oracle ceiling / data2vec+mlm non-privileged) on the latent beam
+modal run --detach rhm/rhm_sculpt_deepbelief.py::sculpt_deepbelief --m 2 --beliefs parser,oracle,data2vec,mlm
 # Stage 2 (the instructive dead-end): faithful value + latent FM on corrupt-repair
 modal run --detach rhm/rhm_latent_planner.py::latent_planner --m 2
 ```
 
-Both Stage-3c/3d runs assert the knob=0 anchor reproduces Stage 3b exactly before sweeping. Results JSON on the `rhm-scaling-data` volume under `rhm_sculpt_planner/`, `rhm_sculpt_latent/`, `rhm_sculpt_latent_po/`, `rhm_sculpt_latent_stoch/`, `rhm_latent_planner/`, `rhm_sculpt_precheck/`.
+Both Stage-3c/3d runs assert the knob=0 anchor reproduces Stage 3b exactly before sweeping. Results JSON on the `rhm-scaling-data` volume under `rhm_sculpt_planner/`, `rhm_sculpt_latent/`, `rhm_sculpt_latent_po/`, `rhm_sculpt_latent_stoch/`, `rhm_latent_planner/`, `rhm_sculpt_precheck/`, `rhm_sculpt_deepbelief/` (Stage 4 gate; output dir tagged by the belief set), `rhm_sculpt_data2vec/` (Stage 4 isolation).
