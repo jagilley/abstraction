@@ -215,6 +215,106 @@ The 2×2 {parser, mlm} belief × {frozen, planner} internalization, identical do
 
 **Caveats (Stage 5).** Single rule-seed (parser_planner replicated across two independent pipeline draws at that seed; magnitudes are directional, not hardened). The subsumption claim is on plannability-specific metrics (FM top1/rank_corr, the clean-channel gap); mlm_planner remains the best *absolute* cell. The endogenous `fm_cotrain` beam rise is a value/behaviour lift, disentangled from belief plannability by the gap + fresh-FM metrics but not separately ablated. Belief depth is probed on clean full-obs sequences (same scope as Stage 4).
 
+## Does the forward model's *arity* predict length-generalization? (2026-07-14)
+
+**Script**: [`rhm_sculpt_lengthgen.py`](rhm_sculpt_lengthgen.py). **Reading**: reading/human-vision.pdf[^private] — Madan, Ebrahimi, Memisevic, *On Locality and Length Generalization in Visual Reasoning* (ECCV 2026). **Status**: done, single seed (L=4, m=2).
+
+**The question.** The human-vision paper (same Ebrahimi/Memisevic lineage as [self_model_needs_a_loop](../../ideas/self_model_needs_a_loop.md)) shows recurrence + strictly-local perception length-generalizes on visual *state-tracking* (train short, test long) while global single-pass shortcuts break OOD — attributed to an inductive bias (foveation-invariance + recurrence). Our stronger, domain-general claim: the load-bearing variable is the extra **degree of freedom** — a forward self-model of a *controlled* system must take the command as a second input (arity-2, `f(s,u)`); a command-blind arity-1 `f(s)` can only predict the command-*averaged* next state ("received wisdom"), and no capacity buys the missing slot. Adding the command turns an *observational* map (Pearl rung 1) into an *interventional* one (rung 2). Sculpting is the ideal test bed: a non-vision, non-greedily-solvable control task (coordination prize proven combinatorially) with an arity-2 block FM (`FM(z,k)`, the acted region is the command) already built (Stage 3b).
+
+**Apparatus** (`rhm_sculpt_lengthgen.py`). Train the Stage-3b apparatus once at the short range (corruption `c ≤ 3`), freeze it, then sweep the eval **plan length** `c` (budget = `c·s`; the number of coordinated edits — a "#switches" analog holding the perceptual substrate fixed, a *cleaner* isolation than the paper's, which conflates #switches with image size). All conditions share the frozen value + generator + controller: **token beam** (materialize-and-re-encode; arity-2 by construction; width-1 = the myopic reflex/"shortcut"); **latent arity-2** (`FM(z,k)`, the extra DOF) vs **latent arity-1** (command-blind `FM(z)`, MSE-optimum = `E_k[Δz|z]` = reaching's `FM_state`; `value_rank_corr ≡ 0` by construction); beam width ∈ {1,4,16,64} (the coordination/search axis).
+
+### Stage 0 — the coordination prize grows with plan length, gated by coupling (combinatorial, `rhm_sculpt_precheck.py`)
+
+DP optimum = 1.000 everywhere; myopic reflex success (weak / strong r\*-aware):
+
+| c | **m=2** weak / strong | **m=4** weak / strong |
+|---|---|---|
+| 1 | 0.665 / 0.797 | 0.959 / 0.831 |
+| 3 | 0.242 / 0.562 | 0.815 / 0.815 |
+| 6 | 0.049 / 0.877 | 0.640 / 0.999 |
+
+The weak myopic reflex collapses ~13× steeper with plan length at m=2 (0.665→0.049) than m=4 (0.959→0.640) — coordination-over-length is real and knob-gated. **Nuance**: the *strong* r\*-aware reflex's prize is *humped* (peaks c=2–3 at 0.44, declines to 0.12 by c=6) — beyond c≈4 the L=4 task reverts toward regenerate-from-scratch, so `c` is a clean coordination axis only up to ≈4. (Depth `L` is the cleanly monotonic length axis, but needs a variable-length controller — deferred.)
+
+### Round 1 — coordination is the length-gen variable; arity is greedy-only (the generator confound)
+
+Loose budget (`c·s`), token/a2/a1 at greedy (w1) vs wide (w64):
+
+| c | greedy w1 tok/a2/a1 | wide w64 tok/a2/a1 |
+|---|---|---|
+| 1 | 0.639/0.452/0.155 | 0.672/0.672/0.672 |
+| 3 | 0.271/0.106/0.046 | 0.508/0.459/0.430 |
+| 6 | 0.071/0.015/0.026 | 0.274/0.175/0.168 |
+
+**Read 1 (the paper's claim, on a symbolic control task):** coordination = the length-gen variable. The myopic shortcut (token w1) collapses 0.639→0.071 across c; the coordinated planner (token w64) holds 0.672→0.274; the gap opens with length.
+
+**Read 2 (arity, nuanced):** the DOF is load-bearing at **greedy in-distribution** (a2[w1] ≈ 2.5–3× a1[w1] for c ≤ 3), reproducing reaching's arity result, with an airtight diagnostic (a1 `rank_corr ≡ 0`). But it **washes out at wide beam** (a2 ≈ a1) — the **generator confound**: regenerating a *random* region is still an on-manifold move that makes progress, so wide-beam + value-selection compensates for a move-blind FM (unlike reaching's primitive actions, where random = no progress).
+
+### Round 2 — tightening the budget does NOT recover arity at width; the neutralizer is *re-grounding*
+
+Budget-slack sweep at fixed c=3 (d\* ≈ 4.3 tokens):
+
+| move budget | greedy w1 a2/a1 (ratio) | wide w64 a2/a1 (gap) |
+|---|---|---|
+| 3 (tight) | 0.074/0.007 (10.6×) | 0.257/0.242 (+0.015) |
+| 6 | 0.106/0.044 (2.4×) | 0.459/0.430 (+0.029) |
+| 8 (loose) | 0.106/0.073 (1.5×) | 0.479/0.450 (+0.029) |
+
+The wide-beam arity gap is **flat (~0.03, ~1.06× relative) at every budget** — slack was *not* the neutralizer. But tightening the budget **sharpens the greedy arity effect** (ratio 1.5×→10.6× as a1 collapses to 0.007 — random-region greedy wastes a tight budget and damages correct blocks). So the DOF is load-bearing precisely in the no-search regime; the reason search substitutes at width is **structural**: the beam *re-grounds* each step (executes the move, re-encodes the TRUE state) and selects on true states, so the forecast is redundant with cheap act-and-observe.
+
+### Round 3 (finalizer) — remove re-grounding (imagined rollout) and arity becomes load-bearing at *every* width
+
+The forward model is irreplaceable exactly when you must plan *without executing* — an **open-loop imagined rollout** (roll the FM's own predicted latent forward, no re-grounding; execute only the finally-selected move sequence). A move-blind arity-1 FM produces an *identical imagined trajectory for every move sequence*, so it cannot plan at any width. The arity gap (a2 − a1) and what beam **width** does to it:
+
+| c (horizon) | **CLOSED** gap w1 → w64 | **OPEN** gap w1 → w64 |
+|---|---|---|
+| 1 (budget 2) | +0.297 → **+0.000** (erased) | +0.237 → **+0.261** (amplified; 2.5×) |
+| 2 (budget 4) | +0.138 → +0.019 | +0.079 → **+0.161** (3.6×) |
+| 3 (budget 6) | +0.060 → +0.029 | +0.019 → **+0.085** (3.0×) |
+| 4–6 (budget 8–12) | small | → 0 (both collapse) |
+
+At wide beam, c=1: **closed a2/a1 = 0.672/0.672 (identical); open a2/a1 = 0.439/0.178 (2.5×)** — same FM/value/everything, *only re-grounding differs*. The one-sentence mechanism: **in a closed loop, width *substitutes* for arity (gap shrinks to 0 as you widen); in an open loop, width *amplifies* arity (gap grows as you widen)** — a wide beam can only *exploit* the forecast's move-discrimination, never *replace* it. (a1_open is flat in width, ~0.18→0.18: move-blind imagined rollout → random floor at every width.)
+
+**Boundary:** the open-loop advantage holds only while the one-step FM stays veridical (horizon ≤ ~6 steps, c ≤ 3); by c ≥ 4 the imagined rollout drifts and both arities collapse — the one-step-*composition* limit from [REACHING_LOOKAHEAD](../a2a_forward/REACHING_LOOKAHEAD_README.md), which needs explicit multi-step-consistency FM training to extend. *(Tested 2026-07-15 — a dedicated multi-step FM does extend it, incrementally: see [One forward model vs two](#one-forward-model-vs-two-does-a-dedicated-multi-step-fm-extend-the-open-loop-horizon-2026-07-15) below.)*
+
+### The finalized narrative
+
+Three findings compose into one domain-general conditional:
+1. **Coordination (search width) is the length-generalization variable** — the paper's claim, reproduced on a symbolic control task.
+2. **The extra DOF is load-bearing, but its necessity is conditional on whether you can act-and-observe.** In a closed loop with cheap feedback (re-grounding), search substitutes for the forward model (redundant except at greedy; *not* recovered by tightening the budget). In an open loop — planning by imagination — search *cannot* substitute, and the DOF is essential at every width.
+3. **This is the sharp form of the "received-wisdom → empirical" claim.** The forward model's irreplaceable function is **counterfactual simulation**: running yourself forward under commands you haven't issued. Whenever you can cheaply execute-and-observe, search stands in for the model; the model is load-bearing *precisely when you must imagine before acting* — motor control / reaching (narrow-target, expensive feedback), not a broadly-searchable domain with cheap feedback like this one. Arity-1 memorizes "what I tend to do"; only arity-2 answers "what would happen if I did *this*" without doing it.
+
+**Why not a literal narrow-target task** (the fork we considered): narrow-target is *ill-posed in RHM* — the ambiguity (`m` synonyms) that *creates* the coordination prize also *broadens* the target (many valid derivations of r\*); removing it (m=1) makes the task greedy-trivial and the generator deterministic, and region-level commands are too coarse to steer to a specific completion anyway. The open-loop test reaches the same regime (search can't substitute) by removing re-grounding instead of narrowing the target.
+
+**Caveats.** Single seed, single setting (L=4, m=2). The `c`-axis is non-monotonic in coordination beyond c≈4 (Stage 0 hump), so OOD points c∈{5,6} partly mean "more random," not "more coordination"; depth `L` is the clean monotonic axis but needs a variable-length controller. The open-loop DOF advantage is horizon-capped by the one-step-FM composition limit. The learned m=4 negative control (coordination should not extrapolate at loose coupling) is validated combinatorially (Stage 0) but not yet in the learned setting. The generator confound is intrinsic to the broad-target task, not a bug — it *is* the "search substitutes" mechanism.
+
+## One forward model vs two: does a dedicated multi-step FM extend the open-loop horizon? (2026-07-15)
+
+**Script**: [`rhm_sculpt_twofm.py`](rhm_sculpt_twofm.py). **Figure**: [`rhm_sculpt_twofm.png`](rhm_sculpt_twofm.png). **Status**: done, single seed (L=4, m=2).
+
+**The question.** The length-gen Round-3 boundary left a thread: the open-loop imagined rollout stays veridical only to ~6 steps (c ≤ 3), then drifts and both arities collapse — "needs explicit multi-step-consistency FM training to extend." This maps onto the brain's *two* forward models (from the hippocampus discussion): a **cerebellar** one-step FM used *with* feedback (our closed-loop re-grounded beam) vs a **hippocampal** extended rollout used *without* executing — vicarious trial-and-error / forward sweeps (our open-loop imagined rollout). The current apparatus uses ONE FM (one-step objective — it only ever sees TRUE latents in training) for both, so open-loop it must feed its own drifting predictions. Two questions: does splitting the open loop onto a dedicated multi-step FM extend the horizon, and is the *separation* (two organs) load-bearing or just the *objective*?
+
+**Design — single controlled variable = which FM rolls the OPEN loop.** Everything else shared/frozen (controller, generator, MC value, eval instances, the closed-loop beam). Two arity-2 FMs trained on IDENTICAL data (same corrupt levels, generator pre-steps, random moves) differing ONLY in loss horizon: **one-step** (`z,k→Δz` from a true latent) vs **multi-step** (unrolled H≤6 steps, fed its OWN predictions, grad through the composition — removing the one-step FM's train/test mismatch). At H=1 the multi-step loss *reduces to* the one-step loss, so H is the only knob. Three composed conditions: **ONE-FM** {closed_1step, open_1step} (= length-gen); **TWO-FM** {closed_1step, open_multistep}; **MULTISTEP-ONLY** {closed_multistep, open_multistep}. Anchor: c=1/w64 reproduces length-gen Round-3 *exactly* (closed 0.672, open_1step 0.439, open_a1 0.174).
+
+Open-loop success, one-step → multi-step FM (beam width 64; gap = multi − one):
+
+| c (rollout = 2c) | open one-step | open multi-step | closed loop | token |
+|---|---|---|---|---|
+| 1 | 0.439 | 0.469 (+.030) | 0.672 | 0.672 |
+| 2 | 0.223 | 0.285 (+.062) | 0.588 | 0.607 |
+| 3 (train edge) | 0.128 | 0.170 (+.042) | 0.451 | 0.508 |
+| 4 (OOD) | 0.057 | 0.100 (+.043) | 0.332 | 0.416 |
+| 6 (OOD) | 0.012 | 0.034 (+.022) | 0.162 | 0.274 |
+
+Two results:
+
+1. **A dedicated multi-step FM extends the open-loop horizon — incrementally.** open_multistep > open_1step in all 24 cells (6 c × 4 widths), **width-gated and horizon-amplified** (c=6 gap: w1 +.006 → w64 +.022). Mechanism (rollout drift curves): the multi-step FM's imagined displacement stays ~0.05–0.06 cos *more* aligned with the true trajectory across the whole rollout (c=6 plateau 0.67 vs 0.61), and the beam amplifies that per-step edge. But it is a **sharpening, not a new capability**: it recovers only **~14% of the open→closed (imagination) penalty** (9–17% across c) — a collapsing rollout collapses ~one-seventh slower. Nothing like the arity floor→capable step-change (open a2/a1 0.439/0.174, where a command-blind a1 *structurally cannot* plan).
+
+2. **The two-organ SEPARATION is NOT load-bearing here — the OBJECTIVE is.** The multi-step FM costs **nothing** one-step: identical ranking currency (top-1 0.394 vs 0.395, rank-corr 0.525 vs 0.531, Δcos 0.498 vs 0.498) and matched closed-loop beams (closed_multistep ≈ closed_1step, |Δ| ≤ 0.013 across c). So it *strictly dominates* — the multi-step loss is a **superset** of the one-step loss, so at this capacity there is no tradeoff to force specialization. A single multi-step FM therefore serves BOTH loops as well as the specialized pair; two separate networks buy nothing. What the apparatus was missing is a **training objective**, not a second organ. (Consistent with the complementary-learning-systems view of the hippocampus as *fast-adapting cortex* rather than a forward model per se; the brain's cerebellum/hippocampus split is plausibly a biological constraint — the cerebellum must be fast/feedforward for real-time control — that this task doesn't impose.)
+
+**Verdict: filed, not adopted.** The gain is incremental and expresses *only* in the open-loop regime, which this task never *forces* (re-grounding is always available and strictly better). Hidden costs: ~3.5× FM-training compute (unrolled H), BPTT instability at larger H, benefit horizon-bounded by training H (=6), and the no-tradeoff "free lunch" is scoped to this deterministic ample-capacity setting (could break under the Stage-3d stochastic channel, where one-step accuracy and multi-step consistency can diverge). Pick it back up only for a regime with genuinely expensive feedback, where imagined planning is mandatory.
+
+**Caveats.** Single seed, single setting (L=4, m=2). Open-loop stays well below closed/token everywhere — the multi-step FM narrows the imagination penalty, does not erase it. The "why two organs" tradeoff is untested *under capacity pressure* — the sharp deferred follow-up is to shrink FM capacity until one-step accuracy and multi-step consistency genuinely compete for representation, then ask whether a capacity-matched *pair* beats a capacity-matched *single* multi-step FM. Only that would distinguish "objective is the lever" from "separation is genuinely never needed."
+
 ## What this arc establishes (so far)
 
 1. **Faithfulness ≠ plannability, and density must be *learned*, not faked.** A faithful verifier is too sparse; a Monte-Carlo value (dense-by-experience) is the right instrument (dense distance-to-goal, ungameable).
@@ -248,7 +348,7 @@ The 2×2 {parser, mlm} belief × {frozen, planner} internalization, identical do
 10. *(future work)* **Push the non-privileged belief past ~40%-of-ceiling depth** — more mlm steps / higher weight / mlm+data2vec, or a parser warm-start giving the EMA teacher a real floor. Deferred: mlm already suffices as a planner substrate.
 11. **Internalization × lossy channel (Stage 5 × Stage 3c/3d).** Does the plannability-shaped belief *widen* the latent advantage under partial-obs / stochastic dynamics beyond the clean channel? Composes the two big positive axes of the whole arc — grounded internalization already flips the gap on the *clean* channel, so on a lossy channel it should push further.
 12. **Seeds on the Stage-5 ordering** — confirm `frozen < fm_cotrain(caps) < planner` and the subsumption `parser_planner ≈ mlm_planner` (plannability axis) across 1–2 rule-seeds before crystallizing. (parser_planner already replicated across two pipeline draws at seed 0.)
-13. **Continuous internalization (the "does it compound" question).** Stage 5 is one belief-training pass then freeze. The reaching/RHM_LATENT_LOOP analog is an interleaved loop (collect rollouts with the beam as behaviour policy → update value → update FM → update belief), i.e. value-iteration extended to the belief. Prediction (from RHM_LATENT_LOOP): compounds *while the belief frontier is still climbing toward the task's coordination-plannability ceiling*, then exhausts.
+13. ~~**Continuous internalization (the "does it compound" question).**~~ *Done* → [RHM_SCULPT_CONTINUAL_README.md](RHM_SCULPT_CONTINUAL_README.md) (Stage 6). Iterated the loop (A continuous / B one-shot+VI / C value-iter only). **Weak ratchet**: value-iteration is the +0.25 compounding engine (lifts beam 0.59→0.82), one-shot internalization a +0.15 ceiling-setter, continuous re-internalization only +0.02 — the belief frontier **exhausts in one pass** (RHM_LATENT_LOOP's "compounds then exhausts," confirmed on a fixed task). No privatization (fresh FM stays +0.15 > co-trained). Live threads there: non-stationary abstraction-novelty (does it re-open the ratchet?) and pushing value/search toward the DP optimum.
 14. **Ablate-to-floor / map-model coexistence (Stage 5).** The current eval measures the belief's transferable plannability with a *fresh* FM (the "map" is available). The complementary reaching diagnostic — does the *co-trained* running loop *depend* on its own forecast (ablate → floor) while a linear readout still recovers a legible plan-map — was deferred; it would confirm map-and-model coexist here as in reaching.
 
 ## Reproduce
@@ -277,6 +377,19 @@ modal run --detach rhm/rhm_latent_planner.py::latent_planner --m 2
 modal run --detach rhm/rhm_sculpt_internalize.py::sculpt_internalize --m 2
 # Stage 5b: belief-quality × internalization 2×2 (parser/mlm × frozen/planner) — stack vs subsume
 modal run --detach rhm/rhm_sculpt_internalize.py::sculpt_compose --m 2
+# Length-gen × arity × closed-vs-open loop (2026-07-14): coordination is the length-gen
+# variable; arity is load-bearing only when search can't substitute (open-loop imagined rollout).
+# Stage 0 (combinatorial length sweep, m=2 vs m=4 negative control):
+modal run rhm/rhm_sculpt_precheck.py::sculpt_precheck --m 2 --depths "4" --corrupt-blocks "1,2,3,4,5,6"
+modal run rhm/rhm_sculpt_precheck.py::sculpt_precheck --m 4 --depths "4" --corrupt-blocks "1,2,3,4,5,6"
+# Rounds 1-3 (one run: length sweep closed-vs-open at each width + budget-slack sweep at c=3):
+modal run --detach rhm/rhm_sculpt_lengthgen.py::lengthgen --m 2
+# One FM vs two (2026-07-15): one-step "cerebellar" vs multi-step "hippocampal" FM in the
+# open loop; multi-step extends the horizon incrementally, but the objective (not the
+# separation) is the lever — a single multi-step FM serves both loops at no closed-loop cost.
+modal run --detach rhm/rhm_sculpt_twofm.py::twofm --m 2
 ```
 
-Both Stage-3c/3d runs assert the knob=0 anchor reproduces Stage 3b exactly before sweeping. Results JSON on the `rhm-scaling-data` volume under `rhm_sculpt_planner/`, `rhm_sculpt_latent/`, `rhm_sculpt_latent_po/`, `rhm_sculpt_latent_stoch/`, `rhm_latent_planner/`, `rhm_sculpt_precheck/`, `rhm_sculpt_deepbelief/` (Stage 4 gate; output dir tagged by the belief set), `rhm_sculpt_data2vec/` (Stage 4 isolation), `rhm_sculpt_internalize/` (Stage 5 ladder tagged by rung set; Stage 5b tagged `compose_<mask_mode>`).
+Both Stage-3c/3d runs assert the knob=0 anchor reproduces Stage 3b exactly before sweeping. Results JSON on the `rhm-scaling-data` volume under `rhm_sculpt_planner/`, `rhm_sculpt_latent/`, `rhm_sculpt_latent_po/`, `rhm_sculpt_latent_stoch/`, `rhm_latent_planner/`, `rhm_sculpt_precheck/`, `rhm_sculpt_deepbelief/` (Stage 4 gate; output dir tagged by the belief set), `rhm_sculpt_data2vec/` (Stage 4 isolation), `rhm_sculpt_internalize/` (Stage 5 ladder tagged by rung set; Stage 5b tagged `compose_<mask_mode>`), `rhm_sculpt_twofm/` (one-FM-vs-two).
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
