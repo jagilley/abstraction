@@ -1,19 +1,19 @@
 # Active-Vision Looped ViT — the "missing u" (efference copy) test
 
-**Idea doc**: [ideas/self_model_needs_a_loop.md](../../ideas/self_model_needs_a_loop.md) (the "missing u" thread)
-**Parent experiments**: [README.md](README.md) (feedforward a2a arc), [LOOPED_README.md](LOOPED_README.md) (the weight-shared looped arc, incl. the negative runnable-simulator probe this explains)
+**Idea doc**: [ideas/self_model_needs_a_loop.md](../../../ideas/self_model_needs_a_loop.md) (the "missing u" thread)
+**Parent experiments**: [README.md](../README.md) (feedforward a2a arc), [LOOPED_README.md](../LOOPED_README.md) (the weight-shared looped arc, incl. the negative runnable-simulator probe this explains)
 **Status**: Observational half **done, positive** (single seed): a genuine command `u` creates command-conditional dynamics that a command-blind forward model cannot predict *at any capacity*, collapsing when the command is removed. Causal-injection half **done, null with a diagnosis** (2026-07-10): the loop does not causally use the injected efference-copy forecast, and the reason (below) redirects the productive next step to a *control* task. **Control-regime port done, positive** (2026-07-10, 3 MNIST seeds + Fashion): on a foveal-reaching control task, an arity-2 forward self-model is *causally usable for planning* while an arity-1 one is stuck at the random floor at every capacity — the positive the perception-task injection could not produce. See ["Causal use in the control regime"](#causal-use-in-the-control-regime-the-null-flips-when-the-objective-is-endogenous-2026-07-10) below.
 **Date**: 2026-07-09 (observational), 2026-07-10 (causal null + control-regime port)
 
 ## The claim being tested
 
-From the discussion behind [self_model_needs_a_loop.md](../../ideas/self_model_needs_a_loop.md): the a2a forward model predicts `s_{t+1} = f(s_t)` — it conditions only on the current state. A **cerebellar** forward model predicts `s_{t+1} = f(s_t, u_t)` — it also conditions on an **efference copy** of the command `u_t` the system is about to issue, available *before* the consequence. The a2a model "dropped the `u`."
+From the discussion behind [self_model_needs_a_loop.md](../../../ideas/self_model_needs_a_loop.md): the a2a forward model predicts `s_{t+1} = f(s_t)` — it conditions only on the current state. A **cerebellar** forward model predicts `s_{t+1} = f(s_t, u_t)` — it also conditions on an **efference copy** of the command `u_t` the system is about to issue, available *before* the consequence. The a2a model "dropped the `u`."
 
 The load-bearing consequence, in one sentence:
 
 > **Arity, not resolution.** A forward model of a *controlled* system must take the command as a second input (be **arity-2**, `f(s, u)`). A command-blind **arity-1** model `f(s)` can only predict the command-*averaged* next state — and no amount of extra capacity ("resolution") can fix a missing input slot. Absorbing "what I tend to do" over many passes sharpens `f(s)`'s resolution; it never grows its arity.
 
-("Arity" = the number of arguments a function takes.) This predicts *why* the looped runnable-simulator probe was negative on MNIST ([LOOPED_README](LOOPED_README.md#near-manifold-self-map-extrapolation--is-the-self-map-a-runnable-simulator-2026-07-09)): plain MNIST classification is an **autonomous** system (`f(s)`, no command), so there was nothing to run a counterfactual over. Give the loop a real `u` and the arity-2 structure becomes both present and necessary.
+("Arity" = the number of arguments a function takes.) This predicts *why* the looped runnable-simulator probe was negative on MNIST ([LOOPED_README](../LOOPED_README.md#near-manifold-self-map-extrapolation--is-the-self-map-a-runnable-simulator-2026-07-09)): plain MNIST classification is an **autonomous** system (`f(s)`, no command), so there was nothing to run a counterfactual over. Give the loop a real `u` and the arity-2 structure becomes both present and necessary.
 
 ## What we built
 
@@ -36,7 +36,7 @@ Both are swept across capacity (`d_head ∈ {4,8,16,32,64}`) to test arity-vs-re
 
 ### Two design corrections the pilot forced (load-bearing gotchas)
 
-1. **Predict the update, not the next state.** Predicting the full `s_{t+1}` let `FM_state` score ~0.94 just by echoing the slowly-varying carried state — the same degenerate self-decodability [LOOPED_README](LOOPED_README.md) flagged. Predicting `Δ_t = s_{t+1} − s_t` (where the command's effect actually lives) exposed the real structure (`cmd_rel_spread` 0.04 → 0.24).
+1. **Predict the update, not the next state.** Predicting the full `s_{t+1}` let `FM_state` score ~0.94 just by echoing the slowly-varying carried state — the same degenerate self-decodability [LOOPED_README](../LOOPED_README.md) flagged. Predicting `Δ_t = s_{t+1} − s_t` (where the command's effect actually lives) exposed the real structure (`cmd_rel_spread` 0.04 → 0.24).
 2. **The efference copy must be delivered *spatially*.** Encoding `u` as one global vector broadcast to all positions made `FM_eff` *worse* than `FM_state` — because the command acts by *localizing which positions update*, so a broadcast vector is just noise everywhere. Delivering it as a per-position "about-to-be-revealed here" marker (a function of `u` only, no content) flipped `FM_eff` above `FM_state`. This is itself a small confirmation of the framing: the command's information is *where*, so the self-model needs it *where*.
 
 ## Headline result (single seed; 4000 main / 3000 FM steps)
@@ -62,7 +62,7 @@ Metric definitions: `cmd_rel_spread` = relative deviation of the update `Δ_t` a
 **Two internal controls strengthen it:**
 
 - **Same-architecture command-blindness cap.** `FM_state` predicts the *autonomous* full-view loop *better* (0.915) than the *controlled* glimpse loop (0.901). Identical architecture — so the 0.90 glimpse ceiling is genuine command-blindness, not undertraining or optimization failure.
-- **The arity gap scales with loop-necessity.** Fashion's loop is more load-bearing than MNIST's, and Fashion shows a *larger* gap on every measure (spread 0.31 > 0.24; cmd-conditional 0.67 > 0.54; whole-update Δ 0.051 > 0.024; cmd-diff 0.50 > 0.36). The harder the task's sequential integration, the more the command matters — the same channel × loop-necessity interaction signature as the [LOOPED_README baseline battery](LOOPED_README.md#baseline-battery--the-dependency-is-not-forecast-specific-but-its-scaling-is-2026-07-09).
+- **The arity gap scales with loop-necessity.** Fashion's loop is more load-bearing than MNIST's, and Fashion shows a *larger* gap on every measure (spread 0.31 > 0.24; cmd-conditional 0.67 > 0.54; whole-update Δ 0.051 > 0.024; cmd-diff 0.50 > 0.36). The harder the task's sequential integration, the more the command matters — the same channel × loop-necessity interaction signature as the [LOOPED_README baseline battery](../LOOPED_README.md#baseline-battery--the-dependency-is-not-forecast-specific-but-its-scaling-is-2026-07-09).
 
 **Why `FM_eff` is 0.54/0.67 and not ~1 is correct, not a shortfall.** `FM_eff` knows *where* it will look, not *what is there*, so it predicts the *expected* command-driven update before the reafference arrives. The residual (`1 − 0.54`) is the unobserved pixel content — exactly the cerebellar ceiling (a forward model predicts the expected consequence of a command, then the real sensation corrects it).
 
@@ -135,24 +135,24 @@ Reference controllers (all runs): **`model_free` ceiling ≈ +1.0**, **`random` 
 ```bash
 cd experiments/
 # The test (glimpse loop -> FM_state vs FM_eff capacity sweep -> counterfactual eval)
-modal run --detach a2a_forward/mnist_active_vision.py::active_vision --dataset mnist
-modal run --detach a2a_forward/mnist_active_vision.py::active_vision --dataset fashion_mnist
+modal run --detach a2a_forward/reaching/mnist_active_vision.py::active_vision --dataset mnist
+modal run --detach a2a_forward/reaching/mnist_active_vision.py::active_vision --dataset fashion_mnist
 # The no-u control (command inert)
-modal run --detach a2a_forward/mnist_active_vision.py::active_vision --dataset mnist --full-view
+modal run --detach a2a_forward/reaching/mnist_active_vision.py::active_vision --dataset mnist --full-view
 
 # Causal-injection arm (null): OL / CL_state / CL_eff, co-trained. --full-view = control.
 for c in ol cl_state cl_eff; do
-  modal run --detach a2a_forward/mnist_active_vision_causal.py::train_condition --condition $c --dataset fashion_mnist
+  modal run --detach a2a_forward/reaching/mnist_active_vision_causal.py::train_condition --condition $c --dataset fashion_mnist
 done
 # Delayed-feedback sweep (null): content arrives d steps late.
 for d in 0 1 2 3; do for c in ol cl_state cl_eff; do
-  modal run --detach a2a_forward/mnist_active_vision_delay.py::train_condition --condition $c --dataset fashion_mnist --content-delay $d
+  modal run --detach a2a_forward/reaching/mnist_active_vision_delay.py::train_condition --condition $c --dataset fashion_mnist --content-delay $d
 done; done
 
 # Control-regime port (positive): foveal reaching -> FM sweep -> MB planner.
 # --with-content = content-glimpse footprint (primary); omit it for the blank-nav ablation.
-modal run --detach a2a_forward/mnist_reaching.py::reaching --with-content --dataset mnist --seed 42
-modal run --detach a2a_forward/mnist_reaching.py::reaching --with-content --dataset fashion_mnist --seed 42
+modal run --detach a2a_forward/reaching/mnist_reaching.py::reaching --with-content --dataset mnist --seed 42
+modal run --detach a2a_forward/reaching/mnist_reaching.py::reaching --with-content --dataset fashion_mnist --seed 42
 ```
 
 Results JSON under `/data/a2a_forward/{mnist_active_vision,mnist_active_vision_causal,mnist_active_vision_delay,mnist_reaching}/...`.

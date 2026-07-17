@@ -30,9 +30,9 @@ fresh_data mode: each wake cycle generates a fresh corpus from the same
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_sparse_ratchet::rhm_sparse_ratchet
+  modal run --detach -m rhm.ratchet.rhm_sparse_ratchet::rhm_sparse_ratchet
   # Fresh data variant:
-  modal run --detach -m rhm.rhm_sparse_ratchet::rhm_sparse_ratchet --fresh-data
+  modal run --detach -m rhm.ratchet.rhm_sparse_ratchet::rhm_sparse_ratchet --fresh-data
 """
 
 import json

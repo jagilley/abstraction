@@ -1,7 +1,7 @@
 # Multi-step lookahead: does the one-step self-forecast COMPOSE into a runnable simulator?
 
-**Idea doc**: [ideas/self_model_needs_a_loop.md](../../ideas/self_model_needs_a_loop.md) ("run a rough forward pass on yourself, off to the side" = an N-step FM rollout; the central open question is whether one-step fixed-point self-consistency is *sufficient* for usable near-manifold counterfactuals or only the seed)
-**Parent**: [REACHING_INTERNAL_README.md](REACHING_INTERNAL_README.md) (the endogenous one-step self-forecast that came out a transferable, task-relevant self-model — its live next step was exactly this composition test), [ACTIVE_VISION_README.md](ACTIVE_VISION_README.md), [README.md](README.md)
+**Idea doc**: [ideas/self_model_needs_a_loop.md](../../../ideas/self_model_needs_a_loop.md) ("run a rough forward pass on yourself, off to the side" = an N-step FM rollout; the central open question is whether one-step fixed-point self-consistency is *sufficient* for usable near-manifold counterfactuals or only the seed)
+**Parent**: [REACHING_INTERNAL_README.md](REACHING_INTERNAL_README.md) (the endogenous one-step self-forecast that came out a transferable, task-relevant self-model — its live next step was exactly this composition test), [ACTIVE_VISION_README.md](ACTIVE_VISION_README.md), [README.md](../README.md)
 **Code**: `mnist_reaching_lookahead.py`, `reaching_vit.py`
 **Status**: Done, positive-with-a-sharp-dissociation (single seed × {obstacles, maze} × MNIST; env-MPC control done). Multi-step-FM round + perfect-simulator control both agree.
 **Date**: 2026-07-11
@@ -70,7 +70,7 @@ Two operators: `mf` (model-free head; = the decoupled operator) and `int_plan` (
 
 ## Interpretation — where this leaves the self-model question
 
-On the [self_model_needs_a_loop](../../ideas/self_model_needs_a_loop.md) discriminators the composition question **resolves into two separable axes**, and the earlier outcome-A/B/C framing was too coarse:
+On the [self_model_needs_a_loop](../../../ideas/self_model_needs_a_loop.md) discriminators the composition question **resolves into two separable axes**, and the earlier outcome-A/B/C framing was too coarse:
 
 - **Simulator axis (veridical composition): outcome A, and loop-gated.** A deeply-composable, near-full-state-veridical runnable simulator over the operator *is* buildable — but only *because* closing the loop reorganized the operator into composable dynamics (it is not learnable on the `mf` operator). "Run a rough forward pass on yourself off to the side" is realizable to horizon 8 at 99% fidelity on the looped operator. This is the strongest positive of the arc for the runnable-simulator thesis.
 - **Control axis (usefulness of the forecast): governed by value-alignment, not fidelity.** The forecast that actually *helps the controller* is the value-shaped co-trained one — which is a poor full-state simulator but beats even a perfect simulator with the same planner. So the self-model's payoff is **value-relevant selectivity** (the parent's finding, now shown to *dominate* veridicality for control), consistent with a2a gauge symmetry and the division-of-labor reframe.
@@ -93,20 +93,20 @@ On the [self_model_needs_a_loop](../../ideas/self_model_needs_a_loop.md) discrim
 ```bash
 cd experiments/
 # Baseline (one-step FMs) + veridicality, all three geometries:
-modal run --detach a2a_forward/mnist_reaching_lookahead.py::lookahead_reaching --geometry obstacles
-modal run --detach a2a_forward/mnist_reaching_lookahead.py::lookahead_reaching --geometry maze
-modal run --detach a2a_forward/mnist_reaching_lookahead.py::lookahead_reaching --geometry occluded
+modal run --detach a2a_forward/reaching/mnist_reaching_lookahead.py::lookahead_reaching --geometry obstacles
+modal run --detach a2a_forward/reaching/mnist_reaching_lookahead.py::lookahead_reaching --geometry maze
+modal run --detach a2a_forward/reaching/mnist_reaching_lookahead.py::lookahead_reaching --geometry occluded
 
 # Multi-step-consistency FMs (the A-vs-C sharpener), obstacles + maze, both operators:
-modal run --detach a2a_forward/mnist_reaching_lookahead.py::lookahead_reaching \
+modal run --detach a2a_forward/reaching/mnist_reaching_lookahead.py::lookahead_reaching \
   --geometry obstacles --fm-compose-horizons "4,8" --tag-suffix "_ms"
-modal run --detach a2a_forward/mnist_reaching_lookahead.py::lookahead_reaching \
+modal run --detach a2a_forward/reaching/mnist_reaching_lookahead.py::lookahead_reaching \
   --geometry maze --fm-compose-horizons "4,8" --tag-suffix "_ms"
 
 # Perfect-simulator MPC control (fast, no training):
-modal run --detach a2a_forward/mnist_reaching_lookahead.py::lookahead_reaching \
+modal run --detach a2a_forward/reaching/mnist_reaching_lookahead.py::lookahead_reaching \
   --geometry obstacles --env-mpc-only --depths "1,2,4,6,8,10" --tag-suffix "_envmpc"
-modal run --detach a2a_forward/mnist_reaching_lookahead.py::lookahead_reaching \
+modal run --detach a2a_forward/reaching/mnist_reaching_lookahead.py::lookahead_reaching \
   --geometry maze --env-mpc-only --depths "1,2,4,6,8,10" --tag-suffix "_envmpc"
 ```
 

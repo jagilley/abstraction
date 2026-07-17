@@ -28,9 +28,9 @@ post-pretrain baseline, saves results and halts early.
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended
-  modal run --detach -m rhm.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended --weight-decay-mode sleep
-  modal run --detach -m rhm.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended --weight-decay-mode wake
+  modal run --detach -m rhm.ratchet.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended
+  modal run --detach -m rhm.ratchet.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended --weight-decay-mode sleep
+  modal run --detach -m rhm.ratchet.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended --weight-decay-mode wake
 """
 
 import json
@@ -38,7 +38,7 @@ import os
 import modal
 
 from rhm.shared import volume, DATA_DIR, NumpyEncoder, setting_key
-from rhm.rhm_rl_ratchet import (
+from rhm.ratchet.rhm_rl_ratchet import (
     _position_levels,
     _suffix_position_levels,
     _eval_per_level,
@@ -48,7 +48,7 @@ from rhm.rhm_rl_ratchet import (
     _generate_suffix,
     _compute_per_layer_eta2,
 )
-from rhm.rhm_rl_gen_distill import _generate_suffix_with_logits
+from rhm.ratchet.rhm_rl_gen_distill import _generate_suffix_with_logits
 
 image = (
     modal.Image.debian_slim(python_version="3.11")

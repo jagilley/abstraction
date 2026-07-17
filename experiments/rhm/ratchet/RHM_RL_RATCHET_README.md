@@ -1,7 +1,7 @@
 # RHM RL Ratchet: REINFORCE with FM Supervision (2026-06-25)
 
 **Code**: `rhm_rl_ratchet.py`
-**Prior experiments**: [RHM sparse ratchet](RHM_SPARSE_RATCHET_README.md), [FM as DGP approximation](PER_LEVEL_LOSS_README.md#fm-as-dgp-approximation-2026-06-21), [MNIST gated ratchet](../a2a_forward/GATED_RATCHET_README.md)
+**Prior experiments**: [RHM sparse ratchet](RHM_SPARSE_RATCHET_README.md), [FM as DGP approximation](../PER_LEVEL_LOSS_README.md#fm-as-dgp-approximation-2026-06-21), [MNIST gated ratchet](../../a2a_forward/GATED_RATCHET_README.md)
 
 ## Motivation
 
@@ -15,7 +15,7 @@ RL reward is sparse AND rich, like classification. A single scalar reward for a 
 
 ### The FM DGP alignment establishes the necessary condition
 
-The [FM as DGP approximation](PER_LEVEL_LOSS_README.md#fm-as-dgp-approximation-2026-06-21) analysis showed that the FM captures 91-97% of the feature-conditioned structure at learned hierarchy levels, and is 12-13% more DGP-aligned than the main model at intermediate layers. The FM genuinely learns the composition rules. The ratchet's prior failure on RHM was not because the FM learns garbage — the training setup (dense NTP) didn't create conditions where the FM's knowledge was useful.
+The [FM as DGP approximation](../PER_LEVEL_LOSS_README.md#fm-as-dgp-approximation-2026-06-21) analysis showed that the FM captures 91-97% of the feature-conditioned structure at learned hierarchy levels, and is 12-13% more DGP-aligned than the main model at intermediate layers. The FM genuinely learns the composition rules. The ratchet's prior failure on RHM was not because the FM learns garbage — the training setup (dense NTP) didn't create conditions where the FM's knowledge was useful.
 
 ### Predictions
 
@@ -568,63 +568,63 @@ The FM cosine result (0.911 vs 0.997) confirms the mechanism: NTP distillation w
 cd experiments/
 
 # Run 1: No NTP regularization (all 4 conditions)
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --lambda-ntp 0.0 --ntp-mask-rate 0.0
 
 # Run 2: Dense NTP regularization (all 4 conditions)
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --lambda-ntp 1.0 --ntp-mask-rate 0.0
 
 # Run 3: Sparse NTP regularization (RL_FM only)
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --lambda-ntp 1.0 --ntp-mask-rate 0.95 --only-rl-fm
 
 # Run 4: No distillation (RL_FM only)
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --distill-steps 0 --ntp-mask-rate 0.95
 
 # Run 5: Smaller FM (25.8K) + ratchet
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --fwd-d-head 8 --fwd-mlp-mult 0.25 --ntp-mask-rate 0.95
 
 # Run 6: Small FM (13.5K) + ratchet
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --fwd-d-head 4 --fwd-mlp-mult 0.125 --ntp-mask-rate 0.95
 
 # Run 7a: Tiny FM (7.3K) + ratchet
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --fwd-d-head 2 --fwd-mlp-mult 0.0625 --ntp-mask-rate 0.95
 
 # Run 7b: Small FM (13.5K) + reduced local loss
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --fwd-d-head 4 --fwd-mlp-mult 0.125 --lambda-local 0.1 --ntp-mask-rate 0.95
 
 # Run 8: No local loss, m=2, 5-block gap
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --lambda-local 0.0 --ntp-mask-rate 0.95 --run-tag no_ll_m2
 
 # Run 9: No local loss, m=4, 5-block gap
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --lambda-local 0.0 --ntp-mask-rate 0.95 --m 4 --run-tag no_ll_m4
 
 # Run 10: No local loss, m=2, 3-block gap
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --lambda-local 0.0 --ntp-mask-rate 0.95 \
   --predict-to post_block3 --run-tag no_ll_gap3
 
 # Run 11: 3-block gap, λ_local=0.01 stabilizer
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --lambda-local 0.01 --ntp-mask-rate 0.95 \
   --predict-to post_block3 --run-tag gap3_ll001
 
 # Run 12: 3-block gap, λ_local=0.001 stabilizer
-modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet \
+modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet \
   --only-rl-fm --lambda-local 0.001 --ntp-mask-rate 0.95 \
   --predict-to post_block3 --run-tag gap3_ll0001
 ```
 
 # Run 13: Generation-based distillation (gen_distill vs ntp_distill)
-modal run --detach -m rhm.rhm_rl_gen_distill::rhm_rl_gen_distill
+modal run --detach -m rhm.ratchet.rhm_rl_gen_distill::rhm_rl_gen_distill
 ```
 
 Results saved to `rhm-scaling-data` volume at `rhm_rl_ratchet/v8_s2_L6_m2*`, `rhm_rl_ratchet/v8_s2_L6_m4*`, and `rhm_rl_gen_distill/v8_s2_L6_m2/`. Runs 8-12 use `--run-tag` to avoid overwriting each other.

@@ -1,7 +1,7 @@
 # RHM Sparse Ratchet at L=4: Overparameterization Test (2026-06-24)
 
 **Code**: `rhm_sparse_ratchet.py` (same code, `--depth 4`)
-**Prior experiments**: [RHM sparse ratchet at L=6](RHM_SPARSE_RATCHET_README.md), [MNIST gated ratchet](../a2a_forward/GATED_RATCHET_README.md)
+**Prior experiments**: [RHM sparse ratchet at L=6](RHM_SPARSE_RATCHET_README.md), [MNIST gated ratchet](../../a2a_forward/GATED_RATCHET_README.md)
 
 ## Goal
 
@@ -147,7 +147,7 @@ The capacity/overparameterization explanation has been ruled out by this experim
 
 ```bash
 cd experiments/
-modal run --detach -m rhm.rhm_sparse_ratchet::rhm_sparse_ratchet \
+modal run --detach -m rhm.ratchet.rhm_sparse_ratchet::rhm_sparse_ratchet \
   --depth 4 --mask-rates "0.0,0.75,0.90,0.95"
 ```
 

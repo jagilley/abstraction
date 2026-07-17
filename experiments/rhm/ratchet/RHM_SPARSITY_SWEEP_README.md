@@ -1,7 +1,7 @@
 # RHM Sparsity Sweep: Process Supervision as a Function of NTP Sparsity (2026-06-24)
 
 **Code**: `rhm_sparsity_sweep.py`
-**Prior experiments**: [RHM ratchet](RHM_RATCHET_README.md), [MNIST local loss](../a2a_forward/MNIST_LOCAL_LOSS_README.md), [Language ratchet](../a2a_forward/LANGUAGE_RATCHET_README.md)
+**Prior experiments**: [RHM ratchet](RHM_RATCHET_README.md), [MNIST local loss](../../a2a_forward/MNIST_LOCAL_LOSS_README.md), [Language ratchet](../../a2a_forward/LANGUAGE_RATCHET_README.md)
 
 ## Goal
 
@@ -145,14 +145,14 @@ The 38× OL robustness improvement from mask=0.0 to mask=0.95 suggests that dens
 cd experiments/
 
 # Full sweep (5 mask rates × 2 conditions, ~4-5 hours on L4)
-modal run --detach -m rhm.rhm_sparsity_sweep::rhm_sparsity_sweep
+modal run --detach -m rhm.ratchet.rhm_sparsity_sweep::rhm_sparsity_sweep
 
 # Custom mask rates
-modal run --detach -m rhm.rhm_sparsity_sweep::rhm_sparsity_sweep \
+modal run --detach -m rhm.ratchet.rhm_sparsity_sweep::rhm_sparsity_sweep \
   --mask-rates "0.0,0.8,0.9,0.95,0.98"
 
 # Different m (e.g., m=4 where model learns fewer levels)
-modal run --detach -m rhm.rhm_sparsity_sweep::rhm_sparsity_sweep --m 4
+modal run --detach -m rhm.ratchet.rhm_sparsity_sweep::rhm_sparsity_sweep --m 4
 ```
 
 Results saved to `rhm-scaling-data` volume at `/data/rhm_sparsity_sweep/v8_s2_L6_m2/results.json`.

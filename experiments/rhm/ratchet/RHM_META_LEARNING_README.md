@@ -1,7 +1,7 @@
 # RHM Meta-Learning Experiments (2026-06-27 — 2026-06-29)
 
 **Code**: `rhm_meta_learning.py`, `rhm_meta_learning_l2.py`, `rhm_reptile.py`, `rhm_reptile_sparse.py`
-**Prior experiments**: [FOMAML ratchet (single rule set)](RHM_FOMAML_README.md), [Sparse ratchet](RHM_SPARSE_RATCHET_README.md), [RL ratchet & gen-distill](RHM_RL_RATCHET_README.md), [Loss weighting](LOSS_WEIGHTING_README.md)
+**Prior experiments**: [FOMAML ratchet (single rule set)](RHM_FOMAML_README.md), [Sparse ratchet](RHM_SPARSE_RATCHET_README.md), [RL ratchet & gen-distill](RHM_RL_RATCHET_README.md), [Loss weighting](../LOSS_WEIGHTING_README.md)
 **Conversation**: `conversations/claude-code-transcripts/readable/80f9a4b4-75c6-474e-b8e5-08905c8e9acf.md`
 
 ## Motivation
@@ -215,18 +215,18 @@ The conceptual analysis (Student 2 learns transferable structure from diverse ex
 cd experiments/
 
 # Experiment 1: FOMAML (run 3 — update-matched, 5K meta-steps)
-modal run --detach -m rhm.rhm_meta_learning::rhm_meta_learning \
+modal run --detach -m rhm.ratchet.rhm_meta_learning::rhm_meta_learning \
     --n-meta-steps 5000 --k-inner 50 --k-eval 10000 --eval-ckpt-interval 1000
 
 # Experiment 2: L2+ outer loss
-modal run --detach -m rhm.rhm_meta_learning_l2::rhm_meta_learning_l2
+modal run --detach -m rhm.ratchet.rhm_meta_learning_l2::rhm_meta_learning_l2
 
 # Experiment 3: Reptile (dense)
-modal run --detach -m rhm.rhm_reptile::rhm_reptile \
+modal run --detach -m rhm.ratchet.rhm_reptile::rhm_reptile \
     --n-meta-steps 100 --k-inner 2000 --train-eval-interval 5
 
 # Experiment 4: Sparse Reptile (key experiment)
-modal run --detach -m rhm.rhm_reptile_sparse::rhm_reptile_sparse
+modal run --detach -m rhm.ratchet.rhm_reptile_sparse::rhm_reptile_sparse
 ```
 
 Results saved to `rhm-scaling-data` volume at `/data/rhm_meta_learning/`, `/data/rhm_meta_learning_l2/`, `/data/rhm_reptile/`, `/data/rhm_reptile_sparse/`.

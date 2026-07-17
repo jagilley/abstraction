@@ -156,10 +156,10 @@ The key unique contribution of the ratchet is the **per-level pattern**: the cyc
 cd experiments/
 
 # Run 1: gated local loss (WS + OL at 3 mask rates)
-modal run --detach -m rhm.rhm_sparse_ratchet::rhm_sparse_ratchet
+modal run --detach -m rhm.ratchet.rhm_sparse_ratchet::rhm_sparse_ratchet
 
 # Run 2: fixed local loss (WS only, reuses OL from Run 1)
-modal run --detach -m rhm.rhm_sparse_ratchet::rhm_sparse_ratchet \
+modal run --detach -m rhm.ratchet.rhm_sparse_ratchet::rhm_sparse_ratchet \
   --fixed-local-loss --skip-ol
 ```
 

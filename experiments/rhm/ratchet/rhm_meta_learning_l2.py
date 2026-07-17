@@ -23,7 +23,7 @@ Four conditions (update-matched on model updates):
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_meta_learning_l2::rhm_meta_learning_l2
+  modal run --detach -m rhm.ratchet.rhm_meta_learning_l2::rhm_meta_learning_l2
 """
 
 import json
@@ -32,7 +32,7 @@ import modal
 
 from rhm.shared import volume, DATA_DIR, NumpyEncoder
 from rhm.rhm_data import generate_rules, generate_sequences_batched
-from rhm.rhm_rl_ratchet import (
+from rhm.ratchet.rhm_rl_ratchet import (
     _position_levels,
     _eval_per_level,
     _generate_with_traces,

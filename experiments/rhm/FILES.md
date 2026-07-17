@@ -25,17 +25,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `rhm_focal_loss.py` | Focal loss sweep: does confidence-based position weighting shift learning from m to L? |
 | `rhm_confidence_threshold.py` | Confidence threshold sweep: aggressive gradient reallocation + scaled model |
 | `rhm_fm_weighted_ntp.py` | FM-surprise-weighted NTP: principled gradient reallocation via self-model surprise |
-| `rhm_ratchet.py` | Unified gate ratchet with confidence thresholding: meta-learning signature vs m-sharpening |
-| `rhm_sparse_ratchet.py` | Sparse ratchet: WS_UG_uniform with NTP masking, gated vs fixed local loss |
-| `rhm_rl_ratchet.py` | RL ratchet: REINFORCE with FM supervision for generation + FM cosine regime sweep |
-| `rhm_rl_gen_distill.py` | Generation-based distillation: KL on teacher-generated suffixes + CE on NTP |
-| `rhm_rl_gen_distill_extended.py` | Extended gen-distill: 40-cycle ratchet + weight decay experiments |
-| `rhm_fomaml_ratchet.py` | FOMAML ratchet: bilevel meta-learning with dense NTP wake + NTP outer |
-| `rhm_fomaml_rl_ratchet.py` | FOMAML RL ratchet: bilevel meta-learning with RL wake + per-level NTP outer |
-| `rhm_meta_learning.py` | Meta-learning: FOMAML with rule-set transfer for compositional learning |
-| `rhm_meta_learning_l2.py` | Meta-learning: L2+-only outer loss FOMAML with rule-set transfer |
-| `rhm_reptile.py` | Meta-learning: Reptile with rule-set transfer (dense inner loop) |
-| `rhm_reptile_sparse.py` | Meta-learning: Reptile with sparse L2+ inner loop + rule-set transfer |
+| `ratchet/` *(subpackage)* | **Ratchet / meta-learning arc (concluded, negative)** — `rhm_ratchet`, `rhm_sparse_ratchet`, `rhm_sparsity_sweep`, `rhm_rl_ratchet`, `rhm_rl_gen_distill{,_extended}`, `rhm_fomaml_rl_ratchet`, `rhm_meta_learning{,_l2}`, `rhm_reptile{,_sparse}` + their writeups. Per-file purposes and reproduction commands: [ratchet/README.md](ratchet/README.md) |
 | `rhm_fm_regularizer.py` | FM-as-regularizer: structured FM-predictability pressure vs weight decay (functional-complexity floor) |
 | `rhm_latent_loop.py` | Latent-loop 2×2: target (token vs oracle-latent) × loop (open vs closed); λ_local sweep; fresh-FM ensemble. Also hosts the specialization bucket's Exp 2 `ntp_levelfocus@<β>` conditions (aligned deep-skew NTP reweighting; β=0 = uniform-aligned control) — finding: reweighting the token loss toward deep levels is *harmful* (monotone-worse depth), only the direct oracle-latent target recruits depth. See specialization/README.md |
 | `rhm_ensemble_trajectory.py` | Fresh-FM-ensemble residual invariance over saved training checkpoints (complexodynamics: transient scaffolding vs DGP floor) |
@@ -73,13 +63,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `PER_LEVEL_EXPANSION_README.md` | [Per-level expansion: ceiling is set by synonymity, not capacity](PER_LEVEL_EXPANSION_README.md) |
 | `LABEL_SMOOTHING_README.md` | [Label smoothing experiment](LABEL_SMOOTHING_README.md) |
 | `LOSS_WEIGHTING_README.md` | [Loss weighting experiments: focal loss, confidence threshold, FM-surprise NTP](LOSS_WEIGHTING_README.md) |
-| `RHM_RATCHET_README.md` | [Unified gate ratchet with confidence thresholding](RHM_RATCHET_README.md) |
-| `RHM_SPARSE_RATCHET_README.md` | [Sparse ratchet: wake-sleep with NTP masking](RHM_SPARSE_RATCHET_README.md) |
-| `RHM_L4_RATCHET_README.md` | [Sparse ratchet at L=4: overparameterization test](RHM_L4_RATCHET_README.md) |
-| `RHM_RL_RATCHET_README.md` | [RL ratchet: REINFORCE with FM supervision](RHM_RL_RATCHET_README.md) |
-| `RHM_RL_GEN_DISTILL_EXTENDED_README.md` | [Gen-distill extended: 40-cycle ratchet + weight decay](RHM_RL_GEN_DISTILL_EXTENDED_README.md) |
-| `RHM_FOMAML_README.md` | [FOMAML ratchet: bilevel meta-learning diagnostic (3 outer objectives)](RHM_FOMAML_README.md) |
-| `RHM_META_LEARNING_README.md` | [Meta-learning with rule-set transfer: FOMAML, Reptile, sparse L2+ inner](RHM_META_LEARNING_README.md) |
+| `ratchet/` *(subpackage)* | **Ratchet / meta-learning arc (concluded, negative)** — pan-arc summary + 9 per-experiment writeups (RHM_RATCHET, _M2, SPARSITY_SWEEP, SPARSE_RATCHET, L4_RATCHET, RL_RATCHET, RL_GEN_DISTILL_EXTENDED, FOMAML, META_LEARNING): [ratchet/README.md](ratchet/README.md) |
 | `RHM_FRONTIER_AND_LEGIBILITY_README.md` | [m gates the learnable frontier; FM residual tracks it; WD sweep (norm vs rank)](RHM_FRONTIER_AND_LEGIBILITY_README.md) |
 | `RHM_FM_REGULARIZER_README.md` | [FM-as-regularizer beats weight decay's functional-complexity floor](RHM_FM_REGULARIZER_README.md) |
 | `RHM_LATENT_LOOP_README.md` | [Latent target is load-bearing for generalizable self-knowledge on RHM](RHM_LATENT_LOOP_README.md) |

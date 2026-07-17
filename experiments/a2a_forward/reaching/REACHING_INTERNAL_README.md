@@ -1,7 +1,7 @@
 # Internalized forecasting on the reaching control task — endogenous self-forecast vs decoupled external planner
 
-**Idea doc**: [ideas/self_model_needs_a_loop.md](../../ideas/self_model_needs_a_loop.md) (internalization; map-vs-model; the runnable-simulator question)
-**Parent experiments**: [ACTIVE_VISION_README.md](ACTIVE_VISION_README.md) (the control-regime port + the EXTERNAL-planner positive this internalizes), [README.md](README.md) (the feedforward a2a arc)
+**Idea doc**: [ideas/self_model_needs_a_loop.md](../../../ideas/self_model_needs_a_loop.md) (internalization; map-vs-model; the runnable-simulator question)
+**Parent experiments**: [ACTIVE_VISION_README.md](ACTIVE_VISION_README.md) (the control-regime port + the EXTERNAL-planner positive this internalizes), [README.md](../README.md) (the feedforward a2a arc)
 **Code**: `mnist_reaching_internal.py`, `reaching_vit.py`
 **Status**: Done, positive + two rounds of sharpening (single seed per dataset: MNIST + Fashion; both agree). **Diagnostics round 1 (2026-07-10)** corrected "both couplings drift to advisor": the *planner* coupling produces a transferable, task-relevant self-model. **Reading-ladder round 2 (2026-07-10)** corrected "only injection produces an advisor": only *raw-scalar* injection does — injection with the **thalamic-relay gate** (`CerebellarGate`, the gate the prior a2a arc actually used) or an explicit readout is also transferable. See [Collusion vs selectivity](#collusion-vs-selectivity-diagnostics-the-advisor-reading-was-coupling-specific-2026-07-10) and [The reading ladder](#the-reading-ladder-transferability-is-gated-by-how-much-the-forecast-is-read-2026-07-10).
 **Date**: 2026-07-10
@@ -93,9 +93,9 @@ The original `int_inject` used a **raw unbounded scalar** gate (`inject = gate·
 
 ## Interpretation — where this leaves the "self-model" question
 
-On the [self_model_needs_a_loop](../../ideas/self_model_needs_a_loop.md) discriminators, **causal necessity now passes cleanly** in the control regime: an endogenous, causally-load-bearing self-forecast that measurably reorganizes the representation. But the honest sharpening is the payload:
+On the [self_model_needs_a_loop](../../../ideas/self_model_needs_a_loop.md) discriminators, **causal necessity now passes cleanly** in the control regime: an endogenous, causally-load-bearing self-forecast that measurably reorganizes the representation. But the honest sharpening is the payload:
 
-- **The planner path produces a genuine (task-relevant) self-model, not an advisor** (per the diagnostics above): selective on the value-relevant subspace and transferable to an independent consumer. Its low full-vector Δ-cos is correct selectivity, not untethering. So on the [self_model_needs_a_loop](../../ideas/self_model_needs_a_loop.md) discriminators the planner path yields a *separable, causally-used, queryable* forecast — closer to a "model" than we first credited. (What it has *not* shown is *full-state* veridicality or *fixed-point self-consistency* of the whole operator with its own forecast — the forecast is faithful on what the task uses, silent elsewhere.)
+- **The planner path produces a genuine (task-relevant) self-model, not an advisor** (per the diagnostics above): selective on the value-relevant subspace and transferable to an independent consumer. Its low full-vector Δ-cos is correct selectivity, not untethering. So on the [self_model_needs_a_loop](../../../ideas/self_model_needs_a_loop.md) discriminators the planner path yields a *separable, causally-used, queryable* forecast — closer to a "model" than we first credited. (What it has *not* shown is *full-state* veridicality or *fixed-point self-consistency* of the whole operator with its own forecast — the forecast is faithful on what the task uses, silent elsewhere.)
 - **This is architecturally the *right* shape, not a shortfall (division of labor).** If the main model perfectly internalized the forward model, the cerebellum would be redundant — biology keeps it. The map-model coexistence we measured *is* that division of labor: the operator's latent linear-decodable plan is the coarse "vague idea of what the FM would say," the separable ablation-critical FM is the high-fidelity thing it calls. What looked like "we didn't fully internalize" is plausibly the target.
 - **Where the "true simulator" lives is reframed by the control regime.** The main forward pass runs *one* real trajectory; it cannot answer "what if I took action `a` instead" without taking it. The thing that simulates *alternatives off to the side* is the **separable FM** (queryable without committing — the planner's whole trick), doing something the forward pass structurally can't. The planner's FM *does* do this veridically enough to transfer; the injection's does not.
 
@@ -118,13 +118,13 @@ On the [self_model_needs_a_loop](../../ideas/self_model_needs_a_loop.md) discrim
 ```bash
 cd experiments/
 # Round-1 conditions (planner vs injection vs arity-1 control):
-modal run --detach a2a_forward/mnist_reaching_internal.py::internal_reaching --dataset mnist
-modal run --detach a2a_forward/mnist_reaching_internal.py::internal_reaching --dataset fashion_mnist
+modal run --detach a2a_forward/reaching/mnist_reaching_internal.py::internal_reaching --dataset mnist
+modal run --detach a2a_forward/reaching/mnist_reaching_internal.py::internal_reaching --dataset fashion_mnist
 # conditions default to mf,int_plan,int_inject,int_plan_state; fm_aux_lambda default 1.0
 
 # Round-2 reading ladder (raw scalar vs thalamic proj vs explicit readout); --tag-suffix
 # avoids clobbering the round-1 results:
-modal run --detach a2a_forward/mnist_reaching_internal.py::internal_reaching --dataset mnist \
+modal run --detach a2a_forward/reaching/mnist_reaching_internal.py::internal_reaching --dataset mnist \
   --conditions "mf,int_plan,int_inject,int_inject_proj,int_inject_readout" --tag-suffix "_ladder"
 ```
 

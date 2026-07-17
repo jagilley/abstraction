@@ -20,7 +20,7 @@ DGP: L=6, m=4, v=8, s=2 (seq_len=64)
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_ratchet::rhm_ratchet_sweep
+  modal run --detach -m rhm.ratchet.rhm_ratchet::rhm_ratchet_sweep
 """
 
 import json

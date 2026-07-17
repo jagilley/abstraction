@@ -31,7 +31,7 @@ Three conditions, all compute-matched:
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_fomaml_rl_ratchet::rhm_fomaml_rl_ratchet
+  modal run --detach -m rhm.ratchet.rhm_fomaml_rl_ratchet::rhm_fomaml_rl_ratchet
 """
 
 import json
@@ -39,7 +39,7 @@ import os
 import modal
 
 from rhm.shared import volume, DATA_DIR, NumpyEncoder, setting_key
-from rhm.rhm_rl_ratchet import (
+from rhm.ratchet.rhm_rl_ratchet import (
     _position_levels,
     _suffix_position_levels,
     _eval_per_level,

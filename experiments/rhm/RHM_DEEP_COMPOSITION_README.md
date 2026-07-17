@@ -3,7 +3,7 @@
 **Code**: `rhm_local_signal.py` + `rhm_local_signal_sweeps.py` (training-free signal & inference ceilings), `rhm_thread_b.py` (trained-transformer probing + oracle-aux), `rhm_masked_span.py` + `rhm_invariance.py` (self-supervised objective search). Modal/GPU for the trained-model parts.
 
 **One-line arc**: the deep compositional structure in RHM is **recoverable** (optimal inference, Exp. 3) and **representable** by a vanilla transformer given the right signal (oracle-aux, Exp. 4d) — but is **not learnable** by any self-supervised local objective we tried (Exp. 4–5); the high-level signal is intrinsically diluted, so it must come from privileged supervision or an easier regime/curriculum.
-**Prior experiment**: [RHM_META_LEARNING_README.md](RHM_META_LEARNING_README.md) (the meta-learning nulls that motivated going inward)
+**Prior experiment**: [RHM_META_LEARNING_README.md](ratchet/RHM_META_LEARNING_README.md) (the meta-learning nulls that motivated going inward)
 **Theory**: `conversations/Claude-Meta-learning for hierarchical structure discovery in RHM.md` (the cluster-and-lift / local-signal hypothesis being tested here)
 
 ## Motivation

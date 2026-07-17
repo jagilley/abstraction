@@ -1,7 +1,7 @@
 # RHM FOMAML Ratchet Experiments (2026-06-26)
 
 **Code**: `rhm_fomaml_ratchet.py` (NTP wake), `rhm_fomaml_rl_ratchet.py` (RL wake)
-**Prior experiments**: [MNIST gated ratchet](../a2a_forward/GATED_RATCHET_README.md), [RHM gen-distill](RHM_RL_RATCHET_README.md#run-13-generation-based-distillation-2026-06-25), [RHM gen-distill extended](RHM_RL_GEN_DISTILL_EXTENDED_README.md)
+**Prior experiments**: [MNIST gated ratchet](../../a2a_forward/GATED_RATCHET_README.md), [RHM gen-distill](RHM_RL_RATCHET_README.md#run-13-generation-based-distillation-2026-06-25), [RHM gen-distill extended](RHM_RL_GEN_DISTILL_EXTENDED_README.md)
 
 ## Motivation
 
@@ -134,11 +134,11 @@ The MNIST equivalence (FOMAML = unified gate = uniform local loss) was specific 
 cd experiments/
 
 # Experiment 1: Dense NTP wake + NTP outer
-modal run --detach -m rhm.rhm_fomaml_ratchet::rhm_fomaml_ratchet
+modal run --detach -m rhm.ratchet.rhm_fomaml_ratchet::rhm_fomaml_ratchet
 
 # Experiment 2: RL wake + RL outer (original rhm_fomaml_rl_ratchet before edits)
 # Not directly reproducible from current code; see git history
 
 # Experiment 3: RL wake + per-level NTP outer (current code)
-modal run --detach -m rhm.rhm_fomaml_rl_ratchet::rhm_fomaml_rl_ratchet
+modal run --detach -m rhm.ratchet.rhm_fomaml_rl_ratchet::rhm_fomaml_rl_ratchet
 ```

@@ -137,7 +137,7 @@ RHM is the right substrate: ground-truth latents let us check whether downstream
 - Does cancellation compose with the **weight-shared loop** to give *both* producer=consumer *and* forecast-separability — the full self-model — or do they interfere?
 - Does the whitening/decorrelation effect lift the abstraction level of downstream computation (the "modality nudges representations up the ladder" thread from the parent doc), now that downstream sees only the surprising part?
 - Does cancellation change the *content* of self-knowledge from *legibility* (map) toward a genuine *model*, per the map-vs-model axis — i.e. is routing the residual through computation sufficient to make the self-forecast causally-used-as-a-model even feedforward?
-- Interaction with **internalization**: once the FM is internalized (endogenous self-forecast, per [REACHING_INTERNAL](../experiments/a2a_forward/REACHING_INTERNAL_README.md)), cancellation subtracts the model's *own* forecast — the purest efference copy. Does internalized-cancellation behave differently from external-FM cancellation?
+- Interaction with **internalization**: once the FM is internalized (endogenous self-forecast, per [REACHING_INTERNAL](../experiments/a2a_forward/reaching/REACHING_INTERNAL_README.md)), cancellation subtracts the model's *own* forecast — the purest efference copy. Does internalized-cancellation behave differently from external-FM cancellation?
 
 ## Context pointers for a future agent
 

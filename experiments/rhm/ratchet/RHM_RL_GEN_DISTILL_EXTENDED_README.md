@@ -19,7 +19,7 @@ Same setup as gen-distill run 13, extended to 40 cycles:
 
 Per-cycle measurements: val loss, per-level NTP loss, per-layer feature eta², generation accuracy (with and without FM), FM cosine, gate stats, activation norms. Self-knowledge probes and robustness at milestones (every 10 cycles).
 
-**Reproduction**: `modal run --detach -m rhm.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended`
+**Reproduction**: `modal run --detach -m rhm.ratchet.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended`
 
 ## Results (25 of 40 cycles complete)
 
@@ -119,8 +119,8 @@ The theoretical concern with wake WD: NTP gradient is dominated by level 0 (~51%
 
 **Reproduction**:
 ```bash
-modal run --detach -m rhm.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended --weight-decay-mode sleep
-modal run --detach -m rhm.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended --weight-decay-mode wake
+modal run --detach -m rhm.ratchet.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended --weight-decay-mode sleep
+modal run --detach -m rhm.ratchet.rhm_rl_gen_distill_extended::rhm_rl_gen_distill_extended --weight-decay-mode wake
 ```
 
 ### Results (15 cycles)

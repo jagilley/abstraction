@@ -21,7 +21,7 @@ Both use: sparse NTP (mask=0.95), lambda_local=1.0, 4 cycles, default FM.
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_rl_gen_distill::rhm_rl_gen_distill
+  modal run --detach -m rhm.ratchet.rhm_rl_gen_distill::rhm_rl_gen_distill
 """
 
 import json
@@ -29,7 +29,7 @@ import os
 import modal
 
 from rhm.shared import volume, DATA_DIR, NumpyEncoder, setting_key
-from rhm.rhm_rl_ratchet import (
+from rhm.ratchet.rhm_rl_ratchet import (
     _position_levels,
     _suffix_position_levels,
     _eval_per_level,

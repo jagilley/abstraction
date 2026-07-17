@@ -12,7 +12,7 @@ that FOMAML at K=50-500 never reached.
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_reptile::rhm_reptile
+  modal run --detach -m rhm.ratchet.rhm_reptile::rhm_reptile
 """
 
 import json
@@ -22,7 +22,7 @@ import modal
 
 from rhm.shared import volume, DATA_DIR, NumpyEncoder
 from rhm.rhm_data import generate_rules, generate_sequences_batched
-from rhm.rhm_rl_ratchet import (
+from rhm.ratchet.rhm_rl_ratchet import (
     _eval_per_level,
     _generate_with_traces,
     _compute_per_layer_eta2,

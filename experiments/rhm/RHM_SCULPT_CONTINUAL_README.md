@@ -4,7 +4,7 @@
 **Date**: 2026-07-13
 **Script**: [`rhm_sculpt_continual.py`](rhm_sculpt_continual.py) (`sculpt_continual` entrypoint).
 **Parent**: [RHM_SCULPTING_README.md](RHM_SCULPTING_README.md) Stage 5 (one-shot internalization — the grounded planner reshapes the belief once, then freeze). This iterates that.
-**Cousins**: [a2a REACHING_INTERNAL](../a2a_forward/REACHING_INTERNAL_README.md) (the internalization move), [RHM_LATENT_LOOP](RHM_LATENT_LOOP_README.md) (the frontier-moving/exhausts prediction), [a2a CANCELLATION](../a2a_forward/CANCELLATION_README.md) (the entanglement/privatization diagnostic).
+**Cousins**: [a2a REACHING_INTERNAL](../a2a_forward/reaching/REACHING_INTERNAL_README.md) (the internalization move), [RHM_LATENT_LOOP](RHM_LATENT_LOOP_README.md) (the frontier-moving/exhausts prediction), [a2a CANCELLATION](../a2a_forward/CANCELLATION_README.md) (the entanglement/privatization diagnostic).
 
 ---
 

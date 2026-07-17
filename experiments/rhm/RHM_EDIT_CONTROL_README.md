@@ -3,7 +3,7 @@
 **Status**: **WIP.** Part 1 (editing-as-control) and Part 2 (on-manifold generative planning) done, single seed per setting, m ∈ {2,3,4}. Part 3 (planning in *latents* — the stated payoff) not yet built. Results discussed but not yet crystallized as beliefs.
 **Date**: 2026-07-11
 **Scripts**: [`rhm_edit_control.py`](rhm_edit_control.py) (Part 1: editing arity battery + reveal contrast + ground-truth judge), [`rhm_generative_planner.py`](rhm_generative_planner.py) (Part 2: generator-defined on-manifold moves + cerebellar self-consistency veto). New grammar utilities in [`rhm_data.py`](rhm_data.py): `generate_rules_invertible`, `build_inverse_maps`, `parse_leaves`.
-**Origin / sibling**: this is the execution of [ACTIVE_RHM_README.md](ACTIVE_RHM_README.md) **next-step #4** ("to see the internalization/self-model phenomenon in the RHM *domain* it must be a genuine control task — an agent that edits/writes tokens toward a target root, not information-gathering"). The reaching-control analog it is measured against: [a2a_forward/REACHING_INTERNAL_README.md](../a2a_forward/REACHING_INTERNAL_README.md), [a2a_forward/ACTIVE_VISION_README.md](../a2a_forward/ACTIVE_VISION_README.md).
+**Origin / sibling**: this is the execution of [ACTIVE_RHM_README.md](ACTIVE_RHM_README.md) **next-step #4** ("to see the internalization/self-model phenomenon in the RHM *domain* it must be a genuine control task — an agent that edits/writes tokens toward a target root, not information-gathering"). The reaching-control analog it is measured against: [a2a_forward/reaching/REACHING_INTERNAL_README.md](../a2a_forward/reaching/REACHING_INTERNAL_README.md), [a2a_forward/reaching/ACTIVE_VISION_README.md](../a2a_forward/reaching/ACTIVE_VISION_README.md).
 
 ---
 

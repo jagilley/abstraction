@@ -1,7 +1,7 @@
 # MuJoCo control substrate — a controllable physical-dynamics DGP between RHM and language
 
 **Idea doc**: [ideas/physical_control_substrate.md](../../ideas/physical_control_substrate.md)
-**Cousins**: a2a reaching arc ([REACHING_INTERNAL](../a2a_forward/REACHING_INTERNAL_README.md), [ACTIVE_VISION](../a2a_forward/ACTIVE_VISION_README.md)), [RHM sculpting](../rhm/RHM_SCULPTING_README.md)
+**Cousins**: a2a reaching arc ([REACHING_INTERNAL](../a2a_forward/reaching/REACHING_INTERNAL_README.md), [ACTIVE_VISION](../a2a_forward/reaching/ACTIVE_VISION_README.md)), [RHM sculpting](../rhm/RHM_SCULPTING_README.md)
 **Status**: cut #1 (contact-residual structure) done, single seed. File index in [FILES.md](FILES.md).
 
 ## What this is
@@ -64,7 +64,7 @@ An onset-aligned event-triggered average (573 impacts) shows the residual **spik
 
 ## Cut #2 — Arity on torque (`arity_torque.py`)
 
-**Claim** (the a2a/RHM arity thread — [ACTIVE_VISION](../a2a_forward/ACTIVE_VISION_README.md), [REACHING_INTERNAL](../a2a_forward/REACHING_INTERNAL_README.md), RHM length-gen — now on a **real actuator**): a forward model of a *controlled* system must take the command as a second input. An arity-2 `f(s,u)` predicts command-driven dynamics; an arity-1 command-blind `f(s)` can only predict the command-averaged next state `E_u[Δs|s]`, and **no capacity buys the missing slot**. Adding the command turns an observational map (Pearl rung 1) into an interventional one (rung 2).
+**Claim** (the a2a/RHM arity thread — [ACTIVE_VISION](../a2a_forward/reaching/ACTIVE_VISION_README.md), [REACHING_INTERNAL](../a2a_forward/reaching/REACHING_INTERNAL_README.md), RHM length-gen — now on a **real actuator**): a forward model of a *controlled* system must take the command as a second input. An arity-2 `f(s,u)` predicts command-driven dynamics; an arity-1 command-blind `f(s)` can only predict the command-averaged next state `E_u[Δs|s]`, and **no capacity buys the missing slot**. Adding the command turns an observational map (Pearl rung 1) into an interventional one (rung 2).
 
 **The confound to kill** (the RHM "received-wisdom"/generator confound): if the scripted command `u` is a deterministic function of `s`, arity-1 recovers `u` from `s` and there is no gap. We collect with **i.i.d. commands** (`theta=1, seek_gain=0`), so `u_t ⊥ s_t` exactly — measured **max |corr(u,s)| = 0.003**. Arity is evaluated on **free-flight** test transitions (contact is cut #1's regime; wall-bounce velocity reversals are unpredictable from anything and would cap *both* arities' ceiling, hiding that arity-2 fully captures the smooth command-driven dynamics).
 
@@ -120,7 +120,7 @@ Sweeping the MB planner's open-loop commit length (FMs trained once — they are
 | oracle FM | 0.016 | 0.015 | 0.014 | 0.017 | 0.021 | 0.033 |
 | **reward-free benefit** (stale − refit) | **+0.005** | +0.012 | +0.030 | +0.049 | **+0.071** | +0.048 |
 
-The reward-free-adaptation benefit **grows with commitment horizon** (feedback tolerates a stale model when you re-ground every step; committing does not), and the refit **tracks the oracle throughout** (~5000 reward-free transitions recover ~all of a fully-adapted model's value at every commitment length). **Bonus — the turnover at 12**: even the *oracle* degrades (0.033) because no one-step FM composes over a 12-step open-loop rollout — the **~6–8-step composition horizon** from [REACHING_LOOKAHEAD](../a2a_forward/REACHING_LOOKAHEAD_README.md) reappearing on physics. The value of an accurate model peaks where the model is maximally load-bearing *and still veridical enough to compose*.
+The reward-free-adaptation benefit **grows with commitment horizon** (feedback tolerates a stale model when you re-ground every step; committing does not), and the refit **tracks the oracle throughout** (~5000 reward-free transitions recover ~all of a fully-adapted model's value at every commitment length). **Bonus — the turnover at 12**: even the *oracle* degrades (0.033) because no one-step FM composes over a 12-step open-loop rollout — the **~6–8-step composition horizon** from [REACHING_LOOKAHEAD](../a2a_forward/reaching/REACHING_LOOKAHEAD_README.md) reappearing on physics. The value of an accurate model peaks where the model is maximally load-bearing *and still veridical enough to compose*.
 
 ### Caveats
 - **Protocol-fair (confound fixed).** MF is a committing motor-program policy with the *same* open-loop commit as MB, so both degrade **identically** at zero-shot (0.087) — the earlier commit-vs-reactive confound (a reactive MF that re-grounded every step) is removed. The agents differ *only* in how they re-adapt. (`figures/dynshift_full_v2/` holds the earlier reactive-MF run for the record; `full_v3` is the fair one.)

@@ -27,7 +27,7 @@ Design:
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_rl_ratchet::rhm_rl_ratchet
+  modal run --detach -m rhm.ratchet.rhm_rl_ratchet::rhm_rl_ratchet
 """
 
 import json

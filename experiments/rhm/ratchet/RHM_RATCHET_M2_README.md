@@ -146,13 +146,13 @@ For reference, the same metrics from the m=4 ratchet and the MNIST/language ratc
 cd experiments/
 
 # λ=1.0 (local loss ON)
-modal run --detach -m rhm.rhm_ratchet::rhm_ratchet_sweep \
+modal run --detach -m rhm.ratchet.rhm_ratchet::rhm_ratchet_sweep \
   --m 2 --thresholds 1.0 \
   --fwd-n-layer 1 --fwd-d-head 16 --fwd-mlp-mult 0.5 \
   --predict-to post_block5
 
 # λ=0.0 (local loss OFF)
-modal run --detach -m rhm.rhm_ratchet::rhm_ratchet_sweep \
+modal run --detach -m rhm.ratchet.rhm_ratchet::rhm_ratchet_sweep \
   --m 2 --thresholds 1.0 --lambda-local 0.0 \
   --fwd-n-layer 1 --fwd-d-head 16 --fwd-mlp-mult 0.5 \
   --predict-to post_block5

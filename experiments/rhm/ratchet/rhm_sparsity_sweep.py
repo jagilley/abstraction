@@ -20,7 +20,7 @@ As mask rate increases, the LL-OL gap should widen monotonically.
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_sparsity_sweep::rhm_sparsity_sweep
+  modal run --detach -m rhm.ratchet.rhm_sparsity_sweep::rhm_sparsity_sweep
 """
 
 import json

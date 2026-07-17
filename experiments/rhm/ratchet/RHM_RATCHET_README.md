@@ -1,7 +1,7 @@
 # RHM Unified Gate Ratchet with Confidence Thresholding (2026-06-23)
 
 **Code**: `rhm_ratchet.py`
-**Prior experiments**: [MNIST gated ratchet](../a2a_forward/GATED_RATCHET_README.md), [Language ratchet](../a2a_forward/LANGUAGE_RATCHET_README.md), [Confidence threshold sweep](LOSS_WEIGHTING_README.md)
+**Prior experiments**: [MNIST gated ratchet](../../a2a_forward/GATED_RATCHET_README.md), [Language ratchet](../../a2a_forward/LANGUAGE_RATCHET_README.md), [Confidence threshold sweep](../LOSS_WEIGHTING_README.md)
 
 ## Goal
 
@@ -197,12 +197,12 @@ The RHM's controllable DGP could distinguish these explanations: a lower-m setti
 cd experiments/
 
 # Run 2 (capacity-matched FM, main results)
-modal run --detach -m rhm.rhm_ratchet::rhm_ratchet_sweep \
+modal run --detach -m rhm.ratchet.rhm_ratchet::rhm_ratchet_sweep \
   --fwd-n-layer 1 --fwd-d-head 16 --fwd-mlp-mult 0.5 \
   --predict-to post_block5
 
 # Run 1 (oversized FM, for reference)
-modal run --detach -m rhm.rhm_ratchet::rhm_ratchet_sweep
+modal run --detach -m rhm.ratchet.rhm_ratchet::rhm_ratchet_sweep
 ```
 
 Results saved to `rhm-scaling-data` volume at `/data/rhm_ratchet/results.json`.

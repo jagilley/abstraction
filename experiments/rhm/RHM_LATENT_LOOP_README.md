@@ -12,7 +12,7 @@ Closing the cerebellar loop produces **generalizable self-knowledge on RHM for t
 
 ## Why this experiment
 
-We had a standing blind spot: the closed-loop self-knowledge that appears robustly on MNIST and language had **never** shown up on RHM (fresh-FM Δ R²(CL−OL) was zero or negative everywhere — [RHM_SPARSE_RATCHET](RHM_SPARSE_RATCHET_README.md) even saw it *invert*). The sleep-chunking line reframed the whole RHM program as implicitly about **latent vs token targets** and isolated the load-bearing variable: **what you train the model to predict**, not what you feed it. This experiment crosses that variable with the self-knowledge loop to ask whether they are orthogonal — and, if not, why.
+We had a standing blind spot: the closed-loop self-knowledge that appears robustly on MNIST and language had **never** shown up on RHM (fresh-FM Δ R²(CL−OL) was zero or negative everywhere — [RHM_SPARSE_RATCHET](ratchet/RHM_SPARSE_RATCHET_README.md) even saw it *invert*). The sleep-chunking line reframed the whole RHM program as implicitly about **latent vs token targets** and isolated the load-bearing variable: **what you train the model to predict**, not what you feed it. This experiment crosses that variable with the self-knowledge loop to ask whether they are orthogonal — and, if not, why.
 
 Two knobs, kept as **separate additive loss terms** so the factorial is clean:
 

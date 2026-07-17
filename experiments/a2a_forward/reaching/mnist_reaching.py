@@ -84,7 +84,7 @@ def reaching(
     import torch.nn as nn
     import torch.nn.functional as F
     import numpy as np
-    from a2a_forward.reaching_vit import ReachingLoopedViT, ACTION_DELTAS
+    from a2a_forward.reaching.reaching_vit import ReachingLoopedViT, ACTION_DELTAS
     from a2a_forward.forward_model import TransformerForwardModel
 
     device = "cuda" if torch.cuda.is_available() else "cpu"

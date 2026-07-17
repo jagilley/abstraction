@@ -30,7 +30,7 @@ Heavy diagnostics:
 
 Reproduction:
   cd experiments/
-  modal run --detach -m rhm.rhm_reptile_sparse::rhm_reptile_sparse
+  modal run --detach -m rhm.ratchet.rhm_reptile_sparse::rhm_reptile_sparse
 """
 
 import json
@@ -39,7 +39,7 @@ import modal
 
 from rhm.shared import volume, DATA_DIR, NumpyEncoder
 from rhm.rhm_data import generate_rules, generate_sequences_batched
-from rhm.rhm_rl_ratchet import (
+from rhm.ratchet.rhm_rl_ratchet import (
     _position_levels,
     _eval_per_level,
     _generate_with_traces,
