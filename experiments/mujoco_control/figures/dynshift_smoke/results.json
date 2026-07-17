@@ -1,0 +1,156 @@
+{
+  "config": {
+    "tag": "smoke",
+    "seed": 0,
+    "frame_skip": 12,
+    "H": 26,
+    "goal_range": 0.5,
+    "start_range": 0.5,
+    "v0_std": 0.3,
+    "success_eps": 0.1,
+    "v_explore": 1.2,
+    "collect_ep_len": 20,
+    "collect_pos_range": 1.0,
+    "dgp_base": {
+      "arena_half": 2.0,
+      "pusher_mass": 1.0,
+      "joint_damping": 2.0,
+      "gear": 10.0
+    },
+    "shift_mass": 1.0,
+    "shift_damping": 0.05,
+    "K": 96,
+    "H_plan": 12,
+    "vel_pen": 0.5,
+    "replan_every": 8,
+    "cem_iters": 3,
+    "cem_elite": 12,
+    "cem_init_sigma": 0.8,
+    "fm_hidden": 128,
+    "fm_layers": 2,
+    "fm_epochs": 15,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "n_fm": 3000,
+    "adapt_epochs": 30,
+    "n_oracle": 2000,
+    "pol_hidden": 256,
+    "pol_layers": 3,
+    "pol_lr": 0.001,
+    "pol_batch": 512,
+    "bc_epochs": 80,
+    "n_bc_ep": 512,
+    "batch_ep": 24,
+    "rl_lr": 0.001,
+    "rl_sigma": 0.2,
+    "rl_batch": 32,
+    "reward_free_budgets": [
+      0,
+      500,
+      2000
+    ],
+    "reward_driven_budgets": [
+      512,
+      2048
+    ],
+    "n_eval": 24
+  },
+  "dgp0": {
+    "arena_half": 2.0,
+    "pusher_mass": 1.0,
+    "joint_damping": 2.0,
+    "gear": 10.0
+  },
+  "dgp1": {
+    "arena_half": 2.0,
+    "pusher_mass": 1.0,
+    "joint_damping": 0.05,
+    "gear": 10.0
+  },
+  "fm_r2_d0": 0.9991327420798981,
+  "fm_r2_oracle": 0.9956442729947604,
+  "random_floor_d0": {
+    "mean_dist": 0.5578041672706604,
+    "median_dist": 0.5233618021011353,
+    "success": 0.0
+  },
+  "random_floor_d1": {
+    "mean_dist": 0.5628197193145752,
+    "median_dist": 0.4987749457359314,
+    "success": 0.041666666666666664
+  },
+  "mb_d0": {
+    "mean_dist": 0.02445737086236477,
+    "median_dist": 0.009738223627209663,
+    "success": 0.9583333333333334
+  },
+  "mf_d0": {
+    "mean_dist": 0.022965794429183006,
+    "median_dist": 0.009727884083986282,
+    "success": 0.9166666666666666
+  },
+  "mb_d1_stale": {
+    "mean_dist": 0.07864966243505478,
+    "median_dist": 0.08136077225208282,
+    "success": 0.75
+  },
+  "mf_d1_zeroshot": {
+    "mean_dist": 0.07914140820503235,
+    "median_dist": 0.0868695005774498,
+    "success": 0.7083333333333334
+  },
+  "mb_d1_oracle": {
+    "mean_dist": 0.016144216060638428,
+    "median_dist": 0.00944785587489605,
+    "success": 1.0
+  },
+  "reward_free_budgets": [
+    0,
+    500,
+    2000
+  ],
+  "mb_reward_free": {
+    "0": {
+      "mean_dist": 0.07864966243505478,
+      "median_dist": 0.08136077225208282,
+      "success": 0.75
+    },
+    "500": {
+      "mean_dist": 0.019690046086907387,
+      "median_dist": 0.010369764640927315,
+      "success": 1.0
+    },
+    "2000": {
+      "mean_dist": 0.017342207953333855,
+      "median_dist": 0.010659352876245975,
+      "success": 1.0
+    }
+  },
+  "mf_reward_free_flat": {
+    "mean_dist": 0.07914140820503235,
+    "median_dist": 0.0868695005774498,
+    "success": 0.7083333333333334
+  },
+  "reward_driven_budgets": [
+    512,
+    2048
+  ],
+  "mf_reward_driven": {
+    "0": {
+      "mean_dist": 0.07914140820503235,
+      "median_dist": 0.0868695005774498,
+      "success": 0.7083333333333334
+    },
+    "512": {
+      "mean_dist": 0.042827557772397995,
+      "median_dist": 0.03803272545337677,
+      "success": 1.0
+    },
+    "2048": {
+      "mean_dist": 0.04350598156452179,
+      "median_dist": 0.035698872059583664,
+      "success": 0.9583333333333334
+    }
+  },
+  "H": 26
+}

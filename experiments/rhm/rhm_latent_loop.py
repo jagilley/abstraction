@@ -594,6 +594,13 @@ def latent_loop(
         labels = [pool_anc[ell][idx][:, anc_idx[ell]].to(device) for ell in range(L)]
         return x, labels
 
+    def get_aligned_batch(gen):
+        """Sequence-aligned NTP batch (used by ntp_levelfocus): rows are whole RHM
+        sequences, so each target position's hierarchy level is well-defined
+        (flat windows straddle boundaries -> level undefined, hence get_ntp_batch)."""
+        idx = torch.randint(0, pool_size, (batch_size,), generator=gen)
+        return pool_x[idx].to(device)                            # (B,T)
+
     def aux_loss(inter, labels, aux_heads):
         head_out = {b: aux_heads[b](inter[b]).view(batch_size, T, L, v) for b in sup_blocks}
         per_level = []
@@ -721,10 +728,33 @@ def latent_loop(
         use_distill = cond.endswith("+distill")
         use_aux = "aux" in base_cond
         use_loop = "cl" in base_cond
+        use_levelfocus = "levelfocus" in base_cond    # aligned, level-reweighted NTP
         assert not (use_distill and not use_loop), f"{cond}: +distill needs a closed loop"
         cl_lam = float(base_cond.split("@")[1]) if "@" in base_cond else lam_local
+        # ntp_levelfocus@<β> reads its OWN deep-skew exponent β from the @-suffix
+        # (default 1.0). It never engages the loop/aux, so the @-parsed cl_lam above
+        # is inert for it and the cl_lam path for other conditions is untouched.
+        lf_beta = ((float(base_cond.split("@")[1]) if "@" in base_cond else 1.0)
+                   if use_levelfocus else None)
+        # Level-focus per-position CE weights over ALIGNED-batch target positions p+1,
+        # keyed on the target's hierarchy level ℓ = v_s(p+1) (0=local ... L-1=root).
+        # Base combines (a) inverse level frequency 1/count[ℓ] (removes L0's ~51%
+        # frequency dominance) and (b) a linear-in-depth tilt (ℓ+1):
+        #     f(ℓ) = (ℓ+1)/count[ℓ]   (monotonically increasing in ℓ)
+        # β raises the base, then renormalize to mean 1: w[t] = f(ℓ_t)^β · (T-1)/Σ.
+        # β=0 → f^0=1 → UNIFORM per position = plain ALIGNED NTP (batching-only
+        # control); larger β → gradient mass concentrates on the deepest levels
+        # (β=1: per-level mass ∝ (ℓ+1); β=2: root gets ~67% of the mass, T=64).
+        lf_weight = None
+        if use_levelfocus:
+            pos_lv = _position_levels_np(T, s)                 # (T-1,) v_s valuation
+            counts = np.bincount(pos_lv, minlength=L).astype(np.float64)
+            raw = ((pos_lv + 1.0) / counts[pos_lv]) ** lf_beta
+            raw = raw * (T - 1) / raw.sum()                    # mean-1 normalize
+            lf_weight = torch.from_numpy(raw.astype(np.float32)).to(device)  # (T-1,)
         print(f"\n{'='*60}\n  CONDITION: {cond}  (aux={use_aux}, loop={use_loop}, "
-              f"λ_local={cl_lam}, distill={use_distill})\n{'='*60}")
+              f"levelfocus={use_levelfocus}, β={lf_beta}, λ_local={cl_lam}, "
+              f"distill={use_distill})\n{'='*60}")
 
         torch.manual_seed(seed)
         model = GPT(v, T, n_layer, n_head, n_embd).to(device)
@@ -760,7 +790,10 @@ def latent_loop(
             model.train()
             if use_loop:
                 fm.train(); ugate.train()
-            x, y = get_ntp_batch(train_gen)          # phase-diverse: all positions supervised
+            if use_levelfocus:                       # sequence-aligned: level well-defined
+                x, y = get_aligned_batch(train_gen), None
+            else:
+                x, y = get_ntp_batch(train_gen)      # phase-diverse: all positions supervised
 
             cache = {}
             if use_loop:
@@ -776,7 +809,17 @@ def latent_loop(
             else:
                 logits, _, inter = model(x, return_intermediates=True)
 
-            ntp = F.cross_entropy(logits.reshape(-1, v), y.reshape(-1))
+            if use_levelfocus:
+                # weighted ALIGNED NTP: predict token p+1 from the causal context
+                # (drop last position -- no next token); each predicted position's CE
+                # is scaled by its target level's fixed weight lf_weight (β=0 -> plain
+                # aligned mean-CE; β>0 -> deep-skewed). See lf_weight comment above.
+                ce = F.cross_entropy(logits[:, :-1, :].reshape(-1, v),
+                                     x[:, 1:].reshape(-1),
+                                     reduction="none").view(batch_size, T - 1)
+                ntp = (ce * lf_weight).mean()
+            else:
+                ntp = F.cross_entropy(logits.reshape(-1, v), y.reshape(-1))
             loss = ntp
             if use_aux:                               # oracle-latent target on aligned batch
                 xa, labels = get_aux_batch(aux_gen)

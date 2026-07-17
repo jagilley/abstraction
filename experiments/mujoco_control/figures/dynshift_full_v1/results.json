@@ -1,0 +1,190 @@
+{
+  "config": {
+    "tag": "full_v1",
+    "seed": 0,
+    "frame_skip": 12,
+    "H": 24,
+    "goal_range": 0.5,
+    "start_range": 0.5,
+    "v0_std": 0.3,
+    "success_eps": 0.1,
+    "v_explore": 1.2,
+    "collect_ep_len": 20,
+    "collect_pos_range": 1.0,
+    "dgp_base": {
+      "arena_half": 2.0,
+      "pusher_mass": 1.0,
+      "joint_damping": 2.0,
+      "gear": 10.0
+    },
+    "shift_mass": 1.0,
+    "shift_damping": 0.05,
+    "K": 256,
+    "H_plan": 15,
+    "vel_pen": 0.5,
+    "cem_iters": 3,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_epochs": 40,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "n_fm": 20000,
+    "adapt_epochs": 60,
+    "n_oracle": 20000,
+    "pol_hidden": 128,
+    "pol_layers": 2,
+    "pol_lr": 0.001,
+    "pol_batch": 512,
+    "bc_epochs": 40,
+    "n_bc_ep": 384,
+    "batch_ep": 64,
+    "rl_lr": 0.003,
+    "rl_sigma": 0.3,
+    "rl_batch": 64,
+    "reward_free_budgets": [
+      0,
+      50,
+      150,
+      500,
+      1500,
+      5000,
+      20000
+    ],
+    "reward_driven_budgets": [
+      500,
+      2000,
+      10000
+    ],
+    "n_eval": 96
+  },
+  "dgp0": {
+    "arena_half": 2.0,
+    "pusher_mass": 1.0,
+    "joint_damping": 2.0,
+    "gear": 10.0
+  },
+  "dgp1": {
+    "arena_half": 2.0,
+    "pusher_mass": 1.0,
+    "joint_damping": 0.05,
+    "gear": 10.0
+  },
+  "fm_r2_d0": 0.9997703380329365,
+  "fm_r2_oracle": 0.9982570977833238,
+  "random_floor_d0": {
+    "mean_dist": 0.5888428092002869,
+    "median_dist": 0.6040968894958496,
+    "success": 0.041666666666666664
+  },
+  "random_floor_d1": {
+    "mean_dist": 0.6509985327720642,
+    "median_dist": 0.5657294392585754,
+    "success": 0.0
+  },
+  "mb_d0": {
+    "mean_dist": 0.019229965284466743,
+    "median_dist": 0.005413436330854893,
+    "success": 0.96875
+  },
+  "mf_d0": {
+    "mean_dist": 0.014913086779415607,
+    "median_dist": 0.012363296933472157,
+    "success": 1.0
+  },
+  "mb_d1_stale": {
+    "mean_dist": 0.02182689495384693,
+    "median_dist": 0.01843380182981491,
+    "success": 1.0
+  },
+  "mf_d1_zeroshot": {
+    "mean_dist": 0.05784566327929497,
+    "median_dist": 0.05578939616680145,
+    "success": 0.8854166666666666
+  },
+  "mb_d1_oracle": {
+    "mean_dist": 0.013776570558547974,
+    "median_dist": 0.005378155969083309,
+    "success": 1.0
+  },
+  "reward_free_budgets": [
+    0,
+    50,
+    150,
+    500,
+    1500,
+    5000,
+    20000
+  ],
+  "mb_reward_free": {
+    "0": {
+      "mean_dist": 0.02182689495384693,
+      "median_dist": 0.01843380182981491,
+      "success": 1.0
+    },
+    "50": {
+      "mean_dist": 0.014981932938098907,
+      "median_dist": 0.005974173545837402,
+      "success": 0.9895833333333334
+    },
+    "150": {
+      "mean_dist": 0.01614939048886299,
+      "median_dist": 0.0057612257078289986,
+      "success": 0.9895833333333334
+    },
+    "500": {
+      "mean_dist": 0.01547479722648859,
+      "median_dist": 0.006335952319204807,
+      "success": 0.9895833333333334
+    },
+    "1500": {
+      "mean_dist": 0.017320597544312477,
+      "median_dist": 0.006434733513742685,
+      "success": 0.9791666666666666
+    },
+    "5000": {
+      "mean_dist": 0.016996415331959724,
+      "median_dist": 0.006908104754984379,
+      "success": 1.0
+    },
+    "20000": {
+      "mean_dist": 0.017129788175225258,
+      "median_dist": 0.006535138934850693,
+      "success": 0.9791666666666666
+    }
+  },
+  "mf_reward_free_flat": {
+    "mean_dist": 0.05784566327929497,
+    "median_dist": 0.05578939616680145,
+    "success": 0.8854166666666666
+  },
+  "reward_driven_budgets": [
+    500,
+    2000,
+    10000
+  ],
+  "mf_reward_driven": {
+    "0": {
+      "mean_dist": 0.05784566327929497,
+      "median_dist": 0.05578939616680145,
+      "success": 0.8854166666666666
+    },
+    "500": {
+      "mean_dist": 0.1075805053114891,
+      "median_dist": 0.08586081117391586,
+      "success": 0.5625
+    },
+    "2000": {
+      "mean_dist": 0.19445888698101044,
+      "median_dist": 0.1864238977432251,
+      "success": 0.19791666666666666
+    },
+    "10000": {
+      "mean_dist": 0.01409172359853983,
+      "median_dist": 0.01267913356423378,
+      "success": 1.0
+    }
+  },
+  "H": 24
+}

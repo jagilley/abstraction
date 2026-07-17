@@ -1,0 +1,104 @@
+{
+  "config": {
+    "tag": "replan_abl_smoke",
+    "seed": 0,
+    "replan_list": [
+      1,
+      4,
+      12
+    ],
+    "refit_N": 1500,
+    "frame_skip": 12,
+    "H": 24,
+    "goal_range": 0.5,
+    "start_range": 0.5,
+    "v0_std": 0.3,
+    "success_eps": 0.1,
+    "v_explore": 1.2,
+    "collect_ep_len": 20,
+    "collect_pos_range": 1.0,
+    "dgp_base": {
+      "arena_half": 2.0,
+      "pusher_mass": 1.0,
+      "joint_damping": 2.0,
+      "gear": 10.0
+    },
+    "shift_mass": 1.0,
+    "shift_damping": 0.05,
+    "K": 256,
+    "H_plan": 15,
+    "vel_pen": 0.5,
+    "cem_iters": 3,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_epochs": 40,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "n_fm": 3000,
+    "adapt_epochs": 60,
+    "n_oracle": 3000,
+    "n_eval": 24
+  },
+  "dgp0": {
+    "arena_half": 2.0,
+    "pusher_mass": 1.0,
+    "joint_damping": 2.0,
+    "gear": 10.0
+  },
+  "dgp1": {
+    "arena_half": 2.0,
+    "pusher_mass": 1.0,
+    "joint_damping": 0.05,
+    "gear": 10.0
+  },
+  "refit_N": 1500,
+  "rows": [
+    {
+      "replan_every": 1,
+      "stale": {
+        "mean_dist": 0.019061438739299774,
+        "success": 1.0
+      },
+      "oracle": {
+        "mean_dist": 0.01098132599145174,
+        "success": 1.0
+      },
+      "refit": {
+        "mean_dist": 0.013504649512469769,
+        "success": 1.0
+      }
+    },
+    {
+      "replan_every": 4,
+      "stale": {
+        "mean_dist": 0.03942061588168144,
+        "success": 0.9166666666666666
+      },
+      "oracle": {
+        "mean_dist": 0.011421289294958115,
+        "success": 1.0
+      },
+      "refit": {
+        "mean_dist": 0.010879387147724628,
+        "success": 1.0
+      }
+    },
+    {
+      "replan_every": 12,
+      "stale": {
+        "mean_dist": 0.07088278234004974,
+        "success": 0.75
+      },
+      "oracle": {
+        "mean_dist": 0.020187748596072197,
+        "success": 0.9583333333333334
+      },
+      "refit": {
+        "mean_dist": 0.02674022875726223,
+        "success": 0.9166666666666666
+      }
+    }
+  ]
+}
