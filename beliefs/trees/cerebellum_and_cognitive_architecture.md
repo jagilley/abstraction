@@ -21,6 +21,24 @@
 - Cerebellar activation tracks task novelty across cognitive tasks (verb generation, mental rotation, working memory) — high early in learning, decreasing as performance becomes automatic — same source
 - The cerebellar microcircuit (granule → Purkinje, climbing fiber teaching signal) is remarkably uniform across all zones — the same algorithm wired to different cortical partners — discussed here[^private]
 
+#### The cerebellar forward model's codomain — raw body state vs cortical activation — is set by afferent wiring, not by a different computation
+*Confidence: strong*
+
+- The uniform microcircuit computes on whatever the mossy fibers deliver, so one forward-model algorithm serves a *body-state* codomain in some regions and a *cortical-activation* codomain in others — the codomain is a wiring choice, not an algorithm change (sharpens the parent node's "uniform across all zones").
+- Ancient **vestibulo-/spinocerebellum** (archi/paleocerebellum), fed by vestibular afferents and spinocerebellar tracts, forward-models *raw body/physical state* (spindle length/velocity, joint angle, load, head motion) — textbook motor cerebellum; the cleanest behavioral proof is central attenuation of self-generated tickle (Blakemore, Wolpert & Frith) and, in its absence, dysmetria.
+- New **cerebrocerebellum** (neocerebellum, lateral hemispheres), fed by the cortico-ponto-cerebellar projection from association cortex, forward-models *cortical activation dynamics* — the moderate-confidence sibling belief below, and the phylogenetically newest part (neodentate), disproportionately expanded in humans.
+- The two codomains occupy *physically distinct* territories along a phylogenetic gradient (body-state → cortical-state), so a "physics-state forward model" and an "activation forward model" are not rival theories of one organ but faithful descriptions of two cerebellar regions running one algorithm.
+- Program relevance: this is biology performing the exact "swap the forward model's codomain by rewiring its input while holding the computation fixed" move we weighed — evidence that codomain is a free design knob and the algorithm is the invariant — [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md).
+
+See also: [forward models of cortical dynamics](#the-cerebellum-builds-forward-models-of-cortical-dynamics-not-just-sensory-consequences-of-motor-commands) (the cortical-activation half in detail); [cerebellar expansion](#cerebellar-expansion-was-the-last-major-anatomical-change-before-behavioral-modernity) (the neodentate = the new, cortical-state territory).
+
+**Cerebellar microzone modularity buys separability and forward modeling at once — by physically factoring, not by learning a clean distributed split.**
+*Confidence: moderate*
+
+- The cerebellum is built from hundreds of *microzones* — parasagittal Purkinje-cell bands each sharing one inferior-olive climbing-fiber signal, grouped into "multizonal microcomplexes" (Apps & Garwicz) — each a semi-independent module owning a slice of the input.
+- So biology attains a variable-by-variable (e.g. value-relevant vs value-irrelevant) split without learning a disentangled distributed representation: it dedicates *separate hardware* per factor — the concrete biological form of an object-factored / slot architecture.
+- Bears on the separable-vs-self-model tension in our control work: separability need not be learned inside one net if the substrate is physically modular — [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md).
+
 #### The cerebellum builds forward models of cortical dynamics, not just sensory consequences of motor commands
 *Confidence: moderate*
 

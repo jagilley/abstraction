@@ -1,0 +1,139 @@
+{
+  "config": {
+    "tag": "land_easy",
+    "seed": 0,
+    "frame_skip": 3,
+    "conflict": 1.5708,
+    "field_pusher_amp": 0.0,
+    "dgp_base": {
+      "arena_half": 0.9,
+      "gear": 10.0,
+      "puck_mass": 0.5,
+      "pusher_r": 0.12,
+      "puck_r": 0.12,
+      "puck_field": {
+        "amp": 1.3,
+        "pusher_amp": 0.0,
+        "central": 0.5
+      }
+    },
+    "n_train_tasks": 12,
+    "n_test_tasks": 6,
+    "n_episodes": 80,
+    "ep_len": 200,
+    "sigma": 0.7,
+    "theta": 0.15,
+    "seek_gain": 0.9,
+    "n_adapt_pool": 512,
+    "n_holdout": 3000,
+    "puck_move_thresh": 0.02,
+    "n_context": 128,
+    "hidden": 64,
+    "latent_dim": 8,
+    "enc_hidden": 128,
+    "fm_layers": 2,
+    "meta_steps": 3000,
+    "meta_lr": 0.001,
+    "task_batch": 8,
+    "pred_P": 128,
+    "grad_clip": 1.0,
+    "puck_grid": [
+      0.0,
+      0.125,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "outer": false,
+    "outer_pop": 10,
+    "outer_elite": 3,
+    "outer_iters": 4,
+    "outer_sigma0": 1.5,
+    "goal_range": 0.5,
+    "start_range": 0.5,
+    "v0_std": 0.3,
+    "plan_H": 100,
+    "plan_Hp": 16,
+    "replan_every": 8,
+    "k_shoot": 192,
+    "cem_iters": 3,
+    "cem_elite": 24,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.3,
+    "n_eval_plan": 24
+  },
+  "family": "actuator",
+  "conflict": 1.5708,
+  "hidden": 64,
+  "field_pusher_amp": 0.0,
+  "regime": "easy_pusher",
+  "train_params": [
+    -1.5708,
+    -1.2012,
+    -1.0164,
+    -0.6468,
+    -0.46199999999999997,
+    -0.09240000000000004,
+    0.09240000000000004,
+    0.46199999999999997,
+    0.6468,
+    1.0163999999999997,
+    1.2011999999999998,
+    1.5708
+  ],
+  "test_params": [
+    -1.386,
+    -0.8316,
+    -0.2772000000000001,
+    0.2771999999999999,
+    0.8316000000000001,
+    1.386
+  ],
+  "plan_random_dist": 0.4967784881591797,
+  "landscape": [
+    {
+      "w_puck": 0.0,
+      "cost": 0.0610199011862278,
+      "pusher_pos_ff": 0.9993645519614525,
+      "pusher_vel_ff": 0.9395923746655679,
+      "puck_vel_slide": -5.4950701430725175,
+      "all_ff": -0.3477151073737804
+    },
+    {
+      "w_puck": 0.125,
+      "cost": 0.05971088260412216,
+      "pusher_pos_ff": 0.9986077446641223,
+      "pusher_vel_ff": 0.9361425649280066,
+      "puck_vel_slide": 0.2195844018056477,
+      "all_ff": 0.8230694121877443
+    },
+    {
+      "w_puck": 0.25,
+      "cost": 0.07340138033032417,
+      "pusher_pos_ff": 0.998717161043107,
+      "pusher_vel_ff": 0.9250910012198237,
+      "puck_vel_slide": 0.22977525167581891,
+      "all_ff": 0.815976269875704
+    },
+    {
+      "w_puck": 0.5,
+      "cost": 0.06899301894009113,
+      "pusher_pos_ff": 0.9990973537993453,
+      "pusher_vel_ff": 0.8897649812180832,
+      "puck_vel_slide": 0.31925005557651054,
+      "all_ff": 0.7859786091571308
+    },
+    {
+      "w_puck": 1.0,
+      "cost": 0.06042812392115593,
+      "pusher_pos_ff": 0.9995578241119889,
+      "pusher_vel_ff": 0.9446617732305291,
+      "puck_vel_slide": 0.43829974629247237,
+      "all_ff": 0.8598823628356078
+    }
+  ],
+  "landscape_best_w_puck": 0.125,
+  "landscape_veridical_cost": 0.06042812392115593,
+  "landscape_best_cost": 0.05971088260412216,
+  "outer": null
+}

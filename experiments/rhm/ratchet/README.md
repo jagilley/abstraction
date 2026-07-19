@@ -12,6 +12,8 @@ The A2A gated ratchet compounds on MNIST — closing the wake-sleep loop (inject
 
 **It does not.** The ratchet reproduces every MNIST *dynamic* on RHM — gate closing, FM tracking, robustness dissociation, crossover timing — but never the *magnitude*: the val-loss gap peaks at ~1% and does not grow across cycles. The arc ruled out, in turn: capacity / overparameterization (L=4), task structure (RL is sparse-but-rich like classification), the distillation bottleneck (generation-based distillation restores NTP), and FM-cosine regime (the 3-block gap reaches the 0.944 sweet spot). The FOMAML diagnostic settled the mechanism: **on stationary data no outer objective makes FM-predictability pressure improve compositional NTP** — "the outer loop is identical to the inner loop." The consistent read across the arc is that **compounding requires a moving frontier** (novel rules / deeper levels) that stationary RHM cannot supply — which is where the parent program's active / sculpting / latent-loop lines went next.
 
+[**Jasper's note**: this is all true but I think the critical thing is that RHM has a moving frontier up to and until it hits its ceiling, and no further. Then, the frontier goes static and bilevel optimization becomes pointless. (I think.) On MNIST, I believe we observe different properties because MNIST always supervises the root and is non-hierarchical.]
+
 ## Experiments (chronological)
 
 | Date | Writeup | Headline |

@@ -1,0 +1,164 @@
+{
+  "config": {
+    "tag": "smoke",
+    "seed": 0,
+    "frame_skip": 3,
+    "conflict": 1.5708,
+    "field_pusher_amp": 0.0,
+    "dgp_base": {
+      "arena_half": 0.9,
+      "gear": 10.0,
+      "puck_mass": 0.5,
+      "pusher_r": 0.12,
+      "puck_r": 0.12,
+      "puck_field": {
+        "amp": 1.3,
+        "pusher_amp": 0.0,
+        "central": 0.5
+      }
+    },
+    "n_train_tasks": 6,
+    "n_test_tasks": 3,
+    "n_episodes": 40,
+    "ep_len": 140,
+    "sigma": 0.7,
+    "theta": 0.15,
+    "seek_gain": 0.9,
+    "n_adapt_pool": 512,
+    "n_holdout": 2200,
+    "puck_move_thresh": 0.02,
+    "n_context": 128,
+    "hidden": 64,
+    "latent_dim": 8,
+    "enc_hidden": 64,
+    "fm_layers": 2,
+    "meta_steps": 500,
+    "meta_lr": 0.001,
+    "task_batch": 8,
+    "pred_P": 128,
+    "grad_clip": 1.0,
+    "puck_grid": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "outer": true,
+    "outer_normalize": true,
+    "outer_pop": 4,
+    "outer_elite": 3,
+    "outer_iters": 2,
+    "outer_sigma0": 1.5,
+    "goal_range": 0.5,
+    "start_range": 0.5,
+    "v0_std": 0.3,
+    "plan_H": 60,
+    "plan_Hp": 16,
+    "replan_every": 8,
+    "k_shoot": 128,
+    "cem_iters": 3,
+    "cem_elite": 24,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.3,
+    "n_eval_plan": 8
+  },
+  "family": "actuator",
+  "conflict": 1.5708,
+  "hidden": 64,
+  "field_pusher_amp": 0.0,
+  "regime": "easy_pusher",
+  "train_params": [
+    -1.5708,
+    -0.7854,
+    -0.39270000000000005,
+    0.39270000000000005,
+    0.7853999999999999,
+    1.5708
+  ],
+  "test_params": [
+    -1.1781,
+    0.0,
+    1.1781
+  ],
+  "plan_random_dist": 0.7231564521789551,
+  "landscape": [
+    {
+      "w_puck": 0.0,
+      "cost": 0.5706254243850708,
+      "pusher_pos_ff": 0.9951357309167085,
+      "pusher_vel_ff": 0.6528578823885862,
+      "puck_vel_slide": -5.785837192630868,
+      "all_ff": -0.778178176664359
+    },
+    {
+      "w_puck": 0.5,
+      "cost": 0.5986723899841309,
+      "pusher_pos_ff": 0.9949359852128642,
+      "pusher_vel_ff": 0.6623929882310644,
+      "puck_vel_slide": 0.3150499823188603,
+      "all_ff": 0.6404804884288631
+    },
+    {
+      "w_puck": 1.0,
+      "cost": 0.6003517508506775,
+      "pusher_pos_ff": 0.9974733516175156,
+      "pusher_vel_ff": 0.7156521806804337,
+      "puck_vel_slide": 0.40600126224854305,
+      "all_ff": 0.6422521669881438
+    }
+  ],
+  "landscape_best_w_puck": 0.0,
+  "landscape_veridical_cost": 0.6003517508506775,
+  "landscape_best_cost": 0.5706254243850708,
+  "outer": {
+    "base_cost_uniform": 0.6003517508506775,
+    "best_cost": 0.5884488821029663,
+    "w_star": [
+      3.83801007270813,
+      0.29572802782058716,
+      0.018021924421191216,
+      1.0384540557861328,
+      0.45943012833595276,
+      0.3957125246524811,
+      1.208551287651062,
+      0.7460914254188538
+    ],
+    "w_star_pusher": 1.2472201585769653,
+    "w_star_puck": 0.7527796626091003,
+    "corr_to_support": 0.2180734900899175,
+    "history": [
+      {
+        "iter": 0,
+        "best_cost": 0.593153715133667,
+        "mean_w": [
+          2.419074535369873,
+          0.3062257170677185,
+          1.0993778705596924,
+          0.794497549533844,
+          0.30433300137519836,
+          0.1480891853570938,
+          2.358142614364624,
+          0.5702595114707947
+        ],
+        "puck_w": 1.2055693864822388,
+        "pusher_w": 0.7944306135177612
+      },
+      {
+        "iter": 1,
+        "best_cost": 0.5884488821029663,
+        "mean_w": [
+          2.479466438293457,
+          0.30477961897850037,
+          0.03513336926698685,
+          0.8389672040939331,
+          0.11366317421197891,
+          0.18245689570903778,
+          3.111494302749634,
+          0.934038519859314
+        ],
+        "puck_w": 1.2299083471298218,
+        "pusher_w": 0.7700915336608887
+      }
+    ],
+    "gain_vs_uniform": 0.011902868747711182
+  }
+}

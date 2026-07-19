@@ -114,6 +114,119 @@ class PusherEnv:
         self.pusher_gid = mujoco.mj_name2id(
             self.model, mujoco.mjtObj.mjOBJ_GEOM, "pusher_geom")
         self._f6 = np.zeros(6)
+        # puck DOF / qpos indices (for the optional nonlinear force field applied via
+        # qfrc_applied at runtime — see step()). Only meaningful with_puck.
+        if with_puck:
+            self.puck_qpos_idx = [int(self.model.jnt_qposadr[mujoco.mj_name2id(
+                self.model, mujoco.mjtObj.mjOBJ_JOINT, jn)]) for jn in ("puck_x", "puck_y")]
+            self.puck_dof_idx = [int(self.model.jnt_dofadr[mujoco.mj_name2id(
+                self.model, mujoco.mjtObj.mjOBJ_JOINT, jn)]) for jn in ("puck_x", "puck_y")]
+        else:
+            self.puck_qpos_idx = self.puck_dof_idx = []
+        self.pusher_qpos_idx = [int(self.model.jnt_qposadr[mujoco.mj_name2id(
+            self.model, mujoco.mjtObj.mjOBJ_JOINT, jn)]) for jn in ("pusher_x", "pusher_y")]
+        self.pusher_dof_idx = [int(self.model.jnt_dofadr[mujoco.mj_name2id(
+            self.model, mujoco.mjtObj.mjOBJ_JOINT, jn)]) for jn in ("pusher_x", "pusher_y")]
+
+    def _field_force(self, pos, amp, phase, field: dict) -> np.ndarray:
+        """A deterministic, nonlinear force from a MULTI-MODE cellular (Taylor-Green-
+        like) flow + a mild central restoring term. The multi-mode design DECOUPLES
+        the two properties we need, which a single mode couples through wavenumber k:
+          * REDUCIBLE: every mode is spatially SMOOTH (bounded, moderate frequency),
+            so with a fine control step there is no per-step integration aliasing and
+            a big forward model fits the map s->Δs to R^2 -> ~1.
+          * CAPACITY-HUNGRY: the field is a SUM of several modes (a complex function),
+            so a SMALL forward model cannot approximate it even though a big one can.
+            (#modes is the capacity-hunger lever; max-k is the aliasing lever.)
+
+        Applied to the PUCK it is a value-IRRELEVANT distractor whose prediction costs
+        real capacity (so dropping it is a genuine re-allocation, not a free lunch — a
+        linear damped particle is cheap to predict no matter how energetic). Applied to
+        the PUSHER (with a distinct `phase`, so the FM can't share ONE field computation
+        across bodies) it makes the value-RELEVANT dynamics capacity-hungry too, so that
+        capacity freed from the puck actually BUYS pusher fidelity.
+        """
+        x, y = pos
+        c = field.get("central", 0.5)
+        modes = field.get("modes", [(1.0, 0.0), (1.3, 0.7), (1.7, 1.3),
+                                    (2.0, 2.0), (2.3, 2.6), (2.7, 3.1)])
+        fx = fy = 0.0
+        for k, ph in modes:
+            fx += np.sin(k * x + ph + phase) * np.cos(k * y + ph + phase)
+            fy += -np.cos(k * x + ph + phase) * np.sin(k * y + ph + phase)
+        return np.array([amp * fx - c * x, amp * fy - c * y], dtype=np.float64)
+
+    def _apply_fields(self, field: dict):
+        """Set qfrc_applied from the field(s): always on the puck; optionally on the
+        pusher (distinct phase) when `pusher_amp` > 0."""
+        amp = field.get("amp", 1.3)
+        self.data.qfrc_applied[self.puck_dof_idx] = self._field_force(
+            self.data.qpos[self.puck_qpos_idx], amp, 0.0, field)
+        pamp = field.get("pusher_amp", 0.0)
+        if pamp > 0:
+            self.data.qfrc_applied[self.pusher_dof_idx] = self._field_force(
+                self.data.qpos[self.pusher_qpos_idx], pamp, field.get("pusher_phase", 1.57), field)
+
+    def _apply_patch(self, patch: dict):
+        """A spatially-LOCALIZED change to the PUSHER's dynamics: inside a Gaussian patch
+        centered at `patch['center']` (width `sigma`), a strong constant force 'jet'
+        `patch['force']` acts on the pusher (a localized 'current'), Gaussian-gated so it
+        is smooth. d0 has no patch; when it appears in d1 the pusher's Δs INSIDE the patch
+        is dominated by this force, so a stale forward model (no jet) mispredicts there
+        and must RE-LEARN the jet from IN-PATCH transitions ONLY.
+
+        This is a LOCAL, SCARCE dynamics change — unlike a GLOBAL shift, only in-patch
+        transitions are informative about it. That is exactly the regime where a
+        disagreement-directed drive that concentrates collection on the patch can re-adapt
+        the forward model in FEWER transitions than undirected exploration (which under-
+        samples the scarce patch). A weak drag tweak is too small (a stale FM predicts it
+        fine); a strong force jet makes the local change genuinely load-bearing. Additive
+        & off by default (dgp has no 'patch') -> Cuts #1-3 and value_shaping unchanged.
+        Sets the pusher DOFs, so it is not meant to combine with a pusher force field.
+        """
+        pos = self.data.qpos[self.pusher_qpos_idx]
+        cx, cy = patch["center"]
+        sigma = patch.get("sigma", 0.3)
+        w = float(np.exp(-((pos[0] - cx) ** 2 + (pos[1] - cy) ** 2) / (2.0 * sigma ** 2)))
+        fx, fy = patch.get("force", [0.0, 8.0])
+        self.data.qfrc_applied[self.pusher_dof_idx] = w * np.array([fx, fy], dtype=np.float64)
+
+    def _apply_actuator_rot(self, phi: float):
+        """An INPUT-COUPLED dynamics change: the command's effect on the pusher is ROTATED
+        by `phi`. The motors apply gear*ctrl along the axes; we add qfrc = gear*(R(phi)-I)@ctrl
+        so the TOTAL effective actuation force is gear*R(phi)@ctrl. Unlike an additive force
+        field (a constant output bias any model learns by nudging one bias term), rotating the
+        command->motion map is INPUT-COUPLED: phi and phi+pi are OPPOSITE mappings, so a single
+        init cannot serve both, and a model pooled over a symmetric phi range averages the
+        command gain toward zero (arity-1 degenerate at range pi). That is the conflict that
+        makes few-shot re-adaptation non-trivial (the phase-varying regime where a learned
+        adaptable init can beat pooling). Command-only (constant across substeps). Additive &
+        off by default (dgp has no 'push_rot') -> Cuts #1-3 and value_shaping unchanged."""
+        c, s = float(np.cos(phi)), float(np.sin(phi))
+        ux, uy = float(self.data.ctrl[0]), float(self.data.ctrl[1])
+        rux, ruy = c * ux - s * uy, s * ux + c * uy      # R(phi) @ ctrl
+        w = 1.0
+        rp = self.dgp.get("rot_patch")                    # optional: gate rotation to a patch
+        if rp is not None:                                # -> only IN-PATCH transitions carry phi
+            pos = self.data.qpos[self.pusher_qpos_idx]
+            cx, cy = rp["center"]; sig = rp.get("sigma", 0.3)
+            w = float(np.exp(-((pos[0] - cx) ** 2 + (pos[1] - cy) ** 2) / (2.0 * sig ** 2)))
+        correction = w * self.dgp["gear"] * np.array(
+            [rux - ux, ruy - uy], dtype=np.float64)       # (R - I) correction on top of motors
+        # If a pusher force field is ALSO active this substep, `_apply_fields` already wrote
+        # it to the pusher DOFs; a bare assignment here would CLOBBER it (rotation runs after
+        # fields in step()). Recompute the field and SUM, so the value-RELEVANT pusher
+        # dynamics (field) and the input-coupled conflict (rotation) coexist -- required by
+        # meta_value_shaping's capacity-competition cut. Field-off path: base=0 -> byte-
+        # identical to the original assign, so cuts #1-3 / meta_context / meta_adapt / the
+        # rot_patch cut are unchanged.
+        base = np.zeros(2, dtype=np.float64)
+        field = self.dgp.get("puck_field")
+        if field is not None and field.get("pusher_amp", 0.0) > 0:
+            base = self._field_force(
+                self.data.qpos[self.pusher_qpos_idx],
+                field.get("pusher_amp", 0.0), field.get("pusher_phase", 1.57), field)
+        self.data.qfrc_applied[self.pusher_dof_idx] = base + correction
 
     def get_state(self) -> np.ndarray:
         return np.concatenate([self.data.qpos, self.data.qvel]).astype(np.float32)
@@ -155,6 +268,7 @@ class PusherEnv:
         self.data.qpos[:] = qpos
         self.data.qvel[:] = qvel
         self.data.ctrl[:] = 0.0
+        self.data.qfrc_applied[:] = 0.0   # no stale field force leaks into a fresh query
         mujoco.mj_forward(self.model, self.data)
 
     def _contact_scan(self):
@@ -186,12 +300,24 @@ class PusherEnv:
         import mujoco
 
         self.data.ctrl[:] = np.clip(ctrl, -1.0, 1.0)
+        field = self.dgp.get("puck_field")
+        patch = self.dgp.get("patch")
+        push_rot = self.dgp.get("push_rot")
         max_force = 0.0
         max_puck_force = 0.0
         ncon_at_max = 0
         any_contact = False
         any_puck = False
         for _ in range(n_sub):
+            if field is not None:
+                # re-evaluate the (state-dependent) field(s) each substep, then integrate
+                self._apply_fields(field)
+            if patch is not None:
+                # localized force jet on the pusher (state-dependent, Gaussian-gated)
+                self._apply_patch(patch)
+            if push_rot is not None:
+                # input-coupled conflict: rotate the command's effect by push_rot
+                self._apply_actuator_rot(push_rot)
             mujoco.mj_step(self.model, self.data)
             total, puck_f, puck_here, nc = self._contact_scan()
             if nc > 0:

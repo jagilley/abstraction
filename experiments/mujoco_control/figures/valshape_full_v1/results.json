@@ -1,0 +1,278 @@
+{
+  "config": {
+    "tag": "full_v1",
+    "seed": 0,
+    "n_episodes": 350,
+    "ep_len": 200,
+    "frame_skip": 3,
+    "sigma": 0.7,
+    "theta": 0.15,
+    "seek_gain": 0.9,
+    "layers": 2,
+    "epochs": 50,
+    "batch": 512,
+    "lr": 0.001,
+    "caps": [
+      8,
+      16,
+      32,
+      64,
+      128,
+      256
+    ],
+    "lambdas": [
+      1.0,
+      0.5,
+      0.25,
+      0.1,
+      0.0
+    ],
+    "frontier_hidden": 16,
+    "puck_move_thresh": 0.02,
+    "dgp": {
+      "arena_half": 0.9,
+      "puck_mass": 0.5,
+      "pusher_r": 0.12,
+      "puck_r": 0.12,
+      "puck_field": {
+        "amp": 1.3,
+        "pusher_amp": 1.3,
+        "central": 0.5
+      }
+    }
+  },
+  "n_transitions": 70000,
+  "state_labels": [
+    "pusher_x",
+    "pusher_y",
+    "puck_x",
+    "puck_y",
+    "pusher_vx",
+    "pusher_vy",
+    "puck_vx",
+    "puck_vy"
+  ],
+  "engagement": {
+    "any_contact": 0.2728714285714286,
+    "puck_contact": 0.22805714285714285,
+    "puck_moving": 0.4448857142857143,
+    "n_slide": 4519,
+    "n_impact": 1582
+  },
+  "sweep": {
+    "caps": [
+      8,
+      16,
+      32,
+      64,
+      128,
+      256
+    ],
+    "unshaped": [
+      {
+        "hidden": 8,
+        "nparam": 232,
+        "r2_all": 0.018792694686074696,
+        "r2_pusher_vel": 0.13708276906871708,
+        "r2_puck_vel": 0.0035659583094541647,
+        "r2_pusher_vel_ff": 0.9325719941788969,
+        "r2_puck_vel_ff": 0.42831146257832986,
+        "r2_puck_vel_slide": 0.4489655612539051,
+        "r2_puck_vel_impact": -0.007122125813254332
+      },
+      {
+        "hidden": 16,
+        "nparam": 584,
+        "r2_all": 0.023539872098824022,
+        "r2_pusher_vel": 0.14334352968099984,
+        "r2_puck_vel": 0.008162104599275799,
+        "r2_pusher_vel_ff": 0.9323152900613757,
+        "r2_puck_vel_ff": 0.653950497358993,
+        "r2_puck_vel_slide": 0.6892239998425921,
+        "r2_puck_vel_impact": -0.0056018768908252525
+      },
+      {
+        "hidden": 32,
+        "nparam": 1672,
+        "r2_all": 0.029623114626953884,
+        "r2_pusher_vel": 0.16907952344548327,
+        "r2_puck_vel": 0.012204958917618525,
+        "r2_pusher_vel_ff": 0.9480348965258346,
+        "r2_puck_vel_ff": 0.6910995247194395,
+        "r2_puck_vel_slide": 0.7345842848616927,
+        "r2_puck_vel_impact": -0.001979601042098267
+      },
+      {
+        "hidden": 64,
+        "nparam": 5384,
+        "r2_all": 0.03504634595907041,
+        "r2_pusher_vel": 0.1792418882572392,
+        "r2_puck_vel": 0.017146857942302973,
+        "r2_pusher_vel_ff": 0.9447228490537243,
+        "r2_puck_vel_ff": 0.6981855589067689,
+        "r2_puck_vel_slide": 0.7374573739339869,
+        "r2_puck_vel_impact": 0.0029913362007356614
+      },
+      {
+        "hidden": 128,
+        "nparam": 18952,
+        "r2_all": 0.038346740869911855,
+        "r2_pusher_vel": 0.18595316431834785,
+        "r2_puck_vel": 0.020099521226941475,
+        "r2_pusher_vel_ff": 0.9317378767483749,
+        "r2_puck_vel_ff": 0.6468867924061927,
+        "r2_puck_vel_slide": 0.7033231580253415,
+        "r2_puck_vel_impact": 0.00677448731291741
+      },
+      {
+        "hidden": 256,
+        "nparam": 70664,
+        "r2_all": 0.045930881847037974,
+        "r2_pusher_vel": 0.19712291513371205,
+        "r2_puck_vel": 0.02733167235204559,
+        "r2_pusher_vel_ff": 0.9165535126942441,
+        "r2_puck_vel_ff": 0.5886157930860374,
+        "r2_puck_vel_slide": 0.6419174620890137,
+        "r2_puck_vel_impact": 0.014981357470957746
+      }
+    ],
+    "shaped": [
+      {
+        "hidden": 8,
+        "nparam": 232,
+        "r2_all": -0.025073420879151653,
+        "r2_pusher_vel": 0.1447243535566456,
+        "r2_puck_vel": -0.04319550358766833,
+        "r2_pusher_vel_ff": 0.9338801923616425,
+        "r2_puck_vel_ff": -2.487385501726689,
+        "r2_puck_vel_slide": -1.3305853840305737,
+        "r2_puck_vel_impact": -0.005382976859338751
+      },
+      {
+        "hidden": 16,
+        "nparam": 584,
+        "r2_all": -0.11844116698384854,
+        "r2_pusher_vel": 0.17021783676702795,
+        "r2_puck_vel": -0.14932526284966197,
+        "r2_pusher_vel_ff": 0.9514021028808024,
+        "r2_puck_vel_ff": -8.51906008620286,
+        "r2_puck_vel_slide": -4.937161404568067,
+        "r2_puck_vel_impact": -0.005075700642696468
+      },
+      {
+        "hidden": 32,
+        "nparam": 1672,
+        "r2_all": -0.002028274735025981,
+        "r2_pusher_vel": 0.178528696609222,
+        "r2_puck_vel": -0.021760210530002988,
+        "r2_pusher_vel_ff": 0.9521358350396195,
+        "r2_puck_vel_ff": -0.9140433290315162,
+        "r2_puck_vel_slide": -0.38751343586018816,
+        "r2_puck_vel_impact": -0.010462694601361733
+      },
+      {
+        "hidden": 64,
+        "nparam": 5384,
+        "r2_all": -0.008370799306094856,
+        "r2_pusher_vel": 0.18591231021514698,
+        "r2_puck_vel": -0.029383789289798123,
+        "r2_pusher_vel_ff": 0.945620984545857,
+        "r2_puck_vel_ff": -1.4503157926123889,
+        "r2_puck_vel_slide": -0.9209422068582691,
+        "r2_puck_vel_impact": -0.010239522416624736
+      },
+      {
+        "hidden": 128,
+        "nparam": 18952,
+        "r2_all": -0.018006940172503594,
+        "r2_pusher_vel": 0.1962204651721463,
+        "r2_puck_vel": -0.04112280166081339,
+        "r2_pusher_vel_ff": 0.9383394320722016,
+        "r2_puck_vel_ff": -1.8298542713597699,
+        "r2_puck_vel_slide": -1.1858462618090533,
+        "r2_puck_vel_impact": -0.015691937707158488
+      },
+      {
+        "hidden": 256,
+        "nparam": 70664,
+        "r2_all": 0.00030029266672515487,
+        "r2_pusher_vel": 0.1964856807488673,
+        "r2_puck_vel": -0.020956207156317186,
+        "r2_pusher_vel_ff": 0.9190992606796831,
+        "r2_puck_vel_ff": -0.9767025529026505,
+        "r2_puck_vel_slide": -0.3856604005687816,
+        "r2_puck_vel_impact": -0.007868796179903326
+      }
+    ]
+  },
+  "puck_slide_ceiling": 0.7374573739339869,
+  "puck_impact_ceiling": 0.014981357470957746,
+  "pusher_ceiling": 0.9480348965258346,
+  "frontier": {
+    "puck_weight": [
+      1.0,
+      0.5,
+      0.25,
+      0.1,
+      0.0
+    ],
+    "hidden": 16,
+    "rows": [
+      {
+        "puck_weight": 1.0,
+        "nparam": 584,
+        "r2_all": 0.02354924918360135,
+        "r2_pusher_vel": 0.14485856712785583,
+        "r2_puck_vel": 0.008013692459012511,
+        "r2_pusher_vel_ff": 0.9322026179267102,
+        "r2_puck_vel_ff": 0.6738496257486277,
+        "r2_puck_vel_slide": 0.7047462975744829,
+        "r2_puck_vel_impact": -0.00599542509773876
+      },
+      {
+        "puck_weight": 0.5,
+        "nparam": 584,
+        "r2_all": 0.019647704054686188,
+        "r2_pusher_vel": 0.14298398369780208,
+        "r2_puck_vel": 0.0038891238678266937,
+        "r2_pusher_vel_ff": 0.9329428375837936,
+        "r2_puck_vel_ff": 0.5967719699706012,
+        "r2_puck_vel_slide": 0.6252510198347114,
+        "r2_puck_vel_impact": -0.009172631846618762
+      },
+      {
+        "puck_weight": 0.25,
+        "nparam": 584,
+        "r2_all": 0.019991605814471236,
+        "r2_pusher_vel": 0.14367977314098235,
+        "r2_puck_vel": 0.004198148977759275,
+        "r2_pusher_vel_ff": 0.9372054268966062,
+        "r2_puck_vel_ff": 0.5483060837766363,
+        "r2_puck_vel_slide": 0.5689738568095981,
+        "r2_puck_vel_impact": -0.008133669681445577
+      },
+      {
+        "puck_weight": 0.1,
+        "nparam": 584,
+        "r2_all": 0.016404023560208758,
+        "r2_pusher_vel": 0.14737576244811168,
+        "r2_puck_vel": -0.00016036269624453148,
+        "r2_pusher_vel_ff": 0.931206356318373,
+        "r2_puck_vel_ff": 0.45404208961785797,
+        "r2_puck_vel_slide": 0.46653912077152804,
+        "r2_puck_vel_impact": -0.011346583979883418
+      },
+      {
+        "puck_weight": 0.0,
+        "nparam": 584,
+        "r2_all": -0.0634817341732028,
+        "r2_pusher_vel": 0.16375504626597304,
+        "r2_puck_vel": -0.0875948223434091,
+        "r2_pusher_vel_ff": 0.9504671803738178,
+        "r2_puck_vel_ff": -4.472453886067219,
+        "r2_puck_vel_slide": -1.9886901746183296,
+        "r2_puck_vel_impact": -0.015553762243065483
+      }
+    ]
+  }
+}

@@ -48,6 +48,17 @@ The looped-ViT arc ([../LOOPED_README.md](../LOOPED_README.md)) found its runnab
   1. **Deep veridical composition IS achievable — and it is loop-gated.** With explicit multi-step-consistency pressure an FM composes to **near-full-state fidelity out to horizon 8** (maze pos-acc 0.99@n6), but *only on the plannability-shaped `int_plan` operator* — the identical FM collapses on the `mf` operator (0.52 → 0.05). The parent's "one-step self-model doesn't compose" was a one-step-*training* artifact; closing the loop reorganized the operator into **deeply composable dynamics**.
   2. **Veridicality ⊥ control-usefulness.** The value-shaped **co-trained FM is the *best* planner substrate (+0.51) despite the *worst* veridicality (0.21@n4)** — it even **beats a perfect-simulator env-MPC (+0.33)** with the same planner. A perfect-sim control confirms the maze is **planner-bound, not simulator-bound** (perfect sim also floors). What helps control is value-alignment, not full-state fidelity.
 
+### Curiosity drive — the value-side atom (two-timescale value loop) (2026-07-17)
+
+**Full writeup**: [CURIOSITY_DRIVE_README.md](CURIOSITY_DRIVE_README.md) · **Idea doc**: [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md)
+
+A distinct thread that complements the arc above: where the reaching experiments build the *forward-model / inner loop*, this builds the **value / outer-loop** atom the a2a program never had — an **intrinsic learning-progress drive** (`r = −d‖e‖/dt`) that **drives where to attend** (active vision), rather than an extrinsic/stationary value. Chosen on active vision, not RHM, because the RHM specialization line shows RHM's depth frontier is not *allocation*-steerable (only a direct deep target moves it), so curiosity has no lever there.
+
+- **Phase 1 (`curiosity_reaching.py`) — the drive atom, clean positive.** On a stationary struct/noise/blank arena, the LP drive is *distinguishable* from both controls: **surprise pins to irreducible noise** (noisy-TV), **min-surprise pins to blank** (dark room), while **LP alone rides the reducible frontier then releases it** once mastered (the LP signature). Noise error sits exactly at the 1/12 irreducible floor.
+- **Phase 2 (`curiosity_drift.py`) — non-stationarity, instructive negative.** Under **abrupt** content drift naive LP is *worse than random* (blind to re-opened frontiers, distracted by noise fake-LP, forgetful); **continuous `morph` drift fixes the abrupt-jump pathology** but LP still can't beat uniform — because with reducible = ⅓ of the space there is **no scarcity** for concentration to exploit.
+- **Phase 2b (`curiosity_scarcity.py`) — scarcity + fresh-FM ensemble, clean positive.** With a small reducible needle in a large noise field, the **ensemble (cross-model disagreement)** reliably finds it — over-sampling it **3.7×→8.5×** uniform (monotone with scarcity) and best needle-error at every level. Honest nuance: naive LP is **not qualitatively broken** (partially finds the needle; at 5% scarcity beats everything but the ensemble) — so the ensemble is a *consistent quantitative* win, not a strict qualitative necessity.
+- **Follow-up → control substrate + MuJoCo redirection ([CURIOSITY_CONTROL_README.md](CURIOSITY_CONTROL_README.md)).** **Step 0 (clean positive)**: the outer-loop drive is the reducible-**disagreement magnitude**, not the LP derivative (drift-robust at every scarcity). **v1 (substrate-negative)**: porting the drive to the reaching controller (`curiosity_reaching_control.py`) exposed that the reaching-ViT FM *copies* its efference cue rather than *learning* where-you-land dynamics, so it can't learn+re-learn a control map online — an **incidental** (discrete fovea-on-token-grid) limit, not fundamental. **Redirection**: reward-free re-adaptation after a shift is already done on MuJoCo ([../../mujoco_control/README.md](../../mujoco_control/README.md) Cut #3); the un-done work is the **drive/compounding** and **disc-4 (value-shaping)**, with disc-4 → the MuJoCo pusher (puck = value-irrelevant; contact = capacity pressure).
+
 ## Where the arc stands
 
 On the [self_model_needs_a_loop](../../../ideas/self_model_needs_a_loop.md) discriminators, **causal necessity now passes cleanly in the control regime**: an endogenous, causally-load-bearing self-forecast that measurably reorganizes the representation. The loop yields *both* a legible, deeply-composable simulator (available) *and* a value-shaped forecast the controller actually runs on (used) — the map-vs-model coexistence, now with the two axes causally dissociated. Consistent with the a2a gauge-symmetry / division-of-labor reframe: a perfect self-internalization would make the cerebellum redundant; biology keeps it, and so does this.
@@ -65,6 +76,9 @@ Everything lives in the `a2a_forward.reaching` subpackage. Imports of parent mod
 | `mnist_reaching.py` | Control-regime causal test (**positive**) — imitation ceiling → FM capacity sweep → one-step MB planner |
 | `mnist_reaching_internal.py` | Internalized forecasting — coupling conditions + collusion/selectivity + reading-ladder diagnostics |
 | `mnist_reaching_lookahead.py` | Multi-step lookahead / composition — endogenous N-step MPC + multistep-consistency FMs + perfect-sim control |
+| `curiosity_reaching.py` | **Curiosity Phase 1** — intrinsic learning-progress drive vs surprise/min-surprise/random on a stationary struct/noise/blank arena ([CURIOSITY_DRIVE_README](CURIOSITY_DRIVE_README.md)) |
+| `curiosity_drift.py` | **Curiosity Phase 2** — content drift (swap/morph); naive LP under non-stationarity |
+| `curiosity_scarcity.py` | **Curiosity Phase 2b** — scarce needle-in-noise arena + fresh-FM ensemble (disagreement) drive |
 
 The shared `GlimpseLoopedViT` stays in the parent **[../looped_vit.py](../looped_vit.py)**.
 
@@ -91,7 +105,7 @@ modal run --detach a2a_forward/reaching/mnist_reaching_lookahead.py::lookahead_r
 
 ## Modal volume
 
-Results save to the `language-reduction-data` volume under `/data/a2a_forward/{mnist_active_vision, mnist_active_vision_causal, mnist_active_vision_delay, mnist_reaching, mnist_reaching_internal, mnist_reaching_lookahead}/…`. **These data-dir names are unchanged by the code move** — they are set inside each script and are independent of the source path, so prior results remain reproducible in place.
+Results save to the `language-reduction-data` volume under `/data/a2a_forward/{mnist_active_vision, mnist_active_vision_causal, mnist_active_vision_delay, mnist_reaching, mnist_reaching_internal, mnist_reaching_lookahead, curiosity_reaching, curiosity_drift, curiosity_scarcity}/…`. **These data-dir names are unchanged by the code move** — they are set inside each script and are independent of the source path, so prior results remain reproducible in place.
 
 ## Next steps
 
