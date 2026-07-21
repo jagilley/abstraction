@@ -127,6 +127,11 @@ class PusherEnv:
             self.model, mujoco.mjtObj.mjOBJ_JOINT, jn)]) for jn in ("pusher_x", "pusher_y")]
         self.pusher_dof_idx = [int(self.model.jnt_dofadr[mujoco.mj_name2id(
             self.model, mujoco.mjtObj.mjOBJ_JOINT, jn)]) for jn in ("pusher_x", "pusher_y")]
+        # RNG for the optional stochastic `noise_patch` (aleatoric dynamics noise = the
+        # noisy-TV control for curiosity_control.py). Seeded so a run is reproducible, but
+        # repeated visits to the SAME state give DIFFERENT Δs (genuine irreducibility that
+        # an ensemble rejects by construction and a surprise-seeker fixates).
+        self._noise_rng = np.random.default_rng(int((dgp or {}).get("noise_seed", 0)))
 
     def _field_force(self, pos, amp, phase, field: dict) -> np.ndarray:
         """A deterministic, nonlinear force from a MULTI-MODE cellular (Taylor-Green-
@@ -160,8 +165,12 @@ class PusherEnv:
         """Set qfrc_applied from the field(s): always on the puck; optionally on the
         pusher (distinct phase) when `pusher_amp` > 0."""
         amp = field.get("amp", 1.3)
+        # `puck_phase` (default 0.0) lets the value-irrelevant puck field DRIFT between
+        # rounds (compounding_drift.py Phase 2: the value-irrelevant subspace is Type-2
+        # non-stationary too). Default 0.0 -> byte-identical to the original -> Cut #4d/#4e
+        # (meta_value_shaping / meta_value_learn / value_shaping) unchanged.
         self.data.qfrc_applied[self.puck_dof_idx] = self._field_force(
-            self.data.qpos[self.puck_qpos_idx], amp, 0.0, field)
+            self.data.qpos[self.puck_qpos_idx], amp, field.get("puck_phase", 0.0), field)
         pamp = field.get("pusher_amp", 0.0)
         if pamp > 0:
             self.data.qfrc_applied[self.pusher_dof_idx] = self._field_force(
@@ -190,6 +199,46 @@ class PusherEnv:
         w = float(np.exp(-((pos[0] - cx) ** 2 + (pos[1] - cy) ** 2) / (2.0 * sigma ** 2)))
         fx, fy = patch.get("force", [0.0, 8.0])
         self.data.qfrc_applied[self.pusher_dof_idx] = w * np.array([fx, fy], dtype=np.float64)
+
+    def _apply_pusher_perturb(self, field_patch: dict | None, noise_patch: dict | None):
+        """Localized PUSHER perturbations for curiosity_control.py (additive, off by default).
+
+          * `field_patch`: a Gaussian-gated MULTI-MODE smooth force (Taylor-Green-like, same
+            construction as `_field_force`) = a REDUCIBLE-but-CAPACITY-HUNGRY region. Its
+            `center` is DRIFTED between collection rounds (the Type-2 moving frontier); its
+            multi-mode complexity makes it costly to fit (so a curiosity drive that tracks it
+            actually buys FM competence, unlike a cheap constant jet). This is the learnable
+            structure the drive should chase.
+          * `noise_patch`: a Gaussian-gated STOCHASTIC force (`amp * N(0,1)` per substep) =
+            an ALEATORIC / IRREDUCIBLE region (the noisy-TV control). ‖e‖ is large but
+            d‖e‖/dt→0 and ensemble members agree on the mean → correctly rejected by
+            disagreement, incorrectly fixated by raw surprise.
+
+        Summed and written ONCE to the pusher DOFs. Single-writer contract: this experiment's
+        DGP carries none of the puck_field/patch/push_rot keys, so nothing else writes the
+        pusher DOFs this substep (no clobber). When both keys are absent this method is never
+        called (see step()), so the field-off path is byte-identical → Cuts #1-4e unchanged."""
+        pos = self.data.qpos[self.pusher_qpos_idx]
+        f = np.zeros(2, dtype=np.float64)
+        if field_patch is not None:
+            cx, cy = field_patch["center"]
+            sig = field_patch.get("sigma", 0.3)
+            w = float(np.exp(-((pos[0] - cx) ** 2 + (pos[1] - cy) ** 2) / (2.0 * sig ** 2)))
+            amp = field_patch.get("amp", 1.5)
+            phase = field_patch.get("phase", 0.0)
+            modes = field_patch.get("modes", [(1.0, 0.0), (1.6, 0.9), (2.2, 1.8), (2.9, 2.7)])
+            fx = fy = 0.0
+            for k, ph in modes:
+                fx += np.sin(k * pos[0] + ph + phase) * np.cos(k * pos[1] + ph + phase)
+                fy += -np.cos(k * pos[0] + ph + phase) * np.sin(k * pos[1] + ph + phase)
+            f = f + w * amp * np.array([fx, fy], dtype=np.float64)
+        if noise_patch is not None:
+            cx, cy = noise_patch["center"]
+            sig = noise_patch.get("sigma", 0.3)
+            w = float(np.exp(-((pos[0] - cx) ** 2 + (pos[1] - cy) ** 2) / (2.0 * sig ** 2)))
+            amp = noise_patch.get("amp", 3.0)
+            f = f + w * amp * self._noise_rng.standard_normal(2)
+        self.data.qfrc_applied[self.pusher_dof_idx] = f
 
     def _apply_actuator_rot(self, phi: float):
         """An INPUT-COUPLED dynamics change: the command's effect on the pusher is ROTATED
@@ -303,6 +352,8 @@ class PusherEnv:
         field = self.dgp.get("puck_field")
         patch = self.dgp.get("patch")
         push_rot = self.dgp.get("push_rot")
+        field_patch = self.dgp.get("field_patch")   # curiosity_control: reducible moving frontier
+        noise_patch = self.dgp.get("noise_patch")   # curiosity_control: aleatoric noisy-TV region
         max_force = 0.0
         max_puck_force = 0.0
         ncon_at_max = 0
@@ -318,6 +369,9 @@ class PusherEnv:
             if push_rot is not None:
                 # input-coupled conflict: rotate the command's effect by push_rot
                 self._apply_actuator_rot(push_rot)
+            if field_patch is not None or noise_patch is not None:
+                # curiosity_control: localized reducible (moving) + aleatoric (noisy-TV) forces
+                self._apply_pusher_perturb(field_patch, noise_patch)
             mujoco.mj_step(self.model, self.data)
             total, puck_f, puck_here, nc = self._contact_scan()
             if nc > 0:

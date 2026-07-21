@@ -21,3 +21,7 @@ An experiment/sub-experiment `README.md` is the default context injected into ev
 When adding a new script or sub-README, add its row to `FILES.md` and, if it opens a new theme, extend the `## Code & files` bullet map. Persist anything removed from a README into an auxiliary doc; never delete it outright.
 
 This structure should nest hierarchically. We're working on introducing the concept of "sub-experiments", which contain their own READMEs and auxiliary READMEs, and which should contain their own `FILES.md` files too. (Example sub-experiment directories are `experiments/a2a_forward/reaching` and `experiments/rhm/ratchet`). This means that experiment-level READMEs and FILES files should generally contain pointers to their children's READMEs and FILES files, rather than pointing to individual children auxiliary READMEs.
+
+The canonical *shape* of this nesting — and the direction we're migrating toward, where every writeup becomes its own folder with a `README.md` inside (`TOPIC_README.md` → `topic/README.md`) rather than a flat sibling file — is specified in the repo-root [`STRUCTURE.md`](../STRUCTURE.md). Use the `/writeup`[^private] skill to write a new writeup and propagate its (halving) summaries up the tree.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

@@ -1,0 +1,417 @@
+{
+  "config": {
+    "p": 97,
+    "n_epochs": 40000,
+    "lr": 0.001,
+    "weight_decay": 1.0,
+    "train_frac": 0.3,
+    "seed": 0,
+    "sm_steps": 4000,
+    "sm_lr": 0.001,
+    "sm_split": 0.8,
+    "widths": "32,128,512,2048",
+    "n_hidden": 1,
+    "device": "auto",
+    "out": "results/p97_seed0",
+    "log_interval": 2000,
+    "snapshots": ""
+  },
+  "device": "mps",
+  "grokking": {
+    "best_test_acc": 0.9957491755485535,
+    "grok_epoch": 14000,
+    "p": 97
+  },
+  "fiber_diagnostics": {
+    "input": {
+      "within_fiber_frac": 1.0,
+      "between_fiber_frac": 0.0,
+      "cos_fibermean_true": 0.0,
+      "eff_rank": 192.0
+    },
+    "h1": {
+      "within_fiber_frac": 0.8894604086225969,
+      "between_fiber_frac": 0.1105395913774031,
+      "cos_fibermean_true": 0.3311525530911975,
+      "eff_rank": 83.26986694335938
+    },
+    "h2": {
+      "within_fiber_frac": 0.06328723961742679,
+      "between_fiber_frac": 0.9367127603825732,
+      "cos_fibermean_true": 0.9673998635674506,
+      "eff_rank": 13.923500061035156
+    },
+    "logits": {
+      "within_fiber_frac": 0.04048181939903794,
+      "between_fiber_frac": 0.9595181806009621,
+      "cos_fibermean_true": 0.9798784976286286,
+      "eff_rank": 12.129520416259766
+    }
+  },
+  "sweep": {
+    "h1->h2": {
+      "forward": [
+        {
+          "n_params": 8352,
+          "train": {
+            "cosine": 0.9985414743423462,
+            "r2": 0.9971192676865506,
+            "r2_fibermean": 0.9368812980986846,
+            "cos_pred_fibermean": 0.9684763126113483,
+            "cos_fibermean_true": 0.9674807215623027,
+            "eff_rank_pred": 13.63135814666748,
+            "eff_rank_true": 13.940194129943848
+          },
+          "test": {
+            "cosine": 0.9985368251800537,
+            "r2": 0.9971151795841207,
+            "r2_fibermean": 0.938984774651357,
+            "cos_pred_fibermean": 0.9695283310838279,
+            "cos_fibermean_true": 0.968616672777489,
+            "eff_rank_pred": 13.580552101135254,
+            "eff_rank_true": 13.882586479187012
+          },
+          "width": 32
+        },
+        {
+          "n_params": 33024,
+          "train": {
+            "cosine": 0.9997512698173523,
+            "r2": 0.9994606156413572,
+            "r2_fibermean": 0.9368812980986846,
+            "cos_pred_fibermean": 0.9675893063944898,
+            "cos_fibermean_true": 0.9674807215623027,
+            "eff_rank_pred": 13.879448890686035,
+            "eff_rank_true": 13.940194129943848
+          },
+          "test": {
+            "cosine": 0.9997418522834778,
+            "r2": 0.9994396546529565,
+            "r2_fibermean": 0.938984774651357,
+            "cos_pred_fibermean": 0.9687208325060283,
+            "cos_fibermean_true": 0.968616672777489,
+            "eff_rank_pred": 13.828773498535156,
+            "eff_rank_true": 13.882586479187012
+          },
+          "width": 128
+        },
+        {
+          "n_params": 131712,
+          "train": {
+            "cosine": 0.9997743964195251,
+            "r2": 0.9995260039790703,
+            "r2_fibermean": 0.9368812980986846,
+            "cos_pred_fibermean": 0.9674814578479656,
+            "cos_fibermean_true": 0.9674807215623027,
+            "eff_rank_pred": 13.901809692382812,
+            "eff_rank_true": 13.940194129943848
+          },
+          "test": {
+            "cosine": 0.9993727803230286,
+            "r2": 0.9987178867738743,
+            "r2_fibermean": 0.938984774651357,
+            "cos_pred_fibermean": 0.9682643812880467,
+            "cos_fibermean_true": 0.968616672777489,
+            "eff_rank_pred": 13.846298217773438,
+            "eff_rank_true": 13.882586479187012
+          },
+          "width": 512
+        },
+        {
+          "n_params": 526464,
+          "train": {
+            "cosine": 0.9998558759689331,
+            "r2": 0.9997074858484246,
+            "r2_fibermean": 0.9368812980986846,
+            "cos_pred_fibermean": 0.9674525436983293,
+            "cos_fibermean_true": 0.9674807215623027,
+            "eff_rank_pred": 13.919755935668945,
+            "eff_rank_true": 13.940194129943848
+          },
+          "test": {
+            "cosine": 0.9988396167755127,
+            "r2": 0.9976769277289903,
+            "r2_fibermean": 0.938984774651357,
+            "cos_pred_fibermean": 0.9676213707556649,
+            "cos_fibermean_true": 0.968616672777489,
+            "eff_rank_pred": 13.878287315368652,
+            "eff_rank_true": 13.882586479187012
+          },
+          "width": 2048
+        }
+      ],
+      "inverse": [
+        {
+          "n_params": 8352,
+          "train": {
+            "cosine": 0.6880938410758972,
+            "r2": 0.4780178636705539,
+            "r2_fibermean": 0.09168551849723183,
+            "cos_pred_fibermean": 0.2909214371403061,
+            "cos_fibermean_true": 0.30200382039907214,
+            "eff_rank_pred": 28.998905181884766,
+            "eff_rank_true": 90.74520874023438
+          },
+          "test": {
+            "cosine": 0.6823902130126953,
+            "r2": 0.47026731409552147,
+            "r2_fibermean": 0.1270916443933735,
+            "cos_pred_fibermean": 0.3006964595154066,
+            "cos_fibermean_true": 0.3558585137492008,
+            "eff_rank_pred": 28.658187866210938,
+            "eff_rank_true": 88.84278869628906
+          },
+          "width": 32
+        },
+        {
+          "n_params": 33024,
+          "train": {
+            "cosine": 0.8586649298667908,
+            "r2": 0.7356757033775682,
+            "r2_fibermean": 0.09168551849723183,
+            "cos_pred_fibermean": 0.3554952192724935,
+            "cos_fibermean_true": 0.30200382039907214,
+            "eff_rank_pred": 56.60317611694336,
+            "eff_rank_true": 90.74520874023438
+          },
+          "test": {
+            "cosine": 0.8539534211158752,
+            "r2": 0.7272743132796418,
+            "r2_fibermean": 0.1270916443933735,
+            "cos_pred_fibermean": 0.3797301092635794,
+            "cos_fibermean_true": 0.3558585137492008,
+            "eff_rank_pred": 55.68753433227539,
+            "eff_rank_true": 88.84278869628906
+          },
+          "width": 128
+        },
+        {
+          "n_params": 131712,
+          "train": {
+            "cosine": 0.9049083590507507,
+            "r2": 0.8189277418840052,
+            "r2_fibermean": 0.09168551849723183,
+            "cos_pred_fibermean": 0.33989504553137934,
+            "cos_fibermean_true": 0.30200382039907214,
+            "eff_rank_pred": 68.67988586425781,
+            "eff_rank_true": 90.74520874023438
+          },
+          "test": {
+            "cosine": 0.8884561657905579,
+            "r2": 0.7891112488925958,
+            "r2_fibermean": 0.1270916443933735,
+            "cos_pred_fibermean": 0.36948412934178454,
+            "cos_fibermean_true": 0.3558585137492008,
+            "eff_rank_pred": 66.87872314453125,
+            "eff_rank_true": 88.84278869628906
+          },
+          "width": 512
+        },
+        {
+          "n_params": 526464,
+          "train": {
+            "cosine": 0.9389628171920776,
+            "r2": 0.8822614422820244,
+            "r2_fibermean": 0.09168551849723183,
+            "cos_pred_fibermean": 0.32775388788420184,
+            "cos_fibermean_true": 0.30200382039907214,
+            "eff_rank_pred": 76.08147430419922,
+            "eff_rank_true": 90.74520874023438
+          },
+          "test": {
+            "cosine": 0.8937450051307678,
+            "r2": 0.7988124507910401,
+            "r2_fibermean": 0.1270916443933735,
+            "cos_pred_fibermean": 0.36305657061664726,
+            "cos_fibermean_true": 0.3558585137492008,
+            "eff_rank_pred": 72.70109558105469,
+            "eff_rank_true": 88.84278869628906
+          },
+          "width": 2048
+        }
+      ]
+    },
+    "h1->logits": {
+      "forward": [
+        {
+          "n_params": 7329,
+          "train": {
+            "cosine": 0.9998912215232849,
+            "r2": 0.9997512271859034,
+            "r2_fibermean": 0.9580338719762902,
+            "cos_pred_fibermean": 0.9790111148668349,
+            "cos_fibermean_true": 0.9790092143949995,
+            "eff_rank_pred": 12.315017700195312,
+            "eff_rank_true": 12.324352264404297
+          },
+          "test": {
+            "cosine": 0.9998748302459717,
+            "r2": 0.9997169907891874,
+            "r2_fibermean": 0.9592212324691147,
+            "cos_pred_fibermean": 0.9797335618634827,
+            "cos_fibermean_true": 0.9797060728235969,
+            "eff_rank_pred": 12.276178359985352,
+            "eff_rank_true": 12.286009788513184
+          },
+          "width": 32
+        },
+        {
+          "n_params": 29025,
+          "train": {
+            "cosine": 0.9999478459358215,
+            "r2": 0.9998852130872858,
+            "r2_fibermean": 0.9580338719762902,
+            "cos_pred_fibermean": 0.9790519555438264,
+            "cos_fibermean_true": 0.9790092143949995,
+            "eff_rank_pred": 12.323657989501953,
+            "eff_rank_true": 12.324352264404297
+          },
+          "test": {
+            "cosine": 0.9999176263809204,
+            "r2": 0.9998231604633954,
+            "r2_fibermean": 0.9592212324691147,
+            "cos_pred_fibermean": 0.9797326894605569,
+            "cos_fibermean_true": 0.9797060728235969,
+            "eff_rank_pred": 12.28527545928955,
+            "eff_rank_true": 12.286009788513184
+          },
+          "width": 128
+        },
+        {
+          "n_params": 115809,
+          "train": {
+            "cosine": 0.9999470710754395,
+            "r2": 0.9998901470376521,
+            "r2_fibermean": 0.9580338719762902,
+            "cos_pred_fibermean": 0.9789772948822235,
+            "cos_fibermean_true": 0.9790092143949995,
+            "eff_rank_pred": 12.323573112487793,
+            "eff_rank_true": 12.324352264404297
+          },
+          "test": {
+            "cosine": 0.9993461966514587,
+            "r2": 0.9987212548566858,
+            "r2_fibermean": 0.9592212324691147,
+            "cos_pred_fibermean": 0.9791243459552219,
+            "cos_fibermean_true": 0.9797060728235969,
+            "eff_rank_pred": 12.283503532409668,
+            "eff_rank_true": 12.286009788513184
+          },
+          "width": 512
+        },
+        {
+          "n_params": 462945,
+          "train": {
+            "cosine": 0.9999345541000366,
+            "r2": 0.9998639811129437,
+            "r2_fibermean": 0.9580338719762902,
+            "cos_pred_fibermean": 0.9789605409805126,
+            "cos_fibermean_true": 0.9790092143949995,
+            "eff_rank_pred": 12.323040962219238,
+            "eff_rank_true": 12.324352264404297
+          },
+          "test": {
+            "cosine": 0.9991630911827087,
+            "r2": 0.9983312590806969,
+            "r2_fibermean": 0.9592212324691147,
+            "cos_pred_fibermean": 0.978826262536029,
+            "cos_fibermean_true": 0.9797060728235969,
+            "eff_rank_pred": 12.284578323364258,
+            "eff_rank_true": 12.286009788513184
+          },
+          "width": 2048
+        }
+      ],
+      "inverse": [
+        {
+          "n_params": 7360,
+          "train": {
+            "cosine": 0.47188109159469604,
+            "r2": 0.22794918094840222,
+            "r2_fibermean": 0.09168551849723183,
+            "cos_pred_fibermean": 0.659667290571006,
+            "cos_fibermean_true": 0.30200382039907214,
+            "eff_rank_pred": 16.778669357299805,
+            "eff_rank_true": 90.74520874023438
+          },
+          "test": {
+            "cosine": 0.465930700302124,
+            "r2": 0.22215405209437222,
+            "r2_fibermean": 0.1270916443933735,
+            "cos_pred_fibermean": 0.5799180318013675,
+            "cos_fibermean_true": 0.3558585137492008,
+            "eff_rank_pred": 16.765745162963867,
+            "eff_rank_true": 88.84278869628906
+          },
+          "width": 32
+        },
+        {
+          "n_params": 29056,
+          "train": {
+            "cosine": 0.5227603912353516,
+            "r2": 0.2783487084242481,
+            "r2_fibermean": 0.09168551849723183,
+            "cos_pred_fibermean": 0.6152036343802402,
+            "cos_fibermean_true": 0.30200382039907214,
+            "eff_rank_pred": 23.06633186340332,
+            "eff_rank_true": 90.74520874023438
+          },
+          "test": {
+            "cosine": 0.49708929657936096,
+            "r2": 0.25280499178283333,
+            "r2_fibermean": 0.1270916443933735,
+            "cos_pred_fibermean": 0.5264919313539739,
+            "cos_fibermean_true": 0.3558585137492008,
+            "eff_rank_pred": 22.97247886657715,
+            "eff_rank_true": 88.84278869628906
+          },
+          "width": 128
+        },
+        {
+          "n_params": 115840,
+          "train": {
+            "cosine": 0.5762042999267578,
+            "r2": 0.33644070078108557,
+            "r2_fibermean": 0.09168551849723183,
+            "cos_pred_fibermean": 0.5652525277820685,
+            "cos_fibermean_true": 0.30200382039907214,
+            "eff_rank_pred": 35.03428268432617,
+            "eff_rank_true": 90.74520874023438
+          },
+          "test": {
+            "cosine": 0.48084160685539246,
+            "r2": 0.23363065165309682,
+            "r2_fibermean": 0.1270916443933735,
+            "cos_pred_fibermean": 0.4742476464397044,
+            "cos_fibermean_true": 0.3558585137492008,
+            "eff_rank_pred": 34.76289749145508,
+            "eff_rank_true": 88.84278869628906
+          },
+          "width": 512
+        },
+        {
+          "n_params": 462976,
+          "train": {
+            "cosine": 0.6659446358680725,
+            "r2": 0.44641362665207485,
+            "r2_fibermean": 0.09168551849723183,
+            "cos_pred_fibermean": 0.4940985948695673,
+            "cos_fibermean_true": 0.30200382039907214,
+            "eff_rank_pred": 47.512142181396484,
+            "eff_rank_true": 90.74520874023438
+          },
+          "test": {
+            "cosine": 0.47352075576782227,
+            "r2": 0.21436713548402164,
+            "r2_fibermean": 0.1270916443933735,
+            "cos_pred_fibermean": 0.42812864681590285,
+            "cos_fibermean_true": 0.3558585137492008,
+            "eff_rank_pred": 46.92734909057617,
+            "eff_rank_true": 88.84278869628906
+          },
+          "width": 2048
+        }
+      ]
+    }
+  }
+}
