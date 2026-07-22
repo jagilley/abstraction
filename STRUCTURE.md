@@ -42,6 +42,10 @@ Naming: the folder is the `snake_case` of the topic; the writeup inside is alway
 
 Full detail lives once, in the writeup's own `README.md`. Every level *above* it carries a *summary* of it, and that summary roughly **halves in length at each step up**: the immediate parent gets a headline paragraph, the grandparent a sentence, the great-grandparent a clause. So the leaf holds everything, mid-levels hold paragraphs, and the top-level README holds one-liners — which is exactly what keeps each README scoped to its altitude and under the injection cap. The `/writeup`[^private] skill writes the leaf and propagates these halving summaries upward.
 
+## Code files
+
+Code files are also semantic. Files that are shared or imported by the auxiliary READMEs' code files (e.g., `experiments/a2a_forward/shared.py`) should be kept at the parent level, to be properly imported. Files associated with auxiliary READMEs should be in the child folder.
+
 ## Mechanics that keep it from breaking
 
 - **Pointers both ways.** Every README links up to its parent and down to each child. This is what lets an agent enter at any layer and still climb or descend for context.

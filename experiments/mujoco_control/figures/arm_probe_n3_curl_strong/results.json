@@ -1,0 +1,262 @@
+{
+  "config": {
+    "tag": "n3_curl_strong",
+    "seed": 0,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "axis": "curl",
+    "a_test": 6.0,
+    "a_trains": [
+      6.0,
+      4.5,
+      3.0,
+      1.5,
+      0.0
+    ],
+    "payload_base": 0.0,
+    "frame_skip": 10,
+    "q_center": [
+      0.4,
+      0.8,
+      0.6
+    ],
+    "q_range": 0.9,
+    "v_explore": 8.0,
+    "pool_n": 14000,
+    "probe_n": 1500,
+    "cap_pool_n": 9000,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 6000,
+    "cap_hidden": [
+      8,
+      16,
+      32,
+      64,
+      128,
+      256
+    ],
+    "n_eval": 48,
+    "q_jit": 0.25,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "reach_tries": 40,
+    "v0_std": 0.0,
+    "plan_H": 14,
+    "k_shoot": 1024,
+    "cem_iters": 8,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5,
+    "r_bins": 6,
+    "comp_batch": 128,
+    "comp_H": 30,
+    "comp_thresh": 0.05,
+    "do_capacity": false,
+    "do_locality": true,
+    "do_feasibility": true,
+    "do_composition": false,
+    "do_transmission": true
+  },
+  "P0": {
+    "fk_max_abs_err": 4.440892098500626e-16,
+    "axis_bite_rel": 0.4872296114932212
+  },
+  "geometry": {
+    "mean_reach_dist_m": 0.3922468395865583
+  },
+  "P2": {
+    "ladder": [
+      {
+        "a_train": 6.0,
+        "staleness": 0.0,
+        "fm_err": 0.5158482789993286,
+        "fm_err_broad": 0.16347761452198029,
+        "reactive": 0.026763863982680474,
+        "ballistic_cem": 0.08834284102530879
+      },
+      {
+        "a_train": 4.5,
+        "staleness": 1.5,
+        "fm_err": 0.4944683611392975,
+        "fm_err_broad": 1.3791842460632324,
+        "reactive": 0.020201905433584227,
+        "ballistic_cem": 0.16646852809286058
+      },
+      {
+        "a_train": 3.0,
+        "staleness": 3.0,
+        "fm_err": 0.47943314909935,
+        "fm_err_broad": 2.693187713623047,
+        "reactive": 0.033639622370172415,
+        "ballistic_cem": 0.15771716916667838
+      },
+      {
+        "a_train": 1.5,
+        "staleness": 4.5,
+        "fm_err": 0.5774893760681152,
+        "fm_err_broad": 4.068336486816406,
+        "reactive": 0.045678436945576925,
+        "ballistic_cem": 0.21394539759692155
+      },
+      {
+        "a_train": 0.0,
+        "staleness": 6.0,
+        "fm_err": 0.8597666621208191,
+        "fm_err_broad": 5.531859874725342,
+        "reactive": 0.06436212633774901,
+        "ballistic_cem": 0.31387670234360676
+      }
+    ],
+    "bin_var": "tip speed \u2016v_tip\u2016",
+    "r_bins": [
+      {
+        "lo": 0.0,
+        "hi": 0.5168784206972092,
+        "mid": 0.17590488000853247,
+        "n": 224,
+        "err_matched": 0.32881954312324524,
+        "err_stale": 0.34302228689193726,
+        "excess": 0.014202737249433994
+      },
+      {
+        "lo": 0.5168784206972092,
+        "hi": 1.0479318405302396,
+        "mid": 0.7846741745412035,
+        "n": 224,
+        "err_matched": 0.6379868388175964,
+        "err_stale": 0.7433851957321167,
+        "excess": 0.10539830476045609
+      },
+      {
+        "lo": 1.0479318405302396,
+        "hi": 1.4488289426735905,
+        "mid": 1.2589791008341005,
+        "n": 224,
+        "err_matched": 0.4658374786376953,
+        "err_stale": 0.8045927882194519,
+        "excess": 0.33875539898872375
+      },
+      {
+        "lo": 1.4488289426735905,
+        "hi": 1.9257093678425463,
+        "mid": 1.6722447727179761,
+        "n": 224,
+        "err_matched": 0.5811862945556641,
+        "err_stale": 0.8696020245552063,
+        "excess": 0.28841572999954224
+      },
+      {
+        "lo": 1.9257093678425463,
+        "hi": 2.4596614286659766,
+        "mid": 2.1950053417809428,
+        "n": 224,
+        "err_matched": 0.34133729338645935,
+        "err_stale": 1.0955103635787964,
+        "excess": 0.7541731595993042
+      },
+      {
+        "lo": 2.4596614286659766,
+        "hi": 3.720667434615382,
+        "mid": 2.8859020988453,
+        "n": 224,
+        "err_matched": 0.7399219870567322,
+        "err_stale": 1.3024871349334717,
+        "excess": 0.5625651478767395
+      }
+    ],
+    "excess_vs_r_slope": 0.24956968106571184,
+    "excess_extended_over_folded": 39.609628619972476
+  },
+  "P3": {
+    "do_nothing": 0.40194326295747684,
+    "random_action": 0.39734260040118785,
+    "reactive_matched": 0.027853420582266104,
+    "ballistic_matched": 0.0929162028853755,
+    "ballistic_frac_of_floor": 0.2311674587366775,
+    "controlled_max_absq": 2.8597177735488626,
+    "operating_velocity": {
+      "reference": {
+        "max_absqd": 16.30364418029785,
+        "mean_absqd": 5.771434238978794
+      },
+      "reference_ballistic": {
+        "max_absqd": 15.430048942565918,
+        "mean_absqd": 5.54174593942506
+      },
+      "reactive": {
+        "max_absqd": 15.91435432434082,
+        "mean_absqd": 5.916500159672329
+      },
+      "ballistic": {
+        "max_absqd": 15.033093452453613,
+        "mean_absqd": 5.516203867537635
+      }
+    },
+    "collection_v_explore": 8.0
+  },
+  "P5": {
+    "ladder": [
+      {
+        "a_train": 6.0,
+        "staleness": 0.0,
+        "fm_err": 0.5158482789993286,
+        "fm_err_broad": 0.16347761452198029,
+        "reactive": 0.026763863982680474,
+        "ballistic_cem": 0.08834284102530879
+      },
+      {
+        "a_train": 4.5,
+        "staleness": 1.5,
+        "fm_err": 0.4944683611392975,
+        "fm_err_broad": 1.3791842460632324,
+        "reactive": 0.020201905433584227,
+        "ballistic_cem": 0.16646852809286058
+      },
+      {
+        "a_train": 3.0,
+        "staleness": 3.0,
+        "fm_err": 0.47943314909935,
+        "fm_err_broad": 2.693187713623047,
+        "reactive": 0.033639622370172415,
+        "ballistic_cem": 0.15771716916667838
+      },
+      {
+        "a_train": 1.5,
+        "staleness": 4.5,
+        "fm_err": 0.5774893760681152,
+        "fm_err_broad": 4.068336486816406,
+        "reactive": 0.045678436945576925,
+        "ballistic_cem": 0.21394539759692155
+      },
+      {
+        "a_train": 0.0,
+        "staleness": 6.0,
+        "fm_err": 0.8597666621208191,
+        "fm_err_broad": 5.531859874725342,
+        "reactive": 0.06436212633774901,
+        "ballistic_cem": 0.31387670234360676
+      }
+    ],
+    "slopes": {
+      "reactive": 0.10066860011190723,
+      "ballistic_cem": 0.46580885282846896,
+      "ratio_ballistic_over_reactive": 4.627151388874287
+    }
+  },
+  "wrapped_controlled": false
+}

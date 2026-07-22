@@ -1,0 +1,94 @@
+{
+  "config": {
+    "tag": "trans_s1",
+    "seed": 1,
+    "controllers": [
+      "reactive",
+      "ballistic_cem",
+      "ballistic_bc"
+    ],
+    "d_test": 2.0,
+    "damp_trains": [
+      2.0,
+      2.8,
+      3.8,
+      5.2,
+      7.0
+    ],
+    "frame_skip": 12,
+    "arena_half": 1.8,
+    "gear": 10.0,
+    "corridor_r": 0.4,
+    "band_h": 0.5,
+    "pool_n": 9000,
+    "probe_n": 800,
+    "v_explore": 1.2,
+    "probe_v": 0.15,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 4000,
+    "pol_hidden": 256,
+    "pol_layers": 3,
+    "pol_lr": 0.001,
+    "pol_steps": 4000,
+    "bc_tuples": 1500,
+    "n_eval": 40,
+    "goal_jit": 0.06,
+    "v0_std": 0.3,
+    "plan_H": 34,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5
+  },
+  "results": [
+    {
+      "d_train": 2.0,
+      "staleness": 0.0,
+      "fm_err": 0.0008765650563873351,
+      "reactive": 0.01136755757033825,
+      "ballistic_cem": 0.10234418511390686,
+      "ballistic_bc": 0.08752591907978058
+    },
+    {
+      "d_train": 2.8,
+      "staleness": 0.7999999999999998,
+      "fm_err": 0.02851063199341297,
+      "reactive": 0.012467030435800552,
+      "ballistic_cem": 0.19041872024536133,
+      "ballistic_bc": 0.17064633965492249
+    },
+    {
+      "d_train": 3.8,
+      "staleness": 1.7999999999999998,
+      "fm_err": 0.06143533065915108,
+      "reactive": 0.02587895467877388,
+      "ballistic_cem": 0.2270011007785797,
+      "ballistic_bc": 0.22828459739685059
+    },
+    {
+      "d_train": 5.2,
+      "staleness": 3.2,
+      "fm_err": 0.10744959861040115,
+      "reactive": 0.04292883351445198,
+      "ballistic_cem": 0.2482488751411438,
+      "ballistic_bc": 0.2846522033214569
+    },
+    {
+      "d_train": 7.0,
+      "staleness": 5.0,
+      "fm_err": 0.16474635899066925,
+      "reactive": 0.06617161631584167,
+      "ballistic_cem": 0.26806458830833435,
+      "ballistic_bc": 0.27119559049606323
+    }
+  ],
+  "slopes": {
+    "reactive": 0.3510431654029963,
+    "ballistic_cem": 0.8912527375792022,
+    "ballistic_bc": 1.0967925546943982
+  }
+}

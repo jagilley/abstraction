@@ -1,0 +1,113 @@
+{
+  "config": {
+    "tag": "readapt_s0",
+    "seed": 0,
+    "controllers": [
+      "reactive",
+      "ballistic_cem",
+      "ballistic_bc"
+    ],
+    "d0": 6.0,
+    "d1": 2.0,
+    "milestones": [
+      0,
+      200,
+      500,
+      1200,
+      3000,
+      6000
+    ],
+    "finetune_steps": 800,
+    "frame_skip": 12,
+    "arena_half": 1.8,
+    "gear": 10.0,
+    "corridor_r": 0.4,
+    "band_h": 0.5,
+    "pool_n": 6000,
+    "probe_n": 800,
+    "v_explore": 1.2,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 4000,
+    "pol_hidden": 256,
+    "pol_layers": 3,
+    "pol_lr": 0.001,
+    "pol_steps": 4000,
+    "bc_tuples": 1500,
+    "n_eval": 40,
+    "goal_jit": 0.06,
+    "v0_std": 0.3,
+    "plan_H": 34,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5
+  },
+  "ladder": [
+    {
+      "fm_err": 0.13111889362335205,
+      "reactive": 0.050154946744441986,
+      "ballistic_cem": 0.3043699860572815,
+      "ballistic_bc": 0.2943071722984314,
+      "transitions": 0
+    },
+    {
+      "fm_err": 0.000620977662038058,
+      "reactive": 0.009656641632318497,
+      "ballistic_cem": 0.11315581202507019,
+      "transitions": 200
+    },
+    {
+      "fm_err": 0.0003606884856708348,
+      "reactive": 0.009656163863837719,
+      "ballistic_cem": 0.11392606794834137,
+      "transitions": 500
+    },
+    {
+      "fm_err": 0.00040796928806230426,
+      "reactive": 0.009802697226405144,
+      "ballistic_cem": 0.11162663996219635,
+      "transitions": 1200
+    },
+    {
+      "fm_err": 0.00033144649933092296,
+      "reactive": 0.010112973861396313,
+      "ballistic_cem": 0.113155797123909,
+      "transitions": 3000
+    },
+    {
+      "fm_err": 0.00024390555336140096,
+      "reactive": 0.009255973622202873,
+      "ballistic_cem": 0.11275649070739746,
+      "ballistic_bc": 0.11444821953773499,
+      "transitions": 6000
+    }
+  ],
+  "ceiling": {
+    "fm_err": 0.0003878468996845186,
+    "reactive": 0.008503586053848267,
+    "ballistic_cem": 0.11430218815803528,
+    "ballistic_bc": 0.10294967889785767,
+    "transitions": -1
+  },
+  "recovery": {
+    "reactive": {
+      "stale": 0.050154946744441986,
+      "recovered": 0.009255973622202873,
+      "gain": 0.04089897312223911
+    },
+    "ballistic_cem": {
+      "stale": 0.3043699860572815,
+      "recovered": 0.11275649070739746,
+      "gain": 0.19161349534988403
+    },
+    "ballistic_bc": {
+      "stale": 0.2943071722984314,
+      "recovered": 0.11444821953773499,
+      "gain": 0.1798589527606964
+    }
+  }
+}

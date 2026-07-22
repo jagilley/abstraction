@@ -1,0 +1,79 @@
+{
+  "config": {
+    "tag": "chartr1",
+    "seed": 0,
+    "controllers": [
+      "reactive",
+      "ballistic_cem"
+    ],
+    "d_test": 2.0,
+    "damp_trains": [
+      2.0,
+      3.0,
+      4.5,
+      6.5
+    ],
+    "frame_skip": 12,
+    "arena_half": 1.8,
+    "gear": 10.0,
+    "corridor_r": 0.4,
+    "band_h": 0.5,
+    "pool_n": 9000,
+    "probe_n": 800,
+    "v_explore": 1.2,
+    "probe_v": 0.15,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 4000,
+    "pol_hidden": 256,
+    "pol_layers": 3,
+    "pol_lr": 0.001,
+    "pol_steps": 4000,
+    "bc_tuples": 2000,
+    "n_eval": 28,
+    "goal_jit": 0.06,
+    "v0_std": 0.3,
+    "plan_H": 34,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5
+  },
+  "results": [
+    {
+      "d_train": 2.0,
+      "staleness": 0.0,
+      "fm_err": 0.0008629196672700346,
+      "reactive": 0.010652689263224602,
+      "ballistic_cem": 0.11285864561796188
+    },
+    {
+      "d_train": 3.0,
+      "staleness": 1.0,
+      "fm_err": 0.03361125662922859,
+      "reactive": 0.017978698015213013,
+      "ballistic_cem": 0.20791572332382202
+    },
+    {
+      "d_train": 4.5,
+      "staleness": 2.5,
+      "fm_err": 0.08318787813186646,
+      "reactive": 0.03532087057828903,
+      "ballistic_cem": 0.2548111081123352
+    },
+    {
+      "d_train": 6.5,
+      "staleness": 4.5,
+      "fm_err": 0.14601433277130127,
+      "reactive": 0.05885475501418114,
+      "ballistic_cem": 0.2793653607368469
+    }
+  ],
+  "slopes": {
+    "reactive": 0.3377986865506323,
+    "ballistic_cem": 1.0606437120248748
+  }
+}

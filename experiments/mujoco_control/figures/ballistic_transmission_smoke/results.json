@@ -1,0 +1,67 @@
+{
+  "config": {
+    "tag": "smoke",
+    "seed": 0,
+    "controllers": [
+      "reactive",
+      "ballistic_cem",
+      "ballistic_bc"
+    ],
+    "d_test": 2.0,
+    "damp_trains": [
+      2.0,
+      7.0
+    ],
+    "frame_skip": 12,
+    "arena_half": 1.8,
+    "gear": 10.0,
+    "corridor_r": 0.5,
+    "band_h": 0.5,
+    "pool_n": 3000,
+    "probe_n": 300,
+    "v_explore": 1.2,
+    "probe_v": 0.15,
+    "fm_hidden": 128,
+    "fm_layers": 2,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1200,
+    "pol_hidden": 128,
+    "pol_layers": 2,
+    "pol_lr": 0.001,
+    "pol_steps": 1200,
+    "bc_tuples": 600,
+    "n_eval": 16,
+    "goal_jit": 0.06,
+    "v0_std": 0.3,
+    "plan_H": 30,
+    "k_shoot": 128,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5
+  },
+  "results": [
+    {
+      "d_train": 2.0,
+      "staleness": 0.0,
+      "fm_err": 0.0005873230984434485,
+      "reactive": 0.11864733695983887,
+      "ballistic_cem": 0.2738066017627716,
+      "ballistic_bc": 0.26145845651626587
+    },
+    {
+      "d_train": 7.0,
+      "staleness": 5.0,
+      "fm_err": 0.1625000238418579,
+      "reactive": 0.034210205078125,
+      "ballistic_cem": 0.24819281697273254,
+      "ballistic_bc": 0.22911638021469116
+    }
+  ],
+  "slopes": {
+    "reactive": -0.5214978904929928,
+    "ballistic_cem": -0.15819503147334682,
+    "ballistic_bc": -0.19975008849261053
+  }
+}

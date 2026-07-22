@@ -1,0 +1,92 @@
+{
+  "config": {
+    "tag": "smoke",
+    "seed": 0,
+    "controllers": [
+      "reactive",
+      "ballistic_cem",
+      "ballistic_bc"
+    ],
+    "d0": 6.0,
+    "d1": 2.0,
+    "milestones": [
+      0,
+      500,
+      3000
+    ],
+    "finetune_steps": 400,
+    "frame_skip": 12,
+    "arena_half": 1.8,
+    "gear": 10.0,
+    "corridor_r": 0.4,
+    "band_h": 0.5,
+    "pool_n": 3000,
+    "probe_n": 300,
+    "v_explore": 1.2,
+    "fm_hidden": 128,
+    "fm_layers": 2,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1200,
+    "pol_hidden": 128,
+    "pol_layers": 2,
+    "pol_lr": 0.001,
+    "pol_steps": 1200,
+    "bc_tuples": 600,
+    "n_eval": 16,
+    "goal_jit": 0.06,
+    "v0_std": 0.3,
+    "plan_H": 34,
+    "k_shoot": 128,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5
+  },
+  "ladder": [
+    {
+      "fm_err": 0.13164429366588593,
+      "reactive": 0.05900260806083679,
+      "ballistic_cem": 0.16272929310798645,
+      "ballistic_bc": 0.11604765057563782,
+      "transitions": 0
+    },
+    {
+      "fm_err": 0.0007946426630951464,
+      "reactive": 0.03529652953147888,
+      "ballistic_cem": 0.07157519459724426,
+      "transitions": 500
+    },
+    {
+      "fm_err": 0.0005705237272195518,
+      "reactive": 0.03270997479557991,
+      "ballistic_cem": 0.07458102703094482,
+      "ballistic_bc": 0.06786501407623291,
+      "transitions": 3000
+    }
+  ],
+  "ceiling": {
+    "fm_err": 0.000691998575348407,
+    "reactive": 0.03267272561788559,
+    "ballistic_cem": 0.07450240105390549,
+    "ballistic_bc": 0.06480242311954498,
+    "transitions": -1
+  },
+  "recovery": {
+    "reactive": {
+      "stale": 0.05900260806083679,
+      "recovered": 0.03270997479557991,
+      "gain": 0.02629263326525688
+    },
+    "ballistic_cem": {
+      "stale": 0.16272929310798645,
+      "recovered": 0.07458102703094482,
+      "gain": 0.08814826607704163
+    },
+    "ballistic_bc": {
+      "stale": 0.11604765057563782,
+      "recovered": 0.06786501407623291,
+      "gain": 0.04818263649940491
+    }
+  }
+}

@@ -277,6 +277,66 @@ class PusherEnv:
                 field.get("pusher_amp", 0.0), field.get("pusher_phase", 1.57), field)
         self.data.qfrc_applied[self.pusher_dof_idx] = base + correction
 
+    def _apply_rot_regions(self, regions: list, accumulate: bool):
+        """K INDEPENDENT, spatially-LOCALIZED command->motion rotations (directed-collection
+        cut #5). `regions` is a list of dicts `{center: (cx,cy), sigma: float, phi: float}`;
+        the pusher's effective actuation becomes
+
+            qfrc = gear * ( sum_j w_j(pos) * (R(phi_j) - I) ) @ ctrl,     w_j = Gaussian gate
+
+        i.e. each region carries its OWN rotation of the command channel, and only transitions
+        taken INSIDE region j carry information about phi_j.
+
+        WHY THIS SHAPE (the design finding cut #5 turns on). Directed collection needs a
+        dynamics change that is at once
+          * LOCAL       — only in-region data informs it, so *where* you collect matters
+                          (a global damping shift, cut #4b's axis, is learnable from anywhere);
+          * open-loop COMPENSABLE — a ballistic controller with a correct FM can actually cash
+                          the local fix in. An additive local force JET (`_apply_patch`) is NOT:
+                          feedforward cannot counteract a strong kick whose timing it can't
+                          predict, so it saturates ballistic control at "fail" for every FM
+                          quality (cut #4b's negative). A rotation of the COMMAND channel is
+                          compensable — the planner simply pre-rotates its commands — while
+                          still being purely local. Perturb the command channel, not the force
+                          channel.
+        Biologically this is the canonical cerebellar adaptation paradigm (state-dependent
+        visuomotor rotation / gain-field), and a wrong phi_j is textbook dysmetria.
+
+        `accumulate=True` ADDS onto whatever a prior pusher writer put in qfrc_applied this
+        substep (so a `noise_patch` aleatoric decoy can coexist — cut #5's region D); with
+        `accumulate=False` it assigns. Called LAST in step() so it never gets clobbered.
+        Additive & off by default (dgp has no 'rot_regions') -> all prior cuts unchanged."""
+        pos = self.data.qpos[self.pusher_qpos_idx]
+        ux, uy = float(self.data.ctrl[0]), float(self.data.ctrl[1])
+        dx = dy = 0.0
+        nx = ny = 0.0
+        for rg in regions:
+            cx, cy = rg["center"]
+            sig = rg.get("sigma", 0.3)
+            w = float(np.exp(-((pos[0] - cx) ** 2 + (pos[1] - cy) ** 2) / (2.0 * sig ** 2)))
+            if w < 1e-4:
+                continue
+            phi = float(rg.get("phi", 0.0))
+            if phi != 0.0:
+                c, s = float(np.cos(phi)), float(np.sin(phi))
+                dx += w * ((c * ux - s * uy) - ux)        # w_j * ((R(phi_j) - I) @ u)_x
+                dy += w * ((s * ux + c * uy) - uy)
+            # Optional ALEATORIC component: a Gaussian-gated stochastic force (the noisy-TV
+            # decoy). Prediction error inside such a region is large but IRREDUCIBLE, so a
+            # raw-surprise drive fixates on it while an ensemble-disagreement drive rejects
+            # it. Carried on the same region dict so one partition can mix reducible
+            # (rotation) and irreducible (noise) regions -- directed_ladder's 2x2.
+            amp = float(rg.get("noise", 0.0))
+            if amp > 0.0:
+                z = self._noise_rng.standard_normal(2)
+                nx += w * amp * float(z[0]); ny += w * amp * float(z[1])
+        corr = self.dgp["gear"] * np.array([dx, dy], dtype=np.float64) \
+            + np.array([nx, ny], dtype=np.float64)
+        if accumulate:
+            self.data.qfrc_applied[self.pusher_dof_idx] += corr
+        else:
+            self.data.qfrc_applied[self.pusher_dof_idx] = corr
+
     def get_state(self) -> np.ndarray:
         return np.concatenate([self.data.qpos, self.data.qvel]).astype(np.float32)
 
@@ -354,6 +414,11 @@ class PusherEnv:
         push_rot = self.dgp.get("push_rot")
         field_patch = self.dgp.get("field_patch")   # curiosity_control: reducible moving frontier
         noise_patch = self.dgp.get("noise_patch")   # curiosity_control: aleatoric noisy-TV region
+        rot_regions = self.dgp.get("rot_regions")   # directed_*: K localized command rotations
+        # rot_regions runs LAST and accumulates iff another writer already touched the pusher
+        # DOFs this substep (so an aleatoric noise_patch can coexist with the rotations).
+        rot_accum = (patch is not None or field_patch is not None or noise_patch is not None
+                     or (field is not None and field.get("pusher_amp", 0.0) > 0))
         max_force = 0.0
         max_puck_force = 0.0
         ncon_at_max = 0
@@ -372,6 +437,9 @@ class PusherEnv:
             if field_patch is not None or noise_patch is not None:
                 # curiosity_control: localized reducible (moving) + aleatoric (noisy-TV) forces
                 self._apply_pusher_perturb(field_patch, noise_patch)
+            if rot_regions:
+                # directed collection: K localized command->motion rotations (last writer)
+                self._apply_rot_regions(rot_regions, rot_accum)
             mujoco.mj_step(self.model, self.data)
             total, puck_f, puck_here, nc = self._contact_scan()
             if nc > 0:

@@ -1,0 +1,203 @@
+{
+  "config": {
+    "tag": "tool_v1",
+    "seed": 0,
+    "n_links": 5,
+    "n_passive": 2,
+    "goal_site": "hand",
+    "tool_masses": [
+      0.02,
+      0.1,
+      0.3,
+      0.6,
+      1.0
+    ],
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3,
+      0.25,
+      0.2
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6,
+      0.4,
+      0.3
+    ],
+    "q_center": [
+      0.4,
+      0.8,
+      0.6,
+      0.0,
+      0.0
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "q_range": 0.9,
+    "v_explore": 6.0,
+    "pool_n": 14000,
+    "probe_n": 1500,
+    "fm_hidden": 256,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 5000,
+    "cap_hidden": [
+      32,
+      256
+    ],
+    "r2_target": 0.99,
+    "n_eval": 48,
+    "q_jit": 0.25,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "reach_tries": 40,
+    "plan_H": 14,
+    "k_shoot": 512,
+    "cem_iters": 5,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5
+  },
+  "rows": [
+    {
+      "tool_mass": 0.02,
+      "widths": [
+        {
+          "hidden": 32,
+          "r2_full_armvel": 0.9921258091926575,
+          "r2_blind_armvel": 0.9980524182319641
+        },
+        {
+          "hidden": 256,
+          "r2_full_armvel": 0.9994112849235535,
+          "r2_blind_armvel": 0.9991076588630676
+        }
+      ],
+      "capacity_req_full": 32,
+      "capacity_req_blind": 32,
+      "coupling_r2_gap": 0.00030362606048583984,
+      "control": {
+        "full_reactive": 0.04074427794128342,
+        "full_ballistic": 0.07715678977570692,
+        "blind_reactive": 0.034530559631497405,
+        "blind_ballistic": 0.06097588412758993
+      },
+      "do_nothing": 0.37154294849994957,
+      "blind_cost_reactive": -0.006213718309786016,
+      "blind_cost_ballistic": -0.016180905648116986
+    },
+    {
+      "tool_mass": 0.1,
+      "widths": [
+        {
+          "hidden": 32,
+          "r2_full_armvel": 0.9910394549369812,
+          "r2_blind_armvel": 0.9905110001564026
+        },
+        {
+          "hidden": 256,
+          "r2_full_armvel": 0.9993616938591003,
+          "r2_blind_armvel": 0.9912354946136475
+        }
+      ],
+      "capacity_req_full": 32,
+      "capacity_req_blind": 32,
+      "coupling_r2_gap": 0.00812619924545288,
+      "control": {
+        "full_reactive": 0.07207203835863263,
+        "full_ballistic": 0.13068679098021452,
+        "blind_reactive": 0.07602489302038232,
+        "blind_ballistic": 0.12564106995536137
+      },
+      "do_nothing": 0.37154294849994957,
+      "blind_cost_reactive": 0.0039528546617496885,
+      "blind_cost_ballistic": -0.00504572102485315
+    },
+    {
+      "tool_mass": 0.3,
+      "widths": [
+        {
+          "hidden": 32,
+          "r2_full_armvel": 0.9878904819488525,
+          "r2_blind_armvel": 0.9611262679100037
+        },
+        {
+          "hidden": 256,
+          "r2_full_armvel": 0.9989909529685974,
+          "r2_blind_armvel": 0.9587705135345459
+        }
+      ],
+      "capacity_req_full": 256,
+      "capacity_req_blind": null,
+      "coupling_r2_gap": 0.040220439434051514,
+      "control": {
+        "full_reactive": 0.11244310467637308,
+        "full_ballistic": 0.19448276002604023,
+        "blind_reactive": 0.14622328398889595,
+        "blind_ballistic": 0.20011085001711326
+      },
+      "do_nothing": 0.37154294849994957,
+      "blind_cost_reactive": 0.03378017931252286,
+      "blind_cost_ballistic": 0.005628089991073032
+    },
+    {
+      "tool_mass": 0.6,
+      "widths": [
+        {
+          "hidden": 32,
+          "r2_full_armvel": 0.9858672022819519,
+          "r2_blind_armvel": 0.9378195405006409
+        },
+        {
+          "hidden": 256,
+          "r2_full_armvel": 0.9982842803001404,
+          "r2_blind_armvel": 0.9320032000541687
+        }
+      ],
+      "capacity_req_full": 256,
+      "capacity_req_blind": null,
+      "coupling_r2_gap": 0.06628108024597168,
+      "control": {
+        "full_reactive": 0.15360190512072514,
+        "full_ballistic": 0.22917057548731046,
+        "blind_reactive": 0.19454504567097358,
+        "blind_ballistic": 0.2679812704840863
+      },
+      "do_nothing": 0.37154294849994957,
+      "blind_cost_reactive": 0.04094314055024845,
+      "blind_cost_ballistic": 0.03881069499677586
+    },
+    {
+      "tool_mass": 1.0,
+      "widths": [
+        {
+          "hidden": 32,
+          "r2_full_armvel": 0.9833058714866638,
+          "r2_blind_armvel": 0.9194353222846985
+        },
+        {
+          "hidden": 256,
+          "r2_full_armvel": 0.9974306225776672,
+          "r2_blind_armvel": 0.9088156819343567
+        }
+      ],
+      "capacity_req_full": 256,
+      "capacity_req_blind": null,
+      "coupling_r2_gap": 0.08861494064331055,
+      "control": {
+        "full_reactive": 0.191756502766812,
+        "full_ballistic": 0.2636981925451818,
+        "blind_reactive": 0.23740406667578068,
+        "blind_ballistic": 0.2892697887361739
+      },
+      "do_nothing": 0.37154294849994957,
+      "blind_cost_reactive": 0.04564756390896868,
+      "blind_cost_ballistic": 0.02557159619099214
+    }
+  ],
+  "hand_fk_max_abs_err": 4.440892098500626e-16
+}
