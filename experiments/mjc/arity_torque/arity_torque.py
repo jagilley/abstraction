@@ -28,14 +28,14 @@ Three readouts:
 
 Run:
     cd experiments/
-    modal run mujoco_control/arity_torque.py::arity_torque --quick
-    modal run --detach mujoco_control/arity_torque.py::run_arity  # (full; see entrypoint)
+    modal run mjc/arity_torque/arity_torque.py::arity_torque --quick
+    modal run --detach mjc/arity_torque/arity_torque.py::run_arity  # (full; see entrypoint)
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 # state-dim groups (see pusher_env.STATE_LABELS)
 PUSHER_VEL = [4, 5]   # directly actuated -> where the command lives
@@ -60,7 +60,7 @@ def run_arity(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import collect_transitions, PusherEnv, STATE_LABELS
+    from mjc.pusher_env import collect_transitions, PusherEnv, STATE_LABELS
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

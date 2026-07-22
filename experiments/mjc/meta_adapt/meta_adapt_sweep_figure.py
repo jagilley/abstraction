@@ -1,7 +1,7 @@
 """Stitch the meta_adapt floor + actuator-conflict runs into the ORDER-PARAMETER
 figure: the meta-vs-multitask gap (and the conflict strength) as a function of the
 actuator-rotation half-range Phi. Reads the local results.json mirrors and writes a
-combined figure. Run locally (matplotlib): python3 mujoco_control/meta_adapt_sweep_figure.py
+combined figure. Run locally (matplotlib): python3 mjc/meta_adapt/meta_adapt_sweep_figure.py
 """
 import json
 import os

@@ -45,14 +45,14 @@ while the FM can be re-fit from reward-free (s,u,s') transitions.
 
 Run:
     cd experiments/
-    modal run mujoco_control/dynamics_shift.py::dynamics_shift --quick   # smoke
-    modal run --detach mujoco_control/dynamics_shift.py::run_dynamics_shift  # (full; see entrypoint)
+    modal run mjc/dynamics_shift/dynamics_shift.py::dynamics_shift --quick   # smoke
+    modal run --detach mjc/dynamics_shift/dynamics_shift.py::run_dynamics_shift  # (full; see entrypoint)
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 
 @app.function(gpu="L4", memory=32768, timeout=7200, volumes={DATA_DIR: volume})
@@ -63,7 +63,7 @@ def run_dynamics_shift(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])
@@ -655,7 +655,7 @@ def run_replan_ablation(cfg: dict) -> dict:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"]); np.random.seed(cfg["seed"])
     device = "cuda" if torch.cuda.is_available() else "cpu"

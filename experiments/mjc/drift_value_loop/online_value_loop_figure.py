@@ -11,8 +11,8 @@ flat. Reads figures/online_value_loop_<tag>/results.json for the seed tags and e
   * fig_selftune  — the self-tuned b trajectories: online_front converges toward argmin
         corridor-error; online_ctrl wanders (flat control gives no gradient).
 
-Run:  python3 mujoco_control/online_value_loop_figure.py
-      python3 mujoco_control/online_value_loop_figure.py --tags teacher_s0 teacher_s1 teacher_s2
+Run:  python3 mjc/drift_value_loop/online_value_loop_figure.py
+      python3 mjc/drift_value_loop/online_value_loop_figure.py --tags teacher_s0 teacher_s1 teacher_s2
 """
 
 import argparse

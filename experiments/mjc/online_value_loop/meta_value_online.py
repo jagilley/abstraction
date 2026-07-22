@@ -51,11 +51,11 @@ restructured from retrain-per-candidate (offline) to one continuously-trained li
 
 Run:
     cd experiments/
-    modal run mujoco_control/meta_value_online.py::meta_value_online --quick                       # smoke
+    modal run mjc/online_value_loop/meta_value_online.py::meta_value_online --quick                       # smoke
     # the 2x2 (3 seeds each):
     for s in 0 1 2; do
-      modal run --detach mujoco_control/meta_value_online.py::meta_value_online --tag comp_s$s --seed $s --field-pusher-amp 2.0
-      modal run --detach mujoco_control/meta_value_online.py::meta_value_online --tag easy_s$s --seed $s --field-pusher-amp 0.0
+      modal run --detach mjc/online_value_loop/meta_value_online.py::meta_value_online --tag comp_s$s --seed $s --field-pusher-amp 2.0
+      modal run --detach mjc/online_value_loop/meta_value_online.py::meta_value_online --tag easy_s$s --seed $s --field-pusher-amp 0.0
     done
 """
 
@@ -63,7 +63,7 @@ import json
 import math
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 PUSHER_POS = [0, 1]
 PUCK_POS = [2, 3]
@@ -88,7 +88,7 @@ def run_meta_value_online(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import collect_transitions, PusherEnv
+    from mjc.pusher_env import collect_transitions, PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

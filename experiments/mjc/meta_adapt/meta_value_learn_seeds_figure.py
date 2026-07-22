@@ -16,7 +16,7 @@ easy-pusher seeds and plots the two order parameters side by side:
     -0.28 while its converged mean was +0.31). The converged mean is the standard,
     less-biased CEM point estimate. Per-seed scatter + mean+-sem.
 
-Run:  cd experiments/ && python3 mujoco_control/meta_value_learn_seeds_figure.py
+Run:  cd experiments/ && python3 mjc/meta_adapt/meta_value_learn_seeds_figure.py
 Writes figures/meta_value_learn_seeds/fig_seeds.png
 """
 import json

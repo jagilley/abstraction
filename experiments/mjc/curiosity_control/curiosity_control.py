@@ -52,17 +52,17 @@ occupancy heatmap (did the drive find/track the moving patch). Order parameters:
 
 Run:
     cd experiments/
-    modal run mujoco_control/curiosity_control.py::curiosity_control --quick                       # smoke
-    modal run --detach mujoco_control/curiosity_control.py::curiosity_control --tag drift_v1        # drift (headline)
-    modal run --detach mujoco_control/curiosity_control.py::curiosity_control --tag stat_v1  --drift-mode none   # stationary null
-    modal run --detach mujoco_control/curiosity_control.py::curiosity_control --tag noise_v1 --noise             # noisy-TV
-    modal run --detach mujoco_control/curiosity_control.py::curiosity_control --tag offpath_v1 --value-rel off    # value-relevance null
+    modal run mjc/curiosity_control/curiosity_control.py::curiosity_control --quick                       # smoke
+    modal run --detach mjc/curiosity_control/curiosity_control.py::curiosity_control --tag drift_v1        # drift (headline)
+    modal run --detach mjc/curiosity_control/curiosity_control.py::curiosity_control --tag stat_v1  --drift-mode none   # stationary null
+    modal run --detach mjc/curiosity_control/curiosity_control.py::curiosity_control --tag noise_v1 --noise             # noisy-TV
+    modal run --detach mjc/curiosity_control/curiosity_control.py::curiosity_control --tag offpath_v1 --value-rel off    # value-relevance null
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 ALL_ARMS = ["reducible", "disagree", "lp", "surprise", "taskonly", "random"]
 
@@ -75,7 +75,7 @@ def run_curiosity_control(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

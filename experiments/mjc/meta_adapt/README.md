@@ -1,13 +1,14 @@
 # Meta-adaptation over a distribution of dynamics — collapse at the floor, gap opens under conflict
 
-**Idea doc**: [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md) (§"Meta-RL: the two-timescale structure"; non-stationarity is the load-bearing part) · **Parent**: [Cut #3](README.md#cut-3--operator-intervention-reward-free-re-adaptation-after-a-dynamics-shift) (single reward-free re-adaptation) · [DIRECTED_READAPT](DIRECTED_READAPT_README.md) (the pivot: phenomenon-first, dissectible)
-**Code**: `meta_adapt.py` (+ `meta_adapt_sweep_figure.py`) · **Status**: floor = clean collapse anchor; actuator-conflict sweep = the gap opens monotonically. Single family-seed. **Date**: 2026-07-18.
+**Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) (§"Meta-RL: the two-timescale structure"; non-stationarity is the load-bearing part) · **Parent**: [Cut #3](../dynamics_shift/README.md) (single reward-free re-adaptation) · [DIRECTED_READAPT](../directed_readapt/README.md) (the pivot: phenomenon-first, dissectible)
+**Code**: `meta_adapt.py` (+ `meta_adapt_sweep_figure.py`) · File index: [FILES.md](FILES.md) · **Status**: floor = clean collapse anchor; actuator-conflict sweep = the gap opens monotonically. Single family-seed. **Date**: 2026-07-18.
+**Builds on this**: [`curiosity_control/`](../curiosity_control/README.md) (the *afferent* half of the interface whose *efferent* half is #4d/#4e; extends #4c) · [`online_value_loop/`](../online_value_loop/README.md) (takes #4d/#4e's offline reward loop fully online) · [`drift_value_loop/`](../drift_value_loop/README.md) (#4b's context latent is what compounds under drift; #4d/#4e's capacity boundary is what gates the carving) · [`arm_substrate/`](../arm_substrate/README.md) (puts #4d's capacity-competition boundary on one knob measured in kg)
 
 ---
 
 ## The question (made non-tautological)
 
-A persistent learner on *any* shifting environment improves with exposure, so "adaptation gets cheaper over a sequence" is near-tautological. The falsifiable claim is the **standard meta-learning** one: meta-train a fast adapter over a *distribution* of dynamics, then measure **few-shot adaptation to HELD-OUT dynamics** against a **multitask/pooled init trained on the same data**. That is exactly the comparison [RHM_META_LEARNING](../rhm/ratchet/RHM_META_LEARNING_README.md) found *collapses* (meta → plain multitask) with no exploitable structure. So we track the **meta − multitask gap as an order parameter**, not a checkbox — and ask what a control-dynamics family needs before learn-to-adapt beats pooling.
+A persistent learner on *any* shifting environment improves with exposure, so "adaptation gets cheaper over a sequence" is near-tautological. The falsifiable claim is the **standard meta-learning** one: meta-train a fast adapter over a *distribution* of dynamics, then measure **few-shot adaptation to HELD-OUT dynamics** against a **multitask/pooled init trained on the same data**. That is exactly the comparison [RHM_META_LEARNING](../../rhm/ratchet/RHM_META_LEARNING_README.md) found *collapses* (meta → plain multitask) with no exploitable structure. So we track the **meta − multitask gap as an order parameter**, not a checkbox — and ask what a control-dynamics family needs before learn-to-adapt beats pooling.
 
 ## Apparatus (`meta_adapt.py`)
 
@@ -27,7 +28,7 @@ Family = `joint_damping ∈ [0.05, 2.0]` log-spaced, disjoint **interior (interp
 
 ## Result 2 — CONFLICT (actuator rotation): the gap OPENS (`actuator_p16/p2/pi`)
 
-The floor told us what's missing: **task conflict**. Family = an **input-coupled** rotation of the command→motion map (`push_rot` in `pusher_env.py`, additive/off-by-default → Cuts #1–3 byte-identical): for task φ the effective actuation is `gear·R(φ)·u`. This is *not* an additive force-field (a constant output bias any init learns by nudging one term); rotating how commands map to outcomes makes φ and φ+π opposite, so a model pooled over φ∈[−Φ,Φ] averages the command gain to `sin(Φ)/Φ` — **1.0 at Φ=0, 0 at Φ=π (arity-1 degenerate)**. Φ is a clean **conflict dial**.
+The floor told us what's missing: **task conflict**. Family = an **input-coupled** rotation of the command→motion map (`push_rot` in [`../pusher_env.py`](../pusher_env.py), additive/off-by-default → Cuts #1–3 byte-identical): for task φ the effective actuation is `gear·R(φ)·u`. This is *not* an additive force-field (a constant output bias any init learns by nudging one term); rotating how commands map to outcomes makes φ and φ+π opposite, so a model pooled over φ∈[−Φ,Φ] averages the command gain to `sin(Φ)/Φ` — **1.0 at Φ=0, 0 at Φ=π (arity-1 degenerate)**. Φ is a clean **conflict dial**.
 
 | Φ (rad) | pooled zero-shot R² | meta−multitask gap (peak few-shot) | meta vs multitask sample-efficiency |
 |---|---|---|---|
@@ -76,25 +77,25 @@ The first cut with **value** in the loop: does a value-of-information drive **id
 
 **Why (the boundary condition).** For a rotation the most informative command *is* the largest one, so max‖u‖ **simultaneously** maximizes spatial coverage (finding the scarce patch) *and* per-transition signal — for free. And identifying a **1-D** parameter saturates after a handful of good in-patch transitions, so the navigating drive's 3× extra visits are redundant. Value-of-information's lever should appear only for **harder identification**: a higher-dimensional task parameter, or a family where informative actions are *not* simply "large." On low-dim system-ID, VoI is over-engineering.
 
-**Caveats.** Single family/rule design; 4 collection seeds. The info-MPC rolls out with the mean-codebook `z_ref` (valid for navigation — position dynamics are task-independent up to the patch). In-patch R² and φ-error agree; all-region R² is confounded (out-of-patch is `z`-independent) and is not the headline. `push_rot` + `rot_patch` are additive/off-by-default in `pusher_env.py` → Cuts #1–3 byte-identical.
+**Caveats.** Single family/rule design; 4 collection seeds. The info-MPC rolls out with the mean-codebook `z_ref` (valid for navigation — position dynamics are task-independent up to the patch). In-patch R² and φ-error agree; all-region R² is confounded (out-of-patch is `z`-independent) and is not the headline. `push_rot` + `rot_patch` are additive/off-by-default in [`../pusher_env.py`](../pusher_env.py) → Cuts #1–3 byte-identical.
 
 ## Reproduce
 
 ```bash
 cd experiments/
-modal run mujoco_control/meta_adapt.py::meta_adapt --quick                                  # smoke (damping)
-modal run mujoco_control/meta_adapt.py::meta_adapt --tag full_v2                             # FLOOR (damping collapse)
-modal run mujoco_control/meta_adapt.py::meta_adapt --tag actuator_p2 --family actuator --conflict 1.5708   # conflict Φ=π/2
+modal run mjc/meta_adapt/meta_adapt.py::meta_adapt --quick                                                # smoke (damping)
+modal run mjc/meta_adapt/meta_adapt.py::meta_adapt --tag full_v2                                          # FLOOR (damping collapse)
+modal run mjc/meta_adapt/meta_adapt.py::meta_adapt --tag actuator_p2 --family actuator --conflict 1.5708  # conflict Φ=π/2
 # sweep: --conflict 0.5236 (π/6), 1.5708 (π/2), 3.14159 (π); then:
-python3 mujoco_control/meta_adapt_sweep_figure.py                                            # gap-vs-conflict figure
+python3 mjc/meta_adapt/meta_adapt_sweep_figure.py  # gap-vs-conflict figure
 
 # Cut #4b — context latent
-modal run mujoco_control/meta_context.py::meta_context --tag ctx_p2 --family actuator --conflict 1.5708   # conflict + z-probe
-modal run mujoco_control/meta_context.py::meta_context --tag ctx_floor --family damping                   # floor control
+modal run mjc/meta_adapt/meta_context.py::meta_context --tag ctx_p2 --family actuator --conflict 1.5708  # conflict + z-probe
+modal run mjc/meta_adapt/meta_context.py::meta_context --tag ctx_floor --family damping                  # floor control
 
 # Cut #4c — value-directed identification (4 collection seeds, then aggregate)
-for s in 0 1 2 3; do modal run mujoco_control/meta_active.py::meta_active --tag act_patch4${s:+_s$s} --rot-patch --seed $s; done
-python3 mujoco_control/meta_active_seeds_figure.py     # multi-seed figure (act_patch4 = seed 0)
+for s in 0 1 2 3; do modal run mjc/meta_adapt/meta_active.py::meta_active --tag act_patch4${s:+_s$s} --rot-patch --seed $s; done
+python3 mjc/meta_adapt/meta_active_seeds_figure.py  # multi-seed figure (act_patch4 = seed 0)
 ```
 
 Results/figures commit to `mujoco-control-data` under `/data/meta_adapt/<tag>/` + `/data/meta_context/<tag>/` and mirror to `figures/meta_adapt_<tag>/` (+ `figures/meta_adapt_sweep/`, `figures/meta_context_<tag>/`).
@@ -103,17 +104,17 @@ Results/figures commit to `mujoco-control-data` under `/data/meta_adapt/<tag>/` 
 Reptile (`figures/meta_adapt_<tag>/`): `fig1_adaptation_curves` (held-out R² vs N, 4 inits — the MAML crossover) · `fig2_transitions_to_adapt` · **`fig3_meta_vs_multitask_gap`** (the order parameter) · `fig4_planning`. Sweep (`figures/meta_adapt_sweep/`): **`fig_gap_vs_conflict`**. Context latent (`figures/meta_context_<tag>/`): `fig1_context_curve` · `fig2_context_gap` · **`fig3_z_probe`** (z→param system-ID scatter). Value-directed (`figures/meta_active_<tag>/`): `fig1_identification_curve` (in-patch R², arms) · `fig2_phi_error`; multi-seed **`figures/meta_active_seeds/fig_seeds`** (ID quality + the visitation mechanism — the headline).
 
 ## Next
-The arc is complete on one substrate: **collapse→gap (phenomenon) → dissectible `z` (system-ID) → system-ID ⊥ adaptation-value (dissociation) → value-directed identification (VoI in the loop — a robust, scarcity-gated negative).** The interchange story is: `z` is the legible low-dim task-identifier; whether it helps *adaptation* is set by conflict (4b); a VoI drive to *acquire* `z` faster is over-engineering for low-dim system-ID (4c). Candidate next probes: **(a)** disc-4 value-shaping *caused by* the outer loop (does the `z`-conditioned FM become value-shaped when the meta-objective is task reward, not prediction error?); **(b)** raise identification difficulty (higher-dim task parameter, or informative-actions ≠ large) — the boundary condition where 4c predicts VoI should finally earn its keep; **(c)** back-translate the whole arc into [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md) / the belief tree.
+The arc is complete on one substrate: **collapse→gap (phenomenon) → dissectible `z` (system-ID) → system-ID ⊥ adaptation-value (dissociation) → value-directed identification (VoI in the loop — a robust, scarcity-gated negative).** The interchange story is: `z` is the legible low-dim task-identifier; whether it helps *adaptation* is set by conflict (4b); a VoI drive to *acquire* `z` faster is over-engineering for low-dim system-ID (4c). Candidate next probes: **(a)** disc-4 value-shaping *caused by* the outer loop (does the `z`-conditioned FM become value-shaped when the meta-objective is task reward, not prediction error?); **(b)** raise identification difficulty (higher-dim task parameter, or informative-actions ≠ large) — the boundary condition where 4c predicts VoI should finally earn its keep; **(c)** back-translate the whole arc into [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) / the belief tree.
 
 ---
 
 ## Cut #4d — Value-shaping × meta-conditioning: two separable capacity levers, and *when* re-allocation buys control (`meta_value_shaping.py`)
 
-**Date**: 2026-07-19. Takes candidate **(a)** above (disc-4: does a value objective *cause* the FM to become value-shaped?) and fuses it with the conflict/context machinery. **Parents**: [`value_shaping.py`](VALUE_SHAPING_README.md) (stationary value-shaping via a *hand-set* per-dim weight; one task, no meta) and Cut #4b `meta_context.py` (the context latent `z` that holds a per-task conflicted map). **Program**: [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md) discriminator 4 + the FM↔value interface ("one efferent gain: value-shaping = capacity **re-allocation**, a priority field over prediction targets"). **Status**: disc-4 landed on the FM side; the *control* payoff is a **multi-seed-validated, capacity-gated positive** (4 seeds), with the easy-pusher run as its matched null. Single family design.
+**Date**: 2026-07-19. Takes candidate **(a)** above (disc-4: does a value objective *cause* the FM to become value-shaped?) and fuses it with the conflict/context machinery. **Parents**: [`value_shaping.py`](../value_shaping/README.md) (stationary value-shaping via a *hand-set* per-dim weight; one task, no meta) and Cut #4b `meta_context.py` (the context latent `z` that holds a per-task conflicted map). **Program**: [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) discriminator 4 + the FM↔value interface ("one efferent gain: value-shaping = capacity **re-allocation**, a priority field over prediction targets"). **Status**: disc-4 landed on the FM side; the *control* payoff is a **multi-seed-validated, capacity-gated positive** (4 seeds), with the easy-pusher run as its matched null. Single family design.
 
 ### The question and the 2×2
 
-`value_shaping` showed a hand-set `λ_puck=0` re-allocates a small FM off the value-irrelevant puck (stationary). [REACHING_LOOKAHEAD](../a2a_forward/reaching/REACHING_LOOKAHEAD_README.md) showed value-shaped ≻ veridical for control, but from a *hand-coded* value. Neither showed the shaping is **caused by** a value objective, and neither needed the meta machinery. This cut crosses the two on **one** substrate (puck + `push_rot` φ conflict + a capacity-limited context-conditioned FM `f(s,u,z)→Δs(8)`), as a **2×2**:
+`value_shaping` showed a hand-set `λ_puck=0` re-allocates a small FM off the value-irrelevant puck (stationary). [REACHING_LOOKAHEAD](../../a2a_forward/reaching/REACHING_LOOKAHEAD_README.md) showed value-shaped ≻ veridical for control, but from a *hand-coded* value. Neither showed the shaping is **caused by** a value objective, and neither needed the meta machinery. This cut crosses the two on **one** substrate (puck + `push_rot` φ conflict + a capacity-limited context-conditioned FM `f(s,u,z)→Δs(8)`), as a **2×2**:
 
 |  | **veridical** (match all 8 dims) | **value-shaped** (match pusher dims) |
 |---|---|---|
@@ -135,7 +136,7 @@ The value-shaped arm matches the **support of the goal-reaching value** `V(s) = 
 
 ### Stage 2 — planning (CEM-MPC goal-reaching), and the boundary condition
 
-The FM-side R² *cannot* reveal whether the re-allocation **matters** (veridicality ⊥ usefulness — [REACHING_LOOKAHEAD](../a2a_forward/reaching/REACHING_LOOKAHEAD_README.md)); only planning can. A fixed CEM planner (value = pusher-goal dist + terminal-vel penalty; cost **ignores the puck**) rolls each arm's FM; committed `replan_every`-step segments make the model load-bearing (Cut #3).
+The FM-side R² *cannot* reveal whether the re-allocation **matters** (veridicality ⊥ usefulness — [REACHING_LOOKAHEAD](../../a2a_forward/reaching/REACHING_LOOKAHEAD_README.md)); only planning can. A fixed CEM planner (value = pusher-goal dist + terminal-vel penalty; cost **ignores the puck**) rolls each arm's FM; committed `replan_every`-step segments make the model load-bearing (Cut #3).
 
 - **`plan_v1` (easy pusher) — control-NEUTRAL.** Context-mode planning is a **wash**: veridical ≈ value-shaped at every capacity (verid marginally *ahead* at small caps). The value-shaped FM is a **drastically worse literal simulator** (all-dim veridicality ≪ 0 — puck dropped) at **equal control** — the *veridicality-unnecessary* half of REACHING_LOOKAHEAD, but **not** the value-shaping-superior half. Diagnosis: on an easy, puck-decoupled task the puck **neither competes for capacity the pusher needs nor misleads the planner**, so dropping it is *free but unrewarded*. This is the **matched null** that makes the next run interpretable.
 - **The prediction it sets up:** value-shaping should turn control-*superior* **iff** the value-relevant dynamics are capacity-hungry (so the puck genuinely competes).
@@ -159,7 +160,7 @@ The `plan_v1` ↔ `pfield` pair is the causal isolation: **value-shaping's re-al
 
 ### Substrate bug fixed (backward-compatible)
 
-This cut is the first to run **`push_rot` and a pusher force field together**, which exposed a latent clobber in `pusher_env.py`: `_apply_actuator_rot` and the pusher branch of `_apply_fields` both wrote `qfrc_applied[pusher_dof]` with `=`, so the rotation (applied last) silently **overwrote** the field. Fixed by summing the field base into the rotation correction. Verified **byte-identical on the field-off path** (base=0), so Cuts #1–3, `value_shaping`, `meta_context`, `meta_adapt`, and the `rot_patch` cut are unchanged.
+This cut is the first to run **`push_rot` and a pusher force field together**, which exposed a latent clobber in [`../pusher_env.py`](../pusher_env.py): `_apply_actuator_rot` and the pusher branch of `_apply_fields` both wrote `qfrc_applied[pusher_dof]` with `=`, so the rotation (applied last) silently **overwrote** the field. Fixed by summing the field base into the rotation correction. Verified **byte-identical on the field-off path** (base=0), so Cuts #1–3, `value_shaping`, `meta_context`, `meta_adapt`, and the `rot_patch` cut are unchanged.
 
 ### Caveats
 - The control benefit is **modest** (~16% relative at h=64) and **capacity-specific** (peaks at h=64; muted where the FM is too weak or saturated). Single family design (the 4 seeds vary the train/test split + collection + init, not the family structure).
@@ -169,13 +170,13 @@ This cut is the first to run **`push_rot` and a pusher force field together**, w
 ### Reproduce
 ```bash
 cd experiments/
-modal run mujoco_control/meta_value_shaping.py::meta_value_shaping --quick --plan            # smoke
-modal run mujoco_control/meta_value_shaping.py::meta_value_shaping --tag full_v1             # Stage 1 (FM-side, easy pusher)
-modal run mujoco_control/meta_value_shaping.py::meta_value_shaping --tag plan_v1 --plan      # Stage 2, easy pusher -> control-NEUTRAL (the null)
+modal run mjc/meta_adapt/meta_value_shaping.py::meta_value_shaping --quick --plan        # smoke
+modal run mjc/meta_adapt/meta_value_shaping.py::meta_value_shaping --tag full_v1         # Stage 1 (FM-side, easy pusher)
+modal run mjc/meta_adapt/meta_value_shaping.py::meta_value_shaping --tag plan_v1 --plan  # Stage 2, easy pusher -> control-NEUTRAL (the null)
 # capacity-competition test (hard pusher), 4 seeds -> the positive:
-for s in "" 1 2 3; do modal run --detach mujoco_control/meta_value_shaping.py::meta_value_shaping \
-    --tag plan_pfield${s:+_s$s}${s:+} --plan --field-pusher-amp 2.0 --plan-h 100 --seed ${s:-0}; done   # seed 0 tag = plan_pfield_v1
-python3 mujoco_control/meta_value_shaping_seeds_figure.py                                    # multi-seed aggregate
+for s in "" 1 2 3; do modal run --detach mjc/meta_adapt/meta_value_shaping.py::meta_value_shaping \
+    --tag plan_pfield${s:+_s$s}${s:+} --plan --field-pusher-amp 2.0 --plan-h 100 --seed ${s:-0}; done  # seed 0 tag = plan_pfield_v1
+python3 mjc/meta_adapt/meta_value_shaping_seeds_figure.py                                              # multi-seed aggregate
 ```
 Results/figures commit to `mujoco-control-data` under `/data/meta_value_shaping/<tag>/` and mirror to `figures/meta_value_shaping_<tag>/`. Use `--detach` for the full/plan runs (they exceed the ~2-min client window; the remote commits to the volume regardless of client connectivity).
 
@@ -184,13 +185,13 @@ Per run (`figures/meta_value_shaping_<tag>/`): `fig1_capacity_frontier` (puck-dr
 
 ### Next
 - **Close the loop (the real disc-4):** ✅ **done — Cut #4e below** (`meta_value_learn.py`): a reward-*driven* outer loop (the per-dim FM weight chosen by control performance alone, no support hint) reconstructs the shaping, seed-robust and capacity-gated.
-- **Back-translate to [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md):** sharpen the efferent-gain claim with the boundary condition — *value-shaping (capacity re-allocation) converts to a control benefit iff the value-irrelevant subsystem competes for capacity the value-relevant control needs*; veridicality⊥usefulness holds regardless.
+- **Back-translate to [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md):** sharpen the efferent-gain claim with the boundary condition — *value-shaping (capacity re-allocation) converts to a control benefit iff the value-irrelevant subsystem competes for capacity the value-relevant control needs*; veridicality⊥usefulness holds regardless.
 
 ---
 
 ## Cut #4e — Closing the reward loop: the value-shaping is CAUSED by reward (`meta_value_learn.py`)
 
-**Date**: 2026-07-19. Closes the piece Cut #4d flagged as open ("'reward' in 4d is a value-*support*-weighted PREDICTION objective, NOT a reward-*driven* outer loop"). **Parent**: [Cut #4d](#cut-4d--value-shaping--meta-conditioning-two-separable-capacity-levers-and-when-re-allocation-buys-control-meta_value_shapingpy) `meta_value_shaping.py` (identical substrate). **Program**: [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md) **discriminator 4** ("does an outer loop *cause* the shaping"). **Status**: disc-4 closed — both readouts seed-robust (3 seeds) and capacity-gated. Single family.
+**Date**: 2026-07-19. Closes the piece Cut #4d flagged as open ("'reward' in 4d is a value-*support*-weighted PREDICTION objective, NOT a reward-*driven* outer loop"). **Parent**: [Cut #4d](#cut-4d--value-shaping--meta-conditioning-two-separable-capacity-levers-and-when-re-allocation-buys-control-meta_value_shapingpy) `meta_value_shaping.py` (identical substrate). **Program**: [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) **discriminator 4** ("does an outer loop *cause* the shaping"). **Status**: disc-4 closed — both readouts seed-robust (3 seeds) and capacity-gated. Single family.
 
 ### The question and the one change
 
@@ -221,12 +222,12 @@ Both fire **only under capacity competition** — the same `plan_v1↔pfield` bo
 ### Reproduce
 ```bash
 cd experiments/
-modal run mujoco_control/meta_value_learn.py::meta_value_learn --quick --outer            # smoke
+modal run mjc/meta_adapt/meta_value_learn.py::meta_value_learn --quick --outer  # smoke
 # A1 dissociation + A2 outer loop, 3 seeds/regime (seed 0 tags have no suffix):
 for s in 0 1 2; do
-  modal run --detach mujoco_control/meta_value_learn.py::meta_value_learn --tag outer_pfield_norm${s:+_s$s} --field-pusher-amp 2.0 --outer --seed $s
-  modal run --detach mujoco_control/meta_value_learn.py::meta_value_learn --tag outer_easy_norm${s:+_s$s} --outer --seed $s
+  modal run --detach mjc/meta_adapt/meta_value_learn.py::meta_value_learn --tag outer_pfield_norm${s:+_s$s} --field-pusher-amp 2.0 --outer --seed $s
+  modal run --detach mjc/meta_adapt/meta_value_learn.py::meta_value_learn --tag outer_easy_norm${s:+_s$s} --outer --seed $s
 done
-python3 mujoco_control/meta_value_learn_seeds_figure.py                                    # the aggregate (headline)
+python3 mjc/meta_adapt/meta_value_learn_seeds_figure.py  # the aggregate (headline)
 ```
 Results/figures commit to `/data/meta_value_learn/<tag>/` and mirror to `figures/meta_value_learn_<tag>/`. Per-run: `fig1_reward_landscape` (A1) · `fig2_outer_loop` (A2 weight discovery). Aggregate: **`figures/meta_value_learn_seeds/fig_seeds.png`** (both order parameters, competition vs easy). The `outer_pfield` tag (unnormalized) is retained as the scale-confound demo.

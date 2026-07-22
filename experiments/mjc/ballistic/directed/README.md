@@ -138,27 +138,27 @@ Three updates, stated at the doc's own vocabulary:
 cd experiments/
 # S0 — separability preconditions (3 seeds)
 for s in 0 1 2; do
-  modal run --detach mujoco_control/ballistic/directed/directed_separability.py::directed_separability \
+  modal run --detach mjc/ballistic/directed/directed_separability.py::directed_separability \
       --tag sep_s$s --seed $s --corridor-r 0.4 --plan-h 34
 done
 
 # S1 — the one-shot allocation ladder (3 seeds)
 for s in 0 1 2; do
-  modal run --detach mujoco_control/ballistic/directed/directed_ladder.py::directed_ladder \
+  modal run --detach mjc/ballistic/directed/directed_ladder.py::directed_ladder \
       --tag lad_s$s --seed $s
 done
 
 # S2 — the online loop. loopC = drift-dense; loopD adds the gated value arms.
 for s in 0 1 2; do
-  modal run --detach mujoco_control/ballistic/directed/directed_loop.py::directed_loop \
+  modal run --detach mjc/ballistic/directed/directed_loop.py::directed_loop \
       --tag loopD_s$s --seed $s --policies "uniform,oracle,value,value-floor,value-maint,lprog-only"
 done
-python3 mujoco_control/ballistic/directed/directed_loop_figure.py --tags loopC_s0 loopC_s1 loopC_s2 --out loopC
-python3 mujoco_control/ballistic/directed/directed_loop_from_logs.py \
+python3 mjc/ballistic/directed/directed_loop_figure.py --tags loopC_s0 loopC_s1 loopC_s2 --out loopC
+python3 mjc/ballistic/directed/directed_loop_from_logs.py \
     --tags loopD_s0 loopD_s1 loopD_s2 --splice-from loopC --splice-policy lprog-only --verify-splice
 ```
 
-**Gotchas.** (i) Run `modal run` from `experiments/`, not from `mujoco_control/` — the module path doubles and the file is not found. (ii) Launching 3 detached clients from one shell is fragile: clients get evicted and a killed client loses the local mirror *and* (if killed before the function's final `volume.commit()`) the results.json entirely — the per-round log lines are the fallback. (iii) The earlier configurations (`loop_s*` rich, `loopB_s*` scarce) are retained deliberately: the rich/scarce contrast is the evidence for the asymptotic-metric null.
+**Gotchas.** (i) Run `modal run` from `experiments/`, not from `mjc/` — the module path doubles and the file is not found. (ii) Launching 3 detached clients from one shell is fragile: clients get evicted and a killed client loses the local mirror *and* (if killed before the function's final `volume.commit()`) the results.json entirely — the per-round log lines are the fallback. (iii) The earlier configurations (`loop_s*` rich, `loopB_s*` scarce) are retained deliberately: the rich/scarce contrast is the evidence for the asymptotic-metric null.
 
 ## Figures (`figures/`)
 

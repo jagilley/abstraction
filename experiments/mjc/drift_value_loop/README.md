@@ -1,10 +1,11 @@
 # The two-timescale value loop under perpetual drift — compounding, the capacity-gated null, and the corrected teacher
 
-**Up**: [../README.md](../README.md) (mujoco_control) · **Idea doc**: [../../../ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md)
-**Direct parent**: [../ONLINE_VALUE_LOOP_README.md](../ONLINE_VALUE_LOOP_README.md) — the *first* fully-online loop, which found **value is a slow/committed quantity** (fast-online discovery obstructed on both levers), reframed its benefit as **adaptation speed, not converged competence**, and named the next experiment: *"re-adaptation compounding across a sequence of Type-2 drifts."* This arc is that experiment — and it runs three cuts deep.
-**Other parents**: [../META_ADAPT_README.md](../META_ADAPT_README.md) (#4b context latent `f(s,u,z)`; #4d/#4e the capacity-competition boundary), [../CURIOSITY_CONTROL_README.md](../CURIOSITY_CONTROL_README.md) (the two value terms — explore + exploit — as collection directors, graded by control), `../meta_curiosity_loop.py` (self-tune the balance `b` by control reward → wandered).
-**Code** (lives flat in the parent, per the experiment's convention): `../compounding_drift.py` (cuts 1+2), `../online_value_loop.py` (cut 3), `../compounding_drift_seeds_figure.py`, `../value_carved_drift_capacity_figure.py`, `../online_value_loop_figure.py`, `../guidance.md`.
+**Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [../../../ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md)
+**Direct parent**: [../online_value_loop/README.md](../online_value_loop/README.md) — the *first* fully-online loop, which found **value is a slow/committed quantity** (fast-online discovery obstructed on both levers), reframed its benefit as **adaptation speed, not converged competence**, and named the next experiment: *"re-adaptation compounding across a sequence of Type-2 drifts."* This arc is that experiment — and it runs three cuts deep.
+**Other parents**: [../meta_adapt/README.md](../meta_adapt/README.md) (#4b context latent `f(s,u,z)`; #4d/#4e the capacity-competition boundary), [../curiosity_control/README.md](../curiosity_control/README.md) (the two value terms — explore + exploit — as collection directors, graded by control), `../online_value_loop/meta_curiosity_loop.py` (self-tune the balance `b` by control reward → wandered).
+**Code** (lives in this folder, per [STRUCTURE.md](../../../STRUCTURE.md)): `compounding_drift.py` (cuts 1+2), `online_value_loop.py` (cut 3), `compounding_drift_seeds_figure.py`, `value_carved_drift_capacity_figure.py`, `online_value_loop_figure.py`. The only shared dependencies are [`../pusher_env.py`](../pusher_env.py) and [`../shared.py`](../shared.py), which stay at the `mjc` node because every experiment there imports them. File index: [FILES.md](FILES.md).
 **Status**: cut 1 clean positive; cut 2 capacity-gated/control-robust null; cut 3 the corrected teacher — landscape clean (3 seeds), self-tuning directional-but-noisy. Single-family designs; multi-seed where it matters (mechanism metrics trustworthy, control noisy). **Date**: 2026-07-21.
+**Builds on this**: [`ballistic/`](../ballistic/README.md) (builds the *genuinely ballistic, non-re-groundable controller* this arc named as its next step, resolving the blind grader) · [`arm_substrate/`](../arm_substrate/README.md) (independently re-derives Cut 3's value-relevant teacher on a second task family)
 
 ---
 
@@ -14,11 +15,11 @@ Under perpetual drift, **the compounding the idea doc predicted is real — but 
 
 ## The frame
 
-The first online loop ([../ONLINE_VALUE_LOOP_README.md](../ONLINE_VALUE_LOOP_README.md)) established: value is slow/committed, its benefit is *adaptation speed*, and under perpetual drift (where you never converge) the payoff to look for is **compounding** — each new drift cheaper than the last because the invariant core is already paid for. This arc builds that experiment on the Cut #3 re-adaptation substrate, and finds the compounding is real but *reassigns its source*, then diagnoses and fixes the meta-layer's apparent inertness.
+The first online loop ([../online_value_loop/README.md](../online_value_loop/README.md)) established: value is slow/committed, its benefit is *adaptation speed*, and under perpetual drift (where you never converge) the payoff to look for is **compounding** — each new drift cheaper than the last because the invariant core is already paid for. This arc builds that experiment on the Cut #3 re-adaptation substrate, and finds the compounding is real but *reassigns its source*, then diagnoses and fixes the meta-layer's apparent inertness.
 
 ---
 
-## Cut 1 — Compounding isolation (`../compounding_drift.py`, `run_compounding_drift`)
+## Cut 1 — Compounding isolation (`compounding_drift.py`, `run_compounding_drift`)
 
 **The experiment.** A sequence of related **Type-2 drifts** — the `push_rot` actuator-rotation conflict (φ and φ+π are *opposite* command→motion maps, the input-coupled conflict that makes pooling collapse; **not** noise, which collapses meta-learning to multitask). Measure **transitions-to-recover per drift** (held-out velocity-dim Δs R² vs #reward-free transitions) for:
 - **factored** — the context-latent `f(s,u,z)` (a stable invariant core `f` shared across φ + a thin adaptable `z` encoding φ; fast adapt = infer `z` by a forward pass; slow loop consolidates `f` over the growing task bank);
@@ -41,7 +42,7 @@ The first online loop ([../ONLINE_VALUE_LOOP_README.md](../ONLINE_VALUE_LOOP_REA
 - **Carve-sweep refinement** ("nothing more, nothing less"): latent width helps **monotonically, saturating at d≈8** — a 1-D task parameter does *not* imply a 1-D optimal latent (z is a learned *modulation channel*, not a minimal sufficient statistic). The carving knob is *which subspace* is adaptive, not the latent dimension count.
 - **Honest caveat**: this invariant core (near-linear free-flight) is *cheap* to re-fit, so memoryless scratch is a strong floor — factored's win is the *trajectory/sign* (compounds vs collapses) + zero-gradient adaptation, not raw transition count.
 
-## Cut 2 — Value-driven carving under a value-irrelevant drift (`../compounding_drift.py`, `run_value_carved_drift`)
+## Cut 2 — Value-driven carving under a value-irrelevant drift (`compounding_drift.py`, `run_value_carved_drift`)
 
 **The experiment.** Composes #4d/#4e's capacity-competition substrate (puck force field = value-irrelevant capacity sink; `push_rot` φ conflict; context-latent `f(s,u,z)→Δs(8)`; CEM-MPC control) with #1's drift *sequence*. The new ingredient: the value-**irrelevant** subspace **drifts too** (`puck_phase` θ rotates each drift — a backward-compatible knob added to `../pusher_env.py`). A **veridical** FM (matches all 8 dims) must re-learn the drifting puck every drift; a **value-carved** FM (drops the puck via the goal-reaching value's support = pusher dims [0,1,4,5], the 4d/4e hand-derived mask, frozen) tracks only φ. Per **guidance.md #3**, log re-adaptation at **both** FM and CONTROL level.
 
@@ -61,9 +62,9 @@ Three realizations turned the cut-2 "null" into a sharper claim:
 
 ---
 
-## Cut 3 — The corrected full online loop (`../online_value_loop.py`)
+## Cut 3 — The corrected full online loop (`online_value_loop.py`)
 
-**The change.** A copy of `../meta_curiosity_loop.py`'s two-timescale machinery (RPF-ensemble live FM on a recency FIFO; teleport-region collection scored by `grounded@b` = `b·reducible + (1−b)·exploit`; a slow REINFORCE gradient-bandit self-tuning `b = σ(θ)`) with **one load-bearing change**: the outer loop's **teacher**. Two selectable rewards:
+**The change.** A copy of `../online_value_loop/meta_curiosity_loop.py`'s two-timescale machinery (RPF-ensemble live FM on a recency FIFO; teleport-region collection scored by `grounded@b` = `b·reducible + (1−b)·exploit`; a slow REINFORCE gradient-bandit self-tuning `b = σ(θ)`) with **one load-bearing change**: the outer loop's **teacher**. Two selectable rewards:
 - **`online_front`** — the **value-relevant FM re-adaptation error** (mean forward-model prediction error over the goal *corridor*, a fair, non-privileged region; the cerebellum→VTA messenger — value reads FM error, not reward);
 - **`online_ctrl`** — downstream **control** goal-dist (= the parent's near-blind grader).
 
@@ -95,33 +96,33 @@ This closes the loop the whole arc approached — the missing piece was the *tea
 ```bash
 cd experiments/
 # --- Cut 1: compounding isolation (headline 3 seeds + controls) ---
-modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag full_v1                    # seed 0
-modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag full_s1 --seed 1
-modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag full_s2 --seed 2
-modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag floor_v1 --family damping   # no-conflict control
-modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag revisit_v1 --drift-mode revisit
-modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag carve --carve-sweep         # latent-dim optimum
-python3 mujoco_control/compounding_drift_seeds_figure.py                                                    # headline figures
+modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag full_v1                    # seed 0
+modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag full_s1 --seed 1
+modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag full_s2 --seed 2
+modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag floor_v1 --family damping   # no-conflict control
+modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag revisit_v1 --drift-mode revisit
+modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag carve --carve-sweep         # latent-dim optimum
+python3 mjc/drift_value_loop/compounding_drift_seeds_figure.py                                                   # headline figures
 
 # --- Cut 2: value-carved drift + the capacity boundary ---
-for h in 24 32; do modal run --detach mujoco_control/compounding_drift.py::value_carved_drift --tag comp_h$h --n-drifts 20 --fm-hidden $h; done
-modal run --detach mujoco_control/compounding_drift.py::value_carved_drift --tag comp_v1 --n-drifts 20       # h=64
-modal run --detach mujoco_control/compounding_drift.py::value_carved_drift --tag static_v1 --n-drifts 20 --static-puck
-python3 mujoco_control/value_carved_drift_capacity_figure.py --runs 24:comp_h24 32:comp_h32 64:comp_v1
+for h in 24 32; do modal run --detach mjc/drift_value_loop/compounding_drift.py::value_carved_drift --tag comp_h$h --n-drifts 20 --fm-hidden $h; done
+modal run --detach mjc/drift_value_loop/compounding_drift.py::value_carved_drift --tag comp_v1 --n-drifts 20       # h=64
+modal run --detach mjc/drift_value_loop/compounding_drift.py::value_carved_drift --tag static_v1 --n-drifts 20 --static-puck
+python3 mjc/drift_value_loop/value_carved_drift_capacity_figure.py --runs 24:comp_h24 32:comp_h32 64:comp_v1
 
 # --- Cut 3: the corrected teacher (landscape 3 seeds + displaced-init self-tuning) ---
 for s in 0 1 2; do
-  modal run --detach mujoco_control/online_value_loop.py::online_value_loop --tag teacher_s$s --seed $s \
+  modal run --detach mjc/drift_value_loop/online_value_loop.py::online_value_loop --tag teacher_s$s --seed $s \
       --task-geom corridor --noise --arms "online_front,online_ctrl,b0.0,b0.3,b0.5,b0.7,b1.0,random"
-  modal run --detach mujoco_control/online_value_loop.py::online_value_loop --tag selftune15_s$s --seed $s \
+  modal run --detach mjc/drift_value_loop/online_value_loop.py::online_value_loop --tag selftune15_s$s --seed $s \
       --task-geom corridor --noise --b-init 0.15 --arms "online_front,online_ctrl"
 done
-python3 mujoco_control/online_value_loop_figure.py --tags teacher_s0 teacher_s1 teacher_s2 \
+python3 mjc/drift_value_loop/online_value_loop_figure.py --tags teacher_s0 teacher_s1 teacher_s2 \
     --selftune-tags selftune15_s0 selftune15_s1 selftune15_s2
 ```
 **Gotcha** (this session's): `--detach` runs survive client disconnects and commit to the volume, but launching many via `&` can lose all-but-the-last, and heavy runs can get killed before committing — prefer independent launches and pull from the volume (`modal volume get mujoco-control-data <path>`) if the local mirror is missing.
 
-## Figures (mirrored to `../figures/`)
+## Figures (mirrored to `figures/`)
 
 - **Cut 1**: `compounding_drift_seeds/` — **`fig_fewshot`** (threshold-free compounding: factored climbs & locks, pooled collapses), `fig_ttr` (transitions-to-recover), `fig_cumulative` (pooled memory is a liability). Per-run: `compounding_drift_{full_v1,full_s1,full_s2,floor_v1,revisit_v1,carve_d*}/`.
 - **Cut 2**: `value_carved_drift_capacity/` — **`fig_capacity_boundary`** (carving is capacity-gated, never reaches control). Per-run: `value_carved_drift_{comp_v1,static_v1,comp_h24,comp_h32}/` (fig1 FM-TTR, fig3 puck-drop, fig4 control-TTR).

@@ -44,14 +44,14 @@ DESIGN (a knob-sweep-with-a-baseline; only the INITIALIZATION differs across arm
 
 Run:
     cd experiments/
-    modal run mujoco_control/meta_adapt.py::meta_adapt --quick          # smoke
-    modal run --detach mujoco_control/meta_adapt.py::run_meta_adapt     # (full; via entrypoint)
+    modal run mjc/meta_adapt/meta_adapt.py::meta_adapt --quick          # smoke
+    modal run --detach mjc/meta_adapt/meta_adapt.py::run_meta_adapt     # (full; via entrypoint)
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 
 @app.function(gpu="L4", memory=32768, timeout=7200, volumes={DATA_DIR: volume})
@@ -64,7 +64,7 @@ def run_meta_adapt(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

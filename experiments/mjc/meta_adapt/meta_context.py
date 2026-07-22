@@ -29,15 +29,15 @@ Readout = held-out velocity-dim Δs R^2 vs #context transitions N (median over t
 
 Run:
     cd experiments/
-    modal run mujoco_control/meta_context.py::meta_context --quick                                   # smoke (actuator pi/2)
-    modal run mujoco_control/meta_context.py::meta_context --tag ctx_p2 --family actuator --conflict 1.5708
-    modal run mujoco_control/meta_context.py::meta_context --tag ctx_floor --family damping          # the floor control
+    modal run mjc/meta_adapt/meta_context.py::meta_context --quick                                   # smoke (actuator pi/2)
+    modal run mjc/meta_adapt/meta_context.py::meta_context --tag ctx_p2 --family actuator --conflict 1.5708
+    modal run mjc/meta_adapt/meta_context.py::meta_context --tag ctx_floor --family damping          # the floor control
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 
 @app.function(gpu="L4", memory=32768, timeout=7200, volumes={DATA_DIR: volume})
@@ -47,7 +47,7 @@ def run_meta_context(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

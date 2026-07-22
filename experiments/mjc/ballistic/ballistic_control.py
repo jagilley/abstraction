@@ -55,20 +55,20 @@ discipline).
 
 Run:
     cd experiments/
-    modal run mujoco_control/ballistic_control.py::ballistic_control --quick                    # smoke
+    modal run mjc/ballistic/ballistic_control.py::ballistic_control --quick                    # smoke
     # --- Exp 1: the commitment-horizon landscape (3 seeds) ---
     for s in 0 1 2; do
-      modal run --detach mujoco_control/ballistic_control.py::ballistic_control --tag land_s$s --seed $s \
+      modal run --detach mjc/ballistic/ballistic_control.py::ballistic_control --tag land_s$s --seed $s \
           --task-geom corridor --noise --replan-sweep "2,8,24" \
           --arms "b0.0,b0.3,b0.5,b0.7,b1.0,random"
     done
     # --- Exp 2: self-tuning under the ballistic teacher (displaced init, 3 seeds) ---
     for s in 0 1 2; do
-      modal run --detach mujoco_control/ballistic_control.py::ballistic_control --tag selftune_s$s --seed $s \
+      modal run --detach mjc/ballistic/ballistic_control.py::ballistic_control --tag selftune_s$s --seed $s \
           --task-geom corridor --noise --b-init 0.15 --teacher-replan 24 --replan-sweep "2,24" \
           --arms "online_ctrl,online_front"
     done
-    python3 mujoco_control/ballistic_control_figure.py --land-tags land_s0 land_s1 land_s2 \
+    python3 mjc/ballistic/ballistic_control_figure.py --land-tags land_s0 land_s1 land_s2 \
         --selftune-tags selftune_s0 selftune_s1 selftune_s2
 """
 
@@ -76,7 +76,7 @@ import json
 import math
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 # fixed-b arms give the landscape; `online_front`/`online_ctrl` self-tune (Exp 2); `random`=floor.
 DEFAULT_ARMS = ["b0.0", "b0.3", "b0.5", "b0.7", "b1.0", "random"]
@@ -104,7 +104,7 @@ def run_ballistic_control(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

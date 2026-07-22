@@ -41,15 +41,15 @@ context mode differ across arms -- the arity_torque/value_shaping discipline.
 
 Run:
     cd experiments/
-    modal run mujoco_control/meta_value_shaping.py::meta_value_shaping --quick                 # smoke
-    modal run --detach mujoco_control/meta_value_shaping.py::run_meta_value_shaping            # (full; via entrypoint)
-    modal run mujoco_control/meta_value_shaping.py::meta_value_shaping --tag vs_p2 --conflict 1.5708
+    modal run mjc/meta_adapt/meta_value_shaping.py::meta_value_shaping --quick                 # smoke
+    modal run --detach mjc/meta_adapt/meta_value_shaping.py::run_meta_value_shaping            # (full; via entrypoint)
+    modal run mjc/meta_adapt/meta_value_shaping.py::meta_value_shaping --tag vs_p2 --conflict 1.5708
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 # state-dim groups (pusher_env.STATE_LABELS)
 PUSHER_POS = [0, 1]
@@ -67,7 +67,7 @@ def run_meta_value_shaping(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import collect_transitions, PusherEnv
+    from mjc.pusher_env import collect_transitions, PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

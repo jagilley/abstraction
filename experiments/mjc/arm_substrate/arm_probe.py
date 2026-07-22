@@ -48,14 +48,14 @@ learned and what drifts.
 
 Run:
     cd experiments/
-    modal run mujoco_control/arm_probe.py::arm_probe --quick          # smoke (~2 min)
-    modal run --detach mujoco_control/arm_probe.py::arm_probe --tag char_v1
+    modal run mjc/arm_substrate/arm_probe.py::arm_probe --quick          # smoke (~2 min)
+    modal run --detach mjc/arm_substrate/arm_probe.py::arm_probe --tag char_v1
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 
 @app.function(gpu="L4", memory=32768, timeout=14400, volumes={DATA_DIR: volume})
@@ -65,7 +65,7 @@ def run_arm_probe(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.arm_env import ArmEnv, collect_pool, fk
+    from mjc.arm_env import ArmEnv, collect_pool, fk
 
     torch.manual_seed(cfg["seed"]); np.random.seed(cfg["seed"])
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -642,7 +642,7 @@ def run_arm_capacity_sweep(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.arm_env import ArmEnv, collect_pool
+    from mjc.arm_env import ArmEnv, collect_pool
 
     torch.manual_seed(cfg["seed"]); np.random.seed(cfg["seed"])
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -955,7 +955,7 @@ def run_arm_tool_probe(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.arm_env import ArmEnv, collect_pool, fk
+    from mjc.arm_env import ArmEnv, collect_pool, fk
 
     torch.manual_seed(cfg["seed"]); np.random.seed(cfg["seed"])
     device = "cuda" if torch.cuda.is_available() else "cpu"

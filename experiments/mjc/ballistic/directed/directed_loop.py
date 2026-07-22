@@ -38,9 +38,9 @@ needs sufficient non-stationarity").
 
 Run:
     cd experiments/
-    modal run mujoco_control/directed_loop.py::directed_loop --quick        # smoke
+    modal run mjc/ballistic/directed/directed_loop.py::directed_loop --quick        # smoke
     for s in 0 1 2; do
-      modal run --detach mujoco_control/directed_loop.py::directed_loop --tag loop_s$s --seed $s
+      modal run --detach mjc/ballistic/directed/directed_loop.py::directed_loop --tag loop_s$s --seed $s
     done
 """
 
@@ -48,7 +48,7 @@ import copy
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 
 @app.function(gpu="L4", memory=32768, timeout=21600, volumes={DATA_DIR: volume})
@@ -58,7 +58,7 @@ def run_directed_loop(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"]); np.random.seed(cfg["seed"])
     device = "cuda" if torch.cuda.is_available() else "cpu"

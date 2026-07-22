@@ -1,8 +1,9 @@
 # Directed reward-free re-adaptation — when does a value-directed drive earn its keep? (two instructive negatives)
 
-**Idea doc**: [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md) (§"Meta-RL two-timescale"; §interface point 3 — ensemble-disagreement as the online reducibility proxy) · **Drive selection**: [../a2a_forward/reaching/CURIOSITY_CONTROL_README.md](../a2a_forward/reaching/CURIOSITY_CONTROL_README.md) Step 0 (chose the disagreement magnitude)
-**Parent**: [Cut #3](README.md#cut-3--operator-intervention-reward-free-re-adaptation-after-a-dynamics-shift) `dynamics_shift.py` — reward-free re-adaptation from *undirected* collection · **Sibling**: [VALUE_SHAPING_README.md](VALUE_SHAPING_README.md) (the learning-layer control)
-**Code**: `directed_readapt.py` · **Status**: two negatives, both well-understood — **global shift → null** (single seed), **localized shift → drive fails** (3 seeds). **Date**: 2026-07-18.
+**Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) (§"Meta-RL two-timescale"; §interface point 3 — ensemble-disagreement as the online reducibility proxy) · **Drive selection**: [../../a2a_forward/reaching/CURIOSITY_CONTROL_README.md](../../a2a_forward/reaching/CURIOSITY_CONTROL_README.md) Step 0 (chose the disagreement magnitude)
+**Parent**: [Cut #3](../dynamics_shift/README.md) `dynamics_shift.py` — reward-free re-adaptation from *undirected* collection · **Sibling**: [../value_shaping/README.md](../value_shaping/README.md) (the learning-layer control)
+**Code**: `directed_readapt.py` (lives in this folder); file index: [FILES.md](FILES.md) · **Status**: two negatives, both well-understood — **global shift → null** (single seed), **localized shift → drive fails** (3 seeds). **Date**: 2026-07-18.
+**Builds on this**: [`meta_adapt/`](../meta_adapt/README.md) (this cut's two negatives are what motivate its phenomenon-first pivot) · [`curiosity_control/`](../curiosity_control/README.md) (extends the confident-prior blindness found here to a *drifting* frontier)
 
 ---
 
@@ -20,7 +21,7 @@ Answer, on two shift geometries: **no** — and the *reasons* are the payoff. Th
 
 ## Experiment 2 — localized shift (a force-jet patch): DRIVE FAILS
 
-To create scarcity, `shift_mode="patch"` adds a **spatially-localized** change: a strong constant force **jet** inside a Gaussian patch (`pusher_env.py`'s `patch` DGP key, via `qfrc_applied`; additive, off by default → Cuts #1–3 reproducible). A weak drag tweak was too small (a stale FM predicted it fine — stale in-patch R² 0.94); the jet makes the local change genuinely load-bearing: **stale in-patch R² ≈ 0.63 → oracle ≈ 1.0**, and planning degrades (stale ~0.05–0.07 vs oracle ~0.03–0.04). Only in-patch transitions are informative → scarce. Sharp readout: **per-region FM R² (in-patch vs out) on a balanced eval pool** (oracle given guaranteed patch coverage) + **patch visitation** per arm.
+To create scarcity, `shift_mode="patch"` adds a **spatially-localized** change: a strong constant force **jet** inside a Gaussian patch (`../pusher_env.py`'s `patch` DGP key, via `qfrc_applied`; additive, off by default → Cuts #1–3 reproducible). A weak drag tweak was too small (a stale FM predicted it fine — stale in-patch R² 0.94); the jet makes the local change genuinely load-bearing: **stale in-patch R² ≈ 0.63 → oracle ≈ 1.0**, and planning degrades (stale ~0.05–0.07 vs oracle ~0.03–0.04). Only in-patch transitions are informative → scarce. Sharp readout: **per-region FM R² (in-patch vs out) on a balanced eval pool** (oracle given guaranteed patch coverage) + **patch visitation** per arm.
 
 **Result (3 seeds).** No re-adaptation benefit — and the visitation metric shows why:
 
@@ -44,19 +45,19 @@ This also **flips the curiosity-line drive ranking, by regime**: with *irreducib
 
 ## Where this leads (the pivot)
 
-These negatives close a chapter of *a-priori mechanistic-atom verification* (disc-4 value-shaping; the specific drive) with diminishing returns — isolating a mechanism kept either killing the phenomenon or leaving the baseline already good enough. The decision (2026-07-18) is to go **phenomenon-first**: stop verifying isolated atoms, and instead **get the actual meta phenomenon working — compounding re-adaptation over a *sequence* of shifts** (the thing stationary meta-RL provably can't manufacture, [RHM_META_LEARNING](../rhm/ratchet/RHM_META_LEARNING_README.md)) — then back-translate the mechanism from what works. Two guardrails keep it from becoming RL-to-SOTA: (a) the deliverable stays a **dissociation** (the compounding curve vs a no-outer-loop *ablation*), not a leaderboard number; (b) a **factored, dissectible** architecture (adaptable FM + explicit outer memory/modulator) so "what worked" is legible by construction. The scarcity + flag-confident-wrong-regions insight becomes a *candidate mechanism to watch for* in whatever compounds — not a thing to verify first. An **error/surprise-directed** drive (which should flag the patch where disagreement couldn't) is a low-cost check we can fold in opportunistically rather than as a standalone arm.
+These negatives close a chapter of *a-priori mechanistic-atom verification* (disc-4 value-shaping; the specific drive) with diminishing returns — isolating a mechanism kept either killing the phenomenon or leaving the baseline already good enough. The decision (2026-07-18) is to go **phenomenon-first**: stop verifying isolated atoms, and instead **get the actual meta phenomenon working — compounding re-adaptation over a *sequence* of shifts** (the thing stationary meta-RL provably can't manufacture, [RHM_META_LEARNING](../../rhm/ratchet/RHM_META_LEARNING_README.md)) — then back-translate the mechanism from what works. Two guardrails keep it from becoming RL-to-SOTA: (a) the deliverable stays a **dissociation** (the compounding curve vs a no-outer-loop *ablation*), not a leaderboard number; (b) a **factored, dissectible** architecture (adaptable FM + explicit outer memory/modulator) so "what worked" is legible by construction. The scarcity + flag-confident-wrong-regions insight becomes a *candidate mechanism to watch for* in whatever compounds — not a thing to verify first. An **error/surprise-directed** drive (which should flag the patch where disagreement couldn't) is a low-cost check we can fold in opportunistically rather than as a standalone arm.
 
 ## Reproduce
 
 ```bash
 cd experiments/
 # global shift (the null) — single seed
-modal run mujoco_control/directed_readapt.py::directed_readapt --tag full_v1
+modal run mjc/directed_readapt/directed_readapt.py::directed_readapt --tag full_v1
 # localized force-jet patch (the drive negative) — per seed
-modal run mujoco_control/directed_readapt.py::directed_readapt --tag patch_v1_s0 --shift-mode patch --seed 0
+modal run mjc/directed_readapt/directed_readapt.py::directed_readapt --tag patch_v1_s0 --shift-mode patch --seed 0
 # quick smokes
-modal run mujoco_control/directed_readapt.py::directed_readapt --quick                    # global
-modal run mujoco_control/directed_readapt.py::directed_readapt --quick --shift-mode patch  # patch
+modal run mjc/directed_readapt/directed_readapt.py::directed_readapt --quick                    # global
+modal run mjc/directed_readapt/directed_readapt.py::directed_readapt --quick --shift-mode patch  # patch
 ```
 
 Knobs are auto-exposed CLI flags (`--patch-force-y`, `--patch-center-x`, `--patch-sigma`, `--ens-k`, `--ens-pert`, `--dir-warmup`, …). Results + figures commit to `mujoco-control-data` under `/data/directed_readapt/<tag>/` and mirror to `figures/directed_readapt_<tag>/`.

@@ -821,3 +821,120 @@ def main(conditions: str = "ntp_aux_cl,ntp_aux", n_steps: int = 20000,
          tag: str = "", smoke: bool = False):
     confabulation_test.remote(conditions=conditions, n_steps=n_steps,
                               tag=tag, smoke=smoke)
+
+
+@app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=7200, memory=32768)
+def eta2_recheck(
+    v: int = 16, s: int = 2, depth: int = 6, m: int = 4, rule_seed: int = 0,
+    n_layer: int = 8, n_head: int = 8, n_embd: int = 256,
+    predict_from: str = "post_block0", predict_to: str = "post_block6",
+    fwd_n_layer: int = 1, fwd_n_head: int = 8,
+    inst_caps_str: str = "16:1.0,4:0.25,64:2.0,128:4.0",
+    conditions: str = "ntp_aux_cl,ntp_aux",
+    n_steps: int = 20000, seed: int = 42,
+    fresh_fm_steps: int = 3000, fwd_lr: float = 1e-3,
+    n_eval_sequences: int = 8000, eval_seed: int = 999,
+    pool_size: int = 200000, data_seed: int = 7, batch_size: int = 64,
+):
+    """Recompute residual hierarchy eta2 with the REFERENCE estimator.
+
+    The main run reports eta2 pooled over all T positions; rhm_latent_loop's
+    `_compute_hierarchy_eta2` uses the LAST TOKEN ONLY (`residuals_np[:, -1, :]`, line
+    186) -- the root-completing position, where deep-level structure is maximal. Pooling
+    over all 64 positions dilutes it heavily, so the two numbers are not comparable and
+    the main run's 0.024-vs-reference-0.322 gap may be entirely an estimator artifact.
+
+    This loads the saved wake checkpoints (no retraining) and reports BOTH estimators
+    side by side, importing the reference function itself so the comparison is exact.
+    """
+    import numpy as np
+    import torch
+    import torch.nn.functional as F
+    from rhm.model import GPT
+    from rhm.rhm_data import generate_rules_distinct
+    from rhm.rhm_latent_loop import _compute_hierarchy_eta2      # the reference estimator
+    from a2a_forward.forward_model import TransformerForwardModel
+
+    device = "cuda"
+    L, T = depth, s ** depth
+    key = tb_key(v, s, L, m)
+    ckpt_dir = f"{DATA_DIR}/rhm_confabulation/{key}/ckpt"
+    caps = [(int(c.split(":")[0]), float(c.split(":")[1])) for c in inst_caps_str.split(",")]
+    rules = generate_rules_distinct(v, s, L, m, seed=rule_seed)
+
+    # NTP batches must match the main run's training distribution (flat corpus windows)
+    pool_seqs, _, _ = _generate_with_traces(rules, pool_size, data_seed)
+    corpus = torch.from_numpy(pool_seqs.astype(np.int64)).reshape(-1)
+    n_corpus, arangeT = corpus.shape[0], torch.arange(T)
+
+    def get_ntp_batch(gen):
+        ix = torch.randint(0, n_corpus - T - 1, (batch_size,), generator=gen)
+        return corpus[ix[:, None] + arangeT[None, :]].to(device)
+
+    eval_seqs, eval_lf, eval_lr = _generate_with_traces(rules, n_eval_sequences, eval_seed)
+    eval_x = torch.from_numpy(eval_seqs.astype(np.int64)).to(device)
+
+    out = {}
+    for cond in [c.strip() for c in conditions.split(",")]:
+        path = f"{ckpt_dir}/{cond}_s{n_steps}_seed{seed}.pt"
+        model = GPT(v, T, n_layer, n_head, n_embd).to(device)
+        model.load_state_dict(torch.load(path, map_location=device))
+        model.eval()
+        for p in model.parameters():
+            p.requires_grad = False
+        print(f"\n{'='*72}\n  {cond}   (loaded {path})\n{'='*72}")
+
+        out[cond] = {}
+        for (dh, mm) in caps:
+            torch.manual_seed(seed + 911)
+            fm = TransformerForwardModel(d_model=n_embd, d_head=dh, n_head=fwd_n_head,
+                                         n_layer=fwd_n_layer, mlp_mult=mm,
+                                         block_size=T).to(device)
+            opt = torch.optim.AdamW(fm.parameters(), lr=fwd_lr, weight_decay=0.01)
+            gen = torch.Generator().manual_seed(seed + 912)
+            for _ in range(fresh_fm_steps):
+                fm.train()
+                with torch.no_grad():
+                    _, _, vi = model(get_ntp_batch(gen), return_intermediates=True)
+                F.mse_loss(fm(vi[predict_from]), vi[predict_to]).backward()
+                torch.nn.utils.clip_grad_norm_(fm.parameters(), 1.0)
+                opt.step(); opt.zero_grad()
+            fm.eval()
+
+            res, cos = [], []
+            with torch.no_grad():
+                for i in range(0, len(eval_x), 128):
+                    _, _, vi = model(eval_x[i:i + 128], return_intermediates=True)
+                    pr, tg = fm(vi[predict_from]), vi[predict_to]
+                    res.append((tg - pr).cpu().numpy())
+                    cos.append(float(F.cosine_similarity(pr, tg, dim=-1).mean()))
+            res_np = np.concatenate(res, 0)
+
+            ref = _compute_hierarchy_eta2(res_np, eval_lf, eval_lr, s=s, L=L)   # last token
+            pooled = _eta2_by_level(torch.from_numpy(res_np), eval_lf, s, L, T)  # all pos
+            tag = f"h{dh}m{mm:g}"
+            out[cond][tag] = {"fwd_cosine": float(np.mean(cos)),
+                              "reference_last_token": ref, "pooled_all_positions": pooled}
+            print(f"  {tag:10s} cos={np.mean(cos):.4f}")
+            print("     reference (last token) feature η²: " +
+                  " ".join(f"d{L-e}={ref[f'level_{e}']['feature_eta2']:.3f}"
+                           for e in range(L)))
+            print("     reference (last token) rule    η²: " +
+                  " ".join(f"d{L-e}={ref[f'level_{e}']['rule_eta2']:.3f}"
+                           for e in range(L)))
+            print("     pooled    (all positions)      η²: " +
+                  " ".join(f"{k_}={v_:.3f}" for k_, v_ in pooled.items()))
+            del fm
+            torch.cuda.empty_cache()
+        del model
+        torch.cuda.empty_cache()
+
+    fn = f"{DATA_DIR}/rhm_confabulation/{key}/eta2_recheck.json"
+    with open(fn, "w") as f:
+        json.dump(out, f, indent=2, cls=NumpyEncoder)
+    volume.commit()
+    print(f"\n  saved -> {fn}")
+    print("  Reference line (RHM_LATENT_LOOP Exp 1, fresh FM, d_head16 matched-head):")
+    print("    ntp_aux    d6 η²=0.295  d5 η²=0.381")
+    print("    ntp_aux_cl d6 η²=0.322  d5 η²=0.421")
+    return out

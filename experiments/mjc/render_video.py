@@ -10,15 +10,15 @@ framing on a single frame before `make_video` renders the whole rollout.
 
 Run:
     cd experiments/
-    modal run mujoco_control/render_video.py::render_smoke          # 1 frame -> PNG
-    modal run mujoco_control/render_video.py::make_video --tag demo # rollout -> mp4
+    modal run mjc/render_video.py::render_smoke          # 1 frame -> PNG
+    modal run mjc/render_video.py::make_video --tag demo # rollout -> mp4
 """
 
 import json
 import os
 import modal
 
-from mujoco_control.shared import volume, DATA_DIR, NumpyEncoder
+from mjc.shared import volume, DATA_DIR, NumpyEncoder
 
 render_image = (
     modal.Image.debian_slim(python_version="3.11")
@@ -28,7 +28,7 @@ render_image = (
         "matplotlib==3.9.2", "imageio==2.36.0", "imageio-ffmpeg==0.5.1",
     )
     .env({"MUJOCO_GL": "osmesa"})
-    .add_local_python_source("mujoco_control")
+    .add_local_python_source("mjc")
 )
 
 app = modal.App("mujoco-control-render", image=render_image)
@@ -53,7 +53,7 @@ def render_smoke() -> bytes:
     """Render a single top-down frame to validate GL + camera framing."""
     import numpy as np
     import mujoco
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     env = PusherEnv(DGP)
     rng = np.random.default_rng(0)
@@ -88,7 +88,7 @@ def make_video(cfg: dict) -> bytes:
     import matplotlib.pyplot as plt
     import imageio
 
-    from mujoco_control.pusher_env import collect_transitions, PusherEnv
+    from mjc.pusher_env import collect_transitions, PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

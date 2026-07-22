@@ -55,18 +55,18 @@ the source of `w` changes. 4d is untouched (this is a new file).
 
 Run:
     cd experiments/
-    modal run mujoco_control/meta_value_learn.py::meta_value_learn --quick                 # smoke
+    modal run mjc/meta_adapt/meta_value_learn.py::meta_value_learn --quick                 # smoke
     # A1 landscape, the dissociation (two tags):
-    modal run --detach mujoco_control/meta_value_learn.py::meta_value_learn --tag land_pfield --field-pusher-amp 2.0
-    modal run --detach mujoco_control/meta_value_learn.py::meta_value_learn --tag land_easy
+    modal run --detach mjc/meta_adapt/meta_value_learn.py::meta_value_learn --tag land_pfield --field-pusher-amp 2.0
+    modal run --detach mjc/meta_adapt/meta_value_learn.py::meta_value_learn --tag land_easy
     # A2 reward-driven outer loop (capacity-competition regime):
-    modal run --detach mujoco_control/meta_value_learn.py::meta_value_learn --tag outer_pfield --field-pusher-amp 2.0 --outer
+    modal run --detach mjc/meta_adapt/meta_value_learn.py::meta_value_learn --tag outer_pfield --field-pusher-amp 2.0 --outer
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 # state-dim groups (pusher_env.STATE_LABELS)
 PUSHER_POS = [0, 1]
@@ -84,7 +84,7 @@ def run_meta_value_learn(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import collect_transitions, PusherEnv
+    from mjc.pusher_env import collect_transitions, PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

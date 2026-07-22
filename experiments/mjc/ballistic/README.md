@@ -1,9 +1,11 @@
 # Ballistic control — when the cerebellar forward model becomes behaviorally load-bearing
 
-**Up**: [../README.md](../README.md) (mujoco_control) · **Idea doc**: [../../../ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md)
+**Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [../../../ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md)
 **Direct parent**: [../drift_value_loop/README.md](../drift_value_loop/README.md) — this is the *"genuinely ballistic, non-re-groundable controller where the FM gap might transmit to control"* it named as its next step. Also extends Cut #3's biological reading (`replan_every` ≈ how ballistic a movement is; reward-free FM refit = cerebellar recalibration).
-**Code** (lives flat in the parent, per convention): `../ballistic_control.py` (4a), `../ballistic_transmission.py` (4b), `../ballistic_readapt.py` (4c); figures `../ballistic_control_figure.py`, `../ballistic_transmission_figure.py`, `../ballistic_readapt_figure.py`. File index: [FILES.md](FILES.md).
+**Code** (lives in this folder, per [STRUCTURE.md](../../../STRUCTURE.md)): `ballistic_control.py` (4a), `ballistic_transmission.py` (4b), `ballistic_readapt.py` (4c); figures `ballistic_control_figure.py`, `ballistic_transmission_figure.py`, `ballistic_readapt_figure.py`. The only shared dependencies are [`../pusher_env.py`](../pusher_env.py) and [`../shared.py`](../shared.py), which stay at the `mjc` node because every experiment there imports them. File index: [FILES.md](FILES.md).
+**Child**: [directed/README.md](directed/README.md) — directed collection (S0/S1/S2): does the value drive choose *where* to look, and does it pay?
 **Status**: 4a a confounded-drive negative + diagnostic (3 seeds); 4b + 4c clean multi-seed positives (3 seeds each). Single-family (damping / corridor reach) — mechanism metrics are the trustworthy readouts. **Date**: 2026-07-22.
+**Builds on this**: [`directed/`](directed/README.md) (its child — the afferent link this cut named as its missing piece) · [`arm_substrate/`](../arm_substrate/README.md) (the second task family built to retire this arc's single-family caveat; re-derives Cut 4b's smooth quality axis)
 
 ---
 
@@ -30,7 +32,7 @@ The cerebellum's classical role is exactly the forward model that makes ballisti
 
 ---
 
-## Cut 4a — the confounded-drive negative + the diagnostic (`../ballistic_control.py`)
+## Cut 4a — the confounded-drive negative + the diagnostic (`ballistic_control.py`)
 
 **The attempt.** Make the *value loop's own* explore/exploit balance `b` (drift-value-loop Cut 3's `grounded@b`) produce the FM-quality differences, and grade identical FMs at a sweep of commitment horizons (`replan_every` reactive→ballistic) on the drifting-corridor substrate. Prediction: control-over-`b` flat when reactive, interior-optimum when ballistic.
 
@@ -40,7 +42,7 @@ The cerebellum's classical role is exactly the forward model that makes ballisti
 
 Two secondary observations, both consistent with the arc: the effect is **drift-speed-dependent** (a slower drift washes out all `b`-differentiation — the value benefit is an adaptation-speed effect that needs sufficient non-stationarity), and online REINFORCE self-tuning of `b` stays **noisy** (reproducing drift-value-loop Cut 3's shallow-bowl caveat). **Conclusion: control variables.** Drop the confounded drive; manufacture the FM-quality axis directly (4b).
 
-## Cut 4b — the clean transmission test (`../ballistic_transmission.py`)
+## Cut 4b — the clean transmission test (`ballistic_transmission.py`)
 
 **The controlled axis.** Replace the confounded drive with **damping-staleness**: train the FM on `d_train` dynamics, test on fixed `d_test=2.0`; FM prediction-error on the true dynamics grows monotonically with `|d_train − d_test|`. Two design facts that are findings in themselves:
 - The quality axis must be **smooth/global, not localized** — a localized needle is *open-loop-incompensable* (even a perfect FM can't counteract a strong local kick feedforward, which is *why* biology uses feedback there), so it saturates ballistic control at "fail" for every FM quality. Momentum/damping is smooth → the reach itself (accelerate → decelerate to stop) requires good modeling and is open-loop-compensable.
@@ -58,7 +60,7 @@ Three controllers, same FM, true-env execution, identical reaches.
 
 **Ballistic control transmits FM quality ~3–3.3× more than reactive**, and the genuinely-feedforward **BC motor program transmits the *most*** (it can't re-optimize per episode, so it bakes in the FM's staleness). Reactive re-grounds past the stale FM and stays competent (slope +0.35, identical across all 3 seeds). The efferent bridge transmits — in proportion to feedforward commitment. *(Note: reactive is the more accurate controller in absolute goal-distance — open-loop is intrinsically harder. The claim is about the **slope** — how much FM quality reaches behavior — not that ballistic beats reactive on accuracy.)*
 
-## Cut 4c — the end-to-end loop (`../ballistic_readapt.py`)
+## Cut 4c — the end-to-end loop (`ballistic_readapt.py`)
 
 **The integration.** Make the FM-quality axis **endogenous**: a Type-2 damping drift `d0=6 → d1=2` leaves the FM stale; the learning layer re-adapts it **online from reward-free `d1` transitions** (self-supervised — the cerebellum re-learning the new table). Snapshot the FM along the re-adaptation trajectory and grade each snapshot under reactive vs ballistic. (Operate at `d1=2`, where ballistic control *can* be competent with a matched FM — cf. 4b — so re-adaptation can restore competence; drift *from* the stale high-damping FM.)
 
@@ -97,32 +99,32 @@ The reward-free / ballistic synergy is the reading to lead with: the cerebellar 
 cd experiments/
 # 4a — the confounded-drive landscape (fast-drift, 3 seeds) + the diagnostic
 for s in 0 1 2; do
-  modal run --detach mujoco_control/ballistic_control.py::ballistic_control --tag land48_s$s --seed $s \
+  modal run --detach mjc/ballistic/ballistic_control.py::ballistic_control --tag land48_s$s --seed $s \
     --task-geom corridor --noise --arms "b0.0,b0.25,b0.5,b0.75,b1.0,random" --replan-sweep "3,12,30" \
     --corridor-r 0.5 --plan-h 30 --plan-hp 30 --rounds 48 --outer-m 6 --n-eval 24 \
     --cem-iters 4 --drift-cycles 2.0 --patch-amp 3.5 --patch-sigma 0.30
 done
-python3 mujoco_control/ballistic_control_figure.py --land-tags land48_s0 land48_s1 land48_s2 \
+python3 mjc/ballistic/ballistic_control_figure.py --land-tags land48_s0 land48_s1 land48_s2 \
     --selftune-tags selftune_s1 selftune_s2
 
 # 4b — the clean transmission test (damping-staleness, 3 seeds)
 for s in 0 1 2; do
-  modal run --detach mujoco_control/ballistic_transmission.py::ballistic_transmission --tag trans_s$s --seed $s \
+  modal run --detach mjc/ballistic/ballistic_transmission.py::ballistic_transmission --tag trans_s$s --seed $s \
     --controllers "reactive,ballistic_cem,ballistic_bc" --d-test 2.0 --damp-trains "2.0,2.8,3.8,5.2,7.0" \
     --corridor-r 0.4 --plan-h 34 --n-eval 40 --bc-tuples 1500
 done
-python3 mujoco_control/ballistic_transmission_figure.py --tags trans_s0 trans_s1 trans_s2
+python3 mjc/ballistic/ballistic_transmission_figure.py --tags trans_s0 trans_s1 trans_s2
 
 # 4c — the end-to-end re-adaptation loop (3 seeds)
 for s in 0 1 2; do
-  modal run --detach mujoco_control/ballistic_readapt.py::ballistic_readapt --tag readapt_s$s --seed $s
+  modal run --detach mjc/ballistic/ballistic_readapt.py::ballistic_readapt --tag readapt_s$s --seed $s
 done
-python3 mujoco_control/ballistic_readapt_figure.py --tags readapt_s0 readapt_s1 readapt_s2
+python3 mjc/ballistic/ballistic_readapt_figure.py --tags readapt_s0 readapt_s1 readapt_s2
 ```
 
 **Gotchas** (this session's): (i) launch the heavy detached runs **independently** and don't pile on competing background tasks — the harness can evict older background clients, and a `--detach` client killed mid-run *before its volume commit* loses the run (pull from the volume with `modal volume get mujoco-control-data <path>` if the local mirror is missing). (ii) Both smoke tests looked like nulls until two regime fixes: the FM-quality axis must be **smooth (damping), not a localized needle** (open-loop-incompensable), and the reach must be **feasible** so the matched controller reaches. (iii) In 4c the drift direction matters — operate where ballistic is competent (`d1=2`) and drift *from* the stale FM (`d0=6`), not the reverse.
 
-## Figures (mirrored to `../figures/`)
+## Figures (mirrored to `figures/`)
 
 - **4a**: `ballistic_control_contrast/` — `fig_landscape` (control-over-b per commitment horizon), `fig_transmission` (spread vs horizon), `fig_selftune`.
 - **4b**: `ballistic_transmission_contrast/` — **`fig_transmission`** (control vs FM-error per controller — the headline slopes) and `fig_slopes` (transmission slope per controller).

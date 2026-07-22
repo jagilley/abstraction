@@ -2,7 +2,7 @@
 robust figure: per-arm in-patch R^2 and phi-decode error (mean +/- sem over seeds) + the
 patch-visitation ladder (the mechanism). The single-seed ranking of the active arms was
 seed-noise; this resolves what is robust. Run locally:
-    python3 mujoco_control/meta_active_seeds_figure.py
+    python3 mjc/meta_adapt/meta_active_seeds_figure.py
 """
 import json
 import os

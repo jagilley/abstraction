@@ -27,8 +27,8 @@ finding that the value benefit needs sufficient non-stationarity to show up at a
 
 Run:
     cd experiments/
-    python3 mujoco_control/directed_loop_figure.py --tags loop_s0 loop_s1 loop_s2
-    python3 mujoco_control/directed_loop_figure.py --tags loopB_s0 loopB_s1 loopB_s2 --out loopB
+    python3 mjc/ballistic/directed/directed_loop_figure.py --tags loop_s0 loop_s1 loop_s2
+    python3 mjc/ballistic/directed/directed_loop_figure.py --tags loopB_s0 loopB_s1 loopB_s2 --out loopB
 """
 
 import argparse

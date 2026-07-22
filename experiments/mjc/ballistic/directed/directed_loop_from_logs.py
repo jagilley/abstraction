@@ -18,7 +18,7 @@ overlapping rounds (observed max |diff| = 5e-5, i.e. the 4-decimal print roundin
 
 Run:
     cd experiments/
-    python3 mujoco_control/ballistic/directed/directed_loop_from_logs.py \
+    python3 mjc/ballistic/directed/directed_loop_from_logs.py \
         --tags loopD_s0 loopD_s1 loopD_s2 --splice-from loopC --splice-policy lprog-only --verify-splice
 """
 

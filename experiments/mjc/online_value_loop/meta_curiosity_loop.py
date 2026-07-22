@@ -55,15 +55,15 @@ structurally nothing to wirehead. Stated, not separately tested.
 
 Run:
     cd experiments/
-    modal run mujoco_control/meta_curiosity_loop.py::meta_curiosity_loop --quick               # smoke
+    modal run mjc/online_value_loop/meta_curiosity_loop.py::meta_curiosity_loop --quick               # smoke
     # CLAIM 1 (2x2 reward-discovers-the-setpoint), 3 seeds each:
     for s in 0 1 2; do
-      modal run --detach mujoco_control/meta_curiosity_loop.py::meta_curiosity_loop --tag disc_clean_s$s --seed $s
-      modal run --detach mujoco_control/meta_curiosity_loop.py::meta_curiosity_loop --tag disc_noise_s$s --seed $s --noise
+      modal run --detach mjc/online_value_loop/meta_curiosity_loop.py::meta_curiosity_loop --tag disc_clean_s$s --seed $s
+      modal run --detach mjc/online_value_loop/meta_curiosity_loop.py::meta_curiosity_loop --tag disc_noise_s$s --seed $s --noise
     done
     # CLAIM 2 (track a moving optimum: noise onset partway), 3 seeds:
     for s in 0 1 2; do
-      modal run --detach mujoco_control/meta_curiosity_loop.py::meta_curiosity_loop --tag onset_s$s --seed $s --noise --noise-onset 0.4
+      modal run --detach mjc/online_value_loop/meta_curiosity_loop.py::meta_curiosity_loop --tag onset_s$s --seed $s --noise --noise-onset 0.4
     done
 """
 
@@ -71,7 +71,7 @@ import json
 import math
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 # arms: `online` learns b; `b<val>` fixes it (reference lines); `random` = floor.
 DEFAULT_ARMS = ["online", "b1.0", "b0.5", "b0.0", "random"]
@@ -91,7 +91,7 @@ def run_meta_curiosity_loop(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

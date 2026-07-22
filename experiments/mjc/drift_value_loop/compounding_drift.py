@@ -42,17 +42,17 @@ Phase 2 (value-driven carving under a value-IRRELEVANT drift) lives in `run_valu
 
 Run:
     cd experiments/
-    modal run mujoco_control/compounding_drift.py::compounding_drift --quick                 # smoke
-    modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag full_v1  # headline (novel φ, conflict)
-    modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag floor_v1 --family damping
-    modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag revisit_v1 --drift-mode revisit
-    modal run --detach mujoco_control/compounding_drift.py::compounding_drift --tag carve_v1 --carve-sweep
+    modal run mjc/drift_value_loop/compounding_drift.py::compounding_drift --quick                 # smoke
+    modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag full_v1  # headline (novel φ, conflict)
+    modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag floor_v1 --family damping
+    modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag revisit_v1 --drift-mode revisit
+    modal run --detach mjc/drift_value_loop/compounding_drift.py::compounding_drift --tag carve_v1 --carve-sweep
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 # state-dim groups (pusher_env.STATE_LABELS), for Phase 2 (puck-present, 8-dim)
 PUSHER_POS = [0, 1]
@@ -71,7 +71,7 @@ def run_compounding_drift(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])
@@ -595,7 +595,7 @@ def run_value_carved_drift(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import collect_transitions, PusherEnv
+    from mjc.pusher_env import collect_transitions, PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

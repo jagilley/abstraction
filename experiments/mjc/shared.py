@@ -29,7 +29,7 @@ image = (
         "mujoco==3.2.3",
         "matplotlib==3.9.2",
     )
-    .add_local_python_source("mujoco_control")
+    .add_local_python_source("mjc")
 )
 
 volume = modal.Volume.from_name("mujoco-control-data", create_if_missing=True)

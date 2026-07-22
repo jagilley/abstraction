@@ -11,8 +11,8 @@ emits:
   * fig_ttr       — transitions-to-recover per drift, mean±sem (the compounding curve).
   * fig_cumulative— cumulative transitions (sublinear=compounding vs linear/censored).
 
-Run:  python3 mujoco_control/compounding_drift_seeds_figure.py
-      python3 mujoco_control/compounding_drift_seeds_figure.py --tags full_v1 full_s1 full_s2 --frac 0.8 --fewshot 20
+Run:  python3 mjc/drift_value_loop/compounding_drift_seeds_figure.py
+      python3 mjc/drift_value_loop/compounding_drift_seeds_figure.py --tags full_v1 full_s1 full_s2 --frac 0.8 --fewshot 20
 """
 
 import argparse

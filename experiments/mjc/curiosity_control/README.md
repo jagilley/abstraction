@@ -1,8 +1,9 @@
 # Curiosity on control: an intrinsic drive on a drifting task, and grounding it against the noisy TV
 
-**Idea doc**: [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md) — the **explore/exploit interface** ("two afferent taps + one efferent gain"); this cut lands **next-piece #1** ("the `e`-tap and the `p`-tap are one system") on control.
-**Parents / lineage**: [a2a_forward/reaching/CURIOSITY_DRIVE_README.md](../a2a_forward/reaching/CURIOSITY_DRIVE_README.md) (the drive *atom* on active vision — Phases 1/2/2b) → [a2a_forward/reaching/CURIOSITY_CONTROL_README.md](../a2a_forward/reaching/CURIOSITY_CONTROL_README.md) (drive-selection **Step 0** + the reaching-ViT substrate dead-end, which pointed the build here — *this is the MuJoCo realization it flagged; it does not subsume that doc*). Substrate = **Cut #3** [`dynamics_shift.py`](README.md#cut-3--operator-intervention-reward-free-re-adaptation-after-a-dynamics-shift) (reward-free re-adaptation; the FM that provably learns *and re-learns*). Single-shift precursors it extends: [DIRECTED_READAPT](DIRECTED_READAPT_README.md) (disagreement under-visits a confident-prior patch) and [META_ADAPT §#4c](META_ADAPT_README.md#cut-4c--value-in-the-loop-value-directed-identification-a-robust-negative-meta_activepy) (VoI ≈ max-‖u‖ on low-dim ID). The *efferent* half of the interface (value-**shaping** the FM) is [META_ADAPT §#4d/#4e](META_ADAPT_README.md#cut-4d--value-shaping--meta-conditioning-two-separable-capacity-levers-and-when-re-allocation-buys-control-meta_value_shapingpy); this cut is the *afferent* half (value **directing where to look**).
-**Code**: `curiosity_control.py` · **Status**: done; mechanism metrics seed-robust (2–3 seeds/regime), control payoff modest & seed-variable. Single family. **Date**: 2026-07-20.
+**Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [../../../ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) — the **explore/exploit interface** ("two afferent taps + one efferent gain"); this cut lands **next-piece #1** ("the `e`-tap and the `p`-tap are one system") on control.
+**Parents / lineage**: [a2a_forward/reaching/CURIOSITY_DRIVE_README.md](../../a2a_forward/reaching/CURIOSITY_DRIVE_README.md) (the drive *atom* on active vision — Phases 1/2/2b) → [a2a_forward/reaching/CURIOSITY_CONTROL_README.md](../../a2a_forward/reaching/CURIOSITY_CONTROL_README.md) (drive-selection **Step 0** + the reaching-ViT substrate dead-end, which pointed the build here — *this is the MuJoCo realization it flagged; it does not subsume that doc*). Substrate = **Cut #3** [`dynamics_shift.py`](../dynamics_shift/README.md) (reward-free re-adaptation; the FM that provably learns *and re-learns*). Single-shift precursors it extends: [DIRECTED_READAPT](../directed_readapt/README.md) (disagreement under-visits a confident-prior patch) and [META_ADAPT §#4c](../meta_adapt/README.md#cut-4c--value-in-the-loop-value-directed-identification-a-robust-negative-meta_activepy) (VoI ≈ max-‖u‖ on low-dim ID). The *efferent* half of the interface (value-**shaping** the FM) is [META_ADAPT §#4d/#4e](../meta_adapt/README.md#cut-4d--value-shaping--meta-conditioning-two-separable-capacity-levers-and-when-re-allocation-buys-control-meta_value_shapingpy); this cut is the *afferent* half (value **directing where to look**).
+**Code** (lives in this folder): `curiosity_control.py`. File index: [FILES.md](FILES.md). · **Status**: done; mechanism metrics seed-robust (2–3 seeds/regime), control payoff modest & seed-variable. Single family. **Date**: 2026-07-20.
+**Builds on this**: [`online_value_loop/`](../online_value_loop/README.md) (its *afferent* lever — self-tuning the balance `b` was this cut's flagged next step) · [`drift_value_loop/`](../drift_value_loop/README.md) (the two drives as collection directors, re-graded by the corrected teacher)
 
 ---
 
@@ -17,7 +18,7 @@ The two-timescale doc splits the value system into an **explore tap** (`e`: "whe
 ## Apparatus (`curiosity_control.py`)
 
 - **Substrate**: Cut #3's puck-free momentum reaching (`frame_skip=12`, gear 10, damping 2, arena 1.8 — the known-working controller). State `[px,py,pvx,pvy]`, command `u∈[-1,1]²`.
-- **The moving frontier**: a localized, drifting **`field_patch`** (a smooth multi-mode force = *reducible* but capacity-hungry; added to `pusher_env.py`, additive/off-by-default → Cuts #1–4e byte-identical). Its Gaussian `sigma` makes it **scarce** (the Phase-2b precondition); `drift_mode=morph` sweeps its center back-and-forth (gradual — the Phase-2 lesson that derivative drives degrade gracefully under gradual drift); `drift_mode=none` pins it = the **stationary null**. An optional aleatoric **`noise_patch`** (Gaussian-gated random force) is the **noisy-TV** decoy.
+- **The moving frontier**: a localized, drifting **`field_patch`** (a smooth multi-mode force = *reducible* but capacity-hungry; added to [`../pusher_env.py`](../pusher_env.py), additive/off-by-default → Cuts #1–4e byte-identical). Its Gaussian `sigma` makes it **scarce** (the Phase-2b precondition); `drift_mode=morph` sweeps its center back-and-forth (gradual — the Phase-2 lesson that derivative drives degrade gracefully under gradual drift); `drift_mode=none` pins it = the **stationary null**. An optional aleatoric **`noise_patch`** (Gaussian-gated random force) is the **noisy-TV** decoy.
 - **Inner loop**: an **RPF ensemble** (K random-prior forward models; Osband 2018 — a frozen random prior per member so they disagree off-data, the intended fix for `directed_readapt`'s confident-prior blindness) continually re-fit on a **recency FIFO buffer**. The ensemble mean plans.
 - **Collection = teleport-region allocation** (isolates the drive from navigation — the confound that muddied #4c). Each round the drive scores a G×G grid of workspace cells, softmax-samples one, and collects a short in-cell rollout. **All arms share the FM/init/update; only the collection differs** (the `directed_readapt` discipline).
 - **The drives**: `surprise` (raw ‖e‖), `disagree` (ensemble variance), **`reducible`** = error×disagreement ("reducible surprise"), `lp` (the `−d‖e‖/dt` derivative), `taskonly` (on-policy toward goals), `random`; and **`grounded@b`** = `b·reducible + (1−b)·exploit` where **exploit** = value-relevance (density of the control task's start→goal paths through each cell).
@@ -70,18 +71,18 @@ Three things, all robust on the (stark) mechanism metrics: (1) **grounding immun
 
 ```bash
 cd experiments/
-modal run mujoco_control/curiosity_control.py::curiosity_control --quick                                  # smoke
+modal run mjc/curiosity_control/curiosity_control.py::curiosity_control --quick                                  # smoke
 # Finding 1 (drift, undiluted) + its stationary null (3 seeds each):
 for s in 0 1 2; do
-  modal run --detach mujoco_control/curiosity_control.py::curiosity_control --tag ft_drift_s$s --seed $s --n-eval 36
-  modal run --detach mujoco_control/curiosity_control.py::curiosity_control --tag ft_stat_s$s  --seed $s --n-eval 36 --drift-mode none
+  modal run --detach mjc/curiosity_control/curiosity_control.py::curiosity_control --tag ft_drift_s$s --seed $s --n-eval 36
+  modal run --detach mjc/curiosity_control/curiosity_control.py::curiosity_control --tag ft_stat_s$s  --seed $s --n-eval 36 --drift-mode none
 done
 # Finding 2 (value-relevance null): --value-rel off   (diluted-task runs drift_v1/offpath_v1 also show it)
 # Finding 4 (grounding balance sweep, noise on vs off; 3 seeds each):
 for s in 0 1 2; do
-  modal run --detach mujoco_control/curiosity_control.py::curiosity_control --tag ground_noise_s$s \
+  modal run --detach mjc/curiosity_control/curiosity_control.py::curiosity_control --tag ground_noise_s$s \
       --arms "reducible,grounded@0.7,grounded@0.5,grounded@0.3,grounded@0.0,random" --noise --n-eval 36 --seed $s
-  modal run --detach mujoco_control/curiosity_control.py::curiosity_control --tag ground_clean_s$s \
+  modal run --detach mjc/curiosity_control/curiosity_control.py::curiosity_control --tag ground_clean_s$s \
       --arms "reducible,grounded@0.7,grounded@0.5,grounded@0.3,grounded@0.0,random" --n-eval 36 --seed $s
 done
 ```
@@ -94,4 +95,4 @@ Per run (`figures/curiosity_control_<tag>/`): `fig1_curves` (control + frontier-
 - **Self-tune the balance**: a reward-driven outer loop over `b` (à la #4e's A2) — does the system *discover* the grounded optimum?
 - **The anticipation geometry**: a frontier that will *become* value-relevant but isn't yet (fixed goals, drift through them), where the explore term is *strictly* necessary (pure-exploit can't find it) — isolates the `e`-tap's distinctive value and would give a true inverted-U.
 - **Strict compounding**: successive related shifts; does per-shift re-adaptation *accelerate* (the meta-layer signature)?
-- Back-translate into [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md) (interface next-piece #1) and the belief tree.
+- Back-translate into [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) (interface next-piece #1) and the belief tree.

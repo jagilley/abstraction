@@ -9,7 +9,7 @@ pattern was noisy. This resolves what is robust across seeds:
            freed-capacity lever that (under a capacity-hungry pusher) drives Panel B.
 
 Run locally (after the seed runs land):
-    python3 mujoco_control/meta_value_shaping_seeds_figure.py
+    python3 mjc/meta_adapt/meta_value_shaping_seeds_figure.py
 """
 import json
 import os

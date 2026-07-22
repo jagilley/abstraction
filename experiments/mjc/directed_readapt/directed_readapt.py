@@ -61,14 +61,14 @@ the Cut #3 anchors (d0 competence, d1 zero-shot, oracle ceiling, random floor).
 
 Run:
     cd experiments/
-    modal run mujoco_control/directed_readapt.py::directed_readapt --quick   # smoke
-    modal run --detach mujoco_control/directed_readapt.py::run_directed_readapt  # (full; via entrypoint)
+    modal run mjc/directed_readapt/directed_readapt.py::directed_readapt --quick   # smoke
+    modal run --detach mjc/directed_readapt/directed_readapt.py::run_directed_readapt  # (full; via entrypoint)
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 
 @app.function(gpu="L4", memory=32768, timeout=7200, volumes={DATA_DIR: volume})
@@ -81,7 +81,7 @@ def run_directed_readapt(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

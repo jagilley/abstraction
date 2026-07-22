@@ -45,18 +45,18 @@ pattern). Static dynamics, no drift, no outer loop — the clean mechanism isola
 
 Run:
     cd experiments/
-    modal run mujoco_control/ballistic_transmission.py::ballistic_transmission --quick     # smoke
+    modal run mjc/ballistic/ballistic_transmission.py::ballistic_transmission --quick     # smoke
     for s in 0 1 2; do
-      modal run --detach mujoco_control/ballistic_transmission.py::ballistic_transmission \
+      modal run --detach mjc/ballistic/ballistic_transmission.py::ballistic_transmission \
           --tag trans_s$s --seed $s
     done
-    python3 mujoco_control/ballistic_transmission_figure.py --tags trans_s0 trans_s1 trans_s2
+    python3 mjc/ballistic/ballistic_transmission_figure.py --tags trans_s0 trans_s1 trans_s2
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 
 @app.function(gpu="L4", memory=32768, timeout=14400, volumes={DATA_DIR: volume})
@@ -66,7 +66,7 @@ def run_ballistic_transmission(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"]); np.random.seed(cfg["seed"])
     device = "cuda" if torch.cuda.is_available() else "cpu"

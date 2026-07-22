@@ -1,9 +1,11 @@
 # Value-shaping as capacity re-allocation — the value→FM interface (learning-layer, stationary)
 
-**Idea doc**: [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md) (discriminator 4 = "does a value/outer loop *cause* the FM to become value-shaped"; the "efferent gain: value-shaping = capacity re-allocation" section)
-**Spec it came from**: [../a2a_forward/reaching/CURIOSITY_CONTROL_README.md](../a2a_forward/reaching/CURIOSITY_CONTROL_README.md) (the MuJoCo redirection — bare-state disc-4 on the pusher, puck = value-irrelevant distractor)
-**Cousin / the meta sequel**: [Cut #3](README.md#cut-3--operator-intervention-reward-free-re-adaptation-after-a-dynamics-shift) `dynamics_shift.py` — reward-free re-adaptation, the substrate for the non-stationary (meta) experiments this one is a control for.
+**Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) (discriminator 4 = "does a value/outer loop *cause* the FM to become value-shaped"; the "efferent gain: value-shaping = capacity re-allocation" section)
+**Spec it came from**: [../../a2a_forward/reaching/CURIOSITY_CONTROL_README.md](../../a2a_forward/reaching/CURIOSITY_CONTROL_README.md) (the MuJoCo redirection — bare-state disc-4 on the pusher, puck = value-irrelevant distractor)
+**Cousin / the meta sequel**: [Cut #3](../dynamics_shift/README.md) `dynamics_shift.py` — reward-free re-adaptation, the substrate for the non-stationary (meta) experiments this one is a control for.
+**Code**: `value_shaping.py` (lives in this folder). File index: [FILES.md](FILES.md).
 **Status**: single seed, **stationary**. Robust core (re-allocation) + a fragile bonus (the "teeth"). **Date**: 2026-07-18.
+**Builds on this**: [`directed_readapt/`](../directed_readapt/README.md) (its sibling — the learning-layer control beside the collection-layer question) · [`meta_adapt/`](../meta_adapt/README.md) (Cut #4d fuses this per-dim re-allocation with the context latent) · [`arm_substrate/`](../arm_substrate/README.md) (replaces this cut's *manufactured* capacity competition with competition intrinsic to the plant)
 
 ---
 
@@ -12,7 +14,7 @@
 The program's goal is the **interplay between meta-learning and FM-based value supervision**. The idea doc splits that into two layers:
 
 - **Learning layer** — *how a value signal shapes the FM*. Achievable **stationary**, no outer loop.
-- **Meta layer** — the slow reward-driven **outer loop**; earns its keep only under **non-stationarity** (a stationary outer loop provably collapses to multitask — [RHM_META_LEARNING](../rhm/ratchet/RHM_META_LEARNING_README.md)).
+- **Meta layer** — the slow reward-driven **outer loop**; earns its keep only under **non-stationarity** (a stationary outer loop provably collapses to multitask — [RHM_META_LEARNING](../../rhm/ratchet/RHM_META_LEARNING_README.md)).
 
 **This experiment is the learning layer**: it characterizes the value→FM interface (the "efferent gain" — value re-prioritizing which state directions the FM spends capacity on) **in isolation, on a stationary task**. It is *not* the meta result and does not try to be. It is the **control** that makes the meta claim sharp: value-shaping is available stationary, so anything the outer loop buys *beyond* it (faster re-adaptation, compounding) is the meta contribution. Those live in the non-stationary sequel on `dynamics_shift.py`.
 
@@ -30,7 +32,7 @@ The naïve design (a heavy, frequently-hit puck) **failed**, and the failures ar
 
 1. **Energy ≠ prediction cost.** A high-energy puck whose free-flight is a *linear* damped particle is **cheap to predict at any capacity** — so dropping a reducible distractor frees nothing, and there is no re-allocation to see.
 2. **The capacity-hungry part of the physics (contact impulse) is *irreducible*** (Cut #1's sub-timestep aliasing) — it can't be "dropped" because no capacity was ever spent fitting it.
-3. **Fix: a deterministic nonlinear *multi-mode force field*** on the puck (`pusher_env.py`, applied via `qfrc_applied` at runtime — **additive, XML byte-identical when off, so Cuts #1–3 stay reproducible**). Multi-mode **decouples** the two properties a single mode conflates through its wavenumber: *smooth* (bounded frequency ⇒ fine-step-reducible, a big FM fits it to high R²) yet *complex* (a sum of modes ⇒ a small FM cannot — genuine capacity hunger). `#modes` is the capacity-hunger lever; max-`k` is the aliasing lever.
+3. **Fix: a deterministic nonlinear *multi-mode force field*** on the puck (`../pusher_env.py`, applied via `qfrc_applied` at runtime — **additive, XML byte-identical when off, so Cuts #1–3 stay reproducible**). Multi-mode **decouples** the two properties a single mode conflates through its wavenumber: *smooth* (bounded frequency ⇒ fine-step-reducible, a big FM fits it to high R²) yet *complex* (a sum of modes ⇒ a small FM cannot — genuine capacity hunger). `#modes` is the capacity-hunger lever; max-`k` is the aliasing lever.
 4. **Both bodies must be capacity-hungry.** The pusher's dynamics are **command-dominated** (the actuator does most of the work), so with the field on the puck only, the easy pusher never competes for capacity. Putting a *distinct-phase* field on the pusher too makes the value-relevant task capacity-hungry, so freed capacity can actually buy pusher fidelity.
 
 ## Results (full run, `full_v1`, 70K transitions, single seed)
@@ -54,8 +56,8 @@ The naïve design (a heavy, frequently-hit puck) **failed**, and the failures ar
 
 ```bash
 cd experiments/
-modal run mujoco_control/value_shaping.py::value_shaping --quick            # smoke (~1-2 min)
-modal run mujoco_control/value_shaping.py::value_shaping --tag full_v1       # full (~8-10 min, CPU)
+modal run mjc/value_shaping/value_shaping.py::value_shaping --quick            # smoke (~1-2 min)
+modal run mjc/value_shaping/value_shaping.py::value_shaping --tag full_v1       # full (~8-10 min, CPU)
 ```
 
 Knobs are auto-exposed CLI flags (`--field-amp`, `--field-pusher-amp`, `--field-central`, `--frame-skip`, `--caps` via code, `--seek-gain`, …). Results + 3 figures commit to the `mujoco-control-data` volume under `/data/value_shaping/<tag>/` and mirror to `figures/valshape_<tag>/`.

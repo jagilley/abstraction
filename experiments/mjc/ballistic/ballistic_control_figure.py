@@ -17,7 +17,7 @@ Reads figures/ballistic_control_<tag>/results.json (seed tags) and emits:
   * fig_selftune      — self-tuned b under a BALLISTIC control teacher: online_ctrl now converges
                         toward the FM-err optimum (Cut 3's reactive online_ctrl wandered).
 
-Run:  python3 mujoco_control/ballistic_control_figure.py \
+Run:  python3 mjc/ballistic/ballistic_control_figure.py \
           --land-tags land_s0 land_s1 land_s2 --selftune-tags selftune_s0 selftune_s1 selftune_s2
 """
 

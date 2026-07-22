@@ -25,15 +25,15 @@ then test residual-at-contact vs residual-in-free-flight along several axes:
 Run:
     cd experiments/
     # smoke test (fast, ~1-2 min on Modal)
-    modal run mujoco_control/contact_residual.py::contact_residual --quick
+    modal run mjc/contact_residual/contact_residual.py::contact_residual --quick
     # full run
-    modal run --detach mujoco_control/contact_residual.py::contact_residual
+    modal run --detach mjc/contact_residual/contact_residual.py::contact_residual
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 
 # --------------------------------------------------------------------------- #
@@ -157,7 +157,7 @@ def run_contact_residual(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import collect_transitions, STATE_LABELS
+    from mjc.pusher_env import collect_transitions, STATE_LABELS
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

@@ -36,18 +36,18 @@ per Cut 4; the learning-layer re-adaptation is the clean, drive-free piece).
 
 Run:
     cd experiments/
-    modal run mujoco_control/ballistic_readapt.py::ballistic_readapt --quick        # smoke
+    modal run mjc/ballistic/ballistic_readapt.py::ballistic_readapt --quick        # smoke
     for s in 0 1 2; do
-      modal run --detach mujoco_control/ballistic_readapt.py::ballistic_readapt --tag readapt_s$s --seed $s
+      modal run --detach mjc/ballistic/ballistic_readapt.py::ballistic_readapt --tag readapt_s$s --seed $s
     done
-    python3 mujoco_control/ballistic_readapt_figure.py --tags readapt_s0 readapt_s1 readapt_s2
+    python3 mjc/ballistic/ballistic_readapt_figure.py --tags readapt_s0 readapt_s1 readapt_s2
 """
 
 import copy
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 
 @app.function(gpu="L4", memory=32768, timeout=14400, volumes={DATA_DIR: volume})
@@ -57,7 +57,7 @@ def run_ballistic_readapt(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"]); np.random.seed(cfg["seed"])
     device = "cuda" if torch.cuda.is_available() else "cpu"

@@ -11,7 +11,7 @@ feedforward commitment. Reads figures/ballistic_transmission_<tag>/results.json 
   * fig_slopes       — the transmission slope d(control)/d(FM-err) per controller, mean±sem: the
                        one-number summary (ballistic slopes >> reactive).
 
-Run:  python3 mujoco_control/ballistic_transmission_figure.py --tags trans_s0 trans_s1 trans_s2
+Run:  python3 mjc/ballistic/ballistic_transmission_figure.py --tags trans_s0 trans_s1 trans_s2
 """
 
 import argparse

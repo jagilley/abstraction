@@ -4,7 +4,7 @@ Full file-by-file reference for the directed-collection cut (S0/S1/S2). Summariz
 [README.md](README.md); this is the lookup material. Code lives **in this folder** (per
 [STRUCTURE.md](../../../../STRUCTURE.md)); the only shared dependency is
 [`../../pusher_env.py`](../../pusher_env.py) and [`../../shared.py`](../../shared.py), which stay
-at the `mujoco_control` node because every experiment there imports them.
+at the `mjc` node because every experiment there imports them.
 
 ## Code files
 

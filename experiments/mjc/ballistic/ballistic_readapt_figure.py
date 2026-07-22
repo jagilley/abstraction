@@ -10,7 +10,7 @@ figures/ballistic_readapt_<tag>/results.json (seed tags):
   * fig_gain     — recovery gain (stale − recovered) per controller: the behavioral value of
                    re-adaptation, ballistic vs reactive.
 
-Run:  python3 mujoco_control/ballistic_readapt_figure.py --tags readapt_s0 readapt_s1 readapt_s2
+Run:  python3 mjc/ballistic/ballistic_readapt_figure.py --tags readapt_s0 readapt_s1 readapt_s2
 """
 
 import argparse

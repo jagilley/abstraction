@@ -8,8 +8,8 @@ starts to bite (or the informative null if the controller/capacity stays robust 
 
 Reads figures/value_carved_drift_<tag>/results.json for the (hidden, tag) pairs given.
 
-Run:  python3 mujoco_control/value_carved_drift_capacity_figure.py
-      python3 mujoco_control/value_carved_drift_capacity_figure.py --runs 24:comp_h24 32:comp_h32 64:comp_v1
+Run:  python3 mjc/drift_value_loop/value_carved_drift_capacity_figure.py
+      python3 mjc/drift_value_loop/value_carved_drift_capacity_figure.py --runs 24:comp_h24 32:comp_h32 64:comp_v1
 """
 
 import argparse

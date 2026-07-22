@@ -49,21 +49,21 @@ the loop can game). Stated, per #4e's discipline.
 
 Run:
     cd experiments/
-    modal run mujoco_control/online_value_loop.py::online_value_loop --quick                    # smoke
+    modal run mjc/drift_value_loop/online_value_loop.py::online_value_loop --quick                    # smoke
     # the teacher contrast (front vs control) + the fixed-b landscape, corridor geometry + noise:
     for s in 0 1 2; do
-      modal run --detach mujoco_control/online_value_loop.py::online_value_loop --tag teacher_s$s --seed $s \
+      modal run --detach mjc/drift_value_loop/online_value_loop.py::online_value_loop --tag teacher_s$s --seed $s \
           --task-geom corridor --noise \
           --arms "online_front,online_ctrl,b0.0,b0.3,b0.5,b0.7,b1.0,random"
     done
-    python3 mujoco_control/online_value_loop_figure.py     # the two-teacher contrast + b-landscape
+    python3 mjc/drift_value_loop/online_value_loop_figure.py     # the two-teacher contrast + b-landscape
 """
 
 import json
 import math
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 # arms: `online_front`/`online_ctrl` learn b (front vs control teacher); `b<val>` fixes it
 # (landscape reference lines); `random` = floor.
@@ -92,7 +92,7 @@ def run_online_value_loop(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import PusherEnv
+    from mjc.pusher_env import PusherEnv
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

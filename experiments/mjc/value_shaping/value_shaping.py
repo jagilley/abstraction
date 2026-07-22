@@ -54,14 +54,14 @@ the shaping, under non-stationarity) is a separate script.
 
 Run:
     cd experiments/
-    modal run mujoco_control/value_shaping.py::value_shaping --quick   # smoke
-    modal run --detach mujoco_control/value_shaping.py::run_value_shaping  # (full; see entrypoint)
+    modal run mjc/value_shaping/value_shaping.py::value_shaping --quick   # smoke
+    modal run --detach mjc/value_shaping/value_shaping.py::run_value_shaping  # (full; see entrypoint)
 """
 
 import json
 import modal
 
-from mujoco_control.shared import app, volume, DATA_DIR, NumpyEncoder
+from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
 # state-dim groups (see pusher_env.STATE_LABELS)
 PUSHER_POS = [0, 1]
@@ -89,7 +89,7 @@ def run_value_shaping(cfg: dict) -> dict:
     import torch
     import torch.nn as nn
 
-    from mujoco_control.pusher_env import collect_transitions, STATE_LABELS
+    from mjc.pusher_env import collect_transitions, STATE_LABELS
 
     torch.manual_seed(cfg["seed"])
     np.random.seed(cfg["seed"])

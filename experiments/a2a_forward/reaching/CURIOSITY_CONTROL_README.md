@@ -2,7 +2,7 @@
 
 **Idea doc**: [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) (the value/outer-loop thesis; disc-4 = "does an outer loop *cause* value-shaping"; the merged Step 1+2)
 **Parent**: [CURIOSITY_DRIVE_README.md](CURIOSITY_DRIVE_README.md) (the drive atom on active vision — Phases 1/2/2b)
-**Cousin (the redirection target)**: [../../mujoco_control/README.md](../../mujoco_control/README.md) Cut #3 `dynamics_shift.py` — reward-free re-adaptation after a dynamics shift
+**Cousin (the redirection target)**: [../../mjc/dynamics_shift/README.md](../../mjc/dynamics_shift/README.md) Cut #3 `dynamics_shift.py` — reward-free re-adaptation after a dynamics shift
 **Code**: `curiosity_reaching_control.py` (the control-substrate attempt; kept as the diagnostic record)
 **Status**: **Step 0 (drive selection) — clean positive.** **v1 (curiosity on the reaching control substrate) — instructive substrate-negative + full diagnosis.** Redirected to MuJoCo for the real next step. Single seed.
 **Date**: 2026-07-18
@@ -60,7 +60,7 @@ Before building a loop, settle the Phase-2 wound: the LP **derivative** `−d‖
 
 ## The MuJoCo reconciliation — "can it re-adapt at all" is already done, and better
 
-Reading [../../mujoco_control/README.md](../../mujoco_control/README.md) Cut #3 (`dynamics_shift.py`) reframed the whole line. It is the **reward-free re-adaptation after a dynamics shift** result, on real continuous physics: an arity-2 FM `f(s,u)→Δs` that **provably learns *and re-learns*** the dynamics (recovers to the oracle ceiling from **~50 reward-free transitions**), a model-free policy that gets **no** signal from reward-free interaction and needs **~240×** more reward-*labeled* data, the **factorization** (a dynamics shift corrupts only the world-model factor), and a cerebellar-recalibration reading. The irony: **the exact thing the reaching-ViT could not do — an FM that learns and re-learns a control map online — MuJoCo already has working.**
+Reading [../../mjc/dynamics_shift/README.md](../../mjc/dynamics_shift/README.md) Cut #3 (`mjc/dynamics_shift/dynamics_shift.py`) reframed the whole line. It is the **reward-free re-adaptation after a dynamics shift** result, on real continuous physics: an arity-2 FM `f(s,u)→Δs` that **provably learns *and re-learns*** the dynamics (recovers to the oracle ceiling from **~50 reward-free transitions**), a model-free policy that gets **no** signal from reward-free interaction and needs **~240×** more reward-*labeled* data, the **factorization** (a dynamics shift corrupts only the world-model factor), and a cerebellar-recalibration reading. The irony: **the exact thing the reaching-ViT could not do — an FM that learns and re-learns a control map online — MuJoCo already has working.**
 
 So re-deriving "an MB agent re-adapts after a shift" on *any* toy substrate (reaching-ViT or gridworld) would just reproduce Cut #3 on worse footing. **Re-adaptation feasibility is not the open question.**
 
@@ -87,14 +87,14 @@ The reaching detour wasn't wasted: it is *why* we can now say precisely where a 
 
 ## Concrete next step — disc-4 on the MuJoCo pusher
 
-Target the **linchpin** (disc-4) on the one substrate where the choice is principled rather than incidental. On the MuJoCo pusher (goal-conditioned reaching, `mujoco_control/`):
+Target the **linchpin** (disc-4) on the one substrate where the choice is principled rather than incidental. On the MuJoCo pusher (goal-conditioned reaching, `mjc/`):
 
 - **Value-irrelevant split**: keep the **puck** in the scene as an answer-irrelevant distractor for a *pusher*-reaching task. The FM `f(s,u)→Δs` predicts the full state (pusher + puck); the value/planner only cares about pusher position.
 - **The disc-4 test**: does an outer loop driven by the **disagreement magnitude** (Step 0's drive) + goal-value cause the FM to **re-allocate capacity toward the pusher (value-relevant) dynamics and away from the puck (value-irrelevant)** — versus a raw-`Δs`-MSE FM that spends capacity on both? Measure per-dim FM fidelity (pusher-vel vs puck-vel, the Cut #2 idiom) under the value-shaped vs unshaped FM.
 - **Under non-stationarity (the merged claim)**: apply Cut #3's dynamics shift (friction/drag collapse). Does the value-shaped FM **re-orient** its capacity to the newly-reducible pusher directions faster than the unshaped one — and does the disagreement-directed collection re-adapt in fewer reward-free transitions than Cut #3's undirected baseline?
 - **Controls inherited physically**: noisy-TV = contact aliasing (Cut #1's irreducible component); the drive must chase free-flight-reducible structure, not contact-aliasing-irreducible. Wireheading deferred (the reaching manifold is the reachable state — low risk, per next_steps).
 
-This turns the MuJoCo `dynamics_shift` flagship from "MB re-adapts reward-free" into "the **value/outer loop shapes and re-orients** the world model" — the disc-4 result the whole two-timescale doc is built around, on a substrate with the complexity to make it real. Spec/build lives in `mujoco_control/`, not here.
+This turns the MuJoCo `dynamics_shift` flagship from "MB re-adapts reward-free" into "the **value/outer loop shapes and re-orients** the world model" — the disc-4 result the whole two-timescale doc is built around, on a substrate with the complexity to make it real. Spec/build lives in `mjc/`, not here.
 
 ---
 
