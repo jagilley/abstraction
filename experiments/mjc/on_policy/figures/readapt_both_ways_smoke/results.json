@@ -1,0 +1,320 @@
+{
+  "config": {
+    "tag": "smoke",
+    "seed": 0,
+    "arms": [
+      "teleport",
+      "teleport_matched",
+      "on_policy"
+    ],
+    "b0": 0.0,
+    "b1": 6.0,
+    "milestones": [
+      0,
+      100,
+      400,
+      2000
+    ],
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      0.8,
+      0.6
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "q_range": 0.9,
+    "v_explore": 8.0,
+    "ep_len": 14,
+    "op_q_range": 0.25,
+    "ref_op_n": 2000,
+    "n_par": 8,
+    "sigma_u": 0.15,
+    "collect_k_shoot": 128,
+    "collect_cem_iters": 3,
+    "collect_replan_every": 14,
+    "wrap_limit": 3.0,
+    "fm_hidden": 128,
+    "fm_layers": 2,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1500,
+    "finetune_steps": 400,
+    "pool_n": 3000,
+    "probe_n": 600,
+    "n_eval": 12,
+    "plan_H": 14,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5,
+    "q_jit": 0.25,
+    "v0_std": 0.0,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "reach_tries": 40
+  },
+  "ceiling": {
+    "fm_err_task": 0.6256431341171265,
+    "fm_err_broad": 0.491921991109848,
+    "reactive": 0.09527777135372162,
+    "ballistic_cem": 0.15538367629051208
+  },
+  "results": {
+    "teleport": [
+      {
+        "fm_err_task": 1.0627907514572144,
+        "fm_err_broad": 5.619489669799805,
+        "reactive": 0.13682764768600464,
+        "ballistic_cem": 0.26725614070892334,
+        "transitions": 0
+      },
+      {
+        "fm_err_task": 1.1266361474990845,
+        "fm_err_broad": 1.0737087726593018,
+        "reactive": 0.07411527633666992,
+        "ballistic_cem": 0.18304941058158875,
+        "transitions": 100,
+        "corr": 0.21075624281220307,
+        "speed": 13.147788047790527,
+        "cover": 2.094823112564376
+      },
+      {
+        "fm_err_task": 0.5990197658538818,
+        "fm_err_broad": 0.6774904131889343,
+        "reactive": 0.08839872479438782,
+        "ballistic_cem": 0.16497981548309326,
+        "transitions": 400,
+        "corr": 0.09251460669679604,
+        "speed": 13.192216873168945,
+        "cover": 1.8192290384390741
+      },
+      {
+        "fm_err_task": 0.5849697589874268,
+        "fm_err_broad": 0.47820231318473816,
+        "reactive": 0.0603429339826107,
+        "ballistic_cem": 0.15835082530975342,
+        "transitions": 2000,
+        "corr": 0.05569546506431505,
+        "speed": 12.747961044311523,
+        "cover": 1.471397113048854
+      }
+    ],
+    "teleport_matched": [
+      {
+        "fm_err_task": 1.0627907514572144,
+        "fm_err_broad": 5.619489669799805,
+        "reactive": 0.13682764768600464,
+        "ballistic_cem": 0.26725614070892334,
+        "transitions": 0
+      },
+      {
+        "fm_err_task": 0.338944673538208,
+        "fm_err_broad": 2.9294111728668213,
+        "reactive": 0.06278059631586075,
+        "ballistic_cem": 0.17879949510097504,
+        "transitions": 100,
+        "corr": 0.2377166503767916,
+        "speed": 2.9694266319274902,
+        "cover": 2.199695388962447
+      },
+      {
+        "fm_err_task": 0.20757731795310974,
+        "fm_err_broad": 2.165329933166504,
+        "reactive": 0.04415687918663025,
+        "ballistic_cem": 0.16452014446258545,
+        "transitions": 400,
+        "corr": 0.1433562561120549,
+        "speed": 2.802720308303833,
+        "cover": 2.0563348259129786
+      },
+      {
+        "fm_err_task": 0.1488647162914276,
+        "fm_err_broad": 1.9443546533584595,
+        "reactive": 0.050512053072452545,
+        "ballistic_cem": 0.1538984477519989,
+        "transitions": 2000,
+        "corr": 0.044749753735826674,
+        "speed": 2.925947666168213,
+        "cover": 1.899340401976861
+      }
+    ],
+    "on_policy": [
+      {
+        "fm_err_task": 1.0627907514572144,
+        "fm_err_broad": 5.619489669799805,
+        "reactive": 0.13682764768600464,
+        "ballistic_cem": 0.26725614070892334,
+        "transitions": 0
+      },
+      {
+        "fm_err_task": 0.6085925102233887,
+        "fm_err_broad": 4.6572394371032715,
+        "reactive": 0.10449591279029846,
+        "ballistic_cem": 0.16859295964241028,
+        "transitions": 100,
+        "corr": 0.3768750117322655,
+        "speed": 3.0680992603302,
+        "cover": 2.3455033670405836
+      },
+      {
+        "fm_err_task": 0.3576548397541046,
+        "fm_err_broad": 2.499371290206909,
+        "reactive": 0.06967564672231674,
+        "ballistic_cem": 0.15936660766601562,
+        "transitions": 400,
+        "corr": 0.22426183451575374,
+        "speed": 2.742666482925415,
+        "cover": 2.2486346754084834
+      },
+      {
+        "fm_err_task": 0.2234988957643509,
+        "fm_err_broad": 2.270251989364624,
+        "reactive": 0.05782042443752289,
+        "ballistic_cem": 0.16077691316604614,
+        "transitions": 2000,
+        "corr": 0.2095039187225126,
+        "speed": 2.702284336090088,
+        "cover": 2.0570105339138864
+      }
+    ]
+  },
+  "summary": {
+    "teleport": {
+      "ballistic_cem": {
+        "stale": 0.26725614070892334,
+        "final": 0.15835082530975342,
+        "recovery_curve": [
+          0.0,
+          0.752702915459118,
+          0.9142225100477727,
+          0.9734773964740423
+        ],
+        "recovery_at_400": 0.9142225100477727,
+        "share_in_first_milestone": 0.7732104702024161
+      },
+      "reactive": {
+        "stale": 0.13682764768600464,
+        "final": 0.0603429339826107,
+        "recovery_curve": [
+          0.0,
+          1.5093275091316956,
+          1.1655611801180978,
+          1.840792812275294
+        ],
+        "recovery_at_400": 1.1655611801180978,
+        "share_in_first_milestone": 0.8199333999278855
+      },
+      "fm_err_task": {
+        "stale": 1.0627907514572144,
+        "final": 0.5849697589874268,
+        "recovery_curve": [
+          0.0,
+          -0.14604996918512378,
+          1.0609024668262859,
+          1.0930426554242363
+        ],
+        "recovery_at_400": 1.0609024668262859,
+        "share_in_first_milestone": -0.1336178130472303
+      },
+      "ballistic_over_reactive_gain": 1.4238834157306566
+    },
+    "teleport_matched": {
+      "ballistic_cem": {
+        "stale": 0.26725614070892334,
+        "final": 0.1538984477519989,
+        "recovery_curve": [
+          0.0,
+          0.790691847791195,
+          0.9183313944180017,
+          1.0132760867138701
+        ],
+        "recovery_at_400": 0.9183313944180017,
+        "share_in_first_milestone": 0.7803320912817232
+      },
+      "reactive": {
+        "stale": 0.13682764768600464,
+        "final": 0.050512053072452545,
+        "recovery_curve": [
+          0.0,
+          1.7821244707920232,
+          2.2303500438428974,
+          2.077397148508176
+        ],
+        "recovery_at_400": 2.2303500438428974,
+        "share_in_first_milestone": 0.8578641171582456
+      },
+      "fm_err_task": {
+        "stale": 1.0627907514572144,
+        "final": 0.1488647162914276,
+        "recovery_curve": [
+          0.0,
+          1.6558390099971094,
+          1.9563492961664113,
+          2.090657706718734
+        ],
+        "recovery_at_400": 1.9563492961664113,
+        "share_in_first_milestone": 0.7920182269320079
+      },
+      "ballistic_over_reactive_gain": 1.3132933100263502
+    },
+    "on_policy": {
+      "ballistic_cem": {
+        "stale": 0.26725614070892334,
+        "final": 0.16077691316604614,
+        "recovery_curve": [
+          0.0,
+          0.8819255174133422,
+          0.9643975718581913,
+          0.9517912034603712
+        ],
+        "recovery_at_400": 0.9643975718581913,
+        "share_in_first_milestone": 0.9265955749611655
+      },
+      "reactive": {
+        "stale": 0.13682764768600464,
+        "final": 0.05782042443752289,
+        "recovery_curve": [
+          0.0,
+          0.7781427467350939,
+          1.616178118718317,
+          1.9015032106628795
+        ],
+        "recovery_at_400": 1.616178118718317,
+        "share_in_first_milestone": 0.40922505014536736
+      },
+      "fm_err_task": {
+        "stale": 1.0627907514572144,
+        "final": 0.2234988957643509,
+        "recovery_curve": [
+          0.0,
+          1.039004270450988,
+          1.6130384422398325,
+          1.9199277827469416
+        ],
+        "recovery_at_400": 1.6130384422398325,
+        "share_in_first_milestone": 0.5411684125766596
+      },
+      "ballistic_over_reactive_gain": 1.3477150969854312
+    }
+  },
+  "milestones": [
+    0,
+    100,
+    400,
+    2000
+  ]
+}

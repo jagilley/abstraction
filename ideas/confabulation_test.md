@@ -1,6 +1,7 @@
 # The Confabulation Test: separating introspection from self-theory
 
-**Status**: design, pre-registration. No results yet.
+**Status**: **resolved** — run 2026-07-22. Results: [experiments/rhm/confabulation/README.md](../experiments/rhm/confabulation/README.md).
+Two predictions in this doc were **falsified** by the run and are left standing below rather than edited out: the loop is *not* necessary for the dissociation (open-loop shows it too, weaker), and `O_act` did *not* behave as a ceiling. The capacity-guard section was added mid-design after Jasper flagged the toy-DGP risk, and it earned its place — a smoke run reproduced the false positive exactly.
 **Depends on**: [activation_to_activation_forward.md](activation_to_activation_forward.md) (the FM primitive), [../experiments/rhm/RHM_LATENT_LOOP_README.md](../experiments/rhm/RHM_LATENT_LOOP_README.md) (the only RHM condition with generalizable self-knowledge — the substrate), ../papers/forward_self_models_paper1.md[^private].
 **Related**: [gradient_verbalization.md](gradient_verbalization.md), [self_model_needs_a_loop.md](self_model_needs_a_loop.md).
 

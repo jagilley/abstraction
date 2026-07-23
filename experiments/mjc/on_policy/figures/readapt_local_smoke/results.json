@@ -1,0 +1,376 @@
+{
+  "config": {
+    "tag": "smoke",
+    "seed": 0,
+    "arms": [
+      "teleport",
+      "teleport_matched",
+      "on_policy"
+    ],
+    "b0": 0.0,
+    "b1": 6.0,
+    "milestones": [
+      0,
+      100,
+      400,
+      2000
+    ],
+    "curl_center": [
+      0.78,
+      0.55
+    ],
+    "curl_sigma": 0.25,
+    "region_k": 1.4,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      0.8,
+      0.6
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "q_range": 0.9,
+    "v_explore": 8.0,
+    "ep_len": 14,
+    "op_q_range": 0.25,
+    "ref_op_n": 2000,
+    "n_par": 8,
+    "sigma_u": 0.15,
+    "collect_k_shoot": 128,
+    "collect_cem_iters": 3,
+    "collect_replan_every": 14,
+    "wrap_limit": 3.0,
+    "fm_hidden": 128,
+    "fm_layers": 2,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1500,
+    "finetune_steps": 400,
+    "pool_n": 3000,
+    "probe_n": 600,
+    "n_eval": 12,
+    "plan_H": 14,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5,
+    "q_jit": 0.25,
+    "v0_std": 0.0,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "reach_tries": 40
+  },
+  "ceiling": {
+    "fm_err_task": 0.21133944392204285,
+    "fm_err_in": 0.2593843340873718,
+    "fm_err_out": 0.13326644897460938,
+    "reactive": 0.08402596414089203,
+    "ballistic_cem": 0.12894156575202942
+  },
+  "results": {
+    "teleport": [
+      {
+        "fm_err_task": 0.7735967040061951,
+        "fm_err_in": 0.9795169830322266,
+        "fm_err_out": 0.4389762878417969,
+        "reactive": 0.08399517834186554,
+        "ballistic_cem": 0.16849258542060852,
+        "transitions": 0,
+        "in_share": NaN
+      },
+      {
+        "fm_err_task": 0.8850905895233154,
+        "fm_err_in": 1.162854552268982,
+        "fm_err_out": 0.43372422456741333,
+        "reactive": 0.15158241987228394,
+        "ballistic_cem": 0.2149049937725067,
+        "transitions": 100,
+        "in_share": 0.32
+      },
+      {
+        "fm_err_task": 0.8963062763214111,
+        "fm_err_in": 1.1998000144958496,
+        "fm_err_out": 0.40312907099723816,
+        "reactive": 0.05557967722415924,
+        "ballistic_cem": 0.1362048089504242,
+        "transitions": 400,
+        "in_share": 0.3466666666666667
+      },
+      {
+        "fm_err_task": 1.0024555921554565,
+        "fm_err_in": 1.3145314455032349,
+        "fm_err_out": 0.49533185362815857,
+        "reactive": 0.08415094017982483,
+        "ballistic_cem": 0.15813782811164856,
+        "transitions": 2000,
+        "in_share": 0.330625
+      }
+    ],
+    "teleport_matched": [
+      {
+        "fm_err_task": 0.7735967040061951,
+        "fm_err_in": 0.9795169830322266,
+        "fm_err_out": 0.4389762878417969,
+        "reactive": 0.08399517834186554,
+        "ballistic_cem": 0.16849258542060852,
+        "transitions": 0,
+        "in_share": NaN
+      },
+      {
+        "fm_err_task": 0.24864241480827332,
+        "fm_err_in": 0.3259259760379791,
+        "fm_err_out": 0.12305662035942078,
+        "reactive": 0.06286965310573578,
+        "ballistic_cem": 0.11897070705890656,
+        "transitions": 100,
+        "in_share": 0.49
+      },
+      {
+        "fm_err_task": 0.20399300754070282,
+        "fm_err_in": 0.27422282099723816,
+        "fm_err_out": 0.08986963331699371,
+        "reactive": 0.07159500569105148,
+        "ballistic_cem": 0.11319489777088165,
+        "transitions": 400,
+        "in_share": 0.44666666666666666
+      },
+      {
+        "fm_err_task": 0.1443585604429245,
+        "fm_err_in": 0.1706915646791458,
+        "fm_err_out": 0.10156738013029099,
+        "reactive": 0.0657752975821495,
+        "ballistic_cem": 0.11066344380378723,
+        "transitions": 2000,
+        "in_share": 0.375625
+      }
+    ],
+    "on_policy": [
+      {
+        "fm_err_task": 0.7735967040061951,
+        "fm_err_in": 0.9795169830322266,
+        "fm_err_out": 0.4389762878417969,
+        "reactive": 0.08399517834186554,
+        "ballistic_cem": 0.16849258542060852,
+        "transitions": 0,
+        "in_share": NaN
+      },
+      {
+        "fm_err_task": 0.4834505617618561,
+        "fm_err_in": 0.6421108245849609,
+        "fm_err_out": 0.2256275713443756,
+        "reactive": 0.07934515923261642,
+        "ballistic_cem": 0.1380716860294342,
+        "transitions": 100,
+        "in_share": 0.35
+      },
+      {
+        "fm_err_task": 0.3305089473724365,
+        "fm_err_in": 0.4411696791648865,
+        "fm_err_out": 0.1506853699684143,
+        "reactive": 0.06160460412502289,
+        "ballistic_cem": 0.12439994513988495,
+        "transitions": 400,
+        "in_share": 0.24333333333333335
+      },
+      {
+        "fm_err_task": 0.2504945993423462,
+        "fm_err_in": 0.31265777349472046,
+        "fm_err_out": 0.14947934448719025,
+        "reactive": 0.043942488729953766,
+        "ballistic_cem": 0.10914895683526993,
+        "transitions": 2000,
+        "in_share": 0.348125
+      }
+    ]
+  },
+  "summary": {
+    "teleport": {
+      "fm_err_in": {
+        "stale": 0.9795169830322266,
+        "final": 1.3145314455032349,
+        "recovery_curve": [
+          0.0,
+          -0.25458860878670525,
+          -0.30589229885130725,
+          -0.46521215634629914
+        ],
+        "recovery_at_400": -0.30589229885130725,
+        "share_in_first_milestone": 0.5472527003296795
+      },
+      "fm_err_out": {
+        "stale": 0.4389762878417969,
+        "final": 0.49533185362815857,
+        "recovery_curve": [
+          0.0,
+          0.01717989611929124,
+          0.11725895698153233,
+          -0.1843433171637135
+        ],
+        "recovery_at_400": 0.11725895698153233,
+        "share_in_first_milestone": -0.09319511216147826
+      },
+      "ballistic_cem": {
+        "stale": 0.16849258542060852,
+        "final": 0.15813782811164856,
+        "recovery_curve": [
+          0.0,
+          -1.1734819668573564,
+          0.8163576246767417,
+          0.2618075942346991
+        ],
+        "recovery_at_400": 0.8163576246767417,
+        "share_in_first_milestone": -4.482230434482282
+      },
+      "fm_err_task": {
+        "stale": 0.7735967040061951,
+        "final": 1.0024555921554565,
+        "recovery_curve": [
+          0.0,
+          -0.1982969246149587,
+          -0.21824453151009612,
+          -0.4070358969042187
+        ],
+        "recovery_at_400": -0.21824453151009612,
+        "share_in_first_milestone": 0.4871730629242776
+      },
+      "in_share_trace": [
+        0.32,
+        0.3466666666666667,
+        0.330625
+      ],
+      "ballistic_over_reactive_gain": -66.4781402468191
+    },
+    "teleport_matched": {
+      "fm_err_in": {
+        "stale": 0.9795169830322266,
+        "final": 0.1706915646791458,
+        "recovery_curve": [
+          0.0,
+          0.9075980764820137,
+          0.9793947865971528,
+          1.1231617113016323
+        ],
+        "recovery_at_400": 0.9793947865971528,
+        "share_in_first_milestone": 0.808074266910504
+      },
+      "fm_err_out": {
+        "stale": 0.4389762878417969,
+        "final": 0.10156738013029099,
+        "recovery_curve": [
+          0.0,
+          1.0333971214437234,
+          1.1419542655821062,
+          1.1036900511994634
+        ],
+        "recovery_at_400": 1.1419542655821062,
+        "share_in_first_milestone": 0.9363109872383579
+      },
+      "ballistic_cem": {
+        "stale": 0.16849258542060852,
+        "final": 0.11066344380378723,
+        "recovery_curve": [
+          0.0,
+          1.2521011791016885,
+          1.3981355755957297,
+          1.4621403468584415
+        ],
+        "recovery_at_400": 1.3981355755957297,
+        "share_in_first_milestone": 0.8563481486520472
+      },
+      "fm_err_task": {
+        "stale": 0.7735967040061951,
+        "final": 0.1443585604429245,
+        "recovery_curve": [
+          0.0,
+          0.9336549769394754,
+          1.0130659698022226,
+          1.1191285346303814
+        ],
+        "recovery_at_400": 1.0130659698022226,
+        "share_in_first_milestone": 0.8342696554045393
+      },
+      "in_share_trace": [
+        0.49,
+        0.44666666666666666,
+        0.375625
+      ],
+      "ballistic_over_reactive_gain": 3.173958292014782
+    },
+    "on_policy": {
+      "fm_err_in": {
+        "stale": 0.9795169830322266,
+        "final": 0.31265777349472046,
+        "recovery_curve": [
+          0.0,
+          0.4685333444354125,
+          0.7475668609889188,
+          0.9260227411083147
+        ],
+        "recovery_at_400": 0.7475668609889188,
+        "share_in_first_milestone": 0.5059631082867858
+      },
+      "fm_err_out": {
+        "stale": 0.4389762878417969,
+        "final": 0.14947934448719025,
+        "recovery_curve": [
+          0.0,
+          0.6978797845957075,
+          0.9430213922510606,
+          0.9469663927969802
+        ],
+        "recovery_at_400": 0.9430213922510606,
+        "share_in_first_milestone": 0.7369636239512523
+      },
+      "ballistic_cem": {
+        "stale": 0.16849258542060852,
+        "final": 0.10914895683526993,
+        "recovery_curve": [
+          0.0,
+          0.7691558813423434,
+          1.1148294190693777,
+          1.5004323297506164
+        ],
+        "recovery_at_400": 1.1148294190693777,
+        "share_in_first_milestone": 0.5126228394919904
+      },
+      "fm_err_task": {
+        "stale": 0.7735967040061951,
+        "final": 0.2504945993423462,
+        "recovery_curve": [
+          0.0,
+          0.5160380538277323,
+          0.7880516412850628,
+          0.9303607828657596
+        ],
+        "recovery_at_400": 0.7880516412850628,
+        "share_in_first_milestone": 0.5546644520399896
+      },
+      "in_share_trace": [
+        0.35,
+        0.24333333333333335,
+        0.348125
+      ],
+      "ballistic_over_reactive_gain": 1.4816390399832136
+    }
+  },
+  "milestones": [
+    0,
+    100,
+    400,
+    2000
+  ],
+  "region_frac": 0.6190476190476191
+}

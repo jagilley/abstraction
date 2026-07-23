@@ -3,13 +3,13 @@
 **Up**: [../README.md](../README.md) (ballistic control) · **Idea doc**: [../../../../ideas/two_timescale_value_loop.md](../../../../ideas/two_timescale_value_loop.md)
 **Direct parent**: [../README.md](../README.md) — Cut 4 closed the **efferent** half of the cerebellum↔value bridge (a better forward model reaches behavior, ~3× more under feedforward commitment) and named the missing piece in its own caveats: *"the value loop **directing where to collect** is the piece 4a showed is confounded in this geometry — so 'the value loop chooses collection' is **not** cleanly demonstrated here."* This cut builds that afferent link.
 **Code** (lives in this folder, per [STRUCTURE.md](../../../../STRUCTURE.md)): `directed_separability.py` (S0), `directed_ladder.py` (S1), `directed_loop.py` (S2); analysis `directed_loop_figure.py`, `directed_loop_from_logs.py`. Env support: `rot_regions` in [../../pusher_env.py](../../pusher_env.py). File index: [FILES.md](FILES.md).
-**Status**: S0 + S1 clean positives (3 seeds each). S2 a **bounded positive with a real null inside it** (4 configurations, 3 seeds). Single-family (corridor reach, command-rotation drift). **Date**: 2026-07-22.
+**Status**: S0 + S1 clean positives (3 seeds each). S2 a **bounded positive with an instrument-limited non-result inside it** (4 configurations, 3 seeds). Single-family (corridor reach, command-rotation drift). **Date**: 2026-07-22; S2's inner claim **corrected 2026-07-22** after an audit — see [§The S2 audit](#the-s2-audit--why-the-inner-null-was-retracted).
 
 ---
 
 ## One-liner
 
-Directed collection buys **speed of re-adaptation, not a better final model** — and it is the **reducibility** half of the value signal that does the work. Concentrating a scarce reward-free collection budget beats spreading it by ~2.9× under feedforward control and ~2.3× less under feedback control (the Cut-4 ballistic specificity, reproduced). Chasing raw prediction error is the *worst* way to concentrate (the noisy-TV failure, 1.5–1.9× costlier), so **knowing what is learnable is load-bearing**. But weighting by *where you will actually be* — the relevance term — wins decisively when collection is **one-shot** and contributes nothing measurable once collection is **repeated**, because budget spent somewhere irrelevant is a one-time cost you amortize rather than a permanent loss. Two mechanism findings fall out: **ensemble disagreement cannot detect a drift at all** (every member trained pre-drift agrees, and they are all wrong together), and a **multiplicative value signal needs an explicit no-op** or it normalizes floating-point noise into confident nonsense.
+Directed collection buys **speed of re-adaptation, not a better final model** — and **reducibility-awareness** is unambiguously load-bearing. Concentrating a scarce reward-free collection budget beats spreading it by ~2.9× under feedforward control and ~2.3× less under feedback control (the Cut-4 ballistic specificity, reproduced). Chasing raw prediction error is the *worst* way to concentrate (the noisy-TV failure, 1.5–1.9× costlier), so **knowing what is learnable** is what the value signal must supply. Weighting by *where you will actually be* — the relevance term — wins decisively when collection is **one-shot** (S1). Whether it also pays **in a loop is untested**: S2 was built to answer it and cannot, for reasons its own audit makes concrete (a control grader this tree had already shown is blind, a metric two-thirds contaminated by post-recovery plateau, and a 22× measurement subsidy that removes the term's whole job). Two mechanism findings survive intact and are the transferable content: **ensemble disagreement cannot detect a drift at all** (every member trained pre-drift agrees, and they are all wrong together), and a **multiplicative value signal needs an explicit no-op** or it normalizes floating-point noise into confident nonsense.
 
 ## The design problem this cut had to solve first
 
@@ -100,7 +100,7 @@ Each round: survey → allocate → collect → fine-tune → grade, with one re
 2. **Reducibility-awareness is load-bearing** — `error-only` is consistently the worst *directed* policy (1.5–1.9×). The noisy-TV trap is real and expensive.
 3. **The payoff stays ballistic-specific** — 2.2–2.8×, matching Cut 4b's transmission slopes and 4c's recovery gains.
 
-**What is a null:** the conjunction never beats reducibility-chasing alone in a loop. `value-floor` (1.009 ± 0.068) vs `lprog-only` (0.908 ± 0.057) is ~1.3 SEM, in the same direction across every configuration tried. The mechanism: with repeated attempts, budget spent off-reach **permanently repairs a rarely-re-drifted region** — a one-time cost, after which the relevance-blind policy behaves identically to a relevance-weighted one. The visitation term only pays when allocation is genuinely zero-sum, which is exactly S1's regime.
+**What looked like a null — and has been retracted.** On this table the conjunction never beats reducibility-chasing alone: `value-floor` (1.009 ± 0.068) vs `lprog-only` (0.908 ± 0.057), ~1.3 SEM, same direction in every configuration. It was originally reported as a real null with the mechanism *"budget spent off-reach permanently repairs a rarely-re-drifted region — a one-time cost you amortize, so the visitation term only pays when allocation is genuinely zero-sum."* That explanation is a coherent description of **this harness** and was mistaken for a property of loops. See [§The S2 audit](#the-s2-audit--why-the-inner-null-was-retracted) below: the harness could not have measured the claim either way, and the sighted instrument points the other direction.
 
 ### Two things the loop taught that the ladder could not
 
@@ -114,19 +114,80 @@ Two hypotheses this ruled *out*, both checkable from stored data: the visitation
 
 ---
 
+## The S2 audit — why the inner null was retracted
+
+Re-read of the stored per-round records (`directed_loop_audit.py`, local and read-only — no re-run,
+every number from `figures/directed_loop_<tag>/results.json`). Four checks, each answerable from
+data already on disk. Logs: [`logs/directed_loop_audit_loopC.log`](logs/directed_loop_audit_loopC.log),
+[`logs/directed_loop_audit_loopB.log`](logs/directed_loop_audit_loopB.log).
+
+**1. The grader is the one this tree already proved blind.** `excess damage` is a *control* metric.
+[`drift_value_loop`](../../drift_value_loop/README.md) Cut 3 — in this same node — is the finding that
+*control is a near-blind grader of FM quality; grade by the **value-relevant FM prediction error**
+instead.* Scoring the same runs by that teacher (probe error in the on-reach reducible region, over
+the same epochs) inverts the ranking, and the two rankings differ in a diagnostic way:
+
+| ranking (best → worst) | loopC |
+|---|---|
+| **mechanism** (value-relevant FM error) | `value` < `oracle` < `visits-only` < `lprog-only` < `error-only` < `uniform` |
+| **control** (excess damage) | `lprog-only` < `value` < `visits-only` < **`oracle`** < `error-only` < `uniform` |
+
+The mechanism metric reproduces the **predicted ladder exactly**, privileged `oracle` second. The
+control metric scrambles it and puts `oracle` — which by construction knows which region is stale
+*and* relevant — in 4th, behind two unprivileged heuristics. A grader that cannot rank the oracle
+correctly is not measuring allocation quality. On the pair the null is about, **`value` has lower
+value-relevant FM error than `lprog-only` in 6/6 seeds** (3 in loopC, 3 in loopB), while control
+favours `value` in only 2/3 and 2/3.
+
+**2. The metric is mostly the metric this cut already discredited.** `excess damage` integrates over
+the whole 12-round epoch, but recovery completes in ~2–3 rounds. **62% of loopC's score accrues after
+recovery is done** — i.e. it is the asymptotic-competence metric S2 itself showed nulls
+(*"the asymptotic metric is the wrong metric"*, above). loopB (`drift_every=6`) is only 35%
+contaminated and is the better-designed configuration; there the arms tie on control and `value`
+still wins the mechanism metric 3/3.
+
+**3. The aggregate is one seed.** loopC per-seed excess for `value` is 0.929 / **1.678** / 0.850 vs
+`lprog-only` 0.992 / 0.742 / 1.038 — value wins 2 of 3 and the mean is flipped by seed 1, which is
+the *same seed* this README already identifies as the degenerate-multiplication catastrophe.
+
+**4. The measurement subsidy removes the relevance term's job.** Every round, every policy spends
+`probe_n×K = 1600` + `monitor_n×K = 640` = **2240 free teleported transitions, everywhere in the
+world**, to decide where to spend a budget of **100** — a **22× subsidy**. The relevance term exists
+to answer *where should I even look*; when looking is free and global, it is demoted to a tiebreaker
+on repair effort, and repair is cheap (Cut 4c: ~200 transitions fixes a region). Combined with
+teleport collection (`collect_region` calls `set_state`), a per-round budget that refills for free,
+K=4 hand-drawn regions, and drift as a scheduled one-region-at-a-time event, off-manifold data is a
+**one-time purchase in a world with four places**. The original amortization explanation is exactly
+right about *that* world.
+
+**Status of the claim after the audit**: not "relevance pays in a loop", not "relevance doesn't" —
+**untested**. The one-shot result (S1) is unaffected; it uses a different grader and a genuinely
+zero-sum budget.
+
+> **What this cut needs before it can be re-attempted: on-policy collection.** The node-level memo
+> [`../../COLLECTION_REALISM.md`](../../COLLECTION_REALISM.md) is the standing writeup; the short
+> version is that "where should I collect" is unaskable on a substrate where collecting is free
+> teleportation and measuring is free and global. The recommended fix is a
+> `collection_mode: teleport | on_policy` flag on the existing envs — data becomes a byproduct of
+> behaviour, so relevance sits *upstream* of measurement rather than multiplying it afterwards and
+> allocation is permanently zero-sum. **Stopgap if something needs unblocking sooner**: charge the
+> `probe_n`/`monitor_n` surveys against the same budget the policy allocates (a config change),
+> which removes the 22× subsidy without changing how transitions are obtained.
+
 ## What this says about the idea doc
 
 Three updates, stated at the doc's own vocabulary:
 
 1. **Falsify functional-shape bullet #2 / answer open-Q #2.** The doc proposes ensemble disagreement as the online reducibility instrument (next-piece-to-test #3), citing curiosity Phase 2b's 3.7×→8.5× needle over-sampling. That result and ours are both right, and they are **two different problems the doc currently calls one**: disagreement works when the frontier moves into *never-sampled* territory (missing data) and is **blind** when the world *rewrites already-sampled* territory (stale data). Since the doc's own **Type-2** non-stationarity is precisely the stale case, *the proposed instrument fails on the kind of non-stationarity the doc calls load-bearing.* What worked instead is neither the disagreement magnitude nor the `−d‖e‖/dt` derivative but a **counterfactual fit probe** — fit on a small sample, check whether held-out error drops — which also sidesteps the "re-opening blindness" Phase 2 exposed, because it tests whether error *can* fall rather than waiting for it to fall.
-2. **Downgrade the two-taps claim.** "Explore/exploit falls out of which part of the FM's output the value system taps" (`e`-tap vs `p`-tap) is supported **one-shot** and unsupported **in a loop**. The interface *shape* survives; the `p`-tap's contribution is regime-conditional, not structural.
+2. ~~**Downgrade the two-taps claim.**~~ **Retracted — no update.** The original text read *"supported one-shot and unsupported in a loop; the `p`-tap's contribution is regime-conditional, not structural."* The loop evidence for that downgrade does not survive its own audit (§above): it was read off a control grader this node had already shown is blind, on a metric 62% contaminated by post-recovery plateau, with the aggregate flipped by one seed — and the sighted grader favours the conjunction 6/6 seeds. The correct status is **supported one-shot, untested in a loop**. Nothing in the idea doc changes on this point. *(Recorded rather than deleted: the mistake — reading a program-level belief downgrade off the instrument you have already published as blind — is the transferable part.)*
 3. **"Compounding" should be "rate."** The meta layer here buys *re-adaptation speed*, not a higher ceiling — which is what Type-2 implies anyway, since a genuinely drifting world has no asymptote to compound toward.
 
 **Not updated (re-confirmed):** the noisy-TV control keeps earning its "not optional" status; non-stationarity remains load-bearing, with the sharper condition that drift must be **dense relative to budget**; scarcity replicates from curiosity Phase 2b into a control substrate; the multiplicative/gating form holds, with the no-op addendum above.
 
 ## Honest caveats
 
-- **Single-family**: one arena, one kind of drift (command rotation), 3 seeds. The disagreement finding is the most transferable because it rests on a *structural* argument; the relevance-null is the most contingent.
+- **Single-family**: one arena, one kind of drift (command rotation), 3 seeds. The disagreement finding is the most transferable because it rests on a *structural* argument; the relevance question is the one this substrate cannot answer at all (§audit).
+- **Collection and measurement are both free and disembodied**, here and throughout the `mjc` node: `collect_region` teleports via `set_state`, the monitoring survey is global and uncharged, and the budget refills each round. The **arm substrate does not fix this** — [`arm_env.py:57`](../../arm_env.py) states teleport collection as the contract every script in that directory is written against. It fixes the *substrate* half (physics instead of six bolted-on perturbation layers; continuous locality instead of K=4 hand gates) and inherits the *acquisition* half wholesale. Any future directed-collection cut must charge measurement to the budget explicitly; it does not come for free with a better plant.
 - **The disagreement result's main threat**: our committee is bootstrap-resampled members of one architecture on one pre-drift pool. A genuinely diverse committee might behave differently. The structural argument (no member saw post-drift data, so none can represent the new mapping) is an argument, not a measurement — attack this before promoting it to a belief.
 - **`rounds-to-recover` is retired**, not reported. It was censored in 5–8 of 8 epochs for every policy at these settings, and an earlier version normalized to each policy's *own* epoch minimum, which rewards a uniformly-mediocre policy for "recovering" instantly and produced an incoherent ranking. `excess damage` is the workhorse.
 - **loopD's numbers come from parsed logs, not `results.json`** — all three clients were killed at ~91%, and the volume commits only at the end. `directed_loop_from_logs.py` reproduces them, and `--verify-splice` confirms the spliced `lprog-only` arm matches loopC to 5e-5 (print rounding). Re-run loopD if a clean artifact is wanted.
@@ -156,6 +217,10 @@ done
 python3 mjc/ballistic/directed/directed_loop_figure.py --tags loopC_s0 loopC_s1 loopC_s2 --out loopC
 python3 mjc/ballistic/directed/directed_loop_from_logs.py \
     --tags loopD_s0 loopD_s1 loopD_s2 --splice-from loopC --splice-policy lprog-only --verify-splice
+
+# the audit that retracted S2's inner null — local, read-only, no re-run needed
+python3 mjc/ballistic/directed/directed_loop_audit.py --tags loopC_s0 loopC_s1 loopC_s2
+python3 mjc/ballistic/directed/directed_loop_audit.py --tags loopB_s0 loopB_s1 loopB_s2
 ```
 
 **Gotchas.** (i) Run `modal run` from `experiments/`, not from `mjc/` — the module path doubles and the file is not found. (ii) Launching 3 detached clients from one shell is fragile: clients get evicted and a killed client loses the local mirror *and* (if killed before the function's final `volume.commit()`) the results.json entirely — the per-round log lines are the fallback. (iii) The earlier configurations (`loop_s*` rich, `loopB_s*` scarce) are retained deliberately: the rich/scarce contrast is the evidence for the asymptotic-metric null.

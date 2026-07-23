@@ -254,6 +254,19 @@ class ArmEnv:
             and a controller running an un-re-adapted internal model produces mirror-image
             trajectory errors -- direct behavioural evidence the internal model changed.
         `mj_jacSite` gives the exact analytic Jacobian, so no approximation enters.
+
+        OPTIONAL SPATIAL LOCALITY (`center`, `sigma`). If `curl["center"]` is set, the gain `b`
+        is Gaussian-gated on the TIP's Cartesian position: `b_eff = b * exp(-‖tip - center‖² /
+        2σ²)`. The field then acts only where the hand IS, so learning it requires physically
+        VISITING that region -- the property that makes *where you collect* matter (the
+        `COLLECTION_REALISM.md` on-policy program's `readapt_both_ways` E2). It keeps every other
+        curl property: still smooth (Gaussian, not a jet), still velocity-dependent, still
+        open-loop compensable (a correct FM pre-compensates when reaching THROUGH the region),
+        still aftereffect-capable. When `center` is absent the gate is identically 1.0 and this
+        method is BYTE-IDENTICAL to the global curl -- so Cut 4c-arm, P5, and E1 are unchanged
+        (checked by `on_policy/verify_backcompat.py`). Gating on the perpendicular curl keeps the
+        force smoothly on/off across the region boundary because it multiplies a term that is
+        itself zero at rest.
         """
         import mujoco
 
@@ -261,6 +274,12 @@ class ArmEnv:
         J = self._jacp[:2, :]                                  # (2, nv)
         v_tip = J @ self.data.qvel                             # (2,)
         b = float(curl.get("b", 0.0))
+        center = curl.get("center")
+        if center is not None:
+            tip = self.data.site_xpos[self.tip_sid][:2]
+            sig = float(curl.get("sigma", 0.3))
+            b *= float(np.exp(-((tip[0] - center[0]) ** 2 + (tip[1] - center[1]) ** 2)
+                              / (2.0 * sig ** 2)))
         F = b * np.array([-v_tip[1], v_tip[0]], dtype=np.float64)
         self.data.qfrc_applied[:] += J.T @ F
 
@@ -376,12 +395,42 @@ class ArmEnv:
 
 
 def collect_pool(env: "ArmEnv", n: int, rng: np.random.Generator, frame_skip: int,
-                 q_center, q_range: float, v_explore: float) -> tuple:
-    """Teleport-based transition collection -- the established modern idiom in this
-    directory (cuts #3 onward), which isolates the dynamics being modelled from any
-    navigation/coverage confound: sample a configuration and velocity directly, teleport
-    there, apply a uniform random command, record (s, u, s').
+                 q_center, q_range: float, v_explore: float,
+                 collection_mode: str = "teleport", **on_policy_kw) -> tuple:
+    """Transition collection. `collection_mode` selects HOW the transitions are obtained.
+
+    `"teleport"` (default, unchanged) -- the established modern idiom in this directory (cuts #3
+    onward), which isolates the dynamics being modelled from any navigation/coverage confound:
+    sample a configuration and velocity directly, teleport there, apply a uniform random command,
+    record (s, u, s'). Every cut through Cut 4c-arm was collected this way and still is: the
+    branch below is taken before `rng` is touched, so the default path is byte-identical and all
+    prior results stay reproducible.
+
+    `"on_policy"` -- data as a byproduct of behaviour (`embodied.py`, the fix in
+    `COLLECTION_REALISM.md` §3). Transitions are the ones a body actually passed through, one
+    `env.step` each, so the two modes are comparable at matched step count. Requires
+    `behaviour=` and `ep_len=`; passes every other keyword through to
+    `embodied.collect_on_policy`.
+
+    Two semantic changes worth stating rather than discovering:
+      * `q_center`/`q_range` become the EPISODE-START distribution, not the distribution of every
+        sample. The operating region is then bounded by episode length plus `wrap_limit`, not by
+        the sampling distribution (cf. the module docstring: teleport bounding is why joints could
+        be left unlimited).
+      * `v_explore` HAS NO ON-POLICY ANALOGUE and is asserted unused. Velocity stops being a knob
+        and becomes a consequence of behaving -- which is the point, and is also why the two modes
+        do not sample the same velocity band (`arm_substrate` P5: reaches run to ~15 rad/s while
+        collection samples at `v_explore=8`).
     """
+    if collection_mode == "on_policy":
+        from mjc.embodied import collect_on_policy
+
+        return collect_on_policy(env, n, rng, frame_skip, q_center, q_range, **on_policy_kw)
+    if collection_mode != "teleport":
+        raise ValueError(f"collection_mode must be 'teleport' or 'on_policy', got {collection_mode!r}")
+    if on_policy_kw:
+        raise TypeError(f"unexpected keyword(s) for teleport collection: {sorted(on_policy_kw)}")
+
     n_dof, n_u = env.n, env.act_dim
     qc = np.asarray(q_center, dtype=np.float64)[:n_dof]
     S = np.empty((n, 2 * n_dof), np.float32)

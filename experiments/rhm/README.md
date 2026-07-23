@@ -35,6 +35,7 @@ Full file-by-file reference (every `.py` and every auxiliary README with its one
 - **Loss weighting**: `rhm_label_smoothing.py`, `rhm_focal_loss.py`, `rhm_confidence_threshold.py`, `rhm_fm_weighted_ntp.py`.
 - **Ratchet / meta-learning arc** (wake-sleep, sparse, RL/gen-distill, FOMAML, meta-learning — *concluded, negative*): moved to **[`ratchet/`](ratchet/README.md)**. See that folder's README for the pan-arc summary, per-experiment index, and reproduction commands.
 - **Regularizer & latent loop**: `rhm_fm_regularizer.py`, `rhm_latent_loop.py`.
+- **Self-report / introspection**: [`confabulation/`](confabulation/README.md) — the confabulation test built on the latent loop's `ntp_aux{,_cl}` substrate.
 
 Each experiment section below links its own `Full writeup` auxiliary README; **[FILES.md](FILES.md)** collects those links in one table.
 
@@ -244,6 +245,16 @@ Reads the saved m2 trajectories (FM-reg + WD-sweep per-checkpoint parts) as an e
 ```bash
 modal run --detach -m rhm.rhm_ensemble_trajectory::ensemble_trajectory
 ```
+
+### The confabulation test: does a self-report track the implementation or a self-theory? (2026-07-22)
+
+**Full writeup**: [confabulation/README.md](confabulation/README.md) | **Design doc**: [ideas/confabulation_test.md](../../ideas/confabulation_test.md)
+
+The standing objection to any introspection claim (Nisbett & Wilson) is that a self-report may come from a learned *theory* of oneself rather than *access* to oneself. The FM decomposition `a_j = FM(a_i) + r` makes that operational: `FM(a_i)` is everything a self-theory could produce, so **confabulation lives in the range of the self-model and its complement is the residual**. A report head on `post_block7` reports the residual-direction cluster (IMPL) against three controls (BEHAV / ENT / WORLD), forking `rhm_latent_loop`'s `ntp_aux{,_cl}` wake recipe verbatim (reproduces its val loss to 3 dp).
+
+**IMPL is the only target with a first-person advantage over a capacity-matched third-party observer** (+0.09 to +0.11): BEHAV is a dead null (−0.001), and on ENT and WORLD the observer *beats* the self-report — exactly as the criterion "not cheaply recoverable from the I/O map" predicts. The sharpest result is that **the observer ladder is flat in capacity** (`O_input` 0.376 → 0.376 from 64D to 256D; `O_io` plateaus by 2L/128D and a model-sized 8L/256D observer does no better), while on the input-determined WORLD target the same ladder climbs steeply (0.227 → 0.522) — the third party is *access*-limited, not resource-limited. Matched-KL steering moves the report 2.2× more along residual than prediction directions with BEHAV-flip matched (0.024 vs 0.023). Everything survives a 24× instrument-FM capacity sweep, gated on `ens_cos` (0.84–0.91) and hierarchy-η², because an over-capacity FM leaves a junk residual that *fakes* the whole signature (a smoke run at cosine 0.993 / `ens_cos` 0.65 produced +0.118 advantage from noise).
+
+**Two pre-registered expectations failed.** The loop is **not necessary** — OL shows the same dissociation, weaker (margin +0.14 vs +0.33); and residual DGP-structure is *equal* in CL and OL (d6 η² 0.322 vs 0.295, matching the latent-loop reference exactly), so **closing the loop changes how well M knows itself, not what there is to know**. Also negative: `O_act` failed as a ceiling (0.666, below `O_io`), and the channel-ablation test is too blunt to carry weight. Single seed.
 
 ## Next steps
 

@@ -3,7 +3,8 @@
 **Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [../../../ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) (the efferent bridge + the value→FM capacity gain) · [../../../ideas/physical_control_substrate.md](../../../ideas/physical_control_substrate.md) §"Animals are biological robots" (morphology as an inductive-bias knob).
 **Parents / lineage**: this is *substrate machinery*, not a cut. It exists to retire the honest caveat on [../ballistic/README.md](../ballistic/README.md) — **"single-family (damping drift, corridor reach)"** — by supplying a second, nonlinear family for the ballistic/transmission arc, and to replace the pusher's *manufactured* capacity competition ([../value_shaping/README.md](../value_shaping/README.md), [meta_adapt §#4d/#4e](../meta_adapt/README.md)) with competition that is intrinsic to the plant. It inherits, and independently re-derives, two rules from the pusher arc: the value-relevant-teacher correction ([../drift_value_loop/README.md](../drift_value_loop/README.md) Cut 3) and the smooth-not-localized quality axis ([../ballistic/README.md](../ballistic/README.md) Cut 4b).
 **Code**: [`../arm_env.py`](../arm_env.py) (the DGP — stays at the `mjc` node as shared machinery, alongside `pusher_env.py`/`shared.py`) · `arm_probe.py` (in this folder; characterization: P0–P6 + `run_arm_capacity_sweep`). File index: [FILES.md](FILES.md).
-**Status**: substrate characterized and **verified against every precondition the ballistic arc requires**; single seed throughout; no cut has been ported onto it yet. **Date**: 2026-07-22.
+**First cut ported**: [`../ballistic/arm/`](../ballistic/arm/) — Cut 4c-arm, endogenous reward-free re-adaptation under a curl-field drift, 3 seeds. Its findings validate (and correct) the characterization below: see **[P7](#p7--the-substrate-under-a-live-cut-what-the-first-port-validated-2026-07-23)**.
+**Status**: substrate characterized and **verified against every precondition the ballistic arc requires**; P0–P6 single-seed, P7 3-seed. Physics realism only — the acquisition model is unchanged from the pusher ([`../COLLECTION_REALISM.md`](../COLLECTION_REALISM.md)). **Date**: 2026-07-22, extended 2026-07-23 (P7).
 
 ---
 
@@ -124,6 +125,64 @@ Coupling rises monotonically; the capacity requirement jumps 32 → 256 between 
 
 *Caveat*: control degrades overall with tool mass (reactive 0.041 → 0.192 against a 0.372 do-nothing floor), so at 1.0 kg ballistic is entering saturation — the same compression that produced the earlier false negatives. **0.3–0.6 kg is the usable competition regime.**
 
+### P7 — the substrate under a live cut: what the first port validated (2026-07-23)
+
+P0–P6 are characterization: the substrate grading *itself*. [`../ballistic/arm/`](../ballistic/arm/)
+is the first real cut run on it (Cut 4c-arm — endogenous, reward-free FM re-adaptation under a
+curl-field drift `b0=0 → b1=6`, 3 seeds), and it is the first evidence that the characterization
+was *predictive* rather than merely self-consistent. It was run at P5's config **byte-identical**
+(`joint_damping=0.5, gear=8.0, frame_skip=10, vel_pen=0.5, v0_std=0.0, cem_elite=32`, n=3 curl
+design point), so the only difference from P5 is where FM quality comes from.
+
+**Confirmed, and the substrate earns its keep:**
+
+| what P0–P6 predicted | what the live cut found |
+|---|---|
+| P5: ballistic transmits FM quality far more than reactive (exogenous axis, 6.0× damage, 1 seed) | **endogenous** version reproduces at **5.24× ± 0.18** recovery gain, 3 seeds (pusher Cut 4c: 4.3×) |
+| P3: the reach is feasible ballistically with a strong planner | ballistic recovers to **0.0999** against a matched-FM ceiling of **0.0993** — the ceiling is reachable, not asymptotic |
+| P4/P3: H=14 below the composition horizon, `k_shoot=1024`/`cem_iters=8` sized to the 42-dim sequence | no planner-induced flattening; the smoke at the pusher-tuned 256/4 gave 1.54×, the sized run 5.24× — **P3's warning reproduced exactly** |
+| curl is the better transmission axis (perpendicular, accumulates open-loop) | confirmed, and it is what makes the aftereffect below possible |
+
+**The aftereffect — measured, and it retires the substrate's biggest outstanding caveat.** Grading
+the re-adapted FM back in the field-free world gives a **mirror-signed** lateral deviation:
+
+| ballistic, signed lateral (+ = the direction the curl field pushes the hand) | 3-seed mean |
+|---|---|
+| naive FM, evaluated **in** the field | **+0.175** |
+| adapted FM, evaluated in the **field-free** world | **−0.168** |
+
+Ratio 0.96, signs opposed. The naive model is pushed by a field it does not represent; the adapted
+model pre-compensates a field that is no longer there and misses by nearly the same amount the
+other way. This is the canonical Shadmehr signature that adaptation was a **model update**, not
+impedance/co-contraction — and it is **ballistic-specific** (cost of being adapted-in-the-wrong-world:
++0.177 ballistic vs +0.021 reactive, 8.6×; 12.7× on the lateral term), because feedback corrects
+it away within a step. **The pusher structurally could not produce this**: it has no perpendicular,
+motion-dependent axis for a mirror-image error to be defined on. This is the clearest case so far
+of the arm buying a readout rather than just a second data point.
+
+**Two P-level corrections the port forces:**
+
+- **P5's noisy task-probe x-axis is reduced but not solved.** P5 prescribed two fixes for its
+  non-monotonic `fm_err(task)`: widen `v_explore`, or score **excess** error against a matched FM.
+  The port took the second (it does not perturb the substrate). Excess is much better behaved but
+  still non-monotonic across the ladder (0.595, 0.124, 0.177, 0.135, 0.059, 0.060) and does **not**
+  reach zero where control is already at ceiling. **Standing rule: report damage/gain on this
+  substrate, never a slope against `fm_err`.** If a future cut genuinely needs a clean FM-error
+  axis, widen `v_explore` to cover the reach's high-velocity tail — that fix is still untried.
+- **Re-adaptation is step-like here too.** 96% of the ballistic recovery is complete by the first
+  milestone (400 transitions), flat thereafter. The pusher's "recovery is fast/step-like" caveat
+  was expected to stretch into a graded trajectory on a harder plant and **did not**. A curl field
+  is apparently as easy to re-learn as a damping change. Milestones below 400 (50/100/200/300) are
+  needed to resolve the curve; a genuinely compositional drift may be needed to stretch it.
+
+**New gotchas from the port** (both cost a re-run): (iv) the `eval_geometry` reach-band rejection
+keeps only **~25%** of joint-space candidates, so any tuple count (`bc_tuples`, eval batches) must
+be sized to the *kept* count, not the drawn count — a BC arm cloned from 78 kept tuples visibly
+under-fits; (v) `modal run` intermittently dies client-side with *"Could not connect to the Modal
+server"* **before the function is created**, and exits 0 through a pipe — it hit 2 of 3 seeds on
+the first pass. Loop on a completion marker in the log, not on exit status
+([`../ballistic/arm/train.sh`](../ballistic/arm/train.sh) does this).
+
 ---
 
 ## Three transferable methodological findings
@@ -145,11 +204,21 @@ Recorded because they were wrong in the proposal and are load-bearing for anyone
 
 **n=5, `n_passive=2`, `tool_mass` 0.3–0.6, `curl_field` staleness axis, `goal_site=hand`, H ≤ composition horizon, `k_shoot` ≥ 1024 / `cem_iters` ≥ 8, FM error graded on the task distribution.** This is the only setting found that satisfies every precondition at once: capacity binds, the reach is feasible ballistically, the quality axis is smooth and one-signed, staleness is state-local, and control sits well off the floor.
 
+### What this substrate does *not* fix — read before porting a directed-collection cut
+
+The arm replaces the pusher's **scaffolding** (six bolted-on `qfrc_applied` perturbation layers → physics; K=4 hand-drawn Gaussian gates → continuous locality, P2's stale error ∝ tip speed). It does **not** change the **acquisition model**, and says so by contract: [`../arm_env.py:57`](../arm_env.py) — *"collection is teleport-based (`set_state`)"* — which is what makes the operating region controllable via the sampling distribution (§The env) and is load-bearing for P1/P2/P6.
+
+That is fine for every *exogenous-axis* cut (transmission, re-adaptation, capacity), where the experimenter sets FM quality and collection is just instrumentation. It is **not** fine for any cut where *where to collect* is the dependent variable. [`../ballistic/directed/`](../ballistic/directed/README.md)'s audit found its loop result was unmeasurable partly because monitoring was free: 2,240 uncharged teleported transitions per round decided where to spend a budget of 100, a **22× subsidy** that demotes the relevance term from *where should I even look* to a tiebreaker on repair effort. Porting that cut here inherits the problem unchanged.
+
+> **Rule for the arm's directed cut: it needs on-policy collection first.** Data as a byproduct of behaviour — you get the transitions your body passed through, and practising elsewhere costs an excursion in task time. The recommended implementation is a `collection_mode: teleport | on_policy` flag on `collect_pool` rather than a second substrate, so this plant keeps its characterization and finished cuts stay byte-identical; see [`../COLLECTION_REALISM.md`](../COLLECTION_REALISM.md) §3, which also states the real cost (it couples model quality to data quality, so dissociations measured that way are compound rather than clean). *Stopgap*: charging the monitoring survey against the collection budget removes the 22× subsidy as a config change, without changing how transitions are obtained.
+
 ## Caveats
 
-- **Single seed throughout.** Every number here is one seed; the mechanism readouts (coupling monotonicity, capacity requirement, composition horizon) were stable across configuration changes, but nothing is multi-seeded yet.
-- **No cut has been ported.** This is characterization only. The payload axis is retained but the curl axis is better on every measured count.
-- **Aftereffects and directional generalization — the two readouts that most justify the arm — are built for but unmeasured.** `curl_field` exists and is exact; the protocol (adapt at `b`, evaluate at `b=0`) is not yet implemented.
+- **Single seed throughout, in this file.** Every P0–P6 number is one seed; the mechanism readouts (coupling monotonicity, capacity requirement, composition horizon) were stable across configuration changes. P7's port numbers are 3-seed and are the only multi-seed evidence the substrate has.
+- **Physics realism ≠ experience realism.** The arm fixes the plant and inherits the acquisition model unchanged — see §"What this substrate does *not* fix" and the node-level memo [`../COLLECTION_REALISM.md`](../COLLECTION_REALISM.md). Everything verified here is verified under teleported, free, uniform-access collection.
+- ~~**No cut has been ported.**~~ The first port is [`../ballistic/arm/`](../ballistic/arm/) (Cut 4c-arm — endogenous reward-free re-adaptation under a curl-field drift, multi-seed, plus the aftereffect readout), running now. This section is characterization only; the payload axis is retained but the curl axis is better on every measured count.
+- ~~**Aftereffects** ... built for but unmeasured.~~ **Aftereffects are now measured** (P7, 3 seeds, mirror ratio 0.96) — this was the substrate's largest outstanding justification and it is discharged. **Directional generalization remains unmeasured**: whether adaptation acquired at one reach direction transfers to others, which is the second readout the arm was built for and the one that would say whether the FM learned the *field* or a set of direction-specific corrections.
+- **Aftereffect caveat**: measured at a single drift magnitude (`b=6`), with the ladder's endpoints only, and it is confounded with "the FM is simply wrong for `b=0`" in the same way any aftereffect is. The *sign* is what carries the argument, not the magnitude — an unsigned miss would be equally consistent with a degraded model.
 - **The 3-link/5-link `q_center` postures were chosen by hand** to sit comfortably inside the workspace; no sensitivity analysis.
 
 ## Reproduce

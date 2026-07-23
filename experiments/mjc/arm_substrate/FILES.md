@@ -13,6 +13,12 @@ is a substrate any cut in `mjc/` can be ported onto, exactly like [`../pusher_en
 | `arm_probe.py` | **Arm substrate characterization** (see [README.md](README.md)). `run_arm_probe(cfg)`: P0 FK/axis sanity · P1 capacity frontier · P2 state-locality of staleness · P3 ballistic feasibility vs do-nothing/random floors · P4 composition horizon · P5 reactive-vs-ballistic transmission slopes. `--axis payload\|curl`. FM error is graded on the **task distribution** (transitions visited by matched-FM reaches), with a broad probe kept alongside as the contrast — the fix that took transmission from 0.81x to 24x. `run_arm_capacity_sweep(cfg)`: where capacity binds, over (n_links x v_explore x frame_skip); readout = width needed for R²>=0.99 (pusher ref: 8). `run_arm_tool_probe(cfg)`: the passive tool — tool-blind vs full FM coupling + control cost of dropping the tool vs `tool_mass`. Entrypoints `arm_probe`, `arm_capacity_sweep`, `arm_tool_probe`. |
 | `__init__.py` | Empty package marker — makes `mjc.arm_substrate` importable and gets the folder shipped by the Modal image's `.add_local_python_source("mjc")`. |
 
+## Cuts ported onto this substrate
+
+| Node | Content |
+|---|---|
+| [`../ballistic/arm/`](../ballistic/arm/) | **Cut 4c-arm** (`arm_readapt.py`, `arm_readapt_figure.py`, `train.sh`) — the first real cut on this substrate, run at P5's config byte-identical. Endogenous reward-free FM re-adaptation under a Shadmehr curl-field drift `b0=0 → b1=6`: **5.24× ± 0.18** ballistic-over-reactive recovery gain (3 seeds), ballistic reaching the matched-FM ceiling, plus the **mirror-signed aftereffect** (+0.175 naive-in-field vs −0.168 adapted-in-field-free, ratio 0.96). Validates P3/P4/P5 predictively and forces two corrections to them — see [README.md](README.md) §P7. |
+
 ## Env support (in the parent, shared)
 
 | Symbol | Purpose |

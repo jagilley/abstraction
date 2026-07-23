@@ -1,0 +1,139 @@
+{
+  "config": {
+    "tag": "smoke",
+    "seed": 0,
+    "controllers": [
+      "reactive",
+      "ballistic_cem",
+      "ballistic_bc"
+    ],
+    "b0": 0.0,
+    "b1": 6.0,
+    "milestones": [
+      0,
+      400,
+      2000
+    ],
+    "do_aftereffect": true,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      0.8,
+      0.6
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "q_range": 0.9,
+    "v_explore": 8.0,
+    "fm_hidden": 128,
+    "fm_layers": 2,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1500,
+    "finetune_steps": 400,
+    "pool_n": 3000,
+    "probe_n": 800,
+    "n_eval": 12,
+    "plan_H": 14,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5,
+    "q_jit": 0.25,
+    "v0_std": 0.0,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "reach_tries": 40,
+    "bc_tuples": 300,
+    "pol_hidden": 256,
+    "pol_layers": 3,
+    "pol_lr": 0.001,
+    "pol_steps": 600
+  },
+  "ladder": [
+    {
+      "fm_err": 1.0425636768341064,
+      "fm_err_broad": 5.535097122192383,
+      "reactive": 0.13682764768600464,
+      "reactive_lat": 0.01395680382847786,
+      "ballistic_cem": 0.26725614070892334,
+      "ballistic_cem_lat": 0.11155525594949722,
+      "ballistic_bc": 0.26460233330726624,
+      "ballistic_bc_lat": 0.08867667615413666,
+      "transitions": 0,
+      "ae_reactive": 0.10691256821155548,
+      "ae_reactive_lat": -0.008136361837387085,
+      "ae_ballistic_cem": 0.1583106815814972,
+      "ae_ballistic_cem_lat": 0.016407687216997147,
+      "fm_err_excess": 0.3781982660293579
+    },
+    {
+      "fm_err": 0.5820965766906738,
+      "fm_err_broad": 0.6896976232528687,
+      "reactive": 0.06548397988080978,
+      "reactive_lat": 0.0005285596707835793,
+      "ballistic_cem": 0.15233677625656128,
+      "ballistic_cem_lat": 0.056871648877859116,
+      "transitions": 400,
+      "fm_err_excess": -0.08226883411407471
+    },
+    {
+      "fm_err": 0.6117183566093445,
+      "fm_err_broad": 0.48667335510253906,
+      "reactive": 0.07208512723445892,
+      "reactive_lat": 0.0015837266109883785,
+      "ballistic_cem": 0.1673378199338913,
+      "ballistic_cem_lat": 0.047924578189849854,
+      "ballistic_bc": 0.20120641589164734,
+      "ballistic_bc_lat": 0.04813366383314133,
+      "transitions": 2000,
+      "ae_reactive": 0.14152657985687256,
+      "ae_reactive_lat": -0.027189718559384346,
+      "ae_ballistic_cem": 0.22729045152664185,
+      "ae_ballistic_cem_lat": -0.0125107541680336,
+      "fm_err_excess": -0.05264705419540405
+    }
+  ],
+  "ceiling": {
+    "fm_err": 0.6643654108047485,
+    "fm_err_broad": 0.4963356852531433,
+    "reactive": 0.09527777135372162,
+    "reactive_lat": -0.0176254753023386,
+    "ballistic_cem": 0.15538367629051208,
+    "ballistic_cem_lat": 0.0108365248888731,
+    "ballistic_bc": 0.202627032995224,
+    "ballistic_bc_lat": 0.04671524837613106,
+    "transitions": -1,
+    "fm_err_excess": 0.0
+  },
+  "recovery": {
+    "reactive": {
+      "stale": 0.13682764768600464,
+      "recovered": 0.07208512723445892,
+      "gain": 0.06474252045154572
+    },
+    "ballistic_cem": {
+      "stale": 0.26725614070892334,
+      "recovered": 0.1673378199338913,
+      "gain": 0.09991832077503204
+    },
+    "ballistic_bc": {
+      "stale": 0.26460233330726624,
+      "recovered": 0.20120641589164734,
+      "gain": 0.0633959174156189
+    }
+  }
+}

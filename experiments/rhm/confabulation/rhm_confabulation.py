@@ -1,7 +1,7 @@
 """The Confabulation Test: does a self-report track the implementation or a self-theory?
 
-Design doc: ideas/confabulation_test.md
-Substrate:  RHM_LATENT_LOOP_README.md -- this file forks its `ntp_aux_cl` / `ntp_aux`
+Design doc: ../../../ideas/confabulation_test.md
+Substrate:  ../RHM_LATENT_LOOP_README.md -- this file forks its `ntp_aux_cl` / `ntp_aux`
             wake recipe VERBATIM (same DGP, model, FM, gate, init, losses) and adds a
             report battery on top. `ntp_aux*` is not optional: latent-loop showed the
             token target has *inverted* self-knowledge on RHM (fresh-FM SK -0.67), so a
@@ -46,10 +46,10 @@ WHAT THIS SCRIPT MEASURES
 
 Run:
   # smoke (a few minutes, everything tiny -- checks wiring only, numbers meaningless)
-  modal run -m rhm.rhm_confabulation::confabulation_test --smoke
+  modal run -m rhm.confabulation.rhm_confabulation::confabulation_test --smoke
 
   # headline: the loop arm (CL vs OL), full battery
-  modal run --detach -m rhm.rhm_confabulation::confabulation_test \
+  modal run --detach -m rhm.confabulation.rhm_confabulation::confabulation_test \
       --conditions "ntp_aux_cl,ntp_aux" --tag main
 """
 

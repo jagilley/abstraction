@@ -1,0 +1,172 @@
+{
+  "config": {
+    "tag": "armre_s1",
+    "seed": 1,
+    "controllers": [
+      "reactive",
+      "ballistic_cem",
+      "ballistic_bc"
+    ],
+    "b0": 0.0,
+    "b1": 6.0,
+    "milestones": [
+      0,
+      400,
+      1000,
+      2500,
+      6000,
+      14000
+    ],
+    "do_aftereffect": true,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      0.8,
+      0.6
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "q_range": 0.9,
+    "v_explore": 8.0,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 6000,
+    "finetune_steps": 1500,
+    "pool_n": 14000,
+    "probe_n": 1500,
+    "n_eval": 48,
+    "plan_H": 14,
+    "k_shoot": 1024,
+    "cem_iters": 8,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5,
+    "q_jit": 0.25,
+    "v0_std": 0.0,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "reach_tries": 40,
+    "bc_tuples": 6000,
+    "pol_hidden": 256,
+    "pol_layers": 3,
+    "pol_lr": 0.001,
+    "pol_steps": 4000
+  },
+  "ladder": [
+    {
+      "fm_err": 0.857599139213562,
+      "fm_err_broad": 5.431391716003418,
+      "reactive": 0.06579649448394775,
+      "reactive_lat": 0.06157544255256653,
+      "ballistic_cem": 0.37319111824035645,
+      "ballistic_cem_lat": 0.21557065844535828,
+      "ballistic_bc": 0.36025065183639526,
+      "ballistic_bc_lat": 0.21316005289554596,
+      "transitions": 0,
+      "ae_reactive": 0.017826654016971588,
+      "ae_reactive_lat": -0.0022781253792345524,
+      "ae_ballistic_cem": 0.06502963602542877,
+      "ae_ballistic_cem_lat": -0.00233821221627295,
+      "fm_err_excess": 0.66983862221241
+    },
+    {
+      "fm_err": 0.35183170437812805,
+      "fm_err_broad": 0.3096686899662018,
+      "reactive": 0.020197473466396332,
+      "reactive_lat": 0.006490059196949005,
+      "ballistic_cem": 0.08597683906555176,
+      "ballistic_cem_lat": 0.0580071285367012,
+      "transitions": 400,
+      "fm_err_excess": 0.164071187376976
+    },
+    {
+      "fm_err": 0.3411068320274353,
+      "fm_err_broad": 0.2438201904296875,
+      "reactive": 0.019871026277542114,
+      "reactive_lat": -0.004572352394461632,
+      "ballistic_cem": 0.06889993697404861,
+      "ballistic_cem_lat": 0.013718707486987114,
+      "transitions": 1000,
+      "fm_err_excess": 0.15334631502628326
+    },
+    {
+      "fm_err": 0.3304601013660431,
+      "fm_err_broad": 0.17051920294761658,
+      "reactive": 0.018318448215723038,
+      "reactive_lat": -0.0022689031902700663,
+      "ballistic_cem": 0.09454534947872162,
+      "ballistic_cem_lat": 0.03978738933801651,
+      "transitions": 2500,
+      "fm_err_excess": 0.14269958436489105
+    },
+    {
+      "fm_err": 0.25618717074394226,
+      "fm_err_broad": 0.10741247236728668,
+      "reactive": 0.015257705003023148,
+      "reactive_lat": 0.0032215064857155085,
+      "ballistic_cem": 0.08602531254291534,
+      "ballistic_cem_lat": 0.046203985810279846,
+      "transitions": 6000,
+      "fm_err_excess": 0.06842665374279022
+    },
+    {
+      "fm_err": 0.2813488245010376,
+      "fm_err_broad": 0.11337060481309891,
+      "reactive": 0.015170050784945488,
+      "reactive_lat": 0.001499970443546772,
+      "ballistic_cem": 0.08560284227132797,
+      "ballistic_cem_lat": 0.03625505417585373,
+      "ballistic_bc": 0.08783195167779922,
+      "ballistic_bc_lat": 0.039407722651958466,
+      "transitions": 14000,
+      "ae_reactive": 0.0323050357401371,
+      "ae_reactive_lat": -0.011419061571359634,
+      "ae_ballistic_cem": 0.2719327211380005,
+      "ae_ballistic_cem_lat": -0.21071285009384155,
+      "fm_err_excess": 0.09358830749988556
+    }
+  ],
+  "ceiling": {
+    "fm_err": 0.18776051700115204,
+    "fm_err_broad": 0.23294512927532196,
+    "reactive": 0.01733175851404667,
+    "reactive_lat": 0.001085182186216116,
+    "ballistic_cem": 0.0883696973323822,
+    "ballistic_cem_lat": 0.05238077789545059,
+    "ballistic_bc": 0.10262037813663483,
+    "ballistic_bc_lat": 0.04812043905258179,
+    "transitions": -1,
+    "fm_err_excess": 0.0
+  },
+  "recovery": {
+    "reactive": {
+      "stale": 0.06579649448394775,
+      "recovered": 0.015170050784945488,
+      "gain": 0.050626443699002266
+    },
+    "ballistic_cem": {
+      "stale": 0.37319111824035645,
+      "recovered": 0.08560284227132797,
+      "gain": 0.2875882759690285
+    },
+    "ballistic_bc": {
+      "stale": 0.36025065183639526,
+      "recovered": 0.08783195167779922,
+      "gain": 0.27241870015859604
+    }
+  }
+}

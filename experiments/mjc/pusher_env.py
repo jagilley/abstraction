@@ -454,6 +454,48 @@ class PusherEnv:
         return self.get_state(), info
 
 
+def collect_pool(env: "PusherEnv", n: int, rng: np.random.Generator, frame_skip: int,
+                 q_center, q_range: float, v_explore: float,
+                 collection_mode: str = "teleport", **on_policy_kw) -> tuple:
+    """The pusher's mirror of `arm_env.collect_pool` -- teleport by default, on-policy by flag.
+
+    NEW FUNCTION, added with the `COLLECTION_REALISM.md` fix. The teleport branch is written to
+    match the inline `_roll`/`collect_box` idiom the scripts in this node already use (e.g.
+    `ballistic/directed/directed_loop.py:137`) rather than to replace it: those scripts keep their
+    own copies, so nothing existing changes behaviour. Use this one for NEW cuts, where the flag
+    buys the mode comparison.
+
+    Note `collect_transitions` above is the cut-#1/#2 ancestor of the on-policy idea -- a scripted
+    OU walk with a seek drift, episodic and continuous. It predates the teleport convention and is
+    kept as-is; `embodied.OUBehaviour` is its generalisation with the meter attached.
+    """
+    if collection_mode == "on_policy":
+        from mjc.embodied import collect_on_policy
+
+        return collect_on_policy(env, n, rng, frame_skip, q_center, q_range, **on_policy_kw)
+    if collection_mode != "teleport":
+        raise ValueError(f"collection_mode must be 'teleport' or 'on_policy', got {collection_mode!r}")
+    if on_policy_kw:
+        raise TypeError(f"unexpected keyword(s) for teleport collection: {sorted(on_policy_kw)}")
+
+    nq, nv, n_u = int(env.model.nq), int(env.model.nv), int(env.model.nu)
+    qc = np.asarray(q_center, dtype=np.float64)[:nq]
+    S = np.empty((n, nq + nv), np.float32)
+    U = np.empty((n, n_u), np.float32)
+    S2 = np.empty((n, nq + nv), np.float32)
+    for i in range(n):
+        q = qc + rng.uniform(-q_range, q_range, nq)
+        qd = rng.normal(0.0, v_explore, nv)
+        env.set_state(q, qd)
+        u = rng.uniform(-1, 1, n_u).astype(np.float32)
+        s = env.get_state()
+        s2, _ = env.step(u, frame_skip)
+        S[i] = s
+        U[i] = u
+        S2[i] = s2
+    return S, U, S2
+
+
 def collect_transitions(dgp: dict | None, n_episodes: int, ep_len: int,
                         frame_skip: int, seed: int,
                         sigma: float = 0.5, theta: float = 0.15,
