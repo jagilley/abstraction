@@ -147,6 +147,46 @@ def run_verify() -> dict:
     check("gated_far_curl_is_off", dev < 1e-6,
           f"curl gated at a far center == field-free, max dev {dev:.2e}")
 
+    # ---------------------------------------------------------------- 2c
+    # The multi-region `curl_fields` / `noise_fields` LISTS (directed-collection substrate) must be
+    # additive: absent -> byte-identical to the plain arm; a single-element `curl_fields` must equal
+    # the equivalent single `curl_field`; a far-gated noise region must be field-free.
+    print("\n[2c] multi-region field lists are additive and default-inert", flush=True)
+    # (i) no lists present -> byte-identical to the field-free arm (both should be the plain arm)
+    dgp_plain = dict(dgp); dgp_plain["curl_field"] = {"b": 0.0}
+    dgp_emptylist = dict(dgp); dgp_emptylist["curl_field"] = {"b": 0.0}; dgp_emptylist["curl_fields"] = []
+    dev_e = float(np.abs(_roll(ArmEnv(dgp_plain)) - _roll(ArmEnv(dgp_emptylist))).max())
+    check("empty_curl_fields_is_inert", dev_e < 1e-6, f"[] curl_fields == field-free, dev {dev_e:.2e}")
+    # (ii) curl_fields=[{b}] == curl_field={b}  (same physics, list vs scalar path)
+    dgp_scalar = dict(dgp); dgp_scalar["curl_field"] = {"b": 6.0}
+    dgp_list = dict(dgp); dgp_list["curl_field"] = {"b": 0.0}; dgp_list["curl_fields"] = [{"b": 6.0}]
+    dev_l = float(np.abs(_roll(ArmEnv(dgp_scalar)) - _roll(ArmEnv(dgp_list))).max())
+    check("single_curl_fields_matches_scalar", dev_l < 1e-6,
+          f"curl_fields=[{{b}}] == curl_field={{b}}, dev {dev_l:.2e}")
+    # (iii) two gated curls at far centers -> off; a gated noise at a far center -> off
+    dgp_farlist = dict(dgp); dgp_farlist["curl_field"] = {"b": 0.0}
+    dgp_farlist["curl_fields"] = [{"b": 6.0, "center": (99.0, 99.0), "sigma": 0.25},
+                                  {"b": 6.0, "center": (-99.0, -99.0), "sigma": 0.25}]
+    dgp_farlist["noise_fields"] = [{"amp": 30.0, "center": (88.0, 88.0), "sigma": 0.25}]
+    dev_f = float(np.abs(_roll(ArmEnv(dgp_farlist)) - _roll(ArmEnv(dgp_plain))).max())
+    check("far_gated_lists_are_off", dev_f < 1e-6,
+          f"far-gated curl_fields+noise_fields == field-free, dev {dev_f:.2e}")
+    # (iv) a gated noise region ON the visited postures has a real effect (differs from field-free)
+    #      and is genuinely stochastic (two DIFFERENT noise_seeds diverge -- same seed is
+    #      deterministic by design, so we vary the seed rather than expecting two identical envs to
+    #      differ). Compared against the field-free plant, an in-region noise field must perturb it.
+    dgp_noise = dict(dgp); dgp_noise["curl_field"] = {"b": 0.0}
+    tip0 = ArmEnv(dgp_plain); tip0.set_state(np.asarray(qc), np.zeros(3))
+    near = tip0.tip_pos()
+    dgp_noise["noise_fields"] = [{"amp": 30.0, "center": tuple(near.tolist()), "sigma": 1.5}]
+    noise_effect = float(np.abs(_roll(ArmEnv(dgp_noise)) - _roll(ArmEnv(dgp_plain))).max())
+    check("gated_noise_perturbs_in_region", noise_effect > 1e-6,
+          f"in-region noise != field-free, dev {noise_effect:.2e}")
+    dgp_noise2 = dict(dgp_noise); dgp_noise2["noise_seed"] = 123
+    noise_stoch = float(np.abs(_roll(ArmEnv(dgp_noise)) - _roll(ArmEnv(dgp_noise2))).max())
+    check("gated_noise_is_stochastic", noise_stoch > 1e-6,
+          f"different noise_seed -> different Δs, dev {noise_stoch:.2e}")
+
     # ---------------------------------------------------------------- 3
     print("\n[3] Body's per-episode MjData matches the set_state-multiplexed idiom", flush=True)
     n_par, T = 4, 20

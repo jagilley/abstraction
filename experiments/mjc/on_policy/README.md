@@ -2,8 +2,8 @@
 
 **Up**: [../README.md](../README.md) (mjc) · **Standing memo**: [../COLLECTION_REALISM.md](../COLLECTION_REALISM.md) · **Idea doc**: [../../../ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md)
 **Direct parent**: [../ballistic/directed/README.md](../ballistic/directed/README.md) — its S2 audit retracted a where-to-collect claim as *unmeasurable*, because collecting was free teleportation and measuring was free and global (a **22× subsidy**). The memo that audit produced is what this node implements.
-**Code** (lives in this folder, per [STRUCTURE.md](../../../STRUCTURE.md)): `verify_backcompat.py` (the gate), `coverage_probe.py` (E0), `readapt_both_ways.py` (E1), `readapt_local.py` (E2), aggregators `*_agg.py`, `train.sh`. Shared machinery at the node: [`../embodied.py`](../embodied.py); the flag on [`../arm_env.py`](../arm_env.py) / [`../pusher_env.py`](../pusher_env.py). File index: [FILES.md](FILES.md).
-**Status**: machinery built and **backwards-compatibility gated**; E0/E1/E2 each 3 seeds, clean. Single task family (arm, curl drift). **Date**: 2026-07-23.
+**Code** (lives in this folder, per [STRUCTURE.md](../../../STRUCTURE.md)): `verify_backcompat.py` (the gate), `coverage_probe.py` (E0), `readapt_both_ways.py` (E1), `readapt_local.py` (E2), aggregators `*_agg.py`, `train.sh`; **E3 is its own sub-experiment** [`directed_on_policy/`](directed_on_policy/README.md) (**the prize**). Shared machinery at the node: [`../embodied.py`](../embodied.py); the flag + multi-region local fields on [`../arm_env.py`](../arm_env.py) / [`../pusher_env.py`](../pusher_env.py). File index: [FILES.md](FILES.md).
+**Status**: machinery built and **backwards-compatibility gated**; E0/E1/E2/E3 each 3 seeds, clean. Single task family (arm, curl drift). **Date**: 2026-07-24.
 
 ---
 
@@ -11,7 +11,7 @@
 
 Every FM in this node was trained on **teleported** transitions — isolated `(s,u,s′)` triples snapped to arbitrary states, free, i.i.d., omnisciently covering. This node builds the alternative (**data as a byproduct of behaviour**) as a flag on the existing envs, then prices it. Three findings, in the order they corrected each other: **(E0)** most of on-policy's apparent advantage was *not* embodiment but a **mistuned teleport knob** — the default samples a 12.7-rad/s, wide-posture region the task never enters, and an *oracle teleporter told where to look* recovers the whole gap; what survives as structurally embodied is **command-state entanglement** (|corr(u,s)| ≈ 0.7 vs teleport's 0.03), the luxury Cut #2's i.i.d.-command premise was quietly enjoying. **(E1)** Under the arc's **global** curl drift, Cut 4c-arm reproduces under every collection mode (**5.5× / 4.8× / 4.9×** ballistic-over-reactive), the recovery "step" is real and *sharper* on-manifold, and the memo's "on-policy will stretch it" hypothesis is **refuted** — a globally-learnable drift is re-adaptable from any motion. **(E2)** Make the drift **local** and embodiment finally becomes load-bearing: on-policy needs **2.5×** more transitions to repair the region than a task-matched teleporter, and broad teleport **never** repairs it. The mechanism is not the memo's guessed "coverage grows" but **bootstrap data-quality** — you visit the region at the same rate, but the data you gather while your model is wrong is itself wrong-distributed.
 
-**Net for the substrate**: embodiment is nearly free when structure is global and expensive when it is local. That is the boundary condition on every acquisition claim this tree makes, and **local drift is the regime where "where should I practise?" becomes a real question** — the on-ramp back to the retracted directed-collection cut.
+**Net for the substrate**: embodiment is nearly free when structure is global and expensive when it is local. That is the boundary condition on every acquisition claim this tree makes, and **local drift is the regime where "where should I practise?" becomes a real question** — the on-ramp back to the retracted directed-collection cut. **(E3)** That cut, re-attempted: the full inner-loop (reward-free FM re-adaptation + ballistic control) + outer-loop (a value signal `lprog × visits` choosing *where* to collect) + FM-as-bridge, on the on-policy arm — with the per-region learning-progress **survey itself on-policy and metered** (monitor:collect **1.84×**, not S2's 22×). Both halves of the retracted S1/S2 ladder reproduce: `value` beats `lprog-only` (**relevance** pays — 3/3 seeds on the sighted grader) *and* beats `error-only` (**reducibility**-awareness pays — `error-only` burns 47% of budget on the noisy-TV trap and collapses to uniform), and `value` matches the privileged oracle. The retracted claim is now measurable and positive, because collecting *and* looking are both embodied.
 
 ## The machinery ([`../embodied.py`](../embodied.py))
 
@@ -109,6 +109,17 @@ Region placed by computing the reach-tip distribution directly (`fk` is pure num
 
 **4. The 5× dissociation survives again** (≈5.4/5.1/5.4× at seed 0), across both drift geometries and all three collection modes.
 
+## E3 — the prize: directed collection on the on-policy arm ([`directed_on_policy/`](directed_on_policy/README.md), 3 seeds)
+
+**Full dedicated writeup: [`directed_on_policy/README.md`](directed_on_policy/README.md).** Next-step #1, delivered. The retracted [`ballistic/directed`](../ballistic/directed/README.md) S2 cut — the full **inner loop** (reward-free FM re-adaptation + ballistic control) + **outer loop** (a value signal `lprog × visits` choosing *where* to collect) + **FM as the shared bridge** — re-attempted where the fatal S2 subsidy is gone: the per-region learning-progress **survey is itself on-policy and metered** (monitor:collect **1.84×**, not 22×). Scarcity-among-distractors ladder: 1 on-reach reducible target A + off-reach reducible (catch `lprog-only`) + off-reach noise (catch `error-only`), under continuous OU drift. Mean region-A FM error over rounds (sighted grader; control is near-saturated):
+
+| | uniform | error-only | lprog-only | visits-only | oracle | **value** |
+|---|---|---|---|---|---|---|
+| region-A err ↓ | 0.475 | 0.457 | 0.447 | 0.390 | 0.372 | **0.350** |
+| budget → noise | 33% | **47%** | 35% | 13% | 0% | 29% |
+
+Both halves of the ladder reproduce: `value` beats `lprog-only` **3/3 seeds** (**relevance** pays, once looking is embodied) and beats `error-only`, which burns 47% of budget on the noisy-TV trap and collapses to uniform (**reducibility**-awareness pays); `value` matches the privileged oracle. The one on-policy twist: the S1/S2 *on-reach noise* decoy is **unplaceable** — visitation concentrates on the target, so there is no "visited-but-irrelevant" territory (you only go where you reach). See the writeup for findings, caveats, and the geometry gotchas.
+
 ---
 
 ## What the arc says about the substrate
@@ -118,6 +129,7 @@ Region placed by computing the reach-tip distribution directly (`fk` is pure num
 3. **Teleport was mistuned, and that masqueraded as a scientific effect twice** — as on-policy's apparent sample-efficiency win (E0) and as default teleport's apparent gradual recovery (E1). The fix (`teleport_matched`) is cheap and belongs in any future teleport cut.
 4. **Cut #2's i.i.d.-command premise is a teleport-only luxury.** A body faces |corr(u,s)| ≈ 0.7, caused by continuity itself.
 5. **Local drift is the regime where "where should I practise?" is a real question** — allocation becomes zero-sum and place-dependent. That is precisely what [`ballistic/directed/`](../ballistic/directed/README.md) S2 could not have, and it is the on-ramp to re-attempting that retracted cut honestly.
+6. **The retracted directed-collection claim is true, once looking is embodied (E3).** Relevance pays *because* on-policy you can only cheaply survey where you actually go — the 22× measurement subsidy that made S2 unmeasurable is not a config to remember to disable but a thing the body structurally cannot buy. And **on-policy dissolves the on-reach-noise decoy entirely**: visitation concentrates on the target, so "visited-but-irrelevant" territory does not exist — the relevance lever is purely the off-reach direction.
 
 ## Reproduce
 
@@ -132,15 +144,21 @@ for s in 0 1 2; do modal run --detach mjc/on_policy/coverage_probe.py::coverage_
 for s in 0 1 2; do modal run --detach mjc/on_policy/readapt_both_ways.py::readapt_both_ways --tag rbw_s$s --seed $s; done
 for s in 0 1 2; do modal run --detach mjc/on_policy/readapt_local.py::readapt_local --tag loc_s$s --seed $s; done
 
+# E3 — directed collection, the prize (own sub-experiment). --quick smokes the noisy-TV ladder.
+modal run --detach mjc/on_policy/directed_on_policy/directed_on_policy.py::directed_on_policy --quick --tag ladder_smoke
+for s in 0 1 2; do modal run --detach mjc/on_policy/directed_on_policy/directed_on_policy.py::directed_on_policy --tag ladder_s$s --seed $s --mon-n 40; done
+
 python3 mjc/on_policy/coverage_probe_agg.py --tags e0_s0 e0_s1 e0_s2 e0b_s0 e0b_s1 e0b_s2
 python3 mjc/on_policy/readapt_both_ways_agg.py --tags rbw_s0 rbw_s1 rbw_s2
 python3 mjc/on_policy/readapt_local_agg.py --tags loc_s0 loc_s1 loc_s2
+python3 mjc/on_policy/directed_on_policy/directed_on_policy_agg.py --tags ladder_s0 ladder_s1 ladder_s2
 ```
 
 **Gotchas.**
 - **Do not launch the 3 seeds from one shell** with backgrounded `modal run --detach … &` + `wait` (`train.sh`'s multi-seed targets do this, and it cost E2 an entire run). Detached mode only guarantees the *last* triggered function survives the parent; the siblings evict each other, and a client killed before `volume.commit()` loses `results.json` entirely. Launch each seed as its own independent client. Same fragility is recorded in [`../ballistic/directed/README.md`](../ballistic/directed/README.md).
 - If a client dies anyway, `modal volume get mujoco-control-data <path>/results.json …` recovers a clean artifact (this rescued `e0b_s1`); `coverage_probe_agg.py` also parses logs, and merges tags by trailing `_s<N>` so a follow-up run that *adds rungs* to an existing seed folds in — with an explicit **merge check** that shared configurations agree to 0.0.
 - `modal volume get` can fail with a transient DNS error and leave a **0-byte** file; check the size and retry.
+- **E3 geometry (two smokes' worth of lessons, now in code).** (i) On/off-reach must be defined by **actual reach visitation**, not a geometric proxy: the reach tip-path is widely curved, so a straight-corridor (or angle-from-P0) test mislabels swung-through regions as off-reach and, worse, put an "off-reach" distractor ~0.1 m from the start posture — which *every* reach passes through — sending `value`/`oracle` to chase it instead of A. The fix computes gate-occupancy over the FK'd joint-space reach sweep. (ii) Regions must sit in the **extended/tame** radius band; a folded/inward region's fast dynamics give ~10× the FM error and swamp the curl signal. (iii) Noise `amp` must be **< `gear`** and noise regions well-separated, or aleatoric noise bleeds into A and destroys its reducibility (an early smoke's A ceiling jumped 0.14→0.37).
 
 ## Caveats
 
@@ -153,8 +171,8 @@ python3 mjc/on_policy/readapt_local_agg.py --tags loc_s0 loc_s1 loc_s2
 
 ## Next steps
 
-1. **Re-attempt the retracted directed-collection cut on the local-drift substrate** — the prize. Allocation is now zero-sum, place-dependent, and metered, so *"where should I practise?"* is finally askable. Charge probes/monitors to the same `Body` budget.
-2. **Test whether ensemble disagreement recovers its job.** S1 found disagreement **cannot detect a drift** — structurally, because every member had data everywhere, so the problem was staleness, never missing data. On-policy kills that premise: there *is* genuinely unvisited territory. Predicted split: disagreement flags where you *lack* data, learning-progress flags where data went *stale*. This would turn S1's "the doc calls two problems one" into a measured separation.
+1. ~~**Re-attempt the retracted directed-collection cut on the local-drift substrate** — the prize.~~ **Done (E3).** Allocation is now zero-sum, place-dependent, and metered; the monitor survey is charged to the same `Body` budget (ratio 1.84×, not 22×); the relevance *and* reducibility halves of the ladder both reproduce. Remaining rungs it opens: (a) the **fully-online learned-value head** (backpropped control performance driving a *live* FM, vs E3's reward-free computed `lprog×visits` over per-round refits — idea-doc discriminator #4's last rung); (b) **sweep region count / drift speed** — E3 is one geometry, and no policy fully repairs A under the current OU rate; a slower drift should let `value` reach the ceiling and sharpen the control (currently blind-grader) readout.
+2. **Test whether ensemble disagreement recovers its job.** S1 found disagreement **cannot detect a drift** — structurally, because every member had data everywhere, so the problem was staleness, never missing data. On-policy kills that premise: there *is* genuinely unvisited territory (E3's off-reach regions have visitation ~0). Predicted split: disagreement flags where you *lack* data, learning-progress flags where data went *stale*. This would turn S1's "the doc calls two problems one" into a measured separation.
 3. **Retune the teleport default for new teleport cuts** (`teleport_matched`-style sampling), and re-check whether `arm_substrate` P5's non-monotone `fm_err(task)` disappears.
 4. **Sweep `sigma_u`** to separate command-channel identifiability from state coverage as the price of on-policy data.
 5. **Aftereffect + directional generalization under on-policy collection** — the arm's second built-for readout, still unmeasured (`arm_substrate` §Caveats).

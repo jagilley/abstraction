@@ -12,6 +12,8 @@ Up: [README.md](README.md) · node: [`../README.md`](../README.md) · memo: [`..
 | `readapt_local.py` | **E2** — the LOCAL-drift version E1 predicted should stretch the on-policy step: a spatially-gated curl (`arm_env` `curl_field["center"]`), with the FM-error split IN-region vs OUT-region (the readout control saturation hides). `readapt_local_agg.py` aggregates. |
 | `train.sh` | `verify` / `smoke` / `full` / `readapt` / `local`, logging to `logs/`. |
 
+**E3 lives in its own sub-experiment** — [`directed_on_policy/`](directed_on_policy/README.md) ([FILES](directed_on_policy/FILES.md)): the retracted `ballistic/directed` S2 directed-collection loop (inner FM-readapt + outer `lprog×visits` where-to-collect + ballistic control), on the ON-POLICY arm, with the learning-progress survey itself metered.
+
 > **Launch gotcha (learned the hard way, twice).** Do **not** launch the 3 seeds from one shell with backgrounded `modal run --detach ... &` + `wait` (the `full`/`readapt`/`local` targets do this). Detached mode only guarantees the *last* triggered function survives the parent, and the sibling clients evict each other — E2's first real run lost all three before their `volume.commit()`. **Launch each seed as its own independent background task** (a separate `modal run --detach --tag <t> --seed <n>` per shell). Same fragility is documented in [`../ballistic/directed/README.md`](../ballistic/directed/README.md) §Gotchas.
 
 ## Shared machinery this node introduced (lives at the `mjc` node, since both plants use it)
@@ -19,14 +21,23 @@ Up: [README.md](README.md) · node: [`../README.md`](../README.md) · memo: [`..
 | file | purpose |
 |---|---|
 | [`../embodied.py`](../embodied.py) | `Body` (metered, per-episode-`MjData`, **no `set_state`**), `collect_on_policy`, the behaviour rungs (`OUBehaviour`, `ReachBehaviour`), goal samplers, and the per-mode diagnostics (`cmd_state_corr`, `coverage_stats`, `pool_diagnostics`). |
-| [`../arm_env.py`](../arm_env.py) | `collect_pool` gained `collection_mode="teleport" \| "on_policy"`. Default path byte-identical (gated by `verify_backcompat.py`). |
+| [`../arm_env.py`](../arm_env.py) | `collect_pool` gained `collection_mode="teleport" \| "on_policy"`. Default path byte-identical (gated by `verify_backcompat.py`). E3 added `curl_fields` (list of gated curls) + `noise_fields` (list of spatially-gated aleatoric noise) so one workspace can host the directed-collection 2×2 of local drift/noise regions; absent ⇒ byte-identical (also gated). |
 | [`../pusher_env.py`](../pusher_env.py) | New `collect_pool` mirroring the arm's, same flag. The pre-existing `collect_transitions` (cut #1/#2's scripted OU rollout) is untouched — it is the ancestor of this whole idea. |
 
 ## Modal volume layout
 
 ```
-/data/on_policy_coverage/<tag>/results.json
+/data/on_policy_coverage/<tag>/results.json      # E0
+/data/readapt_both_ways/<tag>/results.json       # E1
+/data/readapt_local/<tag>/results.json           # E2
+/data/directed_on_policy/<tag>/results.json      # E3
 ```
+
+## Sub-experiments
+
+| dir | summary |
+|---|---|
+| [`directed_on_policy/`](directed_on_policy/README.md) ([FILES](directed_on_policy/FILES.md)) | **E3 / the prize** — directed collection on the on-policy arm; the retracted S2 where-to-collect claim reproduced once the learning-progress survey is itself metered (`value` beats `lprog-only` 3/3 seeds; `error-only` collapses on the noisy-TV trap; 1.84× not 22×). |
 
 ## Auxiliary READMEs
 

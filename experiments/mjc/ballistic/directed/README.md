@@ -173,6 +173,15 @@ zero-sum budget.
 > allocation is permanently zero-sum. **Stopgap if something needs unblocking sooner**: charge the
 > `probe_n`/`monitor_n` surveys against the same budget the policy allocates (a config change),
 > which removes the 22× subsidy without changing how transitions are obtained.
+>
+> **Done (2026-07-24):** re-attempted in [`../../on_policy/directed_on_policy/`](../../on_policy/directed_on_policy/README.md)
+> (E3). On the on-policy arm, with the monitor survey itself metered
+> (ratio 1.84×, not 22×), the inner null **resolves positive**: `value = lprog×visits` beats
+> `lprog-only` on the value-relevant FM error in **3/3 seeds** — the relevance term pays once looking
+> is embodied. The noisy-TV control also reproduces (`error-only` burns 47% of budget on irreducible
+> noise, collapses to uniform). An on-policy-specific twist: the S1/S2 *on-reach noise* decoy (region
+> C) is unplaceable, because visitation concentrates on the target — there is no visited-but-irrelevant
+> territory when you can only survey where you go.
 
 ## What this says about the idea doc
 

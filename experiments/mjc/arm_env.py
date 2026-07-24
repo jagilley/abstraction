@@ -302,6 +302,29 @@ class ArmEnv:
         every substep, so repeated visits to the SAME state give DIFFERENT Δs."""
         self.data.qfrc_applied[:] += amp * self._noise_rng.standard_normal(self.model.nv)
 
+    def _apply_gated_noise(self, nf: dict):
+        """A SPATIALLY-LOCAL aleatoric noise region -- the noisy-TV decoy, gated the same way
+        `_apply_curl_field` gates the reducible curl, so a 2x2 of reducible/irreducible x
+        on-reach/off-reach can be built from co-existing local fields (the directed-collection
+        substrate, `on_policy/directed_on_policy/directed_on_policy.py`).
+
+            amp_eff = amp * exp(-‖tip - center‖² / 2σ²)          (Gaussian-gated on the tip)
+            qfrc += amp_eff * N(0, I_nv)      resampled every substep
+
+        Irreducible by construction: the noise is fresh each substep, so repeated visits to the
+        SAME state give DIFFERENT Δs and no forward model can drive its held-out error to zero --
+        which is exactly what makes it the control that separates a reducibility-aware drive (which
+        leaves once learning progress -> 0) from raw error-chasing (which fixates it). When `center`
+        is absent the gate is identically 1.0, i.e. the global `joint_noise` behaviour."""
+        amp = float(nf.get("amp", 0.0))
+        center = nf.get("center")
+        if center is not None:
+            tip = self.data.site_xpos[self.tip_sid][:2]
+            sig = float(nf.get("sigma", 0.3))
+            amp *= float(np.exp(-((tip[0] - center[0]) ** 2 + (tip[1] - center[1]) ** 2)
+                                / (2.0 * sig ** 2)))
+        self.data.qfrc_applied[:] += amp * self._noise_rng.standard_normal(self.model.nv)
+
     # ---------------------------------- API ----------------------------------------- #
 
     def tip_pos(self) -> np.ndarray:
@@ -351,15 +374,29 @@ class ArmEnv:
         curl = self.dgp.get("curl_field")
         trot = self.dgp.get("torque_rot")
         jnoise = self.dgp.get("joint_noise")
+        # LISTS of co-existing LOCAL fields (the directed-collection 2x2). Absent by default, so
+        # the single-field paths above and every prior cut are byte-identical (checked by
+        # `on_policy/verify_backcompat.py`). Each entry is a `_apply_curl_field` / `_apply_gated_noise`
+        # dict with its own center/sigma, so several drift/noise regions can sit in one workspace.
+        curl_list = self.dgp.get("curl_fields")
+        noise_list = self.dgp.get("noise_fields")
+        active = (curl is not None or trot is not None or jnoise is not None
+                  or curl_list or noise_list)
         for _ in range(n_sub):
-            if curl is not None or trot is not None or jnoise is not None:
+            if active:
                 self.data.qfrc_applied[:] = 0.0
                 if curl is not None:
                     self._apply_curl_field(curl)
+                if curl_list:
+                    for cf in curl_list:
+                        self._apply_curl_field(cf)
                 if trot is not None:
                     self._apply_torque_rot(float(trot))
                 if jnoise is not None:
                     self._apply_joint_noise(float(jnoise))
+                if noise_list:
+                    for nf in noise_list:
+                        self._apply_gated_noise(nf)
             mujoco.mj_step(self.model, self.data)
         s = self.get_state()
         # Never let a diverged sim pass as data. A light passive link can violate the
