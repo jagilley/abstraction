@@ -67,6 +67,10 @@ import modal
 
 from mjc.shared import app, volume, DATA_DIR, NumpyEncoder
 
+# the full ladder, and the `--policies` default. Named so `--quick` can tell "the user asked for
+# a specific policy" from "the user took the default" without changing either behaviour.
+_ALL_POLICIES = "uniform,oracle,value,lprog-only,visits-only,error-only"
+
 
 @app.function(gpu="L4", memory=32768, timeout=21600, volumes={DATA_DIR: volume})
 def run_directed_on_policy(cfg: dict) -> dict:
@@ -226,7 +230,10 @@ def run_directed_on_policy(cfg: dict) -> dict:
     # ================================================================= #
     # ENV -- one plant, current per-region drift gains folded into curl_fields / noise_fields.
     # ================================================================= #
-    def make_env(b_state):
+    def env_dgp(b_state):
+        """The fully-resolved DGP knob dict for a given per-region drift state. Split out of
+        `make_env` so a render pack can carry the EXACT plant it was recorded on (no
+        re-derivation, no drift between the loop and the renderer)."""
         curls, noises = [], []
         for j, r in enumerate(REG):
             if r["kind"] == "curl":
@@ -241,7 +248,10 @@ def run_directed_on_policy(cfg: dict) -> dict:
             dgp["curl_fields"] = curls
         if noises:
             dgp["noise_fields"] = noises
-        return ArmEnv(dgp)
+        return dgp
+
+    def make_env(b_state):
+        return ArmEnv(env_dgp(b_state))
 
     # ================================================================= #
     # FM  f(s,u) -> Δs   (identical architecture/training to E2 readapt_local.py)
@@ -365,6 +375,71 @@ def run_directed_on_policy(cfg: dict) -> dict:
         return v / max(v.sum(), 1e-9)
 
     # ================================================================= #
+    # RENDER PACK (off by default) -- everything `render_ladder.py` needs to replay and draw
+    # this round's ballistic reaches, including the FM's OWN forecast of them.
+    # ================================================================= #
+    render_packs = []
+    render_rounds = set(cfg.get("render_rounds", []))
+    render_pols = set(cfg.get("render_policies", []))
+
+    def render_pack(pname, t, net, b_state):
+        """Record the ballistic reaches this FM plans, what the body actually does, and what the
+        FM *thought* would happen -- the predicted-vs-actual divergence IS the thing that shrinks
+        as the model is re-calibrated, and it is invisible in any scalar we already log.
+
+        SIDE-EFFECT-FREE BY CONSTRUCTION, which is the whole reason this is safe to bolt onto a
+        published loop: it uses a FRESH `ArmEnv` (hence its own `_noise_rng`, so the graded
+        rollout's noise draws are untouched) and FRESH plan generators (`make_plan_fn` seeds its
+        own), and it never trains. With `--render-rounds ""` (the default) it is not called at
+        all, so `ladder_s{0,1,2}` reproduce exactly.
+
+        The replay is ONE CONTINUOUS EPISODE per reach rather than `rollout()`'s multiplexed
+        `set_state`-per-step -- exact for the contactless arm (`../README.md` §machinery), modulo
+        the float32 state round-trip the multiplexed idiom incurs (~1e-7).
+        """
+        # Record EVERY eval reach by default (`render_n=0`). The point is that the pack's `miss` is
+        # then the same 40-reach median the loop grades as `ballistic_cem`, not a 4-reach subsample
+        # of it -- those disagree badly (at one round, 9.1 cm over 4 reaches vs 4.9 cm over 40), and
+        # a headline number in a video must be the real metric. The video renders only the first
+        # few; recording the rest is nearly free.
+        R = B if int(cfg["render_n"]) <= 0 else min(int(cfg["render_n"]), B)
+        renv = make_env(b_state)
+        plan = make_plan_fn(net, cfg["k_shoot"], cfg["cem_iters"],
+                            np.random.default_rng(cfg["seed"] + 7001))(ev_starts, ev_goals)
+        starts, goals, acts = ev_starts[:R], ev_goals[:R], plan[:R]
+
+        actual = np.zeros((R, H + 1, SD), np.float64)          # what the BODY does
+        for b in range(R):
+            renv.set_state(starts[b, :n].astype(np.float64), starts[b, n:].astype(np.float64))
+            actual[b, 0] = starts[b]
+            for h in range(H):
+                actual[b, h + 1], _ = renv.step(acts[b, h], fs)
+
+        with torch.no_grad():                                   # what the MODEL expected
+            s = torch.tensor(starts, device=device)
+            pred = [s.cpu().numpy().copy()]
+            for h in range(H):
+                x = torch.cat([s, torch.tensor(acts[:, h, :], device=device)], 1)
+                s = s + (net((x - norm["mx"]) / norm["sx"]) * norm["sy"] + norm["my"])
+                pred.append(s.cpu().numpy().copy())
+            pred = np.stack(pred, 1).astype(np.float64)
+
+        a_tip = fk(actual[..., :n], Ls)
+        p_tip = fk(pred[..., :n], Ls)
+        per_miss = np.linalg.norm(a_tip[:, -1] - goals, axis=1)
+        per_div = np.linalg.norm(p_tip - a_tip, axis=2).mean(1)
+        miss = float(np.median(per_miss))
+        div = float(per_div.mean())
+        print(f"[render] pack {pname} r{t}: R={R} miss={miss:.4f} model-vs-body tip div={div:.4f}",
+              flush=True)
+        return {"policy": pname, "round": int(t), "b_state": np.asarray(b_state).tolist(),
+                "dgp": env_dgp(b_state), "starts": starts.tolist(), "goals": goals.tolist(),
+                "actions": acts.tolist(), "actual_states": actual.tolist(),
+                "actual_tips": a_tip.tolist(), "pred_tips": p_tip.tolist(),
+                "miss": miss, "tip_divergence": div,
+                "per_miss": per_miss.tolist(), "per_div": per_div.tolist()}
+
+    # ================================================================= #
     # ON-POLICY reach-toward-a-region collection (the metered acquisition primitive)
     # ================================================================= #
     def make_fixed_goal_sampler(center, jit):
@@ -454,6 +529,11 @@ def run_directed_on_policy(cfg: dict) -> dict:
         opt = torch.optim.Adam(net.parameters(), lr=cfg["finetune_lr"])
         bufs = {j: None for j in range(K)}
         hist = []
+        # round "-1" = the STALE base FM, before this policy has collected anything, graded against
+        # the round-0 drifted world. The strongest "early" frame there is: every round >= 0 has
+        # already been fine-tuned once on that round's collection.
+        if pname in render_pols and -1 in render_rounds:
+            render_packs.append(render_pack(pname, -1, net, b_traj[0]))
         for t in range(T):
             b_state = b_traj[t]                                  # shared drift; only alloc varies
             if t in schedule:
@@ -538,6 +618,8 @@ def run_directed_on_policy(cfg: dict) -> dict:
             # per-region FM error on a fixed matched-reach probe set (built once, below)
             reg_err = [fm_err(snap, PB[j][0], PB[j][1], PB[j][2]) if len(PB[j][0]) else float("nan")
                        for j in range(K)]
+            if pname in render_pols and t in render_rounds:
+                render_packs.append(render_pack(pname, t, snap, b_state))
             bal = rollout(make_plan_fn(snap, cfg["k_shoot"], cfg["cem_iters"],
                                        np.random.default_rng(cfg["seed"] + 7001)), H, env)
             rec = {"round": t, "alloc": alloc.tolist(), "in_share": in_share.tolist(),
@@ -678,9 +760,26 @@ def run_directed_on_policy(cfg: dict) -> dict:
     os.makedirs(outdir, exist_ok=True)
     with open(os.path.join(outdir, "results.json"), "w") as fh:
         json.dump(out, fh, indent=2, cls=NumpyEncoder)
+
+    # render packs go to their OWN file so `results.json` stays byte-comparable with the
+    # published ladder_s{0,1,2} artifacts (`render_ladder.py` reads this one).
+    render = None
+    if render_packs:
+        render = {"meta": {"tag": cfg["tag"], "seed": cfg["seed"], "frame_skip": fs, "plan_H": H,
+                           "n_links": n, "link_lengths": Ls.tolist(), "region_k": cfg["region_k"],
+                           "P0": P0.tolist(), "G": G.tolist(), "ceil_err": ceil_err,
+                           "region_names": names, "ceil_regA": ceil_err[a_idx],
+                           "regions": [{"name": r["name"], "center": np.asarray(r["center"]).tolist(),
+                                        "sigma": r["sigma"], "kind": r["kind"],
+                                        "reducible": bool(r["reducible"]),
+                                        "on_reach": bool(r["on_reach"])} for r in REG]},
+                  "packs": render_packs}
+        with open(os.path.join(outdir, "render_pack.json"), "w") as fh:
+            json.dump(render, fh, cls=NumpyEncoder)
+        print(f"[save] wrote {len(render_packs)} render packs to {outdir}/render_pack.json", flush=True)
     volume.commit()
     print(f"\n[save] wrote results to {outdir}", flush=True)
-    return {"results": out}
+    return {"results": out, "render": render}
 
 
 @app.local_entrypoint()
@@ -688,7 +787,7 @@ def directed_on_policy(
     quick: bool = False,
     tag: str = "",
     seed: int = 0,
-    policies: str = "uniform,oracle,value,lprog-only,visits-only,error-only",
+    policies: str = _ALL_POLICIES,
     rounds: int = 30,
     drift_mode: str = "ou",                   # "ou" = continuous walk (default); "schedule" = S2-style
     ou_sigma: float = 1.6,                     # per-round std of the curl-gain random walk
@@ -767,6 +866,11 @@ def directed_on_policy(
     reach_lo: float = 0.25,
     reach_hi: float = 0.50,
     reach_tries: int = 40,
+    # --- rendering (OFF by default: with render_rounds="" nothing is called and every prior
+    #     result reproduces exactly). Rounds are 0-indexed; -1 = the stale base FM. ---
+    render_rounds: str = "",
+    render_policies: str = "value",
+    render_n: int = 0,                        # 0 = every eval reach (so `miss` == the graded median)
 ):
     import os
 
@@ -777,7 +881,8 @@ def directed_on_policy(
         k_shoot = 256; cem_iters = 4; collect_k_shoot = 128; collect_cem_iters = 3
         budget = 120; mon_n = 60; probe_pool_n = 800; ceil_pool_n = 1500; geom_samples = 600; n_par = 8
         n_off_red = 3; n_off_noise = 2
-        pol = ["uniform", "value", "lprog-only", "error-only"]   # noisy-TV contrast, lean for smoke
+        if policies == _ALL_POLICIES:                            # only if not explicitly overridden
+            pol = ["uniform", "value", "lprog-only", "error-only"]   # noisy-TV contrast, lean smoke
         tag = tag or "smoke"
     tag = tag or "default"
 
@@ -804,6 +909,9 @@ def directed_on_policy(
         cem_iters=cem_iters, cem_elite=cem_elite, cem_init_sigma=cem_init_sigma, vel_pen=vel_pen,
         q_jit=q_jit, v0_std=v0_std, reach_amp=reach_amp, reach_lo=reach_lo, reach_hi=reach_hi,
         reach_tries=reach_tries,
+        render_rounds=[int(x) for x in render_rounds.split(",") if x.strip()],
+        render_policies=[p for p in render_policies.split(",") if p.strip()],
+        render_n=render_n,
     )
     out = run_directed_on_policy.remote(cfg)
     localdir = os.path.join(os.path.dirname(__file__), "figures", "directed_on_policy_" + tag)
@@ -811,3 +919,7 @@ def directed_on_policy(
     with open(os.path.join(localdir, "results.json"), "w") as fh:
         json.dump(out["results"], fh, indent=2, cls=NumpyEncoder)
     print(f"\n[local] wrote results.json to {localdir}")
+    if out.get("render"):
+        with open(os.path.join(localdir, "render_pack.json"), "w") as fh:
+            json.dump(out["render"], fh, cls=NumpyEncoder)
+        print(f"[local] wrote render_pack.json ({len(out['render']['packs'])} packs) to {localdir}")
