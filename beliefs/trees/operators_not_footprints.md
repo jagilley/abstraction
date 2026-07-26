@@ -1,7 +1,7 @@
 # Operators, Not Footprints
 
 *Domain: representation learning, data, self-modeling, philosophy of language*
-*Last updated: 2026-07-02*
+*Last updated: 2026-07-25*
 
 
 ## The meaningful primitive in data is the operator (the transformation between states), not the surface trace it leaves; modeling the surface distribution captures a distribution-bound footprint, while modeling the operator captures a distribution-invariant object
@@ -9,7 +9,9 @@
 
 - The transformation is defined by the *weights* of the generating system (a model's layers, a speaker's mind), so it is invariant to the data distribution; the surface manifold (activations, token strings) is defined by the *data*, so it moves when the distribution moves — [why single models are not enough §9](../why_single_models_are_not_enough.md)
 - Single-objective learning fixates on the footprint because the output loss is blind to the *character* of computation and sees only its *quality*: two systems that produce the same surface via a general operator vs. a distribution-specific shortcut generate the same gradient — same source
-- The principle has two instances at different altitudes — a model modeling itself, and a model modeling language — that turn out to be the same claim (see children); this cross-level unification is the main reason to treat it as a root rather than a self-modeling detail
+- The principle has three instances at different altitudes — a model modeling itself, a model modeling language, and a model modeling a whole mind's output stream (see children) — that turn out to be the same claim; this cross-level unification is the main reason to treat it as a root rather than a self-modeling detail
+- **Mechanism for why the footprint→operator inversion is hard, and why it gets harder as the generator improves**: recovering a generating process from its outputs is an *inverse problem*, ill-posed exactly to the degree the forward process destroyed information, and the failure is **silent** — regressing a single-valued map onto a multivalued relation returns a smooth, confident, mode-averaged answer that is wrong on the collisions. Measured: as a grokking MLP compresses onto the task variable, its inverse self-model collapses R² 0.88 → 0.15 while the forward self-model stays pinned at 1.0 — and the collapse *keeps deepening after test accuracy has already hit 100%*, so no performance metric can see it — [inverse dynamics](../../experiments/inverse_dynamics/README.md)
+- Corollary with teeth: **the better a generating system's compression, the less of it survives in its outputs.** Expert human abstraction is excellent compression, which is why one can read every paper in a field and not acquire the taste.
 
 
 ### Self-modeling instance: a network's activations are the footprint of its computation; modeling P(activations) captures the manifold (distribution-bound), while a forward self-model captures the transformation g (distribution-invariant)
@@ -36,5 +38,16 @@ See also: [Self-prediction and self-knowledge — transformation vs manifold is 
 
 - Injecting the forward model's predicted-future-activation into the residual stream is a signal that transitions the model's own downstream state, ingested through the same weights it uses for any external input — structurally, an utterance the network makes to itself — [A2A closed-loop](../../experiments/a2a_forward/README.md)
 - Same primitive, differing only in scope: language is how one cortex transitions another; the forward model is how a network transitions itself — the inter-agent and intra-agent instances of operator transmission — [cerebellum and cognitive architecture](cerebellum_and_cognitive_architecture.md#the-cortex-can-ingest-cerebellar-predictions-as-native-input--the-grounding-is-the-processing)
+
+
+### Pretraining instance: a text corpus is the footprint of the *whole* cognitive loop, not just of the communicative act — so pretraining is distillation from a finished mind's output channel
+*Confidence: speculative — a structural argument about training setups, not a measurement*
+
+- The altitude above the language instance: that node's operator is the *utterance acting on a receiver*; this one's operator is the **entire multi-organ loop that produced the utterance** — cerebellar forward modeling, value-driven pruning, and the abstraction ratchet all ran before a single token was emitted. Text is post-cerebellar, post-limbic, post-ratchet; pixels are pre-everything — [ideas/heterogeneous_graders.md](../../ideas/heterogeneous_graders.md)
+- This is what Ilya means by *"the whole world as projected by people onto text"* and why he finds *"no human analog to pre-training"* in the same breath — pretraining is not a developmental stage, it is distillation from the output channel of an already-finished system — transcript[^private] §00:08:31
+- Mechanism, via the ratchet: each cerebellum↔cortex cycle compresses multi-step computation into a cortical primitive, and *experts cannot decompose their chunks back into primitives*. Text is written **in chunks**, so pretraining receives the ratchet's top layer without running a cycle — predicting exactly the observed profile (fluent use of inherited primitives in-distribution; inability to *manufacture new ones* under shift) — [cerebellar abstraction ratchet](cerebellum_and_cognitive_architecture.md#the-cerebellum-and-cortex-co-training-produces-an-abstraction-ratchet), [RHM meta-learning](../../experiments/rhm/ratchet/RHM_META_LEARNING_README.md)
+- The root's inverse-problem mechanism bites hardest here, because `mind → text` is violently non-injective (many mental states emit the same sentence): the mode-averaged, confident-on-the-collisions failure is the best structural description we have of **confabulation**
+- What the footprint structurally cannot carry: things never verbalized because they are *pre-verbal* (you cannot write down how to ride a bike) and things never verbalized because they are *updates rather than outputs* (people write down conclusions, never their reweightings) — i.e. the motor domain and the value domain, which is exactly the pair of organs the requirements argument says are needed. The footprint reading and the requirements reading are the same claim from opposite ends.
+- Related framing: a text corpus is **pre-rotated** — the world's causal structure is in the pixels too, encrypted by a bad coordinate system, and humans already found the coordinates. A corpus of text is a corpus of *rotations* — [contra-long-horizon-benchmarks](../../ideas/contra-long-horizon-benchmarks.md)
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

@@ -1,7 +1,7 @@
 # Cerebellum and Cognitive Architecture
 
 *Domain: neuroscience, cognitive architecture, AI implications*
-*Last updated: 2026-07-01*
+*Last updated: 2026-07-25*
 
 
 ## The brain's cognitive power arises from multiple specialized subsystems teaching the cortex, not from cortical computation alone
@@ -10,6 +10,34 @@
 - The cortex learns from at least five distinct teaching systems: hippocampus (episodic replay), cerebellum (predictive forward models), basal ganglia (reward prediction errors via dopamine), amygdala (salience/valence tagging), and neuromodulatory systems (plasticity regime gating) — overview[^private]
 - The cortex also learns directly from sensory streams (Hebbian/STDP), but subcortical tutoring accelerates and structures what it learns — same source
 - Each subsystem implements a distinct learning algorithm: cerebellum = supervised ("what will happen?"), basal ganglia = reinforcement ("was that good?"), hippocampus = fast one-shot encoding, cortex = slow statistical extraction — maps to Doya's framework, discussed here[^private]
+
+
+### The teaching systems are graders of *different type*, and the architecture's distinctive payoff is the detectability of grader blindness
+*Confidence: moderate*
+
+- The subsystems are not modules that decompose a task into parts; they are **graders that disagree** about the same behaviour. A single-grader learner cannot ever discover that its grader is blind — the failure is invisible from the inside, by construction, in the same way and for the same reason as a spurious somatic marker ([two_timescale_value_loop §somatic marker](../../ideas/two_timescale_value_loop.md): the spuriousness is invisible in-distribution and manifests only under shift) — [ideas/heterogeneous_graders.md](../../ideas/heterogeneous_graders.md)
+- **Our own research process is the strongest available evidence**, because it independently converged on the same structure: [`mjc/HISTORY.md`](../../experiments/mjc/HISTORY.md) records that most of that arc's nulls were *instrument failures*, and every one was caught by playing two differently-typed graders against each other — control-vs-FM-error in [`drift_value_loop`](../../experiments/mjc/drift_value_loop/README.md) Cut 3 (clean interior optimum at b=0.5 exactly where control is flat to 0.1%), in [E1](../../experiments/mjc/on_policy/README.md) (control at ceiling by m=50 while FM error improved to m=400), and in the [S2 retraction](../../experiments/mjc/ballistic/directed/README.md) (re-scored by the sighted grader, the privileged oracle moved from fourth to second)
+- The cerebellum→VTA pathway is then not a curiosity but **the wire that lets the two graders disagree with each other** — the anatomical form of the same move (sharpens the "prediction errors modulate dopaminergic signaling" line below from a connectivity fact into a functional claim)
+- Caveat on the same history: knowing which grader is blind did **not** stop the next node from reading a program-level belief update off the instrument it had just published as blind. Detectability is not automatic — which is the argument for building it as a mechanism rather than relying on discipline.
+
+#### No single learning signal can be both dense and evaluative — so the two-teacher structure is derived, not designed
+*Confidence: moderate*
+
+- **Dense** requires being *free*: available every step, hence self-supervised on what actually happened (every `(s,u,s′)` is a label of the physics, no goal required). **Evaluative** requires referencing outcomes, and the informative outcomes are the ones you would rather not sample — in the wild, sampling rewards is dangerous. The two pull opposite ways and no known objective collapses them — [ideas/heterogeneous_graders.md](../../ideas/heterogeneous_graders.md)
+- The motor case is the crisp one: reward alone cannot learn movement (too dangerous to sample failures); prediction error alone has no preference over movements (Friston's dark room). Neither is a motor learner; the **pair with an interface** is.
+- This is why the reward-free / ballistic synergy is a good deal rather than an awkward one — the one asset maintainable *without* reward is exactly the asset committed movement *depends on*, the same object — [`mjc/ballistic/`](../../experiments/mjc/ballistic/README.md)
+- Load-bearing because it makes the structure *forced* rather than a contingency of vertebrate anatomy, and therefore expected to reappear in any learner facing both conditions.
+- **The same dichotomy from the representation side, and arguably the more intuitive statement of it: compression vs expansion.** Compression (`R_res → R_comp`) is drivable by a dense predictive signal; **expansion (`R_act ↑`) is not**, because opening a direction makes prediction *worse* before it makes it better — Copernicus got worse numbers than Ptolemy at the moment of the rotation — so its grader must tolerate deferred, initially-negative payoff, i.e. be evaluative. Measured consequence: compression alone provably terminates, and does so in our data (naive wake-sleep collapses residual rank 23.9 → 13.5; the internal re-expression route saturates at 27.8 → 30.2 then inflates) — [dimensionality expansion §What grades an expansion?](../dimensionality_expansion.md), [GATED_RATCHET](../../experiments/a2a_forward/GATED_RATCHET_README.md)
+- Under that reading **learning progress is the expansion grader**, and its band-pass shape (~0 when mastered, ~0 when irreducible, peak at moderate-and-falling error) is a *specification* rather than an empirical curiosity — [two_timescale_value_loop](../../ideas/two_timescale_value_loop.md), [curiosity Phase 1](../../experiments/a2a_forward/reaching/CURIOSITY_DRIVE_README.md)
+- Engineering corollary: LLM training does not lack an expansion loop — **it has one implemented in humans** (weight decay, width, depth, data mix, when to stop are all deferred-payoff expansion decisions on a wall-clock of weeks), which is the mechanism behind LLMs expanding only slowly, coarsely and exogenously — [ideas/heterogeneous_graders.md §4b](../../ideas/heterogeneous_graders.md)
+
+#### Disagreement between *heterogeneous* graders is a different instrument from disagreement between *homogeneous* ensemble members — and only the former can see structural blindness
+*Confidence: speculative — the distinction is argued and consistent with existing data, but the discriminating experiment is unbuilt*
+
+- [`ballistic/directed/`](../../experiments/mjc/ballistic/directed/README.md) S1 established, on a structural argument, that ensemble disagreement **cannot detect a drift**: every member trained pre-drift agrees, and they are all wrong together. Disagreement finds where you *lack* data, not where your data went *stale*. Recorded there as a falsification of the instrument.
+- But those members were **homogeneous** — same objective, different seeds. Blindness that is *structural* is shared by every member, so homogeneous disagreement is blind exactly where its members are. Heterogeneous graders do not inherit this: a grader blind for a structural reason stays blind while a differently-typed one does not.
+- Existence proof from our own data: the control grader and the FM-error grader disagreed *precisely at* control's structural blind spot (the bullets in the parent node).
+- **Open, and the proposed test**: make grader disagreement itself the allocation signal, with homogeneous seed-ensemble disagreement as the honest baseline, under a **local** drift ([E2](../../experiments/mjc/on_policy/README.md) — global drift leaves no place-dependent blindness to detect) and with the noisy-TV control retained, since irreducible noise also produces disagreement; the discriminator is that noise-disagreement does not *close* when you collect there — [ideas/heterogeneous_graders.md §9](../../ideas/heterogeneous_graders.md)
 
 
 ### The cerebellum is a domain-general prediction engine, not merely a motor controller
@@ -171,6 +199,16 @@ See also: [Self-prediction and self-knowledge — injection vs local loss dissoc
 - The cerebellar patient parallel: LLMs can reason but have poor calibration, can't catch themselves mid-generation, lack the "something feels off" signal — same source
 - Metacognitive calibration may require a structurally distinct monitoring component, not just scale — same source
 - See also: [Why single models are not enough](../why_single_models_are_not_enough.md)
+
+**Sharpening (2026-07-25): LLMs did not fail to acquire the subcortical systems — they were trained on the transcript of all of them.** Text is *"the whole world as projected by people onto text"* (Ilya, transcript[^private] §00:08:31), i.e. the frozen output channel of finished multi-grader systems, which is why the same interview finds *"no human analog to pre-training."* So "LLM ≈ cortex" is wrong in both directions: too stingy (in-context learning is a real fast loop, and looks more hippocampal than cortical) and too generous (the cortex learns from five teachers; the LLM has one whose signal is *already the other four's output*). Better: an LLM is a **fossilized synthesis of full brains that cannot play its inherited parts against each other in a first-class manner** — and correspondingly a *cortex alone* is closer to a raw-data/image model than to an LLM. Completeness bifurcates: cortex-alone is content-poor but process-complete; an LLM is content-rich but process-empty. — [ideas/heterogeneous_graders.md §3](../../ideas/heterogeneous_graders.md)
+
+#### An LLM-as-judge is not a second grader; it is the same grader in a mirror
+*Confidence: speculative — a structural argument about training setups, not a measurement on any model we have run*
+
+- Grader conflict is present in the corpus **as a fossil**, so an LLM can emit the surface form of a system catching itself without a second grader to run. Under this reading **chain-of-thought is a simulation of grader conflict inside the one channel available** — which predicts its profile: large gains, plus an unreliability no amount of additional CoT fixes, because the check and the checked come from one distribution and go blind together — [ideas/heterogeneous_graders.md §8](../../ideas/heterogeneous_graders.md)
+- The criterion that follows: a genuine second grader must be **sighted where the first is blind**. Same corpus + same failure geometry = redundancy, not heterogeneity.
+- **Prediction**: RL post-training pays in proportion to how sighted-where-the-first-is-blind its grader is — verifiable rewards (does the code run, does the proof check) ≫ LLM-as-judge — and scaling LLM-as-judge specifically does not close the generalization gap.
+- Note where Ilya locates the same intuition (§01:29:23): diversity *between* agents (self-play, debate, prover-verifier). The brain obtains it *within* one agent via organs with genuinely different objectives — cheaper, and on the timescale of a single action rather than a population.
 
 ### A looped transformer + cerebellar-style fast predictor is a viable architecture
 *Confidence: speculative*
