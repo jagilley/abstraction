@@ -7,6 +7,7 @@ This is a research monorepo consolidating several projects.
 - `experiments/` - All experiments
     - `experiments/a2a_forward` is our main experiment for training forward self-models for decomposing activations
     - `experiments/rhm` is a controlled setup for generating language-like data with a known data generating process
+    - `experiments/mjc` is a place we run MuJoCo experiments for motor learning
 - `reading/` — Papers, notes, and reference material (shared across projects)
 - `ideas/` — Research ideas and hypotheses (shared)
 - `beliefs/` — Crystallized beliefs about how things work (shared)
@@ -33,12 +34,10 @@ Each project subdirectory has its own CLAUDE.md with setup instructions and conv
 - Controlling variables is absolutely essential for good science.
 - Please always discuss results with me before writing a new README. These things can be difficult to interpret sometimes.
 - Don't get discouraged. If something didn't work, there's a reason for it, and we should understand what that reason is before we update our priors on why we wanted to try that thing in the first place.
-- We should edit this doc as frequently as possible to persist learnings.
+- We should edit documentation whenever appropriate to persist learnings.
 
 ## Experiment conventions
-- Each experiment gets its own folder in the project's `experiments/` directory.
-- Put the `train.sh` for an experiment inside that experiment's directory.
-- In `train.sh`, capture output and write it to disk for future debugging.
+- We run most of our experiments on Modal. Before running anything there, please invoke the Claude Skill `/run-experiment-on-modal` for explicit guidance.
 - Write a `README.md` in each experiment directory after results come back, so we have the complete picture. Include a pointer to the prior experiment's README so agents can reference it.
 - Running quick tests to ensure code works before kicking off longer training jobs is usually a good idea.
 
