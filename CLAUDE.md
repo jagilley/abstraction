@@ -35,11 +35,12 @@ Each project subdirectory has its own CLAUDE.md with setup instructions and conv
 - Please always discuss results with me before writing a new README. These things can be difficult to interpret sometimes.
 - Don't get discouraged. If something didn't work, there's a reason for it, and we should understand what that reason is before we update our priors on why we wanted to try that thing in the first place.
 - We should edit documentation whenever appropriate to persist learnings.
-
-## Experiment conventions
-- We run most of our experiments on Modal. Before running anything there, please invoke the Claude Skill `/run-experiment-on-modal` for explicit guidance.
-- Write a `README.md` in each experiment directory after results come back, so we have the complete picture. Include a pointer to the prior experiment's README so agents can reference it.
 - Running quick tests to ensure code works before kicking off longer training jobs is usually a good idea.
+
+## Conventions (important to follow)
+- We run most of our experiments on Modal. Before running anything there, please invoke the Claude Skill `/run-experiment-on-modal` for explicit guidance.
+- We want to maintain a specific structure in this monorepo. Refer to `STRUCTURE.md` for what this should look like.
+- When writing up results, please invoke the `/writeup` skill. It contains a brief description of the aspects of our formalized `STRUCTURE` which are important to know when writing up results.
 
 ## Shared directories
 
