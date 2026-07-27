@@ -2,11 +2,11 @@
 
 *A "Big History" of the MuJoCo control substrate: what we set out to do, what actually happened, and
 where the thinking turned. Scope: `experiments/mjc/` only (formerly `experiments/mujoco_control/`).
-Sources: git history (`c10b503` … `797b622`), every node README, and the two idea docs that drove the
+Sources: git history (`c10b503` … `aef54dc`), every node README, and the idea docs that drove the
 work. Auto-generatable — overwrite freely.*
 
-**Span**: 2026-07-16 → 2026-07-22. Seven days. Six substantive commits. Eleven child nodes.
-**Current state**: [README.md](README.md) · [FILES.md](FILES.md)
+**Span**: 2026-07-16 → 2026-07-27. Twelve days. Twelve child nodes plus one grandchild
+(`on_policy/directed_on_policy/`). **Current state**: [README.md](README.md) · [FILES.md](FILES.md)
 
 ---
 
@@ -22,6 +22,10 @@ work. Auto-generatable — overwrite freely.*
 | 07-21 | `a1fcd86` | `online_value_loop`, `drift_value_loop` | **Obstruction as confirmation**; then *"the teacher, not the structure"* |
 | 07-22 | `94eed10` | `ballistic`, `ballistic/directed`, `arm_substrate` | **"The control mode, not the value"**; a second task family |
 | 07-22 | `6c3ab11`, `797b622` | `mujoco_control/` → `mjc/`, flat → 11 nested nodes | The writeup structure catches up with the science |
+| 07-23→24 | `0d017e9` … `13028b4` | `on_policy/directed_on_policy/` (E3) | **The retracted S2 claim reproduces** once looking, not just collecting, is embodied |
+| 07-25→26 | `4f503cc` | `ideas/heterogeneous_graders.md` written | The week's results reread as one claim: **grader disagreement is the fire** |
+| 07-26 | `40a6826`, `396a902` | Cut #5's rank-triple readout retracted | **Rank fails a third time** — caught pre-compute this time |
+| 07-27 | `aef54dc` | Corrected readout lands (in `rhm/`); cut #5 gated on gap-width | The open cut gets a precondition instead of a spec |
 
 Effect sizes over the arc are their own story: **8.1×, 0.999-vs-0, 240×** (days 1) → **+0.156, +0.036 ±
 0.012, ≈0, ≈0** (days 3–6, the interface descent) → **3.0×, 4.3×, 6.0×, 2.9×** (day 7, after the
@@ -314,6 +318,93 @@ their original names deliberately, with every result path set *in-script*, so th
 reorganization moved zero results and broke zero reproductions. The "keep all prior results
 reproducible" rule was tested at scale here and held.
 
+## Part X — The retraction reproduces: looking has to be embodied too (07-23 → 07-24)
+
+`ballistic/directed/`'s S2 audit (Part VII) had retracted the where-to-collect relevance claim as
+**unmeasurable**, not false: every round both policies got ~2,240 free teleported probe/monitor
+transitions to decide where to spend a budget of 100, a 22× measurement subsidy that removed the
+question's entire job. [`on_policy/directed_on_policy/`](on_policy/directed_on_policy/README.md) (E3)
+is the direct re-attempt, and its existence is itself a small methodological event: the retraction did
+not read as a dead end, it read as *a spec for what would make the question askable* — embodied
+looking, not just embodied collecting.
+
+The fix took eleven small commits across a single day (`0d017e9` → `9b48b83`) before the ladder ran
+clean, and the commit log itself is a compressed lesson in **why region geometry is not free to
+assume**. Two corrections recur: on/off-reach has to be defined by actual FK'd path visitation, not a
+corridor-distance or angle-from-start proxy (a proxy once placed a "distractor" on top of the start
+posture, which every reach passes through by construction); and regions must sit in a radius band
+where the arm's dynamics are tame, or a folded/inward placement's ~10× larger free-flight FM error
+swamps the signal being measured. Both are instances of the week's oldest villain — the grader, or
+here the *stimulus*, silently confounding the manipulation — just moved one level upstream, into the
+world-building step that precedes any grader at all.
+
+**The result, once the geometry held:** with monitoring metered at 1.84× instead of S2's 22×, both
+halves of the retracted ladder reproduce over 3 seeds. `value = lprog × visits` beats `lprog-only`
+(relevance pays once looking costs something) and beats `error-only` (reducibility-awareness pays;
+`error-only` burns 47% of its budget on the noisy-TV trap and collapses toward uniform), and matches
+the privileged oracle (0.350 vs 0.372). Control is again near-blind (~0.08, saturated) — Part VI's
+"grade by the value-relevant FM error, not control" is now confirmed a third time, on a third
+substrate, without anyone having to re-derive it.
+
+The more interesting negative result is structural rather than statistical: **the on-reach-noise decoy
+that separated `value` from `visits-only` in the teleport world cannot be built on-policy at all.**
+Visitation concentrates almost entirely on the reach target (1.0 there, ~0 elsewhere) — you only go
+where you reach — so there is no "visited but irrelevant" territory for a distractor to occupy. The
+relevance lever survives, but it now lives entirely in the off-reach direction. This is the first place
+in the arc where embodiment doesn't just cost more transitions, it **removes an experimental condition
+that the teleport substrate had access to for free.**
+
+## Part XI — Naming the fire, and the third rank failure caught in time (07-25 → 07-27)
+
+[`ideas/heterogeneous_graders.md`](../../ideas/heterogeneous_graders.md) is not a new experiment; it is
+the week's first attempt to answer, in one frame, a question a conversation asked directly: in what
+sense is motor learning *harder* than distribution modeling, "or else animals would not have needed
+anything except a cortex." The document's discipline is unusual for this tree — its evidence is
+entirely **already-measured** results re-read, and it says so up front — which makes it a different
+kind of artifact than everything before it: a synthesis pass over the arc's own instrument problem,
+rather than another cut.
+
+Its central move is to reject target-complexity as the axis (a 2-link arm's command-aware FM needs 232
+params where command-blind needs 70,152 and still loses; language's residual is full-rank and still
+learnable) and relocate "harder" onto **epistemic conditions**: commitment under delay, metered
+measurement, endogenous data, Type-2 non-stationarity, and — the one this history has been building
+toward since Part VI — **two teachers of different type**, because no single signal can be both dense
+(free, every step, self-supervised) and evaluative (referencing outcomes you'd rather not sample). The
+doc's sharpest reframe of this arc's own six days: **most of the nulls were instrument failures, and
+every one was caught by playing two differently-typed graders against each other** — control vs
+value-relevant FM error, ensemble disagreement vs a counterfactual fit probe. That is not incidental to
+the science; the doc's claim is that *this is what heterogeneous grading is for*, and that a **single
+homogeneous ensemble (same objective, different seeds) cannot ever produce this**, because a
+structurally blind grader is blind for every member alike. The proposed next cut (§9, unbuilt) is to
+make cross-grader disagreement itself the allocation signal — the natural sequel to E3, which already
+computes both graders per round and currently reconciles them by hand in the writeup.
+
+The same window closes a loose thread that had been live since the addendum written at commit
+`40a6826`: cut #5 (dimensionality expansion under drift, billed in the founding memo as "the single
+biggest open question of the whole program") had a readout spec — the `(R_act, R_comp, R_res)`
+rank-decomposition triple — that was **retracted before it ever ran** (`40a6826`, `396a902`) when
+in-flight re-measurement on the a2a/RHM substrate showed the triple's partition doesn't hold:
+`R_comp` is not independent of `R_act`, so a matched-control defense doesn't rescue it. That makes
+**three** independent times this tree has found rank a weak instrument for this kind of question
+(`contact_residual`'s retired "rank ∝ complexity," a2a's `rank ⊥ noise`, and this), and the third is
+qualitatively different from the first two: it is the first one caught *before* the compute was spent,
+because a second, differently-typed measurement was actually run rather than reasoned about — the
+grader-heterogeneity discipline the same week had just named, working on itself in real time.
+
+On 07-27 the corrected readout landed downstream, at
+[`rhm/residual_decomposition/README.md`](../rhm/residual_decomposition/README.md) — **β** (the
+`res_var ∝ act_var^β` exponent, capacity-invariant) and **`R_res_participation`**, in place of the
+withdrawn triple — and cut #5 in `mjc/` picked up a precondition it didn't have before: a **gap-width
+gate**. Re-measurement found the residual geometry is regime-dependent on whether the FM *saturates*
+(drives relative residual to ~0); where it does, both β and rank collapse to a noise-floor reading
+regardless of the underlying DGP. An arm FM doing one-step `(s,u) → s′` is the narrowest possible gap,
+so the cut may have nothing to find on this substrate until it is run at the ballistic horizon instead
+of k=1 — which reframes "gap width" as the same axis `ballistic/` has been about all along
+(reactive control re-grounds every step; ballistic control commits for a horizon). Cut #5 is therefore
+not abandoned and not yet a spec either: it is now **one cheap calibration check away from being
+launchable**, which is a more honest place for it to sit than the six days it spent as an unqualified
+"biggest open question."
+
 ---
 
 ## Cross-cutting narratives
@@ -327,17 +418,14 @@ wrong (replanning re-grounds past the thing you're measuring). Each level up exp
 preceding nulls. The deepest finding in the node is not about value at all; it is that most of the
 arc's null results were instrument failures of increasing subtlety.
 
-*Addendum (2026-07-26): the first one caught before the compute was spent.* Cut #5's planned readout —
-the `(R_act, R_comp, R_res)` triple from `beliefs/dimensionality_expansion.md` — was falsified by direct
-re-measurement on the a2a/RHM substrate *while cut #5 was still being specified*: the components are not
-independent, so the "differential against a matched control" defense that was supposed to distinguish it
-from cut #1's retired rank claim could not have worked. Rank has now failed as an instrument here three
-times (`contact_residual`, a2a's `rank ⊥ noise`, and this), and the transferable rule is narrower than
-"be careful with rank": **a matched control does not rescue a readout whose components are not
-independent — check independence and magnitude-sensitivity first.** This is also the counter-example to
-the caveat above at "the arc's own headline discovery did not stop the very next node…": the discipline
-worked here, but only because a second, differently-typed measurement was actually run rather than
-reasoned about.
+*Addendum, and its own counter-example (07-25 → 07-27, told in full in Part XI):* cut #5's planned
+readout — the `(R_act, R_comp, R_res)` triple — was retracted *while the cut was still being specified*,
+not after it ran, because a second, differently-typed measurement was actually taken rather than
+reasoned about. Rank has now failed as an instrument here three times
+(`contact_residual`, a2a's `rank ⊥ noise`, and this), but this one is the exception that proves the
+rule directly above: the discipline that "did not stop the very next node" in Part VII *did* work here
+— the difference is that someone ran the second grader instead of trusting the first one's own
+diagnosis of its blind spots.
 
 **2. Negatives were the engine, not the exhaust.** `directed_readapt` (two), #4c, both halves of
 `online_value_loop`, drift Cut 2, ballistic 4a, directed S2's internal null. Every one names the next
@@ -374,18 +462,21 @@ tell was visible early — six additive perturbation knobs on a near-linear plan
 
 ## Priors, then and now
 
-| Question | 07-16 prior | 07-22 position |
+| Question | 07-16 prior | 07-27 position |
 |---|---|---|
 | What is MuJoCo *for* here? | Testing operators-not-footprints robustness on physics (degradation slope) | Testing the FM↔value interface; robustness slope abandoned as theoretically shaky |
 | What does a dynamics shift buy? | A static robustness comparison | A **re-adaptation sample-efficiency dissociation** (~50 reward-free vs ~240× reward-labeled) |
 | Where does value help? | Not yet asked | **Adaptation speed, never converged competence**; and only under capacity competition |
 | Why two timescales? | Asserted by the idea doc | **Forced** — fast-online discovery of value is structurally obstructed on both taps |
 | What compounds? | The value-carving (meta layer) | The **memory architecture** (learning layer); the carving is capacity-gated and control-robust |
-| How to grade a value loop? | Task reward | **Value-relevant FM prediction error** — control is a near-blind grader |
+| How to grade a value loop? | Task reward | **Value-relevant FM prediction error** — control is a near-blind grader; now confirmed a third time on a third substrate (E3) |
 | Is ensemble disagreement the reducibility instrument? | Yes (a2a Phase 2b) | **No for Type-2 drift** — blind to stale data by construction; use a counterfactual fit probe |
-| Do the `e`-tap and `p`-tap form one system? | Predicted | **One-shot yes; in a loop untested** — the loop's apparent null was retracted as instrument-limited (blind grader + plateau-contaminated metric + a 22× measurement subsidy) |
+| Do the `e`-tap and `p`-tap form one system? | Predicted | **Reproduces once looking is embodied too** (E3, on a third substrate) — one-shot; in a loop with genuinely metered monitoring it now measures as positive, not just untested |
+| Does directed collection pay once measurement is metered? | Retracted as unmeasurable (22× subsidy, `ballistic/directed` S2) | **Reproduces at 1.84× metering** (E3) — the retraction was about the instrument, not the claim |
 | Does a better FM reach behavior? | Assumed | **Only under feedforward commitment** (~3×; ~4.3× for re-adaptation; 6.0× on the arm) |
 | Is "nonlinear" enough for capacity pressure? | Implicitly yes | **No** — nonlinear and capacity-hungry are separate axes; chain length is the knob |
+| Why does the substrate need *two* graders at all? | Unasked | **Derived, not designed** — no signal can be both dense (free, every step) and evaluative (references outcomes); [`heterogeneous_graders.md`](../../ideas/heterogeneous_graders.md) names this the arc's own operating principle |
+| Is rank a trustworthy readout for representational structure here? | Untested | **No, three times over** — but the third failure was caught before any compute ran, by actually running a second, differently-typed check instead of reasoning about it |
 
 ## Planned and never run
 
@@ -394,32 +485,46 @@ Recorded because their absence is informative, not because they failed:
 - **Partial-observability / latent planning** (substrate memo cut #4) — the Stage-3c/3d analog on real
   dynamics. Still listed in Next steps; never started.
 - **Dimensionality expansion under drifting dynamics** (memo cut #5, billed as the program's biggest
-  open question) — the substrate was built to make this free, and the value-loop program consumed the
-  drift machinery for a different purpose instead.
+  open question) — no longer simply unrun. As of 07-27 it has a design (support-growing drift, chain
+  length ≥ 5) and a corrected readout (β, `R_res_participation`) but is **gated behind a cheap
+  gap-width calibration** that has not yet been run — see Part XI. The nearest it has come to actually
+  starting.
+- **Heterogeneous-vs-homogeneous grader disagreement as an allocation signal** (`heterogeneous_graders.md`
+  §9) — proposed 07-25/26, not on any Next-steps list yet, cheap on the existing E3 substrate (both
+  graders are already computed per round).
 - **MJX, sim2sim at scale, musculoskeletal bodies, morphological computation** — the arm's passive
   tool is the only piece of the morphology thread that exists.
 - **Cut #3 hardening** (multi-seed the REINFORCE slope; a mass-shift as a second qualitatively
-  different operator) — proposed 07-16, still open 07-22, restated verbatim in every README version.
+  different operator) — proposed 07-16, still open 07-27, restated verbatim in every README version.
 - **Cut #1's frame-skip sweep** (separating the aliasing cause from the stiffness cause) — the one
   loose mechanistic thread on the cleanest result in the tree.
-- **Back-translation into the belief tree** — flagged as owed by five separate nodes. The interface
-  findings (*value is slow/committed*; *the teacher, not the structure*; *the control mode gates
-  transmission*) are belief-shaped and not yet crystallized. This is the largest outstanding debt.
+- **Porting a cut onto `arm_substrate/`'s passive-tool capacity axis** beyond what 4c already ports —
+  the structural debt every day-7 ballistic claim still carries as a "single-family" caveat outside 4c.
+- **Back-translation into the belief tree** — flagged as owed by six separate nodes now (E3 and the
+  heterogeneous-graders synthesis add to the debt rather than paying it down). The interface findings
+  (*value is slow/committed*; *the teacher, not the structure*; *the control mode gates transmission*;
+  *heterogeneous grading is why the nulls were catchable at all*) are belief-shaped and not yet
+  crystallized. This is the largest outstanding debt.
 
 ## Where it stands
 
-The live thread is [`ballistic/directed/`](ballistic/directed/README.md), whose open piece is now
-explicitly *open*: whether the relevance term pays in a loop was never measured, and the next attempt
-must **charge measurement against the collection budget** — the smallest edit that makes "where should
-I look" a real question, and one no substrate supplies for free (the arm inherits teleport collection
-by contract). The largest structural debt is that
-[`arm_substrate/`](arm_substrate/README.md) is fully characterized and carries **no cut yet** — porting
-the ballistic transmission/re-adaptation result there is what retires the single-family caveat every
-day-7 claim currently carries.
+The live thread as of 07-27 is the **gap-width calibration** gating cut #5 (Part XI): a small, cheap
+check of whether an arm FM's one-step residual geometry differs from its ballistic-horizon geometry,
+run before any full expansion-under-drift ladder. If the calibration finds nothing at either gap
+width, cut #5 closes on this substrate rather than staying open by default. In parallel, the
+`heterogeneous_graders.md` §9 cut — using cross-grader disagreement itself, rather than one grader
+alone, as the allocation signal — is unbuilt but cheap, since E3 already computes both instruments per
+round. The largest structural debt is unchanged from 07-22: [`arm_substrate/`](arm_substrate/README.md)
+carries only the 4c port, so the ballistic transmission/re-adaptation/directed-collection results all
+still lean on the pusher for their strongest form.
 
-Read as a whole, the node is a week in which a substrate proposed for one program was taken over by
-another, kept its methodological discipline entirely intact through the transfer, descended through
-five increasingly subtle measurement failures into a set of near-nulls, and climbed back out by
-discovering that the nulls were about *how we were looking* — first the teacher, then the control
-mode. The headline results on day 7 are large again. They are large because the question finally
-matched the instrument.
+Read as a whole, the node is now a twelve-day arc in which a substrate proposed for one program was
+taken over by another, kept its methodological discipline entirely intact through the transfer,
+descended through five increasingly subtle measurement failures into a set of near-nulls, climbed back
+out by discovering the nulls were about *how we were looking* — first the teacher, then the control
+mode — and then, on reflection, watched its own retracted claims **reproduce** once the same fix
+(embody the measurement, not just the collection) was applied one substrate later. The final turn is
+the arc naming its own method: the reason nulls kept turning into findings is that no result here ever
+depended on a single grader, and the one time a readout *did* implicitly assume its components were
+independent (cut #5's rank triple), the failure was caught before it cost anything — because a second
+grader was run, not because anyone remembered to be careful.
