@@ -1,7 +1,7 @@
 # Continual Learning as Dimensionality Expansion
 
-**Date:** 2026-07-03 · *extended 2026-07-25 with §"What grades an expansion?"; decomposition corrected 2026-07-27*
-**Status:** Core belief intact and untested; its arithmetic operationalization **falsified and replaced** (see §"The decomposition, corrected"). Measured across three domains in [`rhm/residual_decomposition/`](../experiments/rhm/residual_decomposition/README.md).
+**Date:** 2026-07-03 · *extended 2026-07-25 with §"What grades an expansion?"; decomposition corrected 2026-07-27; scoped 2026-07-27*
+**Status:** Core belief intact and untested; its arithmetic operationalization **falsified and replaced** (see §"The decomposition, corrected"), and its domain of applicability now **bounded** (see §"Scope"). Measured across three domains in [`rhm/residual_decomposition/`](../experiments/rhm/residual_decomposition/README.md).
 **Related:**
 - [Self-prediction and self-knowledge](./trees/self_prediction_and_self_knowledge.md)
 - [Cerebellum and cognitive architecture](./trees/cerebellum_and_cognitive_architecture.md)
@@ -82,6 +82,21 @@ The claim was that compression drains `R_res → R_comp` with `R_act` unchanged,
 - **External (novelty):** new data adds genuinely new content. **Unbounded.** This is the channel the human intuition is about.
 
 ⚠️ The a2a evidence once cited for the internal channel saturating — WS_LG's residual rank growing 27.8 → 30.2 before hitting activation-norm inflation — is a **rank number measured with the falsified instrument**, and the direction of a rank change is exactly what that instrument gets wrong. The *behavioural* observation (the ratchet stops compounding by 16 cycles; activation norms inflate) stands on its own and is what the claim now rests on. The rank mechanism is withdrawn pending re-measurement with β and `R_res_participation`.
+
+## Scope: which domains should expand at all (2026-07-27)
+
+This file has read as universal. It should not. **Expansion needs a domain with hierarchical structure to expand *into*** — where new data carries genuinely new compositional content, so there is more to represent than before. RHM and language are such domains by construction. **A motor plant with fixed degrees of freedom is not.** An arm is a fixed map from commands to state; a drift moves the target function without enlarging the space of functions worth representing, so a well-fit FM should show a **flat frontier**, and on this belief's own terms that is *health*, not a failed compressor.
+
+The biology agrees and is the reason to take it seriously: real animals do not visibly expand their motor representations and remain extremely capable. A body never grows a limb. The conditions under which a motor system *must* expand are the ones that change its degrees of freedom — **development, injury, and tool use** — and tool use is the sharp one, since a tool extends the body schema.
+
+Two consequences:
+
+1. **Drift ≠ expansion.** Drift moves the *target function*; expansion grows the *space of representable functions*. A one-parameter walk (friction slowly changing) does the first and structurally cannot do the second. They converge **only under support-growing drift** — which is the useful form of the "drifting dynamics is isomorphic to expansion" intuition, and the boundary that makes the distinction operational rather than semantic.
+2. **The motor-domain test must be a support-growing intervention**, and anything principled qualifies: *region accretion* (new local operators appearing over rounds) or *DOF accretion* (joints unlocking; a passive tool acquired). Spec at [`mjc/README.md`](../experiments/mjc/README.md) §Next steps #3.
+
+**This is falsifiable and worth running as stated**: a fixed-DOF plant under support-fixed drift should hold the frontier flat, and the *same* plant under DOF accretion should open it. A flat frontier in both would say the frontier instrument does not read on control substrates at all, which is a different and more damaging result.
+
+**Instrument note carried over.** FM overcapacity does not bias the readout — `R_res_participation` weights by computation actually done, so idle directions contribute ~nothing (the 7-vs-84 gap on RHM is precisely this working). But **β** is a power-law fit across *participating* directions, so a low-dimensional prediction target leaves ~6 points to fit rather than ~200. Frontier mass and `R_res_participation` survive that; β does not. On control substrates this argues for predicting a **learned latent** rather than simulator state — which is independently the right move, since predicting `qpos/qvel` is privileged access to the DGP's own coordinates that no embodied learner has.
 
 ## Supporting evidence (from a2a_forward)
 
