@@ -1,5 +1,14 @@
 # RHM Residual Rank Experiment (2026-06-20)
 
+> ⚠️ **Superseded as the instrument of record (2026-07-27).** The entropy effective rank used throughout this file reads the
+> residual's *shape* and is blind to its *magnitude* — which is why Exp. 3 below sees a 17x residual-norm range leave rank flat at
+> 90-96%. That is now explained rather than contradicted: the residual follows `res_var(i) ~ act_var(i)^beta` across the model's
+> principal directions, and the FM-capacity sweep moves the *level* while leaving the *exponent* fixed. Exp. 3's conclusion ("the
+> residual's shape is a property of the main model's computation") **stands and is strengthened** — beta is invariant to capacity
+> to +/-0.01. But do not use effective rank for new measurements; use beta and `R_res_participation` from
+> [`residual_decomposition/README.md`](residual_decomposition/README.md). Note also that every gap here is 1 block, where the FM
+> saturates and the leftover is numerical noise.
+
 **Code**: `rhm_residual_rank.py`
 **Prior experiment**: See `SWEEP_README.md` for RHM scaling exponent results; see `../a2a_forward/README.md` for the A2A forward model background.
 

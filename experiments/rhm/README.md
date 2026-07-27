@@ -72,6 +72,20 @@ Tests whether the effective rank of a forward model's residual reflects DGP comp
 
 **Reproduction**: `modal run --detach rhm/rhm_residual_rank.py::rhm_residual_rank_sweep`
 
+> **Superseded as the instrument of record** by [`residual_decomposition/`](residual_decomposition/README.md) (2026-07-27), which explains Exp. 3's "17× norm range, rank barely moves" rather than contradicting it: entropy effective rank reads the residual's *shape* and is blind to its *magnitude*. Use β and `R_res_participation` from that node for any new rank-shaped measurement.
+
+### Residual decomposition: what residual rank was actually measuring (2026-07-27)
+
+**Full writeup**: [residual_decomposition/README.md](residual_decomposition/README.md) · **Also spans** [`a2a_forward/residual_decomposition/`](../a2a_forward/residual_decomposition/README.md) (language + vision)
+
+Across RHM, language, and MNIST, the FM residual is not a set of leftover directions but a graded shadow of the whole computation, obeying **`res_var(i) ∝ act_var(i)^β`** across the main model's principal directions (R² = 0.95–0.99). β is invariant to a 4× FM-capacity range (±0.01) while that same sweep moves the frontier's *level* by 1.8× — **shape and level are separate quantities, and the old single `R_res` tracked neither.**
+
+This falsifies the `R_act ≈ R_comp + R_res` partition in [`dimensionality_expansion.md`](../../beliefs/dimensionality_expansion.md) (ratio measures 1.85–3.56, never ~1; `R_comp` is a redundant readout of `R_act`; `R_res` > `R_act` everywhere), and explains three separate historical rank negatives — Exp. 3's norm-invariance above, "language residual is full-rank 200/256 yet cosine 0.97", and [`mjc` cut #1](../mjc/contact_residual/README.md)'s contact eff-rank 3.60 > free 2.52. All three were measuring a **saturated FM's noise floor**: where the FM drives relative residual to ~0, β collapses to 0.11–0.17 and naive rank inflates to 94–96% of `d_model` in all three domains.
+
+The replacement instrument is two numbers: **β** (the shape, a property of the model's computation) and **`R_res_participation`** (the frontier's dimensionality, counted in the model's own basis weighted by the computation it actually does there — RHM 7 where naive rank says 84). The geometric intuition survives: at a wide prediction gap the residual sits in the model's top directions at **5–6× chance**.
+
+**Reproduction**: `modal run --detach -m rhm.residual_decomposition.rhm_decomposition_audit::decomposition_audit`
+
 ### Regime transition experiment (2026-06-21)
 
 **Full writeup**: [REGIME_TRANSITION_README.md](REGIME_TRANSITION_README.md)

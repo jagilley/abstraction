@@ -1,5 +1,13 @@
 # Model Scale Experiment: Residual Structure vs Main Model Size
 
+> ⚠️ **Reinterpreted 2026-07-27.** This experiment's headline — relative effective rank 93.8% -> 91.8% from 29M to 77M — was
+> measured at a **1-block gap**, where the FM saturates (its own cosine 0.980 -> 0.994 shows this) and the residual is essentially
+> numerical noise. In that regime naive rank is a noise-floor readout: on language it reads 244.3 in the pure-noise regime and
+> 244.7 in the genuinely structured one, so a 2pp shift is not evidence of scale-dependent residual structure. A width sweep at a
+> *wide* gap finds the effect is real but far larger (relative rank 75.3% -> 46.3%) **and means the opposite of how it reads**:
+> measured against the model's own active dimensionality, `R_res/R_act` *rises* (1.82 -> 2.18). The denominator moved, because
+> activations concentrate as width grows. See [`rhm/residual_decomposition/README.md`](../rhm/residual_decomposition/README.md) 6.
+
 **Parent experiment**: [README.md](README.md)
 **Grokking comparison**: [fer/experiments/zipfian_grokking/cnb_self_regulation/README.md](../../../../fer/experiments/zipfian_grokking/cnb_self_regulation/README.md)
 **Code**: `model_scale_experiment.py`

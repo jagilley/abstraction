@@ -327,6 +327,18 @@ wrong (replanning re-grounds past the thing you're measuring). Each level up exp
 preceding nulls. The deepest finding in the node is not about value at all; it is that most of the
 arc's null results were instrument failures of increasing subtlety.
 
+*Addendum (2026-07-26): the first one caught before the compute was spent.* Cut #5's planned readout —
+the `(R_act, R_comp, R_res)` triple from `beliefs/dimensionality_expansion.md` — was falsified by direct
+re-measurement on the a2a/RHM substrate *while cut #5 was still being specified*: the components are not
+independent, so the "differential against a matched control" defense that was supposed to distinguish it
+from cut #1's retired rank claim could not have worked. Rank has now failed as an instrument here three
+times (`contact_residual`, a2a's `rank ⊥ noise`, and this), and the transferable rule is narrower than
+"be careful with rank": **a matched control does not rescue a readout whose components are not
+independent — check independence and magnitude-sensitivity first.** This is also the counter-example to
+the caveat above at "the arc's own headline discovery did not stop the very next node…": the discipline
+worked here, but only because a second, differently-typed measurement was actually run rather than
+reasoned about.
+
 **2. Negatives were the engine, not the exhaust.** `directed_readapt` (two), #4c, both halves of
 `online_value_loop`, drift Cut 2, ballistic 4a, directed S2's internal null. Every one names the next
 experiment in its own text, and the chain of "Builds on this" pointers across the tree is almost

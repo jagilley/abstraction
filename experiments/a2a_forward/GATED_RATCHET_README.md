@@ -88,6 +88,12 @@ The gate would only close in a regime where the bilevel outer loop evaluates on 
 | 3 | 28.0 | 13.4 | 27.0 | 18.6 |
 | 4 | **30.2** | **13.5** | 24.5 | 19.7 |
 
+> ⚠️ **The rank interpretation in this paragraph was withdrawn 2026-07-27.** These are entropy effective ranks, which read the
+> residual's shape and not its magnitude; an RHM wake-sleep 2x2 measuring the full triple on a fixed held-out probe finds
+> compression has **no measurable effect** (wake-sleep ~ open-loop: ΔR_act +52.7 vs +51.9, ΔR_res -5.9 vs -4.1) and no drain
+> toward zero. The condition *contrast* below may still be real, but "the residual concentrates / stays high-rank" is not what
+> these numbers show. See [`rhm/residual_decomposition/README.md`](../rhm/residual_decomposition/README.md).
+
 WS_LG and WS diverge dramatically: WS_LG's effective rank **increases** (27.8 → 30.2) while WS's **decreases** (23.9 → 13.5). Without the local loss, standard distillation concentrates the residual into fewer dimensions (the "grokking direction" — computation becoming more structured/low-rank). With the gated local loss, the model's computation stays high-rank because the FM is being pushed toward accuracy across ALL dimensions, preventing concentration.
 
 WS_LG's digit discriminability (eta²) also increases across cycles (0.049 → 0.083) while WS's decreases (0.054 → 0.035). The gated ratchet produces a residual that becomes MORE digit-specific over cycles — the fresh FM keeps missing class-conditional computation that the model continues to develop.
