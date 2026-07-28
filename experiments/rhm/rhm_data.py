@@ -199,24 +199,82 @@ def generate_sequences_batched(rules, n_sequences, seed=0, batch_size=10000):
     return sequences
 
 
+def generate_sequences_weighted(rules, n_sequences, weights, seed=0, batch_size=10000):
+    """`generate_sequences_batched`, but each node's rule is drawn from that cell's mixture
+    weights instead of uniformly over m.
+
+    `weights` is a list of L arrays of shape (v, m), each row summing to 1 —
+    `weights[ell][f, r]` = P(feature f at depth ell expands via rule r). Pass
+    `rhm_drift.uniform_weights(rules)` to recover `generate_sequences_batched` exactly
+    (distributionally; the rng is consumed differently, so streams are not bit-identical —
+    see `verify_backcompat.py`, which checks the distributional claim).
+
+    This is the sampling half of support-fixed rule drift: because only the weights move
+    and never the rule tables, the legal tuple set — and therefore every grammar readout
+    (`build_inverse_maps`, `parse_leaves`, possible-sets, the DP `d*`) — is invariant.
+    See `rhm_drift.py` for the drift process itself.
+
+    Kept separate from `generate_sequences_batched` so all prior experiments stay
+    reproducible.
+    """
+    rng = np.random.default_rng(seed)
+    L = len(rules)
+    v, m, s = rules[0].shape
+    seq_len = s ** L
+    if len(weights) != L:
+        raise ValueError(f"weights must have one (v, m) array per level (got {len(weights)}, need {L})")
+
+    sequences = np.empty((n_sequences, seq_len), dtype=np.int64)
+    for start in range(0, n_sequences, batch_size):
+        end = min(start + batch_size, n_sequences)
+        bs = end - start
+        current = rng.integers(0, v, size=(bs, 1))
+        for ell in range(L):
+            w = weights[ell][current]                       # (bs, n_features, m)
+            cdf = np.cumsum(w, axis=-1)
+            u = rng.random(current.shape + (1,)) * cdf[..., -1:]
+            choices = (u > cdf).sum(axis=-1)                # (bs, n_features)
+            n_features = current.shape[1]
+            next_level = np.empty((bs, n_features * s), dtype=np.int64)
+            for j in range(n_features):
+                next_level[:, j * s:(j + 1) * s] = rules[ell][current[:, j], choices[:, j]]
+            current = next_level
+        sequences[start:end] = current
+    return sequences
+
+
 def sequences_to_corpus(sequences):
     """Flatten sequences into a 1D token array (corpus)."""
     return sequences.reshape(-1)
 
 
-def make_corpus(v, s, L, m, n_tokens, rule_seed=0, seq_seed=1):
+def make_corpus(v, s, L, m, n_tokens, rule_seed=0, seq_seed=1, weights=None,
+                rule_kind="plain"):
     """End-to-end: generate rules and a corpus of n_tokens tokens.
 
     Returns (corpus, rules, meta) where:
     - corpus is a 1D int64 array of tokens
     - rules is the list of composition rule arrays
     - meta is a dict with generation parameters
+
+    Optional, both defaulting to the historical behaviour so every prior call is unchanged:
+    - `weights`: per-level (v, m) mixture weights (see `generate_sequences_weighted`). None
+      means uniform, which takes the original code path verbatim.
+    - `rule_kind`: "plain" | "distinct" | "invertible", selecting the rule generator.
+      "plain" is `generate_rules`, the original.
     """
-    rules = generate_rules(v, s, L, m, seed=rule_seed)
+    gen = {"plain": generate_rules, "distinct": generate_rules_distinct,
+           "invertible": generate_rules_invertible}
+    if rule_kind not in gen:
+        raise ValueError(f"rule_kind must be one of {sorted(gen)} (got {rule_kind!r})")
+    rules = gen[rule_kind](v, s, L, m, seed=rule_seed)
     seq_len = s ** L
     n_sequences = (n_tokens + seq_len - 1) // seq_len
 
-    sequences = generate_sequences_batched(rules, n_sequences, seed=seq_seed)
+    if weights is None:
+        sequences = generate_sequences_batched(rules, n_sequences, seed=seq_seed)
+    else:
+        sequences = generate_sequences_weighted(rules, n_sequences, weights, seed=seq_seed)
     corpus = sequences_to_corpus(sequences)[:n_tokens]
 
     meta = {
@@ -227,6 +285,8 @@ def make_corpus(v, s, L, m, n_tokens, rule_seed=0, seq_seed=1):
         "vocab_size": v,
         "rule_seed": rule_seed,
         "seq_seed": seq_seed,
+        "rule_kind": rule_kind,
+        "weighted": weights is not None,
     }
 
     return corpus, rules, meta
