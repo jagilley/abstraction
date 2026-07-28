@@ -30,6 +30,13 @@ image = (
         "matplotlib==3.9.2",
     )
     .add_local_python_source("mjc")
+    # `rhm.residual_decomposition.decomposition` is the frontier instrument of record
+    # (beta / R_res_participation / frontier mass — see rhm/residual_decomposition/README.md)
+    # and is pure numpy with empty package __init__s, so importing it pulls in no Modal app
+    # and no extra dependency. `mjc/expansion/` (cut #5) uses it rather than vendoring a
+    # second copy that could silently drift from the instrument it is supposed to be.
+    # Additive: no existing cut imports `rhm`, so every prior code path is unchanged.
+    .add_local_python_source("rhm")
 )
 
 volume = modal.Volume.from_name("mujoco-control-data", create_if_missing=True)

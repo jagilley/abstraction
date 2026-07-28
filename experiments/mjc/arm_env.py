@@ -150,8 +150,42 @@ def build_xml(dgp: dict) -> str:
                 f'{tail}{inner}'
                 f'    </body>\n')
 
+    # ---- LOCKED JOINTS: degrees of freedom the body does not have YET ------------------ #
+    # `locked_joints` = {joint_index (0-based): angle}. Each named joint is pinned at that
+    # angle by an `equality/joint` constraint. With joint2 omitted the constraint is
+    # y - y0 = a0, so polycoef's constant term IS the held angle (y0 = 0 since we never set
+    # a joint `ref`), which is why the angle can be specified directly without disturbing the
+    # qpos coordinate system that `q_center` is written in.
+    #
+    # Why a constraint rather than a shorter chain: the state stays 2n-dimensional and the
+    # command stays n-dimensional, so ONE forward model spans the locked and unlocked bodies
+    # and "the FM's input layer changed" is never a confound.
+    #
+    # A locked joint's motor is emitted with **gear="0"**. MuJoCo equality constraints are
+    # SOFT, and leaving a gear-8 motor driving a pinned joint makes the actuator fight the
+    # constraint every substep: a first pass left the motors on and the pinned joints drifted
+    # up to 0.16 rad off target within a single 10-substep control step, i.e. the "locked"
+    # body was not actually locked. Zero gear removes the fight at the source (commanding a
+    # joint you cannot yet move does nothing — the honest version of not having that DOF)
+    # and `solref` stiffens what remains against inter-link coupling torque.
+    #
+    # Additive and off by default: with no `locked_joints` key nothing is emitted, no gear is
+    # altered, and the XML is byte-identical to the unlocked arm, so every prior cut stays
+    # reproducible (gated by `on_policy/verify_backcompat.py`).
+    locked = d.get("locked_joints") or {}
+    eq = ""
+    if locked:
+        sr = d.get("lock_solref", "0.005 1")
+        si = d.get("lock_solimp", "0.99 0.999 0.001")
+        rows = "\n".join(
+            f'    <joint joint1="j{int(i)+1}" polycoef="{float(a)} 0 0 0 0" '
+            f'solref="{sr}" solimp="{si}"/>'
+            for i, a in sorted(locked.items(), key=lambda kv: int(kv[0])))
+        eq = f"  <equality>\n{rows}\n  </equality>\n"
+
     motors = "\n".join(
-        f'    <motor name="m{i+1}" joint="j{i+1}" gear="{d["gear"]}" '
+        f'    <motor name="m{i+1}" joint="j{i+1}" '
+        f'gear="{0.0 if i in locked else d["gear"]}" '
         f'ctrllimited="true" ctrlrange="-1 1"/>' for i in range(n_act))
 
     return f"""
@@ -165,7 +199,7 @@ def build_xml(dgp: dict) -> str:
 {body}    <camera name="topdown" pos="0 0 3.0" xyaxes="1 0 0 0 1 0"/>
     <light name="top" pos="0 0 3" dir="0 0 -1" directional="true"/>
   </worldbody>
-  <actuator>
+{eq}  <actuator>
 {motors}
   </actuator>
 </mujoco>
