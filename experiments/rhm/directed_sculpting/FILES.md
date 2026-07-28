@@ -28,5 +28,6 @@ certify them.
 
 ## Children
 
-None yet. The loop itself (arity-2 block FM + DP `k*` teacher + the six-policy allocation
-ladder on this substrate) is unbuilt; see [README.md](README.md) §Known open items.
+| Folder | What |
+|---|---|
+| [`full_loop/`](full_loop/README.md) ([FILES](full_loop/FILES.md)) | E3's inner + outer loop wired onto this substrate: the multi-channel sculpting environment and its E1–E6 certification, the seven-policy allocation ladder, the drift-level climb sweep, and the grader-type × drift expansion 2×2 |

@@ -111,15 +111,17 @@ def node_counts(rules, s, weights=None):
 # Drift state
 # --------------------------------------------------------------------------- #
 
-def make_drift_state(rules, levels, n_cells_per_level=None, seed=0):
-    """Pick which cells drift, and initialise their logits at uniform.
+def make_drift_state(rules, levels, n_cells_per_level=None, seed=0, theta0=None):
+    """Pick which cells drift, and initialise their logits (at uniform unless `theta0`).
 
     `levels` -- iterable of depths (0 = root-ward) whose cells are allowed to drift.
     `n_cells_per_level` -- how many features per level drift (None = all v).
+    `theta0` -- optional (L, v, m) initial logits, e.g. from `stationary_theta`. Default
+    zeros reproduces the original behaviour exactly, so every earlier run stays reachable.
     """
     v, m, _s = rules[0].shape
     rng = np.random.default_rng(seed)
-    theta = np.zeros((len(rules), v, m))
+    theta = np.zeros((len(rules), v, m)) if theta0 is None else np.array(theta0, dtype=float)
     mask = np.zeros((len(rules), v), dtype=bool)
     for ell in levels:
         if n_cells_per_level is None:
@@ -148,8 +150,13 @@ def ou_step(state, kappa, sigma, rng):
         if rows.size == 0:
             continue
         sig = sigma[ell] if isinstance(sigma, dict) else sigma
-        noise = rng.normal(0.0, sig, size=(rows.size, theta.shape[2]))
-        theta[ell, rows] = (1.0 - kappa) * theta[ell, rows] + noise
+        # kappa may be per-level too. A level sweep needs the NON-swept levels held at their
+        # (non-uniform) baseline while one level walks; a shared kappa with sigma=0 would
+        # instead decay those levels back toward uniform, quietly turning the frozen part of
+        # the world into a slow drift of its own.
+        kap = kappa[ell] if isinstance(kappa, dict) else kappa
+        noise = rng.normal(0.0, sig, size=(rows.size, theta.shape[2])) if sig > 0 else 0.0
+        theta[ell, rows] = (1.0 - kap) * theta[ell, rows] + noise
     state["kappa"] = kappa
     state["sigma"] = sigma if isinstance(sigma, dict) else {
         ell: sigma for ell in state["levels"]}
@@ -244,6 +251,95 @@ def calibrate_sigma(rules, s, levels, kappa, target_kl, n_cells_per_level=None,
         for _ in range(max_iter):
             mid = 0.5 * (lo + hi)
             got = stationary_kl(rules, s, ell, kappa, mid, n_cells_per_level, seed, n_draws)
+            if abs(got - target_kl) < tol:
+                break
+            lo, hi = (mid, hi) if got < target_kl else (lo, mid)
+        out[ell] = 0.5 * (lo + hi)
+    return out
+
+
+def stationary_theta(rules, levels, kappa, sigma, n_cells_per_level=None, seed=0):
+    """One draw of the logits from the OU walk's STATIONARY law.
+
+    WHY THIS EXISTS -- the anchor is not neutral. The walk mean-reverts to theta=0, which is
+    the UNIFORM mixture, which is the MAXIMUM-ENTROPY point of the simplex. So every state the
+    walk can reach satisfies H(w) <= log m with equality only at the anchor, and "drifted
+    world" becomes a synonym for "lower-entropy world" by construction.
+
+    Event-to-event that is harmless: at stationarity theta_t and theta_{t+n} are exchangeable,
+    so E[Delta H] = 0 across drift events. The damage is to the BASELINE comparison. A static
+    arm parked at uniform is sitting at the entropy maximum while a drifting arm sits at a
+    typical draw, whose expected entropy is strictly lower -- and lower synonym entropy means
+    a more deterministic render, a lower stochasticity floor, and a world that is mechanically
+    EASIER to plan in. Measured at a fixed controller: tree floor 0.146 (drifted) vs 0.216
+    (uniform), ~30%. Credited to the drifting arm that reads as robustness.
+
+    Note the sign is an artefact of the anchor, not of drift: anchored at uniform, drift can
+    only REDUCE synonymity; anchored near a deterministic mixture it could only increase it.
+    Drawing the pre-drift world from this same stationary law makes the two arms' worlds
+    exchangeable in entropy, so what remains between them is only whether the world MOVES --
+    which is the thing we meant to study. It does not make drift easy: the learner still faces
+    a non-stationary target, and that cost still shows up as repair.
+    """
+    v, m, _s = rules[0].shape
+    st = make_drift_state(rules, levels, n_cells_per_level, seed=seed)
+    rng = np.random.default_rng(seed + 31337)
+    theta = np.zeros((len(rules), v, m))
+    scale = stationary_scale(kappa)
+    for ell in levels:
+        rows = np.flatnonzero(st["mask"][ell])
+        sig = sigma[ell] if isinstance(sigma, dict) else sigma
+        theta[ell, rows] = rng.normal(0.0, sig * scale, size=(rows.size, m))
+    return theta
+
+
+def event_kl(rules, s, level, kappa, sigma, n_steps, n_cells_per_level=None, seed=0,
+             n_draws=512):
+    """Expected KL between two states `n_steps` apart at stationarity -- the size of one
+    DRIFT EVENT, which is what "at matched drift magnitude" actually means.
+
+    `stationary_kl` measures distance from UNIFORM, which is the accumulated displacement of
+    the walk and not the size of any event. Matching on it leaves the per-event magnitudes
+    badly unmatched across levels: at L=4 the calibrated level sweep produced mean per-event
+    KLs of 0.78 (surface) / 1.00 (mid) / 3.49 (root) -- a 4.5x spread inside a sweep whose
+    whole point was to hold magnitude fixed.
+
+    Drawn exactly rather than simulated: at stationarity `theta_{t+n} = rho*theta_t +
+    sqrt(1-rho^2)*tau*z` with `rho = (1-kappa)^n`, so pairs come from a closed form.
+    """
+    v, m, _s = rules[0].shape
+    st = make_drift_state(rules, [level], n_cells_per_level, seed=seed)
+    mask = st["mask"]
+    tau = sigma * stationary_scale(kappa)
+    rho = (1.0 - kappa) ** n_steps
+    rng = np.random.default_rng(seed + 4242)
+    kls = []
+    for _ in range(n_draws):
+        z1 = rng.normal(size=(v, m))
+        z2 = rng.normal(size=(v, m))
+        t_old = np.zeros((len(rules), v, m))
+        t_new = np.zeros((len(rules), v, m))
+        t_old[level] = tau * z1
+        t_new[level] = tau * (rho * z1 + np.sqrt(max(1.0 - rho ** 2, 0.0)) * z2)
+        ws = []
+        for t in (t_old, t_new):
+            w = weights_from_theta(t)
+            ws.append([np.where(mask[j][:, None], w[j], 1.0 / m) for j in range(len(rules))])
+        kls.append(drift_kl(rules, s, ws[0], ws[1])[0])
+    return float(np.mean(kls))
+
+
+def calibrate_sigma_event(rules, s, levels, kappa, target_kl, n_steps, n_cells_per_level=None,
+                          seed=0, n_draws=512, tol=1e-3, max_iter=40):
+    """Per-level sigma making one DRIFT EVENT (`n_steps` of the walk at stationarity) cost the
+    same KL at every level. The magnitude currency `adaptive_core_and_hierarchy_climb.md` §6
+    asks for; `calibrate_sigma` matches accumulated displacement instead."""
+    out = {}
+    for ell in levels:
+        lo, hi = 1e-4, 16.0
+        for _ in range(max_iter):
+            mid = 0.5 * (lo + hi)
+            got = event_kl(rules, s, ell, kappa, mid, n_steps, n_cells_per_level, seed, n_draws)
             if abs(got - target_kl) < tol:
                 break
             lo, hi = (mid, hi) if got < target_kl else (lo, mid)

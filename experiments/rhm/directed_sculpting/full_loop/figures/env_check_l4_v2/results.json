@@ -1,0 +1,334 @@
+{
+  "config": {
+    "v": 8,
+    "s": 2,
+    "edit_budget": 6,
+    "n_corrupt": 3,
+    "fm_steps": 12000,
+    "renders": [
+      "canon",
+      "mixture"
+    ],
+    "chunks": [
+      1,
+      2,
+      3,
+      6
+    ],
+    "tree_depth": 4,
+    "total_len": 28,
+    "n_blocks": 14,
+    "fm_layer": 2,
+    "fm_head": 4
+  },
+  "channels": [
+    {
+      "name": "tree",
+      "kind": "tree",
+      "depth": 4,
+      "m": 2,
+      "blk0": 0,
+      "blk1": 8
+    },
+    {
+      "name": "structA",
+      "kind": "struct",
+      "depth": 2,
+      "m": 2,
+      "blk0": 8,
+      "blk1": 10
+    },
+    {
+      "name": "structB",
+      "kind": "struct",
+      "depth": 2,
+      "m": 4,
+      "blk0": 10,
+      "blk1": 12
+    },
+    {
+      "name": "noiseA",
+      "kind": "noise",
+      "depth": null,
+      "m": null,
+      "blk0": 12,
+      "blk1": 13
+    },
+    {
+      "name": "noiseB",
+      "kind": "noise",
+      "depth": null,
+      "m": null,
+      "blk0": 13,
+      "blk1": 14
+    }
+  ],
+  "e2_irreducible_floor": {
+    "canon": {
+      "tree": 0.0,
+      "structA": 0.0,
+      "structB": 0.0,
+      "noiseA": 0.4977097113927205,
+      "noiseB": 0.4933755397796631
+    },
+    "mixture": {
+      "tree": 0.16030782461166382,
+      "structA": 0.2812524636586507,
+      "structB": 0.449791153271993,
+      "noiseA": 0.5028773546218872,
+      "noiseB": 0.514477531115214
+    }
+  },
+  "e2_irreducible_floor_acted": {
+    "canon": {
+      "tree": 0.0,
+      "structA": 0.0,
+      "structB": 0.0,
+      "noiseA": 0.49902844429016113,
+      "noiseB": 0.49503497282663983
+    },
+    "mixture": {
+      "tree": 0.18912827968597412,
+      "structA": 0.2715279658635457,
+      "structB": 0.46096054712931317,
+      "noiseA": 0.502430240313212,
+      "noiseB": 0.4998555580774943
+    }
+  },
+  "e1_canon_deterministic": {
+    "max_floor_under_canon_grammar_channels": 0.0,
+    "pass": true
+  },
+  "e4_task": {
+    "dstar_mean": 4.263671875,
+    "frac_solvable_token_budget": 1.0,
+    "frac_solvable_edit_budget": 1.0,
+    "start_possible_set_success": 0.0
+  },
+  "e6_ground_truth_relevance": {
+    "mean_dstar_gain": {
+      "tree": 0.187744140625,
+      "structA": 0.0,
+      "structB": 0.0,
+      "noiseA": 0.0,
+      "noiseB": 0.0
+    },
+    "best_dstar_gain": {
+      "tree": 1.64453125,
+      "structA": 0.0,
+      "structB": 0.0,
+      "noiseA": 0.0,
+      "noiseB": 0.0
+    }
+  },
+  "value_buffer_success": 0.2727000117301941,
+  "per_render": {
+    "canon": {
+      "fm_per_channel": {
+        "tree": {
+          "nmse": 0.5186149477958679,
+          "raw_mse": 0.15346433222293854,
+          "floor": 0.0,
+          "nmse_acted": 0.5336041450500488,
+          "floor_acted": 0.0,
+          "headroom_used": 0.4813850522041321,
+          "headroom_used_acted": 0.46639585494995117
+        },
+        "structA": {
+          "nmse": 1.000185251235962,
+          "raw_mse": 0.005249859299510717,
+          "floor": 0.0,
+          "nmse_acted": 0.9326766729354858,
+          "floor_acted": 0.0,
+          "headroom_used": -0.00018525123596191406,
+          "headroom_used_acted": 0.06732332706451416
+        },
+        "structB": {
+          "nmse": 0.9843695759773254,
+          "raw_mse": 0.0064289444126188755,
+          "floor": 0.0,
+          "nmse_acted": 0.9311633706092834,
+          "floor_acted": 0.0,
+          "headroom_used": 0.01563042402267456,
+          "headroom_used_acted": 0.06883662939071655
+        },
+        "noiseA": {
+          "nmse": 0.9995415210723877,
+          "raw_mse": 0.008561041206121445,
+          "floor": 0.4977097113927205,
+          "nmse_acted": 0.9617313742637634,
+          "floor_acted": 0.49902844429016113,
+          "headroom_used": 0.0009127768105641613,
+          "headroom_used_acted": 0.07638881948499615
+        },
+        "noiseB": {
+          "nmse": 0.9772763848304749,
+          "raw_mse": 0.01086818054318428,
+          "floor": 0.4933755397796631,
+          "nmse_acted": 0.9404203295707703,
+          "floor_acted": 0.49503497282663983,
+          "headroom_used": 0.04485297681766565,
+          "headroom_used_acted": 0.11798771642214219
+        }
+      },
+      "fm_one_step": {
+        "delta_cos": 0.34152838587760925,
+        "value_top1_agree": 0.283203125,
+        "value_rank_corr": 0.44553250074386597,
+        "delta_cos_per_channel": [
+          0.47964686527848244,
+          0.158333919942379,
+          0.18303203582763672,
+          0.12071306258440018,
+          0.14077720046043396
+        ]
+      },
+      "forecast_visits": {
+        "tree": 0.5826823115348816,
+        "structA": 0.2233072966337204,
+        "structB": 0.0634765625,
+        "noiseA": 0.09765625,
+        "noiseB": 0.0328776054084301
+      },
+      "value_sensitivity": {
+        "tree": 0.6947808265686035,
+        "structA": 0.04667706415057182,
+        "structB": 0.04555341228842735,
+        "noiseA": 0.04843343421816826,
+        "noiseB": 0.05283542349934578
+      },
+      "value_relevance": {
+        "mean_signed_dvalue": {
+          "tree": -0.10012926494164276,
+          "structA": 0.01751566265375004,
+          "structB": -0.0027956475714745466,
+          "noiseA": 0.003525451698806137,
+          "noiseB": -0.0071496459931950085
+        },
+        "top1_share": {
+          "tree": 0.939453125,
+          "structA": 0.017578125,
+          "structB": 0.021484375,
+          "noiseA": 0.0078125,
+          "noiseB": 0.013671875
+        },
+        "value_vs_dp_rank_corr": 0.3087369279831299
+      },
+      "control": {
+        "reactive_w16": 0.154296875,
+        "ballistic_c1_w1": 0.029296875,
+        "ballistic_c1_w16": 0.029296875,
+        "ballistic_c2_w1": 0.041015625,
+        "ballistic_c2_w16": 0.046875,
+        "ballistic_c3_w1": 0.03515625,
+        "ballistic_c3_w16": 0.048828125,
+        "ballistic_c6_w1": 0.021484375,
+        "ballistic_c6_w16": 0.037109375
+      }
+    },
+    "mixture": {
+      "fm_per_channel": {
+        "tree": {
+          "nmse": 0.6491231322288513,
+          "raw_mse": 0.18801631033420563,
+          "floor": 0.16030782461166382,
+          "nmse_acted": 0.650938093662262,
+          "floor_acted": 0.18912827968597412,
+          "headroom_used": 0.4178636863072793,
+          "headroom_used_acted": 0.4304773462842643
+        },
+        "structA": {
+          "nmse": 0.9960041642189026,
+          "raw_mse": 0.006158946547657251,
+          "floor": 0.2812524636586507,
+          "nmse_acted": 0.9424937963485718,
+          "floor_acted": 0.2715279658635457,
+          "headroom_used": 0.005559442751536195,
+          "headroom_used_acted": 0.07894085284906957
+        },
+        "structB": {
+          "nmse": 0.9657725095748901,
+          "raw_mse": 0.00785598624497652,
+          "floor": 0.449791153271993,
+          "nmse_acted": 0.922775387763977,
+          "floor_acted": 0.46096054712931317,
+          "headroom_used": 0.06220817900085501,
+          "headroom_used_acted": 0.14326337678023132
+        },
+        "noiseA": {
+          "nmse": 0.9617400169372559,
+          "raw_mse": 0.008482364006340504,
+          "floor": 0.5028773546218872,
+          "nmse_acted": 0.9208627939224243,
+          "floor_acted": 0.502430240313212,
+          "headroom_used": 0.07696286503634027,
+          "headroom_used_acted": 0.1590474592495156
+        },
+        "noiseB": {
+          "nmse": 0.940233051776886,
+          "raw_mse": 0.010122730396687984,
+          "floor": 0.514477531115214,
+          "nmse_acted": 0.8988730907440186,
+          "floor_acted": 0.4998555580774943,
+          "headroom_used": 0.1230982128600451,
+          "headroom_used_acted": 0.2021954075251934
+        }
+      },
+      "fm_one_step": {
+        "delta_cos": 0.3229888081550598,
+        "value_top1_agree": 0.255859375,
+        "value_rank_corr": 0.36219561100006104,
+        "delta_cos_per_channel": [
+          0.43531106784939766,
+          0.13685870915651321,
+          0.17862842231988907,
+          0.18733134865760803,
+          0.22104927897453308
+        ]
+      },
+      "forecast_visits": {
+        "tree": 0.6936848759651184,
+        "structA": 0.1363932341337204,
+        "structB": 0.09765625,
+        "noiseA": 0.0413411445915699,
+        "noiseB": 0.03092447854578495
+      },
+      "value_sensitivity": {
+        "tree": 0.6259815692901611,
+        "structA": 0.04605688527226448,
+        "structB": 0.049041349440813065,
+        "noiseA": 0.05121580883860588,
+        "noiseB": 0.052158016711473465
+      },
+      "value_relevance": {
+        "mean_signed_dvalue": {
+          "tree": 0.03998961870547646,
+          "structA": 0.007453785001416691,
+          "structB": -0.004169221607298823,
+          "noiseA": -0.00019497932225931436,
+          "noiseB": -0.004994472561520524
+        },
+        "top1_share": {
+          "tree": 0.958984375,
+          "structA": 0.0078125,
+          "structB": 0.015625,
+          "noiseA": 0.00390625,
+          "noiseB": 0.013671875
+        },
+        "value_vs_dp_rank_corr": 0.2989076464179638
+      },
+      "control": {
+        "reactive_w16": 0.189453125,
+        "ballistic_c1_w1": 0.046875,
+        "ballistic_c1_w16": 0.044921875,
+        "ballistic_c2_w1": 0.0546875,
+        "ballistic_c2_w16": 0.0859375,
+        "ballistic_c3_w1": 0.044921875,
+        "ballistic_c3_w16": 0.091796875,
+        "ballistic_c6_w1": 0.0234375,
+        "ballistic_c6_w16": 0.04296875
+      }
+    }
+  },
+  "elapsed_seconds": 589.7435944080353
+}

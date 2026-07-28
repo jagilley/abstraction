@@ -1,6 +1,6 @@
 # Directed sculpting: porting mjc E3's inner+outer loop to RHM — the DGP groundwork
 
-**Status**: substrate built and verified; the loop itself is not yet wired. Four primitives, each with its own validation entrypoint and committed results. Single rule-seed throughout (repo convention).
+**Status**: substrate built and verified, **and the loop now built and run** — see [`full_loop/`](full_loop/README.md). Phase 1 (this README) is the DGP and the instruments. Four primitives, each with its own validation entrypoint and committed results. Single rule-seed throughout (repo convention).
 **Date**: 2026-07-28
 **Up**: [../README.md](../README.md) (rhm) · **Files**: [FILES.md](FILES.md)
 **Idea doc**: [`ideas/adaptive_core_and_hierarchy_climb.md`](../../../ideas/adaptive_core_and_hierarchy_climb.md) — this node builds its §6 instrument and the DGP its §11 argument needs.
@@ -267,10 +267,33 @@ statement of the design property: drift moves the encoding, not the content.
 4. **The homeostatic readout cannot be raw loss.** Verified exactly, and the correct readout
    cross-validates against the closed-form magnitude at 88–95%.
 
+## The loop itself — [`full_loop/`](full_loop/README.md)
+
+**Goal**: wire E3's inner loop (reward-free block-FM re-adaptation + ballistic control) and outer loop
+(`value = lprog × visits` over a metered budget) onto this substrate, and test the idea doc's three drift-
+dependent claims.
+
+**Finding**: the reward-free **relevance** signal ports and is a smoking gun — a value trained only on terminal
+task success, never told which channel is which, separates real tokens from distractors **13–18×** and
+allocating by it alone recovers **76%** of a privileged oracle's advantage over uniform. But **expansion turns
+out to be a property of the grader's *type*, not of non-stationarity**: a grounded evaluative grader expands the
+belief ~1.7× in effective dimension and ~15× in ballistic control where an endogenous dense grader caps *below
+the no-loop floor*, and that holds identically in a static and a drifting world. Both drift-dependent
+predictions — hierarchy-climbing (§6/§11) and drift-sustained expansion (§5's missing cell) — come back
+negative, under instruments that had to be repaired twice, each repair removing a bias that pointed toward the
+positive result. The port passes a back-compat gate against the single-channel apparatus (`delta_cos` 0.492 vs
+the reference's 0.486).
+
+**Also lands two corrections to this node's own primitives**, both now default-off in
+[`../rhm_drift.py`](../rhm_drift.py): the OU walk anchors at the *maximum-entropy* point of the simplex, so a
+uniform-anchored static control is a handicap rather than a control (~18% on the FM's stochasticity floor); and
+`calibrate_sigma` matches accumulated displacement rather than event size, which left a matched-magnitude level
+sweep running at a 4.5× spread. `stationary_theta` / `calibrate_sigma_event` fix both.
+
 ## Caveats
 
-- **The loop is not built.** No arity-2 block FM, no DP `k*` teacher, no six-policy ladder on
-  this substrate. Everything here is the DGP and the instruments.
+- **This README covers the DGP and the instruments only.** The arity-2 block FM, the DP `k*` teacher
+  and the six-policy ladder live in [`full_loop/`](full_loop/README.md), which carries its own caveats.
 - Single rule-seed; single L=5 setting. Directional.
 - The distractor verification is **token-CE on a plain LM**, not the sculpting apparatus. It
   establishes DGP properties (irreducibility, structural irrelevance, the learnability
@@ -284,7 +307,7 @@ statement of the design property: drift moves the encoding, not the content.
 - `repair_cost_l5_v1/results.json` is retained as **instrument validation only** — its absolute
   numbers come from the broken fixed-pool harness.
 
-## Known open items before the loop
+## Known open items carried into the loop
 
 1. **The in-tree irreducible cell.** E3 could not place an *on-path irreducible* region
    ("you only go where you reach"), which is what separates `visits-only` from `value` — hence

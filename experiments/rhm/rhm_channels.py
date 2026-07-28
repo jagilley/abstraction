@@ -64,8 +64,8 @@ import modal
 import numpy as np
 
 from rhm.rhm_drift import (
-    calibrate_sigma, drift_kl, make_drift_state, ou_step, sample_derivations_weighted,
-    state_weights, uniform_weights)
+    calibrate_sigma, calibrate_sigma_event, drift_kl, make_drift_state, ou_step,
+    sample_derivations_weighted, state_weights, stationary_theta, uniform_weights)
 from rhm.rhm_data import build_inverse_maps, generate_rules_distinct, parse_leaves
 from rhm.rhm_sculpt_precheck import (nearest_derivation_cost, possible_sets,
                                      sample_derivations)
@@ -212,21 +212,45 @@ def sample_channel(layout, ch, roots, rng):
 
 
 def attach_drift(layout, channel_name, levels, kappa, target_kl, n_cells_per_level=None,
-                 seed=0):
+                 seed=0, calibrate="stationary", event_steps=None, init="uniform",
+                 frozen=False, sigma=None):
     """Give a grammar channel a calibrated OU drift state over the named levels.
 
-    `target_kl` is nats per sequence at stationarity **per level**, and sigma is solved
-    separately for each level so the levels are matched in that currency -- see
-    `rhm_rule_drift.calibrate_sigma`. Drifting k levels therefore costs ~k * target_kl in
-    total; pass `target_kl / k` if you want a fixed channel-level budget instead.
+    `calibrate="stationary"` (default, back-compatible): `target_kl` is nats/sequence from
+    UNIFORM at stationarity, per level. `calibrate="event"`: `target_kl` is the KL of ONE
+    DRIFT EVENT of `event_steps` steps -- the currency §6's "at matched drift magnitude"
+    actually means, and the one that keeps a level sweep honest (the stationary calibration
+    left per-event magnitudes 4.5x apart across levels at L=4).
+
+    `init="stationary"` starts the logits at a draw from the walk's own stationary law
+    instead of at uniform. Combined with `frozen=True` (sigma and kappa both 0) this gives a
+    STATIC but non-uniform world -- the entropy-matched baseline a drifting arm should be
+    compared against. Anchoring the static world at uniform instead puts it at the simplex's
+    maximum-entropy point, so every drifted world is systematically lower-entropy and
+    therefore mechanically easier to render and to plan in; see `rhm_drift.stationary_theta`
+    for the measurement (~30% on the block FM's stochasticity floor).
+
+    `sigma` lets a caller pass a previously calibrated dict rather than re-solving it.
     """
     ch = next(c for c in layout["channels"] if c["name"] == channel_name)
     if ch["rules"] is None:
         raise ValueError(f"channel {channel_name!r} has no grammar to drift")
-    ch["drift"] = make_drift_state(ch["rules"], levels, n_cells_per_level, seed=seed)
-    ch["drift_sigma"] = calibrate_sigma(ch["rules"], layout["s"], levels, kappa, target_kl,
-                                        n_cells_per_level, seed=seed)
-    ch["drift_kappa"] = kappa
+    if sigma is None:
+        if calibrate == "event":
+            if not event_steps:
+                raise ValueError("calibrate='event' needs event_steps")
+            sigma = calibrate_sigma_event(ch["rules"], layout["s"], levels, kappa, target_kl,
+                                          event_steps, n_cells_per_level, seed=seed)
+        else:
+            sigma = calibrate_sigma(ch["rules"], layout["s"], levels, kappa, target_kl,
+                                    n_cells_per_level, seed=seed)
+    theta0 = (stationary_theta(ch["rules"], levels, kappa, sigma, n_cells_per_level,
+                               seed=seed + 1) if init == "stationary" else None)
+    ch["drift"] = make_drift_state(ch["rules"], levels, n_cells_per_level, seed=seed,
+                                   theta0=theta0)
+    ch["drift_sigma"] = {ell: 0.0 for ell in levels} if frozen else sigma
+    ch["drift_kappa"] = 0.0 if frozen else kappa
+    ch["drift_calibrated_sigma"] = sigma
     return ch
 
 
