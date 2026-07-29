@@ -7,6 +7,7 @@
 - [Cerebellum and cognitive architecture](./trees/cerebellum_and_cognitive_architecture.md)
 - [Metacognitive novelty learning](./metacognitive_novelty_learning.md)
 - [Heterogeneous graders](../ideas/heterogeneous_graders.md) — supplies the grader this file's expansion drive left unspecified
+- [Breadth as grader heterogeneity](../ideas/breadth_as_grader_heterogeneity.md) — splits the external route into *received* vs *minted* novelty, and scopes the internal/external cap accordingly
 - [A2A forward model](../experiments/a2a_forward/README.md)
 
 ## The belief
@@ -80,6 +81,18 @@ The claim was that compression drains `R_res → R_comp` with `R_act` unchanged,
 
 - **Internal (self-legibility reorganization):** the gated local loss spreads existing computation across more, more-orthogonal directions without new data — but is **capped**, since you can only re-express fixed content so far.
 - **External (novelty):** new data adds genuinely new content. **Unbounded.** This is the channel the human intuition is about.
+
+> **Scoped 2026-07-29 — the external route splits in two, and the split is where the cost lives.** *Received*
+> novelty (a broad corpus) arrives **pre-certified** by the systems that produced it; *minted* novelty (a
+> self-curated curriculum — synthetic constructions, self-generated problems, actual experiments) arrives
+> **without warrant**. Both are unbounded in content, so the internal/external cap above does **not** bind an
+> expansion drive that mints — the objection *"a drive only allocates over content that is present"* assumes a
+> fixed corpus. What binds instead is **verification**: minted data is cheap in volume and dubious in quality,
+> which relocates the meter from tokens to *verified* tokens and puts an evaluative grader on the critical
+> path. The constraint this inherits is [heterogeneous_graders](../ideas/heterogeneous_graders.md) §8's —
+> a verifier derived from the same band is *the same grader in a mirror*, and self-evaluated minting is model
+> autophagy. **Argument, not measurement; the cut that would test it is unbuilt.**
+> See [breadth_as_grader_heterogeneity.md](../ideas/breadth_as_grader_heterogeneity.md) §2–§3, §7.
 
 ⚠️ The a2a evidence once cited for the internal channel saturating — WS_LG's residual rank growing 27.8 → 30.2 before hitting activation-norm inflation — is a **rank number measured with the falsified instrument**, and the direction of a rank change is exactly what that instrument gets wrong. The *behavioural* observation (the ratchet stops compounding by 16 cycles; activation norms inflate) stands on its own and is what the claim now rests on. The rank mechanism is withdrawn pending re-measurement with β and `R_res_participation`.
 

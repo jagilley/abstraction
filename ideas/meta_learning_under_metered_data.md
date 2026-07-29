@@ -147,6 +147,20 @@ the task**, and they answer "should I restrict to what's relevant?" with opposit
 | [**specialization**](../experiments/rhm/specialization/README.md) — one shared ruleset, A and B are subtrees | *A's depth **is** B's depth* | **inert.** Breadth restriction Δ ≤ 0.013; broad beats narrow on A's own domain (0.581 vs 0.440); supervising A alone lifts B's d4 **0.108 → 0.408** |
 | [**full_loop**](../experiments/rhm/directed_sculpting/full_loop/README.md) — independent rule tables per channel (`rhm_channels.py:83`, `generate_rules_distinct`, `rule_seed=101`) | nothing shared | **pays 0.063** in tree FM error (uniform 0.7371 → oracle 0.6742) |
 
+> ⚠️ **The specialization row packs two different interventions under one verdict (noted 2026-07-29).** The
+> Δ ≤ 0.013 figure is **Exp 1** — *corpus*-breadth restriction under plain NTP, matched tokens — and it is
+> genuinely inert. The 0.581-vs-0.440 figure is **cut-2a**, which is *supervision*-breadth on a corpus that
+> stays broad in **every** arm (*"every condition trains flat NTP on all roots"*), and it is **not inert**:
+> concentration costs **−0.140** at d4, worst exactly at m=8 where the expander is capacity-limited. Different
+> axes, opposite verdicts. Two further limits on the cut-2a numbers: they come from a **precomputed external
+> oracle label**, not from any endogenous drive, so they carry no implication for intrinsic-drive settings
+> (§4b's whole content is that grader *type* is the operative variable); and they carry an unresolved **count
+> confound** (`aux_A` draws ~50k A-sequences vs `aux_all`'s 200k, equal-count control unrun). A claim that
+> cut-2a shows corpus breadth and an intrinsic expansion drive to be *complements* was made and retracted on
+> this basis — see [breadth_as_grader_heterogeneity.md](breadth_as_grader_heterogeneity.md) §6, which also
+> notes that **Exp 1's inertness is a null measured at the floor** (both arms stall at ~d3.5, root at chance
+> even on S), so it does not settle the breadth question in the other direction either.
+
 This is the sharpest available statement of what curation is worth, and it says the answer is **set by
 the geometry, not by the learner**.
 
