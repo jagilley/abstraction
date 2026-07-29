@@ -5,16 +5,43 @@ block-FM re-adaptation under continuous drift + ballistic (open-loop) control. O
 a metered budget allocated over channels by `value = lprog x visits`, both taps read off the
 SAME forward model the inner loop keeps calibrated. Six E3 rungs plus one:
 
-  uniform        the floor
-  error_only     chases raw FM error          -> should be trapped by the NOISE channels
-  lprog_only     chases reducible structure   -> should be trapped by the STRUCT channels
-  visits_only    chases relevance only
-  value          lprog x visits               -> E3's positive result
-  value_satiety  lprog measured against the noise-calibrated floor, minus a depletable
-                 satiety state                -> `ideas/adaptive_core_and_hierarchy_climb.md`
-                                                §10/§12's one-line change; predicts the
-                                                irreducible-channel leak falls
-  oracle         privileged: all budget to the tree
+  uniform            the floor
+  error_only         chases raw FM error       -> should be trapped by the NOISE channels
+  visits_only        chases relevance only
+  oracle             privileged: all budget to the tree
+
+  ...and the `e` tap in two estimators, run side by side so the ladder measures the
+  ESTIMATOR as a controlled variable (both are computed every round for every arm, so the
+  monitor charge is identical and only the allocation rule differs):
+
+  lprog_only         counterfactual-fit LP alone
+  value              lprog x visits            -> E3's rung, as first run
+  value_satiety      + a depletable satiety state on the LP drive
+  reducible_only     FLOOR-CORRECTED reducibility alone -- `(err - aleatoric floor) / err`,
+                     with the floor MEASURED by re-executing the same command from the same
+                     state (metered, label-free)
+  value_red          reducible x visits        -> the repaired rung
+  value_red_satiety  + satiety, thresholded on the irreducible channels' own apparent
+                     reducibility -> §10/§12's prediction that the irreducible-channel leak
+                     falls, finally testable on a drive that is not inverted
+
+WHY TWO ESTIMATORS
+------------------
+The first run of this ladder had `value` LOSE to `visits_only`, for a reason that is about
+the estimator rather than about relevance. A fixed-budget counterfactual fit measures
+MARGINAL RETURN, which early in training is dominated by how STARVED a channel is, not by how
+REDUCIBLE it is: block-proportional warm-up leaves the 1-block noise channels furthest back on
+their learning curve, so probing them yields the biggest held-out drop. Measured mean LP came
+out exactly inverted -- tree +0.044 < structA +0.053 < structB +0.057 < noise +0.064/+0.066 --
+so the noisy-TV *filter* had become the noisy-TV *attractor*.
+
+Floor-corrected reducibility cannot be fooled that way, because it never asks where the
+channel sits on its learning curve. On the same run it orders them correctly (tree 0.709 ~
+structA 0.712 > structB 0.500 > noise 0.454/0.444).
+
+And the loss was VARIANCE more than bias: `lprog x visits` implied a 61% tree share on its
+round-averaged taps but realised 44%, with a per-round tree-share sd of 0.309 against
+`visits_only`'s 0.059. So both taps are now EMA-smoothed and read off FROZEN probe states.
 
 GRADERS, TWO OF DIFFERENT TYPE (the arc's own discipline)
 ---------------------------------------------------------
@@ -52,7 +79,7 @@ from rhm.rhm_repair_cost import Meter
 from rhm.shared import DATA_DIR, NumpyEncoder, image, volume
 from rhm.directed_sculpting.full_loop.channel_env import (
     POLICIES, advance_drift, allocate, blocks_of_channel, build_block_tables,
-    closed_loop_beam, make_spec, prewarm_drift,
+    closed_loop_beam, ema, make_spec, measure_floors, prewarm_drift, reducible_fraction,
     collect_value_buffer, counterfactual_lp, forecast_visits, ground_truth_relevance,
     fm_one_step_check, make_tree_probe, open_loop_beam, per_channel_error,
     refresh_w_blk, sample_states,
@@ -120,7 +147,8 @@ def ladder(
     controller_steps: int = 12_000, generator_steps: int = 12_000, value_steps: int = 12_000,
     value_episodes: int = 40_000, fm_warm_steps: int = 12_000, batch_size: int = 256,
     n_corrupt: int = 3, edit_budget: int = 6, explore_eps: float = 0.3,
-    rounds: int = 12, collect_budget: int = 8192, mon_n: int = 2560, forecast_n: int = 512,
+    rounds: int = 12, collect_budget: int = 8192, mon_n: int = 1280, forecast_n: int = 512,
+    floor_n: int = 512, floor_draws: int = 3, tap_ema: float = 0.5,
     fm_epochs: int = 8, lp_steps: int = 40, drift_kappa: float = 0.05,
     drift_kl: float = 0.30, drift_steps_per_round: int = 20, drift_prewarm: int = 200,
     n_eval: int = 512, n_probe_states: int = 1024, grade_every: int = 3,
@@ -139,7 +167,7 @@ def ladder(
     if quick:
         controller_steps = generator_steps = value_steps = fm_warm_steps = 600
         value_episodes, rounds = 6_000, 3
-        collect_budget, mon_n, forecast_n = 1024, 256, 128
+        collect_budget, mon_n, forecast_n, floor_n = 1024, 256, 128, 128
         n_eval, n_probe_states, grade_every = 128, 256, 2
         lp_steps = 10
 
@@ -210,6 +238,17 @@ def ladder(
                                    presteps=0, seed=seed + 42, device=device, render=render,
                                    gen=gen)
     probe_leaves, level_feats, _ = make_tree_probe(layout, tb, seed + 43)
+    # FROZEN monitor and floor probes. The taps are read every round, so resampling their
+    # states injects state-draw variance into a signal that is already a noisy derivative --
+    # and it was that variance, not bias, that cost `value` the first ladder (implied tree
+    # share 61%, realised 44%, sd 0.309). The transitions still change every round because
+    # the world drifts and the render is stochastic; only the start states are held.
+    x_mon0, _ = sample_states(layout, tb, generator, n=mon_n, n_corrupt=n_corrupt,
+                              presteps=edit_budget // 2, seed=seed + 45, device=device,
+                              render=render, gen=gen)
+    x_floor0, _ = sample_states(layout, tb, generator, n=floor_n, n_corrupt=n_corrupt,
+                                presteps=edit_budget // 2, seed=seed + 46, device=device,
+                                render=render, gen=gen)
 
     # ---- warm-start FM on a uniform budget (so LP is measurable at round 1) --------------
     # every policy forks from this SAME warm state, so the ladder measures allocation only
@@ -252,6 +291,7 @@ def ladder(
         results[policy] = _run_policy(
             policy, warm_fm, controller, generator, value, layout, tb, drift_spec,
             x_probe=x_probe, x_eval=x_eval, r_eval=r_eval, seed=seed, rounds=rounds,
+            x_mon0=x_mon0, x_floor0=x_floor0, floor_draws=floor_draws, tap_ema=tap_ema,
             collect_budget=collect_budget, mon_n=mon_n, forecast_n=forecast_n,
             fm_epochs=fm_epochs, lp_steps=lp_steps, batch_size=batch_size,
             n_corrupt=n_corrupt, edit_budget=edit_budget,
@@ -261,13 +301,19 @@ def ladder(
 
     # ---- summary ------------------------------------------------------------------------
     print(f"\n{'=' * 78}\n=== SUMMARY -- E3's ladder on RHM (mean over rounds) ===\n{'=' * 78}")
-    print(f"{'policy':14s} {'tree FM err ↓':>14s} {'ballistic ↑':>12s} {'reactive':>9s} "
-          f"{'→noise':>8s} {'→struct':>8s} {'→tree':>7s} {'mon:col':>8s}")
+    print(f"{'policy':18s} {'tree FM err ↓':>14s} {'ball mean ↑':>12s} {'reactive':>9s} "
+          f"{'→noise':>8s} {'→struct':>8s} {'→tree':>7s} {'tree sd':>8s} {'mon:col':>8s}")
     for policy in policy_list:
         r = results[policy]
-        print(f"{policy:14s} {r['tree_err_mean']:>14.4f} {r['ballistic_final']:>12.3f} "
+        print(f"{policy:18s} {r['tree_err_mean']:>14.4f} {r['ballistic_mean']:>12.3f} "
               f"{r['reactive_final']:>9.3f} {r['share_noise']:>8.1%} "
-              f"{r['share_struct']:>8.1%} {r['share_tree']:>7.1%} {r['meter_ratio']:>8.2f}x")
+              f"{r['share_struct']:>8.1%} {r['share_tree']:>7.1%} "
+              f"{r['tree_share_sd']:>8.3f} {r['meter_ratio']:>8.2f}x")
+    ref = results[policy_list[0]]["rounds"]
+    print("\n  the two `e`-tap estimators, averaged over rounds (identical across arms):")
+    for key in ("lprog", "reducible"):
+        print(f"    {key:10s} " + "  ".join(
+            f"{n}={np.mean([x[key][n] for x in ref]):+.4f}" for n in ref[0][key]))
 
     metrics = {
         "config": {"v": v, "s": s, "tree_depth": tree_depth, "total_len": T,
@@ -301,8 +347,9 @@ def ladder(
 
 
 def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift_spec, *,
-                x_probe, x_eval, r_eval, seed, rounds, collect_budget, mon_n, forecast_n,
-                fm_epochs, lp_steps, batch_size, n_corrupt, edit_budget,
+                x_probe, x_eval, r_eval, x_mon0, x_floor0, floor_draws, tap_ema, seed, rounds,
+                collect_budget, mon_n, forecast_n, fm_epochs, lp_steps, batch_size,
+                n_corrupt, edit_budget,
                 drift_steps_per_round, drift_prewarm, grade_every, beta_sat, alloc_eps,
                 ballistic_chunk,
                 render, device):
@@ -329,6 +376,7 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
         prewarm_drift(layout, drift_rng, drift_prewarm)
         refresh_w_blk(tb, layout, device)
     satiety = np.zeros(n_ch)
+    lp_s = red_s = None
     rows, lp_hist = [], []
 
     for rnd in range(1, rounds + 1):
@@ -336,15 +384,22 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
         kls = advance_drift(layout, drift_rng, drift_steps_per_round)
         refresh_w_blk(tb, layout, device)
 
-        # --- e tap: counterfactual learning progress per channel (metered) -----------
-        x_mon, _ = sample_states(layout, tb, generator, n=mon_n, n_corrupt=n_corrupt,
-                                 presteps=edit_budget // 2, seed=seed + 9000 + rnd * 7,
-                                 device=device, render=render, gen=gen)
-        lp_info = counterfactual_lp(fm, controller, generator, tb, x_mon, lp_steps=lp_steps,
+        # --- e tap, BOTH estimators (metered identically for every policy, so the ladder
+        # --- compares allocation rules and not monitoring budgets). Budget split is sized to
+        # --- hold E3's anti-subsidy ratio: 5*mon_n LP + 5*floor_n*floor_draws floor + the
+        # --- forecast, against collect_budget -> ~1.78x vs E3's 1.84x. -----------------
+        lp_info = counterfactual_lp(fm, controller, generator, tb, x_mon0, lp_steps=lp_steps,
                                     batch_size=batch_size, lr=1e-3, meter=meter,
                                     render=render, gen=gen, device=device)
         errors = {c: lp_info[c]["e_before"] for c in range(n_ch)}
-        lprog = {c: lp_info[c]["lp"] for c in range(n_ch)}
+        lp_raw = {c: lp_info[c]["lp"] for c in range(n_ch)}
+        floors = measure_floors(controller, generator, tb, x_floor0, meter=meter,
+                                n_draws=floor_draws, render=render, gen=gen, device=device,
+                                seed=seed + 47)
+        red_raw = reducible_fraction(errors, floors, n_ch)
+        lp_s = ema(lp_s if rnd > 1 else None, lp_raw, tap_ema, n_ch)
+        red_s = ema(red_s if rnd > 1 else None, red_raw, tap_ema, n_ch)
+        lprog, reducible = lp_s, red_s
         lp_hist.append([lprog[c] for c in range(n_ch)])
 
         # LP floor calibrated off the IRREDUCIBLE channels, exactly as `verify_distractors`
@@ -353,6 +408,10 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
         # first pass credit the noise channels with progress.
         noise_ch = [c for c, ch in enumerate(layout["channels"]) if ch["kind"] == "noise"]
         lp_floor = float(max(abs(lprog[c]) for c in noise_ch)) if noise_ch else 0.0
+        # the irreducible channels cannot be reduced, so whatever reducibility they APPEAR to
+        # show is what "no real headroom" reads as on this instrument -- the self-calibrating
+        # null `verify_distractors` used for its LP floor, in the reducibility currency.
+        red_floor = float(max(reducible[c] for c in noise_ch)) if noise_ch else 0.0
 
         # --- p tap: forecast visitation by rolling the FM (metered) ------------------
         x_fc, r_fc = sample_states(layout, tb, generator, n=forecast_n, n_corrupt=n_corrupt,
@@ -365,6 +424,7 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
         # --- allocate ----------------------------------------------------------------
         w, drive = allocate(policy, errors=errors, lprog=lprog, visits=visits,
                             tree_channel=tree_c, n_channels=n_ch, lp_floor=lp_floor,
+                            reducible=reducible, red_floor=red_floor,
                             satiety=satiety, beta_sat=beta_sat, eps=alloc_eps)
         sat_prev = satiety.copy()
         satiety = 0.7 * satiety + w        # depletable state: fills with spending, decays if not
@@ -411,6 +471,11 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
                "alloc": {names[c]: float(w[c]) for c in range(n_ch)},
                "drive": {names[c]: float(drive[c]) for c in range(n_ch)},
                "lprog": {names[c]: float(lprog[c]) for c in range(n_ch)},
+               "lprog_raw": {names[c]: float(lp_raw[c]) for c in range(n_ch)},
+               "reducible": {names[c]: float(reducible[c]) for c in range(n_ch)},
+               "reducible_raw": {names[c]: float(red_raw[c]) for c in range(n_ch)},
+               "floor": {names[c]: float(floors[c]) for c in range(n_ch)},
+               "red_floor": red_floor,
                "error_probe": {names[c]: errs[c]["nmse_acted"] for c in range(n_ch)},
                "error_probe_all_blocks": {names[c]: errs[c]["nmse"] for c in range(n_ch)},
                "error_raw": {names[c]: errs[c]["raw_mse"] for c in range(n_ch)},
@@ -455,6 +520,7 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
         "share_struct": float(sum(share[c] for c in range(len(names)) if kinds[c] == "struct")),
         "share_tree": float(sum(share[c] for c in range(len(names)) if kinds[c] == "tree")),
         "meter_ratio": float(rows[-1]["meter"]["ratio"]),
+        "tree_share_sd": float(np.std([r["alloc"][names[tree_c]] for r in rows])),
         "lp_history": lp_hist,
     }
 

@@ -83,8 +83,9 @@ from rhm.rhm_repair_cost import Meter
 from rhm.shared import DATA_DIR, NumpyEncoder, image, volume
 from rhm.directed_sculpting.full_loop.channel_env import (
     advance_drift, allocate, belief_update, blocks_of_channel, build_block_tables,
-    collect_grounded_moves, prewarm_drift, repaired_fraction,
-    collect_value_buffer, counterfactual_lp, fm_error, forecast_visits, make_spec,
+    collect_grounded_moves, ema, measure_floors, prewarm_drift, reducible_fraction,
+    repaired_fraction, collect_value_buffer, counterfactual_lp, fm_error, forecast_visits,
+    make_spec,
     make_tree_probe, open_loop_beam, per_channel_error, refresh_w_blk, root_ce,
     sample_states, train_block_fm, train_generator_channels, transition_targets,
     tree_depth_probe)
@@ -108,14 +109,16 @@ def climb(
     controller_steps: int = 12_000, generator_steps: int = 12_000, value_steps: int = 12_000,
     value_episodes: int = 40_000, fm_warm_steps: int = 8_000, batch_size: int = 256,
     explore_eps: float = 0.3, rounds: int = 10, collect_budget: int = 4096,
-    mon_n: int = 1024, forecast_n: int = 512, fm_epochs: int = 4, lp_steps: int = 25,
+    mon_n: int = 1024, forecast_n: int = 512, floor_n: int = 256, floor_draws: int = 3,
+    tap_ema: float = 0.5, fm_epochs: int = 4, lp_steps: int = 25,
     belief_steps: int = 1200, ground_states: int = 3072, anchor_pool: int = 40_000,
+    samples_sweep: str = "4096,1024,256,64",   # scale anchor: 4096 == the pre-fix operating point
     lam_fm: float = 1.0, lam_plan: float = 1.0, tau: float = 1.0,
     drift_kappa: float = 0.05, drift_kl: float = 0.60, drift_steps_per_round: int = 20,
     drift_prewarm: int = 200, entropy_matched_base: bool = True,
     n_eval: int = 512, n_probe_states: int = 1024, n_probe: int = 2000,
     probe_steps: int = 250, grade_every: int = 3, ballistic_chunk: int = 3,
-    arms: str = "nodrift,surface,mid,root", policy: str = "value",
+    arms: str = "nodrift,surface", policy: str = "value_red_satiety",
     tag: str = "v1", quick: bool = False,
 ):
     """Repeated drift events at matched magnitude, read against the per-level depth probe."""
@@ -130,10 +133,12 @@ def climb(
         controller_steps = generator_steps = value_steps = fm_warm_steps = 800
         value_episodes, rounds, belief_steps = 6_000, 3, 200
         collect_budget, mon_n, forecast_n, ground_states = 512, 192, 128, 512
+        samples_sweep = "512,64"
         n_eval, n_probe_states, n_probe, probe_steps = 128, 256, 600, 80
         anchor_pool, lp_steps, grade_every = 8_000, 8, 2
 
     arm_list = [a for a in arms.split(",") if a]
+    sweep = [int(x) for x in samples_sweep.split(",")]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -221,30 +226,65 @@ def climb(
     probe_leaves, level_feats, _ = make_tree_probe(layout, tb, seed + 43)
 
     results = {}
-    for arm in arm_list:
-        print(f"\n{'#' * 72}\n# ARM: {arm}\n{'#' * 72}")
-        results[arm] = _run_arm(
-            arm, controller0, fm0, value0, generator, layout, tb, sigmas,
-            x_probe=x_probe, x_eval=x_eval, r_eval=r_eval, probe_leaves=probe_leaves,
-            level_feats=level_feats, seed=seed, L=L, v=v, s=s, state_dim=state_dim,
-            rounds=rounds, collect_budget=collect_budget, mon_n=mon_n,
-            forecast_n=forecast_n, fm_epochs=fm_epochs, lp_steps=lp_steps,
-            belief_steps=belief_steps, ground_states=ground_states, anchor_pool=anchor_pool,
-            batch_size=batch_size, n_corrupt=n_corrupt, edit_budget=edit_budget,
-            drift_kappa=drift_kappa, drift_steps_per_round=drift_steps_per_round,
-            drift_prewarm=drift_prewarm, levels=levels, theta0=theta0,
-            lam_fm=lam_fm, lam_plan=lam_plan, tau=tau, probe_steps=probe_steps,
-            grade_every=grade_every, ballistic_chunk=ballistic_chunk, policy=policy,
-            render=render, device=device)
+    # SAMPLES PER EVENT is the knob, not drift magnitude. Drift makes the deep level cheaper
+    # to MAINTAIN; it does not make it NECESSARY. If post-drift surface re-fit fully restores
+    # performance, holding the invariant buys nothing measurable and no gradient ever prices
+    # the integrated cost -- the agent that never climbed is not paying for the deep level, it
+    # just does not need one. Measured on the first sweep: the surface arm repaired 91% of its
+    # damage within the round (residual/damage 0.09 over the last 5 rounds) and converged to
+    # the nodrift arm's root CE every round. So climbing had no lever, and the null said only
+    # that drift ALONE does not induce it.
+    #
+    # Below the sample count surface re-fit needs, the cheap repair should instead be
+    # deep-prior-plus-few-samples -- which is specialization's own line, "a learner that
+    # already holds level l recruits l+1 from a small marginal sample". So: hold KL/event
+    # fixed (already exact) and sweep samples/event DOWN, expecting a threshold rather than a
+    # gradient. Each budget carries its own matched `nodrift` control, so the DiD stays paired.
+    for S in sweep:
+        scale = S / 4096.0
+        # EVERYTHING per-event scales together, monitoring included. Flooring the monitor
+        # instead is how a first pass reached a 13.5x monitor:collect ratio at the starved end
+        # -- E3's fatal 22x subsidy rebuilt by accident, which would have left the "starved"
+        # arms not actually starved and made allocation a non-question exactly where the
+        # experiment needs it to bind. The floors below are small enough that the ratio stays
+        # bounded; it is reported per arm and does rise at the bottom of the sweep, which is an
+        # honest property of metering a very small budget rather than a subsidy.
+        cfg = dict(collect_budget=S,
+                   ground_states=max(48, int(round(ground_states * scale))),
+                   anchor_pool=max(256, int(round(anchor_pool * scale))),
+                   belief_steps=max(12, int(round(belief_steps * scale))),
+                   mon_n=max(16, int(round(mon_n * scale))),
+                   floor_n=max(8, int(round(floor_n * scale))),
+                   forecast_n=max(16, int(round(forecast_n * scale))))
+        print(f"\n{'=' * 72}\n= SAMPLES/EVENT = {S}   {cfg}\n{'=' * 72}")
+        for arm in arm_list:
+            key = f"{arm}@{S}"
+            print(f"\n{'#' * 72}\n# ARM: {key}\n{'#' * 72}")
+            results[key] = _run_arm(
+                arm, controller0, fm0, value0, generator, layout, tb, sigmas,
+                x_probe=x_probe, x_eval=x_eval, r_eval=r_eval, probe_leaves=probe_leaves,
+                level_feats=level_feats, seed=seed, L=L, v=v, s=s, state_dim=state_dim,
+                rounds=rounds, fm_epochs=fm_epochs, lp_steps=lp_steps,
+                floor_draws=floor_draws, tap_ema=tap_ema,
+                batch_size=batch_size, n_corrupt=n_corrupt, edit_budget=edit_budget,
+                drift_kappa=drift_kappa, drift_steps_per_round=drift_steps_per_round,
+                drift_prewarm=drift_prewarm, levels=levels, theta0=theta0,
+                lam_fm=lam_fm, lam_plan=lam_plan, tau=tau, probe_steps=probe_steps,
+                grade_every=grade_every, ballistic_chunk=ballistic_chunk, policy=policy,
+                render=render, device=device, **cfg)
+            results[key]["samples_per_event"] = S
+            results[key]["arm"] = arm
 
     # ---- the cross-arm difference-in-differences ----------------------------------------
     readout = {}
-    if "nodrift" in results:
-        ref = results["nodrift"]["rounds"]
+    for S in sweep:
+        if f"nodrift@{S}" not in results:
+            continue
+        ref = results[f"nodrift@{S}"]["rounds"]
         for arm in arm_list:
             if arm == "nodrift":
                 continue
-            cur = results[arm]["rounds"]
+            cur = results[f"{arm}@{S}"]["rounds"]
             n = min(len(cur), len(ref))
             # resolution floor from the arm's OWN damage series (half the median), so an
             # event too small to measure is reported out of range instead of dividing to a
@@ -263,24 +303,41 @@ def climb(
                     rec[f"{key}_residual"] = res
                     rec[f"{key}_repaired"] = repaired_fraction(dmg, res, floors[key])
                 per_round.append(rec)
-            readout[arm] = {"resolution_floors": floors, "per_round": per_round}
+            readout[f"{arm}@{S}"] = {"resolution_floors": floors,
+                                     "per_round": per_round}
 
-    print(f"\n{'=' * 78}\n=== SUMMARY -- repair per drift event vs the depth probe ===\n{'=' * 78}")
-    for arm in arm_list:
-        rr = results[arm]["rounds"]
-        d0, dN = rr[0]["depth"], rr[-1]["depth"]
-        print(f"\n[{arm}]  depth r1 -> r{len(rr)}: " + "  ".join(
-            f"{k}={d0[k]:.3f}->{dN[k]:.3f}" for k in d0))
-        if arm in readout and readout[arm]["per_round"]:
-            pr = readout[arm]["per_round"]
-            print("  event KL : " + "  ".join(f"r{x['round']}={x['kl_event']:.3f}" for x in pr))
-            print("  repaired fraction of same-magnitude damage, per event:")
-            print("    root CE (fixed instrument) : " + "  ".join(
-                f"r{x['round']}={x['root_ce_repaired']:+.2f}" for x in pr))
-            print("    tree FM (moving instrument): " + "  ".join(
-                f"r{x['round']}={x['tree_fm_err_repaired']:+.2f}" for x in pr))
-            print("    root-CE damage             : " + "  ".join(
-                f"r{x['round']}={x['root_ce_damage']:+.4f}" for x in pr))
+    print(f"\n{'=' * 78}\n=== SUMMARY -- does starving samples/event make the deep level NECESSARY? ==="
+          f"\n{'=' * 78}")
+    print("The claim under test is that climbing appears only once post-drift SURFACE repair")
+    print("stops sufficing. `unrepaired` is the fraction of same-magnitude damage still")
+    print("standing at the end of the round: ~0 means invariance is free and nothing prices it.\n")
+    print(f"{'S/event':>8s} {'unrepaired':>11s} {'Δd1':>7s} {'Δd2':>7s} {'Δd3':>7s} {'Δd4':>7s} {'ΔPR':>7s}")
+    for S in sweep:
+        nd = results.get(f"nodrift@{S}")
+        for arm in arm_list:
+            if arm == "nodrift" or f"{arm}@{S}" not in results:
+                continue
+            rr, ndr = results[f"{arm}@{S}"]["rounds"], nd["rounds"]
+            pr = readout.get(f"{arm}@{S}", {}).get("per_round", [])
+            ur = [1.0 - x["root_ce_repaired"] for x in pr[len(pr) // 2:]
+                  if np.isfinite(x["root_ce_repaired"])]
+            d = {k: (rr[-1]["depth"][k] - rr[0]["depth"][k])
+                    - (ndr[-1]["depth"][k] - ndr[0]["depth"][k])
+                 for k in ("d1", "d2", "d3", "d4", "PR")}
+            print(f"{S:>8d} {(np.mean(ur) if ur else float('nan')):>11.2f} "
+                  + " ".join(f"{d[k]:>+7.3f}" for k in ("d1", "d2", "d3", "d4"))
+                  + f" {d['PR']:>+7.2f}")
+    print("\n  climbing = unrepaired rises AND Δdepth turns positive at the same budget.")
+    for S in sweep:
+        for arm in arm_list:
+            key = f"{arm}@{S}"
+            if key not in results:
+                continue
+            rr = results[key]["rounds"]
+            print(f"  [{key:16s}] depth " + "  ".join(
+                f"{k}={rr[-1]['depth'][k]:.3f}" for k in ("d1", "d2", "d3", "d4"))
+                + f"  PR={rr[-1]['depth']['PR']:.1f}  rootCE={rr[-1]['root_ce_end']:.4f}"
+                + f"  meter={rr[-1]['meter']['ratio']:.2f}x")
 
     metrics = {
         "config": {"v": v, "s": s, "tree_depth": tree_depth, "total_len": T,
@@ -288,6 +345,7 @@ def climb(
                    "collect_budget": collect_budget, "belief_steps": belief_steps,
                    "drift_kl_per_seq": drift_kl, "drift_kappa": drift_kappa,
                    "drift_steps_per_round": drift_steps_per_round, "arms": arm_list,
+                   "samples_sweep": sweep, "policy_drive": policy,
                    "entropy_matched_base": entropy_matched_base, "calibrate": "event",
                    "policy": policy, "render": render, "seed": seed,
                    "arm_levels": {a: (None if ARM_LEVELS[a] is None else (L + ARM_LEVELS[a]) % L)
@@ -318,7 +376,8 @@ def _tree_err(fm, controller, generator, tb, x_probe, *, render, gen, device, se
 def _run_arm(arm, controller0, fm0, value0, generator, layout, tb, sigmas, *, levels, theta0,
              x_probe, x_eval,
              r_eval, probe_leaves, level_feats, seed, L, v, s, state_dim, rounds,
-             collect_budget, mon_n, forecast_n, fm_epochs, lp_steps, belief_steps,
+             collect_budget, mon_n, forecast_n, floor_n, floor_draws, tap_ema, fm_epochs,
+             lp_steps, belief_steps,
              ground_states, anchor_pool, batch_size, n_corrupt, edit_budget, drift_kappa,
              drift_steps_per_round, drift_prewarm, lam_fm, lam_plan, tau, probe_steps, grade_every,
              ballistic_chunk, policy, render, device):
@@ -363,6 +422,8 @@ def _run_arm(arm, controller0, fm0, value0, generator, layout, tb, sigmas, *, le
         prewarm_drift(layout, drift_rng, drift_prewarm)
         refresh_w_blk(tb, layout, device)
     meter = Meter()
+    satiety = np.zeros(n_ch)
+    lp_s = red_s = None
     rows = []
 
     for rnd in range(1, rounds + 1):
@@ -390,9 +451,25 @@ def _run_arm(arm, controller0, fm0, value0, generator, layout, tb, sigmas, *, le
                                     batch_size=batch_size, lr=1e-3, meter=meter,
                                     render=render, gen=gen, device=device)
         errors = {c: lp_info[c]["e_before"] for c in range(n_ch)}
-        lprog = {c: lp_info[c]["lp"] for c in range(n_ch)}
+        lp_raw = {c: lp_info[c]["lp"] for c in range(n_ch)}
+        # the REPAIRED reducibility tap, so §12's mechanism (satiate on what has stopped
+        # paying, move on) is actually present in this loop. The first climb run allocated by
+        # `lprog x visits`, whose LP estimator was inverted by data starvation -- so the one
+        # mechanism the idea doc says produces climbing was never in the loop being asked to
+        # produce it.
+        x_fl, _ = sample_states(layout, tb, generator, n=floor_n, n_corrupt=n_corrupt,
+                                presteps=edit_budget // 2, seed=seed + 46, device=device,
+                                render=render, gen=gen)
+        floors_c = measure_floors(controller, generator, tb, x_fl, meter=meter,
+                                  n_draws=floor_draws, render=render, gen=gen, device=device,
+                                  seed=seed + 47)
+        red_raw = reducible_fraction(errors, floors_c, n_ch)
+        lp_s = ema(lp_s if rnd > 1 else None, lp_raw, tap_ema, n_ch)
+        red_s = ema(red_s if rnd > 1 else None, red_raw, tap_ema, n_ch)
+        lprog, reducible = lp_s, red_s
         noise_ch = [c for c, ch in enumerate(layout["channels"]) if ch["kind"] == "noise"]
         lp_floor = float(max(abs(lprog[c]) for c in noise_ch)) if noise_ch else 0.0
+        red_floor = float(max(reducible[c] for c in noise_ch)) if noise_ch else 0.0
 
         x_fc, r_fc = sample_states(layout, tb, generator, n=forecast_n, n_corrupt=n_corrupt,
                                    presteps=0, seed=seed + 9500 + rnd * 7, device=device,
@@ -402,7 +479,9 @@ def _run_arm(arm, controller0, fm0, value0, generator, layout, tb, sigmas, *, le
                                       budget=edit_budget, device=device)
         w, _drive = allocate(policy, errors=errors, lprog=lprog, visits=visits,
                              tree_channel=tb["tree_channel"], n_channels=n_ch,
-                             lp_floor=lp_floor, eps=0.01)
+                             lp_floor=lp_floor, reducible=reducible, red_floor=red_floor,
+                             satiety=satiety, beta_sat=1.0, eps=0.01)
+        satiety = 0.7 * satiety + w
 
         x_col, _ = sample_states(layout, tb, generator, n=collect_budget, n_corrupt=n_corrupt,
                                  presteps=edit_budget // 2, seed=seed + 10_000 + rnd * 7,
@@ -457,6 +536,7 @@ def _run_arm(arm, controller0, fm0, value0, generator, layout, tb, sigmas, *, le
                "root_ce_stale": stale["root_ce"], "root_ce_end": end["root_ce"],
                "dstar_cur": d_cur, "dstar_best_move": d_best,
                "alloc": {names[c]: float(w[c]) for c in range(n_ch)},
+               "reducible": {names[c]: float(reducible[c]) for c in range(n_ch)},
                "root_acc": info.get("root_acc"), "plan_acc": info.get("plan_acc"),
                "meter": {"collect": meter.collect, "monitor": meter.monitor,
                          "ratio": meter.ratio}}

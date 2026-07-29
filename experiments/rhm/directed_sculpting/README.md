@@ -284,6 +284,16 @@ negative, under instruments that had to be repaired twice, each repair removing 
 positive result. The port passes a back-compat gate against the single-channel apparatus (`delta_cos` 0.492 vs
 the reference's 0.486).
 
+**A follow-up sweep re-opens the climb question.** The climb null held only because surface re-fit repaired
+**91%** of each drift event, so invariance was free and nothing ever priced the integrated cost — *invariance ≠
+necessity*. Starving **samples per event** at fixed drift magnitude makes the drifting arm's depth advantage
+**migrate from the surface to the deep levels**, monotonically across four budgets (t = −5.44, 3/3 seeds). Small
+and single-instrument, but the first positive on the climbing axis. Separately, repairing the `e` tap
+(floor-corrected reducibility, with the aleatoric floor *measured* by repeat-execution) buys −0.054 ± 0.009 over
+the counterfactual fit and an 8× drop in allocation variance — and shows the ladder cannot separate
+relevance×reducibility from relevance alone *by construction*, since this geometry has no
+visited-but-irreducible cell.
+
 **Also lands two corrections to this node's own primitives**, both now default-off in
 [`../rhm_drift.py`](../rhm_drift.py): the OU walk anchors at the *maximum-entropy* point of the simplex, so a
 uniform-anchored static control is a handicap rather than a control (~18% on the FM's stochasticity floor); and

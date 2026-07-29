@@ -618,6 +618,71 @@ def counterfactual_lp(fm, controller, generator, tb, x_mon, *, lp_steps, batch_s
     return out
 
 
+def measure_floors(controller, generator, tb, x, *, meter, n_draws, render, gen, device,
+                   seed=0):
+    """Per-channel ALEATORIC FLOOR: the error no forward model can beat, measured by executing
+    the same command from the same state `n_draws` times and reading the residual around the
+    conditional mean. Charged to the monitor meter -- this is work the agent does, not a
+    privileged lookup, and nothing about it needs a channel label.
+
+    This is the honest replacement for the idea doc's "filtered by fresh-FM-ensemble
+    invariance so it rejects the noisy TV" (§4). An ensemble filter infers irreducibility;
+    repeat-execution MEASURES it, which is a thing RHM's exact re-executability hands us and
+    a physical substrate does not.
+    """
+    import torch
+    g = torch.Generator(device=device).manual_seed(seed)
+    out = {}
+    for c in range(tb["n_channels"]):
+        blks = blocks_of_channel(tb, c)
+        k = blks[torch.randint(0, len(blks), (x.shape[0],), device=device, generator=g)]
+        with torch.no_grad():
+            z = _block_state_chunked(controller, x)
+            deltas = []
+            for _ in range(n_draws):
+                x2 = regenerate_block(generator, x, k, tb, render=render, gen=gen)
+                deltas.append(_block_state_chunked(controller, x2) - z)
+                meter.charge_monitor(x.shape[0])
+            d = torch.stack(deltas)
+            idx = k[None, :, None, None].expand(n_draws, -1, 1, d.shape[3])
+            d = d.gather(2, idx)                                  # acted block only
+            mu = d.mean(dim=0, keepdim=True)
+            num = float((d - mu).pow(2).sum())
+            den = float(d.pow(2).sum()) + 1e-12
+        out[c] = (num / den) * n_draws / max(n_draws - 1, 1)       # unbiased for n draws
+    return out
+
+
+def reducible_fraction(errors, floors, n_channels, eps=1e-6):
+    """What fraction of a channel's CURRENT error is even removable: `(e - floor) / e`.
+
+    The `e` tap, done as a STOCK rather than a FLOW -- and that is the whole fix. A
+    counterfactual-fit LP measures marginal return, which early in training is dominated by
+    how STARVED a channel is rather than how REDUCIBLE it is: under a block-proportional warm
+    start the 1-block noise channels are furthest back on their learning curve, so probing
+    them yields the biggest held-out drop and the noisy-TV *filter* becomes the noisy-TV
+    *attractor* (measured mean LP: tree +0.044 < structA +0.053 < structB +0.057 < noise
+    +0.064/+0.066 -- exactly inverted).
+
+    Floor-relative reducibility cannot be fooled that way, because it does not ask where the
+    channel sits on its curve. Measured on the same run: tree 0.709 ~ structA 0.712 >
+    structB 0.500 > noise 0.454/0.444 -- correctly ordered. It is also far lower-variance,
+    needing two error measurements instead of an SGD fit (the fit's noise, not its bias, is
+    what actually cost `value` the ladder: implied tree share 61% against a realised 44% with
+    sd 0.309).
+    """
+    return {c: max(errors[c] - floors[c], 0.0) / max(errors[c], eps) for c in range(n_channels)}
+
+
+def ema(prev, now, alpha, n_channels):
+    """Exponential smoothing of a per-channel tap. `learning progress` is a derivative
+    estimate, and a one-shot derivative off a fresh sample is dominated by sampling noise --
+    the arm that used it swung between 1% and 93% of its budget on the target across rounds."""
+    if prev is None:
+        return dict(now)
+    return {c: (1.0 - alpha) * prev[c] + alpha * now[c] for c in range(n_channels)}
+
+
 # --------------------------------------------------------------------------- #
 # The `p` tap: forecast visitation by ROLLING the FM (no materialisation)
 # --------------------------------------------------------------------------- #
@@ -972,11 +1037,11 @@ def tree_depth_probe(controller, probe_leaves, level_feats, layout, tb, device,
 # --------------------------------------------------------------------------- #
 
 POLICIES = ("uniform", "error_only", "lprog_only", "visits_only", "value",
-            "value_satiety", "oracle")
+            "value_satiety", "reducible_only", "value_red", "value_red_satiety", "oracle")
 
 
 def allocate(policy, *, errors, lprog, visits, tree_channel, n_channels, lp_floor,
-             satiety=None, beta_sat=1.0, eps=0.02):
+             reducible=None, red_floor=0.0, satiety=None, beta_sat=1.0, eps=0.02):
     """Per-channel budget shares. `eps` is an identical uniform floor for every policy, so
     the arms differ only in their signal (and so that a policy is never handed an all-zero
     signal). Returns (weights, drive) with `drive` the per-channel signal actually used.
@@ -1018,6 +1083,23 @@ def allocate(policy, *, errors, lprog, visits, tree_channel, n_channels, lp_floo
             # satiating rung would lose to plain `value` for a reason that has nothing to do
             # with satiety. Falling back to `value` keeps the rung nested inside it.
             drive = np.maximum(lp, 0.0) * vis
+    elif policy in ("reducible_only", "value_red", "value_red_satiety"):
+        red = np.asarray([reducible[c] for c in range(n_channels)], dtype=np.float64)
+        if policy == "reducible_only":
+            drive = red.copy()
+        elif policy == "value_red":
+            drive = red * vis
+        else:
+            # Satiety on a drive that is not inverted, so §10's prediction is finally
+            # testable. The exclusion threshold is calibrated off the IRREDUCIBLE channels'
+            # own apparent reducibility -- they cannot be reduced, so whatever they show is
+            # what "no real headroom" looks like on this instrument -- and it HARDENS with
+            # accumulated spending, so a channel that has stopped paying is pushed out rather
+            # than left to be re-picked by estimator noise.
+            sat = np.zeros(n_channels) if satiety is None else np.asarray(satiety)
+            drive = np.maximum(red - red_floor * (1.0 + beta_sat * sat), 0.0) * vis
+            if drive.sum() <= 0:
+                drive = red * vis                    # fall back to the unsatiated drive
     elif policy == "oracle":
         drive = np.zeros(n_channels)
         drive[tree_channel] = 1.0
