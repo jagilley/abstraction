@@ -1,0 +1,723 @@
+{
+  "config": {
+    "v": 16,
+    "s": 2,
+    "depth": 6,
+    "m": 3,
+    "rule_seed": 0,
+    "subtree_roots": "0,1,2,3",
+    "n_layer": 8,
+    "n_head": 8,
+    "n_embd": 256,
+    "seed_pool": 65536,
+    "warmup_steps": 8000,
+    "rounds": 8,
+    "steps_per_round": 1500,
+    "batch_size": 64,
+    "lr": 0.0003,
+    "weight_decay": 0.01,
+    "data_seed": 7,
+    "n_candidates": 73728,
+    "accept_quota": 8192,
+    "prefix_frac": 0.5,
+    "temperature": 1.0,
+    "mint_weight": -1.0,
+    "n_eval": 8000,
+    "n_val": 2000,
+    "n_gen_probe": 2048,
+    "eval_seed": 999,
+    "probe_steps": 600,
+    "probe_lr": 0.01,
+    "mlp_hidden": 128,
+    "mlp_steps": 800,
+    "seed": 2,
+    "quick": false
+  },
+  "breadth": "narrow",
+  "acceptance": "static",
+  "seed_pool_stats": {
+    "n": 65536,
+    "valid_frac": 1.0,
+    "parse_level_mean": 6.0,
+    "parse_level_hist": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      65536
+    ],
+    "root_union_size": 16,
+    "root_set_size_mean": 1.1490325927734375,
+    "root_only_outside_S": 0.0,
+    "root_any_outside_S": 0.1291656494140625,
+    "level_union_size": [
+      16,
+      16,
+      16,
+      16,
+      16,
+      16
+    ],
+    "distinct_frac": 1.0,
+    "pair_entropy_nats": 3.6029192703720585
+  },
+  "rounds": [
+    {
+      "round": 0,
+      "pool_size": 65536,
+      "mint_pool_size": 0,
+      "mint_gradient_share": 0.0,
+      "val": {
+        "S": 1.2788782715797424,
+        "complement": 1.2999194145202637,
+        "full": 1.295699679851532
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.056640625,
+          "parse_level_mean": 3.38037109375,
+          "parse_level_hist": [
+            36,
+            59,
+            265,
+            856,
+            510,
+            206,
+            116
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1637931034482758,
+          "root_only_outside_S": 0.04150390625,
+          "root_any_outside_S": 0.04638671875,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.612389881691778,
+          "mean_logprob": -1.217712640762329
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.06640625,
+          "parse_level_mean": 3.423828125,
+          "parse_level_hist": [
+            24,
+            66,
+            270,
+            823,
+            524,
+            205,
+            136
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.2279411764705883,
+          "root_only_outside_S": 0.03369140625,
+          "root_any_outside_S": 0.04150390625,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6091082188119192,
+          "mean_logprob": -1.218925952911377
+        }
+      }
+    },
+    {
+      "round": 1,
+      "pool_size": 65536,
+      "mint_pool_size": 0,
+      "mint_gradient_share": 0.0,
+      "val": {
+        "S": 1.2698169708251954,
+        "complement": 1.294040286540985,
+        "full": 1.2891164064407348
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.08837890625,
+          "parse_level_mean": 3.59423828125,
+          "parse_level_hist": [
+            11,
+            57,
+            222,
+            774,
+            563,
+            240,
+            181
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.2044198895027625,
+          "root_only_outside_S": 0.05224609375,
+          "root_any_outside_S": 0.0615234375,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6045341140021825,
+          "mean_logprob": -1.2040084600448608
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.07958984375,
+          "parse_level_mean": 3.56298828125,
+          "parse_level_hist": [
+            21,
+            64,
+            243,
+            725,
+            566,
+            266,
+            163
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.165644171779141,
+          "root_only_outside_S": 0.04150390625,
+          "root_any_outside_S": 0.048828125,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6092280350554344,
+          "mean_logprob": -1.2091623544692993
+        }
+      }
+    },
+    {
+      "round": 2,
+      "pool_size": 65536,
+      "mint_pool_size": 0,
+      "mint_gradient_share": 0.0,
+      "val": {
+        "S": 1.2650329232215882,
+        "complement": 1.2916808009147644,
+        "full": 1.2834241151809693
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.0947265625,
+          "parse_level_mean": 3.6484375,
+          "parse_level_hist": [
+            15,
+            65,
+            220,
+            709,
+            549,
+            296,
+            194
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1597938144329898,
+          "root_only_outside_S": 0.0576171875,
+          "root_any_outside_S": 0.064453125,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.609139142324771,
+          "mean_logprob": -1.2016329765319824
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.08935546875,
+          "parse_level_mean": 3.6435546875,
+          "parse_level_hist": [
+            15,
+            60,
+            209,
+            715,
+            589,
+            277,
+            183
+          ],
+          "root_union_size": 15,
+          "root_set_size_mean": 1.169398907103825,
+          "root_only_outside_S": 0.04052734375,
+          "root_any_outside_S": 0.05078125,
+          "level_union_size": [
+            15,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.606770038223754,
+          "mean_logprob": -1.205439567565918
+        }
+      }
+    },
+    {
+      "round": 3,
+      "pool_size": 65536,
+      "mint_pool_size": 0,
+      "mint_gradient_share": 0.0,
+      "val": {
+        "S": 1.2629006028175354,
+        "complement": 1.2966681361198424,
+        "full": 1.288325047492981
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.1259765625,
+          "parse_level_mean": 3.86083984375,
+          "parse_level_hist": [
+            18,
+            45,
+            182,
+            592,
+            591,
+            362,
+            258
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.2054263565891472,
+          "root_only_outside_S": 0.07373046875,
+          "root_any_outside_S": 0.0888671875,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6039085610452655,
+          "mean_logprob": -1.1818339824676514
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.13134765625,
+          "parse_level_mean": 3.92529296875,
+          "parse_level_hist": [
+            19,
+            46,
+            142,
+            572,
+            621,
+            379,
+            269
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1933085501858736,
+          "root_only_outside_S": 0.0595703125,
+          "root_any_outside_S": 0.07666015625,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6046496214418116,
+          "mean_logprob": -1.1825765371322632
+        }
+      }
+    },
+    {
+      "round": 4,
+      "pool_size": 65536,
+      "mint_pool_size": 0,
+      "mint_gradient_share": 0.0,
+      "val": {
+        "S": 1.2594663381576539,
+        "complement": 1.2985915541648865,
+        "full": 1.2864291191101074
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.13232421875,
+          "parse_level_mean": 3.92138671875,
+          "parse_level_hist": [
+            15,
+            41,
+            139,
+            625,
+            574,
+            383,
+            271
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1771217712177122,
+          "root_only_outside_S": 0.07470703125,
+          "root_any_outside_S": 0.08544921875,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.602735023936654,
+          "mean_logprob": -1.1768217086791992
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.13623046875,
+          "parse_level_mean": 3.9716796875,
+          "parse_level_hist": [
+            17,
+            41,
+            140,
+            535,
+            646,
+            390,
+            279
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.189964157706093,
+          "root_only_outside_S": 0.05859375,
+          "root_any_outside_S": 0.07568359375,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.598623345983638,
+          "mean_logprob": -1.1811023950576782
+        }
+      }
+    },
+    {
+      "round": 5,
+      "pool_size": 65536,
+      "mint_pool_size": 0,
+      "mint_gradient_share": 0.0,
+      "val": {
+        "S": 1.2582472085952758,
+        "complement": 1.3006241202354432,
+        "full": 1.2864358305931092
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.14990234375,
+          "parse_level_mean": 4.0087890625,
+          "parse_level_hist": [
+            18,
+            34,
+            158,
+            518,
+            601,
+            412,
+            307
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1791530944625408,
+          "root_only_outside_S": 0.08837890625,
+          "root_any_outside_S": 0.099609375,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.604225309542624,
+          "mean_logprob": -1.1686595678329468
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.14697265625,
+          "parse_level_mean": 4.04833984375,
+          "parse_level_hist": [
+            11,
+            42,
+            142,
+            479,
+            643,
+            430,
+            301
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.176079734219269,
+          "root_only_outside_S": 0.0625,
+          "root_any_outside_S": 0.07958984375,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6055315227684,
+          "mean_logprob": -1.1736860275268555
+        }
+      }
+    },
+    {
+      "round": 6,
+      "pool_size": 65536,
+      "mint_pool_size": 0,
+      "mint_gradient_share": 0.0,
+      "val": {
+        "S": 1.2596331000328065,
+        "complement": 1.3033925652503968,
+        "full": 1.2930500507354736
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.150390625,
+          "parse_level_mean": 4.00537109375,
+          "parse_level_hist": [
+            21,
+            43,
+            141,
+            528,
+            589,
+            418,
+            308
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.2077922077922079,
+          "root_only_outside_S": 0.0771484375,
+          "root_any_outside_S": 0.0947265625,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6120835820608854,
+          "mean_logprob": -1.165716290473938
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.18017578125,
+          "parse_level_mean": 4.1279296875,
+          "parse_level_hist": [
+            23,
+            29,
+            125,
+            487,
+            575,
+            440,
+            369
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1544715447154472,
+          "root_only_outside_S": 0.0751953125,
+          "root_any_outside_S": 0.09375,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6125324364638463,
+          "mean_logprob": -1.1652742624282837
+        }
+      }
+    },
+    {
+      "round": 7,
+      "pool_size": 65536,
+      "mint_pool_size": 0,
+      "mint_gradient_share": 0.0,
+      "val": {
+        "S": 1.2602081060409547,
+        "complement": 1.3033411622047424,
+        "full": 1.2946590900421142
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.1533203125,
+          "parse_level_mean": 4.04638671875,
+          "parse_level_hist": [
+            19,
+            37,
+            137,
+            502,
+            609,
+            430,
+            314
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1751592356687899,
+          "root_only_outside_S": 0.09228515625,
+          "root_any_outside_S": 0.10595703125,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6054271863528706,
+          "mean_logprob": -1.161452293395996
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.17236328125,
+          "parse_level_mean": 4.12060546875,
+          "parse_level_hist": [
+            12,
+            42,
+            130,
+            487,
+            562,
+            462,
+            353
+          ],
+          "root_union_size": 15,
+          "root_set_size_mean": 1.1954674220963173,
+          "root_only_outside_S": 0.0732421875,
+          "root_any_outside_S": 0.09375,
+          "level_union_size": [
+            15,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.607670057133645,
+          "mean_logprob": -1.16343355178833
+        }
+      }
+    }
+  ],
+  "recovery": {
+    "S": {
+      "linear_best": {
+        "d6": 0.4845833480358124,
+        "d5": 0.7141667008399963,
+        "d4": 0.9608333706855774,
+        "d3": 0.9929167032241821,
+        "d2": 0.9970833659172058,
+        "d1": 0.99958336353302
+      },
+      "mlp_best": {
+        "d6": 0.5354166626930237,
+        "d5": 0.8070833683013916,
+        "d4": 0.9675000309944153,
+        "d3": 0.9937500357627869,
+        "d2": 0.9975000023841858,
+        "d1": 0.9991666674613953
+      }
+    },
+    "complement": {
+      "linear_best": {
+        "d6": 0.24166667461395264,
+        "d5": 0.5095833539962769,
+        "d4": 0.92125004529953,
+        "d3": 0.9816666841506958,
+        "d2": 0.9941666722297668,
+        "d1": 0.9987500309944153
+      },
+      "mlp_best": {
+        "d6": 0.2679166793823242,
+        "d5": 0.5920833349227905,
+        "d4": 0.9345833659172058,
+        "d3": 0.9829167127609253,
+        "d2": 0.9945833683013916,
+        "d1": 0.9991666674613953
+      }
+    },
+    "full": {
+      "linear_best": {
+        "d6": 0.17166666686534882,
+        "d5": 0.5266667008399963,
+        "d4": 0.9241666793823242,
+        "d3": 0.9795833826065063,
+        "d2": 0.9916666746139526,
+        "d1": 0.9975000023841858
+      },
+      "mlp_best": {
+        "d6": 0.19875000417232513,
+        "d5": 0.6079166531562805,
+        "d4": 0.9366666674613953,
+        "d3": 0.9791666865348816,
+        "d2": 0.9912500381469727,
+        "d1": 0.9975000023841858
+      }
+    }
+  },
+  "final_pool_size": 65536,
+  "final_mint_pool_size": 0,
+  "final_mint_stats": null,
+  "final_pool_stats": {
+    "n": 65536,
+    "valid_frac": 1.0,
+    "parse_level_mean": 6.0,
+    "parse_level_hist": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      65536
+    ],
+    "root_union_size": 16,
+    "root_set_size_mean": 1.1490325927734375,
+    "root_only_outside_S": 0.0,
+    "root_any_outside_S": 0.1291656494140625,
+    "level_union_size": [
+      16,
+      16,
+      16,
+      16,
+      16,
+      16
+    ],
+    "distinct_frac": 1.0,
+    "pair_entropy_nats": 3.6029192703720585
+  }
+}

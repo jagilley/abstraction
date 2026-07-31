@@ -1,0 +1,1246 @@
+{
+  "config": {
+    "v": 16,
+    "s": 2,
+    "depth": 6,
+    "m": 3,
+    "rule_seed": 0,
+    "subtree_roots": "0,1,2,3",
+    "n_layer": 8,
+    "n_head": 8,
+    "n_embd": 256,
+    "seed_pool": 65536,
+    "warmup_steps": 8000,
+    "rounds": 8,
+    "steps_per_round": 1500,
+    "batch_size": 64,
+    "lr": 0.0003,
+    "weight_decay": 0.01,
+    "data_seed": 7,
+    "n_candidates": 73728,
+    "accept_quota": 8192,
+    "prefix_frac": 0.5,
+    "temperature": 1.0,
+    "mint_weight": -1.0,
+    "n_eval": 8000,
+    "n_val": 2000,
+    "n_gen_probe": 2048,
+    "eval_seed": 999,
+    "probe_steps": 600,
+    "probe_lr": 0.01,
+    "mlp_hidden": 128,
+    "mlp_steps": 800,
+    "seed": 42,
+    "quick": false
+  },
+  "breadth": "narrow",
+  "acceptance": "random",
+  "seed_pool_stats": {
+    "n": 65536,
+    "valid_frac": 1.0,
+    "parse_level_mean": 6.0,
+    "parse_level_hist": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      65536
+    ],
+    "root_union_size": 16,
+    "root_set_size_mean": 1.1490325927734375,
+    "root_only_outside_S": 0.0,
+    "root_any_outside_S": 0.1291656494140625,
+    "level_union_size": [
+      16,
+      16,
+      16,
+      16,
+      16,
+      16
+    ],
+    "distinct_frac": 1.0,
+    "pair_entropy_nats": 3.6029192703720585
+  },
+  "rounds": [
+    {
+      "round": 0,
+      "pool_size": 65536,
+      "mint_pool_size": 0,
+      "mint_gradient_share": 0.0,
+      "val": {
+        "S": 1.2798136711120605,
+        "complement": 1.30093914270401,
+        "full": 1.2942036628723144
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.05712890625,
+          "parse_level_mean": 3.31201171875,
+          "parse_level_hist": [
+            14,
+            93,
+            316,
+            865,
+            454,
+            189,
+            117
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.2393162393162394,
+          "root_only_outside_S": 0.0380859375,
+          "root_any_outside_S": 0.04345703125,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.608110507762907,
+          "mean_logprob": -1.225571870803833
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.05859375,
+          "parse_level_mean": 3.3681640625,
+          "parse_level_hist": [
+            19,
+            92,
+            284,
+            834,
+            479,
+            220,
+            120
+          ],
+          "root_union_size": 15,
+          "root_set_size_mean": 1.225,
+          "root_only_outside_S": 0.0263671875,
+          "root_any_outside_S": 0.033203125,
+          "level_union_size": [
+            15,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6095148158679713,
+          "mean_logprob": -1.223367691040039
+        }
+      },
+      "candidates": {
+        "n": 73728,
+        "valid_frac": 0.05837673611111111,
+        "parse_level_mean": 3.3168402777777777,
+        "parse_level_hist": [
+          739,
+          3679,
+          10576,
+          30951,
+          16359,
+          7120,
+          4304
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1802973977695168,
+        "root_only_outside_S": 0.030476888020833332,
+        "root_any_outside_S": 0.03663465711805555,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.6107211053141883,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.227062463760376
+      },
+      "accepted": {
+        "n": 8192,
+        "valid_frac": 0.06005859375,
+        "parse_level_mean": 3.3125,
+        "parse_level_hist": [
+          84,
+          419,
+          1170,
+          3462,
+          1786,
+          779,
+          492
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.184959349593496,
+        "root_only_outside_S": 0.030029296875,
+        "root_any_outside_S": 0.0364990234375,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.6104641080382525,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2274467945098877,
+        "yield_": 73728,
+        "quota_met": true
+      }
+    },
+    {
+      "round": 1,
+      "pool_size": 73728,
+      "mint_pool_size": 8192,
+      "mint_gradient_share": -1.0,
+      "val": {
+        "S": 1.2731582880020142,
+        "complement": 1.2949846267700196,
+        "full": 1.2877048969268798
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.06640625,
+          "parse_level_mean": 3.470703125,
+          "parse_level_hist": [
+            20,
+            70,
+            263,
+            789,
+            521,
+            249,
+            136
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1691176470588236,
+          "root_only_outside_S": 0.041015625,
+          "root_any_outside_S": 0.04833984375,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.607690517869483,
+          "mean_logprob": -1.2127881050109863
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.07421875,
+          "parse_level_mean": 3.5029296875,
+          "parse_level_hist": [
+            15,
+            99,
+            229,
+            748,
+            564,
+            241,
+            152
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1513157894736843,
+          "root_only_outside_S": 0.03662109375,
+          "root_any_outside_S": 0.04296875,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.607793895937605,
+          "mean_logprob": -1.2148852348327637
+        }
+      },
+      "candidates": {
+        "n": 73728,
+        "valid_frac": 0.07527669270833333,
+        "parse_level_mean": 3.5008002387152777,
+        "parse_level_hist": [
+          759,
+          2941,
+          8829,
+          27280,
+          19477,
+          8892,
+          5550
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1733333333333333,
+        "root_only_outside_S": 0.03701443142361111,
+        "root_any_outside_S": 0.045369466145833336,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.6103130500218867,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.215528964996338
+      },
+      "accepted": {
+        "n": 8192,
+        "valid_frac": 0.0777587890625,
+        "parse_level_mean": 3.50048828125,
+        "parse_level_hist": [
+          95,
+          351,
+          977,
+          3025,
+          2061,
+          1046,
+          637
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.163265306122449,
+        "root_only_outside_S": 0.0377197265625,
+        "root_any_outside_S": 0.0460205078125,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.6128747856650616,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2165255546569824,
+        "yield_": 73728,
+        "quota_met": true
+      }
+    },
+    {
+      "round": 2,
+      "pool_size": 81920,
+      "mint_pool_size": 16384,
+      "mint_gradient_share": -1.0,
+      "val": {
+        "S": 1.269643783569336,
+        "complement": 1.2928020358085632,
+        "full": 1.2845304608345032
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.0830078125,
+          "parse_level_mean": 3.51611328125,
+          "parse_level_hist": [
+            12,
+            74,
+            274,
+            767,
+            497,
+            254,
+            170
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1823529411764706,
+          "root_only_outside_S": 0.0576171875,
+          "root_any_outside_S": 0.06201171875,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6096286446604373,
+          "mean_logprob": -1.2176218032836914
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.08447265625,
+          "parse_level_mean": 3.5263671875,
+          "parse_level_hist": [
+            19,
+            84,
+            253,
+            720,
+            561,
+            238,
+            173
+          ],
+          "root_union_size": 15,
+          "root_set_size_mean": 1.1445086705202312,
+          "root_only_outside_S": 0.03857421875,
+          "root_any_outside_S": 0.04638671875,
+          "level_union_size": [
+            15,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.613806700975022,
+          "mean_logprob": -1.2210733890533447
+        }
+      },
+      "candidates": {
+        "n": 73728,
+        "valid_frac": 0.081298828125,
+        "parse_level_mean": 3.5271402994791665,
+        "parse_level_hist": [
+          729,
+          2868,
+          9127,
+          26437,
+          19213,
+          9360,
+          5994
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.173506840173507,
+        "root_only_outside_S": 0.039116753472222224,
+        "root_any_outside_S": 0.04832628038194445,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.6147642821959356,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2182923555374146
+      },
+      "accepted": {
+        "n": 8192,
+        "valid_frac": 0.081298828125,
+        "parse_level_mean": 3.5262451171875,
+        "parse_level_hist": [
+          64,
+          321,
+          1042,
+          2952,
+          2105,
+          1042,
+          666
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1921921921921923,
+        "root_only_outside_S": 0.03857421875,
+        "root_any_outside_S": 0.0494384765625,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.611295846175043,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2183125019073486,
+        "yield_": 73728,
+        "quota_met": true
+      }
+    },
+    {
+      "round": 3,
+      "pool_size": 90112,
+      "mint_pool_size": 24576,
+      "mint_gradient_share": -1.0,
+      "val": {
+        "S": 1.268209457397461,
+        "complement": 1.2920559406280518,
+        "full": 1.2857446789741516
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.07373046875,
+          "parse_level_mean": 3.53076171875,
+          "parse_level_hist": [
+            18,
+            73,
+            245,
+            759,
+            525,
+            277,
+            151
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1920529801324504,
+          "root_only_outside_S": 0.04638671875,
+          "root_any_outside_S": 0.05322265625,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.604231888208733,
+          "mean_logprob": -1.2105646133422852
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.091796875,
+          "parse_level_mean": 3.55078125,
+          "parse_level_hist": [
+            13,
+            84,
+            260,
+            726,
+            523,
+            254,
+            188
+          ],
+          "root_union_size": 15,
+          "root_set_size_mean": 1.1914893617021276,
+          "root_only_outside_S": 0.04736328125,
+          "root_any_outside_S": 0.056640625,
+          "level_union_size": [
+            15,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6017918938431173,
+          "mean_logprob": -1.2117323875427246
+        }
+      },
+      "candidates": {
+        "n": 73728,
+        "valid_frac": 0.08734809027777778,
+        "parse_level_mean": 3.5695393880208335,
+        "parse_level_hist": [
+          750,
+          2952,
+          8876,
+          25417,
+          18885,
+          10408,
+          6440
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1802795031055902,
+        "root_only_outside_S": 0.04391818576388889,
+        "root_any_outside_S": 0.053507486979166664,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.607319758359411,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2123339176177979
+      },
+      "accepted": {
+        "n": 8192,
+        "valid_frac": 0.0859375,
+        "parse_level_mean": 3.572021484375,
+        "parse_level_hist": [
+          102,
+          313,
+          936,
+          2893,
+          2046,
+          1198,
+          704
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1519886363636365,
+        "root_only_outside_S": 0.04443359375,
+        "root_any_outside_S": 0.0521240234375,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.608576043690891,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2122896909713745,
+        "yield_": 73728,
+        "quota_met": true
+      }
+    },
+    {
+      "round": 4,
+      "pool_size": 98304,
+      "mint_pool_size": 32768,
+      "mint_gradient_share": -1.0,
+      "val": {
+        "S": 1.2663515567779542,
+        "complement": 1.2912550687789917,
+        "full": 1.284072184562683
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.0810546875,
+          "parse_level_mean": 3.55224609375,
+          "parse_level_hist": [
+            19,
+            77,
+            241,
+            731,
+            543,
+            271,
+            166
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.2048192771084338,
+          "root_only_outside_S": 0.0478515625,
+          "root_any_outside_S": 0.0556640625,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6130705760708985,
+          "mean_logprob": -1.2080461978912354
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.0947265625,
+          "parse_level_mean": 3.6591796875,
+          "parse_level_hist": [
+            29,
+            71,
+            225,
+            658,
+            520,
+            351,
+            194
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1546391752577319,
+          "root_only_outside_S": 0.048828125,
+          "root_any_outside_S": 0.05859375,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6134179203029504,
+          "mean_logprob": -1.2105112075805664
+        }
+      },
+      "candidates": {
+        "n": 73728,
+        "valid_frac": 0.09663899739583333,
+        "parse_level_mean": 3.631198459201389,
+        "parse_level_hist": [
+          726,
+          2741,
+          7997,
+          25114,
+          19231,
+          10794,
+          7125
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1717894736842105,
+        "root_only_outside_S": 0.04649522569444445,
+        "root_any_outside_S": 0.057373046875,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.6106573708817624,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2106329202651978
+      },
+      "accepted": {
+        "n": 8192,
+        "valid_frac": 0.0904541015625,
+        "parse_level_mean": 3.6046142578125,
+        "parse_level_hist": [
+          90,
+          318,
+          904,
+          2814,
+          2110,
+          1215,
+          741
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1578947368421053,
+        "root_only_outside_S": 0.044677734375,
+        "root_any_outside_S": 0.0538330078125,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.612088555495248,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.211137056350708,
+        "yield_": 73728,
+        "quota_met": true
+      }
+    },
+    {
+      "round": 5,
+      "pool_size": 106496,
+      "mint_pool_size": 40960,
+      "mint_gradient_share": -1.0,
+      "val": {
+        "S": 1.2655759692192077,
+        "complement": 1.2905729770660401,
+        "full": 1.2836906790733338
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.0927734375,
+          "parse_level_mean": 3.6435546875,
+          "parse_level_hist": [
+            18,
+            68,
+            233,
+            709,
+            489,
+            341,
+            190
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1894736842105262,
+          "root_only_outside_S": 0.0498046875,
+          "root_any_outside_S": 0.06103515625,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.611108338104489,
+          "mean_logprob": -1.2022629976272583
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.099609375,
+          "parse_level_mean": 3.609375,
+          "parse_level_hist": [
+            27,
+            100,
+            216,
+            689,
+            491,
+            321,
+            204
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1764705882352942,
+          "root_only_outside_S": 0.0517578125,
+          "root_any_outside_S": 0.06298828125,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.617028821384419,
+          "mean_logprob": -1.207298755645752
+        }
+      },
+      "candidates": {
+        "n": 73728,
+        "valid_frac": 0.1028781467013889,
+        "parse_level_mean": 3.6654052734375,
+        "parse_level_hist": [
+          731,
+          2760,
+          7768,
+          24595,
+          18793,
+          11496,
+          7585
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1796967699406724,
+        "root_only_outside_S": 0.05056423611111111,
+        "root_any_outside_S": 0.062188042534722224,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.61039743891642,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2060495615005493
+      },
+      "accepted": {
+        "n": 8192,
+        "valid_frac": 0.105712890625,
+        "parse_level_mean": 3.681396484375,
+        "parse_level_hist": [
+          78,
+          282,
+          860,
+          2735,
+          2100,
+          1271,
+          866
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1558891454965359,
+        "root_only_outside_S": 0.04931640625,
+        "root_any_outside_S": 0.060302734375,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.609911268434905,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2044938802719116,
+        "yield_": 73728,
+        "quota_met": true
+      }
+    },
+    {
+      "round": 6,
+      "pool_size": 114688,
+      "mint_pool_size": 49152,
+      "mint_gradient_share": -1.0,
+      "val": {
+        "S": 1.2651954293251038,
+        "complement": 1.2897089838981628,
+        "full": 1.2836121320724487
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.08203125,
+          "parse_level_mean": 3.60107421875,
+          "parse_level_hist": [
+            26,
+            63,
+            252,
+            688,
+            519,
+            332,
+            168
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.2202380952380953,
+          "root_only_outside_S": 0.05859375,
+          "root_any_outside_S": 0.0654296875,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6171884677510655,
+          "mean_logprob": -1.2029321193695068
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.11279296875,
+          "parse_level_mean": 3.69873046875,
+          "parse_level_hist": [
+            21,
+            66,
+            221,
+            676,
+            512,
+            321,
+            231
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1861471861471862,
+          "root_only_outside_S": 0.05126953125,
+          "root_any_outside_S": 0.064453125,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6150933437903237,
+          "mean_logprob": -1.205155611038208
+        }
+      },
+      "candidates": {
+        "n": 73728,
+        "valid_frac": 0.10276963975694445,
+        "parse_level_mean": 3.6614854600694446,
+        "parse_level_hist": [
+          870,
+          2598,
+          7976,
+          24305,
+          18983,
+          11419,
+          7577
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1809423254586249,
+        "root_only_outside_S": 0.0489501953125,
+        "root_any_outside_S": 0.06081814236111111,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.6146428236605264,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.206885814666748
+      },
+      "accepted": {
+        "n": 8192,
+        "valid_frac": 0.10400390625,
+        "parse_level_mean": 3.6572265625,
+        "parse_level_hist": [
+          102,
+          272,
+          916,
+          2691,
+          2124,
+          1235,
+          852
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1948356807511737,
+        "root_only_outside_S": 0.0496826171875,
+        "root_any_outside_S": 0.06298828125,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.614914837596677,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2081665992736816,
+        "yield_": 73728,
+        "quota_met": true
+      }
+    },
+    {
+      "round": 7,
+      "pool_size": 122880,
+      "mint_pool_size": 57344,
+      "mint_gradient_share": -1.0,
+      "val": {
+        "S": 1.26497061252594,
+        "complement": 1.2911256670951843,
+        "full": 1.2839706897735597
+      },
+      "gen_probe": {
+        "full": {
+          "n": 2048,
+          "valid_frac": 0.0869140625,
+          "parse_level_mean": 3.5615234375,
+          "parse_level_hist": [
+            22,
+            87,
+            245,
+            729,
+            473,
+            314,
+            178
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1629213483146068,
+          "root_only_outside_S": 0.0498046875,
+          "root_any_outside_S": 0.05908203125,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.61507486924596,
+          "mean_logprob": -1.2072722911834717
+        },
+        "S": {
+          "n": 2048,
+          "valid_frac": 0.10205078125,
+          "parse_level_mean": 3.63916015625,
+          "parse_level_hist": [
+            17,
+            76,
+            236,
+            686,
+            527,
+            297,
+            209
+          ],
+          "root_union_size": 16,
+          "root_set_size_mean": 1.1339712918660287,
+          "root_only_outside_S": 0.05126953125,
+          "root_any_outside_S": 0.05908203125,
+          "level_union_size": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "distinct_frac": 1.0,
+          "pair_entropy_nats": 3.6079785808422993,
+          "mean_logprob": -1.2106688022613525
+        }
+      },
+      "candidates": {
+        "n": 73728,
+        "valid_frac": 0.10088433159722222,
+        "parse_level_mean": 3.6497667100694446,
+        "parse_level_hist": [
+          774,
+          2736,
+          8138,
+          24504,
+          18752,
+          11386,
+          7438
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1762570583490186,
+        "root_only_outside_S": 0.049357096354166664,
+        "root_any_outside_S": 0.060709635416666664,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.6119632364409067,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2072657346725464
+      },
+      "accepted": {
+        "n": 8192,
+        "valid_frac": 0.1009521484375,
+        "parse_level_mean": 3.6556396484375,
+        "parse_level_hist": [
+          90,
+          308,
+          894,
+          2706,
+          2064,
+          1303,
+          827
+        ],
+        "root_union_size": 16,
+        "root_set_size_mean": 1.1934703748488513,
+        "root_only_outside_S": 0.046875,
+        "root_any_outside_S": 0.058837890625,
+        "level_union_size": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ],
+        "distinct_frac": 1.0,
+        "pair_entropy_nats": 3.6097295039674924,
+        "dup_with_pool_frac": 0.0,
+        "mean_logprob": -1.2072134017944336,
+        "yield_": 73728,
+        "quota_met": true
+      }
+    }
+  ],
+  "recovery": {
+    "S": {
+      "linear_best": {
+        "d6": 0.4533333480358124,
+        "d5": 0.6545833349227905,
+        "d4": 0.95250004529953,
+        "d3": 0.9887500405311584,
+        "d2": 0.9979166984558105,
+        "d1": 1.0
+      },
+      "mlp_best": {
+        "d6": 0.49041667580604553,
+        "d5": 0.7266666889190674,
+        "d4": 0.965416669845581,
+        "d3": 0.9895833730697632,
+        "d2": 0.9979166984558105,
+        "d1": 1.0
+      }
+    },
+    "complement": {
+      "linear_best": {
+        "d6": 0.22500000894069672,
+        "d5": 0.4766666889190674,
+        "d4": 0.9166666865348816,
+        "d3": 0.9737499952316284,
+        "d2": 0.9933333396911621,
+        "d1": 0.9979166984558105
+      },
+      "mlp_best": {
+        "d6": 0.25708332657814026,
+        "d5": 0.5316666960716248,
+        "d4": 0.934166669845581,
+        "d3": 0.9762500524520874,
+        "d2": 0.9937500357627869,
+        "d1": 0.9983333349227905
+      }
+    },
+    "full": {
+      "linear_best": {
+        "d6": 0.16208334267139435,
+        "d5": 0.4775000214576721,
+        "d4": 0.9120833277702332,
+        "d3": 0.9779167175292969,
+        "d2": 0.9925000071525574,
+        "d1": 0.9979166984558105
+      },
+      "mlp_best": {
+        "d6": 0.17416666448116302,
+        "d5": 0.5475000143051147,
+        "d4": 0.9329167008399963,
+        "d3": 0.9791666865348816,
+        "d2": 0.9929167032241821,
+        "d1": 0.9975000023841858
+      }
+    }
+  },
+  "final_pool_size": 131072,
+  "final_mint_pool_size": 65536,
+  "final_mint_stats": {
+    "n": 65536,
+    "valid_frac": 0.0882720947265625,
+    "parse_level_mean": 3.5637664794921875,
+    "parse_level_hist": [
+      705,
+      2584,
+      7699,
+      23278,
+      16396,
+      9089,
+      5785
+    ],
+    "root_union_size": 16,
+    "root_set_size_mean": 1.1742437337942957,
+    "root_only_outside_S": 0.04266357421875,
+    "root_any_outside_S": 0.0525054931640625,
+    "level_union_size": [
+      16,
+      16,
+      16,
+      16,
+      16,
+      16
+    ],
+    "distinct_frac": 1.0,
+    "pair_entropy_nats": 3.6121995367909623
+  },
+  "final_pool_stats": {
+    "n": 131072,
+    "valid_frac": 0.5441360473632812,
+    "parse_level_mean": 4.781883239746094,
+    "parse_level_hist": [
+      705,
+      2584,
+      7699,
+      23278,
+      16396,
+      9089,
+      71321
+    ],
+    "root_union_size": 16,
+    "root_set_size_mean": 1.1510775227492605,
+    "root_only_outside_S": 0.021331787109375,
+    "root_any_outside_S": 0.0908355712890625,
+    "level_union_size": [
+      16,
+      16,
+      16,
+      16,
+      16,
+      16
+    ],
+    "distinct_frac": 1.0,
+    "pair_entropy_nats": 3.6079035587187906
+  }
+}

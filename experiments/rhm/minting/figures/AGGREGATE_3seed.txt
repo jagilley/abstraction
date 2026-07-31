@@ -1,0 +1,52 @@
+3 seed(s); arms present in all: 7
+levels: ['d4', 'd5', 'd6']   paired within seed against narrow_static
+
+============================================================================================
+PAIRED CONTRAST vs narrow_static  (mean +- sem over seeds)
+arm                                     d4                  d5                  d6
+narrow_real_data        +0.0119 +-0.0020    +0.1060 +-0.0046    +0.0357 +-0.0045  
+narrow_verifier         -0.0004 +-0.0008    +0.0061 +-0.0035    +0.0004 +-0.0030  
+narrow_peer_verifier    -0.0021 +-0.0032    +0.0104 +-0.0025    -0.0010 +-0.0023  
+narrow_peer             -0.0044 +-0.0013    -0.0201 +-0.0070    -0.0161 +-0.0034  
+narrow_mirror           -0.0040 +-0.0022    -0.0276 +-0.0110    -0.0117 +-0.0036  
+narrow_random           -0.0037 +-0.0010    -0.0378 +-0.0098    -0.0135 +-0.0016  
+
+============================================================================================
+THE LOAD-BEARING CONTRASTS  (does the acceptance signal's TYPE matter)
+  narrow_verifier - narrow_random   (legality filter vs no filter)
+      d4:  +0.0033 +- 0.0017    t=  1.92  2/3 seeds positive  [0.0042, 0.0, 0.0058]
+      d5:  +0.0439 +- 0.0080    t=  5.47  3/3 seeds positive  [0.0279, 0.0533, 0.0504]
+      d6:  +0.0139 +- 0.0026    t=  5.40  3/3 seeds positive  [0.0167, 0.0162, 0.0088]
+  narrow_verifier - narrow_mirror   (non-mirror vs mirror)
+      d4:  +0.0036 +- 0.0014    t=  2.64  3/3 seeds positive  [0.0029, 0.0063, 0.0017]
+      d5:  +0.0337 +- 0.0105    t=  3.22  3/3 seeds positive  [0.015, 0.0512, 0.035]
+      d6:  +0.0121 +- 0.0019    t=  6.43  3/3 seeds positive  [0.0104, 0.0158, 0.01]
+  narrow_peer_verifier - narrow_verifier   (+location on top of legality)
+      d4:  -0.0017 +- 0.0027    t= -0.61  1/3 seeds positive  [-0.0046, -0.0042, 0.0037]
+      d5:  +0.0043 +- 0.0060    t=  0.72  1/3 seeds positive  [-0.0008, -0.0025, 0.0163]
+      d6:  -0.0014 +- 0.0053    t= -0.26  1/3 seeds positive  [-0.0113, 0.0, 0.0071]
+  narrow_peer - narrow_random   (location filter vs no filter)
+      d4:  -0.0007 +- 0.0022    t= -0.31  2/3 seeds positive  [0.0004, -0.005, 0.0025]
+      d5:  +0.0176 +- 0.0104    t=  1.70  3/3 seeds positive  [0.0054, 0.0092, 0.0383]
+      d6:  -0.0026 +- 0.0047    t= -0.56  2/3 seeds positive  [-0.0121, 0.0029, 0.0012]
+  narrow_real_data - narrow_verifier   (how far short of real data)
+      d4:  +0.0124 +- 0.0012    t= 10.42  3/3 seeds positive  [0.0133, 0.01, 0.0138]
+      d5:  +0.0999 +- 0.0051    t= 19.41  3/3 seeds positive  [0.0896, 0.1046, 0.1054]
+      d6:  +0.0353 +- 0.0053    t=  6.63  3/3 seeds positive  [0.0342, 0.0267, 0.045]
+
+============================================================================================
+RECOVERY FRACTION: what share of real data's gain each grader buys back
+  d4  ceiling +0.0119   verifier=  -3.5%  peer_verifier= -17.4%  peer= -37.2%  mirror= -33.7%  random= -31.4%
+  d5  ceiling +0.1060   verifier=   5.8%  peer_verifier=   9.8%  peer= -19.0%  mirror= -26.1%  random= -35.6%
+  d6  ceiling +0.0357   verifier=   1.2%  peer_verifier=  -2.7%  peer= -45.1%  mirror= -32.7%  random= -37.7%
+
+============================================================================================
+POOL-LEVEL SEPARATION (final round, mean over seeds) -- the mechanism check
+arm                      violation  support_exp      pool
+narrow_peer                  0.726        0.168    131072
+narrow_peer_verifier         0.000        0.497    125759
+narrow_real_data             0.000        0.000    131072
+narrow_verifier              0.000        0.454    125759
+narrow_mirror                0.664        0.166    131072
+narrow_random                0.897        0.049    131072
+============================================================================================

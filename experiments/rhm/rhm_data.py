@@ -139,6 +139,65 @@ def parse_leaves(leaves, rules, inverse_maps=None):
     return current[:, 0], valid
 
 
+def possible_set_parse(leaves, rules, chunk=2048):
+    """EXACT batched bottom-up parse: leaf sequences -> per-level possible-feature sets.
+
+    `parse_leaves` collapses each s-tuple to a single parent via `build_inverse_maps`,
+    whose table is last-writer-wins, so with `generate_rules_distinct` (where the v*m
+    produced tuples are distinct only *within* a feature, not across features) a colliding
+    tuple silently picks one of its parents. That makes both the recovered root and the
+    `valid` flag approximate — the wrong parent propagates upward and can fail a level that
+    a different, equally legal parent would have passed.
+
+    This routine carries the full *set* of features that could have produced each node
+    (a CYK parse for this fixed-arity grammar), so validity is exact: a sequence is valid
+    iff some feature assignment at every level generates it. Costs one (B, n/s, v, m)
+    boolean per level instead of one (B, n/s) integer, which is why it is a separate
+    function rather than a flag on `parse_leaves` — every prior caller keeps the cheap
+    approximate parse it was written against.
+
+    leaves: (B, s^L) int array. Returns a dict with
+      - `valid`      (B,) bool  — the parse reached the root
+      - `parse_level`(B,) int   — how many levels composed before the first failure
+                                  (L == root reached == valid)
+      - `root_sets`  (B, v) bool — possible roots (meaningful only where valid)
+      - `level_union`(L, v) bool — features possible at each level anywhere in the batch,
+                                   level 0 = root (coverage statistic)
+    """
+    v, m, s = rules[0].shape
+    L = len(rules)
+    leaves = np.asarray(leaves, dtype=np.int64)
+    B = leaves.shape[0]
+    valid = np.zeros(B, dtype=bool)
+    parse_level = np.zeros(B, dtype=np.int64)
+    root_sets = np.zeros((B, v), dtype=bool)
+    level_union = np.zeros((L, v), dtype=bool)
+
+    for lo in range(0, B, chunk):
+        hi = min(lo + chunk, B)
+        cur = np.zeros((hi - lo, leaves.shape[1], v), dtype=bool)
+        np.put_along_axis(cur, leaves[lo:hi][:, :, None], True, axis=2)
+        alive = np.ones(hi - lo, dtype=bool)
+        depth = np.zeros(hi - lo, dtype=np.int64)
+        for ell in range(L - 1, -1, -1):
+            b, n, _ = cur.shape
+            children = cur.reshape(b, n // s, s, v)
+            ok = np.ones((b, n // s, v, m), dtype=bool)
+            for i in range(s):
+                # index the feature axis with rules[ell][:, :, i] -> (b, n/s, v, m)
+                ok &= children[:, :, i, :][:, :, rules[ell][:, :, i]]
+            cur = ok.any(axis=3)                       # (b, n/s, v) parent possible-sets
+            level_ok = cur.any(axis=2).all(axis=1)     # every node has >=1 parent
+            depth += (alive & level_ok)
+            alive &= level_ok
+            level_union[ell] |= cur[alive].any(axis=(0, 1))   # empty slice -> all False
+        valid[lo:hi] = alive
+        parse_level[lo:hi] = depth
+        root_sets[lo:hi] = cur[:, 0, :] & alive[:, None]
+    return {"valid": valid, "parse_level": parse_level,
+            "root_sets": root_sets, "level_union": level_union}
+
+
 def generate_sequences(rules, n_sequences, seed=0):
     """Generate sequences by traversing the hierarchy.
 
