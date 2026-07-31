@@ -78,7 +78,8 @@ from rhm.rhm_channels import attach_drift, make_layout
 from rhm.rhm_repair_cost import Meter
 from rhm.shared import DATA_DIR, NumpyEncoder, image, volume
 from rhm.directed_sculpting.full_loop.channel_env import (
-    POLICIES, advance_drift, allocate, blocks_of_channel, build_block_tables,
+    POLICIES, advance_drift, allocate, block_latent_mean, blocks_of_channel,
+    build_block_tables, build_channel_local_fm,
     closed_loop_beam, ema, make_spec, measure_floors, prewarm_drift, reducible_fraction,
     collect_value_buffer, counterfactual_lp, forecast_visits, ground_truth_relevance,
     fm_one_step_check, make_tree_probe, open_loop_beam, per_channel_error,
@@ -143,7 +144,7 @@ def reset_drift(layout, spec):
 def ladder(
     v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
     tree_depth: int = 4, struct_depths: str = "2,2", struct_ms: str = "2,4",
-    noise_blocks: str = "1,1",
+    noise_blocks: str = "1,1", struct_shares: str = "0,0",
     controller_steps: int = 12_000, generator_steps: int = 12_000, value_steps: int = 12_000,
     value_episodes: int = 40_000, fm_warm_steps: int = 12_000, batch_size: int = 256,
     n_corrupt: int = 3, edit_budget: int = 6, explore_eps: float = 0.3,
@@ -154,7 +155,8 @@ def ladder(
     n_eval: int = 512, n_probe_states: int = 1024, grade_every: int = 3,
     ballistic_chunk: int = 3,
     beta_sat: float = 1.0, alloc_eps: float = 0.01,
-    policies: str = ",".join(POLICIES), tag: str = "v1", quick: bool = False,
+    policies: str = ",".join(POLICIES), fm_arch: str = "block",
+    tag: str = "v1", quick: bool = False,
 ):
     """The six-policy E3 ladder plus a satiating rung, on the multi-channel sculpting task."""
     import torch
@@ -181,17 +183,21 @@ def ladder(
     spec = make_spec(tree_depth=tree_depth,
                      struct_depths=[int(x) for x in struct_depths.split(",")],
                      struct_ms=[int(x) for x in struct_ms.split(",")],
-                     noise_blocks=[int(x) for x in noise_blocks.split(",")])
+                     noise_blocks=[int(x) for x in noise_blocks.split(",")],
+                     struct_shares=[int(x) for x in struct_shares.split(",")])
     layout = make_layout(v, s, spec)
     tb = build_block_tables(layout, device)
     names = tb["channel_names"]
     T, n_blocks = layout["total_len"], tb["n_blocks"]
     tree_c = tb["tree_channel"]
+    # channels that share rule tables with the tree -- the transfer-aware oracle's target set
+    shared_channels = [i for i, ch in enumerate(layout["channels"]) if ch.get("share_top")]
     print(f"Ladder on the distractor DGP: T={T} tokens / {n_blocks} blocks over "
           f"{len(names)} channels; budget={edit_budget}, c={n_corrupt}, device={device}")
     for ch in layout["channels"]:
         print(f"  {ch['name']:9s} {ch['kind']:6s} blocks[{ch['blk0']:2d}:{ch['blk1']:2d}]"
-              + (f" depth={ch['depth']} m={ch['m']}" if ch["rules"] is not None else ""))
+              + (f" depth={ch['depth']} m={ch['m']}" if ch["rules"] is not None else "")
+              + (f" share_top={ch['share_top']}<-{ch['share_from']}" if ch.get("share_top") else ""))
 
     render, gen = "mixture", torch.Generator(device=device).manual_seed(seed)
 
@@ -252,7 +258,17 @@ def ladder(
 
     # ---- warm-start FM on a uniform budget (so LP is measurable at round 1) --------------
     # every policy forks from this SAME warm state, so the ladder measures allocation only
+    if fm_arch == "channel_local":
+        # the position-invariant readout: no absolute-block parameters, attention masked to
+        # within-channel, and the encoder's per-block latent offset subtracted (label-free)
+        BlockFM = build_channel_local_fm()
+    elif fm_arch != "block":
+        raise ValueError(f"fm_arch must be 'block' or 'channel_local' (got {fm_arch!r})")
     warm_fm = BlockFM(state_dim, n_blocks, n_head=4, n_layer=2).to(device)
+    if fm_arch == "channel_local":
+        warm_fm.configure(tb).set_center(block_latent_mean(
+            layout=layout, tb=tb, controller=controller,
+            n=4096 if quick else 20_000, seed=seed + 61, device=device))
     train_block_fm(warm_fm, controller, generator, layout, tb, n_steps=fm_warm_steps,
                    batch_size=batch_size, n_corrupt=n_corrupt, budget=edit_budget, lr=1e-3,
                    seed=seed + 51, render=render, gen=gen, device=device)
@@ -297,7 +313,8 @@ def ladder(
             n_corrupt=n_corrupt, edit_budget=edit_budget,
             drift_steps_per_round=drift_steps_per_round, drift_prewarm=drift_prewarm,
             grade_every=grade_every, beta_sat=beta_sat, alloc_eps=alloc_eps,
-            ballistic_chunk=ballistic_chunk, render=render, device=device)
+            ballistic_chunk=ballistic_chunk, shared_channels=shared_channels,
+            render=render, device=device)
 
     # ---- summary ------------------------------------------------------------------------
     print(f"\n{'=' * 78}\n=== SUMMARY -- E3's ladder on RHM (mean over rounds) ===\n{'=' * 78}")
@@ -322,8 +339,11 @@ def ladder(
                    "n_corrupt": n_corrupt, "drift_kl_per_node": drift_kl,
                    "drift_kappa": drift_kappa, "drift_steps_per_round": drift_steps_per_round,
                    "render": render, "state_dim": state_dim, "policies": policy_list,
-                   "beta_sat": beta_sat, "alloc_eps": alloc_eps, "seed": seed},
-        "channels": [{k: ch[k] for k in ("name", "kind", "depth", "m", "blk0", "blk1")}
+                   "beta_sat": beta_sat, "alloc_eps": alloc_eps, "seed": seed,
+                   "struct_shares": struct_shares, "shared_channels": shared_channels,
+                   "fm_arch": fm_arch},
+        "channels": [{k: ch[k] for k in ("name", "kind", "depth", "m", "blk0", "blk1",
+                                         "share_top", "share_from")}
                      for ch in layout["channels"]],
         "ground_truth_relevance": {
             "mean_dstar_gain": {names[i]: float(rel["mean_dstar_gain"][i]) for i in range(len(names))},
@@ -351,8 +371,8 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
                 collect_budget, mon_n, forecast_n, fm_epochs, lp_steps, batch_size,
                 n_corrupt, edit_budget,
                 drift_steps_per_round, drift_prewarm, grade_every, beta_sat, alloc_eps,
-                ballistic_chunk,
-                render, device):
+                ballistic_chunk, shared_channels=None,
+                render=None, device=None):
     """One policy's trajectory. Every policy re-initialises the drift state from the SAME
     seed and steps it with the same RNG, so all arms see a bit-identical world sequence --
     E3's matched-drift hygiene, obtained here exactly rather than in expectation."""
@@ -425,7 +445,8 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
         w, drive = allocate(policy, errors=errors, lprog=lprog, visits=visits,
                             tree_channel=tree_c, n_channels=n_ch, lp_floor=lp_floor,
                             reducible=reducible, red_floor=red_floor,
-                            satiety=satiety, beta_sat=beta_sat, eps=alloc_eps)
+                            satiety=satiety, beta_sat=beta_sat, eps=alloc_eps,
+                            shared_channels=shared_channels)
         sat_prev = satiety.copy()
         satiety = 0.7 * satiety + w        # depletable state: fills with spending, decays if not
 

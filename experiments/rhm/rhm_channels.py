@@ -111,11 +111,55 @@ def leaf_marginal(rules, v, s):
     return p
 
 
+def share_rules_top(rules, src_rules, share_top):
+    """Overwrite the top `share_top` LEVELS of `rules` with the source channel's tables.
+
+    `generate_rules_distinct` returns tables indexed from the ROOT down: `rules[0]` expands the
+    root, `rules[-1]` renders level-1 features into leaf tokens. So splicing a prefix shares the
+    DEEP (abstract) levels and leaves the SHALLOW (surface) ones independently seeded -- the
+    "superficially unrelated, deeply shared" geometry that `ideas/meta_learning_under_metered_data.md`
+    §9 names as the missing realism condition. `share_top` is the sharing depth knob:
+
+        0            nothing shared -- two independent grammars (full_loop's published geometry)
+        1 .. L-1     shared abstract composition, distinct surface rendering (the middle)
+        L            the same grammar with an independently drawn root (specialization's geometry)
+
+    Tables are COPIED, never aliased: each channel carries its own OU drift state over its own
+    array, so two fully-shared channels still have independent *usage* statistics over identical
+    rules. Sharing is a property of the DGP's rule tables, not of the drift.
+
+    NOTE ON RELEVANCE. This changes nothing about structural irrelevance: every grammar readout
+    (`parse_root`, `possible_set_success`, `dp_cost`) reads the tree slice alone and each channel
+    draws its own independent root, so a distractor's content still cannot move `d*` at any
+    sharing depth (`check_structural_irrelevance` is asserted per-depth by
+    `directed_sculpting/full_loop/partial_hetero/geometry_check.py`). What sharing changes is the
+    *instrumental* value of a distractor's data for LEARNING the tree -- which is exactly the
+    distinction the ladder's stipulated `oracle` cannot see.
+    """
+    if not share_top:
+        return rules
+    if share_top > len(rules) or share_top > len(src_rules):
+        raise ValueError(f"share_top={share_top} exceeds available levels "
+                         f"({len(rules)} / {len(src_rules)})")
+    if len(rules) != len(src_rules):
+        raise ValueError("share_top requires matched depth: level i of the sharer must be "
+                         f"level i of the source (got {len(rules)} vs {len(src_rules)})")
+    if rules[0].shape != src_rules[0].shape:
+        raise ValueError(f"share_top requires matched (v, m, s): {rules[0].shape} vs "
+                         f"{src_rules[0].shape}")
+    return [src_rules[i].copy() for i in range(share_top)] + list(rules[share_top:])
+
+
 def make_layout(v, s, spec=None, noise_match_marginal=True):
     """Build the channel layout. Returns a dict describing token/block spans per channel.
 
     Exactly one channel must have kind == "tree" -- it defines the task's root r*, and
     every grammar operation (parse, DP d*, possible-set success) reads only its slice.
+
+    A grammar channel may additionally carry `share_top` (int, default 0) and `share_from`
+    (channel name, default the tree) to splice the top `share_top` rule tables in from an
+    EARLIER channel -- the partially-heterogeneous DGP. See `share_rules_top`. Absent the key
+    the construction is bit-identical to before, so every prior layout is unchanged.
 
     `noise_match_marginal` (default True) draws noise tokens from the TREE's exact leaf
     unigram distribution rather than from uniform. Without it the noise channels are
@@ -136,13 +180,25 @@ def make_layout(v, s, spec=None, noise_match_marginal=True):
     channels, tok, blk = [], 0, 0
     for ch in spec:
         kind = ch["kind"]
+        share_top, share_from = int(ch.get("share_top", 0) or 0), None
         if kind in ("tree", "struct"):
             depth, m = ch["depth"], ch["m"]
             rules = generate_rules_distinct(v, s, depth, m, seed=ch["rule_seed"])
+            if share_top:
+                share_from = ch.get("share_from") or trees[0]["name"]
+                src = next((c for c in channels if c["name"] == share_from), None)
+                if src is None:
+                    raise ValueError(f"channel {ch['name']!r} shares from {share_from!r}, which "
+                                     "must appear EARLIER in the spec (rules are built in order)")
+                if src["rules"] is None:
+                    raise ValueError(f"channel {share_from!r} has no grammar to share")
+                rules = share_rules_top(rules, src["rules"], share_top)
             n_tok = s ** depth
         elif kind == "noise":
             depth = m = rules = None
             n_tok = ch["n_blocks"] * s
+            if share_top:
+                raise ValueError("a noise channel has no grammar to share")
         else:
             raise ValueError(f"unknown channel kind {kind!r}")
         if n_tok % s:
@@ -150,6 +206,7 @@ def make_layout(v, s, spec=None, noise_match_marginal=True):
         channels.append({
             "name": ch["name"], "kind": kind, "depth": depth, "m": m,
             "rules": rules, "rule_seed": ch.get("rule_seed"),
+            "share_top": share_top, "share_from": share_from,
             "tok0": tok, "tok1": tok + n_tok,
             "blk0": blk, "blk1": blk + n_tok // s,
         })

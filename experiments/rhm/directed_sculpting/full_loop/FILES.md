@@ -37,4 +37,6 @@ The sculpting apparatus this extends is [`../../rhm_sculpt_latent.py`](../../rhm
 
 ## Children
 
-None.
+| Child | What |
+|---|---|
+| [`partial_hetero/`](partial_hetero/README.md) | **Cut-3, the partially-heterogeneous DGP** — the middle of the shared-structure axis that §5/§9 of [`ideas/meta_learning_under_metered_data.md`](../../../../ideas/meta_learning_under_metered_data.md) names as the missing realism condition. `structA` is depth-matched to the tree and takes its top *k* rule tables from it, so sharing depth is a knob running from full_loop's independent-grammar geometry (*k*=0) to specialization's single-ruleset geometry (*k*=4), with superficially-unrelated-but-deeply-shared in between. Two measurements: a static, coverage-matched **transfer curve** (what is off-channel data worth?) and **the ladder re-run at each sharing depth**, plus a transfer-aware `oracle_shared` rung that measures the gap between *stipulated* relevance and *actual* data value |

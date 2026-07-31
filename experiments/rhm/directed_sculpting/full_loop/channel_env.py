@@ -61,15 +61,33 @@ import numpy as np
 # --------------------------------------------------------------------------- #
 
 def make_spec(tree_depth=5, tree_m=2, struct_depths=(3, 3), struct_ms=(2, 4),
-              noise_blocks=(2, 2)):
+              noise_blocks=(2, 2), struct_shares=None, rule_seed_offset=0):
     """`DEFAULT_SPEC` generalised over tree depth, so the whole loop can be run at the depth
     where the sculpting arc is calibrated (L=4) as well as at the deeper L=5 the E3 port was
     specced for. Shapes are kept proportional: struct channels sit two levels below the tree
-    and the noise channels are sized to keep the tree the majority of the blocks."""
-    spec = [{"kind": "tree", "name": "tree", "depth": tree_depth, "m": tree_m, "rule_seed": 0}]
+    and the noise channels are sized to keep the tree the majority of the blocks.
+
+    `struct_shares` (default all-zero, i.e. the published geometry) gives each struct channel a
+    SHARING DEPTH: how many of its top rule tables are spliced in from the tree. Nonzero requires
+    that channel to be depth- and m-matched to the tree, since level i must mean the same scale in
+    both. See `rhm_channels.share_rules_top` for what the knob means and why it leaves structural
+    irrelevance untouched.
+
+    `rule_seed_offset` shifts every channel's rule seed together, so a DGP-level claim can be
+    measured across rule draws rather than only across training draws. 0 reproduces every prior
+    layout exactly."""
+    shares = [0] * len(struct_depths) if struct_shares is None else list(struct_shares)
+    if len(shares) != len(struct_depths):
+        raise ValueError(f"struct_shares needs one entry per struct channel "
+                         f"(got {len(shares)} for {len(struct_depths)})")
+    spec = [{"kind": "tree", "name": "tree", "depth": tree_depth, "m": tree_m,
+             "rule_seed": 0 + rule_seed_offset}]
     for i, (d, m) in enumerate(zip(struct_depths, struct_ms)):
-        spec.append({"kind": "struct", "name": f"struct{chr(65 + i)}", "depth": int(d),
-                     "m": int(m), "rule_seed": 101 + i})
+        entry = {"kind": "struct", "name": f"struct{chr(65 + i)}", "depth": int(d),
+                 "m": int(m), "rule_seed": 101 + i + rule_seed_offset}
+        if int(shares[i]):
+            entry["share_top"], entry["share_from"] = int(shares[i]), "tree"
+        spec.append(entry)
     for i, nb in enumerate(noise_blocks):
         spec.append({"kind": "noise", "name": f"noise{chr(65 + i)}", "n_blocks": int(nb)})
     return spec
@@ -119,8 +137,19 @@ def build_block_tables(layout, device):
                 for r in range(m):
                     bottom[b, int((bot[f, r] * powers).sum())] = f
 
+    # within-channel offset of each block, and a mask that forbids cross-channel attention.
+    # These are what a channel-position-invariant forward model needs: with them, the function
+    # it applies to the tree's blocks and to a depth-matched distractor's blocks is literally
+    # the same function, so "the same grammar at a different position" is the same problem.
+    offset = np.zeros(n_blocks, dtype=np.int64)
+    for ch in layout["channels"]:
+        offset[ch["blk0"]:ch["blk1"]] = np.arange(ch["blk1"] - ch["blk0"])
+    chan_mask = chan[:, None] != chan[None, :]
+
     tree = layout["tree"]
     return {
+        "offset_blk": torch.from_numpy(offset).to(device),
+        "chan_mask": torch.from_numpy(chan_mask).to(device),
         "syn_blk": torch.from_numpy(syn).to(device),
         "m_blk": torch.from_numpy(m_of).to(device),
         "w_blk": _uniform_w_blk(m_of, v, max_m, device),
@@ -461,6 +490,95 @@ def train_block_fm(fm, controller, generator, layout, tb, *, n_steps, batch_size
             print(f"  block FM step {step:5d}/{n_steps}: mse={loss.item():.5f} cos={cos:.3f}")
     fm.eval()
     return fm
+
+
+def build_channel_local_fm():
+    """A block FM with NO absolute-position parameters — the position-invariant readout.
+
+    `rhm_sculpt_latent._build_block_fm` keys two embedding tables on the ABSOLUTE block index:
+    `action_embedding[k]` marks which block the command touched, and `block_position[b]` tags
+    each block. That makes the tree's blocks and a distractor's blocks different problems even
+    when their grammars are bit-identical, which is what `partial_hetero`'s first pass measured:
+    a tree-trained FM read on a distractor whose rule tables are the SAME tables scores above
+    1.0, i.e. worse than predicting no change at all.
+
+    Three changes, and nothing else:
+      * attention MASKED to within-channel (`tb["chan_mask"]`), so a block's forecast is a
+        function of its own channel's latents only -- which is also correct on the merits, since
+        the channels are generatively independent;
+      * WITHIN-CHANNEL offset embeddings (`tb["offset_blk"]`) instead of absolute block tags;
+      * ONE shared acted marker instead of a per-block table.
+
+    Plus per-block latent CENTERING (`set_center`). The frozen controller adds an absolute
+    `position_embedding` before its encoder, so its block latents carry a positional component
+    that a weight-shared FM would have to undo without ever seeing the target channel. The
+    target needs no correction -- it is a difference of latents, so any additive positional term
+    already cancels -- so centering the INPUT is the whole fix, and it is estimated from the
+    frozen encoder's marginal statistics with no channel labels anywhere.
+
+    Same `(z_block, k) -> (B, n_blocks, D)` signature as the published FM, so it drops into
+    `per_channel_error`, `counterfactual_lp`, `forecast_visits` and both beams unchanged.
+    """
+    import torch
+    import torch.nn as nn
+
+    class ChannelLocalBlockFM(nn.Module):
+        def __init__(self, state_dim, n_blocks, n_head, n_layer):
+            super().__init__()
+            self.acted = nn.Parameter(torch.randn(state_dim) * 0.02)
+            self.offset_embedding = nn.Embedding(n_blocks, state_dim)
+            layer = nn.TransformerEncoderLayer(
+                d_model=state_dim, nhead=n_head, dim_feedforward=4 * state_dim,
+                activation="gelu", batch_first=True, norm_first=True, dropout=0.0,
+            )
+            self.encoder = nn.TransformerEncoder(layer, num_layers=n_layer)
+            self.norm = nn.LayerNorm(state_dim)
+            self.head = nn.Linear(state_dim, state_dim)
+            self.register_buffer("mu", torch.zeros(n_blocks, state_dim), persistent=True)
+            self.register_buffer("offsets", torch.zeros(n_blocks, dtype=torch.long),
+                                 persistent=True)
+            self.register_buffer("attn_mask", torch.zeros(n_blocks, n_blocks, dtype=torch.bool),
+                                 persistent=True)
+
+        def configure(self, tb):
+            """Install the layout's offsets and the within-channel attention mask."""
+            self.offsets.copy_(tb["offset_blk"].to(self.offsets.device))
+            self.attn_mask.copy_(tb["chan_mask"].to(self.attn_mask.device))
+            return self
+
+        def set_center(self, mu):
+            self.mu.copy_(mu.to(self.mu.device))
+            return self
+
+        def forward(self, z_block, k):
+            batch, n_blocks, dim = z_block.shape
+            marker = torch.zeros_like(z_block)
+            marker.scatter_(1, k[:, None, None].expand(-1, 1, dim),
+                            self.acted.view(1, 1, dim).expand(batch, 1, dim))
+            hidden = ((z_block - self.mu[None])
+                      + self.offset_embedding(self.offsets)[None] + marker)
+            return self.head(self.norm(self.encoder(hidden, mask=self.attn_mask)))
+
+    return ChannelLocalBlockFM
+
+
+def block_latent_mean(controller, layout, tb, *, n, seed, device, chunk=4096):
+    """Per-block mean of the frozen controller's block latents, on clean draws from the CURRENT
+    world. Channel-label-free — it is a marginal statistic of the encoder, nothing more. This is
+    what `build_channel_local_fm().set_center` subtracts."""
+    import torch
+    from rhm.rhm_channels import sample_pool
+
+    leaves = sample_pool(layout, n, seed)["leaves"]
+    total = torch.zeros(tb["n_blocks"], controller.token_embedding.weight.shape[1],
+                        device=device)
+    seen = 0
+    with torch.no_grad():
+        for i in range(0, n, chunk):
+            x = torch.from_numpy(leaves[i:i + chunk]).to(device)
+            total += controller.block_state(x).sum(0)
+            seen += x.shape[0]
+    return total / max(1, seen)
 
 
 def _block_state_chunked(controller, x, chunk=4096):
@@ -1041,7 +1159,8 @@ POLICIES = ("uniform", "error_only", "lprog_only", "visits_only", "value",
 
 
 def allocate(policy, *, errors, lprog, visits, tree_channel, n_channels, lp_floor,
-             reducible=None, red_floor=0.0, satiety=None, beta_sat=1.0, eps=0.02):
+             reducible=None, red_floor=0.0, satiety=None, beta_sat=1.0, eps=0.02,
+             shared_channels=None):
     """Per-channel budget shares. `eps` is an identical uniform floor for every policy, so
     the arms differ only in their signal (and so that a policy is never handed an all-zero
     signal). Returns (weights, drive) with `drive` the per-channel signal actually used.
@@ -1103,6 +1222,18 @@ def allocate(policy, *, errors, lprog, visits, tree_channel, n_channels, lp_floo
     elif policy == "oracle":
         drive = np.zeros(n_channels)
         drive[tree_channel] = 1.0
+    elif policy == "oracle_shared":
+        # The TRANSFER-AWARE oracle. `oracle` is privileged about RELEVANCE -- it is handed the
+        # channel labels and puts everything on the only channel that can move `d*`. That is the
+        # optimal allocation only when off-tree data is worth nothing to the LEARNER, which is
+        # true by construction in the published geometry and false under partial sharing. This
+        # rung spreads evenly over the tree and every channel that shares rule tables with it, so
+        # `oracle_shared - oracle` measures exactly the gap between stipulated relevance and
+        # actual data value. With no shared channels it is `oracle` verbatim.
+        drive = np.zeros(n_channels)
+        drive[tree_channel] = 1.0
+        for c in (shared_channels or ()):
+            drive[int(c)] = 1.0
     else:
         raise ValueError(policy)
 

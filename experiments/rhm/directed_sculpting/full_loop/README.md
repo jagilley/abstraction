@@ -431,7 +431,13 @@ thumb on the scale in its disfavour.
 - **PR is not certified as "the frontier"** — the idea doc's own warning. It is reported alongside depth
   throughout, and no PR rise with flat depth is read as expansion.
 
-## 10. Open items
+## 10. Children
+
+| Child | What |
+|---|---|
+| [`partial_hetero/`](partial_hetero/README.md) | **Cut-3 — the partially-heterogeneous DGP**, built and running. §3's ladder measures allocation in a geometry where the distractors share *nothing* with the tree, so ground-truth relevance is exactly 0.000 off-tree and the selector faces no judgment call. `partial_hetero` adds a sharing-depth knob: `structA` is depth-matched to the tree and takes its top *k* rule tables, giving a sweep from this node's independent-grammar geometry (*k*=0) to [`specialization`](../../specialization/README.md)'s single-ruleset one (*k*=4). Structural irrelevance is untouched at every depth — what changes is what the distractor's data is worth to the *learner*. Two measurements: a static coverage-matched **transfer curve**, and this ladder re-run at each depth with a **`oracle_shared`** rung that separates *stipulated relevance* from *actual data value*. Built, run and written up in the child — read it there; the result is deliberately not summarised at this altitude, because what it mainly establishes is about the *readout* rather than about this node's findings |
+
+## 11. Open items
 
 1. **A repair readout that actually reports.** The cross-arm root-CE difference has now failed three times for
    three different reasons. Until one works, §6's two-instrument discipline is unavailable and every climbing
