@@ -38,6 +38,7 @@ Up: [README.md](README.md) · node: [`../README.md`](../README.md) · memo: [`..
 | dir | summary |
 |---|---|
 | [`directed_on_policy/`](directed_on_policy/README.md) ([FILES](directed_on_policy/FILES.md)) | **E3 / the prize** — directed collection on the on-policy arm; the retracted S2 where-to-collect claim reproduced once the learning-progress survey is itself metered (`value` beats `lprog-only` 3/3 seeds; `error-only` collapses on the noisy-TV trap; 1.84× not 22×). |
+| [`metered_repair/`](metered_repair/README.md) ([FILES](metered_repair/FILES.md)) | **E4 + E5** — the two cuts RHM's full loop (PRs #15/#16) lands on E3. **E4** (`floor_tap.py`) repairs E3's reducibility tap, which is the same fixed-budget counterfactual fit RHM found *inverted*, by measuring the aleatoric floor from the agent's own metered batch; and places the **visited-but-irreducible** cell E3 reported unplaceable, which turns out to have been a fact about E3's narrow eval cone rather than about embodiment. **E5** (`necessity.py`) ports RHM's samples-per-event necessity sweep onto a two-level drift *generator*, with the transfer-to-an-uncollected-region readout that RHM's drift primitive structurally cannot supply. |
 
 ## Auxiliary READMEs
 

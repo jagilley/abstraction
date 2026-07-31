@@ -1,0 +1,289 @@
+{
+  "config": {
+    "tag": "cert_v2",
+    "seed": 0,
+    "policies": [
+      "uniform",
+      "value",
+      "value-red",
+      "visits-only"
+    ],
+    "rounds": 10,
+    "drift_mode": "ou",
+    "floor_k": 4,
+    "floor_on": "residual",
+    "floor_max_n": 600,
+    "tap_ema": 0.5,
+    "eval_spread": true,
+    "ou_sigma": 1.6,
+    "b_lo": 2.0,
+    "b_hi": 10.0,
+    "drift_every": 8,
+    "drift_cycle": [
+      0,
+      0,
+      1
+    ],
+    "b1": 6.0,
+    "noise_amp": 3.0,
+    "region_sigma": 0.12,
+    "region_k": 1.5,
+    "geom_samples": 600,
+    "rad_min": 0.8,
+    "pref_width": 1.2,
+    "vis_steps": 12,
+    "off_vis_max": 0.12,
+    "on_vis_min": 0.4,
+    "min_sep": 0.3,
+    "n_off_red": 2,
+    "n_off_noise": 1,
+    "n_on_noise": 1,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      0.8,
+      0.6
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "q_range": 0.9,
+    "v_explore": 8.0,
+    "ep_len": 14,
+    "op_q_range": 0.25,
+    "n_par": 8,
+    "sigma_u": 0.15,
+    "collect_k_shoot": 128,
+    "collect_cem_iters": 3,
+    "collect_replan_every": 14,
+    "wrap_limit": 3.0,
+    "goal_jit": 0.05,
+    "budget": 120,
+    "mon_n": 60,
+    "min_in": 10,
+    "buf_cap": 260,
+    "lp_steps": 150,
+    "replay_n": 1200,
+    "finetune_lr": 0.0003,
+    "finetune_steps": 300,
+    "reactive_every": 4,
+    "err_floor": 0.05,
+    "value_floor": 0.0001,
+    "fm_hidden": 128,
+    "fm_layers": 2,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1500,
+    "pool_n": 3000,
+    "probe_pool_n": 800,
+    "ceil_pool_n": 1500,
+    "n_eval": 12,
+    "plan_H": 14,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5,
+    "q_jit": 0.25,
+    "v0_std": 0.0,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "reach_tries": 40,
+    "reach_pad": 1.1,
+    "min_probe": 40,
+    "render_rounds": [],
+    "render_policies": [
+      "value-red"
+    ],
+    "render_n": 0,
+    "certify_only": true
+  },
+  "region_names": [
+    "A",
+    "Con1",
+    "Boff1",
+    "Boff2",
+    "Doff1"
+  ],
+  "region_kinds": [
+    "curl",
+    "noise",
+    "curl",
+    "curl",
+    "noise"
+  ],
+  "region_reducible": [
+    true,
+    false,
+    true,
+    true,
+    false
+  ],
+  "region_on_reach": [
+    true,
+    true,
+    false,
+    false,
+    false
+  ],
+  "region_centers": {
+    "A": [
+      0.5801751186316106,
+      0.7852783902506093
+    ],
+    "Con1": [
+      0.8476964480539111,
+      0.6355704771680634
+    ],
+    "Boff1": [
+      -0.019717520042843148,
+      1.0875030817834825
+    ],
+    "Boff2": [
+      0.11340126195780037,
+      0.8054679377614873
+    ],
+    "Doff1": [
+      0.2889306229285547,
+      1.0570430815908802
+    ]
+  },
+  "region_visitation": [
+    1.0,
+    0.4763285641454796,
+    0.001357009787306553,
+    0.046669526142526105,
+    0.07750745940551285
+  ],
+  "geom_gate": {
+    "A_vis": 1.0,
+    "dist_from_P0": [
+      0.13433298697434934,
+      0.43388513103966125,
+      0.547182914903082,
+      0.33345972217916864,
+      0.3003009482836161
+    ],
+    "on_noise_vis": [
+      0.4763285641454796
+    ],
+    "off_vis": [
+      0.001357009787306553,
+      0.046669526142526105,
+      0.07750745940551285
+    ],
+    "pass_A": true,
+    "pass_on_noise": true,
+    "pass_off": true,
+    "probe_n": [
+      1308,
+      272,
+      0,
+      274,
+      338
+    ],
+    "pass_probe": false
+  },
+  "ceil_err": [
+    0.20697446167469025,
+    0.9628157019615173,
+    NaN,
+    0.4016455113887787,
+    0.5821753740310669
+  ],
+  "floor_certification": {
+    "region": [
+      "A",
+      "Con1",
+      "Boff1",
+      "Boff2",
+      "Doff1"
+    ],
+    "kind": [
+      "curl",
+      "noise",
+      "curl",
+      "curl",
+      "noise"
+    ],
+    "ceil_err": [
+      0.20697446167469025,
+      0.9628157019615173,
+      NaN,
+      0.4016455113887787,
+      0.5821753740310669
+    ],
+    "floor_residual_ceil": [
+      0.1872566545971301,
+      0.9992209049416024,
+      NaN,
+      0.36154612819997184,
+      0.5828653791760309
+    ],
+    "floor_delta_ceil": [
+      1.1149857254679927,
+      1.622868248450751,
+      NaN,
+      0.9979816009581236,
+      1.1879126483991385
+    ],
+    "nbdist_ceil": [
+      0.5764578545869032,
+      0.6471819884477247,
+      NaN,
+      0.5073155232987446,
+      0.5290602392392865
+    ],
+    "fm_err_ceil": [
+      0.20697446167469025,
+      0.9628157019615173,
+      NaN,
+      0.4016455113887787,
+      0.5821753740310669
+    ],
+    "floor_residual_ref": [
+      0.23932675225442906,
+      1.0099839710221536,
+      NaN,
+      0.3810553913639891,
+      0.6026657370134326
+    ],
+    "floor_delta_ref": [
+      1.1149857254679927,
+      1.622868248450751,
+      NaN,
+      0.9979816009581236,
+      1.1879126483991385
+    ],
+    "nbdist_ref": [
+      0.5764578545869032,
+      0.6471819884477247,
+      NaN,
+      0.5073155232987446,
+      0.5290602392392865
+    ],
+    "fm_err_ref": [
+      0.8097582459449768,
+      1.2550345659255981,
+      NaN,
+      0.750459611415863,
+      0.8530400991439819
+    ],
+    "bias_curl_regions": 0.27440139139855096,
+    "floor_noise_regions": 0.7910431420588167,
+    "separation": 0.5166417506602656,
+    "pass_ordering": true,
+    "pass_below_ceiling": true
+  }
+}

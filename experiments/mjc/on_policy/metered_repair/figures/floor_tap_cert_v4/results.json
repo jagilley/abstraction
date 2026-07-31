@@ -1,0 +1,320 @@
+{
+  "config": {
+    "tag": "cert_v4",
+    "seed": 0,
+    "policies": [
+      "uniform",
+      "value",
+      "value-red",
+      "visits-only"
+    ],
+    "rounds": 10,
+    "drift_mode": "ou",
+    "floor_k": 4,
+    "floor_on": "residual",
+    "floor_max_n": 600,
+    "tap_ema": 0.5,
+    "eval_spread": true,
+    "ou_sigma": 1.6,
+    "b_lo": 2.0,
+    "b_hi": 10.0,
+    "drift_every": 8,
+    "drift_cycle": [
+      0,
+      0,
+      1
+    ],
+    "b1": 6.0,
+    "noise_amp": 3.0,
+    "region_sigma": 0.12,
+    "region_k": 1.5,
+    "geom_samples": 600,
+    "rad_min": 0.8,
+    "pref_width": 1.2,
+    "vis_steps": 12,
+    "off_vis_max": 0.12,
+    "on_vis_min": 0.4,
+    "min_sep": 0.3,
+    "n_off_red": 1,
+    "n_off_noise": 1,
+    "n_on_noise": 1,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      0.8,
+      0.6
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "q_range": 0.9,
+    "v_explore": 8.0,
+    "ep_len": 14,
+    "op_q_range": 0.25,
+    "n_par": 8,
+    "sigma_u": 0.15,
+    "collect_k_shoot": 128,
+    "collect_cem_iters": 3,
+    "collect_replan_every": 14,
+    "wrap_limit": 3.0,
+    "goal_jit": 0.05,
+    "budget": 120,
+    "mon_n": 60,
+    "min_in": 10,
+    "buf_cap": 260,
+    "lp_steps": 150,
+    "replay_n": 1200,
+    "finetune_lr": 0.0003,
+    "finetune_steps": 300,
+    "reactive_every": 4,
+    "err_floor": 0.05,
+    "value_floor": 0.0001,
+    "fm_hidden": 128,
+    "fm_layers": 2,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1500,
+    "pool_n": 3000,
+    "probe_pool_n": 800,
+    "ceil_pool_n": 1500,
+    "n_eval": 12,
+    "plan_H": 14,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5,
+    "q_jit": 0.25,
+    "v0_std": 0.0,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "reach_tries": 40,
+    "reach_pad": 0.9,
+    "min_probe": 40,
+    "min_density_frac": 0.01,
+    "floor_batch_sweep": [
+      600,
+      200,
+      60,
+      24,
+      16
+    ],
+    "min_separation": 0.05,
+    "ceiling_tol": 1.2,
+    "render_rounds": [],
+    "render_policies": [
+      "value-red"
+    ],
+    "render_n": 0,
+    "certify_only": true
+  },
+  "region_names": [
+    "A",
+    "Con1",
+    "Boff1",
+    "Doff1"
+  ],
+  "region_kinds": [
+    "curl",
+    "noise",
+    "curl",
+    "noise"
+  ],
+  "region_reducible": [
+    true,
+    false,
+    true,
+    false
+  ],
+  "region_on_reach": [
+    true,
+    true,
+    false,
+    false
+  ],
+  "region_centers": {
+    "A": [
+      0.5801751186316106,
+      0.7852783902506093
+    ],
+    "Con1": [
+      0.8476964480539111,
+      0.6355704771680634
+    ],
+    "Boff1": [
+      0.04361238216013169,
+      0.9884086489033531
+    ],
+    "Doff1": [
+      0.35649833324768143,
+      1.017767209611689
+    ]
+  },
+  "region_visitation": [
+    1.0,
+    0.4763285641454796,
+    0.011941701706931688,
+    0.17888932649975944
+  ],
+  "geom_gate": {
+    "A_vis": 1.0,
+    "dist_from_P0": [
+      0.13433298697434934,
+      0.43388513103966125,
+      0.4443927545050877,
+      0.23427551801780644
+    ],
+    "on_noise_vis": [
+      0.4763285641454796
+    ],
+    "off_vis": [
+      0.011941701706931688,
+      0.17888932649975944
+    ],
+    "pass_A": true,
+    "pass_on_noise": true,
+    "pass_off": false,
+    "probe_n": [
+      1155,
+      218,
+      66,
+      522
+    ],
+    "pass_probe": true
+  },
+  "ceil_err": [
+    0.30797672271728516,
+    0.9997910261154175,
+    0.2874903678894043,
+    0.6909165382385254
+  ],
+  "floor_certification": {
+    "region": [
+      "A",
+      "Con1",
+      "Boff1",
+      "Doff1"
+    ],
+    "kind": [
+      "curl",
+      "noise",
+      "curl",
+      "noise"
+    ],
+    "ceil_err": [
+      0.30797672271728516,
+      0.9997910261154175,
+      0.2874903678894043,
+      0.6909165382385254
+    ],
+    "floor_residual_ceil": [
+      0.27292866562183266,
+      1.057703854265531,
+      0.29369932532552134,
+      0.7013838396475865
+    ],
+    "floor_delta_ceil": [
+      1.1521922932281996,
+      1.681042656504542,
+      1.182334950126699,
+      1.2419180079778809
+    ],
+    "nbdist_ceil": [
+      0.5859315420608332,
+      0.6545669938862011,
+      0.6019933677435351,
+      0.5410711645173241
+    ],
+    "fm_err_ceil": [
+      0.30797672271728516,
+      0.9997910261154175,
+      0.2874903678894043,
+      0.6909165382385254
+    ],
+    "floor_residual_ref": [
+      0.31030916234590417,
+      1.076858765851406,
+      0.32227812244652126,
+      0.716605514464197
+    ],
+    "floor_delta_ref": [
+      1.1521922932281996,
+      1.681042656504542,
+      1.182334950126699,
+      1.2419180079778809
+    ],
+    "nbdist_ref": [
+      0.5859315420608332,
+      0.6545669938862011,
+      0.6019933677435351,
+      0.5410711645173241
+    ],
+    "fm_err_ref": [
+      0.8388757705688477,
+      1.2333704233169556,
+      0.7316866517066956,
+      0.9822381734848022
+    ],
+    "batch_sweep_m": [
+      600,
+      200,
+      60,
+      24,
+      16
+    ],
+    "batch_sweep": {
+      "A": [
+        0.27018247903973064,
+        0.3018192308410781,
+        0.35811144840986675,
+        0.3285207634909111,
+        0.21391493471241466
+      ],
+      "Con1": [
+        NaN,
+        1.076517496483022,
+        0.8524613498313733,
+        0.9334802290210914,
+        1.1100330934385967
+      ],
+      "Boff1": [
+        NaN,
+        NaN,
+        0.31052362080688345,
+        0.3208498434365493,
+        0.30575016321971393
+      ],
+      "Doff1": [
+        NaN,
+        0.651429031676756,
+        0.7009367778754141,
+        0.5658287363550405,
+        0.4469304887681149
+      ]
+    },
+    "batch_sweep_separation": [
+      NaN,
+      0.5621540332388109,
+      0.4423815292450186,
+      0.4249691792243358,
+      0.5186492421372915
+    ],
+    "pass_batch_sweep": true,
+    "bias_curl_regions": 0.28331399547367697,
+    "floor_noise_regions": 0.8795438469565589,
+    "separation": 0.5962298514828819,
+    "pass_ordering": true,
+    "pass_below_ceiling": true
+  }
+}
