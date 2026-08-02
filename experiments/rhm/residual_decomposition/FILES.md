@@ -14,7 +14,11 @@ Parent: [`README.md`](README.md) · [`rhm/FILES.md`](../FILES.md)
 
 ## Children
 
-None — this is a leaf node. The language and vision ports of the same measurement live under [`a2a_forward/residual_decomposition/`](../../a2a_forward/residual_decomposition/README.md) (they need that project's data and model classes) and import `decomposition.py` from here.
+| Folder | Summary |
+|---|---|
+| [`trajectory/`](trajectory/README.md) | **The decomposition over the base model's training checkpoints** — the third axis after the static audit and the wake-sleep ratchet. Re-cuts `RHM_COMPLEXODYNAMICS_README`'s rise-and-fall with the instrument that replaced rank, computing retired and trusted metrics on the identical `(A, P)` over 2 gaps × 2 arms × 4 capacities (112 fresh-FM fits). The arm dissociation on `frontier_mass` reproduces 7/7 (pressure declines, control never does) and β-rises / `R_res_participation`-falls hold in every cell — but **β fails the ±0.01 capacity-invariance check at every unsaturated checkpoint**, bounding §4's invariance claim to a regime this substrate falls outside. |
+
+The language and vision ports of the same measurement live under [`a2a_forward/residual_decomposition/`](../../a2a_forward/residual_decomposition/README.md) (they need that project's data and model classes) and import `decomposition.py` from here.
 
 ## Related, elsewhere
 

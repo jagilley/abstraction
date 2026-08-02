@@ -147,6 +147,16 @@ This corrects a natural intuition about scale. Relative naive `R_res` *does* fal
 
 **The novelty arm is confounded and answers nothing.** New rule sets at matched (v,s,L,m) share no structure with the old, so the model fully relearns and fully forgets: val loss on cycle-0 rules 1.41 → 4.51 while val on current rules stays ~1.44. That is task switching, not novelty; the fixed-probe frontier explosion (0.60) is measuring destroyed computation. Also caveat §7's frontier growth: the FM gets a fixed 1500-step repoint budget while the model's computation grows richer, so it is partly chasing a moving target.
 
+## Children
+
+### [`trajectory/`](trajectory/README.md) — the decomposition over training (2026-08-02)
+
+The third axis: the audit measures the decomposition statically, the ratchet over wake-sleep cycles, and `trajectory/` over the **base model's own training checkpoints** — the axis every complexodynamics claim rests on and the one this instrument had never been run on. It re-cuts [`RHM_COMPLEXODYNAMICS_README`](../RHM_COMPLEXODYNAMICS_README.md)'s rise-and-fall (measured with the rank instrument §1 retired) by refitting fresh FMs on the saved checkpoints and computing the retired *and* trusted metrics on the identical `(A, P)`, over 2 gaps × 2 arms × 4 capacities.
+
+**The arc survives; the exponent does not certify itself.** On `frontier_mass`, the pressure arm peaks and declines in **7/7** measurements and the control arm is monotone-up in **7/7** — so "the descent requires an annealer" now holds across two gaps and four observer bounds. Two directions hold in every cell: **β rises** and **`R_res_participation` falls** monotonically over training, i.e. the FM's error goes from noise-shaped and spread over nearly every direction to computation-shaped and contracted, while the host gets steadily *harder* to predict.
+
+But **β fails §4's capacity-invariance check at every checkpoint where it is measuring anything** (spread 0.065–0.174 vs ±0.01; the only in-tolerance points are saturated ones reading §3's noise floor). Gap width trades the two failures rather than separating them, and 0/16 checkpoints across both gaps pass both trust gates. §4's invariance was established sweeping capacity at fixed gap and never sweeping gap at fixed capacity — this substrate falls outside the regime it mapped. Consequence: on a trajectory this instrument yields robust **directions** and **contrasts**, and no trustworthy **scalar**.
+
 ## What survives of the belief
 
 The core — continual learning as growing representable directions, a persistent frontier as the signature of health — is **untouched**; none of it was tested here. What died is the arithmetic operationalization: the partition, the three-column health meter, and the flows across it. The intuition that the residual maps the model's own structure is **confirmed at 5–6× chance** — it does so by *grading* the model's directions, not by *partitioning* them.
@@ -159,6 +169,8 @@ cd experiments/
 modal run --detach -m rhm.residual_decomposition.rhm_decomposition_audit::decomposition_audit
 # RHM: wake-sleep 2x2
 modal run --detach -m rhm.residual_decomposition.rhm_decomposition_ratchet::decomposition_ratchet
+# RHM: over training checkpoints -- see trajectory/README.md for the gap/capacity variants
+modal run --detach -m rhm.residual_decomposition.trajectory.rhm_decomposition_trajectory::decomposition_trajectory
 # language + MNIST + width sweep: see a2a_forward/residual_decomposition/README.md
 
 # metric unit tests (local, no GPU)

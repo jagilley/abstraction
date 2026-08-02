@@ -50,10 +50,14 @@ Two numbers, not three, and they move independently:
 
 | | what it is | behaviour |
 |---|---|---|
-| **β** | the **shape** — how absorption falls off across the model's directions | invariant to a 4× FM-capacity range (±0.01); a property of *the model's computation* |
+| **β** | the **shape** — how absorption falls off across the model's directions | capacity-invariant (±0.01 over 4×) **only inside a regime that has not been mapped** — see below |
 | **`R_res_participation`** | the **frontier's dimensionality** — how many of the model's own working directions still carry unexplained computation | counted in the model's own basis, weighted by the computation actually done there |
 
 Plus **frontier mass** (fraction of activation variance unexplained) for size. `R_res_participation` reads **7** on RHM where naive rank reads 84, because the naive count was dominated by directions the model barely uses. That gap *is* the failure of the old instrument.
+
+**β's invariance is bounded, and the bound is not yet known.** It was established sweeping FM capacity at a *fixed* 3-block gap on d=128 models (β = 0.610 ± 0.007 MNIST, 0.607 ± 0.009 RHM) — capacity was swept at fixed gap, gap was never swept at fixed capacity. Re-running it along a training trajectory on a d=256 8-layer substrate puts it outside that regime and the invariance fails: spread **0.065–0.174** over the same 4× range, systematically (smaller FM → higher β) at every checkpoint where the FM is unsaturated, at both a 7-block and a 3-block gap. The only points inside ±0.01 are saturated ones reading the noise floor described below. So **wherever β is capacity-invariant there it is measuring nothing, and wherever it measures something it is capacity-dependent** — β is usable as a *direction* (it rises monotonically over training in every cell tested) but not as an absolute number, until the boundary of its invariant regime is mapped — [trajectory](../experiments/rhm/residual_decomposition/trajectory/README.md).
+
+The graded-shadow power law itself is untouched by this: R² = 0.93–0.99 across the whole trajectory, matching the original 0.95–0.99. What is bounded is the claim that the *exponent* is a property of the model's computation alone.
 
 ### The historical negatives this explains
 
