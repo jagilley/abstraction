@@ -239,6 +239,26 @@ difficulty, not damage.
 
 Round-0 belief: PR 7.04 ± 0.05, d4 0.665 ± 0.023.
 
+> ⚠️ **Correction to this section's framing, 2026-08-01 — the PR column does not rank targets, and
+> two children found this independently.** [`endogenous_expansion/`](endogenous_expansion/README.md)
+> found it correlationally: belief PR **anti**-correlates with target quality (ρ = −0.80 against
+> fidelity; the exact DP teacher has the *lowest* ΔPR of its four target arms).
+> [`endo_expansion/`](endo_expansion/README.md) §3 found it causally, with the content control the
+> other node did not run: an arm whose target is a **uniform random block** (agreement with `k*` at
+> chance, 0.072 vs 0.071) reaches **PR 13.5 — 145% of the DP teacher's PR lift, the largest in that
+> experiment** — with ballistic 0.016 and fresh-FM top1 0.129, i.e. exactly at the no-loop floor.
+> Across nine arms, Spearman(PR, ballistic) = **+0.27**, against +0.75 for d4 and **+0.87** for
+> fresh-FM top1. Two independent implementations, different arms, same verdict.
+>
+> **The mechanism the two agree on**: the plan CE feeds gradient to every block latent through the
+> FM and the value regardless of which move is labelled correct, so PR reads *the loss pathway
+> being present*, not the target being good.
+> **The finding below stands** — it also rests on ballistic (15× the floor) and fresh-FM
+> plannability (3×), both clean under both controls, and `frozen`/`dense` genuinely have no plan
+> term. What does not stand is leading with PR, and §9's caveat *"no PR rise with flat depth is
+> read as expansion"* is **not a sufficient guard**: the random-target arm raises PR *and* d4
+> (+41% of the lift) and produces nothing.
+
 1. **The grounded evaluative grader expands, hugely.** PR 7.0 → ~11.6 (1.7× the belief's effective dimension),
    d4 +0.15, transferable fresh-FM plannability 0.17 → 0.55 (**3×**), ballistic control 0.024 → 0.37
    (**~15× the no-loop floor, ~50× the dense grader**). Stable at 3 seeds, in all three grading worlds, under
@@ -429,13 +449,17 @@ thumb on the scale in its disfavour.
   property (floors ordered, value separation 0.61 vs 0.05, top-1 share 94.5%); L=4 was chosen because the whole
   sculpting arc is calibrated there and the loop is ~3× cheaper.
 - **PR is not certified as "the frontier"** — the idea doc's own warning. It is reported alongside depth
-  throughout, and no PR rise with flat depth is read as expansion.
+  throughout, and no PR rise with flat depth is read as expansion. **Superseded 2026-08-01 and the
+  guard is now known to be insufficient**: [`endo_expansion/`](endo_expansion/README.md) §3 shows a
+  zero-information target raising PR *and* depth while producing no control at all, so PR must be
+  read against a content control, not against depth. See the correction box in §5.
 
 ## 10. Children
 
 | Child | What |
 |---|---|
 | [`endogenous_expansion/`](endogenous_expansion/README.md) | **The central gap closed, weakly — and §5's headline metric retired as a ranker.** §5's evaluative grader is external and precomputed; §3's `visits` is endogenous but was only ever tested for *allocation*. This runs the missing cell: 7 arms differing in **one variable, where `belief_update`'s target comes from**, with `frozen`/`dense`/`evaluative` reproduced in-run as anchors. An endogenous MC critic — no DP, no rule table, no channel label, paying 10.08M rollout transitions for terminal-success labels — **does expand** above the no-loop floor on all four readouts, 3/3 seeds in two replicates, but recovers only **19%** of the DP teacher's ballistic lift (66% depth, 51% transfer). Two *external* teachers degraded to matched fidelity bracket it, and it beats them: **the residual gap is target fidelity, not endogeneity**, and §8's mirror-grader hazard did not appear. The mechanism is one number — policy move-quality converges to its target's fidelity *from whichever side it starts* (DP 0.674→0.748 up, critic 0.400→0.333 down), so **a grader is a ceiling**. Two findings that cut against this node: **belief PR anti-correlates with target quality** (ρ = −0.80; the exact DP has the *lowest* ΔPR of the four target arms), and `R_res_participation` does not replace it — it is 1.1× `R_act` and inherits the inversion. Every dimension-*count* fails; only *magnitude* measures track function, with a compression sign. PR remains a valid **detector** (clean target-present/absent separation, which is the regime §5 used, so §5 stands) and an invalid **ranker** |
+| [`endo_expansion/`](endo_expansion/README.md) | **E4 — can an *endogenous* evaluative grader expand?** The metered-data doc names this the program's central gap: §5's teacher expands but is external and precomputed, §3's `visits` is endogenous but was only ever allocated, and no run was both. Nine arms on one warm start. **It expands**: a Monte-Carlo teacher reading only the environment's terminal reward — no DP, no rule tables, no channel labels — recovers **34%** of the DP teacher's ballistic lift and **53%** of its transferable plannability, 3/3 seeds, and its rank-correlation with the dense inner grader (**−0.130**) sits on the *external* teacher's side (−0.220) of a homogeneous floor of **+0.946**, so the two loops did not collapse into one. Two further results: endogenous *allocation* of an external target works but is beaten by endogenous *target generation* (+0.069 ballistic, t=+5.8), and §7's paid-vs-reported design rule comes back a scoped negative. **And the correction in §5 above**: belief PR is anti-informative on this substrate |
 | [`partial_hetero/`](partial_hetero/README.md) | **Cut-3 — the partially-heterogeneous DGP**, built and running. §3's ladder measures allocation in a geometry where the distractors share *nothing* with the tree, so ground-truth relevance is exactly 0.000 off-tree and the selector faces no judgment call. `partial_hetero` adds a sharing-depth knob: `structA` is depth-matched to the tree and takes its top *k* rule tables, giving a sweep from this node's independent-grammar geometry (*k*=0) to [`specialization`](../../specialization/README.md)'s single-ruleset one (*k*=4). Structural irrelevance is untouched at every depth — what changes is what the distractor's data is worth to the *learner*. Two measurements: a static coverage-matched **transfer curve**, and this ladder re-run at each depth with a **`oracle_shared`** rung that separates *stipulated relevance* from *actual data value*. Built, run and written up in the child — read it there; the result is deliberately not summarised at this altitude, because what it mainly establishes is about the *readout* rather than about this node's findings |
 
 ## 11. Open items
@@ -450,7 +474,11 @@ thumb on the scale in its disfavour.
    `value_red` and `visits_only` tie by construction.
 5. **Why does the dense grader land *below* the no-loop floor?** Stage 5 saw it cap; here it actively degrades
    depth and control in both worlds. Worth understanding before "endogenous predictability pressure is merely
-   insufficient" is restated as "actively harmful".
+   insufficient" is restated as "actively harmful". **Partially answered 2026-08-01**:
+   [`endo_expansion/`](endo_expansion/README.md) §3 lands two *non-dense* arms below the floor too
+   (a shuffled and a random target, ballistic 0.011 and 0.016 against frozen's 0.024), so this is
+   about reshaping the belief toward a target that does not track the task rather than about
+   density. Suggestive, not settled — those deltas are t = −1.9 and −1.1.
 6. **Push the sweep past S=64.** The migration crosses zero at the starved end but the deep gain is still only
    +0.014; whether it keeps growing or the whole system collapses first is unmeasured.
 

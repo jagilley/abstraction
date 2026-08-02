@@ -916,7 +916,7 @@ def value_relevance_check(value, controller, generator, layout, tb, x0, roots, *
 # --------------------------------------------------------------------------- #
 
 def open_loop_beam(controller, generator, fm, value, tb, layout, x0, roots, *, budget,
-                   beam_width, render, gen, device, chunk_len=3):
+                   beam_width, render, gen, device, chunk_len=3, return_final=False):
     """BALLISTIC control: plan `chunk_len` steps entirely in imagination (roll the FM's own
     predictions, no re-grounding), COMMIT and execute them, re-ground, repeat.
 
@@ -933,6 +933,11 @@ def open_loop_beam(controller, generator, fm, value, tb, layout, x0, roots, *, b
     the whole `edit_budget=10` plan in one shot therefore grades imagination drift rather than
     FM quality -- a first smoke returned 0.000 for every arm. Chunked commitment is also what
     E3's ballistic controller did: commit a plan segment, then re-ground.
+
+    `return_final=True` additionally hands back the terminal sequences, so the SAME run can be
+    read by the PAID grader (possible-set success) and by the REPORTED one (the controller's own
+    log P(r*)). That pair is `RHM_EDIT_CONTROL`'s Layer-1/Layer-2 table, and their divergence is
+    the wireheading signature. Default False leaves every existing caller bit-identical.
     """
     import torch
     from rhm.rhm_channels import possible_set_success
@@ -949,6 +954,8 @@ def open_loop_beam(controller, generator, fm, value, tb, layout, x0, roots, *, b
             for t in range(h):
                 x = regenerate_block(generator, x, plan[:, t], tb, render=render, gen=gen)
         succ = possible_set_success(layout, x.cpu().numpy(), roots.cpu().numpy())
+    if return_final:
+        return float(succ.mean()), x, roots
     return float(succ.mean())
 
 
@@ -1278,7 +1285,7 @@ def collect_grounded_moves(layout, tb, generator, x, roots, *, render, gen, devi
 def belief_update(mode, controller, block_fm, value, generator, layout, tb, *, train_leaves,
                   train_roots, gstates, groots, gkstar, n_steps, batch_size, lr, lam_fm,
                   lam_plan, tau, n_corrupt, edit_budget, render, gen, device, p_full=0.5,
-                  seed=0):
+                  seed=0, pstates=None, proots=None):
     """One chunk of belief training. Nested exactly as Stage 5's ladder, so the contrasts
     isolate the same things they isolated there:
 
@@ -1293,6 +1300,14 @@ def belief_update(mode, controller, block_fm, value, generator, layout, tb, *, t
 
     `dense subset evaluative`, so `evaluative - dense` isolates GROUNDING and nothing else --
     which is the whole content of the 2x2's missing cell.
+
+    `pstates`/`proots` optionally give the PLAN term its own state pool, defaulting to
+    `gstates`/`groots` (bit-identical to every existing caller). This exists because an
+    endogenous teacher, unlike the DP, has no opinion on some states -- a Monte-Carlo terminal
+    return that is constant across all 14 candidates carries zero information, and training a
+    hard CE on a coin flip there is training on noise. Filtering those out of the PLAN pool
+    while leaving the DENSE pool untouched keeps the dense term's state distribution matched
+    across arms, so `endo - evaluative` still isolates the teacher and nothing else.
     """
     import torch
     import torch.nn.functional as F
@@ -1342,10 +1357,12 @@ def belief_update(mode, controller, block_fm, value, generator, layout, tb, *, t
                                     + F.mse_loss(delta, block_fm(z, k).detach()))
 
         if mode == "evaluative":
-            sub = rng.integers(0, gstates.shape[0], size=batch_size)
+            px = gstates if pstates is None else pstates
+            pr = groots if proots is None else proots
+            sub = rng.integers(0, px.shape[0], size=batch_size)
             si = torch.from_numpy(sub).to(device)
-            zp = controller.block_state(gstates[si])
-            rp = groots[si]
+            zp = controller.block_state(px[si])
+            rp = pr[si]
             logits = torch.stack([
                 value((zp + block_fm(zp, arange_r[j].expand(batch_size))).mean(dim=1), rp)
                 for j in range(n_blocks)], dim=1) / tau

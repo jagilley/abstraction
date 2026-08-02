@@ -10,6 +10,14 @@ this closes the gap named in its own "What this does not establish".
 §4b (compression vs expansion), §8 (the mirror-grader criterion).
 **Design rule held to**: [`adaptive_core_and_hierarchy_climb.md`](../../../../../ideas/adaptive_core_and_hierarchy_climb.md)
 §7 — *an endogenous value must be denominated in a currency the agent pays, not one it reports.*
+**Companion node**: [`../endo_expansion/`](../endo_expansion/README.md) — built in parallel and
+without contact on the same gap, merged second. It runs the **paid**-currency teacher (sampled
+terminal task success) where this node's `critic` runs the reported one, adds **content** controls
+(the same teacher re-paired across states, and a uniform random block) where this node adds
+**fidelity** controls, and builds the grader-disagreement instrument. **It reaches the same verdict
+on PR by a different route** — a zero-information target tops its PR table — which sharpens this
+node's detector/ranker split: PR detects the plan-CE *pathway*, not the target's quality. It also
+runs the (a) allocation cut this node declined. See its §0 for the full side-by-side.
 
 ---
 

@@ -1,0 +1,1308 @@
+{
+  "config": {
+    "v": 8,
+    "s": 2,
+    "tree_depth": 4,
+    "total_len": 28,
+    "n_blocks": 14,
+    "n_tree_blocks": 8,
+    "edit_budget": 6,
+    "presteps": 3,
+    "rounds": 10,
+    "belief_steps": 1500,
+    "ground_states": 3072,
+    "teacher_horizon": 2,
+    "teacher_rolls": 3,
+    "teacher_eps": 0.1,
+    "min_informative": 128,
+    "dp_blocks": 3,
+    "forecast_n": 512,
+    "n_dis": 256,
+    "dis_rolls": 1,
+    "n_calib": 512,
+    "calib_rolls": 2,
+    "world": "static",
+    "arms": [
+      "endo_random"
+    ],
+    "render": "mixture",
+    "seed": 1,
+    "entropy_matched_base": true,
+    "sigma": {
+      "3": 0.15952283172607423
+    }
+  },
+  "belief_round0": {
+    "d1": 0.8068055510520935,
+    "d2": 0.6447222232818604,
+    "d3": 0.5968055725097656,
+    "d4": 0.6973611116409302,
+    "PR": 7.106710910797119
+  },
+  "results": {
+    "endo_random": {
+      "rounds": [
+        {
+          "round": 1,
+          "depth": {
+            "d1": 0.7986111044883728,
+            "d2": 0.6683333516120911,
+            "d3": 0.5952777862548828,
+            "d4": 0.7320833802223206,
+            "PR": 9.644652366638184
+          },
+          "root_ce": 0.3545006662607193,
+          "root_acc": 0.26171875,
+          "plan_acc": 0.9921875,
+          "teacher": {
+            "agree_dp": 0.07063802083333333,
+            "tree_share": 0.5794270833333334,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.034830729166666664,
+            "dstar_cur": 3.7529296875,
+            "dstar_best_move": 2.2109375
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 5.25521262231507e-08,
+            "realised_mean": 0.1494140625,
+            "bias": -0.14941400994787377,
+            "corr": 0.13439956463933417
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.11857496524167721,
+              "cost": 0.623506437022652,
+              "pctile": 0.18582589285714285
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.98828125,
+              "rank_corr": -0.07541274408173808,
+              "cost": 0.4605370504339846,
+              "pctile": 0.3295200892857143
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.07170495714961311,
+              "cost": 0.653106595916559,
+              "pctile": 0.18582589285714285
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": 0.19719487023436955,
+              "cost": 0.6109387228001275,
+              "pctile": 0.1939174107142857
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.6875,
+              "rank_corr": 0.4213169673739356,
+              "cost": 0.416015625,
+              "pctile": 0.4171316964285714
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.7578125,
+              "rank_corr": 0.13876275675340285,
+              "cost": 0.4641927083333333,
+              "pctile": 0.41378348214285715
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.90625,
+              "rank_corr": 0.04858276086407521,
+              "cost": 0.3125,
+              "pctile": 0.06138392857142857
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.65625,
+              "rank_corr": 0.3231717514876559,
+              "cost": 0.291015625,
+              "pctile": 0.56640625
+            }
+          },
+          "disagree_has_fresh": false
+        },
+        {
+          "round": 2,
+          "depth": {
+            "d1": 0.7863889336585999,
+            "d2": 0.6572222113609314,
+            "d3": 0.5894444584846497,
+            "d4": 0.7450000047683716,
+            "PR": 10.44315242767334
+          },
+          "root_ce": 0.36524832248687744,
+          "root_acc": 0.28125,
+          "plan_acc": 0.98046875,
+          "teacher": {
+            "agree_dp": 0.07161458333333333,
+            "tree_share": 0.560546875,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.03515625,
+            "dstar_cur": 3.7936197916666665,
+            "dstar_best_move": 2.255859375
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 1.7194779544454852e-20,
+            "realised_mean": 0.16796875,
+            "bias": -0.16796875,
+            "corr": NaN
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.15991470716091905,
+              "cost": 0.6045581608907736,
+              "pctile": 0.19224330357142855
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.94140625,
+              "rank_corr": -0.08529415057390757,
+              "cost": 0.40712649345995555,
+              "pctile": 0.37193080357142855
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.0252477809372249,
+              "cost": 0.6053516272929975,
+              "pctile": 0.1953125
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": 0.2062217021902526,
+              "cost": 0.5936329996774297,
+              "pctile": 0.21456473214285715
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.6796875,
+              "rank_corr": 0.3863365444899053,
+              "cost": 0.4117838541666667,
+              "pctile": 0.4224330357142857
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.7578125,
+              "rank_corr": 0.11928125771845274,
+              "cost": 0.44596354166666663,
+              "pctile": 0.412109375
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.85546875,
+              "rank_corr": 0.09223358103685185,
+              "cost": 0.25390625,
+              "pctile": 0.10825892857142856
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.671875,
+              "rank_corr": 0.32548331941552955,
+              "cost": 0.2972005208333333,
+              "pctile": 0.5426897321428572
+            }
+          },
+          "disagree_has_fresh": false,
+          "xworld": {
+            "base": {
+              "ballistic_w16": 0.013671875,
+              "beam_grades": {
+                "belief_p_rstar": 0.31744474172592163,
+                "true_success": 0.013671875
+              },
+              "fm": {
+                "delta_cos": 0.22997185587882996,
+                "value_top1_agree": 0.142578125,
+                "value_rank_corr": 0.2142021656036377,
+                "delta_cos_per_channel": [
+                  0.3154575116932392,
+                  0.08865165337920189,
+                  0.11426611617207527,
+                  0.1267726719379425,
+                  0.16333776712417603
+                ]
+              },
+              "tree_floor": 0.2341319719950358
+            },
+            "novel": {
+              "ballistic_w16": 0.0087890625,
+              "beam_grades": {
+                "belief_p_rstar": 0.3153761625289917,
+                "true_success": 0.0087890625
+              },
+              "fm": {
+                "delta_cos": 0.23695722222328186,
+                "value_top1_agree": 0.130859375,
+                "value_rank_corr": 0.23546357452869415,
+                "delta_cos_per_channel": [
+                  0.3266633525490761,
+                  0.09010519459843636,
+                  0.11619280651211739,
+                  0.12621574103832245,
+                  0.1652824580669403
+                ]
+              },
+              "tree_floor": 0.22424890597661337
+            }
+          },
+          "fresh_fm": {
+            "delta_cos": 0.22997185587882996,
+            "value_top1_agree": 0.142578125,
+            "value_rank_corr": 0.2142021656036377,
+            "delta_cos_per_channel": [
+              0.3154575116932392,
+              0.08865165337920189,
+              0.11426611617207527,
+              0.1267726719379425,
+              0.16333776712417603
+            ]
+          },
+          "ballistic_w16": 0.013671875,
+          "beam_grades": {
+            "belief_p_rstar": 0.31744474172592163,
+            "true_success": 0.013671875
+          }
+        },
+        {
+          "round": 3,
+          "depth": {
+            "d1": 0.784166693687439,
+            "d2": 0.6543055772781372,
+            "d3": 0.5875000357627869,
+            "d4": 0.7487500309944153,
+            "PR": 11.3616943359375
+          },
+          "root_ce": 0.3704957515001297,
+          "root_acc": 0.5390625,
+          "plan_acc": 0.99609375,
+          "teacher": {
+            "agree_dp": 0.07259114583333333,
+            "tree_share": 0.5817057291666666,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.038411458333333336,
+            "dstar_cur": 3.7958984375,
+            "dstar_best_move": 2.2581380208333335
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 6.789928111382056e-36,
+            "realised_mean": 0.1708984375,
+            "bias": -0.1708984375,
+            "corr": NaN
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 0.9921875,
+              "rank_corr": -0.12978587902977162,
+              "cost": 0.5776492099728752,
+              "pctile": 0.22237723214285715
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.953125,
+              "rank_corr": -0.0659899586970673,
+              "cost": 0.42346476935370936,
+              "pctile": 0.3685825892857143
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.0063121479329730605,
+              "cost": 0.6212836849011756,
+              "pctile": 0.1925223214285714
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": 0.19119104331802028,
+              "cost": 0.6193649742590074,
+              "pctile": 0.1986607142857143
+            },
+            "fm_pred_vs_fm_pred_fresh": {
+              "top1_disagree": 0.45703125,
+              "rank_corr": 0.9655571444203366,
+              "cost": 0.015933110001312433,
+              "pctile": 0.8683035714285716
+            },
+            "dp_vs_fm_pred_fresh": {
+              "top1_disagree": 0.9921875,
+              "rank_corr": -0.13699665628237234,
+              "cost": 0.5927018612558715,
+              "pctile": 0.220703125
+            },
+            "roll_vs_fm_pred_fresh": {
+              "top1_disagree": 0.9765625,
+              "rank_corr": -0.07157108314086782,
+              "cost": 0.44667299028375024,
+              "pctile": 0.3493303571428571
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.63671875,
+              "rank_corr": 0.406397637372763,
+              "cost": 0.390625,
+              "pctile": 0.4369419642857143
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.765625,
+              "rank_corr": 0.09703238269941461,
+              "cost": 0.4524739583333333,
+              "pctile": 0.4229910714285714
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.87109375,
+              "rank_corr": 0.05085346602531695,
+              "cost": 0.3203125,
+              "pctile": 0.091796875
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.6484375,
+              "rank_corr": 0.3373122849299375,
+              "cost": 0.2685546875,
+              "pctile": 0.5920758928571429
+            }
+          },
+          "disagree_has_fresh": true
+        },
+        {
+          "round": 4,
+          "depth": {
+            "d1": 0.7752777934074402,
+            "d2": 0.6554166674613953,
+            "d3": 0.5954166650772095,
+            "d4": 0.7393055558204651,
+            "PR": 12.069156646728516
+          },
+          "root_ce": 0.3663087785243988,
+          "root_acc": 0.8046875,
+          "plan_acc": 1.0,
+          "teacher": {
+            "agree_dp": 0.06868489583333333,
+            "tree_share": 0.5673828125,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.037109375,
+            "dstar_cur": 3.7734375,
+            "dstar_best_move": 2.2454427083333335
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 0.0,
+            "realised_mean": 0.15234375,
+            "bias": -0.15234375,
+            "corr": NaN
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.13180723095795033,
+              "cost": 0.6025362128151204,
+              "pctile": 0.21010044642857142
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.93359375,
+              "rank_corr": -0.09609988377340349,
+              "cost": 0.42512348298989494,
+              "pctile": 0.3744419642857143
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.00029099997717053905,
+              "cost": 0.6068319263451596,
+              "pctile": 0.21400669642857145
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": 0.1555168270751042,
+              "cost": 0.6137474584754254,
+              "pctile": 0.20340401785714285
+            },
+            "fm_pred_vs_fm_pred_fresh": {
+              "top1_disagree": 0.58203125,
+              "rank_corr": 0.9712113150123167,
+              "cost": 0.01725406264060604,
+              "pctile": 0.8482142857142858
+            },
+            "dp_vs_fm_pred_fresh": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.14240059073586225,
+              "cost": 0.6155910137623062,
+              "pctile": 0.21595982142857142
+            },
+            "roll_vs_fm_pred_fresh": {
+              "top1_disagree": 0.98046875,
+              "rank_corr": -0.10196091555591602,
+              "cost": 0.44714095382109,
+              "pctile": 0.3655133928571429
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.640625,
+              "rank_corr": 0.47614386082207744,
+              "cost": 0.380859375,
+              "pctile": 0.4494977678571428
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.75390625,
+              "rank_corr": 0.09387771217703343,
+              "cost": 0.4322916666666667,
+              "pctile": 0.44977678571428575
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.84375,
+              "rank_corr": 0.03030732323225358,
+              "cost": 0.28515625,
+              "pctile": 0.076171875
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.625,
+              "rank_corr": 0.32544803192184235,
+              "cost": 0.2581380208333333,
+              "pctile": 0.60546875
+            }
+          },
+          "disagree_has_fresh": true,
+          "xworld": {
+            "base": {
+              "ballistic_w16": 0.00390625,
+              "beam_grades": {
+                "belief_p_rstar": 0.30851200222969055,
+                "true_success": 0.00390625
+              },
+              "fm": {
+                "delta_cos": 0.30533838272094727,
+                "value_top1_agree": 0.11328125,
+                "value_rank_corr": 0.20364809036254883,
+                "delta_cos_per_channel": [
+                  0.32648172974586487,
+                  0.23469190299510956,
+                  0.2801850140094757,
+                  0.295559823513031,
+                  0.3375697135925293
+                ]
+              },
+              "tree_floor": 0.24586681524912515
+            },
+            "novel": {
+              "ballistic_w16": 0.0048828125,
+              "beam_grades": {
+                "belief_p_rstar": 0.3080170154571533,
+                "true_success": 0.0048828125
+              },
+              "fm": {
+                "delta_cos": 0.3127784729003906,
+                "value_top1_agree": 0.1142578125,
+                "value_rank_corr": 0.21622392535209656,
+                "delta_cos_per_channel": [
+                  0.33537379279732704,
+                  0.24064265191555023,
+                  0.28586864471435547,
+                  0.30343055725097656,
+                  0.33945444226264954
+                ]
+              },
+              "tree_floor": 0.24622629086176553
+            }
+          },
+          "fresh_fm": {
+            "delta_cos": 0.30533838272094727,
+            "value_top1_agree": 0.11328125,
+            "value_rank_corr": 0.20364809036254883,
+            "delta_cos_per_channel": [
+              0.32648172974586487,
+              0.23469190299510956,
+              0.2801850140094757,
+              0.295559823513031,
+              0.3375697135925293
+            ]
+          },
+          "ballistic_w16": 0.00390625,
+          "beam_grades": {
+            "belief_p_rstar": 0.30851200222969055,
+            "true_success": 0.00390625
+          }
+        },
+        {
+          "round": 5,
+          "depth": {
+            "d1": 0.7706944346427917,
+            "d2": 0.6569444537162781,
+            "d3": 0.5954166650772095,
+            "d4": 0.7351388931274414,
+            "PR": 13.109591484069824
+          },
+          "root_ce": 0.3713558167219162,
+          "root_acc": 0.765625,
+          "plan_acc": 0.9765625,
+          "teacher": {
+            "agree_dp": 0.06803385416666667,
+            "tree_share": 0.5810546875,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.037760416666666664,
+            "dstar_cur": 3.7897135416666665,
+            "dstar_best_move": 2.2568359375
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 0.0,
+            "realised_mean": 0.1572265625,
+            "bias": -0.1572265625,
+            "corr": NaN
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 0.99609375,
+              "rank_corr": -0.16380549761185656,
+              "cost": 0.6340370078806309,
+              "pctile": 0.20340401785714285
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.9296875,
+              "rank_corr": -0.09266298606131362,
+              "cost": 0.42863688125110655,
+              "pctile": 0.37723214285714285
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.08213508667400529,
+              "cost": 0.649178792337529,
+              "pctile": 0.18526785714285715
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": 0.17241134095011176,
+              "cost": 0.6508782577803343,
+              "pctile": 0.19252232142857142
+            },
+            "fm_pred_vs_fm_pred_fresh": {
+              "top1_disagree": 0.65234375,
+              "rank_corr": 0.9456373572949189,
+              "cost": 0.04269498630219419,
+              "pctile": 0.8242187500000001
+            },
+            "dp_vs_fm_pred_fresh": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.15954837609193678,
+              "cost": 0.6322157481508901,
+              "pctile": 0.20340401785714285
+            },
+            "roll_vs_fm_pred_fresh": {
+              "top1_disagree": 0.97265625,
+              "rank_corr": -0.0904436598874836,
+              "cost": 0.4530351388152706,
+              "pctile": 0.3529575892857143
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.66796875,
+              "rank_corr": 0.40395116998684016,
+              "cost": 0.41308593749999994,
+              "pctile": 0.4243861607142857
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.75390625,
+              "rank_corr": 0.08897985125619452,
+              "cost": 0.4619140625,
+              "pctile": 0.4188058035714285
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.875,
+              "rank_corr": 0.05835376538381967,
+              "cost": 0.3203125,
+              "pctile": 0.07784598214285714
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.6640625,
+              "rank_corr": 0.3199322287359107,
+              "cost": 0.28776041666666663,
+              "pctile": 0.5747767857142858
+            }
+          },
+          "disagree_has_fresh": true
+        },
+        {
+          "round": 6,
+          "depth": {
+            "d1": 0.7663888931274414,
+            "d2": 0.6565278172492981,
+            "d3": 0.5981944799423218,
+            "d4": 0.7276389002799988,
+            "PR": 13.30267333984375
+          },
+          "root_ce": 0.36975574493408203,
+          "root_acc": 0.29296875,
+          "plan_acc": 0.98046875,
+          "teacher": {
+            "agree_dp": 0.07096354166666667,
+            "tree_share": 0.5729166666666666,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.033203125,
+            "dstar_cur": 3.8349609375,
+            "dstar_best_move": 2.2828776041666665
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 0.0,
+            "realised_mean": 0.15234375,
+            "bias": -0.15234375,
+            "corr": NaN
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 0.98828125,
+              "rank_corr": -0.14241266466425642,
+              "cost": 0.6119653588628249,
+              "pctile": 0.22544642857142858
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.921875,
+              "rank_corr": -0.1218076292491484,
+              "cost": 0.43648624404070646,
+              "pctile": 0.38643973214285715
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.022005088010935574,
+              "cost": 0.6347430103872977,
+              "pctile": 0.21065848214285715
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": 0.1562090505134443,
+              "cost": 0.6450923950550009,
+              "pctile": 0.20089285714285715
+            },
+            "fm_pred_vs_fm_pred_fresh": {
+              "top1_disagree": 0.6328125,
+              "rank_corr": 0.9487087544099629,
+              "cost": 0.03650446476858019,
+              "pctile": 0.8376116071428572
+            },
+            "dp_vs_fm_pred_fresh": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.14724400712927938,
+              "cost": 0.6235339997025386,
+              "pctile": 0.21065848214285715
+            },
+            "roll_vs_fm_pred_fresh": {
+              "top1_disagree": 0.97265625,
+              "rank_corr": -0.11591532505358856,
+              "cost": 0.45159821649584897,
+              "pctile": 0.3655133928571429
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.65625,
+              "rank_corr": 0.4303191490321905,
+              "cost": 0.40006510416666663,
+              "pctile": 0.4302455357142857
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.75,
+              "rank_corr": 0.0625160940873657,
+              "cost": 0.4524739583333333,
+              "pctile": 0.419921875
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.8515625,
+              "rank_corr": 0.055051815291393705,
+              "cost": 0.2890625,
+              "pctile": 0.10825892857142858
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.63671875,
+              "rank_corr": 0.3376097665858051,
+              "cost": 0.263671875,
+              "pctile": 0.5943080357142857
+            }
+          },
+          "disagree_has_fresh": true,
+          "xworld": {
+            "base": {
+              "ballistic_w16": 0.0009765625,
+              "beam_grades": {
+                "belief_p_rstar": 0.3114592432975769,
+                "true_success": 0.0009765625
+              },
+              "fm": {
+                "delta_cos": 0.289907306432724,
+                "value_top1_agree": 0.06640625,
+                "value_rank_corr": 0.2001621276140213,
+                "delta_cos_per_channel": [
+                  0.32189909368753433,
+                  0.1980525180697441,
+                  0.25567618012428284,
+                  0.24894575774669647,
+                  0.3271063566207886
+                ]
+              },
+              "tree_floor": 0.2572220762570699
+            },
+            "novel": {
+              "ballistic_w16": 0.001953125,
+              "beam_grades": {
+                "belief_p_rstar": 0.30903345346450806,
+                "true_success": 0.001953125
+              },
+              "fm": {
+                "delta_cos": 0.2928435802459717,
+                "value_top1_agree": 0.07421875,
+                "value_rank_corr": 0.2025122344493866,
+                "delta_cos_per_channel": [
+                  0.3301798738539219,
+                  0.19353731721639633,
+                  0.2510743588209152,
+                  0.25084802508354187,
+                  0.3182997405529022
+                ]
+              },
+              "tree_floor": 0.2558784484863281
+            }
+          },
+          "fresh_fm": {
+            "delta_cos": 0.289907306432724,
+            "value_top1_agree": 0.06640625,
+            "value_rank_corr": 0.2001621276140213,
+            "delta_cos_per_channel": [
+              0.32189909368753433,
+              0.1980525180697441,
+              0.25567618012428284,
+              0.24894575774669647,
+              0.3271063566207886
+            ]
+          },
+          "ballistic_w16": 0.0009765625,
+          "beam_grades": {
+            "belief_p_rstar": 0.3114592432975769,
+            "true_success": 0.0009765625
+          }
+        },
+        {
+          "round": 7,
+          "depth": {
+            "d1": 0.7756944894790649,
+            "d2": 0.6715278029441833,
+            "d3": 0.6111111044883728,
+            "d4": 0.7173611521720886,
+            "PR": 13.44560718536377
+          },
+          "root_ce": 0.3632090538740158,
+          "root_acc": 0.796875,
+          "plan_acc": 0.984375,
+          "teacher": {
+            "agree_dp": 0.07356770833333333,
+            "tree_share": 0.5921223958333334,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.036783854166666664,
+            "dstar_cur": 3.8177083333333335,
+            "dstar_best_move": 2.291015625
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 0.0,
+            "realised_mean": 0.1591796875,
+            "bias": -0.1591796875,
+            "corr": NaN
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.13890505878349296,
+              "cost": 0.6265081403793445,
+              "pctile": 0.19866071428571427
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.95703125,
+              "rank_corr": -0.10367853947083099,
+              "cost": 0.45757724774922065,
+              "pctile": 0.3501674107142857
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.011641205105666085,
+              "cost": 0.6470791391804237,
+              "pctile": 0.18387276785714285
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 0.99609375,
+              "rank_corr": 0.21340194006896396,
+              "cost": 0.6514397278820001,
+              "pctile": 0.1802455357142857
+            },
+            "fm_pred_vs_fm_pred_fresh": {
+              "top1_disagree": 0.65625,
+              "rank_corr": 0.9326223671252827,
+              "cost": 0.05503332161213659,
+              "pctile": 0.8194754464285715
+            },
+            "dp_vs_fm_pred_fresh": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.15499709057989075,
+              "cost": 0.6501535794448778,
+              "pctile": 0.19196428571428573
+            },
+            "roll_vs_fm_pred_fresh": {
+              "top1_disagree": 0.96484375,
+              "rank_corr": -0.10758495847081274,
+              "cost": 0.4820974600840724,
+              "pctile": 0.349609375
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.6953125,
+              "rank_corr": 0.43132119150800297,
+              "cost": 0.4134114583333333,
+              "pctile": 0.4352678571428571
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.74609375,
+              "rank_corr": 0.09186038172236807,
+              "cost": 0.46744791666666663,
+              "pctile": 0.42354910714285715
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.83984375,
+              "rank_corr": 0.07492444541658501,
+              "cost": 0.24609375,
+              "pctile": 0.1138392857142857
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.6171875,
+              "rank_corr": 0.31303120191936745,
+              "cost": 0.287109375,
+              "pctile": 0.5809151785714286
+            }
+          },
+          "disagree_has_fresh": true
+        },
+        {
+          "round": 8,
+          "depth": {
+            "d1": 0.7695833444595337,
+            "d2": 0.6738889217376709,
+            "d3": 0.5998611450195312,
+            "d4": 0.7173611521720886,
+            "PR": 13.681063652038574
+          },
+          "root_ce": 0.37712566554546356,
+          "root_acc": 0.8046875,
+          "plan_acc": 0.98828125,
+          "teacher": {
+            "agree_dp": 0.07063802083333333,
+            "tree_share": 0.5709635416666666,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.036783854166666664,
+            "dstar_cur": 3.7600911458333335,
+            "dstar_best_move": 2.2291666666666665
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 0.0,
+            "realised_mean": 0.1640625,
+            "bias": -0.1640625,
+            "corr": NaN
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.11737270703773774,
+              "cost": 0.5924238793046764,
+              "pctile": 0.21763392857142858
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.96484375,
+              "rank_corr": -0.09758851562154834,
+              "cost": 0.44157837531185895,
+              "pctile": 0.3565848214285714
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.0415144003198831,
+              "cost": 0.6475546103550157,
+              "pctile": 0.17996651785714285
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": 0.17239818193919304,
+              "cost": 0.6586122930877205,
+              "pctile": 0.1802455357142857
+            },
+            "fm_pred_vs_fm_pred_fresh": {
+              "top1_disagree": 0.6328125,
+              "rank_corr": 0.9379576323319982,
+              "cost": 0.05015534175934702,
+              "pctile": 0.8130580357142858
+            },
+            "dp_vs_fm_pred_fresh": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.13390009616790846,
+              "cost": 0.6108524501003159,
+              "pctile": 0.216796875
+            },
+            "roll_vs_fm_pred_fresh": {
+              "top1_disagree": 0.96484375,
+              "rank_corr": -0.09955913875211993,
+              "cost": 0.45681181129177983,
+              "pctile": 0.3630022321428572
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.65625,
+              "rank_corr": 0.41700389295097395,
+              "cost": 0.3759765625,
+              "pctile": 0.4547991071428571
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.75,
+              "rank_corr": 0.10529435672194232,
+              "cost": 0.46484375,
+              "pctile": 0.41294642857142855
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.84375,
+              "rank_corr": 0.0657400954039418,
+              "cost": 0.28125,
+              "pctile": 0.1021205357142857
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.60546875,
+              "rank_corr": 0.3368209532270625,
+              "cost": 0.25358072916666663,
+              "pctile": 0.5990513392857143
+            }
+          },
+          "disagree_has_fresh": true,
+          "xworld": {
+            "base": {
+              "ballistic_w16": 0.005859375,
+              "beam_grades": {
+                "belief_p_rstar": 0.323763906955719,
+                "true_success": 0.005859375
+              },
+              "fm": {
+                "delta_cos": 0.2788962721824646,
+                "value_top1_agree": 0.1005859375,
+                "value_rank_corr": 0.1903679370880127,
+                "delta_cos_per_channel": [
+                  0.31104491278529167,
+                  0.18988075852394104,
+                  0.24460870027542114,
+                  0.25620192289352417,
+                  0.2910076379776001
+                ]
+              },
+              "tree_floor": 0.2654392719268799
+            },
+            "novel": {
+              "ballistic_w16": 0.005859375,
+              "beam_grades": {
+                "belief_p_rstar": 0.32736432552337646,
+                "true_success": 0.005859375
+              },
+              "fm": {
+                "delta_cos": 0.2837408781051636,
+                "value_top1_agree": 0.09765625,
+                "value_rank_corr": 0.19636270403862,
+                "delta_cos_per_channel": [
+                  0.3189547434449196,
+                  0.18700773268938065,
+                  0.2442978397011757,
+                  0.2588839530944824,
+                  0.2992390990257263
+                ]
+              },
+              "tree_floor": 0.25494492053985596
+            }
+          },
+          "fresh_fm": {
+            "delta_cos": 0.2788962721824646,
+            "value_top1_agree": 0.1005859375,
+            "value_rank_corr": 0.1903679370880127,
+            "delta_cos_per_channel": [
+              0.31104491278529167,
+              0.18988075852394104,
+              0.24460870027542114,
+              0.25620192289352417,
+              0.2910076379776001
+            ]
+          },
+          "ballistic_w16": 0.005859375,
+          "beam_grades": {
+            "belief_p_rstar": 0.323763906955719,
+            "true_success": 0.005859375
+          }
+        },
+        {
+          "round": 9,
+          "depth": {
+            "d1": 0.7776389122009277,
+            "d2": 0.6766666769981384,
+            "d3": 0.5962499976158142,
+            "d4": 0.7093055844306946,
+            "PR": 14.416683197021484
+          },
+          "root_ce": 0.3709976077079773,
+          "root_acc": 0.7734375,
+          "plan_acc": 0.97265625,
+          "teacher": {
+            "agree_dp": 0.07259114583333333,
+            "tree_share": 0.5680338541666666,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.038736979166666664,
+            "dstar_cur": 3.802734375,
+            "dstar_best_move": 2.2705078125
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 0.0,
+            "realised_mean": 0.1650390625,
+            "bias": -0.1650390625,
+            "corr": NaN
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.1453739040347568,
+              "cost": 0.6156270504720438,
+              "pctile": 0.20479910714285715
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.96875,
+              "rank_corr": -0.10807102258912064,
+              "cost": 0.44175671599526006,
+              "pctile": 0.36690848214285715
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.04529995872355161,
+              "cost": 0.6677436291277807,
+              "pctile": 0.169921875
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": 0.17306318305995877,
+              "cost": 0.6379095761978376,
+              "pctile": 0.1958705357142857
+            },
+            "fm_pred_vs_fm_pred_fresh": {
+              "top1_disagree": 0.58984375,
+              "rank_corr": 0.9614678762293424,
+              "cost": 0.03343995657379947,
+              "pctile": 0.8404017857142858
+            },
+            "dp_vs_fm_pred_fresh": {
+              "top1_disagree": 0.99609375,
+              "rank_corr": -0.16207359227868678,
+              "cost": 0.6406441988028122,
+              "pctile": 0.20005580357142858
+            },
+            "roll_vs_fm_pred_fresh": {
+              "top1_disagree": 0.9609375,
+              "rank_corr": -0.11143992418312888,
+              "cost": 0.4473238127623624,
+              "pctile": 0.3680245535714286
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.640625,
+              "rank_corr": 0.4429215254020673,
+              "cost": 0.4075520833333333,
+              "pctile": 0.4372209821428571
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.73046875,
+              "rank_corr": 0.1331593244168376,
+              "cost": 0.44368489583333337,
+              "pctile": 0.4383370535714286
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.8671875,
+              "rank_corr": 0.07943814552654092,
+              "cost": 0.26953125,
+              "pctile": 0.11328124999999999
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.6484375,
+              "rank_corr": 0.3298434381662215,
+              "cost": 0.29720052083333337,
+              "pctile": 0.5691964285714286
+            }
+          },
+          "disagree_has_fresh": true
+        },
+        {
+          "round": 10,
+          "depth": {
+            "d1": 0.7681944370269775,
+            "d2": 0.6652777791023254,
+            "d3": 0.605138897895813,
+            "d4": 0.694861114025116,
+            "PR": 14.380921363830566
+          },
+          "root_ce": 0.3782327026128769,
+          "root_acc": 0.67578125,
+          "plan_acc": 0.984375,
+          "teacher": {
+            "agree_dp": 0.07486979166666667,
+            "tree_share": 0.564453125,
+            "informative_frac": 1.0,
+            "dp_no_improving_frac": 0.034505208333333336,
+            "dstar_cur": 3.7981770833333335,
+            "dstar_best_move": 2.2630208333333335
+          },
+          "meter": {
+            "materialisations": 0.0,
+            "dp_calls": 0.0
+          },
+          "value_calib": {
+            "reported_mean": 0.0,
+            "realised_mean": 0.1572265625,
+            "bias": -0.1572265625,
+            "corr": NaN
+          },
+          "disagree": {
+            "dp_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.13882319714132005,
+              "cost": 0.6358644178957604,
+              "pctile": 0.19475446428571427
+            },
+            "roll_vs_fm_pred": {
+              "top1_disagree": 0.984375,
+              "rank_corr": -0.10551125814047473,
+              "cost": 0.46842789010386815,
+              "pctile": 0.341796875
+            },
+            "value_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.05230227918620112,
+              "cost": 0.6666990656651562,
+              "pctile": 0.18052455357142855
+            },
+            "belief_vs_fm_pred": {
+              "top1_disagree": 1.0,
+              "rank_corr": 0.20465388941530474,
+              "cost": 0.6306351801964782,
+              "pctile": 0.2075892857142857
+            },
+            "fm_pred_vs_fm_pred_fresh": {
+              "top1_disagree": 0.58203125,
+              "rank_corr": 0.9635338609495268,
+              "cost": 0.029176694434137024,
+              "pctile": 0.8429129464285716
+            },
+            "dp_vs_fm_pred_fresh": {
+              "top1_disagree": 1.0,
+              "rank_corr": -0.1461682659045665,
+              "cost": 0.6441516233102629,
+              "pctile": 0.19559151785714285
+            },
+            "roll_vs_fm_pred_fresh": {
+              "top1_disagree": 0.9765625,
+              "rank_corr": -0.09206924991196952,
+              "cost": 0.45993586872421877,
+              "pctile": 0.3588169642857143
+            },
+            "roll_vs_dp": {
+              "top1_disagree": 0.68359375,
+              "rank_corr": 0.41171057524998345,
+              "cost": 0.40950520833333337,
+              "pctile": 0.4288504464285714
+            },
+            "value_vs_dp": {
+              "top1_disagree": 0.71875,
+              "rank_corr": 0.17110565623372087,
+              "cost": 0.40397135416666663,
+              "pctile": 0.46735491071428575
+            },
+            "value_vs_roll": {
+              "top1_disagree": 0.88671875,
+              "rank_corr": 0.020340362213275537,
+              "cost": 0.27734375,
+              "pctile": 0.09263392857142858
+            },
+            "belief_vs_dp": {
+              "top1_disagree": 0.6328125,
+              "rank_corr": 0.3268088825346849,
+              "cost": 0.2822265625,
+              "pctile": 0.5770089285714286
+            }
+          },
+          "disagree_has_fresh": true,
+          "xworld": {
+            "base": {
+              "ballistic_w16": 0.009765625,
+              "beam_grades": {
+                "belief_p_rstar": 0.32058215141296387,
+                "true_success": 0.009765625
+              },
+              "fm": {
+                "delta_cos": 0.26654213666915894,
+                "value_top1_agree": 0.1181640625,
+                "value_rank_corr": 0.18219345808029175,
+                "delta_cos_per_channel": [
+                  0.30866266414523125,
+                  0.17462283372879028,
+                  0.20568519830703735,
+                  0.22113659977912903,
+                  0.28053605556488037
+                ]
+              },
+              "tree_floor": 0.2545624574025472
+            },
+            "novel": {
+              "ballistic_w16": 0.009765625,
+              "beam_grades": {
+                "belief_p_rstar": 0.32448089122772217,
+                "true_success": 0.009765625
+              },
+              "fm": {
+                "delta_cos": 0.27092093229293823,
+                "value_top1_agree": 0.126953125,
+                "value_rank_corr": 0.1985642910003662,
+                "delta_cos_per_channel": [
+                  0.3165339305996895,
+                  0.1756848245859146,
+                  0.20262816548347473,
+                  0.2198380082845688,
+                  0.284157395362854
+                ]
+              },
+              "tree_floor": 0.24564472834269205
+            }
+          },
+          "fresh_fm": {
+            "delta_cos": 0.26654213666915894,
+            "value_top1_agree": 0.1181640625,
+            "value_rank_corr": 0.18219345808029175,
+            "delta_cos_per_channel": [
+              0.30866266414523125,
+              0.17462283372879028,
+              0.20568519830703735,
+              0.22113659977912903,
+              0.28053605556488037
+            ]
+          },
+          "ballistic_w16": 0.009765625,
+          "beam_grades": {
+            "belief_p_rstar": 0.32058215141296387,
+            "true_success": 0.009765625
+          }
+        }
+      ]
+    }
+  },
+  "elapsed_seconds": 2229.227884054184
+}
