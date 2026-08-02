@@ -31,8 +31,34 @@ has been built and none is required for the science. What the substrate buys tha
 
 **The DGP knob that governs everything**: `x^(2^T)` is eventually *periodic* in `T`, so a badly
 chosen modulus lets a model pass "depth extrapolation" by discovering a cycle rather than
-iterating. On the upstream Easy tiers the first repeat is at T=4 (N=323) and T=2 (N=899).
-`squaring_mod.py` computes the margin and asserts against it.
+iterating. `squaring_mod.py` computes the margin (`tail + period`, verified by brute force over
+all units) and asserts against it.
+
+### How our knobs sit against the upstream tiers
+
+The manifests under `benchmark/manifests/` encode their config in the `data_root` path — e.g.
+`..._easy_bidirectional_fixed_n_323_t123` is fixed `N=323`, train `T ∈ {1,2,3}`. The tiers vary
+along **three** axes, not one: `fixed_n` (one modulus, vary `T`), `fixed_t` (one `T`, vary the
+modulus — the arity axis), and `variable` (both). The `bNNNN` field is the *bit width* of `N`.
+Evaluation is a common ladder, `T = 1, 2, 4, 8, 16, 32, 64`.
+
+| | modulus | bits | first depth-repeat | train `T` |
+|---|---|---|---|---|
+| Easy `e1` (fixed_n) | 323 = 17×19 | 9 | **10** | 1,2,3 |
+| Medium `m1` (fixed_n) | 10403 = 101×103 | 14 | **42** | 4,8,16 |
+| Easy `e5` (variable) | 10–11 bits | 10–11 | — | 1,2,3 |
+| Medium `m5` (variable) | 12/14/16 bits | 12–16 | — | 2,4,8 |
+| **ours** | **893 = 19×47** | **10** | **67** | 1..6 |
+| ours, next rung | 9853 = 59×167 | 14 | 1149 | — |
+
+Two things follow. **Our modulus sits at Easy's scale but is deliberately much deeper**: 10 bits,
+same as Easy's variable range, with a periodicity margin of 67 against Easy's 10. And **the
+upstream ladder's deep rungs are partly degenerate on its own moduli** — for `N=323` (tail 4,
+period 6) the maps at `T=16`, `32`, `64` are *exactly* the maps at `T=4`, `8`, `4`, so nothing
+past `T=8` requires further composition; for `N=10403` (tail 2, period 40) `T=64` reproduces
+`T=24`. This is a property of the moduli, not a criticism of the benchmark — the tiers that carry
+the real difficulty are the `fixed_t` and `variable` ones, where the modulus is the held-out axis
+and depth is short.
 
 ## Cuts
 
@@ -42,8 +68,9 @@ A tied recurrent operator trained on terminal cross-entropy alone (train `T ≤ 
 composition horizon of **T ≈ 13**; a non-recurrent untied stack of matched depth is perfect at
 every trained depth and **at chance one step past it** (1.000 → 0.009) — `operators_not_footprints`
 with a scoreboard. Adding one **label-free** constraint — *the state you rolled into must be one
-your own encoder could have produced* — moves the horizon to **T ≈ 35** (2.8×), perfect out to
-T=20, and lifts held-out-x generalisation from **0.001 to 0.32**.
+your own encoder could have produced* — moves the horizon to **T ≈ 51** (3.9×) at its swept
+optimum, perfect out to T=20 and 0.98 at T=30, and lifts held-out-x generalisation from
+**0.001 to 0.32**.
 
 The mechanism is **manifold closure, not error suppression**: the base model's rolled state is
 nearly orthogonal to the encoder's representation of the same residue (cos **0.19**) from step 1
@@ -51,6 +78,24 @@ while decoding it perfectly — a private trajectory, not a closed operator — 
 takes that to **0.99**, with closure tracking accuracy across a 10× depth range. This reproduces
 [`RHM_SCULPTING`](../rhm/RHM_SCULPTING_README.md) Stage 5b's *rollability ≠ depth* dissociation on
 an unrelated substrate.
+
+A follow-up micro-cut sharpens the mechanism into a behavioural claim. **Neither operator is
+broken at depth**: hand the base model the true residue `x₅₅` and it rolls the last five steps of
+a T=60 problem at **0.873**, while its own rollout to the same target scores **0.000**. What fails
+is the state, not the map — the entire composition-horizon failure is the rollout leaving its own
+input domain. The tightest statement is at zero rollout steps, where base cannot decode its own
+encoder's output (**0.008**) and the constrained arm can (**1.000**). Across 72 runs closure
+orders the horizon at Spearman **+0.94** — including through a knob reversal where the loss weight
+stops predicting the horizon and closure does not — but it does *not* transfer on a calibrated
+scale, and `re-entry-only` buys depth without buying closure at all.
+
+Acting on that diagnosis works. Snapping the rolled state back onto the encoder manifold
+*at test time*, using the model's own decode and **no retraining**, takes the ungrounded model
+from 0.000 to 0.377 at T=60 and the grounded one to **1.000 at every depth out to T=60** — past
+where `N = 893` can measure, since it repeats in depth at T=67. The intervention turns one rollout
+into a chain of restarts whose accuracy goes as `p^⌈T/k⌉`, so what the training-time constraint
+buys is the per-restart rate `p`: 1.000 for the grounded arm, 0.871 for the ungrounded one, which
+decays exponentially in depth no matter how the period is tuned.
 
 The cut's *predicted* mechanism — that the rollout fails by amplifying its own error, so
 discretising the state is mandatory — is **falsified five ways**, with the instrument calibrated
@@ -105,6 +150,7 @@ entrypoint. Each cut's README carries its exact commands. Modal volume layout:
 2. **Held-out modulus** — the arity-2 cut. Fixed-`N` never forces the operator to be *conditioned
    on the rule*; a rule-blind operator can only predict the `N`-averaged next state. This is the
    axis that connects to the length-gen finalizer's *"width amplifies arity in an open loop"*.
-3. **Does closure predict the horizon across arms?** Twelve-plus configurations are already run;
+3. ~~**Does closure predict the horizon across arms?**~~ — done; see `ballistic_depth/` §6–§7.
+   Kept below for the original framing. Twelve-plus configurations are already run;
    closure-at-fixed-`t` against horizon would turn the mechanism claim from a two-arm contrast
    into a slope.

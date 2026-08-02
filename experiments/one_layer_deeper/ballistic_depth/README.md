@@ -3,6 +3,11 @@
 **Up**: [../README.md](../README.md) (one_layer_deeper) · **Files**: [FILES.md](FILES.md)
 **Substrate**: repeated modular squaring, `y = x^(2^T) mod N`, from [tilde-research/one-layer-deeper](https://github.com/tilde-research/one-layer-deeper)
 **Status**: complete — 5 arms + 3 ablations + a 4-point weight sweep + an instrument calibration, 3 seeds each. **Date**: 2026-08-02.
+**Extended 2026-08-02** by a micro-cut (§6–§9): a closure-vs-horizon regression over every run,
+a 7-point cycle-weight sweep that **moves the headline horizon from 35 to 51**, a cold-start probe
+showing the operator is sound at every depth tested, and a test-time re-projection cut in which
+**the grounded model reaches 1.000 at T=60 with no retraining at all**. §1's T≈35 is a *w=1.0*
+number, not a ceiling — see §7.
 
 ---
 
@@ -251,12 +256,214 @@ achieves genuine per-step contraction (0.889 < 1) and 4.8% accuracy.
 The reading we take from it: **the soft constraint achieves the re-attraction that discretisation
 was supposed to provide, and stays learnable, which the hard version does not.**
 
+---
+
+# Micro-cut (2026-08-02): is closure a dial, and is the operator actually broken?
+
+§2 reads the mechanism off a two-arm contrast, and §1 reports a horizon at a cycle weight that
+was never swept. Three follow-ups, run on **L4** (§1–§5 are A10G — see caveats):
+
+## 6. Closure predicts the horizon across 72 runs — ordinally, not on a calibrated scale
+
+![closure vs horizon](figures/closure_horizon/fig_closure_horizon.png)
+
+`closure_horizon.py` is pure re-analysis: every `results/<tag>/results_seed<N>.json` already
+carries `on_manifold_cos` and `exact_seen_x` at every depth, so closure-vs-outcome is a scatter
+over **72 recurrent runs across 24 configs** with no GPU at all. (The `feedforward` arm is
+excluded throughout — non-recurrent, so it has no rolled state to measure.)
+
+**The pooled correlation is not the evidence, and should not be quoted as it.** Before the cycle
+sweep, closure was **bimodal**: every run sat at ≈0.10 or ≈0.99 with *zero* runs between 0.14 and
+0.95. A line across that gap gives R²=0.93 essentially for free — it is §2's two dots with 48
+replicates, not an independent measurement. The figure marks the empty region rather than
+reporting the fit through it.
+
+What survives, over the full set including the sweep that filled the gap:
+
+| readout | n | R² | Spearman rho |
+|---|---|---|---|
+| closure@10 → exact@20 | 72 | 0.80 | **+0.948** |
+| closure@20 → horizon | 45 | 0.73 | **+0.935** |
+| closure@**6** → horizon *(measured at a trained depth)* | 45 | 0.48 | **+0.901** |
+| *control:* ID accuracy → exact@20 | 72 | 0.21 | +0.632 |
+
+Two things worth separating. **Closure is not a proxy for "did this arm learn the task"**: all 60
+ID-competent runs sit at in-distribution accuracy of exactly 1.000, and closure still orders their
+OOD spread at rho +0.93. And **the ordering is readable in-distribution** — closure at t=6, the
+last trained depth, ranks configurations by their eventual horizon at rho +0.90, which is what
+would make it usable as an early-warning instrument rather than a post-hoc description.
+
+**But it does not transfer on a calibrated scale.** Fit the line on the re-entry sweep alone and
+it mispredicts the cycle sweep badly — at closure 0.93 it predicts exact@20 = 0.857 against an
+actual 0.391 (bias −0.47); at 0.81, 0.735 against 0.145 (−0.59). In the other direction
+`re_only` sits **+0.26 above** it: closure 0.135, barely above base's 0.10, yet exact@20 0.306
+against base's 0.027 and horizon 18–19 against 13. So the same closure value means different
+things depending on which knob produced it, and there is at least one route to extra depth that
+does not go through closure at all — which corroborates §4's *separate mechanism* reading from a
+completely different direction. **Closure orders configurations; it does not price them.**
+
+## 7. Sweeping the cycle weight — the horizon was never at its ceiling, and the knob turns over
+
+The cycle weight was held at 1.0 for the entire original cut. Sweeping it with re-entry pinned at
+0 (3 seeds each, eval to T=60, no seed censored):
+
+| cycle w | closure@10 | closure@20 | ID | exact@20 | **horizon** |
+|---|---|---|---|---|---|
+| 0.01 | 0.494 | 0.119 | 1.000 | 0.021 | 13.7 ±0.5 |
+| 0.05 | 0.810 | 0.390 | 1.000 | 0.145 | 16.3 ±0.9 |
+| 0.2 | 0.930 | 0.617 | 1.000 | 0.391 | 19.7 ±2.1 |
+| 1.0 *(§1's point)* | 0.992 | 0.972 | 1.000 | 0.992 | 36.0 ±2.9 |
+| 3.0 | 0.999 | 0.994 | 1.000 | 1.000 | 46.3 ±2.6 |
+| **10.0** | 0.999 | **0.997** | 1.000 | 1.000 | **51.0 ±3.6** |
+| 30.0 | 0.998 | 0.981 | 1.000 | 0.931 | 28.0 ±0.8 |
+
+**The headline extension is 13 → 51, a 3.9× horizon, not the 2.8× reported in §1** — which was an
+arbitrary weight, not a ceiling. At w=10 exact-match is 1.000 at T=20 and 0.977 at T=30.
+
+**This is also what de-confounds §6.** Inside the closed cluster every *earlier* run had cycle
+weight pinned at 1.0, so closure there was generated entirely by the re-entry weight and the two
+were statistically indistinguishable as predictors (R² 0.847 vs 0.844 for the horizon). This
+family moves closure with re-entry held fixed. And the turnover at w=30 does the rest of the work:
+across the sweep the **weight** stops predicting the horizon (R²=0.02) while **closure@20 keeps
+predicting it** (R²=0.69, rho +0.90), because at w=30 the knob went up while closure *and* horizon
+came down together. Closure tracks the outcome through a reversal that the knob does not — which
+is the strongest evidence here that it is a mediator rather than an incidental correlate.
+
+The predicted failure mode for an over-weighted cycle term — *collapse to identity* — is **not**
+what w=30 shows: in-distribution accuracy is still exactly 1.000 at every weight tested, including
+30. Whatever the over-weighted term costs, it costs depth specifically, not the task.
+
+## 8. The operator is sound at every depth; the whole failure is that it cannot reach its own inputs
+
+![cold start](figures/coldstart/fig_coldstart.png)
+
+`on_manifold_cos` is a *cosine* — a geometric proxy. The behavioural version: encode the **true**
+intermediate residue `x_t` cold, as if it were a fresh problem, roll the remaining `T − t` steps,
+score against `x_T`. `t = 0` is the ordinary ballistic rollout, so it re-derives `exact_seen_x[T]`
+as a built-in self-check.
+
+Base, T=60, 3 seeds:
+
+| re-entry point t | 0 | 20 | 35 | 40 | 45 | 50 | 55 |
+|---|---|---|---|---|---|---|---|
+| exact match on `x₆₀` | **0.000** | 0.005 | 0.005 | 0.022 | 0.237 | 0.785 | **0.873** |
+
+**The base operator computes correctly at depth 55.** Hand it `x₅₅` and it rolls the last five
+steps at 0.873, while its own rollout to the same target scores 0.000. The same holds at every
+depth probed — restart at t=25 for T=30 gives 0.871, at t=35 for T=40 gives 0.870. The operator
+does not degrade with depth *at all*; what fails is the state, not the map. And this is true of
+the cycle arm too: at T=60 it scores 0.016 from step 0 and **1.000** restarted at t=45. Closure
+does not make the operator better — it makes the rollout land where the operator already works.
+
+The sharpest number is the `t = T` column, where the model encodes and decodes with **zero**
+rollout steps: **base 0.008, cycle 1.000.** Base cannot decode its own encoder's output — its
+decoder is defined on the *rolled* manifold, not the encoder's. That is §2's cos 0.19 vs 0.99
+cashed out behaviourally, and the consequence is total rather than partial. The
+private-trajectory reading holds, and the tunnel has an entrance ramp.
+
+**How long is the ramp? Exactly one step.** The `t` grid here jumps 15 → 20, so this cut cannot
+see between 0 and 5 rollout steps; an earlier draft of this section guessed "about three
+applications" from that gap, which was interpolation, not measurement. §9's oracle re-projection
+at period k=1 decodes at **0.850** after a single application from an encoder state, so one step
+is enough. Recorded because it is the kind of inference a sparse grid invites.
+
+The equivalence check makes it quantitative: re-entering at `t` and rolling `T − t` should score
+what an ordinary depth-`(T−t)` problem scores, because that is what it is. Cycle matches
+`exact@(T−t)` to within **0.000–0.019**. Base runs **0.02–0.11 below** it, which is about what the
+~10% of quadratic residues that were never training bases predicts, given base's 0.001
+held-out-x.
+
+**Gotcha carried by this probe.** `coldstart_heldout_x` is **not** a clean generalisation readout
+and should not be quoted as one. The residue `x_t` of a held-out base is usually itself a base the
+model trained on, because squaring maps into the 207-element QR subgroup — measured at **82–93%
+overlap for every t ≥ 1** and recorded per run as `heldout_base_leak`. Only the seen-x numbers
+above carry the claim.
+
+## 9. Closure can be installed at test time — and what training-time closure actually buys is a *rate*
+
+![test-time re-projection](figures/reprojection/fig_reprojection.png)
+
+§8 says the operator is sound at every depth and the failure is that the rollout leaves its input
+domain. That makes an intervention available that costs no training at all: every `k` steps,
+snap the state back onto the encoder manifold using the model's **own** decode,
+`h ← Enc(decode(h))`. An oracle variant snapping to `Enc(x_t)` with the true residue gives the
+ceiling; the gap between them is the price of decode error. 3 seeds, from the `coldstart`
+checkpoints, no retraining anywhere.
+
+| arm | setting | T=10 | T=20 | T=30 | T=40 | T=60 |
+|---|---|---|---|---|---|---|
+| base | no re-projection | 0.919 | 0.028 | 0.004 | 0.004 | **0.000** |
+| base | re-project k=8, own decode | 0.867 | 0.751 | 0.654 | 0.569 | **0.377** |
+| base | re-project k=8, oracle | 0.868 | 0.868 | 0.873 | 0.868 | 0.871 |
+| **+ cycle** | no re-projection | 1.000 | 0.987 | 0.750 | 0.330 | **0.016** |
+| **+ cycle** | re-project, own decode *(any k ≤ 10)* | 1.000 | 1.000 | 1.000 | 1.000 | **1.000** |
+
+**Closure is causal, and it is installable at deployment time.** The ungrounded base model,
+untouched since training, goes from 0.000 to 0.377 at T=60 and from 0.028 to 0.751 at T=20 —
+its horizon moves from **13 to roughly 45** (it crosses 50% between T=40 and T=60; the depth grid
+here is coarse). The grounded arm goes to **1.000 at every depth out to T=60**, which is past
+where this substrate can still measure it — `N=893` repeats in depth at T=67.
+
+**Re-projection turns one rollout into a chain of restarts, and the chain is multiplicative.**
+Base's oracle plateau sits at **0.871** at every period from k=1 to k=8 — the same number §8's
+cold-start probe plateaus at, which is what it should be, since an oracle snap *is* a cold start.
+Modelling accuracy as `p ** ⌈T/k⌉` with `p = 0.871`:
+
+| | T=20 | T=40 | T=60 |
+|---|---|---|---|
+| k=8 predicted | 0.661 | 0.502 | 0.332 |
+| k=8 actual | 0.751 | 0.569 | 0.377 |
+| k=5 predicted | 0.576 | 0.332 | 0.191 |
+| k=5 actual | 0.658 | 0.359 | 0.210 |
+
+It tracks within 0.03–0.09 and slightly under-predicts throughout, and it **breaks where it should**
+— at k=10 it over-predicts (0.576 vs 0.463 at T=40) because a 10-step segment is approaching the
+base horizon of 13 and drift inside the segment stops being negligible.
+
+**So what the training-time constraint buys is the per-restart rate, not the operator.** Cycle's
+per-restart reliability is 1.000, and `1.000 ** n = 1.000` for any `n` — flat in depth. Base is
+stuck at `0.871 ** n`, which decays exponentially no matter which `k` you pick. Combined with §8
+(both operators compute correctly at every depth tested), the reading is that the grounded
+constraint never made the *map* better; it made the model able to re-enter its own predictions
+without loss.
+
+**The period has a two-sided optimum for the ungrounded arm and none for the grounded one.**
+Base peaks at k=8: smaller `k` means more restarts and so more multiplicative loss, larger `k`
+means segments that outrun the composition horizon (k=15 > 13 collapses to 0.005). The oracle is
+flat in `k` up to 8 because an injected state is always correct, so only the final segment
+matters. Cycle is flat because its `p` is 1.
+
+**The snap has to be complete.** At α=0.5 base collapses — 0.041 against α=1.0's 0.658 at T=20,
+k=5. A half-snap leaves the state *between* the rolled manifold and the encoder manifold, which is
+worse than committing to either.
+
+**Caveat on the 0.871 ceiling.** It is not a pure re-entry-noise number. Roughly 10% of the
+207 quadratic residues were never training bases, and base's held-out-x is 0.001, so a chunk of
+that ceiling is base's failure to generalise in `x` rather than a cost of re-entering. The chain
+model's `p` therefore mixes two things, and the cleanest place to separate them is a run where
+the base pool is not ~90% seen.
+
+**Every number in §9 is on *seen* base values.** The probe evaluates over `train_idx` only, so
+the grounded arm's 1.000 at T=60 says the *depth* axis is saturated at this modulus with these
+bases — not that the model learned squaring. §2's held-out-x for the same arm is **0.32**. The
+depth axis and the `x` axis are separate, and only the first one is finished here.
+
+---
+
 ## Honest caveats
 
 - **Single modulus, single scale.** `N=893`, 828 units, d=256. Whether the cycle advantage
   survives a larger state space is the natural second cut and is **not** tested here.
 - **The interference reading is one substrate at one cycle weight.** The re-entry weight was
-  swept; the *cycle* weight was not.
+  swept; the *cycle* weight was not — §7 now sweeps it and finds §1's w=1.0 was well short of the
+  optimum, so the §4 interference numbers are also at an unoptimised cycle weight and the
+  re-entry×cycle interaction is untested.
+- **§6–§8 ran on L4, §1–§5 on A10G.** The cycle sweep and the cold-start probe are each
+  internally consistent (all L4), but any comparison *across* those groups carries a hardware
+  change on top of the run-to-run nondeterminism below.
+- **Closure is established as an ordinal predictor and a mediator candidate, not a proven
+  cause.** §7 breaks the collinearity with the re-entry weight and survives the w=30 reversal,
+  which is real evidence, but every manipulation of closure here is still *via* some loss weight.
 - **Run-to-run nondeterminism is ~±2 on the horizon at fixed seed** (A10G, non-deterministic
   kernels): the identical `cycle-only` config gave 35/38/37 in `deep60` and 34/35/35 in `w_re0`.
   Differences below ~3 depths should not be read.
@@ -285,10 +492,13 @@ was supposed to provide, and stays learnable, which the hard version does not.**
    the cycle result and reproduces
    [`metering_sweep`](../../rhm/directed_sculpting/full_loop/metering_sweep/README.md)'s
    within-round overfitting (+0.117 tree error at 16× steps) on a new substrate.
-5. **Check the depth-periodicity margin before choosing `N`.** `x^(2^T)` is eventually periodic
-   in `T`; on the upstream Easy tiers the first repeat is at T=4 (N=323) and T=2 (N=899), so a
-   badly-chosen modulus lets a model pass "depth extrapolation" by discovering a cycle. The
-   generator asserts against this.
+5. **Check the depth-periodicity margin before choosing `N`, and quote `tail + period`, not the
+   tail.** `x^(2^T)` is eventually periodic in `T`, so a badly-chosen modulus lets a model pass
+   "depth extrapolation" by discovering a cycle. An earlier version of this line reported the
+   upstream Easy margins as "T=4 (N=323) and T=2 (N=899)" — those are the *tails*. The first
+   depth at which the map actually repeats is `tail + period`: **10** for N=323 (tail 4, period 6)
+   and **14** for N=899 (tail 2, period 12), brute-force verified over all units. `N=893` is 67.
+   The generator asserts against `tail + period`; only the prose was wrong.
 
 ## Reproduce
 
@@ -327,27 +537,64 @@ done
 modal run --detach ...::ballistic_depth --tag quant_fix --arms "quant,quant_consist" \
   --codebook-size 256 --consist-reentry 0.0 --seed $s
 
+# --- micro-cut (§6-§8) ---
+# cycle weight sweep, re-entry pinned at 0 (§7). w=10 is the optimum found.
+for s in 0 1 2; do
+  for w in 0.01 0.05 0.2 3.0 10.0 30.0; do
+    modal run --detach ...::ballistic_depth --tag w_cyc$w --arms consist \
+      --steps 8000 --eval-max-depth 60 --eval-cap 828 \
+      --consist-cycle $w --consist-reentry 0.0 --seed $s --save-ckpt
+  done
+done
+
+# cold-start re-enterability probe (§8) — the probe rides along with any run,
+# so this tag is just `w_re0`'s config re-run with the new instrument + checkpoints.
+for s in 0 1 2; do
+  modal run --detach ...::ballistic_depth --tag coldstart --arms "base,consist" \
+    --steps 8000 --eval-max-depth 60 --eval-cap 828 --consist-reentry 0.0 \
+    --seed $s --save-ckpt
+done
+
 # fetch + analyse
 MODAL_PROFILE=chromatic modal volume get one-layer-deeper-data \
   /ballistic_depth/<tag>/results_seed<N>.json one_layer_deeper/ballistic_depth/results/<tag>/ --force
 python3 one_layer_deeper/ballistic_depth/analyze.py --tag deep60
 python3 one_layer_deeper/ballistic_depth/sweep_figure.py
+python3 one_layer_deeper/ballistic_depth/closure_horizon.py   # §6 + §7, no GPU
+python3 one_layer_deeper/ballistic_depth/coldstart_figure.py  # §8
+
+# test-time re-projection (§9) — loads checkpoints, trains nothing
+for s in 0 1 2; do
+  modal run --detach one_layer_deeper/ballistic_depth/reprojection.py::reprojection \
+    --tag coldstart --arms "base,consist" --seed $s --eval-cap 828
+done
+python3 one_layer_deeper/ballistic_depth/reprojection_figure.py
 ```
+
+`--save-ckpt` writes `/ballistic_depth/<tag>/ckpt/<arm>_seed<N>.pt`. §1–§5 saved none, which is
+why §8 needed a retrain rather than a re-eval; anything run from here on is re-probeable for free.
 
 Modal volume `one-layer-deeper-data`, results at `/ballistic_depth/<tag>/results_seed<N>.json`.
 
 ## Next steps
 
-1. **Scale `N`.** The single-modulus caveat is the biggest one. `N = 9853 = 59 × 167` (2407
-   reachable states, first depth-repeat 1149) is already characterised in `squaring_mod.py` and
-   is the obvious next rung.
+1. **Scale `N` — now forced, not just advisable.** §9 puts the grounded arm at 1.000 at T=60,
+   and `N=893` repeats in depth at T=67, so this substrate can no longer measure its own best
+   configuration. `N = 9853 = 59 × 167` (2407 reachable states, first depth-repeat 1149) is
+   already characterised in `squaring_mod.py`. Scaling also separates the two things mixed into
+   §9's `p = 0.871`, since the base pool would no longer be ~90% seen.
 2. **Held-out modulus.** Everything here is fixed-`N`, so the operator never had to be
    *conditioned on the rule*. Sampling `N` turns this into the arity-2 question — a rule-blind
    operator can only predict the `N`-averaged next state — and is the cut that connects to
    [`RHM_SCULPTING`](../../rhm/RHM_SCULPTING_README.md)'s length-gen finalizer.
-3. **Sweep the cycle weight**, which was held at 1.0 throughout.
-4. **Does closure predict the horizon across arms?** With 12+ configurations already run, closure
-   at a fixed `t` versus horizon is a cheap regression, and would turn §2's mechanism claim from
-   a two-arm contrast into a slope.
+3. ~~**Sweep the cycle weight**~~ — done, §7. Optimum at w≈10, horizon 51.
+4. ~~**Does closure predict the horizon across arms?**~~ — done, §6. Ordinally yes (rho +0.94
+   over 72 runs), on a calibrated scale no.
 5. **Soft attractors between the two extremes** — EMA-VQ, annealed temperature, or quantise-at-eval
    only — to find out whether §5 is really about differentiability or about something else.
+6. **Re-run the §4 interference sweep at the corrected cycle weight.** The dense/evaluative
+   inversion was measured at cycle w=1.0, which §7 shows is well short of the optimum; whether
+   re-entry is still harmful at w=10 is untested, and the interaction is the interesting object.
+7. ~~**Test-time re-projection**~~ — done, §9.
+8. **Densify the cold-start `t` grid between 0 and 5 steps.** §8's grid jumps 15 → 20 and §9 had
+   to supply the 1-step point. The shape of the decoder's entrance ramp is currently two points.

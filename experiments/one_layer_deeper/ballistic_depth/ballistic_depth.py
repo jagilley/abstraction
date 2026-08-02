@@ -264,7 +264,7 @@ def _make_model(cfg, n_answer_digits, arm, max_len, device):
 
 @app.function(
     volumes={DATA_DIR: volume},
-    gpu="A10G",
+    gpu="L4",
     timeout=7200,
     memory=8192,
 )
@@ -283,6 +283,7 @@ def ballistic_depth(
     consist_cycle: float = 1.0,
     consist_reentry: float = 1.0,
     consist_warmup: float = 0.3,
+    save_ckpt: bool = False,
 ):
     import numpy as np
     import torch
@@ -374,6 +375,21 @@ def ballistic_depth(
 
     train_idx = torch.tensor(data["train_idx"], device=device)
     test_idx = torch.tensor(data["test_idx"], device=device)
+
+    # Held-out-x leaks into the cold-start probe with depth: the residue x_t of a held-out
+    # base is often *itself* a base the model trained on, because squaring maps into the
+    # 207-element QR subgroup. Record the leak so `coldstart_heldout_x` is never read as a
+    # clean generalization number at large t.
+    seen_bases = set(traj[train_idx, 0].tolist())
+    results_leak = {
+        t: float(
+            np.mean([v in seen_bases for v in traj[test_idx, t].tolist()])
+        )
+        for t in range(0, min(spec.max_depth, 20) + 1)
+    }
+    print(f"[leak] held-out base seen-in-train fraction by t: "
+          + " ".join(f"{t}:{v:.2f}" for t, v in results_leak.items()), flush=True)
+    results["heldout_base_leak"] = results_leak
 
     for arm in arms:
         print(f"\n===== arm={arm} seed={cfg['seed']} =====", flush=True)
@@ -571,6 +587,58 @@ def ballistic_depth(
                     }
                 return out
 
+            @torch.no_grad()
+            def coldstart_probe(pool, targets, grid):
+                """Functional re-enterability: can the operator be *restarted*?
+
+                `on_manifold_cos` says the rolled state points the same direction as the
+                encoder's representation of the true residue. That is geometry, and
+                geometry is a proxy. This is the behavioural version: encode the TRUE
+                intermediate residue `x_t` cold — as if it were a fresh problem — roll the
+                remaining `T - t` steps, and score exact-match against `x_T`.
+
+                The two outcomes for the base arm mean opposite things. If a cold start at
+                t recovers `x_T` where the full rollout to T does not, the operator is a
+                sound function of the encoder's states and the failure is *drift* — it
+                cannot reach its own inputs. If the cold start fails too, the operator was
+                never a function on the encoder's state space at all; it only ever worked
+                inside the private trajectory it generates.
+
+                t=0 is the ordinary full rollout, so it double-checks against
+                `exact_seen_x[T]` for free.
+                """
+                pool = pool[:cap]
+                out = {}
+                for T in targets:
+                    row = {}
+                    for t in grid:
+                        if t > T:
+                            continue
+                        h = model.encode(prompts_for(traj[pool, t], 1, include_t), read_pos)
+                        if T - t > 0:
+                            h, _ = model.roll(h, T - t)
+                        pred = model.dec(h).argmax(-1)
+                        row[t] = (
+                            (pred == n_digits_tbl[traj[pool, T]]).all(-1).float().mean().item()
+                        )
+                    out[T] = row
+                return out
+
+            cs_targets = [T for T in (10, 20, 30, 40, 60) if T <= spec.max_depth]
+            cs_grid = [
+                t for t in (0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55)
+                if t <= spec.max_depth
+            ]
+            arm_res["coldstart_seen_x"] = coldstart_probe(train_idx, cs_targets, cs_grid)
+            arm_res["coldstart_heldout_x"] = coldstart_probe(test_idx, cs_targets, cs_grid)
+            for T in cs_targets:
+                r = arm_res["coldstart_seen_x"][T]
+                print(
+                    f"  [{arm}] coldstart T={T}: "
+                    + " ".join(f"t{t}:{v:.3f}" for t, v in r.items()),
+                    flush=True,
+                )
+
             arm_res["amplification"] = amplification("random")
             arm_res["amplification_on_manifold"] = amplification("on_manifold")
             small = arm_res["amplification"][0.01]
@@ -582,6 +650,15 @@ def ballistic_depth(
             )
 
         results["arms"][arm] = arm_res
+
+        if save_ckpt:
+            ck_dir = Path(DATA_DIR) / "ballistic_depth" / str(cfg["tag"]) / "ckpt"
+            ck_dir.mkdir(parents=True, exist_ok=True)
+            torch.save(
+                {"state_dict": model.state_dict(), "cfg": cfg, "arm": arm},
+                ck_dir / f"{arm}_seed{cfg['seed']}.pt",
+            )
+            print(f"  [{arm}] checkpoint saved", flush=True)
 
     out_dir = Path(DATA_DIR) / "ballistic_depth" / str(cfg["tag"])
     out_dir.mkdir(parents=True, exist_ok=True)
