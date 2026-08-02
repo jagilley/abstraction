@@ -90,6 +90,57 @@ from rhm.directed_sculpting.full_loop.channel_env import (
 app = modal.App("rhm-ds-ladder", image=image)
 
 
+class PricedMeter(Meter):
+    """`Meter` with a PRICE per monitored sequence. `price=1.0` is the original code path.
+
+    Added for `metering_sweep/`, whose whole content is that the meter has never been a
+    variable. Read the docstring there before using it: the price is REPORT-ONLY inside this
+    loop -- nothing here reads `meter.ratio`, so a price multiplier ALONE cannot move any
+    outcome. It is meaningful only in combination with a `collect_budget` chosen so that the
+    monitoring bill is paid OUT OF a fixed total spend (`B = T - price*M`), which is what makes
+    price displace collection instead of being free bookkeeping.
+
+    `budget` is optional and, when given, makes the meter genuinely binding: a run that spends
+    more than the total it was allotted raises `BudgetExhausted` instead of silently reporting
+    a ratio nobody enforced.
+    """
+
+    def __init__(self, price: float = 1.0, budget=None):
+        super().__init__(budget=budget)
+        self.price = float(price)
+
+    def charge_monitor(self, n):
+        # exactly the parent's `int(n)` accumulation at unit price, so `mon_price=1.0` runs
+        # are bit-identical to every ladder result committed before this class existed
+        self.monitor += int(n) if self.price == 1.0 else self.price * int(n)
+        self._check()
+        return n
+
+
+# Which monitoring each policy's DRIVE actually reads (`channel_env.allocate`). `uniform` and
+# `oracle` read nothing -- `uniform` has a constant drive and `oracle` is handed the channel
+# label, which is privileged rather than purchased. `error_only`/`lprog_only` need the monitor
+# set (`e_before`/`lp`); the reducibility taps additionally need the repeat-execution floors;
+# anything with `visits` needs the forecast roll-out. Used only by `charge_own_monitoring`.
+TAP_READS = {
+    "uniform": (), "oracle": (), "oracle_dup": (), "oracle_shared": (),
+    "error_only": ("lp",), "lprog_only": ("lp",), "visits_only": ("fc",),
+    "value": ("lp", "fc"), "value_satiety": ("lp", "fc"),
+    "reducible_only": ("lp", "floor"),
+    "value_red": ("lp", "floor", "fc"), "value_red_satiety": ("lp", "floor", "fc"),
+}
+
+
+def tap_bill(policy, *, n_channels, mon_n, floor_n, floor_draws, forecast_n):
+    """Monitor sequences per round that `policy` must buy to compute its own drive."""
+    if policy not in TAP_READS:
+        raise ValueError(f"no tap-cost entry for policy {policy!r}")
+    cost = {"lp": n_channels * mon_n,
+            "floor": n_channels * floor_n * floor_draws,
+            "fc": forecast_n}
+    return sum(cost[t] for t in TAP_READS[policy])
+
+
 def calibrate_drift(layout, kappa, target_kl_per_node, seed):
     """Drift every REDUCIBLE channel at its own surface level; return the calibrated sigmas.
 
@@ -156,6 +207,8 @@ def ladder(
     ballistic_chunk: int = 3,
     beta_sat: float = 1.0, alloc_eps: float = 0.01,
     policies: str = ",".join(POLICIES), fm_arch: str = "block",
+    mon_price: float = 1.0, meter_budget: int = 0,
+    charge_own_monitoring: bool = False, total_budget: int = 0,
     tag: str = "v1", quick: bool = False,
 ):
     """The six-policy E3 ladder plus a satiating rung, on the multi-channel sculpting task."""
@@ -301,19 +354,38 @@ def ladder(
           + " ".join(f"{k}={val:.3f}" for k, val in depth0.items()))
 
     # ---- the ladder ---------------------------------------------------------------------
+    # `charge_own_monitoring` is the HONEST ladder (metering_sweep E5). The published ladder
+    # gives every arm the SAME monitor charge on purpose -- "so the ladder measures allocation
+    # only" -- which isolates the allocation rule but hides the economics: a smart allocator
+    # never pays for its own smartness. Here each arm pays for exactly the taps its own drive
+    # reads, out of one shared total, so `uniform` (which reads nothing) collects the whole
+    # budget while `value_red` buys 64% less data in exchange for knowing where to spend it.
+    # That is the question the metering claim is actually about. Default off, bit-identical.
     results = {}
     for policy in policy_list:
-        print(f"\n{'#' * 72}\n# POLICY: {policy}\n{'#' * 72}")
+        cb = collect_budget
+        if charge_own_monitoring:
+            if not total_budget:
+                raise ValueError("charge_own_monitoring requires --total-budget")
+            cb = total_budget - int(round(mon_price * tap_bill(
+                policy, n_channels=len(names), mon_n=mon_n, floor_n=floor_n,
+                floor_draws=floor_draws, forecast_n=forecast_n)))
+            if cb <= 0:
+                raise ValueError(f"{policy}: monitoring bill exceeds total_budget {total_budget}")
+        print(f"\n{'#' * 72}\n# POLICY: {policy}"
+              + (f"   (own monitoring bill; collect_budget={cb})" if charge_own_monitoring else "")
+              + f"\n{'#' * 72}")
         results[policy] = _run_policy(
             policy, warm_fm, controller, generator, value, layout, tb, drift_spec,
             x_probe=x_probe, x_eval=x_eval, r_eval=r_eval, seed=seed, rounds=rounds,
             x_mon0=x_mon0, x_floor0=x_floor0, floor_draws=floor_draws, tap_ema=tap_ema,
-            collect_budget=collect_budget, mon_n=mon_n, forecast_n=forecast_n,
+            collect_budget=cb, mon_n=mon_n, forecast_n=forecast_n,
             fm_epochs=fm_epochs, lp_steps=lp_steps, batch_size=batch_size,
             n_corrupt=n_corrupt, edit_budget=edit_budget,
             drift_steps_per_round=drift_steps_per_round, drift_prewarm=drift_prewarm,
             grade_every=grade_every, beta_sat=beta_sat, alloc_eps=alloc_eps,
             ballistic_chunk=ballistic_chunk, shared_channels=shared_channels,
+            mon_price=mon_price, meter_budget=meter_budget,
             render=render, device=device)
 
     # ---- summary ------------------------------------------------------------------------
@@ -341,7 +413,11 @@ def ladder(
                    "render": render, "state_dim": state_dim, "policies": policy_list,
                    "beta_sat": beta_sat, "alloc_eps": alloc_eps, "seed": seed,
                    "struct_shares": struct_shares, "shared_channels": shared_channels,
-                   "fm_arch": fm_arch},
+                   "fm_arch": fm_arch, "floor_n": floor_n, "floor_draws": floor_draws,
+                   "n_eval": n_eval, "mon_price": mon_price, "meter_budget": meter_budget,
+                   "fm_epochs": fm_epochs, "drift_kl": drift_kl,
+                   "charge_own_monitoring": charge_own_monitoring,
+                   "total_budget": total_budget},
         "channels": [{k: ch[k] for k in ("name", "kind", "depth", "m", "blk0", "blk1",
                                          "share_top", "share_from")}
                      for ch in layout["channels"]],
@@ -371,7 +447,7 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
                 collect_budget, mon_n, forecast_n, fm_epochs, lp_steps, batch_size,
                 n_corrupt, edit_budget,
                 drift_steps_per_round, drift_prewarm, grade_every, beta_sat, alloc_eps,
-                ballistic_chunk, shared_channels=None,
+                ballistic_chunk, shared_channels=None, mon_price=1.0, meter_budget=0,
                 render=None, device=None):
     """One policy's trajectory. Every policy re-initialises the drift state from the SAME
     seed and steps it with the same RNG, so all arms see a bit-identical world sequence --
@@ -383,7 +459,8 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
     n_ch = tb["n_channels"]
     names = tb["channel_names"]
     tree_c = tb["tree_channel"]
-    meter = Meter()
+    meter = (Meter() if mon_price == 1.0 and not meter_budget
+             else PricedMeter(mon_price, budget=(meter_budget or None)))
     gen = torch.Generator(device=device).manual_seed(seed + 777)
 
     reset_drift(layout, drift_spec)
@@ -541,6 +618,11 @@ def _run_policy(policy, warm_fm, controller, generator, value, layout, tb, drift
         "share_struct": float(sum(share[c] for c in range(len(names)) if kinds[c] == "struct")),
         "share_tree": float(sum(share[c] for c in range(len(names)) if kinds[c] == "tree")),
         "meter_ratio": float(rows[-1]["meter"]["ratio"]),
+        "meter_monitor": float(rows[-1]["meter"]["monitor"]),
+        "meter_collect": float(rows[-1]["meter"]["collect"]),
+        "mon_price": float(mon_price),
+        "collect_budget": int(collect_budget),
+        "fm_steps_per_round": int(max(1, fm_epochs * collect_budget // batch_size)),
         "tree_share_sd": float(np.std([r["alloc"][names[tree_c]] for r in rows])),
         "lp_history": lp_hist,
     }

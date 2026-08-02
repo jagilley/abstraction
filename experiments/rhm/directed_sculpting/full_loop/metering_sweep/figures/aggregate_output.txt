@@ -1,0 +1,495 @@
+============================================================================================
+=== CALIBRATION GATES (read before the curve) ===
+============================================================================================
+
+C1 -- the meter moves as intended, and INFORMATION is constant across E1
+  point        target r  realised r     err  mon_n  floor_n  fc_n       B   price       M
+  r0p0625          0.0625      0.0625  0.00%   1280      512   512   21444  0.0918   16083
+  r0p25            0.2500      0.2500  0.00%   1280      512   512   18227  0.3123   54681
+  r0p5             0.5000      0.5000  0.00%   1280      512   512   15189  0.5205   91134
+  r1p78125         1.7812      1.7812  0.00%   1280      512   512    8192  1.0000  175104
+  r4               4.0000      4.0000  0.00%   1280      512   512    4557  1.2492  218736
+  r8               8.0000      8.0000  0.00%   1280      512   512    2532  1.3882  243072
+  r22             22.0000     22.0000  0.00%   1280      512   512     991  1.4941  261624
+  ab32768          0.4453      0.4453  0.00%   1280      512   512   32768  1.0000  175104
+  ab65536          0.2227      0.2227  0.02%   1280      512   512   65536  1.0000  175104
+  info0p25         0.4453      0.4453  0.00%    320      128   128    8192  1.0000   43776
+  info4            7.1250      7.1250  0.00%   5120     2048  2048    8192  1.0000  700416
+  big262144        0.0557      0.0557  0.06%   1280      512   512  262144  1.0000  175104
+  kl0p15           1.7812      1.7812  0.00%   1280      512   512    8192  1.0000  175104
+  kl0p075          1.7812      1.7812  0.00%   1280      512   512    8192  1.0000  175104
+  kl0p03           1.7812      1.7812  0.00%   1280      512   512    8192  1.0000  175104
+  kl0p01           1.7812      1.7812  0.00%   1280      512   512    8192  1.0000  175104
+  kl0p01b32768     0.4453      0.4453  0.00%   1280      512   512   32768  1.0000  175104
+  fc2048           7.1250      7.1250  0.00%   1280      512   512    2048  1.0000  175104
+  fc32768          0.4453      0.4453  0.00%   1280      512   512   32768  1.0000  175104
+  fd2              1.7812      1.7812  0.00%   1280      512   512    8192  1.0000  175104
+  fd32             1.7812      1.7812  0.00%   1280      512   512    8192  1.0000  175104
+  own17408            nan      0.8382   nan%   1280      512   512    8192  1.0000  175104
+  own22784            nan      0.6404   nan%   1280      512   512    8192  1.0000  175104
+  own45568            nan      0.3202   nan%   1280      512   512    8192  1.0000  175104
+  ic1024              nan     14.2500   nan%   1280      512   512    1024  1.0000  175104
+  ic4096              nan      3.5625   nan%   1280      512   512    4096  1.0000  175104
+  ic16384             nan      0.8906   nan%   1280      512   512   16384  1.0000  175104
+  ic65536             nan      0.2227   nan%   1280      512   512   65536  1.0000  175104
+  ic2_131072          nan      0.1113   nan%   1280      512   512  131072  1.0000  175104
+  ep1                 nan      1.7812   nan%   1280      512   512    8192  1.0000  175104
+  ep2                 nan      1.7812   nan%   1280      512   512    8192  1.0000  175104
+  ep4                 nan      1.7812   nan%   1280      512   512    8192  1.0000  175104
+  ratio hits target to <0.5% at every point: PASS
+  monitoring quantity identical across all of E1 (1 distinct config): PASS  [(1280, 512, 3, 512)]
+
+C5 -- the world is intact at every point
+  best d* off-tree == 0.000 everywhere and on-tree in [1.5, 1.8]: PASS
+  warm-FM delta_cos range over all points: 0.292 - 0.374  (published warm FM ~0.31-0.49)
+
+C3 -- the pointwise noise floor |oracle_dup - oracle|; C4a -- liveness; C4b -- REGIME
+  C4 was pre-registered as one gate with two clauses. Clause (b) -- `oracle`'s tree
+  error must fall from r1 to r12 -- turns out NOT to be a liveness test. This is a
+  CONTINUOUS-DRIFT MAINTENANCE task: error sits at a steady state set by damage vs
+  repair, so a rising error means repair is losing to drift, not that the readout is
+  dead. It is reported below as a REGIME diagnostic (drift-limited vs data-limited)
+  and no longer strikes points. Liveness is clause (a) alone, which passes
+  everywhere by 8-43x. See README §Gates: the headline conclusion is reported both
+  ways and does not depend on this reclassification.
+
+  point             B    floor   spread  spread/floor  alive    oracle r1  oracle r12   r1-r12        regime
+  r0p0625       21444   0.0090   0.0790           8.8    yes       0.6512      0.6407  +0.0105  data-limited
+  r0p25         18227   0.0025   0.0740          29.6    yes       0.6523      0.6559  -0.0036 drift-limited
+  r0p5          15189   0.0033   0.0771          23.4    yes       0.6585      0.6584  +0.0001  data-limited
+  r1p78125       8192   0.0084   0.0662           7.8    yes       0.6624      0.6792  -0.0169 drift-limited
+  r4             4557   0.0060   0.0643          10.7    yes       0.6781      0.6870  -0.0090 drift-limited
+  r8             2532   0.0071   0.0607           8.6    yes       0.6654      0.7027  -0.0373 drift-limited
+  r22             991   0.0018   0.0714          39.2    yes       0.6719      0.7197  -0.0478 drift-limited
+  ab32768       32768   0.0020   0.0876          43.0    yes       0.6488      0.6213  +0.0275  data-limited
+  ab65536       65536   0.0049   0.0896          18.2    yes       0.6246      0.5816  +0.0430  data-limited
+  info0p25       8192   0.0084   0.0662           7.8    yes       0.6624      0.6792  -0.0169 drift-limited
+  info4          8192   0.0084   0.0662           7.8    yes       0.6624      0.6792  -0.0169 drift-limited
+  big262144    262144   0.0040   0.0952          23.8    yes       0.5728      0.4989  +0.0739  data-limited
+  kl0p15         8192   0.0040   0.0637          15.9    yes       0.6655      0.6893  -0.0237 drift-limited
+  kl0p075        8192   0.0029   0.0664          22.9    yes       0.6710      0.6846  -0.0136 drift-limited
+  kl0p03         8192   0.0035   0.0649          18.4    yes       0.6688      0.6989  -0.0301 drift-limited
+  kl0p01         8192   0.0054   0.0653          12.1    yes       0.6677      0.7025  -0.0348 drift-limited
+  kl0p01b32768   32768   0.0011   0.0874          77.9    yes       0.6554      0.6270  +0.0284  data-limited
+  fc2048         2048   0.0143   0.0509           3.5    yes       0.7338      0.8188  -0.0851 drift-limited
+  fc32768       32768   0.0034   0.0542          16.0    yes       0.6277      0.6187  +0.0091  data-limited
+  fd2            8192   0.0046   0.0559          12.1    yes       0.6282      0.6414  -0.0132 drift-limited
+  fd32           8192   0.0023   0.0648          27.7    yes       0.7232      0.7549  -0.0317 drift-limited
+  own17408       8192   0.0074   0.0845          11.4    yes       0.6536      0.6559  -0.0023 drift-limited
+  own22784       8192   0.0060   0.0801          13.3    yes       0.6617      0.6472  +0.0145  data-limited
+  own45568       8192   0.0040   0.0908          22.6    yes       0.6291      0.6201  +0.0091  data-limited
+  ic1024         1024   0.0100   0.0692           6.9    yes       0.7913      0.8658  -0.0745 drift-limited
+  ic4096         4096   0.0069   0.0562           8.1    yes       0.6915      0.7356  -0.0442 drift-limited
+  ic16384       16384   0.0028   0.0641          23.0    yes       0.6315      0.6391  -0.0076 drift-limited
+  ic65536       65536   0.0009   0.0459          51.9    yes       0.6191      0.6139  +0.0052  data-limited
+  ic2_131072   131072   0.0030   0.0647          21.3    yes       0.6116      0.5733  +0.0383  data-limited
+  ep1            8192   0.0029   0.0852          29.3    yes       0.6325      0.6428  -0.0103 drift-limited
+  ep2            8192   0.0069   0.0956          13.9    yes       0.6315      0.6405  -0.0090 drift-limited
+  ep4            8192   0.0032   0.0811          25.2    yes       0.6424      0.6552  -0.0128 drift-limited
+  C4a verdict: 32/32 points live (6-arm spread > 3x pointwise floor)
+
+============================================================================================
+=== E(d) ALONG THE FIXED-EPOCH DIAGONAL (8 epochs): tree FM error vs tree transitions/round,
+=== all 90 (arm, budget) cells. NOT a controlled learning curve -- see E6/E7 below. ===
+============================================================================================
+  At a fixed 8 epochs, raising B raises distinct data AND gradient steps together,
+  so this curve runs along a diagonal and never approaches any fixed capacity floor.
+  E4 shows the compute half is real and NEGATIVE (16x the steps on fixed data costs
+  +0.117), so the apparent steepening here is a confound, not a learning curve.
+  span 198 -> 251658 tree transitions/round (1270x)
+   d (tree/round)  log2 d  tree err             arm       point  share
+              198    7.63    0.7688         uniform         r22   0.20
+              257    8.01    0.7464  reducible_only         r22   0.26
+              506    8.98    0.7477         uniform          r8   0.20
+              662    9.37    0.7384  reducible_only          r8   0.26
+              705    9.46    0.7031     visits_only         r22   0.71
+              738    9.53    0.7080       value_red         r22   0.74
+              873    9.77    0.7334  reducible_only    own17408   0.26
+              911    9.83    0.7477         uniform          r4   0.20
+              951    9.89    0.6994      oracle_dup         r22   0.96
+              951    9.89    0.7007          oracle         r22   0.96
+             1198   10.23    0.7327  reducible_only          r4   0.26
+             1638   10.68    0.7371         uniform    info0p25   0.20
+             1638   10.68    0.7371         uniform       info4   0.20
+             1638   10.68    0.7371         uniform    r1p78125   0.20
+             1858   10.86    0.6943     visits_only          r8   0.73
+             1965   10.94    0.7025       value_red          r8   0.78
+             2152   11.07    0.7303  reducible_only    info0p25   0.26
+             2160   11.08    0.6983       value_red    own17408   0.77
+             2172   11.08    0.7287  reducible_only    r1p78125   0.27
+             2196   11.10    0.7260  reducible_only       info4   0.27
+             2307   11.17    0.7246  reducible_only    own22784   0.27
+             2431   11.25    0.6892          oracle          r8   0.96
+             2431   11.25    0.6920      oracle_dup          r8   0.96
+             3038   11.57    0.7349         uniform        r0p5   0.20
+             3359   11.71    0.6971     visits_only          r4   0.74
+             3482   11.77    0.7353         uniform    own17408   0.20
+             3518   11.78    0.6970       value_red          r4   0.77
+             3645   11.83    0.7305         uniform       r0p25   0.20
+             4050   11.98    0.7175  reducible_only        r0p5   0.27
+             4289   12.07    0.7241         uniform     r0p0625   0.20
+             4375   12.09    0.6845          oracle          r4   0.96
+             4375   12.09    0.6882      oracle_dup          r4   0.96
+             4557   12.15    0.7274         uniform    own22784   0.20
+             4884   12.25    0.7149  reducible_only       r0p25   0.27
+             5752   12.49    0.7141  reducible_only     r0p0625   0.27
+             6071   12.57    0.6883     visits_only    r1p78125   0.74
+             6077   12.57    0.6897     visits_only    info0p25   0.74
+             6090   12.57    0.6882     visits_only       info4   0.74
+             6394   12.64    0.6838       value_red    info0p25   0.78
+             6398   12.64    0.6845       value_red    r1p78125   0.78
+             6405   12.64    0.6837       value_red       info4   0.78
+             6442   12.65    0.6891       value_red    own22784   0.79
+             6554   12.68    0.7196         uniform     ab32768   0.20
+             7864   12.94    0.6738          oracle    info0p25   0.96
+             7864   12.94    0.6738          oracle       info4   0.96
+             7864   12.94    0.6738          oracle    r1p78125   0.96
+             7864   12.94    0.6765      oracle_dup    info0p25   0.96
+             7864   12.94    0.6765      oracle_dup       info4   0.96
+             7864   12.94    0.6765      oracle_dup    r1p78125   0.96
+             8481   13.05    0.7037  reducible_only    own45568   0.27
+             8846   13.11    0.7039  reducible_only     ab32768   0.27
+             9114   13.15    0.7035         uniform    own45568   0.20
+            11061   13.43    0.6759     visits_only        r0p5   0.73
+            11777   13.52    0.6712       value_red        r0p5   0.78
+            12358   13.59    0.6719     visits_only    own17408   0.73
+            13107   13.68    0.6885         uniform     ab65536   0.20
+            13580   13.73    0.6671     visits_only       r0p25   0.75
+            14005   13.77    0.6684       value_red       r0p25   0.77
+            14581   13.83    0.6585          oracle        r0p5   0.96
+            14581   13.83    0.6604      oracle_dup        r0p5   0.96
+            16058   13.97    0.6650     visits_only     r0p0625   0.75
+            16518   14.01    0.6632     visits_only    own22784   0.74
+            16613   14.02    0.6634       value_red     r0p0625   0.77
+            16712   14.03    0.6539      oracle_dup    own17408   0.96
+            16712   14.03    0.6613          oracle    own17408   0.96
+            17498   14.09    0.6576      oracle_dup       r0p25   0.96
+            17498   14.09    0.6587          oracle       r0p25   0.96
+            17805   14.12    0.6725  reducible_only     ab65536   0.27
+            20586   14.33    0.6487          oracle     r0p0625   0.96
+            20586   14.33    0.6532      oracle_dup     r0p0625   0.96
+            21873   14.42    0.6475      oracle_dup    own22784   0.96
+            21873   14.42    0.6535          oracle    own22784   0.96
+            24163   14.56    0.6494     visits_only     ab32768   0.74
+            24505   14.58    0.6481       value_red    own45568   0.79
+            25339   14.63    0.6463       value_red     ab32768   0.77
+            31457   14.94    0.6325      oracle_dup     ab32768   0.96
+            31457   14.94    0.6336          oracle     ab32768   0.96
+            33560   15.03    0.6336     visits_only    own45568   0.74
+            43745   15.42    0.6159      oracle_dup    own45568   0.96
+            43745   15.42    0.6185          oracle    own45568   0.96
+            47931   15.55    0.6142     visits_only     ab65536   0.73
+            51381   15.65    0.6152       value_red     ab65536   0.78
+            52429   15.68    0.6177         uniform   big262144   0.20
+            62915   15.94    0.6004          oracle     ab65536   0.96
+            62915   15.94    0.6023      oracle_dup     ab65536   0.96
+            72646   16.15    0.5930  reducible_only   big262144   0.28
+           192329   17.55    0.5362     visits_only   big262144   0.73
+           206327   17.65    0.5367       value_red   big262144   0.79
+           251658   17.94    0.5225          oracle   big262144   0.96
+           251658   17.94    0.5265      oracle_dup   big262144   0.96
+
+  slope over ALL cells:        -0.0213 per doubling of tree data
+  slope over the STARVED half: -0.0106   (d <= 7864)
+  slope over the ABUNDANT half:-0.0316   (d >  7864)
+  curvature (abundant - starved): -0.0209 per doubling
+  partial_hetero G3 measured -0.05..-0.08 per doubling of task data; env_check E2's aleatoric floor is 0.189
+  >> STEEPENING ALONG THE DIAGONAL -> and this is the confound, not a result. Compute grows with data here. The controlled iso-compute lanes (E6/E7) FLATTEN toward a capacity floor and their prize turns over.
+  (the 0.189 aleatoric floor is ~11 doublings away ALONG THIS DIAGONAL, but that extrapolation is meaningless -- the relevant floor is the CAPACITY floor at fixed compute, which E6/E7 reach.)
+
+  DOES E(d) COLLAPSE? matched-d cells from DIFFERENT arms (within 6% in d).
+  If tree error were a function of tree data alone these would agree. Non-agreement
+  means the rest of the budget matters too -- i.e. INTERFERENCE, decomposed below.
+    d=    911        uniform@r4         err=0.7477   vs   d=    951     oracle_dup@r22        err=0.6994   Delta=-0.0483
+    d=    911        uniform@r4         err=0.7477   vs   d=    951         oracle@r22        err=0.7007   Delta=-0.0470
+    d=   4375         oracle@r4         err=0.6845   vs   d=   4557        uniform@own22784   err=0.7274   Delta=+0.0428
+    d=   4289        uniform@r0p0625    err=0.7241   vs   d=   4375         oracle@r4         err=0.6845   Delta=-0.0395
+    d=   4375     oracle_dup@r4         err=0.6882   vs   d=   4557        uniform@own22784   err=0.7274   Delta=+0.0391
+    d=   3482        uniform@own17408   err=0.7353   vs   d=   3518      value_red@r4         err=0.6970   Delta=-0.0384
+    d=   3359    visits_only@r4         err=0.6971   vs   d=   3482        uniform@own17408   err=0.7353   Delta=+0.0382
+    d=   6405      value_red@info4      err=0.6837   vs   d=   6554        uniform@ab32768    err=0.7196   Delta=+0.0359
+
+============================================================================================
+=== the prize decomposed: interference vs data quantity ===
+============================================================================================
+  point             B    PRIZE  interference  data qty   check  interf share
+  r0p0625       21444  +0.0753       +0.0394   +0.0360 -0.0000          52%
+  r0p25         18227  +0.0718       +0.0445   +0.0273 +0.0000          62%
+  r0p5          15189  +0.0764       +0.0475   +0.0289 +0.0000          62%
+  r1p78125       8192  +0.0633       +0.0430   +0.0203 +0.0000          68%
+  r4             4557  +0.0632       +0.0470   +0.0162 +0.0000          74%   <- d_u outside the oracle curve; split NOT valid here
+  r8             2532  +0.0585       +0.0470   +0.0115 +0.0000          80%   <- d_u outside the oracle curve; split NOT valid here
+  r22             991  +0.0681       +0.0681   +0.0000 +0.0000         100%   <- d_u outside the oracle curve; split NOT valid here
+  ab32768       32768  +0.0860       +0.0425   +0.0435 +0.0000          49%
+  ab65536       65536  +0.0881       +0.0274   +0.0607 +0.0000          31%
+  info0p25       8192  +0.0633       +0.0430   +0.0203 +0.0000          68%
+  info4          8192  +0.0633       +0.0430   +0.0203 +0.0000          68%
+  big262144    262144  +0.0952       +0.0082   +0.0870 +0.0000           9%
+  own17408       8192  +0.0741       +0.0490   +0.0251 +0.0000          66%
+  own22784       8192  +0.0738       +0.0436   +0.0303 +0.0000          59%
+  own45568       8192  +0.0850       +0.0334   +0.0516 +0.0000          39%
+  slope of interference   vs log2(B): -0.00606 per doubling of budget
+  slope of data quantity  vs log2(B): +0.01134 per doubling of budget
+  -> the two components move in OPPOSITE directions with the meter; the doc's
+     intuition is right about one of them and wrong about the other.
+
+============================================================================================
+=== E1-A  the headline: PRICE at fixed total spend (T = 22784) ===
+============================================================================================
+  point              r       B  uniform   oracle     PRIZE     sem   floor   visits  value_red  red_only
+  r0p0625       0.0625   21444   0.7241   0.6487   +0.0753  0.0020  0.0090    78.5%      80.6%     13.3%
+  r0p25         0.2500   18227   0.7305   0.6587   +0.0718  0.0036  0.0025    88.8%      86.9%     22.2%
+  r0p5          0.5000   15189   0.7349   0.6585   +0.0764  0.0050  0.0033    77.6%      83.6%     22.4%
+  r1p78125      1.7812    8192   0.7371   0.6738   +0.0633  0.0031  0.0084    77.6%      83.7%     13.5%
+  r4            4.0000    4557   0.7477   0.6845   +0.0632  0.0074  0.0060    79.0%      80.7%     21.7%
+  r8            8.0000    2532   0.7477   0.6892   +0.0585  0.0102  0.0071    92.5%      76.5%     16.2%
+  r22          22.0000     991   0.7688   0.7007   +0.0681  0.0047  0.0018    97.0%      88.2%     33.3%
+
+  prize vs log2(ratio) over 7 live points (full range)
+    per-seed slope: -0.00203  -0.00262  -0.00028
+    mean -0.00164 +/- 0.00070  t = -2.33  (0/3 positive)
+    -> prize change across the whole fitted span: -0.0139 (pointwise floor ~0.0054)
+
+  prize vs log2(ratio) over 4 live points (LOW limb, r <= 1.78 -- the doc's predicted limb)
+    per-seed slope: -0.00086  -0.00287  -0.00276
+    mean -0.00216 +/- 0.00065  t = -3.31  (0/3 positive)
+    -> prize change across the whole fitted span: -0.0105 (pointwise floor ~0.0058)
+
+  prize vs log2(ratio) over 4 live points (HIGH limb, r >= 1.78 -- the starvation limb)
+    per-seed slope: -0.00185  +0.00139  +0.00345
+    mean +0.00100 +/- 0.00154  t = +0.65  (2/3 positive)
+    -> prize change across the whole fitted span: +0.0036 (pointwise floor ~0.0058)
+
+============================================================================================
+=== the prize against BUDGET, pooling E1-A and E1-B (9 points, 66x in B) ===
+============================================================================================
+  point              r       B     PRIZE     sem   floor
+  r22          22.0000     991   +0.0681  0.0047  0.0018
+  r8            8.0000    2532   +0.0585  0.0102  0.0071
+  r4            4.0000    4557   +0.0632  0.0074  0.0060
+  r1p78125      1.7812    8192   +0.0633  0.0031  0.0084
+  r0p5          0.5000   15189   +0.0764  0.0050  0.0033
+  r0p25         0.2500   18227   +0.0718  0.0036  0.0025
+  r0p0625       0.0625   21444   +0.0753  0.0020  0.0090
+  ab32768       0.4453   32768   +0.0860  0.0031  0.0020
+  ab65536       0.2227   65536   +0.0881  0.0025  0.0049
+  big262144     0.0557  262144   +0.0952  0.0038  0.0040
+
+  prize vs log2(collect_budget) over 10 live points (ALL points -- the doc predicts NEGATIVE as B rises / r falls)
+    per-seed slope: +0.00463  +0.00528  +0.00376
+    mean +0.00456 +/- 0.00044  t = +10.35  (3/3 positive)
+    -> prize change across the whole fitted span: +0.0367 (pointwise floor ~0.0049)
+
+  prize vs log2(collect_budget) over 10 live points (C4a-live points only)
+    per-seed slope: +0.00463  +0.00528  +0.00376
+    mean +0.00456 +/- 0.00044  t = +10.35  (3/3 positive)
+    -> prize change across the whole fitted span: +0.0367 (pointwise floor ~0.0049)
+
+============================================================================================
+=== E1-B  abundance limb: price fixed at 1.0, collection raised ===
+============================================================================================
+  point              r       B  uniform   oracle     PRIZE     sem   floor   visits  value_red  red_only
+  ab32768       0.4453   32768   0.7196   0.6336   +0.0860  0.0031  0.0020    81.6%      85.0%     18.3%
+  ab65536       0.2227   65536   0.6885   0.6004   +0.0881  0.0025  0.0049    84.5%      83.3%     18.2%
+
+============================================================================================
+=== E2  CONTROL: information swept at fixed budget and fixed price ===
+============================================================================================
+  point              r       B  uniform   oracle     PRIZE     sem   floor   visits  value_red  red_only
+  info0p25      0.4453    8192   0.7371   0.6738   +0.0633  0.0031  0.0084    75.4%      85.0%     11.1%
+  info4         7.1250    8192   0.7371   0.6738   +0.0633  0.0031  0.0084    77.8%      85.4%     17.7%
+
+============================================================================================
+=== E3  the DAMAGE sweep: data per unit of damage ===
+============================================================================================
+  `equiv B` = the collection budget at the PUBLISHED drift that would sit at the
+  same point of the repair balance. C6: the commanded drift must actually move.
+  point           drift_kl       B   equiv B  KL/round  uniform   oracle     PRIZE     sem   floor        regime
+  r1p78125           0.300    8192      8192     5.022   0.7371   0.6738   +0.0633  0.0031  0.0084 drift-limited
+  kl0p15             0.150    8192     16384     2.019   0.7416   0.6800   +0.0616  0.0057  0.0040 drift-limited
+  ab32768            0.300   32768     32768     5.022   0.7196   0.6336   +0.0860  0.0031  0.0020  data-limited
+  kl0p075            0.075    8192     32768     0.921   0.7463   0.6820   +0.0644  0.0051  0.0029 drift-limited
+  kl0p03             0.030    8192     81920     0.349   0.7509   0.6860   +0.0649  0.0067  0.0035 drift-limited
+  kl0p01             0.010    8192    245760     0.113   0.7494   0.6871   +0.0624  0.0048  0.0054 drift-limited
+  kl0p01b32768       0.010   32768    983040     0.113   0.7322   0.6454   +0.0868  0.0035  0.0011  data-limited
+
+  prize vs log2(data per unit damage), 7 points spanning 120x:
+    per-seed +0.00083  +0.00287  +0.00302   mean +0.00224 +/- 0.00071 t = +3.17
+
+  THE 2x2 -- budget x drift, both levels of each:
+                     drift 0.30     drift 0.01   drift effect
+    B = 8192            +0.0633        +0.0624        -0.0009
+    B = 32768           +0.0860        +0.0868        +0.0008
+    budget effect at drift 0.3: +0.0227 +/- 0.0043 (t=+5.23)
+    budget effect at drift 0.01: +0.0244 +/- 0.0046 (t=+5.37)
+    -> budget moves the prize; drift does not. The two are not interchangeable,
+       so the repair-balance premise behind this sweep is REFUTED by it.
+
+  WHY the absolute errors do not fall as drift falls -- the entropy identity,
+  for the fourth time in this node (`../README.md` §7). KL(w||uniform) = log m - H(w),
+  and the OU walk is anchored AT uniform, i.e. at maximum rendering entropy. Small
+  sigma keeps the world near that anchor, where synonymy is highest and the world is
+  HARDEST to predict; large sigma wanders to lower-entropy corners that are
+  mechanically easier (measured there at tree floor 0.160 drifted vs 0.195 uniform,
+  ~18%). So less drift buys less repair burden AND a harder world, and the two
+  offset. The PRIZE differences arms within one world, so this largely cancels there.
+
+  P8: most-saturated point (kl0p01b32768) prize +0.0868 +/- 0.0035, floor 0.0011
+      -> PERSISTS -- P8 second branch: interference is structural
+      absolute errors 0.7371 -> 0.7322 (uniform), 0.6738 -> 0.6454 (oracle)  [falling = saturation, rising = starvation]
+
+============================================================================================
+=== E4  DATA vs COMPUTE ===
+============================================================================================
+
+  FIXED COMPUTE (256 steps/round), data varies 16x
+    point                B  epochs  steps/rd  uniform   oracle     PRIZE     sem
+    fc2048            2048      32       256   0.8314   0.7961   +0.0354  0.0030
+    r1p78125          8192       8       256   0.7371   0.6738   +0.0633  0.0031
+    fc32768          32768       2       256   0.6740   0.6221   +0.0519  0.0030
+    end-to-end: prize +0.0165 +/- 0.0053 (t=+3.10), oracle error -0.1740
+
+  FIXED DATA (B=8192), compute varies 16x
+    point                B  epochs  steps/rd  uniform   oracle     PRIZE     sem
+    fd2               8192       2        64   0.6921   0.6363   +0.0559  0.0039
+    r1p78125          8192       8       256   0.7371   0.6738   +0.0633  0.0031
+    fd32              8192      32      1024   0.8161   0.7533   +0.0629  0.0085
+    end-to-end: prize +0.0070 +/- 0.0084 (t=+0.84), oracle error +0.1170
+
+  -> if the steepening is DATA, the fixed-compute cut still moves and the
+     fixed-data cut is flatter. If it is COMPUTE, the reverse.
+
+============================================================================================
+=== E6/E7  ISO-COMPUTE: E(d) and the prize at MATCHED gradient steps ===
+============================================================================================
+
+  256 gradient steps/round  (7 points, 64x in data)
+    point                B  epochs  d=0.96B  uniform   oracle     PRIZE     sem   floor   slope E
+    ic1024            1024      64      983   0.9001   0.8383   +0.0618  0.0091  0.0100         -
+    fc2048            2048      32     1966   0.8314   0.7961   +0.0354  0.0030  0.0143   -0.0423
+    ic4096            4096      16     3932   0.7817   0.7260   +0.0557  0.0076  0.0069   -0.0701
+    info0p25          8192       8     7864   0.7371   0.6738   +0.0633  0.0031  0.0084   -0.0522
+    ic16384          16384       4    15729   0.7027   0.6387   +0.0640  0.0036  0.0028   -0.0350
+    fc32768          32768       2    31457   0.6740   0.6221   +0.0519  0.0030  0.0034   -0.0167
+    ic65536          65536       1    62915   0.6604   0.6154   +0.0450  0.0010  0.0009   -0.0067
+    prize shape: HUMPED -- peaks at B=16384 and falls -0.0190 to the abundant end (2.8x the floor)
+    peak -> abundant end: -0.0190 +/- 0.0031 (t=-6.10, 3/3 negative)
+    -> THE DOC'S PREDICTED LIMB. Round 1 could not see it because its
+       fixed-epoch scaling gave the abundant end more compute as well.
+
+  1024 gradient steps/round  (3 points, 16x in data)
+    point                B  epochs  d=0.96B  uniform   oracle     PRIZE     sem   floor   slope E
+    fd32              8192      32     7864   0.8161   0.7533   +0.0629  0.0085  0.0023         -
+    ab32768          32768       8    31457   0.7196   0.6336   +0.0860  0.0031  0.0020   -0.0598
+    ic2_131072      131072       2   125829   0.6504   0.5865   +0.0639  0.0041  0.0030   -0.0236
+    prize shape: HUMPED -- peaks at B=32768 and falls -0.0221 to the abundant end (9.0x the floor)
+    peak -> abundant end: -0.0221 +/- 0.0010 (t=-21.67, 3/3 negative)
+    -> THE DOC'S PREDICTED LIMB. Round 1 could not see it because its
+       fixed-epoch scaling gave the abundant end more compute as well.
+
+============================================================================================
+=== E5  the HONEST ladder: each arm pays for the taps it reads ===
+============================================================================================
+  `uniform` reads nothing and collects the whole total; `value_red` buys 64% less
+  data in exchange for knowing where to spend it. Everything is vs `uniform` at
+  the SAME total spend, which is the comparison the equal-charge ladder cannot make.
+
+  T = 17408   (C7: bill = T - arm budget)
+    arm               bill/rd       B  tree err  vs uniform     sem  per 1k bought
+    uniform                 0   17408    0.7353     +0.0000  0.0000         (free)
+    visits_only           512   16896    0.6719     +0.0634  0.0071        0.12388
+    reducible_only      14080    3328    0.7334     +0.0019  0.0062        0.00014
+    value_red           14592    2816    0.6983     +0.0370  0.0070        0.00254
+    oracle                  0   17408    0.6613     +0.0741  0.0051         (free)
+    oracle_dup              0   17408    0.6539     +0.0815  0.0048         (free)
+    -> oracle is the free-information ceiling here (+0.0741); the paid arms are visits_only and value_red
+
+  T = 22784   (C7: bill = T - arm budget)
+    arm               bill/rd       B  tree err  vs uniform     sem  per 1k bought
+    uniform                 0   22784    0.7274     +0.0000  0.0000         (free)
+    visits_only           512   22272    0.6632     +0.0642  0.0027        0.12531
+    reducible_only      14080    8704    0.7246     +0.0028  0.0021        0.00020
+    value_red           14592    8192    0.6891     +0.0383  0.0027        0.00262
+    oracle                  0   22784    0.6535     +0.0738  0.0047         (free)
+    oracle_dup              0   22784    0.6475     +0.0799  0.0037         (free)
+    -> oracle is the free-information ceiling here (+0.0738); the paid arms are visits_only and value_red
+
+  T = 45568   (C7: bill = T - arm budget)
+    arm               bill/rd       B  tree err  vs uniform     sem  per 1k bought
+    uniform                 0   45568    0.7035     +0.0000  0.0000         (free)
+    visits_only           512   45056    0.6336     +0.0699  0.0059        0.13653
+    reducible_only      14080   31488    0.7037     -0.0001  0.0041       -0.00001
+    value_red           14592   30976    0.6481     +0.0555  0.0041        0.00380
+    oracle                  0   45568    0.6185     +0.0850  0.0020         (free)
+    oracle_dup              0   45568    0.6159     +0.0876  0.0011         (free)
+    -> oracle is the free-information ceiling here (+0.0850); the paid arms are visits_only and value_red
+
+  P10 -- cost-effectiveness of the two taps, pooled over totals:
+    relevance      (visits_only   ) +0.12858 tree-err per 1000 monitor sequences bought
+    reducibility   (reducible_only) +0.00011 tree-err per 1000 monitor sequences bought
+    both           (value_red     ) +0.00299 tree-err per 1000 monitor sequences bought
+
+============================================================================================
+=== E8  THE PUBLISHED LADDER AT FEWER EPOCHS ===
+============================================================================================
+  Published `ladder_fix_s*` ran at fm_epochs=8, which E4 shows is over-trained.
+  Same B, mon_n, rounds, n_eval and arm ORDER; only `fm_epochs` differs.
+
+  arm                       ep1       ep2       ep4  ep8 (pub)
+  uniform                0.6826    0.6921    0.7089     0.7371
+  error_only             0.6909    0.6930    0.7131     0.7425
+  lprog_only             0.7209    0.7330    0.7321     0.7524
+  visits_only            0.6476    0.6495    0.6653     0.6844
+  value                  0.7112    0.7120    0.7256     0.7406
+  value_satiety          0.7070    0.7219    0.7223     0.7562
+  reducible_only         0.6754    0.6820    0.6987     0.7259
+  value_red              0.6476    0.6495    0.6592     0.6863
+  value_red_satiety      0.6878    0.7008    0.7202     0.7554
+  oracle                 0.6382    0.6401    0.6524     0.6742
+
+  published claim (README §3)                            ep1        ep2        ep4        ep8
+  uniform -> oracle prize                            +0.0445    +0.0521    +0.0565    +0.0629
+  the tap repair: value_red - value  (pub -0.0542)     -0.0636    -0.0625    -0.0665    -0.0542
+  value_red - visits_only  (pub +0.0019, a tie)      +0.0000    +0.0000    -0.0061    +0.0019
+  oracle - value_red  (pub -0.0122)                  -0.0094    -0.0094    -0.0067    -0.0122
+  error_only - uniform  (pub +0.0055, worst arm)     +0.0082    +0.0009    +0.0042    +0.0055
+  satiety: value_red_satiety - value_red (pub +0.0691)     +0.0402    +0.0513    +0.0611    +0.0691
+
+  recovery of the oracle prize                           ep1        ep2        ep4        ep8
+  visits_only  (pub 84%)                              78.3%      82.3%      77.2%      83.8% 
+  value_red  (pub ?)                                  79.0%      82.1%      88.6%      80.6% 
+  reducible_only  (pub 18%)                           16.1%      20.0%      18.5%      17.7% 
+
+  allocation VARIANCE (tree-share sd)                    ep1        ep2        ep4        ep8
+  value  (pub 0.396)                                  +0.348     +0.439     +0.408     +0.406
+  value_red  (pub 0.047)                              +0.048     +0.044     +0.066     +0.059
+
+  ORDERING (best -> worst tree err), and whether it matches ep8:
+    ep1   oracle < visits_only < value_red < reducible_only < uniform < value_red_satiety < error_only < value_satiety < value < lprog_only
+    ep2   oracle < visits_only < value_red < reducible_only < uniform < error_only < value_red_satiety < value < value_satiety < lprog_only
+    ep4   oracle < value_red < visits_only < reducible_only < uniform < error_only < value_red_satiety < value_satiety < value < lprog_only
+    ep8   oracle < visits_only < value_red < reducible_only < uniform < value < error_only < lprog_only < value_red_satiety < value_satiety
+    ep1 vs ep8 on the 10 shared arms: differs  ep1=['oracle', 'visits_only', 'value_red', 'reducible_only', 'uniform', 'value_red_satiety', 'error_only', 'value_satiety', 'value', 'lprog_only']  ep8=['oracle', 'visits_only', 'value_red', 'reducible_only', 'uniform', 'value', 'error_only', 'lprog_only', 'value_red_satiety', 'value_satiety']
+    ep2 vs ep8 on the 10 shared arms: differs  ep2=['oracle', 'visits_only', 'value_red', 'reducible_only', 'uniform', 'error_only', 'value_red_satiety', 'value', 'value_satiety', 'lprog_only']  ep8=['oracle', 'visits_only', 'value_red', 'reducible_only', 'uniform', 'value', 'error_only', 'lprog_only', 'value_red_satiety', 'value_satiety']
+    ep4 vs ep8 on the 10 shared arms: differs  ep4=['oracle', 'value_red', 'visits_only', 'reducible_only', 'uniform', 'error_only', 'value_red_satiety', 'value_satiety', 'value', 'lprog_only']  ep8=['oracle', 'visits_only', 'value_red', 'reducible_only', 'uniform', 'value', 'error_only', 'lprog_only', 'value_red_satiety', 'value_satiety']
+
+  pointwise noise floor at these points: 0.0029, 0.0069, 0.0032
+
+============================================================================================
+=== matched-ratio discriminators: is `r` or `B` the operative variable? ===
+============================================================================================
+  r0p25       (r=0.250, B= 18227) prize +0.0718   vs   ab65536     (r=0.223, B= 65536) prize +0.0881
+      difference +0.0163 +/- 0.0051  t=+3.18   -- same ratio, 3.6x the budget: if r is operative these agree
+  info0p25    (r=0.445, B=  8192) prize +0.0633   vs   ab32768     (r=0.445, B= 32768) prize +0.0860
+      difference +0.0227 +/- 0.0043  t=+5.23   -- same ratio (0.4453 exactly), 4x the budget
+  r1p78125    (r=1.781, B=  8192) prize +0.0633   vs   info4       (r=7.125, B=  8192) prize +0.0633
+      difference +0.0000 +/- 0.0000  t=+nan   -- same budget, 4x the monitoring: E2 must NOT move the prize (P5)
+
+============================================================================================
+=== anchors ===
+============================================================================================
+  C2 -- anchor prize +0.0633 +/- 0.0031 (per seed +0.0695, +0.0594, +0.0611)
+       published ladder_fix_s* prize +0.0629; delta +0.0004, pointwise floor 0.0084, partial_hetero floor 0.0040
+       tap recoveries here: visits_only 77.6% (published 84%), reducible_only 13.5% (published 18%)
+
+  total GPU seconds: 94746

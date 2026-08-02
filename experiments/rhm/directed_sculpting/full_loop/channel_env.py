@@ -1229,6 +1229,15 @@ def allocate(policy, *, errors, lprog, visits, tree_channel, n_channels, lp_floo
     elif policy == "oracle":
         drive = np.zeros(n_channels)
         drive[tree_channel] = 1.0
+    elif policy == "oracle_dup":
+        # A BIT-FOR-BIT DUPLICATE of `oracle`, run as a second arm so that `oracle_dup - oracle`
+        # measures this instrument's noise floor AT THE OPERATING POINT rather than importing a
+        # floor measured somewhere else. `partial_hetero` §2 got the same number for free (its
+        # `oracle_shared` degenerates to `oracle` at zero sharing, giving -0.0033 +/- 0.0039);
+        # the metering sweep needs it at every budget, because the floor is not budget-invariant.
+        # Deliberately NOT in POLICIES, so no default run's arm set changes.
+        drive = np.zeros(n_channels)
+        drive[tree_channel] = 1.0
     elif policy == "oracle_shared":
         # The TRANSFER-AWARE oracle. `oracle` is privileged about RELEVANCE -- it is handed the
         # channel labels and puts everything on the only channel that can move `d*`. That is the
