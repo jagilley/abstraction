@@ -1,0 +1,206 @@
+
+============================================================================================================
+=== PANEL 1 -- EXPANSION: all four readouts, paired against the same seed's no-loop floor ===
+============================================================================================================
+  round-0 belief: PR 7.04 +- 0.06   d4 0.665 +- 0.028   (3 seeds: [1, 2, 3])
+
+  ABSOLUTE (base world, last graded round)
+  arm                       PR r1             PR rN             d4 rN         ballistic         freshTop1
+  frozen        6.97 +- 0.08 (n=3) 6.86 +- 0.26 (n=3)0.620 +- 0.003(n=3)0.022 +- 0.010(n=3)0.163 +- 0.027(n=3)
+  dense         6.34 +- 0.08 (n=3) 6.66 +- 0.13 (n=3)0.617 +- 0.027(n=3)0.005 +- 0.005(n=3)0.131 +- 0.103(n=3)
+  evaluative    8.90 +- 0.33 (n=3)11.45 +- 0.57 (n=3)0.814 +- 0.008(n=3)0.411 +- 0.070(n=3)0.551 +- 0.009(n=3)
+  dp_noised_g   9.05 +- 0.13 (n=3)13.47 +- 1.15 (n=3)0.716 +- 0.017(n=3)0.089 +- 0.037(n=3)0.335 +- 0.066(n=3)
+  dp_noised_a   9.42 +- 0.34 (n=3)14.07 +- 0.82 (n=3)0.701 +- 0.010(n=3)0.048 +- 0.014(n=3)0.233 +- 0.071(n=3)
+  critic        9.50 +- 0.34 (n=3)14.31 +- 0.61 (n=3)0.746 +- 0.007(n=3)0.091 +- 0.027(n=3)0.350 +- 0.016(n=3)
+  mirror        8.99 +- 0.28 (n=3)10.31 +- 0.55 (n=3)0.769 +- 0.022(n=3)0.082 +- 0.052(n=3)0.346 +- 0.064(n=3)
+
+  PAIRED vs `frozen`, same seed, same round  (this is the effect)
+  arm                           dPR                 dd4          dballistic               dtop1   t(dPR)
+  dense         -0.20 +- 0.14 (n=3)-0.002 +- 0.027(n=3)-0.017 +- 0.008(n=3)-0.033 +- 0.079(n=3)    -2.59
+  evaluative     4.59 +- 0.52 (n=3) 0.195 +- 0.006(n=3) 0.389 +- 0.061(n=3) 0.388 +- 0.028(n=3)    15.14
+  dp_noised_g    6.60 +- 1.08 (n=3) 0.096 +- 0.019(n=3) 0.067 +- 0.030(n=3) 0.172 +- 0.050(n=3)    10.63
+  dp_noised_a    7.21 +- 0.56 (n=3) 0.081 +- 0.009(n=3) 0.026 +- 0.005(n=3) 0.070 +- 0.052(n=3)    22.43
+  critic         7.44 +- 0.61 (n=3) 0.126 +- 0.007(n=3) 0.069 +- 0.020(n=3) 0.187 +- 0.033(n=3)    21.01
+  mirror         3.45 +- 0.33 (n=3) 0.150 +- 0.019(n=3) 0.060 +- 0.045(n=3) 0.183 +- 0.048(n=3)    18.34
+
+  REPRODUCTION of the published 2x2 static rows (3 seeds, `../README.md` §5)
+  arm                     PR r1           PR rN           d4 rN       ballistic       freshTop1
+  frozen         6.971/6.990     6.864/6.930     0.620/0.619     0.022/0.024     0.163/0.173   
+  dense          6.338/6.310     6.659/6.610     0.617/0.626     0.005/0.007     0.131/0.200   
+  evaluative     8.898/9.030    11.453/11.560    0.814/0.812     0.411/0.369     0.551/0.554   
+       (cell = this run / published)
+
+============================================================================================================
+=== PANEL 2 -- THE BRACKET: is the critic's deficit fidelity, or structure? ===
+============================================================================================================
+  instrument ceiling (exact DP re-drawn vs the frozen probe): k*agree 0.915 +- 0.039  -- read every k*agree against THIS, not 1.0
+  round-0 critic target : k*agree 0.316 +- 0.024   gain_frac 0.439 +- 0.057
+  corruption rates      : p_agree 0.710   p_gain 0.641
+
+  TARGET FIDELITY as delivered, averaged over rounds (the match, verified)
+  arm                    target k*agree        target gain_frac
+  evaluative        0.915 +- 0.039(n=3)     0.973 +- 0.014(n=3)
+  dp_noised_g       0.408 +- 0.059(n=3)     0.435 +- 0.054(n=3)
+  dp_noised_a       0.316 +- 0.020(n=3)     0.339 +- 0.017(n=3)
+  critic            0.264 +- 0.013(n=3)     0.356 +- 0.011(n=3)
+  mirror            0.167 +- 0.025(n=3)     0.240 +- 0.058(n=3)
+
+  EXPANSION vs FIDELITY -- the bracket. dPR/dd4 are paired vs `frozen`.
+  arm             tgt gain_frac                 dPR                 dd4          dballistic
+  evaluative              0.973  4.59 +- 0.52 (n=3) 0.195 +- 0.006(n=3) 0.389 +- 0.061(n=3)
+  dp_noised_g             0.435  6.60 +- 1.08 (n=3) 0.096 +- 0.019(n=3) 0.067 +- 0.030(n=3)
+  critic                  0.356  7.44 +- 0.61 (n=3) 0.126 +- 0.007(n=3) 0.069 +- 0.020(n=3)
+  dp_noised_a             0.339  7.21 +- 0.56 (n=3) 0.081 +- 0.009(n=3) 0.026 +- 0.005(n=3)
+  mirror                  0.240  3.45 +- 0.33 (n=3) 0.150 +- 0.019(n=3) 0.060 +- 0.045(n=3)
+
+  reading: if `critic` sits BELOW both controls at bracketed fidelity, the deficit
+  is structural. If it tracks the fidelity column, the deficit is accuracy.
+
+============================================================================================================
+=== PANEL 3 -- WIREHEAD: what the loop believes vs what it achieves ===
+============================================================================================================
+  Pre-registered: rising SELF columns with flat/falling WORLD columns is the
+  edit-control signature (P(r*) -> 1 while ~99% of sequences go off-grammar).
+
+  arm          |   plan_acc  believed  wire_idx |   pol k*agr  pol gain  ballistic  freshTop1   rootCE
+               | -- SELF (the loop grading itself) -- |          -- WORLD (held-out instruments) --         
+  frozen       |         --     0.382     0.360 |       0.134     0.177      0.022      0.163   0.3389
+  dense        |         --     0.132     0.126 |       0.212     0.262      0.005      0.131   0.3374
+  evaluative   |      0.999     0.432     0.021 |       0.559     0.745      0.411      0.551   0.3519
+  dp_noised_g  |      0.991     0.000    -0.089 |       0.221     0.315      0.089      0.335   0.3560
+  dp_noised_a  |      0.988     0.000    -0.048 |       0.165     0.219      0.048      0.233   0.3621
+  critic       |      0.997     0.012    -0.079 |       0.236     0.346      0.091      0.350   0.3563
+  mirror       |      0.997     0.030    -0.051 |       0.158     0.234      0.082      0.346   0.3467
+
+  TRAJECTORY of the discriminator (mean over seeds, per round)
+    [frozen]
+      pol gain : 0.229 0.217 0.211 0.216 0.199 0.199 0.199 0.182 0.194 0.177
+      pol k*   : 0.167 0.155 0.157 0.159 0.145 0.142 0.147 0.129 0.142 0.134
+    [dense]
+      pol gain : 0.169 0.159 0.192 0.180 0.219 0.249 0.235 0.260 0.248 0.262
+      pol k*   : 0.161 0.164 0.169 0.176 0.183 0.205 0.201 0.215 0.188 0.212
+    [evaluative]
+      pol gain : 0.675 0.700 0.717 0.727 0.746 0.755 0.746 0.750 0.754 0.745
+      pol k*   : 0.488 0.513 0.523 0.544 0.554 0.554 0.552 0.561 0.562 0.559
+      plan_acc : 1.000 0.996 0.995 1.000 0.996 1.000 0.999 0.999 0.999 0.999
+    [dp_noised_g]
+      pol gain : 0.333 0.310 0.303 0.314 0.276 0.310 0.290 0.309 0.304 0.315
+      pol k*   : 0.245 0.228 0.213 0.235 0.212 0.234 0.211 0.232 0.224 0.221
+      plan_acc : 0.999 0.996 0.986 0.995 0.990 0.991 0.993 0.997 0.991 0.991
+    [dp_noised_a]
+      pol gain : 0.234 0.205 0.211 0.195 0.188 0.205 0.205 0.228 0.228 0.219
+      pol k*   : 0.169 0.149 0.151 0.144 0.146 0.163 0.151 0.171 0.178 0.165
+      plan_acc : 0.991 0.996 0.988 0.996 0.992 0.988 0.990 0.992 0.984 0.988
+    [critic]
+      pol gain : 0.397 0.386 0.367 0.372 0.363 0.350 0.358 0.342 0.355 0.346
+      pol k*   : 0.269 0.251 0.250 0.243 0.246 0.250 0.255 0.237 0.237 0.236
+      plan_acc : 0.993 0.993 0.996 0.993 0.996 0.995 0.992 0.999 0.993 0.997
+    [mirror]
+      pol gain : 0.235 0.243 0.241 0.255 0.237 0.247 0.240 0.237 0.234 0.234
+      pol k*   : 0.160 0.175 0.174 0.178 0.164 0.170 0.166 0.162 0.164 0.158
+      plan_acc : 0.997 0.995 0.999 0.996 0.997 0.996 1.000 0.999 0.997 0.997
+
+  CROSS-WORLD (ballistic at the last graded round; `own` == `base` by construction in a static run)
+  arm                      base          novel1          novel2             own
+  frozen                  0.022           0.020           0.021           0.023
+  dense                   0.005           0.004           0.005           0.004
+  evaluative              0.411           0.387           0.388           0.408
+  dp_noised_g             0.089           0.086           0.083           0.090
+  dp_noised_a             0.048           0.043           0.047           0.048
+  critic                  0.091           0.087           0.087           0.092
+  mirror                  0.082           0.078           0.083           0.084
+
+  METERING -- what each arm paid, per run (the currency question)
+  arm             rollout transitions   DP state-move evals    materialisations
+  frozen                            0                     0                   0
+  dense                             0                     0                   0
+  evaluative                        0               276,480             245,760
+  dp_noised_g                       0               276,480             245,760
+  dp_noised_a                       0               276,480             245,760
+  critic                   10,080,000                     0             430,080
+  mirror                            0                     0                   0
+
+============================================================================================================
+=== PANEL 4 -- READOUT BAKE-OFF: does any representation-side number track function? ===
+============================================================================================================
+
+  DECISIVE -- restricted to the 4 target arms (fidelity varies; the floor does not drown the signal)
+  readout                           vs ballistic                   vs d4      vs target fidelity
+  R_act                   -0.07 [+0.4 -0.8 +0.2]  +0.07 [+0.2 -0.4 +0.4]  -0.33 [+0.4 -1.0 -0.4]
+  R_res_participation     -0.27 [-0.4 +0.0 -0.4]  +0.00 [-0.2 +0.4 -0.2]  -0.60 [-0.4 -0.6 -0.8]
+  R_comp_participation    +0.00 [+0.4 -0.8 +0.4]  +0.20 [+0.2 -0.4 +0.8]  -0.27 [+0.4 -1.0 -0.2]
+  frontier_mass           -0.80 [-0.8 -0.8 -0.8]  -1.00 [-1.0 -1.0 -1.0]  -0.53 [-0.8 -0.4 -0.4]
+  naive_R_res             -0.47 [-0.2 -0.4 -0.8]  -0.33 [-0.4 -0.2 -0.4]  -0.67 [-0.2 -0.8 -1.0]
+  rel_residual            -0.87 [-0.8 -1.0 -0.8]  -0.93 [-1.0 -0.8 -1.0]  -0.67 [-0.8 -0.8 -0.4]
+  beta                    +0.27 [-0.4 +0.4 +0.8]  +0.13 [-0.2 +0.2 +0.4]  +0.47 [-0.4 +0.8 +1.0]
+  beta_r2                 -0.47 [-1.0 +0.4 -0.8]  -0.33 [-0.8 +0.8 -1.0]  -0.40 [-1.0 +0.2 -0.4]
+  alignment_index         +0.33 [+0.2 +0.4 +0.4]  +0.27 [+0.4 +0.2 +0.2]  +0.60 [+0.2 +0.8 +0.8]
+  belief_PR               -0.67 [-0.4 -0.8 -0.8]  -0.33 [-0.2 -0.4 -0.4]  -0.80 [-0.4 -1.0 -1.0]
+
+  ordering of the 4 target arms, best-function FIRST
+    by BALLISTIC (truth)  : evaluative > critic > dp_noised_g > dp_noised_a
+    by belief_PR          : critic > dp_noised_a > dp_noised_g > evaluative
+    by R_act              : critic > dp_noised_g > dp_noised_a > evaluative
+    by R_res_participation: critic > dp_noised_a > dp_noised_g > evaluative
+    by frontier_mass      : dp_noised_a > dp_noised_g > critic > evaluative
+
+  is R_res_participation independent of R_act, or a scaled copy?
+    frozen        R_act=  7.37  R_res_part=  8.08  ratio=1.097
+    dense         R_act=  6.63  R_res_part=  7.02  ratio=1.060
+    evaluative    R_act= 17.94  R_res_part= 19.60  ratio=1.093
+    dp_noised_g   R_act= 18.82  R_res_part= 21.06  ratio=1.119
+    dp_noised_a   R_act= 18.53  R_res_part= 21.10  ratio=1.139
+    critic        R_act= 19.64  R_res_part= 23.34  ratio=1.188
+    mirror        R_act= 14.44  R_res_part= 15.83  ratio=1.096
+
+  [tree blocks]  absolute values at the last graded round (mean over seeds)
+  arm                    R_act  R_res_partici  R_comp_partic  frontier_mass    naive_R_res   rel_residual           beta        beta_r2  alignment_ind   belief-PR
+  frozen                 7.369          8.085          7.237          0.149         43.765          0.257          0.393          0.569          0.878        6.86
+  dense                  6.626          7.022          6.458          0.248         39.211          0.043          0.424          0.563          0.902        6.66
+  evaluative            17.936         19.598         17.669          0.115         69.815          0.106          0.292          0.517          0.646       11.45
+  dp_noised_g           18.822         21.061         18.385          0.149         72.536          0.161          0.278          0.516          0.623       13.47
+  dp_noised_a           18.533         21.105         18.073          0.152         72.700          0.175          0.284          0.539          0.624       14.07
+  critic                19.643         23.336         19.045          0.139         73.789          0.155          0.275          0.523          0.599       14.31
+  mirror                14.444         15.833         14.235          0.113         62.786          0.107          0.343          0.550          0.714       10.31
+
+  [tree blocks]  rank-correlation ACROSS ARMS with the functional readouts  (per seed; want |rho| high and POSITIVE)
+  readout                             vs ballistic                     vs d4              vs freshTop1
+  R_act                  +0.64 [+0.89 +0.46 +0.57] +0.51 [+0.57 +0.39 +0.57] +0.62 [+0.86 +0.46 +0.54]
+  R_res_participation    +0.62 [+0.75 +0.68 +0.43] +0.49 [+0.46 +0.57 +0.43] +0.58 [+0.68 +0.68 +0.39]
+  R_comp_participation   +0.67 [+0.89 +0.46 +0.64] +0.55 [+0.57 +0.39 +0.68] +0.64 [+0.86 +0.46 +0.61]
+  frontier_mass          -0.70 [-0.39 -0.75 -0.96] -0.86 [-0.86 -0.75 -0.96] -0.75 [-0.57 -0.75 -0.93]
+  naive_R_res            +0.57 [+0.79 +0.57 +0.36] +0.42 [+0.43 +0.43 +0.39] +0.54 [+0.71 +0.57 +0.32]
+  rel_residual           -0.08 [+0.14 -0.21 -0.18] -0.36 [-0.21 -0.43 -0.43] -0.20 [+0.00 -0.21 -0.39]
+  beta                   -0.61 [-0.89 -0.57 -0.36] -0.46 [-0.57 -0.43 -0.39] -0.58 [-0.86 -0.57 -0.32]
+  beta_r2                -0.68 [-0.96 -0.36 -0.71] -0.62 [-0.86 -0.21 -0.79] -0.70 [-1.00 -0.36 -0.75]
+  alignment_index        -0.60 [-0.79 -0.57 -0.43] -0.43 [-0.43 -0.43 -0.43] -0.56 [-0.71 -0.57 -0.39]
+  belief_PR              +0.52 [+0.75 +0.46 +0.36] +0.42 [+0.46 +0.39 +0.39] +0.49 [+0.68 +0.46 +0.32]
+
+  [all blocks]  absolute values at the last graded round (mean over seeds)
+  arm                    R_act  R_res_partici  R_comp_partic  frontier_mass    naive_R_res   rel_residual           beta        beta_r2  alignment_ind   belief-PR
+  frozen                 7.532          8.238          7.400          0.150         44.624          0.262          0.385          0.566          0.873        6.86
+  dense                  6.772          7.119          6.617          0.251         40.122          0.045          0.415          0.558          0.899        6.66
+  evaluative            17.948         19.480         17.692          0.111         69.763          0.096          0.289          0.520          0.646       11.45
+  dp_noised_g           19.690         21.268         19.377          0.145         72.798          0.155          0.275          0.522          0.618       13.47
+  dp_noised_a           19.804         21.832         19.442          0.148         73.569          0.177          0.279          0.546          0.610       14.07
+  critic                20.712         23.807         20.204          0.133         74.304          0.148          0.271          0.532          0.591       14.31
+  mirror                14.823         15.971         14.649          0.110         62.952          0.100          0.338          0.551          0.711       10.31
+
+  [all blocks]  rank-correlation ACROSS ARMS with the functional readouts  (per seed; want |rho| high and POSITIVE)
+  readout                             vs ballistic                     vs d4              vs freshTop1
+  R_act                  +0.56 [+0.79 +0.46 +0.43] +0.42 [+0.43 +0.39 +0.43] +0.52 [+0.71 +0.46 +0.39]
+  R_res_participation    +0.58 [+0.75 +0.57 +0.43] +0.44 [+0.46 +0.43 +0.43] +0.55 [+0.68 +0.57 +0.39]
+  R_comp_participation   +0.56 [+0.79 +0.46 +0.43] +0.42 [+0.43 +0.39 +0.43] +0.52 [+0.71 +0.46 +0.39]
+  frontier_mass          -0.77 [-0.54 -0.82 -0.96] -0.89 [-0.93 -0.79 -0.96] -0.82 [-0.71 -0.82 -0.93]
+  naive_R_res            +0.57 [+0.79 +0.57 +0.36] +0.42 [+0.43 +0.43 +0.39] +0.54 [+0.71 +0.57 +0.32]
+  rel_residual           -0.13 [+0.00 -0.21 -0.18] -0.37 [-0.25 -0.43 -0.43] -0.24 [-0.11 -0.21 -0.39]
+  beta                   -0.57 [-0.89 -0.46 -0.36] -0.45 [-0.57 -0.39 -0.39] -0.55 [-0.86 -0.46 -0.32]
+  beta_r2                -0.56 [-0.79 -0.25 -0.64] -0.56 [-0.75 -0.18 -0.75] -0.61 [-0.89 -0.25 -0.68]
+  alignment_index        -0.57 [-0.79 -0.57 -0.36] -0.42 [-0.43 -0.43 -0.39] -0.54 [-0.71 -0.57 -0.32]
+  belief_PR              +0.52 [+0.75 +0.46 +0.36] +0.42 [+0.46 +0.39 +0.39] +0.49 [+0.68 +0.46 +0.32]
+
+  reading: the incumbent `belief_PR` / `R_act` is expected NEGATIVE (the first pass
+  found dPR anti-correlates with target fidelity). A candidate is only an improvement
+  if it is positive and consistent ACROSS SEEDS -- `R_res_participation` is on record
+  as non-monotone in model quality, so a sign flip between seeds is the failure mode
+  to watch for, not a surprise.
