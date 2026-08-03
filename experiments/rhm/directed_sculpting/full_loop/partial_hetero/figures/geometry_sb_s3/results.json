@@ -1,0 +1,2297 @@
+{
+  "config": {
+    "shares": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "seed": 3,
+    "v": 8,
+    "s": 2,
+    "tree_depth": 4,
+    "struct_depths": [
+      4,
+      2
+    ],
+    "struct_ms": "2,4",
+    "noise_blocks": "1,1",
+    "arms": [
+      "tree_half",
+      "tree_only",
+      "tree_structA",
+      "tree_structB",
+      "tree_noise",
+      "uniform",
+      "structA_only",
+      "structB_only"
+    ],
+    "fm_arch": "block",
+    "share_mode": "bottom",
+    "rule_seed_offset": 2,
+    "quick": false
+  },
+  "dgp": {
+    "0": {
+      "irrelevance": {
+        "roots_identical": true,
+        "valid_identical": true,
+        "dp_identical": true,
+        "n_off_tree_tokens": 24,
+        "mean_dp_cost": 3.64697265625
+      },
+      "surface": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 14,
+          "overlap_with_tree": 1.0,
+          "bottom_table_identical": true,
+          "levels_identical_to_tree": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 15,
+          "overlap_with_tree": 0.2,
+          "bottom_table_identical": false,
+          "levels_identical_to_tree": [
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 2,
+          "m": 4,
+          "n_legal_leaf_tuples": 26,
+          "overlap_with_tree": 0.19230769230769232,
+          "bottom_table_identical": false,
+          "levels_identical_to_tree": null
+        },
+        "_chance_overlap": 0.25
+      },
+      "levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.87755,
+            0.877075,
+            0.903375,
+            0.85985
+          ],
+          "n_levels": 4
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.8765000000000001,
+            0.7819
+          ],
+          "n_levels": 2
+        }
+      },
+      "cond_levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "cond_tv_mean_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cond_tv_max_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "levels_exactly_shared": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "cond_tv_mean_by_level": [
+            1.0,
+            0.9375,
+            1.0,
+            0.9375
+          ],
+          "cond_tv_max_by_level": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "levels_exactly_shared": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "n_levels": 4
+        }
+      },
+      "marginals": {
+        "tree": {
+          "unigram_entropy_nats": 1.9448572169834804,
+          "tv_from_uniform": 0.20347812499999998
+        },
+        "structA": {
+          "unigram_entropy_nats": 2.0511798709067253,
+          "tv_from_uniform": 0.10007812499999999
+        },
+        "structB": {
+          "unigram_entropy_nats": 2.0300108005709565,
+          "tv_from_uniform": 0.1458625
+        },
+        "noiseA": {
+          "unigram_entropy_nats": 1.9382057740455119,
+          "tv_from_uniform": 0.206725
+        },
+        "noiseB": {
+          "unigram_entropy_nats": 1.9399541187580498,
+          "tv_from_uniform": 0.20450000000000002
+        },
+        "_uniform_entropy_nats": 2.0794415416798357
+      }
+    },
+    "1": {
+      "irrelevance": {
+        "roots_identical": true,
+        "valid_identical": true,
+        "dp_identical": true,
+        "n_off_tree_tokens": 24,
+        "mean_dp_cost": 3.64697265625
+      },
+      "surface": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 14,
+          "overlap_with_tree": 1.0,
+          "bottom_table_identical": true,
+          "levels_identical_to_tree": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 1,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 14,
+          "overlap_with_tree": 1.0,
+          "bottom_table_identical": true,
+          "levels_identical_to_tree": [
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 2,
+          "m": 4,
+          "n_legal_leaf_tuples": 26,
+          "overlap_with_tree": 0.19230769230769232,
+          "bottom_table_identical": false,
+          "levels_identical_to_tree": null
+        },
+        "_chance_overlap": 0.25
+      },
+      "levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 1,
+          "sibling_tv_vs_tree": [
+            0.87755,
+            0.877075,
+            0.903375,
+            0.16051875
+          ],
+          "n_levels": 4
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.8765000000000001,
+            0.7819
+          ],
+          "n_levels": 2
+        }
+      },
+      "cond_levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "cond_tv_mean_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cond_tv_max_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "levels_exactly_shared": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 1,
+          "cond_tv_mean_by_level": [
+            1.0,
+            0.9375,
+            1.0,
+            0.0
+          ],
+          "cond_tv_max_by_level": [
+            1.0,
+            1.0,
+            1.0,
+            0.0
+          ],
+          "levels_exactly_shared": [
+            false,
+            false,
+            false,
+            true
+          ],
+          "n_levels": 4
+        }
+      },
+      "marginals": {
+        "tree": {
+          "unigram_entropy_nats": 1.9448572169834804,
+          "tv_from_uniform": 0.20347812499999998
+        },
+        "structA": {
+          "unigram_entropy_nats": 1.9422428979700272,
+          "tv_from_uniform": 0.2067875
+        },
+        "structB": {
+          "unigram_entropy_nats": 2.0300108005709565,
+          "tv_from_uniform": 0.1458625
+        },
+        "noiseA": {
+          "unigram_entropy_nats": 1.9382057740455119,
+          "tv_from_uniform": 0.206725
+        },
+        "noiseB": {
+          "unigram_entropy_nats": 1.9399541187580498,
+          "tv_from_uniform": 0.20450000000000002
+        },
+        "_uniform_entropy_nats": 2.0794415416798357
+      }
+    },
+    "2": {
+      "irrelevance": {
+        "roots_identical": true,
+        "valid_identical": true,
+        "dp_identical": true,
+        "n_off_tree_tokens": 24,
+        "mean_dp_cost": 3.64697265625
+      },
+      "surface": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 14,
+          "overlap_with_tree": 1.0,
+          "bottom_table_identical": true,
+          "levels_identical_to_tree": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 2,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 14,
+          "overlap_with_tree": 1.0,
+          "bottom_table_identical": true,
+          "levels_identical_to_tree": [
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 2,
+          "m": 4,
+          "n_legal_leaf_tuples": 26,
+          "overlap_with_tree": 0.19230769230769232,
+          "bottom_table_identical": false,
+          "levels_identical_to_tree": null
+        },
+        "_chance_overlap": 0.25
+      },
+      "levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 2,
+          "sibling_tv_vs_tree": [
+            0.87755,
+            0.877075,
+            0.2734875,
+            0.1019375
+          ],
+          "n_levels": 4
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.8765000000000001,
+            0.7819
+          ],
+          "n_levels": 2
+        }
+      },
+      "cond_levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "cond_tv_mean_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cond_tv_max_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "levels_exactly_shared": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 2,
+          "cond_tv_mean_by_level": [
+            1.0,
+            0.9375,
+            0.0,
+            0.0
+          ],
+          "cond_tv_max_by_level": [
+            1.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "levels_exactly_shared": [
+            false,
+            false,
+            true,
+            true
+          ],
+          "n_levels": 4
+        }
+      },
+      "marginals": {
+        "tree": {
+          "unigram_entropy_nats": 1.9448572169834804,
+          "tv_from_uniform": 0.20347812499999998
+        },
+        "structA": {
+          "unigram_entropy_nats": 1.9503099902799312,
+          "tv_from_uniform": 0.19631875
+        },
+        "structB": {
+          "unigram_entropy_nats": 2.0300108005709565,
+          "tv_from_uniform": 0.1458625
+        },
+        "noiseA": {
+          "unigram_entropy_nats": 1.9382057740455119,
+          "tv_from_uniform": 0.206725
+        },
+        "noiseB": {
+          "unigram_entropy_nats": 1.9399541187580498,
+          "tv_from_uniform": 0.20450000000000002
+        },
+        "_uniform_entropy_nats": 2.0794415416798357
+      }
+    },
+    "3": {
+      "irrelevance": {
+        "roots_identical": true,
+        "valid_identical": true,
+        "dp_identical": true,
+        "n_off_tree_tokens": 24,
+        "mean_dp_cost": 3.64697265625
+      },
+      "surface": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 14,
+          "overlap_with_tree": 1.0,
+          "bottom_table_identical": true,
+          "levels_identical_to_tree": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 3,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 14,
+          "overlap_with_tree": 1.0,
+          "bottom_table_identical": true,
+          "levels_identical_to_tree": [
+            false,
+            true,
+            true,
+            true
+          ]
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 2,
+          "m": 4,
+          "n_legal_leaf_tuples": 26,
+          "overlap_with_tree": 0.19230769230769232,
+          "bottom_table_identical": false,
+          "levels_identical_to_tree": null
+        },
+        "_chance_overlap": 0.25
+      },
+      "levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 3,
+          "sibling_tv_vs_tree": [
+            0.87755,
+            0.252875,
+            0.160375,
+            0.10944375
+          ],
+          "n_levels": 4
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.8765000000000001,
+            0.7819
+          ],
+          "n_levels": 2
+        }
+      },
+      "cond_levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "cond_tv_mean_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cond_tv_max_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "levels_exactly_shared": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 3,
+          "cond_tv_mean_by_level": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cond_tv_max_by_level": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "levels_exactly_shared": [
+            false,
+            true,
+            true,
+            true
+          ],
+          "n_levels": 4
+        }
+      },
+      "marginals": {
+        "tree": {
+          "unigram_entropy_nats": 1.9448572169834804,
+          "tv_from_uniform": 0.20347812499999998
+        },
+        "structA": {
+          "unigram_entropy_nats": 1.9153833327615826,
+          "tv_from_uniform": 0.22657500000000003
+        },
+        "structB": {
+          "unigram_entropy_nats": 2.0300108005709565,
+          "tv_from_uniform": 0.1458625
+        },
+        "noiseA": {
+          "unigram_entropy_nats": 1.9382057740455119,
+          "tv_from_uniform": 0.206725
+        },
+        "noiseB": {
+          "unigram_entropy_nats": 1.9399541187580498,
+          "tv_from_uniform": 0.20450000000000002
+        },
+        "_uniform_entropy_nats": 2.0794415416798357
+      }
+    },
+    "4": {
+      "irrelevance": {
+        "roots_identical": true,
+        "valid_identical": true,
+        "dp_identical": true,
+        "n_off_tree_tokens": 24,
+        "mean_dp_cost": 3.64697265625
+      },
+      "surface": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 14,
+          "overlap_with_tree": 1.0,
+          "bottom_table_identical": true,
+          "levels_identical_to_tree": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 4,
+          "depth": 4,
+          "m": 2,
+          "n_legal_leaf_tuples": 14,
+          "overlap_with_tree": 1.0,
+          "bottom_table_identical": true,
+          "levels_identical_to_tree": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "depth": 2,
+          "m": 4,
+          "n_legal_leaf_tuples": 26,
+          "overlap_with_tree": 0.19230769230769232,
+          "bottom_table_identical": false,
+          "levels_identical_to_tree": null
+        },
+        "_chance_overlap": 0.25
+      },
+      "levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 4,
+          "sibling_tv_vs_tree": [
+            0.013399999999999999,
+            0.0087,
+            0.01101250000000001,
+            0.006193749999999996
+          ],
+          "n_levels": 4
+        },
+        "structB": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "sibling_tv_vs_tree": [
+            0.8765000000000001,
+            0.7819
+          ],
+          "n_levels": 2
+        }
+      },
+      "cond_levels": {
+        "tree": {
+          "share_top": 0,
+          "share_bottom": 0,
+          "cond_tv_mean_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cond_tv_max_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "levels_exactly_shared": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "n_levels": 4
+        },
+        "structA": {
+          "share_top": 0,
+          "share_bottom": 4,
+          "cond_tv_mean_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cond_tv_max_by_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "levels_exactly_shared": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "n_levels": 4
+        }
+      },
+      "marginals": {
+        "tree": {
+          "unigram_entropy_nats": 1.9448572169834804,
+          "tv_from_uniform": 0.20347812499999998
+        },
+        "structA": {
+          "unigram_entropy_nats": 1.9428978046722902,
+          "tv_from_uniform": 0.204475
+        },
+        "structB": {
+          "unigram_entropy_nats": 2.0300108005709565,
+          "tv_from_uniform": 0.1458625
+        },
+        "noiseA": {
+          "unigram_entropy_nats": 1.9382057740455119,
+          "tv_from_uniform": 0.206725
+        },
+        "noiseB": {
+          "unigram_entropy_nats": 1.9399541187580498,
+          "tv_from_uniform": 0.20450000000000002
+        },
+        "_uniform_entropy_nats": 2.0794415416798357
+      }
+    }
+  },
+  "probes": {
+    "0": {
+      "share_top": 0,
+      "share_mode": "bottom",
+      "seed": 3,
+      "fm_arch": "block",
+      "encoder_alignment": {
+        "raw": {
+          "fit_on_tree_eval_tree": 0.8114891648292542,
+          "fit_on_tree_eval_structA": 0.115997314453125,
+          "chance": 0.125
+        },
+        "centered": {
+          "fit_on_tree_eval_tree": 0.8008849620819092,
+          "fit_on_tree_eval_structA": 0.1125335693359375,
+          "chance": 0.125
+        }
+      },
+      "channels": [
+        {
+          "name": "tree",
+          "kind": "tree",
+          "depth": 4,
+          "m": 2,
+          "blk0": 0,
+          "blk1": 8,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "structA",
+          "kind": "struct",
+          "depth": 4,
+          "m": 2,
+          "blk0": 8,
+          "blk1": 16,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "structB",
+          "kind": "struct",
+          "depth": 2,
+          "m": 4,
+          "blk0": 16,
+          "blk1": 18,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseA",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 18,
+          "blk1": 19,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseB",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 19,
+          "blk1": 20,
+          "share_top": 0,
+          "share_bottom": 0
+        }
+      ],
+      "total_len": 40,
+      "n_blocks": 20,
+      "arms": {
+        "tree_half": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 6000,
+          "tree_fm_err": 0.7258333563804626,
+          "err_by_channel": {
+            "tree": 0.7258333563804626,
+            "structA": 1.2045588493347168,
+            "structB": 1.0835973024368286,
+            "noiseA": 1.006406307220459,
+            "noiseB": 1.0176864862442017
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7141368389129639,
+            "structA": 5.038776874542236,
+            "structB": 3.782149076461792,
+            "noiseA": 2.8165664672851562,
+            "noiseB": 2.528251886367798
+          }
+        },
+        "tree_only": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.6693517565727234,
+          "err_by_channel": {
+            "tree": 0.6693517565727234,
+            "structA": 1.1103906631469727,
+            "structB": 1.0812958478927612,
+            "noiseA": 1.05873703956604,
+            "noiseB": 1.0254185199737549
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.640182614326477,
+            "structA": 4.010826587677002,
+            "structB": 3.239586114883423,
+            "noiseA": 3.0119788646698,
+            "noiseB": 2.733715295791626
+          }
+        },
+        "tree_structA": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.5,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7439494132995605,
+          "err_by_channel": {
+            "tree": 0.7439494132995605,
+            "structA": 0.9717181324958801,
+            "structB": 0.9931542277336121,
+            "noiseA": 0.9725447297096252,
+            "noiseB": 0.989945113658905
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7145742774009705,
+            "structA": 1.047752857208252,
+            "structB": 1.5948822498321533,
+            "noiseA": 1.1961084604263306,
+            "noiseB": 1.2540868520736694
+          }
+        },
+        "tree_structB": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.5,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7432189583778381,
+          "err_by_channel": {
+            "tree": 0.7432189583778381,
+            "structA": 1.0540493726730347,
+            "structB": 0.978204607963562,
+            "noiseA": 1.0180823802947998,
+            "noiseB": 1.0099446773529053
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7318982481956482,
+            "structA": 2.9528963565826416,
+            "structB": 1.0165196657180786,
+            "noiseA": 2.0904159545898438,
+            "noiseB": 2.1630098819732666
+          }
+        },
+        "tree_noise": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.25,
+            "noiseB": 0.25
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7765669822692871,
+          "err_by_channel": {
+            "tree": 0.7765669822692871,
+            "structA": 1.1435129642486572,
+            "structB": 1.059793472290039,
+            "noiseA": 0.9355598092079163,
+            "noiseB": 0.9585900902748108
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7639521360397339,
+            "structA": 4.4467010498046875,
+            "structB": 3.413008451461792,
+            "noiseA": 0.9874290227890015,
+            "noiseB": 1.0144104957580566
+          }
+        },
+        "uniform": {
+          "alloc": {
+            "tree": 0.2,
+            "structA": 0.2,
+            "structB": 0.2,
+            "noiseA": 0.2,
+            "noiseB": 0.2
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.8954623937606812,
+          "err_by_channel": {
+            "tree": 0.8954623937606812,
+            "structA": 0.9922561049461365,
+            "structB": 0.991946816444397,
+            "noiseA": 0.9901604652404785,
+            "noiseB": 0.9929696917533875
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.8873984217643738,
+            "structA": 1.0529083013534546,
+            "structB": 1.0391104221343994,
+            "noiseA": 1.0211870670318604,
+            "noiseB": 1.0268452167510986
+          }
+        },
+        "structA_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 1.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.996005117893219,
+          "err_by_channel": {
+            "tree": 0.996005117893219,
+            "structA": 0.7710546851158142,
+            "structB": 0.9970883727073669,
+            "noiseA": 0.9986943602561951,
+            "noiseB": 0.996944010257721
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.9996846318244934,
+            "structA": 0.7913286685943604,
+            "structB": 1.001132845878601,
+            "noiseA": 1.0010312795639038,
+            "noiseB": 0.9998983144760132
+          }
+        },
+        "structB_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 0.0,
+            "structB": 1.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.998518705368042,
+          "err_by_channel": {
+            "tree": 0.998518705368042,
+            "structA": 0.9991868734359741,
+            "structB": 0.6093232035636902,
+            "noiseA": 0.9978916645050049,
+            "noiseB": 0.997965395450592
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.9996256828308105,
+            "structA": 1.0029999017715454,
+            "structB": 0.6550512909889221,
+            "noiseA": 0.9995386004447937,
+            "noiseB": 1.0000916719436646
+          }
+        }
+      },
+      "elapsed_seconds": 1759.428005695343
+    },
+    "1": {
+      "share_top": 1,
+      "share_mode": "bottom",
+      "seed": 3,
+      "fm_arch": "block",
+      "encoder_alignment": {
+        "raw": {
+          "fit_on_tree_eval_tree": 0.8126335144042969,
+          "fit_on_tree_eval_structA": 0.46221923828125,
+          "chance": 0.125
+        },
+        "centered": {
+          "fit_on_tree_eval_tree": 0.7985962629318237,
+          "fit_on_tree_eval_structA": 0.516021728515625,
+          "chance": 0.125
+        }
+      },
+      "channels": [
+        {
+          "name": "tree",
+          "kind": "tree",
+          "depth": 4,
+          "m": 2,
+          "blk0": 0,
+          "blk1": 8,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "structA",
+          "kind": "struct",
+          "depth": 4,
+          "m": 2,
+          "blk0": 8,
+          "blk1": 16,
+          "share_top": 0,
+          "share_bottom": 1
+        },
+        {
+          "name": "structB",
+          "kind": "struct",
+          "depth": 2,
+          "m": 4,
+          "blk0": 16,
+          "blk1": 18,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseA",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 18,
+          "blk1": 19,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseB",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 19,
+          "blk1": 20,
+          "share_top": 0,
+          "share_bottom": 0
+        }
+      ],
+      "total_len": 40,
+      "n_blocks": 20,
+      "arms": {
+        "tree_half": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 6000,
+          "tree_fm_err": 0.7415584325790405,
+          "err_by_channel": {
+            "tree": 0.7415584325790405,
+            "structA": 1.2565170526504517,
+            "structB": 1.2063101530075073,
+            "noiseA": 1.0322967767715454,
+            "noiseB": 0.9963865876197815
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7189804315567017,
+            "structA": 5.893746376037598,
+            "structB": 4.833712577819824,
+            "noiseA": 3.357529640197754,
+            "noiseB": 2.947516918182373
+          }
+        },
+        "tree_only": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.6964466571807861,
+          "err_by_channel": {
+            "tree": 0.6964466571807861,
+            "structA": 1.120739459991455,
+            "structB": 1.093207597732544,
+            "noiseA": 1.0260000228881836,
+            "noiseB": 0.9892693161964417
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.6615920662879944,
+            "structA": 3.7210094928741455,
+            "structB": 3.462883949279785,
+            "noiseA": 2.4340667724609375,
+            "noiseB": 2.322733163833618
+          }
+        },
+        "tree_structA": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.5,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.739112913608551,
+          "err_by_channel": {
+            "tree": 0.739112913608551,
+            "structA": 0.9663797616958618,
+            "structB": 1.01850426197052,
+            "noiseA": 0.985788106918335,
+            "noiseB": 0.98753821849823
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7069175839424133,
+            "structA": 1.0083695650100708,
+            "structB": 1.8512541055679321,
+            "noiseA": 1.073654055595398,
+            "noiseB": 1.15298593044281
+          }
+        },
+        "tree_structB": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.5,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7585602402687073,
+          "err_by_channel": {
+            "tree": 0.7585602402687073,
+            "structA": 1.0466804504394531,
+            "structB": 0.9739924073219299,
+            "noiseA": 1.1674304008483887,
+            "noiseB": 1.004431128501892
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7453401684761047,
+            "structA": 3.669492721557617,
+            "structB": 1.0111407041549683,
+            "noiseA": 3.7251861095428467,
+            "noiseB": 2.4432075023651123
+          }
+        },
+        "tree_noise": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.25,
+            "noiseB": 0.25
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7598057389259338,
+          "err_by_channel": {
+            "tree": 0.7598057389259338,
+            "structA": 1.0198912620544434,
+            "structB": 1.01643967628479,
+            "noiseA": 0.8308395743370056,
+            "noiseB": 0.7825588583946228
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7421303391456604,
+            "structA": 2.382908344268799,
+            "structB": 2.246318817138672,
+            "noiseA": 0.9021350145339966,
+            "noiseB": 0.8447413444519043
+          }
+        },
+        "uniform": {
+          "alloc": {
+            "tree": 0.2,
+            "structA": 0.2,
+            "structB": 0.2,
+            "noiseA": 0.2,
+            "noiseB": 0.2
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.8934476971626282,
+          "err_by_channel": {
+            "tree": 0.8934476971626282,
+            "structA": 0.980446457862854,
+            "structB": 0.9808658361434937,
+            "noiseA": 0.9669021368026733,
+            "noiseB": 0.9576929211616516
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.8893570899963379,
+            "structA": 1.0355300903320312,
+            "structB": 1.0297225713729858,
+            "noiseA": 1.0014296770095825,
+            "noiseB": 0.9901765584945679
+          }
+        },
+        "structA_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 1.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.9981452226638794,
+          "err_by_channel": {
+            "tree": 0.9981452226638794,
+            "structA": 0.6917930245399475,
+            "structB": 0.9978055357933044,
+            "noiseA": 0.9981899261474609,
+            "noiseB": 0.9975815415382385
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.9995049834251404,
+            "structA": 0.7208771705627441,
+            "structB": 1.0003622770309448,
+            "noiseA": 0.9997644424438477,
+            "noiseB": 0.9989743232727051
+          }
+        },
+        "structB_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 0.0,
+            "structB": 1.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.996472954750061,
+          "err_by_channel": {
+            "tree": 0.996472954750061,
+            "structA": 0.9975842833518982,
+            "structB": 0.6342652440071106,
+            "noiseA": 0.9983147382736206,
+            "noiseB": 0.9976252913475037
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.9994404315948486,
+            "structA": 1.0006481409072876,
+            "structB": 0.6711134314537048,
+            "noiseA": 0.9999858736991882,
+            "noiseB": 0.9990658760070801
+          }
+        }
+      },
+      "elapsed_seconds": 1766.9425373077393
+    },
+    "2": {
+      "share_top": 2,
+      "share_mode": "bottom",
+      "seed": 3,
+      "fm_arch": "block",
+      "encoder_alignment": {
+        "raw": {
+          "fit_on_tree_eval_tree": 0.845514178276062,
+          "fit_on_tree_eval_structA": 0.49566650390625,
+          "chance": 0.125
+        },
+        "centered": {
+          "fit_on_tree_eval_tree": 0.8296459913253784,
+          "fit_on_tree_eval_structA": 0.5254669189453125,
+          "chance": 0.125
+        }
+      },
+      "channels": [
+        {
+          "name": "tree",
+          "kind": "tree",
+          "depth": 4,
+          "m": 2,
+          "blk0": 0,
+          "blk1": 8,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "structA",
+          "kind": "struct",
+          "depth": 4,
+          "m": 2,
+          "blk0": 8,
+          "blk1": 16,
+          "share_top": 0,
+          "share_bottom": 2
+        },
+        {
+          "name": "structB",
+          "kind": "struct",
+          "depth": 2,
+          "m": 4,
+          "blk0": 16,
+          "blk1": 18,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseA",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 18,
+          "blk1": 19,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseB",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 19,
+          "blk1": 20,
+          "share_top": 0,
+          "share_bottom": 0
+        }
+      ],
+      "total_len": 40,
+      "n_blocks": 20,
+      "arms": {
+        "tree_half": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 6000,
+          "tree_fm_err": 0.7318570017814636,
+          "err_by_channel": {
+            "tree": 0.7318570017814636,
+            "structA": 1.2499172687530518,
+            "structB": 1.1098252534866333,
+            "noiseA": 1.0547821521759033,
+            "noiseB": 1.036272406578064
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.716627299785614,
+            "structA": 4.566723346710205,
+            "structB": 3.265470504760742,
+            "noiseA": 2.7567968368530273,
+            "noiseB": 2.7778520584106445
+          }
+        },
+        "tree_only": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.6890432238578796,
+          "err_by_channel": {
+            "tree": 0.6890432238578796,
+            "structA": 1.2234241962432861,
+            "structB": 1.0799351930618286,
+            "noiseA": 1.37717866897583,
+            "noiseB": 1.132859706878662
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.6537116169929504,
+            "structA": 5.275695323944092,
+            "structB": 3.987264394760132,
+            "noiseA": 6.325381278991699,
+            "noiseB": 3.739908218383789
+          }
+        },
+        "tree_structA": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.5,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7439537644386292,
+          "err_by_channel": {
+            "tree": 0.7439537644386292,
+            "structA": 0.9925076961517334,
+            "structB": 1.07958984375,
+            "noiseA": 0.9767431616783142,
+            "noiseB": 0.9886245727539062
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7103468179702759,
+            "structA": 1.0744175910949707,
+            "structB": 3.0593278408050537,
+            "noiseA": 1.4568642377853394,
+            "noiseB": 1.5805728435516357
+          }
+        },
+        "tree_structB": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.5,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.741617739200592,
+          "err_by_channel": {
+            "tree": 0.741617739200592,
+            "structA": 1.080164909362793,
+            "structB": 0.9736350178718567,
+            "noiseA": 1.0724111795425415,
+            "noiseB": 1.0042001008987427
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7196457386016846,
+            "structA": 3.7165985107421875,
+            "structB": 1.0133939981460571,
+            "noiseA": 3.0168826580047607,
+            "noiseB": 2.4394211769104004
+          }
+        },
+        "tree_noise": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.25,
+            "noiseB": 0.25
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7536762952804565,
+          "err_by_channel": {
+            "tree": 0.7536762952804565,
+            "structA": 1.4306648969650269,
+            "structB": 1.349933385848999,
+            "noiseA": 0.9044024348258972,
+            "noiseB": 0.8998479843139648
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7428248524665833,
+            "structA": 10.204111099243164,
+            "structB": 5.377357006072998,
+            "noiseA": 0.9372121691703796,
+            "noiseB": 0.9309771656990051
+          }
+        },
+        "uniform": {
+          "alloc": {
+            "tree": 0.2,
+            "structA": 0.2,
+            "structB": 0.2,
+            "noiseA": 0.2,
+            "noiseB": 0.2
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.8458178639411926,
+          "err_by_channel": {
+            "tree": 0.8458178639411926,
+            "structA": 0.9943876266479492,
+            "structB": 0.9893664121627808,
+            "noiseA": 0.9775264859199524,
+            "noiseB": 0.9764567017555237
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.8439298868179321,
+            "structA": 1.0175060033798218,
+            "structB": 1.006903886795044,
+            "noiseA": 0.9923818111419678,
+            "noiseB": 0.9871675372123718
+          }
+        },
+        "structA_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 1.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.9991282224655151,
+          "err_by_channel": {
+            "tree": 0.9991282224655151,
+            "structA": 0.7190355658531189,
+            "structB": 0.9990288615226746,
+            "noiseA": 0.9985992908477783,
+            "noiseB": 0.9970545768737793
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.9996923208236694,
+            "structA": 0.7369901537895203,
+            "structB": 1.0014241933822632,
+            "noiseA": 1.000508427619934,
+            "noiseB": 0.9992561936378479
+          }
+        },
+        "structB_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 0.0,
+            "structB": 1.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.9980186820030212,
+          "err_by_channel": {
+            "tree": 0.9980186820030212,
+            "structA": 0.9986624121665955,
+            "structB": 0.6284487247467041,
+            "noiseA": 0.9980598092079163,
+            "noiseB": 0.998039722442627
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.999478280544281,
+            "structA": 1.0027967691421509,
+            "structB": 0.6592779755592346,
+            "noiseA": 1.0002410411834717,
+            "noiseB": 1.000378966331482
+          }
+        }
+      },
+      "elapsed_seconds": 1764.5848882198334
+    },
+    "3": {
+      "share_top": 3,
+      "share_mode": "bottom",
+      "seed": 3,
+      "fm_arch": "block",
+      "encoder_alignment": {
+        "raw": {
+          "fit_on_tree_eval_tree": 0.8509307503700256,
+          "fit_on_tree_eval_structA": 0.425018310546875,
+          "chance": 0.125
+        },
+        "centered": {
+          "fit_on_tree_eval_tree": 0.819118082523346,
+          "fit_on_tree_eval_structA": 0.523834228515625,
+          "chance": 0.125
+        }
+      },
+      "channels": [
+        {
+          "name": "tree",
+          "kind": "tree",
+          "depth": 4,
+          "m": 2,
+          "blk0": 0,
+          "blk1": 8,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "structA",
+          "kind": "struct",
+          "depth": 4,
+          "m": 2,
+          "blk0": 8,
+          "blk1": 16,
+          "share_top": 0,
+          "share_bottom": 3
+        },
+        {
+          "name": "structB",
+          "kind": "struct",
+          "depth": 2,
+          "m": 4,
+          "blk0": 16,
+          "blk1": 18,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseA",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 18,
+          "blk1": 19,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseB",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 19,
+          "blk1": 20,
+          "share_top": 0,
+          "share_bottom": 0
+        }
+      ],
+      "total_len": 40,
+      "n_blocks": 20,
+      "arms": {
+        "tree_half": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 6000,
+          "tree_fm_err": 0.7122069597244263,
+          "err_by_channel": {
+            "tree": 0.7122069597244263,
+            "structA": 1.1393308639526367,
+            "structB": 1.1064276695251465,
+            "noiseA": 0.9867765307426453,
+            "noiseB": 1.076112151145935
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7201164960861206,
+            "structA": 3.7649528980255127,
+            "structB": 3.2337872982025146,
+            "noiseA": 2.2533316612243652,
+            "noiseB": 2.9278979301452637
+          }
+        },
+        "tree_only": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.6627447009086609,
+          "err_by_channel": {
+            "tree": 0.6627447009086609,
+            "structA": 1.3570090532302856,
+            "structB": 1.2413307428359985,
+            "noiseA": 1.2572154998779297,
+            "noiseB": 1.2605606317520142
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.6536422371864319,
+            "structA": 7.937670707702637,
+            "structB": 6.5788445472717285,
+            "noiseA": 6.44748592376709,
+            "noiseB": 5.691381454467773
+          }
+        },
+        "tree_structA": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.5,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7398797869682312,
+          "err_by_channel": {
+            "tree": 0.7398797869682312,
+            "structA": 0.9877042174339294,
+            "structB": 0.9873467683792114,
+            "noiseA": 0.9767965078353882,
+            "noiseB": 0.9795604944229126
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7255975604057312,
+            "structA": 1.0512393712997437,
+            "structB": 1.7516857385635376,
+            "noiseA": 1.2415235042572021,
+            "noiseB": 1.2086472511291504
+          }
+        },
+        "tree_structB": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.5,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7068918943405151,
+          "err_by_channel": {
+            "tree": 0.7068918943405151,
+            "structA": 1.071575403213501,
+            "structB": 0.9484742283821106,
+            "noiseA": 1.1001803874969482,
+            "noiseB": 0.9872201085090637
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7200618982315063,
+            "structA": 3.7383289337158203,
+            "structB": 0.9984719753265381,
+            "noiseA": 2.8057608604431152,
+            "noiseB": 2.5504136085510254
+          }
+        },
+        "tree_noise": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.25,
+            "noiseB": 0.25
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7337505221366882,
+          "err_by_channel": {
+            "tree": 0.7337505221366882,
+            "structA": 1.063475251197815,
+            "structB": 1.0208324193954468,
+            "noiseA": 0.8728345632553101,
+            "noiseB": 0.8746078014373779
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7384092807769775,
+            "structA": 3.4536986351013184,
+            "structB": 2.391465187072754,
+            "noiseA": 0.9288667440414429,
+            "noiseB": 0.9282168745994568
+          }
+        },
+        "uniform": {
+          "alloc": {
+            "tree": 0.2,
+            "structA": 0.2,
+            "structB": 0.2,
+            "noiseA": 0.2,
+            "noiseB": 0.2
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.9859535694122314,
+          "err_by_channel": {
+            "tree": 0.9859535694122314,
+            "structA": 0.9948558807373047,
+            "structB": 0.9946748614311218,
+            "noiseA": 0.9940791130065918,
+            "noiseB": 0.9948098659515381
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.9835759997367859,
+            "structA": 1.0437761545181274,
+            "structB": 1.030206322669983,
+            "noiseA": 1.0134035348892212,
+            "noiseB": 1.022033929824829
+          }
+        },
+        "structA_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 1.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.997179388999939,
+          "err_by_channel": {
+            "tree": 0.997179388999939,
+            "structA": 0.7463690042495728,
+            "structB": 0.9984615445137024,
+            "noiseA": 0.9986288547515869,
+            "noiseB": 0.9976232647895813
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.9995706677436829,
+            "structA": 0.7655441164970398,
+            "structB": 1.0016014575958252,
+            "noiseA": 1.000800609588623,
+            "noiseB": 0.9999361038208008
+          }
+        },
+        "structB_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 0.0,
+            "structB": 1.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.9973248839378357,
+          "err_by_channel": {
+            "tree": 0.9973248839378357,
+            "structA": 0.9979702234268188,
+            "structB": 0.6327798366546631,
+            "noiseA": 0.9969415068626404,
+            "noiseB": 0.9973587989807129
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.999337911605835,
+            "structA": 1.0008381605148315,
+            "structB": 0.6615654230117798,
+            "noiseA": 0.9991435408592224,
+            "noiseB": 0.9991980791091919
+          }
+        }
+      },
+      "elapsed_seconds": 1816.056473016739
+    },
+    "4": {
+      "share_top": 4,
+      "share_mode": "bottom",
+      "seed": 3,
+      "fm_arch": "block",
+      "encoder_alignment": {
+        "raw": {
+          "fit_on_tree_eval_tree": 0.8484131693840027,
+          "fit_on_tree_eval_structA": 0.4492950439453125,
+          "chance": 0.125
+        },
+        "centered": {
+          "fit_on_tree_eval_tree": 0.8273573517799377,
+          "fit_on_tree_eval_structA": 0.5424346923828125,
+          "chance": 0.125
+        }
+      },
+      "channels": [
+        {
+          "name": "tree",
+          "kind": "tree",
+          "depth": 4,
+          "m": 2,
+          "blk0": 0,
+          "blk1": 8,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "structA",
+          "kind": "struct",
+          "depth": 4,
+          "m": 2,
+          "blk0": 8,
+          "blk1": 16,
+          "share_top": 0,
+          "share_bottom": 4
+        },
+        {
+          "name": "structB",
+          "kind": "struct",
+          "depth": 2,
+          "m": 4,
+          "blk0": 16,
+          "blk1": 18,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseA",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 18,
+          "blk1": 19,
+          "share_top": 0,
+          "share_bottom": 0
+        },
+        {
+          "name": "noiseB",
+          "kind": "noise",
+          "depth": null,
+          "m": null,
+          "blk0": 19,
+          "blk1": 20,
+          "share_top": 0,
+          "share_bottom": 0
+        }
+      ],
+      "total_len": 40,
+      "n_blocks": 20,
+      "arms": {
+        "tree_half": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 6000,
+          "tree_fm_err": 0.7379778623580933,
+          "err_by_channel": {
+            "tree": 0.7379778623580933,
+            "structA": 1.0372954607009888,
+            "structB": 0.9841716885566711,
+            "noiseA": 0.9675688147544861,
+            "noiseB": 0.9653781652450562
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7370460033416748,
+            "structA": 2.413242816925049,
+            "structB": 1.9364902973175049,
+            "noiseA": 1.739694595336914,
+            "noiseB": 1.780238151550293
+          }
+        },
+        "tree_only": {
+          "alloc": {
+            "tree": 1.0,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.6758306622505188,
+          "err_by_channel": {
+            "tree": 0.6758306622505188,
+            "structA": 1.4749070405960083,
+            "structB": 1.2127416133880615,
+            "noiseA": 1.634191632270813,
+            "noiseB": 1.113491415977478
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.6597882509231567,
+            "structA": 9.955414772033691,
+            "structB": 7.2622222900390625,
+            "noiseA": 10.064509391784668,
+            "noiseB": 6.777712821960449
+          }
+        },
+        "tree_structA": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.5,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7364467978477478,
+          "err_by_channel": {
+            "tree": 0.7364467978477478,
+            "structA": 0.9672301411628723,
+            "structB": 0.9849944114685059,
+            "noiseA": 0.9819973111152649,
+            "noiseB": 0.9827773571014404
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7353801727294922,
+            "structA": 1.0305249691009521,
+            "structB": 1.1361538171768188,
+            "noiseA": 1.0496338605880737,
+            "noiseB": 1.0511434078216553
+          }
+        },
+        "tree_structB": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.5,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.7249197363853455,
+          "err_by_channel": {
+            "tree": 0.7249197363853455,
+            "structA": 0.9888890385627747,
+            "structB": 0.8159464597702026,
+            "noiseA": 0.9689286351203918,
+            "noiseB": 0.9713250994682312
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7257963418960571,
+            "structA": 1.9244320392608643,
+            "structB": 0.8622037768363953,
+            "noiseA": 1.7191355228424072,
+            "noiseB": 1.587705135345459
+          }
+        },
+        "tree_noise": {
+          "alloc": {
+            "tree": 0.5,
+            "structA": 0.0,
+            "structB": 0.0,
+            "noiseA": 0.25,
+            "noiseB": 0.25
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.719497561454773,
+          "err_by_channel": {
+            "tree": 0.719497561454773,
+            "structA": 1.0072342157363892,
+            "structB": 0.9571954011917114,
+            "noiseA": 0.8229970335960388,
+            "noiseB": 0.8087503910064697
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.7348402738571167,
+            "structA": 2.3296382427215576,
+            "structB": 1.7098517417907715,
+            "noiseA": 0.8625297546386719,
+            "noiseB": 0.8480088710784912
+          }
+        },
+        "uniform": {
+          "alloc": {
+            "tree": 0.2,
+            "structA": 0.2,
+            "structB": 0.2,
+            "noiseA": 0.2,
+            "noiseB": 0.2
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.8348155617713928,
+          "err_by_channel": {
+            "tree": 0.8348155617713928,
+            "structA": 0.9578547477722168,
+            "structB": 0.9228579998016357,
+            "noiseA": 0.8982754349708557,
+            "noiseB": 0.9025086164474487
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.8468592762947083,
+            "structA": 1.0074657201766968,
+            "structB": 0.9566829800605774,
+            "noiseA": 0.9357812404632568,
+            "noiseB": 0.9341456890106201
+          }
+        },
+        "structA_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 1.0,
+            "structB": 0.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.997869074344635,
+          "err_by_channel": {
+            "tree": 0.997869074344635,
+            "structA": 0.7428847551345825,
+            "structB": 0.9981821775436401,
+            "noiseA": 0.9986293315887451,
+            "noiseB": 0.9942449331283569
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 1.0000298023223877,
+            "structA": 0.7635607123374939,
+            "structB": 1.0002206563949585,
+            "noiseA": 1.0001142024993896,
+            "noiseB": 0.9964773654937744
+          }
+        },
+        "structB_only": {
+          "alloc": {
+            "tree": 0.0,
+            "structA": 0.0,
+            "structB": 1.0,
+            "noiseA": 0.0,
+            "noiseB": 0.0
+          },
+          "fm_steps": 12000,
+          "tree_fm_err": 0.9980185627937317,
+          "err_by_channel": {
+            "tree": 0.9980185627937317,
+            "structA": 0.9977817535400391,
+            "structB": 0.6343439221382141,
+            "noiseA": 0.9973927736282349,
+            "noiseB": 0.9971804022789001
+          },
+          "err_by_channel_all_blocks": {
+            "tree": 0.9992722272872925,
+            "structA": 1.001718521118164,
+            "structB": 0.6701684594154358,
+            "noiseA": 0.9996284246444702,
+            "noiseB": 0.9995991587638855
+          }
+        }
+      },
+      "elapsed_seconds": 1839.9308772087097
+    }
+  },
+  "curve": {
+    "0": {
+      "tree_err": {
+        "tree_half": 0.7258333563804626,
+        "tree_only": 0.6693517565727234,
+        "tree_structA": 0.7439494132995605,
+        "tree_structB": 0.7432189583778381,
+        "tree_noise": 0.7765669822692871,
+        "uniform": 0.8954623937606812,
+        "structA_only": 0.996005117893219,
+        "structB_only": 0.998518705368042
+      },
+      "structA_value": 0.0181160569190979,
+      "structB_value": 0.01738560199737549,
+      "noise_value": 0.05073362588882446,
+      "doubling_value": -0.05648159980773926,
+      "structA_exchange_rate": -0.3207426308880081,
+      "structA_only_cost": 0.3266533613204956,
+      "structB_only_cost": 0.3291669487953186,
+      "uniform_cost": 0.22611063718795776
+    },
+    "1": {
+      "tree_err": {
+        "tree_half": 0.7415584325790405,
+        "tree_only": 0.6964466571807861,
+        "tree_structA": 0.739112913608551,
+        "tree_structB": 0.7585602402687073,
+        "tree_noise": 0.7598057389259338,
+        "uniform": 0.8934476971626282,
+        "structA_only": 0.9981452226638794,
+        "structB_only": 0.996472954750061
+      },
+      "structA_value": -0.002445518970489502,
+      "structB_value": 0.017001807689666748,
+      "noise_value": 0.01824730634689331,
+      "doubling_value": -0.045111775398254395,
+      "structA_exchange_rate": 0.05421021338442228,
+      "structA_only_cost": 0.30169856548309326,
+      "structB_only_cost": 0.3000262975692749,
+      "uniform_cost": 0.19700103998184204
+    },
+    "2": {
+      "tree_err": {
+        "tree_half": 0.7318570017814636,
+        "tree_only": 0.6890432238578796,
+        "tree_structA": 0.7439537644386292,
+        "tree_structB": 0.741617739200592,
+        "tree_noise": 0.7536762952804565,
+        "uniform": 0.8458178639411926,
+        "structA_only": 0.9991282224655151,
+        "structB_only": 0.9980186820030212
+      },
+      "structA_value": 0.012096762657165527,
+      "structB_value": 0.009760737419128418,
+      "noise_value": 0.02181929349899292,
+      "doubling_value": -0.042813777923583984,
+      "structA_exchange_rate": -0.28254368672524977,
+      "structA_only_cost": 0.3100849986076355,
+      "structB_only_cost": 0.3089754581451416,
+      "uniform_cost": 0.156774640083313
+    },
+    "3": {
+      "tree_err": {
+        "tree_half": 0.7122069597244263,
+        "tree_only": 0.6627447009086609,
+        "tree_structA": 0.7398797869682312,
+        "tree_structB": 0.7068918943405151,
+        "tree_noise": 0.7337505221366882,
+        "uniform": 0.9859535694122314,
+        "structA_only": 0.997179388999939,
+        "structB_only": 0.9973248839378357
+      },
+      "structA_value": 0.02767282724380493,
+      "structB_value": -0.005315065383911133,
+      "noise_value": 0.021543562412261963,
+      "doubling_value": -0.04946225881576538,
+      "structA_exchange_rate": -0.5594735846350919,
+      "structA_only_cost": 0.3344346880912781,
+      "structB_only_cost": 0.3345801830291748,
+      "uniform_cost": 0.32320886850357056
+    },
+    "4": {
+      "tree_err": {
+        "tree_half": 0.7379778623580933,
+        "tree_only": 0.6758306622505188,
+        "tree_structA": 0.7364467978477478,
+        "tree_structB": 0.7249197363853455,
+        "tree_noise": 0.719497561454773,
+        "uniform": 0.8348155617713928,
+        "structA_only": 0.997869074344635,
+        "structB_only": 0.9980185627937317
+      },
+      "structA_value": -0.001531064510345459,
+      "structB_value": -0.013058125972747803,
+      "noise_value": -0.018480300903320312,
+      "doubling_value": -0.06214720010757446,
+      "structA_exchange_rate": 0.02463609796893897,
+      "structA_only_cost": 0.3220384120941162,
+      "structB_only_cost": 0.3221879005432129,
+      "uniform_cost": 0.15898489952087402
+    }
+  },
+  "elapsed_seconds": 3606.4687807559967
+}

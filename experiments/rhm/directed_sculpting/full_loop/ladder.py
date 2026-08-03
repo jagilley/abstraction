@@ -195,7 +195,7 @@ def reset_drift(layout, spec):
 def ladder(
     v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
     tree_depth: int = 4, struct_depths: str = "2,2", struct_ms: str = "2,4",
-    noise_blocks: str = "1,1", struct_shares: str = "0,0",
+    noise_blocks: str = "1,1", struct_shares: str = "0,0", share_mode: str = "top",
     controller_steps: int = 12_000, generator_steps: int = 12_000, value_steps: int = 12_000,
     value_episodes: int = 40_000, fm_warm_steps: int = 12_000, batch_size: int = 256,
     n_corrupt: int = 3, edit_budget: int = 6, explore_eps: float = 0.3,
@@ -237,20 +237,24 @@ def ladder(
                      struct_depths=[int(x) for x in struct_depths.split(",")],
                      struct_ms=[int(x) for x in struct_ms.split(",")],
                      noise_blocks=[int(x) for x in noise_blocks.split(",")],
-                     struct_shares=[int(x) for x in struct_shares.split(",")])
+                     struct_shares=[int(x) for x in struct_shares.split(",")],
+                     share_mode=share_mode)
     layout = make_layout(v, s, spec)
     tb = build_block_tables(layout, device)
     names = tb["channel_names"]
     T, n_blocks = layout["total_len"], tb["n_blocks"]
     tree_c = tb["tree_channel"]
     # channels that share rule tables with the tree -- the transfer-aware oracle's target set
-    shared_channels = [i for i, ch in enumerate(layout["channels"]) if ch.get("share_top")]
+    shared_channels = [i for i, ch in enumerate(layout["channels"])
+                       if ch.get("share_top") or ch.get("share_bottom")]
     print(f"Ladder on the distractor DGP: T={T} tokens / {n_blocks} blocks over "
           f"{len(names)} channels; budget={edit_budget}, c={n_corrupt}, device={device}")
     for ch in layout["channels"]:
         print(f"  {ch['name']:9s} {ch['kind']:6s} blocks[{ch['blk0']:2d}:{ch['blk1']:2d}]"
               + (f" depth={ch['depth']} m={ch['m']}" if ch["rules"] is not None else "")
-              + (f" share_top={ch['share_top']}<-{ch['share_from']}" if ch.get("share_top") else ""))
+              + (f" share_{share_mode}="
+                 f"{ch['share_top'] or ch['share_bottom']}<-{ch['share_from']}"
+                 if (ch.get("share_top") or ch.get("share_bottom")) else ""))
 
     render, gen = "mixture", torch.Generator(device=device).manual_seed(seed)
 
@@ -412,14 +416,15 @@ def ladder(
                    "drift_kappa": drift_kappa, "drift_steps_per_round": drift_steps_per_round,
                    "render": render, "state_dim": state_dim, "policies": policy_list,
                    "beta_sat": beta_sat, "alloc_eps": alloc_eps, "seed": seed,
-                   "struct_shares": struct_shares, "shared_channels": shared_channels,
+                   "struct_shares": struct_shares, "share_mode": share_mode,
+                   "shared_channels": shared_channels,
                    "fm_arch": fm_arch, "floor_n": floor_n, "floor_draws": floor_draws,
                    "n_eval": n_eval, "mon_price": mon_price, "meter_budget": meter_budget,
                    "fm_epochs": fm_epochs, "drift_kl": drift_kl,
                    "charge_own_monitoring": charge_own_monitoring,
                    "total_budget": total_budget},
         "channels": [{k: ch[k] for k in ("name", "kind", "depth", "m", "blk0", "blk1",
-                                         "share_top", "share_from")}
+                                         "share_top", "share_bottom", "share_from")}
                      for ch in layout["channels"]],
         "ground_truth_relevance": {
             "mean_dstar_gain": {names[i]: float(rel["mean_dstar_gain"][i]) for i in range(len(names))},

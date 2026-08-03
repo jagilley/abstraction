@@ -265,26 +265,42 @@ discrete feature at 0.69 is evidently not enough to regress a precise latent del
 
 ## 7. Open items — in the order they seem worth doing
 
-1. **Splice the *bottom* tables instead of the top — a one-line change to `share_rules_top`.** This
-   is the cheapest next step and possibly the one that dissolves barrier (a). Sharing the surface and
-   independently seeding the deep levels gives *different domains written in a common alphabet*,
-   which is arguably closer to the idea doc's own §6 image — *"physics and fantasy football are
-   written in one grammar, by one species, about one world"* — than shared-root/distinct-surface is.
-   The current splice may have been the wrong direction for a surface-level learner all along. A
-   `share_bottom` sweep reuses every instrument in this folder unchanged.
+1. ~~**Splice the *bottom* tables instead of the top.**~~ **Done — see
+   [`shared_surface/`](shared_surface/README.md), and it dissolves barrier (a).** A linear feature
+   probe fit on tree blocks reads a shared-*surface* distractor at **0.563 centered with one shared
+   table**, against 0.098 (chance) for this sweep's shared-*deep* splice at the same depth; this
+   geometry needed all four tables to reach 0.689. §4's hedge that the missing vocabulary "may be
+   intrinsic to the construction" can be retired — it is constructible and costs one line. The
+   transfer curve there is flat too, **but that node measures this instrument's run-to-run floor at
+   ±0.0117 on `structA_value` and every cell lies inside it**, which is a caveat this section's
+   own flat curve inherits (see item 6).
 2. **Drive the `share_top=4` invariance gap to ~0, and treat it as the gate for anything else.**
    Whatever the DGP question, no sharing sweep is readable until a generatively-identical channel is
    worth what the task channel is worth. Report it as a standing number.
 3. **Decide whether the encoder rewrite is worth it.** Per-channel encoding with tied weights would
    make strips genuinely interchangeable, but it is a *new instrument*, not a patch — the state
    space, the value head and both planners read the current controller, and the node's calibration is
-   built on it. Given item 1 may make it unnecessary, it should probably wait.
+   built on it. **Item 1 did not make this unnecessary**: supplying a shared alphabet lifts the
+   feature probe to 0.681 but the encoder still tops out at ~0.69 centered against 0.91
+   within-channel, so the ceiling is the encoder's and not the vocabulary's.
 4. **Consider writing the +0.062 gap up as its own result.** "This learner cannot recognise the same
    structure in a different place, measured where the right answer is known exactly" may be a more
    interesting finding than the curve we set out to measure, and it connects to the ratchet arc's
    abstraction-reuse questions rather than to curation.
 5. **Record §5's learner/geometry confound in the idea doc** (§5 above). It holds independently of
    everything else here.
+6. **A transfer readout with a floor below the effect size — now the binding constraint.**
+   [`shared_surface/`](shared_surface/README.md) §4 measures this instrument's run-to-run floor on
+   an *identical* DGP at **±0.0117** on `structA_value`, and the seed spread implies the smallest
+   resolvable effect is ~24–35% of what a doubling of tree data buys. §3's flat curve here is
+   inside that same floor. Until a readout with better resolution exists, neither sweep's flatness
+   is evidence about the geometry, and more cells or seeds buy little.
+
+## 8. Children
+
+| Child | What |
+|---|---|
+| [`shared_surface/`](shared_surface/README.md) | **The mirror splice, and §7 item 1 closed.** `share_rules_bottom` shares the *surface* tables and leaves the deep composition independently drawn — *same language, unrelated topic*, against this sweep's *same argument, alien script*. The cross-channel code §4 found missing arrives at the **first** shared table (feature probe 0.094 → **0.563** centered, where this geometry needed all four tables to reach 0.689), so barrier (a) is dissolved and its "may be intrinsic to the construction" hedge is retired. Two things come back that this node should carry: the encoder's cross-position ceiling is **~0.69 centered against 0.91 within-channel** *even with a shared alphabet*, which is barrier (b) quantified and is why §7 item 3 stands; and the transfer curve's **measured run-to-run floor is ±0.0117**, larger than every cell either sweep reports. Also adds **G2c**, a closed-form conditional-sibling certification that reads either splice direction exactly, and a k=4 cross-mode identity check that reproduces this node's published 0.586 / 0.689 to five decimals |
 
 ## Reproduce
 

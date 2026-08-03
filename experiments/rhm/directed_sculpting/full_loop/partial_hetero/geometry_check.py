@@ -151,6 +151,7 @@ def surface_stats(layout):
         same_depth = ch["depth"] == tree["depth"]
         out[ch["name"]] = {
             "share_top": int(ch.get("share_top") or 0),
+            "share_bottom": int(ch.get("share_bottom") or 0),
             "depth": ch["depth"], "m": ch["m"],
             "n_legal_leaf_tuples": len(codes),
             "overlap_with_tree": len(codes & tree_codes) / max(1, len(codes)),
@@ -202,9 +203,63 @@ def level_sibling_stats(layout, n=20000, seed=13):
         h = per_channel[ch["name"]]
         out[ch["name"]] = {
             "share_top": int(ch.get("share_top") or 0),
+            "share_bottom": int(ch.get("share_bottom") or 0),
             # TV per level, level 1 (root's own expansion) first; None where depths disagree
             "sibling_tv_vs_tree": [float(0.5 * np.abs(a - b).sum())
                                    for a, b in zip(h, tree_h)],
+            "n_levels": len(h),
+        }
+    return out
+
+
+def level_cond_sibling_stats(layout):
+    """G2c: the sharing readout that is exact and graded for BOTH splice directions.
+
+    `level_sibling_stats` histograms the MARGINAL sibling law, which at level `ell` is a
+    functional of tables 0..ell -- so it reads a top-splice exactly (zero TV below the sharing
+    depth) but a BOTTOM-splice not at all: sharing `rules[-1]` leaves the level-1 marginal
+    different anyway, because the parent feature distribution above it was drawn independently.
+    Using it to certify `share_mode="bottom"` would report "no sharing" for a DGP that shares
+    exactly what it claims to.
+
+    The CONDITIONAL law fixes that. P(s-tuple | parent feature f) at level `ell` is a functional
+    of `rules[ell]` ALONE -- the m rules for f, uniformly weighted. So it is *identically zero*
+    on precisely the shared levels and nonzero elsewhere, whichever end was spliced:
+
+        share_top=k     -> TV == 0 for levels 0..k-1        (the deep/abstract end)
+        share_bottom=k  -> TV == 0 for levels L-k..L-1      (the surface/rendering end)
+
+    Computed in closed form from the tables, so there is no sampling noise to read past: the
+    shared cells are exactly 0.000, not "0.010, near enough". Averaged over parent features,
+    and `max` is reported too so a single disagreeing feature cannot hide in the mean.
+    """
+    v, s = layout["v"], layout["s"]
+    powers = (v ** np.arange(s)).astype(np.int64)
+
+    def cond_hists(rules, m):
+        """[(v, v**s)] per level: P(child s-tuple | parent feature), uniform over the m rules."""
+        out = []
+        for layer in rules:                                    # (v, m, s)
+            codes = (layer[:, :m, :] * powers).sum(-1)         # (v, m)
+            h = np.zeros((v, v ** s), dtype=np.float64)
+            np.add.at(h, (np.arange(v)[:, None].repeat(m, 1), codes), 1.0 / m)
+            out.append(h)
+        return out
+
+    tree = layout["tree"]
+    tree_h = cond_hists(tree["rules"], tree["m"])
+    out = {}
+    for ch in layout["channels"]:
+        if ch["rules"] is None or ch["depth"] != tree["depth"] or ch["m"] != tree["m"]:
+            continue
+        h = cond_hists(ch["rules"], ch["m"])
+        tv = [0.5 * np.abs(a - b).sum(axis=1) for a, b in zip(h, tree_h)]   # (v,) per level
+        out[ch["name"]] = {
+            "share_top": int(ch.get("share_top") or 0),
+            "share_bottom": int(ch.get("share_bottom") or 0),
+            "cond_tv_mean_by_level": [float(t.mean()) for t in tv],
+            "cond_tv_max_by_level": [float(t.max()) for t in tv],
+            "levels_exactly_shared": [bool(t.max() == 0.0) for t in tv],
             "n_levels": len(h),
         }
     return out
@@ -382,12 +437,17 @@ def share_probe(share_top: int, seed: int = 1, v: int = 8, s: int = 2, state_dim
                 fm_steps: int = 12_000, batch_size: int = 256, n_corrupt: int = 3,
                 edit_budget: int = 6, n_probe_states: int = 1024,
                 arms: str = ",".join(ALLOC_ARMS), fm_arch: str = "block",
-                quick: bool = False):
+                share_mode: str = "top", quick: bool = False):
     """G3 at one sharing depth: train one FM per fixed allocation, read tree FM error.
 
     Controller and generator are trained ONCE and shared by every arm, so the arms differ only
     in which transitions their FM was fit on -- the same discipline as the ladder's single warm
     FM fork.
+
+    `share_mode` selects which end of the rule stack `share_top` splices (see
+    `channel_env.make_spec`). "top" is the published sweep; "bottom" is the shared-surface
+    geometry this node's open item 1 names. The parameter is still called `share_top` because
+    it is the sharing DEPTH under either mode.
     """
     import torch
 
@@ -411,17 +471,19 @@ def share_probe(share_top: int, seed: int = 1, v: int = 8, s: int = 2, state_dim
     spec = make_spec(tree_depth=tree_depth, struct_depths=[tree_depth, 2],
                      struct_ms=[int(x) for x in struct_ms.split(",")],
                      noise_blocks=[int(x) for x in noise_blocks.split(",")],
-                     struct_shares=[int(share_top), 0], rule_seed_offset=seed - 1)
+                     struct_shares=[int(share_top), 0], rule_seed_offset=seed - 1,
+                     share_mode=share_mode)
     layout = make_layout(v, s, spec)
     tb = build_block_tables(layout, device)
     names = tb["channel_names"]
     render, gen = "mixture", torch.Generator(device=device).manual_seed(seed)
-    print(f"\n### share_top={share_top} seed={seed}: T={layout['total_len']} tokens / "
+    print(f"\n### share_{share_mode}={share_top} seed={seed}: T={layout['total_len']} tokens / "
           f"{tb['n_blocks']} blocks, rule_seed_offset={seed - 1}, device={device}")
     for ch in layout["channels"]:
+        shared = int(ch.get("share_top") or 0) or int(ch.get("share_bottom") or 0)
         print(f"  {ch['name']:9s} {ch['kind']:6s} blocks[{ch['blk0']:2d}:{ch['blk1']:2d}]"
               + (f" depth={ch['depth']} m={ch['m']}" if ch["rules"] is not None else "")
-              + (f" share_top={ch['share_top']}" if ch.get("share_top") else ""))
+              + (f" share_{share_mode}={shared}" if shared else ""))
 
     Controller, Generator = _build_rich_controller(), _build_generator()
     ARCHES = {"block": _build_block_fm, "shared_marker": _build_shared_marker_fm,
@@ -492,10 +554,11 @@ def share_probe(share_top: int, seed: int = 1, v: int = 8, s: int = 2, state_dim
         print(f"    -> tree FM err {out[arm]['tree_fm_err']:.4f}")
         del fm
 
-    return {"share_top": int(share_top), "seed": int(seed), "fm_arch": fm_arch,
-            "encoder_alignment": align,
+    return {"share_top": int(share_top), "share_mode": share_mode, "seed": int(seed),
+            "fm_arch": fm_arch, "encoder_alignment": align,
             "channels": [{k: ch[k] for k in ("name", "kind", "depth", "m", "blk0", "blk1",
-                                             "share_top")} for ch in layout["channels"]],
+                                             "share_top", "share_bottom")}
+                         for ch in layout["channels"]],
             "total_len": T, "n_blocks": n_blocks,
             "arms": out, "elapsed_seconds": time.time() - started}
 
@@ -504,7 +567,7 @@ def share_probe(share_top: int, seed: int = 1, v: int = 8, s: int = 2, state_dim
 def geometry_check(shares: str = "0,1,2,3,4", seed: int = 1, v: int = 8, s: int = 2,
                    tree_depth: int = 4, struct_ms: str = "2,4", noise_blocks: str = "1,1",
                    arms: str = ",".join(ALLOC_ARMS), fm_arch: str = "block",
-                   tag: str = "v1", quick: bool = False,
+                   share_mode: str = "top", tag: str = "v1", quick: bool = False,
                    controller_steps: int = 12_000, generator_steps: int = 12_000,
                    fm_steps: int = 12_000, n_probe_states: int = 1024):
     """G1-G3 across the sharing-depth sweep. DGP checks locally, one GPU probe per depth."""
@@ -517,29 +580,40 @@ def geometry_check(shares: str = "0,1,2,3,4", seed: int = 1, v: int = 8, s: int 
         spec = make_spec(tree_depth=tree_depth, struct_depths=[tree_depth, 2],
                          struct_ms=[int(x) for x in struct_ms.split(",")],
                          noise_blocks=[int(x) for x in noise_blocks.split(",")],
-                         struct_shares=[k, 0], rule_seed_offset=seed - 1)
+                         struct_shares=[k, 0], rule_seed_offset=seed - 1,
+                         share_mode=share_mode)
         layout = make_layout(v, s, spec)
         irr = check_structural_irrelevance(layout, n=1024 if quick else 4096, seed=7)
         n_stat = 4000 if quick else 20000
         dgp[k] = {"irrelevance": irr, "surface": surface_stats(layout),
                   "levels": level_sibling_stats(layout, n=n_stat, seed=13),
+                  "cond_levels": level_cond_sibling_stats(layout),
                   "marginals": check_marginals(layout, n=n_stat, seed=11)}
         ok = irr["roots_identical"] and irr["valid_identical"] and irr["dp_identical"]
         sA = dgp[k]["surface"]["structA"]
-        tv = dgp[k]["levels"]["structA"]["sibling_tv_vs_tree"]
-        print(f"G1/G2 share_top={k}: P1 {'PASS' if ok else '*** FAIL ***'} "
+        ctv = dgp[k]["cond_levels"]["structA"]["cond_tv_max_by_level"]
+        # G2c is the certification that reads BOTH splice directions exactly; the marginal
+        # `levels` table is still recorded, but it is only interpretable under share_mode=top
+        print(f"G1/G2 share_{share_mode}={k}: P1 {'PASS' if ok else '*** FAIL ***'} "
               f"(d* mean {irr['mean_dp_cost']:.2f}) | structA surface overlap "
               f"{sA['overlap_with_tree']:.3f} (chance {dgp[k]['surface']['_chance_overlap']:.3f}), "
-              f"bottom identical={sA['bottom_table_identical']} | sibling TV vs tree by level "
-              + "[" + " ".join(f"{t:.3f}" for t in tv) + "]")
+              f"bottom identical={sA['bottom_table_identical']} | G2c conditional TV (max over "
+              f"features) by level " + "[" + " ".join(f"{t:.3f}" for t in ctv) + "]")
         if not ok:
-            raise RuntimeError(f"P1 structural irrelevance BROKEN at share_top={k}: {irr}")
+            raise RuntimeError(f"P1 structural irrelevance BROKEN at share_{share_mode}={k}: {irr}")
+        # the splice must be EXACT on exactly `k` levels, at the end `share_mode` names --
+        # a cheap assertion that catches an off-by-one in either direction before any GPU runs
+        shared_lv = dgp[k]["cond_levels"]["structA"]["levels_exactly_shared"]
+        want = ([True] * k + [False] * (len(shared_lv) - k) if share_mode == "top"
+                else [False] * (len(shared_lv) - k) + [True] * k)
+        if k < len(shared_lv) and shared_lv != want:
+            raise RuntimeError(f"share_{share_mode}={k}: shared levels {shared_lv} != {want}")
 
     # ---- G3: one GPU probe per sharing depth, in parallel --------------------------------
     handles = [(k, share_probe.spawn(share_top=k, seed=seed, v=v, s=s, tree_depth=tree_depth,
                                      struct_ms=struct_ms, noise_blocks=noise_blocks,
-                                     arms=arms, fm_arch=fm_arch, quick=quick,
-                                     controller_steps=controller_steps,
+                                     arms=arms, fm_arch=fm_arch, share_mode=share_mode,
+                                     quick=quick, controller_steps=controller_steps,
                                      generator_steps=generator_steps, fm_steps=fm_steps,
                                      n_probe_states=n_probe_states))
                for k in share_list]
@@ -608,7 +682,8 @@ def geometry_check(shares: str = "0,1,2,3,4", seed: int = 1, v: int = 8, s: int 
         "config": {"shares": share_list, "seed": seed, "v": v, "s": s,
                    "tree_depth": tree_depth, "struct_depths": [tree_depth, 2],
                    "struct_ms": struct_ms, "noise_blocks": noise_blocks, "arms": arm_list,
-                   "fm_arch": fm_arch, "rule_seed_offset": seed - 1, "quick": quick},
+                   "fm_arch": fm_arch, "share_mode": share_mode,
+                   "rule_seed_offset": seed - 1, "quick": quick},
         "dgp": dgp, "probes": probes, "curve": curve,
         "elapsed_seconds": time.time() - started,
     }

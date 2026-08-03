@@ -150,16 +150,63 @@ def share_rules_top(rules, src_rules, share_top):
     return [src_rules[i].copy() for i in range(share_top)] + list(rules[share_top:])
 
 
+def share_rules_bottom(rules, src_rules, share_bottom):
+    """Overwrite the bottom `share_bottom` LEVELS of `rules` with the source channel's tables.
+
+    THE MIRROR OF `share_rules_top`, and the geometry that node's own open item 1 names as the
+    cheapest next step. Splicing a SUFFIX shares the SURFACE (rendering) levels and leaves the
+    DEEP (abstract composition) ones independently seeded:
+
+        0            nothing shared -- two independent grammars (full_loop's published geometry)
+        1 .. L-1     shared surface alphabet, independent deep composition (the new middle)
+        L            the same grammar with an independently drawn root (identical to share_top=L)
+
+    WHY THIS DIRECTION EXISTS. `partial_hetero/README.md` §4 found that under `share_top` the
+    block forward model has NO SHARED VOCABULARY at any intermediate depth: it works in level-1
+    features, and level-1 is precisely the table `share_top` does not share, so a linear feature
+    probe fit on tree blocks reads a shared-grammar distractor at chance (0.09-0.12 vs 0.125).
+    The shared abstraction lived above the level at which the two channels had any common code.
+    Sharing the BOTTOM inverts exactly that: the two channels render the same alphabet and
+    compose it differently, which is arguably closer to the idea doc's own image -- *"physics and
+    fantasy football are written in one grammar, by one species, about one world"* -- than
+    shared-root/distinct-surface is.
+
+    The two knobs are mutually exclusive on one channel, and both leave structural irrelevance
+    untouched for the same reason (every grammar readout slices the tree alone, and each channel
+    draws its own independent root). What changes, again, is only what a distractor's data is
+    worth to the LEARNER.
+
+    NOTE ON `share_bottom == L`. Both splices degenerate to the same object at full depth -- the
+    tree's entire table set under an independently drawn root -- so the two sweeps share their
+    top rung by construction and it doubles as a cross-sweep consistency check.
+    """
+    if not share_bottom:
+        return rules
+    if share_bottom > len(rules) or share_bottom > len(src_rules):
+        raise ValueError(f"share_bottom={share_bottom} exceeds available levels "
+                         f"({len(rules)} / {len(src_rules)})")
+    if len(rules) != len(src_rules):
+        raise ValueError("share_bottom requires matched depth: level i of the sharer must be "
+                         f"level i of the source (got {len(rules)} vs {len(src_rules)})")
+    if rules[0].shape != src_rules[0].shape:
+        raise ValueError(f"share_bottom requires matched (v, m, s): {rules[0].shape} vs "
+                         f"{src_rules[0].shape}")
+    cut = len(rules) - share_bottom
+    return list(rules[:cut]) + [src_rules[i].copy() for i in range(cut, len(rules))]
+
+
 def make_layout(v, s, spec=None, noise_match_marginal=True):
     """Build the channel layout. Returns a dict describing token/block spans per channel.
 
     Exactly one channel must have kind == "tree" -- it defines the task's root r*, and
     every grammar operation (parse, DP d*, possible-set success) reads only its slice.
 
-    A grammar channel may additionally carry `share_top` (int, default 0) and `share_from`
-    (channel name, default the tree) to splice the top `share_top` rule tables in from an
-    EARLIER channel -- the partially-heterogeneous DGP. See `share_rules_top`. Absent the key
-    the construction is bit-identical to before, so every prior layout is unchanged.
+    A grammar channel may additionally carry `share_top` OR `share_bottom` (int, default 0) and
+    `share_from` (channel name, default the tree) to splice that many rule tables in from an
+    EARLIER channel -- the partially-heterogeneous DGP. See `share_rules_top` (shared deep
+    composition, distinct surface) and `share_rules_bottom` (shared surface, distinct deep
+    composition). The two are mutually exclusive on one channel. Absent both keys the
+    construction is bit-identical to before, so every prior layout is unchanged.
 
     `noise_match_marginal` (default True) draws noise tokens from the TREE's exact leaf
     unigram distribution rather than from uniform. Without it the noise channels are
@@ -180,11 +227,16 @@ def make_layout(v, s, spec=None, noise_match_marginal=True):
     channels, tok, blk = [], 0, 0
     for ch in spec:
         kind = ch["kind"]
-        share_top, share_from = int(ch.get("share_top", 0) or 0), None
+        share_top = int(ch.get("share_top", 0) or 0)
+        share_bottom = int(ch.get("share_bottom", 0) or 0)
+        share_from = None
+        if share_top and share_bottom:
+            raise ValueError(f"channel {ch['name']!r} sets both share_top={share_top} and "
+                             f"share_bottom={share_bottom}; they are mutually exclusive")
         if kind in ("tree", "struct"):
             depth, m = ch["depth"], ch["m"]
             rules = generate_rules_distinct(v, s, depth, m, seed=ch["rule_seed"])
-            if share_top:
+            if share_top or share_bottom:
                 share_from = ch.get("share_from") or trees[0]["name"]
                 src = next((c for c in channels if c["name"] == share_from), None)
                 if src is None:
@@ -192,12 +244,13 @@ def make_layout(v, s, spec=None, noise_match_marginal=True):
                                      "must appear EARLIER in the spec (rules are built in order)")
                 if src["rules"] is None:
                     raise ValueError(f"channel {share_from!r} has no grammar to share")
-                rules = share_rules_top(rules, src["rules"], share_top)
+                rules = (share_rules_top(rules, src["rules"], share_top) if share_top
+                         else share_rules_bottom(rules, src["rules"], share_bottom))
             n_tok = s ** depth
         elif kind == "noise":
             depth = m = rules = None
             n_tok = ch["n_blocks"] * s
-            if share_top:
+            if share_top or share_bottom:
                 raise ValueError("a noise channel has no grammar to share")
         else:
             raise ValueError(f"unknown channel kind {kind!r}")
@@ -206,7 +259,7 @@ def make_layout(v, s, spec=None, noise_match_marginal=True):
         channels.append({
             "name": ch["name"], "kind": kind, "depth": depth, "m": m,
             "rules": rules, "rule_seed": ch.get("rule_seed"),
-            "share_top": share_top, "share_from": share_from,
+            "share_top": share_top, "share_bottom": share_bottom, "share_from": share_from,
             "tok0": tok, "tok1": tok + n_tok,
             "blk0": blk, "blk1": blk + n_tok // s,
         })

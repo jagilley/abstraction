@@ -61,17 +61,25 @@ import numpy as np
 # --------------------------------------------------------------------------- #
 
 def make_spec(tree_depth=5, tree_m=2, struct_depths=(3, 3), struct_ms=(2, 4),
-              noise_blocks=(2, 2), struct_shares=None, rule_seed_offset=0):
+              noise_blocks=(2, 2), struct_shares=None, rule_seed_offset=0,
+              share_mode="top"):
     """`DEFAULT_SPEC` generalised over tree depth, so the whole loop can be run at the depth
     where the sculpting arc is calibrated (L=4) as well as at the deeper L=5 the E3 port was
     specced for. Shapes are kept proportional: struct channels sit two levels below the tree
     and the noise channels are sized to keep the tree the majority of the blocks.
 
     `struct_shares` (default all-zero, i.e. the published geometry) gives each struct channel a
-    SHARING DEPTH: how many of its top rule tables are spliced in from the tree. Nonzero requires
+    SHARING DEPTH: how many of its rule tables are spliced in from the tree. Nonzero requires
     that channel to be depth- and m-matched to the tree, since level i must mean the same scale in
     both. See `rhm_channels.share_rules_top` for what the knob means and why it leaves structural
     irrelevance untouched.
+
+    `share_mode` selects WHICH END is spliced, and it is the only variable between the two
+    partially-heterogeneous geometries:
+      "top"     shared deep composition, independent surface rendering (`share_rules_top`)
+      "bottom"  shared surface alphabet, independent deep composition (`share_rules_bottom`)
+    "top" is the default and reproduces every prior layout bit-identically. The two modes
+    coincide at full sharing depth, which is a free cross-sweep consistency check.
 
     `rule_seed_offset` shifts every channel's rule seed together, so a DGP-level claim can be
     measured across rule draws rather than only across training draws. 0 reproduces every prior
@@ -80,13 +88,16 @@ def make_spec(tree_depth=5, tree_m=2, struct_depths=(3, 3), struct_ms=(2, 4),
     if len(shares) != len(struct_depths):
         raise ValueError(f"struct_shares needs one entry per struct channel "
                          f"(got {len(shares)} for {len(struct_depths)})")
+    if share_mode not in ("top", "bottom"):
+        raise ValueError(f"share_mode must be 'top' or 'bottom' (got {share_mode!r})")
+    share_key = "share_top" if share_mode == "top" else "share_bottom"
     spec = [{"kind": "tree", "name": "tree", "depth": tree_depth, "m": tree_m,
              "rule_seed": 0 + rule_seed_offset}]
     for i, (d, m) in enumerate(zip(struct_depths, struct_ms)):
         entry = {"kind": "struct", "name": f"struct{chr(65 + i)}", "depth": int(d),
                  "m": int(m), "rule_seed": 101 + i + rule_seed_offset}
         if int(shares[i]):
-            entry["share_top"], entry["share_from"] = int(shares[i]), "tree"
+            entry[share_key], entry["share_from"] = int(shares[i]), "tree"
         spec.append(entry)
     for i, nb in enumerate(noise_blocks):
         spec.append({"kind": "noise", "name": f"noise{chr(65 + i)}", "n_blocks": int(nb)})

@@ -47,40 +47,50 @@ def _t_stat(xs):
 
 
 def load_geometry(figdir):
-    """{fm_arch: {seed: {share_top: curve}}} from geometry_* result files."""
+    """{(share_mode, fm_arch): {seed: {sharing depth: curve}}} from geometry_* result files.
+
+    Keyed on `share_mode` as well as `fm_arch` because the two splice directions are different
+    DGPs measured by the same instrument -- pooling them would average a shared-deep geometry
+    with a shared-surface one. Files written before the knob existed carry no key and default
+    to "top", which is what they were.
+    """
     out = {}
     for path in sorted(glob.glob(os.path.join(figdir, "geometry_*", "results.json"))):
         d = json.load(open(path))
         if d["config"].get("quick"):
             continue
-        arch = d["config"].get("fm_arch", "block")
-        out.setdefault(arch, {})[d["config"]["seed"]] = {int(k): v for k, v in d["curve"].items()}
+        key = (d["config"].get("share_mode", "top"), d["config"].get("fm_arch", "block"))
+        out.setdefault(key, {})[d["config"]["seed"]] = {int(k): v for k, v in d["curve"].items()}
     return out
 
 
 def load_ladder(figdir):
-    """{seed: {share_top: {policy: row}}} from ladder_ph_* result files."""
+    """{share_mode: {seed: {sharing depth: {policy: row}}}} from ladder_ph_* result files."""
     out = {}
     for path in sorted(glob.glob(os.path.join(figdir, "ladder_ph_*", "results.json"))):
         d = json.load(open(path))
         cfg = d["config"]
         share = max(int(x) for x in str(cfg.get("struct_shares", "0,0")).split(","))
-        out.setdefault(cfg["seed"], {})[share] = d
+        out.setdefault(cfg.get("share_mode", "top"), {}).setdefault(cfg["seed"], {})[share] = d
     return out
 
 
-def report_geometry(geo, arch="block"):
-    geo = geo.get(arch, {})
+def report_geometry(geo, key=("top", "block")):
+    mode, arch = key
+    geo = geo.get(key, {})
     seeds = sorted(geo)
     if not seeds:
-        print(f"(no geometry_* results found for fm_arch={arch!r})\n")
+        print(f"(no geometry_* results for share_mode={mode!r} fm_arch={arch!r})\n")
         return
     shares = sorted(k for k in geo[seeds[0]] if isinstance(k, int))
     arms = list(geo[seeds[0]][shares[0]]["tree_err"])
 
     print("=" * 100)
-    print(f"G3 [fm_arch={arch}] -- TRANSFER CURVE: tree block-FM error by allocation, "
-          f"vs sharing depth")
+    shared_end = "DEEP composition" if mode == "top" else "SURFACE alphabet"
+    print(f"G3 [share_mode={mode} | fm_arch={arch}] -- TRANSFER CURVE: tree block-FM error by "
+          f"allocation, vs sharing depth")
+    print(f"       (structA shares its {shared_end} with the tree; k=0 is two independent "
+          f"grammars, k=depth is identical tables under both modes)")
     print(f"       (mean +- sd over seeds {seeds}; every arm matched-budget except tree_half)")
     print("=" * 100)
     print(f"{'share':>5s} " + " ".join(f"{a:>15s}" for a in arms))
@@ -133,16 +143,18 @@ def report_geometry(geo, arch="block"):
     print()
 
 
-def report_ladder(lad):
+def report_ladder(lad, mode="top"):
+    lad = lad.get(mode, {})
     seeds = sorted(lad)
     if not seeds:
-        print("(no ladder_ph_* results found)\n")
+        print(f"(no ladder_ph_* results for share_mode={mode!r})\n")
         return
     shares = sorted(lad[seeds[0]])
     policies = list(lad[seeds[0]][shares[0]]["results"])
 
     print("=" * 100)
-    print("E1-PH -- ALLOCATION LADDER vs sharing depth: tree FM error (mean over rounds)")
+    print(f"E1-PH [share_mode={mode}] -- ALLOCATION LADDER vs sharing depth: tree FM error "
+          f"(mean over rounds)")
     print(f"       (mean +- sd over seeds {seeds})")
     print("=" * 100)
     print(f"{'share':>5s} " + " ".join(f"{p:>17s}" for p in policies))
@@ -189,15 +201,50 @@ def report_ladder(lad):
     print()
 
 
+def cross_mode_check(geo):
+    """The free consistency check: at FULL sharing the two splice directions are the same DGP.
+
+    `share_top=L` and `share_bottom=L` both hand structA the tree's entire table set under an
+    independently drawn root, so the two sweeps share their top rung by construction. Any gap
+    between them there is instrument noise, not geometry -- which makes it a measured noise
+    floor for cross-mode comparisons, obtained for free, in the same spirit as the
+    `oracle_shared == oracle` floor at k=0 in the published sweep.
+    """
+    archs = {a for _, a in geo}
+    for arch in sorted(archs):
+        top, bot = geo.get(("top", arch)), geo.get(("bottom", arch))
+        if not top or not bot:
+            continue
+        k = max(set(next(iter(top.values()))) & set(next(iter(bot.values()))))
+        seeds = sorted(set(top) & set(bot))
+        if not seeds:
+            continue
+        print("=" * 100)
+        print(f"CROSS-MODE CHECK [fm_arch={arch}] -- at k={k} the two splices are the SAME DGP")
+        print("=" * 100)
+        for field in ("structA_value", "structB_value", "noise_value", "doubling_value"):
+            mt, st, _ = _mean_sd([top[s][k][field] for s in seeds])
+            mb, sb, _ = _mean_sd([bot[s][k][field] for s in seeds])
+            d, dsd, _ = _mean_sd([top[s][k][field] - bot[s][k][field] for s in seeds])
+            print(f"    {field:22s} top {mt:+.4f}+-{st:.4f} | bottom {mb:+.4f}+-{sb:.4f} "
+                  f"| diff {d:+.4f}+-{dsd:.4f}")
+        print()
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--figures", default=os.path.join(HERE, "figures"))
     args = ap.parse_args()
     print(f"reading {args.figures}\n")
     geo = load_geometry(args.figures)
-    for arch in sorted(geo, reverse=True):          # "block" (the ladder's readout) first
-        report_geometry(geo, arch)
-    report_ladder(load_ladder(args.figures))
+    # "top" (the published sweep) before "bottom"; within a mode, "block" (the ladder's own
+    # readout) before the two architectural controls
+    for key in sorted(geo, key=lambda k: (k[0] != "top", k[1] != "block", k)):
+        report_geometry(geo, key)
+    cross_mode_check(geo)
+    lad = load_ladder(args.figures)
+    for mode in sorted(lad, key=lambda m: m != "top"):
+        report_ladder(lad, mode)
 
 
 if __name__ == "__main__":

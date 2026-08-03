@@ -300,6 +300,25 @@ uniform-anchored static control is a handicap rather than a control (~18% on the
 `calibrate_sigma` matches accumulated displacement rather than event size, which left a matched-magnitude level
 sweep running at a 4.5× spread. `stationary_theta` / `calibrate_sigma_event` fix both.
 
+**Two children added 2026-08-03, both about what the value system can be *asked*.**
+[`full_loop/level_moves/`](full_loop/level_moves/README.md) supplies the axis the node never had —
+a move that commits to one level-ℓ feature and renders the legal subtree beneath it, where the flat
+action space could only ever score level-1 block edits — and finds the value's preference for higher
+levels of the hierarchy **real, monotone and correctly ordered, at 5.0× per-node at the root against
+a privileged oracle's 8.2×**, over a DGP in which depth raises the *floor* rather than the ceiling (a
+random deep move buys 6.7× a random shallow one; the best move is nearly flat across levels). A span
+null — distractor channels, where Δ`d*` is exactly 0.000 at every level, yet |ΔV| still rises 43%
+from L1 to L2 — shows a naive magnitude reading of that profile is substantially the branching
+factor, and the node's 13–18× relevance separation turns out to be level-invariant.
+[`full_loop/partial_hetero/shared_surface/`](full_loop/partial_hetero/shared_surface/README.md)
+splices the *bottom* rule tables instead of the top, giving *the same alphabet composed differently*
+where the published geometry gave *the same composition in an alien alphabet*; the cross-channel code
+that geometry lacked arrives at the **first** shared table (feature probe 0.094 → 0.563 centered),
+retiring the hypothesis that the missing vocabulary was intrinsic to the construction. Its transfer
+curve is flat, **but it also measures that instrument's run-to-run floor at ±0.0117 on an identical
+DGP — larger than every cell either sweep reports**, so neither flatness is currently evidence about
+the geometry.
+
 ## Caveats
 
 - **This README covers the DGP and the instruments only.** The arity-2 block FM, the DP `k*` teacher
