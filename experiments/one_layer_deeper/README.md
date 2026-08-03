@@ -42,6 +42,20 @@ along **three** axes, not one: `fixed_n` (one modulus, vary `T`), `fixed_t` (one
 modulus — the arity axis), and `variable` (both). The `bNNNN` field is the *bit width* of `N`.
 Evaluation is a common ladder, `T = 1, 2, 4, 8, 16, 32, 64`.
 
+**The tier unit is wall-clock, not steps** (read off the manifests, 2026-08-02): `h100_easy_*`
+allow **60 training seconds**, `medium` **600**, hard **3600**, on an H100 at bf16+AMP, batch 512,
+under a `maximum_elements: 500,000,000` model-size cap. Our runs are ~1500 L4-seconds ≈ 190
+H100-equivalent seconds at **5.8M** parameters — i.e. compute between Easy and Medium, at ~85×
+under the permitted model size. Any comparison to the tiers should be made in those units.
+
+**The deep rungs of the small-modulus tiers are substantially degenerate**, extending the
+`N=323`/`N=10403` observation below to the *variable* tiers. Of the 308 distinct-odd-prime
+semiprimes in Easy `e5`'s 10–11 bit band, only **14.3%** have a depth-repeat margin above 64 and
+**30.8%** above 32 — so for most moduli there, the `T=32` and `T=64` rungs are not measuring 32
+or 64 serial squarings. This is a small-modulus effect that largely washes out with scale (75.2%
+of 16-bit semiprimes clear 64), which is consistent with the reading that the harder tiers carry
+the real difficulty.
+
 | | modulus | bits | first depth-repeat | train `T` |
 |---|---|---|---|---|
 | Easy `e1` (fixed_n) | 323 = 17×19 | 9 | **10** | 1,2,3 |
@@ -109,6 +123,38 @@ gradient steps is *worse*, reproducing
 [`metering_sweep`](../rhm/directed_sculpting/full_loop/metering_sweep/README.md)'s within-round
 overfitting on a new substrate.
 
+### [`variable_modulus/`](variable_modulus/README.md) — the arity-2 cut: sampling `N` instead of fixing it
+
+Fixed-`N` never forces the operator to be *conditioned on the rule*, so this cut samples `N` per
+example (26 train / 7 held-out 3-digit moduli, first depth-repeat ≥ 29) and separates arms by
+**where the rule lives**: carried in the rolled state (`fold`) vs re-injected into the operator
+every step from `N`'s digits (`cond`).
+
+`ballistic_depth`'s headline does not reproduce. The same label-free closure constraint installs
+closure just as completely (cos **0.29 → 0.97**) and moves the composition horizon **10 → 12**,
+against 13 → 51 at fixed `N`. Measuring why gives the cut's result: **two independent limits on
+depth, with a double dissociation.** The cycle term multiplies closure 3× and leaves the
+per-restart rate untouched (0.894 → 0.895); state coverage doubles that rate (0.47 → **0.98**,
+`p ≈ coverage`) and leaves closure and the raw horizon flat. So the *unaided* rollout is
+drift-limited while the *re-projected* rollout is coverage-limited, at `p^⌈T/k⌉` — 0.048 → 0.908
+at T=28 across the coverage sweep, with identical closure. The oracle re-projection ceiling is
+**0.894–0.903 across arms whose closure spans 0.15 → 0.97.**
+
+Separately, **no arm learned modular squaring**: held-out `x` and held-out `N` sit at or below the
+0.041 accuracy obtainable with no rule knowledge at all (the `x² < N` no-reduction cases), and a
+500k-step probe with half the bases held out, constant LR and `wd ∈ {0.1, 1.0}` produced no phase
+transition. Within these scales the model represents the task as per-modulus lookup tables, which
+bounds what depth results on this substrate can mean — including the fixed-`N` 1.000 at T=60,
+also measured on seen bases.
+
+**Four of six pre-registered predictions failed**, recorded as such. The sharpest: re-projection
+was expected to favour `fold` (the snap re-supplies the rule, which `cond` already has) and helps
+both identically — *a static rule is cheap to carry*, a genuine disanalogy with `mjc`/RHM where
+the command changes every step. An early "more moduli → shorter horizon" reading was **retracted**
+— it was a fixed-depth readout on a steep curve; horizons are 8.6–11.6 across a 7× state-count
+range. Three `ballistic_depth` results replicate unchanged: the flat oracle plateau, the chain
+model, and the collapse at α=0.5.
+
 ## Shared machinery (lives at this node)
 
 **`squaring_mod.py`** — the task, vendored from upstream. Token ids, decimal digit encoding,
@@ -147,9 +193,12 @@ entrypoint. Each cut's README carries its exact commands. Modal volume layout:
 
 1. **Scale `N`.** Everything so far is `N = 893`. `N = 9853 = 59 × 167` (2407 reachable states,
    first depth-repeat 1149) is already characterised in `squaring_mod.py`.
-2. **Held-out modulus** — the arity-2 cut. Fixed-`N` never forces the operator to be *conditioned
-   on the rule*; a rule-blind operator can only predict the `N`-averaged next state. This is the
-   axis that connects to the length-gen finalizer's *"width amplifies arity in an open loop"*.
+2. ~~**Held-out modulus** — the arity-2 cut.~~ — done; see [`variable_modulus/`](variable_modulus/README.md).
+   The arity axis turned out to be the *weakest* result in it: a static rule is cheap to carry, so
+   `fold` and `cond` differ by 2 depths and share a re-projection ceiling. The connection to the
+   length-gen finalizer's *"width amplifies arity in an open loop"* is **not** established here —
+   that setting has a rule that changes every step, which this one does not. A substrate with a
+   non-static rule is the open version of this question.
 3. ~~**Does closure predict the horizon across arms?**~~ — done; see `ballistic_depth/` §6–§7.
    Kept below for the original framing. Twelve-plus configurations are already run;
    closure-at-fixed-`t` against horizon would turn the mechanism claim from a two-arm contrast

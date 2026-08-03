@@ -140,6 +140,117 @@ class TaskSpec:
         }
 
 
+def _primes_upto(limit: int) -> list[int]:
+    sieve = bytearray([1]) * (limit + 1)
+    sieve[0] = sieve[1] = 0
+    for i in range(2, int(limit**0.5) + 1):
+        if sieve[i]:
+            sieve[i * i :: i] = bytearray(len(sieve[i * i :: i]))
+    return [i for i, ok in enumerate(sieve) if ok]
+
+
+@dataclass(frozen=True)
+class ModulusFamily:
+    """A *family* of moduli — the arity-2 DGP.
+
+    Fixed-`N` never forces the operator to be conditioned on the rule: `x -> x^2 mod N` is
+    one map, and a tied block can simply *be* that map. Sampling `N` makes the operator
+    arity-2, `F(h, N)`, so a rule-blind operator can only predict the `N`-averaged next
+    state. This is the modular-squaring analogue of `mjc/arity_torque`'s command-blind
+    forward model.
+
+    Three constraints define the family, and each is load-bearing:
+
+    1. **Uniform digit width** (`n_digits=4`, so `1000 <= N <= 9999`). The answer width is
+       then constant across the family, so exact-match never tangles answer *length* with
+       answer *value* — the same reason `answer_digits` zero-pads in the fixed-`N` cut.
+    2. **`depth_first_repeat(p, q) > min_margin` for every member.** `x^(2^T)` is eventually
+       periodic in `T`; one leaky modulus in the family would let a model pass depth
+       extrapolation on those examples by discovering a cycle instead of iterating.
+    3. **`min(p, q) >= min_factor`.** Semiprimes with a tiny factor (e.g. `3 x 347`) have a
+       degenerate unit group and a far smaller effective state space, so excluding them
+       keeps difficulty roughly homogeneous across the family.
+
+    Defaults give **325 moduli** spanning `N = 1081..9983`, minimum margin 61, median 110.
+    """
+
+    n_digits: int = 4
+    min_margin: int = 60
+    min_factor: int = 11
+    heldout_fraction: float = 0.2
+    seed: int = 45
+    # Optional narrower band inside the digit width. Upstream's own *variable* tiers use
+    # 10-11 bit moduli (Easy `e5`) and 12/14/16 bit (Medium `m5`); `(1024, 2047)` is Easy
+    # `e5`'s band. Narrowing trades rule diversity — the arity axis — for an easier
+    # one-step map. `None` means the full digit-width range.
+    mod_lo: int | None = None
+    mod_hi: int | None = None
+
+    @property
+    def lo(self) -> int:
+        return self.mod_lo if self.mod_lo is not None else 10 ** (self.n_digits - 1)
+
+    @property
+    def hi(self) -> int:
+        return self.mod_hi if self.mod_hi is not None else 10**self.n_digits - 1
+
+    def members(self) -> list[tuple[int, int, int, int]]:
+        """Sorted `(N, p, q, first_depth_repeat)` for every member of the family."""
+        primes = [p for p in _primes_upto(self.hi // self.min_factor) if p >= self.min_factor]
+        out = []
+        for i, p in enumerate(primes):
+            for q in primes[i + 1 :]:
+                n = p * q
+                if n > self.hi:
+                    break
+                if n < self.lo:
+                    continue
+                tail, period = depth_first_repeat(p, q)
+                if tail + period > self.min_margin:
+                    out.append((n, p, q, tail + period))
+        return sorted(out)
+
+    def split(self) -> tuple[list[tuple[int, int, int, int]], list[tuple[int, int, int, int]]]:
+        """Train / held-out moduli. The held-out set is the arity generalisation axis."""
+        members = self.members()
+        perm = np.random.default_rng(self.seed).permutation(len(members))
+        n_held = int(round(self.heldout_fraction * len(members)))
+        held = sorted(members[i] for i in perm[:n_held])
+        train = sorted(members[i] for i in perm[n_held:])
+        return train, held
+
+    @staticmethod
+    def units_for(p: int, q: int) -> np.ndarray:
+        """`x` coprime to `N = pq`, i.e. not divisible by `p` or `q`.
+
+        Non-units are excluded because their orbits can repeat in depth *earlier* than
+        `depth_first_repeat`, which is derived from `lambda(N)` on the unit group — a
+        non-unit would be a periodicity leak the family assertion does not cover.
+        """
+        n = p * q
+        x = np.arange(1, n, dtype=np.int64)
+        return x[(x % p != 0) & (x % q != 0)]
+
+    def describe(self) -> dict:
+        train, held = self.split()
+        allm = train + held
+        margins = [m[3] for m in allm]
+        return {
+            "n_digits": self.n_digits,
+            "min_margin": self.min_margin,
+            "min_factor": self.min_factor,
+            "n_moduli": len(allm),
+            "n_train_moduli": len(train),
+            "n_heldout_moduli": len(held),
+            "modulus_min": min(m[0] for m in allm),
+            "modulus_max": max(m[0] for m in allm),
+            "depth_first_repeat_min": min(margins),
+            "depth_first_repeat_median": int(np.median(margins)),
+            "train_moduli": [m[0] for m in train],
+            "heldout_moduli": [m[0] for m in held],
+        }
+
+
 def tokenize_prompt(modulus: int, x: int, time_steps: int | None) -> list[int]:
     """Upstream's prompt encoding. `time_steps=None` omits the T field entirely.
 
