@@ -1,0 +1,858 @@
+{
+  "config": {
+    "v": 8,
+    "s": 2,
+    "seed": 3,
+    "tree_depth": 4,
+    "struct_depths": "4,2",
+    "struct_ms": "2,4",
+    "noise_blocks": "1,1",
+    "struct_shares": "0,0",
+    "share_mode": "top",
+    "state_dim": 96,
+    "value_episodes": 40000,
+    "edit_budget": 6,
+    "n_corrupt": 3,
+    "explore_eps": 0.3,
+    "n_eval": 512,
+    "arms": [
+      "flat",
+      "level"
+    ],
+    "quick": false
+  },
+  "channels": [
+    {
+      "name": "tree",
+      "kind": "tree",
+      "depth": 4,
+      "m": 2,
+      "blk0": 0,
+      "blk1": 8
+    },
+    {
+      "name": "structA",
+      "kind": "struct",
+      "depth": 4,
+      "m": 2,
+      "blk0": 8,
+      "blk1": 16
+    },
+    {
+      "name": "structB",
+      "kind": "struct",
+      "depth": 2,
+      "m": 4,
+      "blk0": 16,
+      "blk1": 18
+    },
+    {
+      "name": "noiseA",
+      "kind": "noise",
+      "depth": null,
+      "m": null,
+      "blk0": 18,
+      "blk1": 19
+    },
+    {
+      "name": "noiseB",
+      "kind": "noise",
+      "depth": null,
+      "m": null,
+      "blk0": 19,
+      "blk1": 20
+    }
+  ],
+  "move_set": {
+    "n_moves": 35,
+    "census": {
+      "tree": {
+        "1": 8,
+        "2": 4,
+        "3": 2,
+        "4": 1
+      },
+      "structA": {
+        "1": 8,
+        "2": 4,
+        "3": 2,
+        "4": 1
+      },
+      "structB": {
+        "1": 2,
+        "2": 1
+      },
+      "noiseA": {
+        "1": 1
+      },
+      "noiseB": {
+        "1": 1
+      }
+    },
+    "moves": [
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 1,
+        "node": 0,
+        "blk0": 0,
+        "span": 1,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 1,
+        "node": 1,
+        "blk0": 1,
+        "span": 1,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 1,
+        "node": 2,
+        "blk0": 2,
+        "span": 1,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 1,
+        "node": 3,
+        "blk0": 3,
+        "span": 1,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 1,
+        "node": 4,
+        "blk0": 4,
+        "span": 1,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 1,
+        "node": 5,
+        "blk0": 5,
+        "span": 1,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 1,
+        "node": 6,
+        "blk0": 6,
+        "span": 1,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 1,
+        "node": 7,
+        "blk0": 7,
+        "span": 1,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 2,
+        "node": 0,
+        "blk0": 0,
+        "span": 2,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 2,
+        "node": 1,
+        "blk0": 2,
+        "span": 2,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 2,
+        "node": 2,
+        "blk0": 4,
+        "span": 2,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 2,
+        "node": 3,
+        "blk0": 6,
+        "span": 2,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 3,
+        "node": 0,
+        "blk0": 0,
+        "span": 4,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 3,
+        "node": 1,
+        "blk0": 4,
+        "span": 4,
+        "kind": "tree"
+      },
+      {
+        "channel": 0,
+        "channel_name": "tree",
+        "level": 4,
+        "node": 0,
+        "blk0": 0,
+        "span": 8,
+        "kind": "tree"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 1,
+        "node": 0,
+        "blk0": 8,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 1,
+        "node": 1,
+        "blk0": 9,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 1,
+        "node": 2,
+        "blk0": 10,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 1,
+        "node": 3,
+        "blk0": 11,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 1,
+        "node": 4,
+        "blk0": 12,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 1,
+        "node": 5,
+        "blk0": 13,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 1,
+        "node": 6,
+        "blk0": 14,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 1,
+        "node": 7,
+        "blk0": 15,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 2,
+        "node": 0,
+        "blk0": 8,
+        "span": 2,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 2,
+        "node": 1,
+        "blk0": 10,
+        "span": 2,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 2,
+        "node": 2,
+        "blk0": 12,
+        "span": 2,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 2,
+        "node": 3,
+        "blk0": 14,
+        "span": 2,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 3,
+        "node": 0,
+        "blk0": 8,
+        "span": 4,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 3,
+        "node": 1,
+        "blk0": 12,
+        "span": 4,
+        "kind": "struct"
+      },
+      {
+        "channel": 1,
+        "channel_name": "structA",
+        "level": 4,
+        "node": 0,
+        "blk0": 8,
+        "span": 8,
+        "kind": "struct"
+      },
+      {
+        "channel": 2,
+        "channel_name": "structB",
+        "level": 1,
+        "node": 0,
+        "blk0": 16,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 2,
+        "channel_name": "structB",
+        "level": 1,
+        "node": 1,
+        "blk0": 17,
+        "span": 1,
+        "kind": "struct"
+      },
+      {
+        "channel": 2,
+        "channel_name": "structB",
+        "level": 2,
+        "node": 0,
+        "blk0": 16,
+        "span": 2,
+        "kind": "struct"
+      },
+      {
+        "channel": 3,
+        "channel_name": "noiseA",
+        "level": 1,
+        "node": 0,
+        "blk0": 18,
+        "span": 1,
+        "kind": "noise"
+      },
+      {
+        "channel": 4,
+        "channel_name": "noiseB",
+        "level": 1,
+        "node": 0,
+        "blk0": 19,
+        "span": 1,
+        "kind": "noise"
+      }
+    ]
+  },
+  "arms": {
+    "flat": {
+      "cells": {
+        "tree|L1": {
+          "channel": "tree",
+          "level": 1,
+          "n_nodes": 8,
+          "span_blocks": 1,
+          "abs_dvalue": 0.5286867314919164,
+          "mean_dvalue": 0.08466894856792351,
+          "mean_dstar_gain": 0.267822265625,
+          "best_dstar_gain": 1.748046875,
+          "residual": -0.04060520551096899,
+          "top1_share": 0.33203125,
+          "dp_top1_share": 0.2109375
+        },
+        "tree|L2": {
+          "channel": "tree",
+          "level": 2,
+          "n_nodes": 4,
+          "span_blocks": 2,
+          "abs_dvalue": 0.80626232850409,
+          "mean_dvalue": 0.21535473251060466,
+          "mean_dstar_gain": 0.24755859375,
+          "best_dstar_gain": 1.8203125,
+          "residual": 0.09369259488989086,
+          "top1_share": 0.291015625,
+          "dp_top1_share": 0.138671875
+        },
+        "tree|L3": {
+          "channel": "tree",
+          "level": 3,
+          "n_nodes": 2,
+          "span_blocks": 4,
+          "abs_dvalue": 1.0520594071931555,
+          "mean_dvalue": 0.3098484646252473,
+          "mean_dstar_gain": 1.1611328125,
+          "best_dstar_gain": 2.267578125,
+          "residual": 0.02534095849242905,
+          "top1_share": 0.234375,
+          "dp_top1_share": 0.279296875
+        },
+        "tree|L4": {
+          "channel": "tree",
+          "level": 4,
+          "n_nodes": 1,
+          "span_blocks": 8,
+          "abs_dvalue": 1.1392760320595698,
+          "mean_dvalue": 0.412454810764757,
+          "mean_dstar_gain": 2.443359375,
+          "best_dstar_gain": 2.443359375,
+          "residual": -0.10061065245666956,
+          "top1_share": 0.12890625,
+          "dp_top1_share": 0.37109375
+        },
+        "structA|L1": {
+          "channel": "structA",
+          "level": 1,
+          "n_nodes": 8,
+          "span_blocks": 1,
+          "abs_dvalue": 0.030293028026903812,
+          "mean_dvalue": 0.00010655854919150443,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.07742805270292963,
+          "top1_share": 0.001953125,
+          "dp_top1_share": 0.0
+        },
+        "structA|L2": {
+          "channel": "structA",
+          "level": 2,
+          "n_nodes": 4,
+          "span_blocks": 2,
+          "abs_dvalue": 0.057192544285499025,
+          "mean_dvalue": -0.007144327806599904,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.08467893905872104,
+          "top1_share": 0.001953125,
+          "dp_top1_share": 0.0
+        },
+        "structA|L3": {
+          "channel": "structA",
+          "level": 3,
+          "n_nodes": 2,
+          "span_blocks": 4,
+          "abs_dvalue": 0.08987383081012013,
+          "mean_dvalue": -0.006801909207297285,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.08433652045941842,
+          "top1_share": 0.00390625,
+          "dp_top1_share": 0.0
+        },
+        "structA|L4": {
+          "channel": "structA",
+          "level": 4,
+          "n_nodes": 1,
+          "span_blocks": 8,
+          "abs_dvalue": 0.12867170049867127,
+          "mean_dvalue": -0.0039815902564441785,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.08151620150856531,
+          "top1_share": 0.00390625,
+          "dp_top1_share": 0.0
+        },
+        "structB|L1": {
+          "channel": "structB",
+          "level": 1,
+          "n_nodes": 2,
+          "span_blocks": 1,
+          "abs_dvalue": 0.050984761568543036,
+          "mean_dvalue": -0.002561260036600288,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.08009587128872142,
+          "top1_share": 0.0,
+          "dp_top1_share": 0.0
+        },
+        "structB|L2": {
+          "channel": "structB",
+          "level": 2,
+          "n_nodes": 1,
+          "span_blocks": 2,
+          "abs_dvalue": 0.0763845498295268,
+          "mean_dvalue": 0.002273577018058859,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.07526103423406227,
+          "top1_share": 0.001953125,
+          "dp_top1_share": 0.0
+        },
+        "noiseA|L1": {
+          "channel": "noiseA",
+          "level": 1,
+          "n_nodes": 1,
+          "span_blocks": 1,
+          "abs_dvalue": 0.05359775603574235,
+          "mean_dvalue": 0.0021572898695012555,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.07537732138261988,
+          "top1_share": 0.0,
+          "dp_top1_share": 0.0
+        },
+        "noiseB|L1": {
+          "channel": "noiseB",
+          "level": 1,
+          "n_nodes": 1,
+          "span_blocks": 1,
+          "abs_dvalue": 0.05169302590365987,
+          "mean_dvalue": 0.0032282253523590043,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.07430638589976213,
+          "top1_share": 0.0,
+          "dp_top1_share": 0.0
+        }
+      },
+      "tree_by_level": {
+        "1": {
+          "abs_dvalue": 0.5286867314919164,
+          "best_dstar_gain": 1.748046875,
+          "residual": -0.04060520551096899,
+          "top1_share": 0.33203125,
+          "dp_top1_share": 0.2109375
+        },
+        "2": {
+          "abs_dvalue": 0.80626232850409,
+          "best_dstar_gain": 1.8203125,
+          "residual": 0.09369259488989086,
+          "top1_share": 0.291015625,
+          "dp_top1_share": 0.138671875
+        },
+        "3": {
+          "abs_dvalue": 1.0520594071931555,
+          "best_dstar_gain": 2.267578125,
+          "residual": 0.02534095849242905,
+          "top1_share": 0.234375,
+          "dp_top1_share": 0.279296875
+        },
+        "4": {
+          "abs_dvalue": 1.1392760320595698,
+          "best_dstar_gain": 2.443359375,
+          "residual": -0.10061065245666956,
+          "top1_share": 0.12890625,
+          "dp_top1_share": 0.37109375
+        }
+      },
+      "value_vs_dp_rank_corr": 0.284196001743209,
+      "calibration": {
+        "slope": 0.17825083629758942,
+        "intercept": 0.07753461125212112
+      },
+      "dstar_mean": 4.26953125,
+      "tree_top1_share": 0.986328125,
+      "dp_tree_top1_share": 1.0,
+      "terminal_success": 0.38177499175071716,
+      "train_move_set": {
+        "n_moves": 20,
+        "census": {
+          "tree": {
+            "1": 8
+          },
+          "structA": {
+            "1": 8
+          },
+          "structB": {
+            "1": 2
+          },
+          "noiseA": {
+            "1": 1
+          },
+          "noiseB": {
+            "1": 1
+          }
+        }
+      }
+    },
+    "level": {
+      "cells": {
+        "tree|L1": {
+          "channel": "tree",
+          "level": 1,
+          "n_nodes": 8,
+          "span_blocks": 1,
+          "abs_dvalue": 0.46267151344591184,
+          "mean_dvalue": 0.06314000803786257,
+          "mean_dstar_gain": 0.2685546875,
+          "best_dstar_gain": 1.744140625,
+          "residual": 0.04515147667206701,
+          "top1_share": 0.384765625,
+          "dp_top1_share": 0.20703125
+        },
+        "tree|L2": {
+          "channel": "tree",
+          "level": 2,
+          "n_nodes": 4,
+          "span_blocks": 2,
+          "abs_dvalue": 0.7118994230995668,
+          "mean_dvalue": 0.06776329051444918,
+          "mean_dstar_gain": 0.2353515625,
+          "best_dstar_gain": 1.80859375,
+          "residual": 0.05160424548489627,
+          "top1_share": 0.31640625,
+          "dp_top1_share": 0.142578125
+        },
+        "tree|L3": {
+          "channel": "tree",
+          "level": 3,
+          "n_nodes": 2,
+          "span_blocks": 4,
+          "abs_dvalue": 0.9237499299924821,
+          "mean_dvalue": -0.018029766841209494,
+          "mean_dstar_gain": 1.1796875,
+          "best_dstar_gain": 2.3046875,
+          "residual": -0.08622155561036977,
+          "top1_share": 0.1953125,
+          "dp_top1_share": 0.2890625
+        },
+        "tree|L4": {
+          "channel": "tree",
+          "level": 4,
+          "n_nodes": 1,
+          "span_blocks": 8,
+          "abs_dvalue": 1.154589406622108,
+          "mean_dvalue": -0.25865719982539304,
+          "mean_dstar_gain": 2.419921875,
+          "best_dstar_gain": 2.419921875,
+          "residual": -0.395185684095382,
+          "top1_share": 0.091796875,
+          "dp_top1_share": 0.361328125
+        },
+        "structA|L1": {
+          "channel": "structA",
+          "level": 1,
+          "n_nodes": 8,
+          "span_blocks": 1,
+          "abs_dvalue": 0.027727077890631335,
+          "mean_dvalue": -7.693322731938679e-05,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.0032681486382110814,
+          "top1_share": 0.00390625,
+          "dp_top1_share": 0.0
+        },
+        "structA|L2": {
+          "channel": "structA",
+          "level": 2,
+          "n_nodes": 4,
+          "span_blocks": 2,
+          "abs_dvalue": 0.055798149162910704,
+          "mean_dvalue": -0.014844835796793632,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.018036051207685328,
+          "top1_share": 0.00390625,
+          "dp_top1_share": 0.0
+        },
+        "structA|L3": {
+          "channel": "structA",
+          "level": 3,
+          "n_nodes": 2,
+          "span_blocks": 4,
+          "abs_dvalue": 0.08033091178185714,
+          "mean_dvalue": -0.022858113561596838,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.026049328972488538,
+          "top1_share": 0.001953125,
+          "dp_top1_share": 0.0
+        },
+        "structA|L4": {
+          "channel": "structA",
+          "level": 4,
+          "n_nodes": 1,
+          "span_blocks": 8,
+          "abs_dvalue": 0.1179824803948577,
+          "mean_dvalue": -0.04619025103238528,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.04938146644327698,
+          "top1_share": 0.001953125,
+          "dp_top1_share": 0.0
+        },
+        "structB|L1": {
+          "channel": "structB",
+          "level": 1,
+          "n_nodes": 2,
+          "span_blocks": 1,
+          "abs_dvalue": 0.04116321603578399,
+          "mean_dvalue": -0.004237107052176725,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.00742832246306842,
+          "top1_share": 0.0,
+          "dp_top1_share": 0.0
+        },
+        "structB|L2": {
+          "channel": "structB",
+          "level": 2,
+          "n_nodes": 1,
+          "span_blocks": 2,
+          "abs_dvalue": 0.06272617012291448,
+          "mean_dvalue": 0.0013085863029118627,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.0018826291079798315,
+          "top1_share": 0.0,
+          "dp_top1_share": 0.0
+        },
+        "noiseA|L1": {
+          "channel": "noiseA",
+          "level": 1,
+          "n_nodes": 1,
+          "span_blocks": 1,
+          "abs_dvalue": 0.04584454705036478,
+          "mean_dvalue": 0.0028567626941367052,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.0003344527167549909,
+          "top1_share": 0.0,
+          "dp_top1_share": 0.0
+        },
+        "noiseB|L1": {
+          "channel": "noiseB",
+          "level": 1,
+          "n_nodes": 1,
+          "span_blocks": 1,
+          "abs_dvalue": 0.046425292341155,
+          "mean_dvalue": 0.0019251937046647072,
+          "mean_dstar_gain": 0.0,
+          "best_dstar_gain": 0.0,
+          "residual": -0.001266021706226988,
+          "top1_share": 0.0,
+          "dp_top1_share": 0.0
+        }
+      },
+      "tree_by_level": {
+        "1": {
+          "abs_dvalue": 0.46267151344591184,
+          "best_dstar_gain": 1.744140625,
+          "residual": 0.04515147667206701,
+          "top1_share": 0.384765625,
+          "dp_top1_share": 0.20703125
+        },
+        "2": {
+          "abs_dvalue": 0.7118994230995668,
+          "best_dstar_gain": 1.80859375,
+          "residual": 0.05160424548489627,
+          "top1_share": 0.31640625,
+          "dp_top1_share": 0.142578125
+        },
+        "3": {
+          "abs_dvalue": 0.9237499299924821,
+          "best_dstar_gain": 2.3046875,
+          "residual": -0.08622155561036977,
+          "top1_share": 0.1953125,
+          "dp_top1_share": 0.2890625
+        },
+        "4": {
+          "abs_dvalue": 1.154589406622108,
+          "best_dstar_gain": 2.419921875,
+          "residual": -0.395185684095382,
+          "top1_share": 0.091796875,
+          "dp_top1_share": 0.361328125
+        }
+      },
+      "value_vs_dp_rank_corr": 0.10197524647693557,
+      "calibration": {
+        "slope": 0.05509982377389654,
+        "intercept": 0.0031912154108916964
+      },
+      "dstar_mean": 4.26953125,
+      "tree_top1_share": 0.98828125,
+      "dp_tree_top1_share": 1.0,
+      "terminal_success": 0.5070750117301941,
+      "train_move_set": {
+        "n_moves": 35,
+        "census": {
+          "tree": {
+            "1": 8,
+            "2": 4,
+            "3": 2,
+            "4": 1
+          },
+          "structA": {
+            "1": 8,
+            "2": 4,
+            "3": 2,
+            "4": 1
+          },
+          "structB": {
+            "1": 2,
+            "2": 1
+          },
+          "noiseA": {
+            "1": 1
+          },
+          "noiseB": {
+            "1": 1
+          }
+        }
+      }
+    }
+  },
+  "elapsed_seconds": 336.6882529258728
+}

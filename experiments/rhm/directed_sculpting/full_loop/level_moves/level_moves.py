@@ -60,6 +60,30 @@ it is what makes a flat |ΔV| profile interpretable: if deep moves buy nothing (
 commitments -- a root-level move masks the whole tree slice, so the generator has almost no
 evidence left to condition on), then a value that rates them low is CORRECT, not level-blind.
 
+TWO STRONGER CORRECTIONS, ADDED 2026-08-03
+------------------------------------------
+`residual` above corrects the confound by REGRESSION (ΔV on Δd*, fit on tree moves pooled) and it
+did not resolve -- per-seed level-4 values +0.739 / -0.430 / -0.020. Two structural corrections
+replace it, neither of which needs the fit:
+
+  the span null      run with `--struct-depths 4,2`, so structA is a depth-4, 8-block channel with
+                     ground-truth Δd* EXACTLY 0.000 at every level (P1/G1). Its |ΔV|-by-level
+                     profile is the pure mechanical rise: a level-ell move rewrites `s**ell`
+                     tokens and so displaces `z.mean(dim=1)` by ~`s**ell`/n_blocks whether or not
+                     it buys anything. The tree profile is only informative ABOVE this.
+  the lazy twin      `--lazy-twins`. A paired control at the SAME node: identical tokens rewritten,
+                     so the displacement cancels inside the pair, and the twins differ in exactly
+                     one respect -- one legal abstract commitment vs `s**(ell-1)` independent
+                     level-1 guesses. `matched_span.pref_rate` is then level preference with the
+                     confound removed BY CONSTRUCTION. This is the readout the span null cannot
+                     give: the null shows argmax never lands off-tree at all (relevance dominates),
+                     so it corrects the MAGNITUDE readout but says nothing about the WITHIN-tree
+                     ordering that `top1_share` measures.
+
+The twins are never actions -- no arm trains on them, and every ranking readout (`top1_share`,
+the calibration line, the rank correlation) is computed over committed moves only, so a run with
+`--lazy-twins` is directly comparable to one without.
+
 TWO VALUE ARMS
 --------------
 Whether the value CAN express a level preference and whether it DOES are different questions, and
@@ -113,7 +137,7 @@ app = modal.App("rhm-ds-level-moves", image=image)
 # The move set: every (channel, level, node) the action space contains
 # --------------------------------------------------------------------------- #
 
-def build_move_set(layout, tb, device, max_level=None):
+def build_move_set(layout, tb, device, max_level=None, lazy_twins=False):
     """Enumerate the level-indexed action space.
 
     One entry per (channel, level, node). A grammar channel of depth `d` contributes levels
@@ -125,6 +149,16 @@ def build_move_set(layout, tb, device, max_level=None):
     `blk0`/`span` are in BLOCKS; the token span is `span * s` wide starting at `blk0 * s`.
     Returns a dict with a `moves` list plus torch-side index tensors and the per-channel rule
     tables the DP needs, all on `device`.
+
+    `lazy_twins` adds, for every grammar node at level >= 2, a SECOND move over the identical
+    token span that skips the DP and picks each block's level-1 feature independently -- the
+    "lazy construction" the module docstring rejects as a level-`ell` move. It is a bad move and
+    a very good CONTROL: it rewrites exactly the same positions, so it displaces the value's
+    pooled latent (`z.mean(dim=1)`) by the same amount, and it differs from its twin in one
+    respect only -- whether the span is one legal abstract commitment or `s**(ell-1)` independent
+    guesses. Any value preference between a twin pair is therefore about the commitment and not
+    about the span, with the branching-factor confound removed BY CONSTRUCTION rather than by
+    regression against `d*`. Off by default, so the published move set is bit-identical.
     """
     import torch
 
@@ -134,7 +168,8 @@ def build_move_set(layout, tb, device, max_level=None):
         if ch["rules"] is None:                       # noise: level-1 blocks only
             for b in range(ch["blk0"], ch["blk1"]):
                 moves.append({"channel": ci, "channel_name": ch["name"], "level": 1,
-                              "node": b - ch["blk0"], "blk0": b, "span": 1, "kind": "noise"})
+                              "node": b - ch["blk0"], "blk0": b, "span": 1, "kind": "noise",
+                              "lazy": False})
             continue
         rules_t[ci] = [torch.from_numpy(np.ascontiguousarray(r)).to(device)
                        for r in ch["rules"]]          # root-down: rules[depth-ell] expands level ell
@@ -142,9 +177,14 @@ def build_move_set(layout, tb, device, max_level=None):
         for ell in range(1, top + 1):
             span = s ** (ell - 1)
             for j in range((ch["blk1"] - ch["blk0"]) // span):
-                moves.append({"channel": ci, "channel_name": ch["name"], "level": ell,
-                              "node": j, "blk0": ch["blk0"] + j * span, "span": span,
-                              "kind": ch["kind"]})
+                base = {"channel": ci, "channel_name": ch["name"], "level": ell,
+                        "node": j, "blk0": ch["blk0"] + j * span, "span": span,
+                        "kind": ch["kind"]}
+                moves.append({**base, "lazy": False})
+                # at ell=1 the DP is empty, so the lazy twin IS the committed move -- adding one
+                # would be a duplicate column, not a control.
+                if lazy_twins and ell >= 2:
+                    moves.append({**base, "lazy": True})
     return {
         "moves": moves,
         "n_moves": len(moves),
@@ -166,11 +206,15 @@ def flat_move_set(layout, tb, device):
 
 
 def moves_table(ms, tb):
-    """Human-readable (channel, level) -> n_nodes census of a move set."""
+    """Human-readable (channel, level) -> n_nodes census of a move set.
+
+    Lazy twins are counted under `<level>~` so the census stays honest about the column count.
+    """
     out = {}
     for m in ms["moves"]:
-        out.setdefault(m["channel_name"], {}).setdefault(m["level"], 0)
-        out[m["channel_name"]][m["level"]] += 1
+        key = f"{m['level']}~" if m.get("lazy") else m["level"]
+        out.setdefault(m["channel_name"], {}).setdefault(key, 0)
+        out[m["channel_name"]][key] += 1
     return out
 
 
@@ -202,7 +246,10 @@ def _node_features(generator, x, move, ms, tb, return_deriv=False):
     obs = x.clone().scatter_(1, pos, torch.full_like(pos, -1))
     logits = generator.block_logits(obs)                        # (B, n_blocks, v)
     cur = logits[:, blk0:blk0 + span, :]                        # (B, span, v) -- level-1 evidence
-    if ell == 1:
+    # ell == 1: the DP is empty, so this IS regenerate_block's choice (C1).
+    # lazy twin: deliberately DON'T run the DP -- take each block's level-1 argmax independently.
+    # Same positions, same span, no abstract commitment. See `build_move_set(lazy_twins=...)`.
+    if ell == 1 or move.get("lazy"):
         f1 = cur.argmax(-1)                                     # == regenerate_block's choice
         return (f1, pos, {1: f1}) if return_deriv else (f1, pos)
 
@@ -231,6 +278,136 @@ def _node_features(generator, x, move, ms, tb, return_deriv=False):
         lv -= 1
         deriv[lv] = feats
     return (feats, pos, deriv) if return_deriv else (feats, pos)
+
+
+# --------------------------------------------------------------------------- #
+# Hierarchical damage: an error that block-local inspection cannot see
+# --------------------------------------------------------------------------- #
+
+def corrupt_tree_hier(leaves_np, layout, tb_np, *, level, n_nodes, rng):
+    """Replace `n_nodes` level-`level` tree subtrees with a legal derivation of a feature the
+    observed subtree provably CANNOT derive.
+
+    WHY THIS EXISTS. `channel_env.corrupt_tree` writes `rng.integers(0, v)` -- random symbols,
+    which are off-grammar and therefore visible **block-locally**: each corrupt block looks wrong
+    on its own, so a per-block argmax repairs it. That means no error in the published DGP
+    *requires* abstraction to see, which is why the matched-span abstraction premium came back
+    flat in level: a level-ell commitment has nothing a level-1 edit cannot also get.
+
+    This writes the opposite kind of damage. Every block stays a legal synonym of some level-1
+    feature, so nothing is locally suspicious; what is wrong is the level-`level` node, and only a
+    commitment at level >= `level` can re-derive it. `level` is therefore the depth at which the
+    error LIVES, and the prediction it licenses is sharp: the matched-span premium should be ~0 for
+    move levels below it and positive at or above it.
+
+    The swapped feature is chosen from the COMPLEMENT of `possible_sets` at that node, so the
+    damage is guaranteed to be a real inconsistency rather than a re-rendering of the same
+    feature (a different derivation of the SAME feature leaves `d*` untouched -- the trap this
+    avoids).
+    """
+    from rhm.rhm_channels import possible_sets, tree_leaves
+
+    v, s = layout["v"], layout["s"]
+    rules = layout["tree_rules"]                       # root-down: rules[depth-lv] expands lv
+    depth = layout["tree"]["depth"]
+    B = leaves_np.shape[0]
+    n_at_level = s ** (depth - level)
+    k = min(n_nodes, n_at_level)
+
+    # which level-`level` features can derive each node's OBSERVED subtree
+    levels = possible_sets(rules, tree_leaves(layout, leaves_np), s)
+    poss = levels[level - 1]                           # (B, n_at_level, v) boolean
+
+    nodes = np.stack([rng.choice(n_at_level, size=k, replace=False) for _ in range(B)])  # (B, k)
+    rowi = np.arange(B)[:, None]
+    # uniform over the features the node CANNOT derive (mask out the possible ones)
+    scores = rng.random((B, k, v))
+    scores[poss[rowi, nodes]] = -1.0
+    feats = scores.argmax(-1)[:, :, None]              # (B, k, 1) -- the wrong level-`level` feat
+
+    # expand top-down with uniformly random rules: level -> level-1 -> ... -> 1
+    for lv in range(level, 1, -1):
+        table = rules[depth - lv]                      # (v, m, s)
+        m = table.shape[1]
+        r = rng.integers(0, m, size=feats.shape)
+        feats = table[feats, r].reshape(B, k, -1)      # (B, k, n_children)
+
+    # render each level-1 feature as a uniformly random synonym of itself
+    span = feats.shape[-1]
+    blk0 = layout["tree"]["blk0"] + nodes * span       # (B, k) first block of each damaged node
+    blocks = blk0[:, :, None] + np.arange(span)[None, None, :]        # (B, k, span)
+    mm = tb_np["m_blk"][blocks]                                        # (B, k, span)
+    choice = (rng.random(mm.shape) * mm).astype(np.int64)
+    tup = tb_np["syn_blk"][blocks, feats, choice]                      # (B, k, span, s)
+
+    out = leaves_np.copy()
+    pos = blocks[..., None] * s + np.arange(s)[None, None, None, :]    # (B, k, span, s)
+    np.put_along_axis(out, pos.reshape(B, -1), tup.reshape(B, -1), axis=1)
+    return out
+
+
+def tb_numpy(tb):
+    """The rendering tables `corrupt_tree_hier` needs, host-side."""
+    return {k: tb[k].cpu().numpy() for k in ("m_blk", "syn_blk", "tree_blocks")}
+
+
+def make_damage(layout, tb_np, level):
+    """`damage(leaves, c, rng)` for a given damage level; None-equivalent at level 0."""
+    if level <= 0:
+        return None
+    return lambda leaves, c, rng: corrupt_tree_hier(leaves, layout, tb_np, level=level,
+                                                    n_nodes=c, rng=rng)
+
+
+def sample_states_damaged(layout, tb, generator, *, n, n_corrupt, presteps, seed, device,
+                          render="mixture", gen=None, damage=None):
+    """`channel_env.sample_states` with the damage hook. `damage=None` reproduces it exactly."""
+    import torch
+
+    rng = np.random.default_rng(seed)
+    pool = sample_pool(layout, n, seed)
+    tree_blocks = tb["tree_blocks"].cpu().numpy()
+    start = (damage(pool["leaves"], n_corrupt, rng) if damage is not None else
+             corrupt_tree(pool["leaves"], tree_blocks, n_corrupt,
+                          layout["v"], layout["s"], rng))
+    x = torch.from_numpy(start).to(device)
+    roots = torch.from_numpy(pool["roots"].astype(np.int64)).to(device)
+    for _ in range(presteps):
+        k = torch.randint(0, tb["n_blocks"], (n,), device=device, generator=gen)
+        k = k.to(device)
+        x = regenerate_block(generator, x, k, tb, render=render, gen=gen)
+    return x, roots
+
+
+def certify_damage(layout, tb_np, *, level, n_corrupt, n=2048, seed=11):
+    """G-D: the damage is ON-GRAMMAR everywhere and still moves `d*`.
+
+    This is the gate that makes the whole level sweep interpretable, and it is the one property
+    the published damage does NOT have. Two numbers per damage mode:
+
+      on_grammar   fraction of TREE blocks whose token tuple is a legal synonym of some level-1
+                   feature. Hierarchical damage must be 1.000 -- nothing is locally suspicious,
+                   so a per-block reader cannot localise the error at all. Random-symbol damage
+                   sits far below 1, which is exactly why a level-1 edit can repair it.
+      dstar        mean exact `d*`. Must be > 0, or there is no damage to repair.
+    """
+    rng = np.random.default_rng(seed)
+    pool = sample_pool(layout, n, seed)
+    dmg = make_damage(layout, tb_np, level)
+    leaves = (dmg(pool["leaves"], n_corrupt, rng) if dmg is not None else
+              corrupt_tree(pool["leaves"], tb_np["tree_blocks"], n_corrupt,
+                           layout["v"], layout["s"], rng))
+    s = layout["s"]
+    ok, tot = 0, 0
+    for blk in tb_np["tree_blocks"]:
+        m = int(tb_np["m_blk"][blk])
+        legal = tb_np["syn_blk"][blk, :, :m, :].reshape(-1, s)                 # (v*m, s)
+        tup = leaves[:, blk * s:(blk + 1) * s]                                 # (n, s)
+        ok += int((tup[:, None, :] == legal[None]).all(-1).any(-1).sum())
+        tot += len(tup)
+    d = dp_cost(layout, leaves, pool["roots"])
+    return {"level": level, "on_grammar": ok / tot, "dstar_mean": float(d.mean()),
+            "dstar_zero_frac": float((d == 0).mean())}
 
 
 def regenerate_node(generator, x, move, ms, tb, *, render="mixture", gen=None, chunk=16384):
@@ -285,13 +462,19 @@ def apply_moves(generator, x, move_ids, ms, tb, *, render="mixture", gen=None):
 # --------------------------------------------------------------------------- #
 
 def collect_value_buffer_moves(controller, generator, layout, tb, ms, *, n_episodes, batch_size,
-                               n_corrupt, budget, epsilon, seed, render, gen, device):
+                               n_corrupt, budget, epsilon, seed, render, gen, device,
+                               damage=None):
     """`channel_env.collect_value_buffer` with the behaviour policy over an arbitrary MOVE SET.
 
     Identical in every other respect -- controller-greedy over every available move with
     eps-random exploration, never restricted to the tree, every visited state labelled by its
     rollout's terminal possible-set success on the tree. Passing `flat_move_set` reproduces the
     published buffer's action space exactly.
+
+    `damage(leaves, c, rng)` overrides how start states are corrupted. None = the published
+    random-symbol `corrupt_tree`. The value MUST be trained on the same damage it is probed on,
+    or the arms conflate "does the value prefer abstraction" with "does a value trained on
+    shallow damage generalise to deep damage".
     """
     import torch
 
@@ -304,7 +487,8 @@ def collect_value_buffer_moves(controller, generator, layout, tb, ms, *, n_episo
         done += b
         pool = sample_pool(layout, b, int(rng.integers(0, 2 ** 31)))
         c = int(rng.integers(1, n_corrupt + 1))
-        start = corrupt_tree(pool["leaves"], tree_blocks, c, layout["v"], layout["s"], rng)
+        start = (damage(pool["leaves"], c, rng) if damage is not None else
+                 corrupt_tree(pool["leaves"], tree_blocks, c, layout["v"], layout["s"], rng))
         x = torch.from_numpy(start).to(device)
         roots = torch.from_numpy(pool["roots"].astype(np.int64)).to(device)
         traj = [x.clone()]
@@ -384,22 +568,28 @@ def level_value_probe(value, controller, generator, layout, tb, ms, x0, roots, *
     tree_c = tb["tree_channel"]
     cells = {}
     for mi, mv in enumerate(ms["moves"]):
-        cells.setdefault((mv["channel"], mv["level"]), []).append(mi)
+        cells.setdefault((mv["channel"], mv["level"], bool(mv.get("lazy"))), []).append(mi)
+
+    # Lazy twins are a PAIRED CONTROL, not rival actions: every ranking readout below is computed
+    # over committed moves only, so `top1_share` / `dp_top1_share` / the calibration line / the
+    # rank correlation are bit-identical to the published run when no twins are present. The twins
+    # are read only through `matched_span` at the end.
+    commit_mi = np.array([mi for mi, mv in enumerate(ms["moves"]) if not mv.get("lazy")])
 
     # calibration line, fit on TREE moves only and pooled over every level: the value's own
     # exchange rate between "d* the move buys" and "value the move is worth". The per-level
     # residual against it is the level preference with the branching-factor confound removed.
-    tree_mi = [mi for mi, mv in enumerate(ms["moves"]) if mv["channel"] == tree_c]
+    tree_mi = [mi for mi in commit_mi if ms["moves"][mi]["channel"] == tree_c]
     X, Y = dd[tree_mi].ravel(), dv[tree_mi].ravel()
     slope, intercept = np.polyfit(X, Y, 1) if X.std() > 1e-9 else (0.0, float(Y.mean()))
 
-    top1 = dv.argmax(axis=0)
-    dp_top1 = dd.argmax(axis=0)
+    top1 = commit_mi[dv[commit_mi].argmax(axis=0)]
+    dp_top1 = commit_mi[dd[commit_mi].argmax(axis=0)]
     out = {}
-    for (ci, ell), mis in sorted(cells.items()):
+    for (ci, ell, lazy), mis in sorted(cells.items()):
         sub_dv, sub_dd = dv[mis], dd[mis]
-        out[f"{names[ci]}|L{ell}"] = {
-            "channel": names[ci], "level": ell, "n_nodes": len(mis),
+        out[f"{names[ci]}|L{ell}" + ("|lazy" if lazy else "")] = {
+            "channel": names[ci], "level": ell, "lazy": lazy, "n_nodes": len(mis),
             "span_blocks": ms["moves"][mis[0]]["span"],
             "abs_dvalue": float(np.abs(sub_dv).mean()),
             "mean_dvalue": float(sub_dv.mean()),
@@ -410,22 +600,66 @@ def level_value_probe(value, controller, generator, layout, tb, ms, x0, roots, *
             "dp_top1_share": float(np.isin(dp_top1, mis).mean()),
         }
 
-    # rank agreement between the value's ordering over ALL moves and the DP's, per state
-    dvc = dv - dv.mean(axis=0, keepdims=True)
-    ddc = dd - dd.mean(axis=0, keepdims=True)
+    # rank agreement between the value's ordering over all COMMITTED moves and the DP's, per state
+    dvc = dv[commit_mi] - dv[commit_mi].mean(axis=0, keepdims=True)
+    ddc = dd[commit_mi] - dd[commit_mi].mean(axis=0, keepdims=True)
     corr = float(np.mean((dvc * ddc).sum(0)
                          / np.maximum(np.linalg.norm(dvc, axis=0) * np.linalg.norm(ddc, axis=0),
                                       1e-9)))
     by_level = {}
     for ell in sorted({mv["level"] for mv in ms["moves"] if mv["channel"] == tree_c}):
         mis = [mi for mi, mv in enumerate(ms["moves"])
-               if mv["channel"] == tree_c and mv["level"] == ell]
+               if mv["channel"] == tree_c and mv["level"] == ell and not mv.get("lazy")]
         by_level[ell] = {"abs_dvalue": float(np.abs(dv[mis]).mean()),
                          "best_dstar_gain": float(dd[mis].max(axis=0).mean()),
                          "residual": float((dv[mis] - (intercept + slope * dd[mis])).mean()),
                          "top1_share": float(np.isin(top1, mis).mean()),
                          "dp_top1_share": float(np.isin(dp_top1, mis).mean())}
-    return {"cells": out, "tree_by_level": by_level,
+
+    # ---- the matched-span control ------------------------------------------------------------
+    # Pair each committed level-`ell` node with its lazy twin. Both rewrite the IDENTICAL token
+    # positions, so they displace `z.mean(dim=1)` equally and the span/branching-factor confound
+    # cancels within the pair. `pref_rate` is a paired binary preference over (node, state): the
+    # fraction of times the value ranks the abstract commitment above `s**(ell-1)` independent
+    # guesses at the same place. That is level preference with the confound removed by
+    # construction rather than by regression -- and `dp_pref_rate` is what it should be.
+    twin = {}
+    for mi, mv in enumerate(ms["moves"]):
+        twin.setdefault((mv["channel"], mv["level"], mv["node"]), {})[bool(mv.get("lazy"))] = mi
+    matched = {}
+    pairs_by_cell = {}
+    for (ci, ell, _node), d in twin.items():
+        if False in d and True in d:
+            pairs_by_cell.setdefault((ci, ell), []).append((d[False], d[True]))
+    for (ci, ell), prs in sorted(pairs_by_cell.items()):
+        cm = np.array([p[0] for p in prs])
+        lz = np.array([p[1] for p in prs])
+        d_dv, d_dd = dv[cm] - dv[lz], dd[cm] - dd[lz]
+        # `d*` is integer-valued, so a large fraction of pairs TIE on ground truth while ΔV
+        # essentially never does. Comparing a value rate over all pairs to a DP rate over all
+        # pairs is then apples-to-oranges (the DP's is diluted by ties). Both rates are therefore
+        # also reported on the UNTIED subset, where they measure the same thing and the value's
+        # ordering can be scored against the DP's directly.
+        untied = d_dd != 0
+        matched[f"{names[ci]}|L{ell}"] = {
+            "channel": names[ci], "level": ell, "n_pairs": int(len(prs) * dv.shape[1]),
+            "span_blocks": ms["moves"][cm[0]]["span"],
+            "value_premium": float(d_dv.mean()),
+            "dp_premium": float(d_dd.mean()),
+            "pref_rate": float((d_dv > 0).mean()),
+            "dp_pref_rate": float((d_dd > 0).mean()),
+            "tie_rate_dp": float((d_dd == 0).mean()),
+            # like-for-like: both rates on the pairs where ground truth actually discriminates
+            "n_untied": int(untied.sum()),
+            "pref_rate_untied": (float((d_dv[untied] > 0).mean()) if untied.any() else None),
+            "dp_pref_rate_untied": (float((d_dd[untied] > 0).mean()) if untied.any() else None),
+            # does the value AGREE with the DP pair by pair, where the DP has an opinion?
+            "agree_untied": (float((np.sign(d_dv[untied]) == np.sign(d_dd[untied])).mean())
+                             if untied.any() else None),
+            "abs_dvalue_commit": float(np.abs(dv[cm]).mean()),
+            "abs_dvalue_lazy": float(np.abs(dv[lz]).mean()),
+        }
+    return {"cells": out, "tree_by_level": by_level, "matched_span": matched,
             "value_vs_dp_rank_corr": corr,
             "calibration": {"slope": float(slope), "intercept": float(intercept)},
             "dstar_mean": float(d_cur.mean()),
@@ -448,6 +682,20 @@ def print_probe(res, title):
           f"{res['tree_top1_share']:.3f} vs DP {res['dp_tree_top1_share']:.3f}")
     print(f"  calibration ΔV = {res['calibration']['intercept']:+.4f} "
           f"{res['calibration']['slope']:+.4f} * Δd*  (fit on tree moves, all levels pooled)")
+    if res.get("matched_span"):
+        print(f"\n  MATCHED-SPAN CONTROL -- committed level-ℓ move vs its LAZY twin at the same "
+              f"node.\n  Identical tokens rewritten, so the branching-factor confound cancels "
+              f"inside each pair.\n  `pref` = fraction of (node, state) pairs where the "
+              f"commitment is ranked above the guesses.")
+        print(f"  {'cell':14s} {'span':>4s} {'pairs':>7s} {'ΔV prem':>9s} {'Δd* prem':>9s} "
+              f"{'DP tie':>7s} | untied: {'n':>6s} {'value':>7s} {'DP':>7s} {'agree':>7s}")
+        for key, c in res["matched_span"].items():
+            u = "" if c["pref_rate_untied"] is None else (
+                f"{c['n_untied']:>6d} {c['pref_rate_untied']:>7.3f} "
+                f"{c['dp_pref_rate_untied']:>7.3f} {c['agree_untied']:>7.3f}")
+            print(f"  {key:14s} {c['span_blocks']:>4d} {c['n_pairs']:>7d} "
+                  f"{c['value_premium']:>+9.4f} {c['dp_premium']:>+9.4f} "
+                  f"{c['tie_rate_dp']:>7.3f} |          {u}")
 
 
 # --------------------------------------------------------------------------- #
@@ -556,6 +804,53 @@ def selfcheck(v=8, s=2, tree_depth=4, seed=1, n=256):
         assert bool(ok.all()), f"C2b FAILED: rendered tuple is not a synonym of the choice, {mv}"
     print("C2 PASS: every level-ell move commits to ONE level-ell feature (C2a) and renders "
           "each block as a legal synonym of it (C2b)")
+
+    # C3 -- the matched-span control is span-matched AND non-vacuous.
+    #
+    # The whole point of the lazy twin is that it cancels the branching-factor confound within a
+    # pair, so (a) it must rewrite the IDENTICAL positions, and (b) it must actually DIFFER from
+    # its committed twin often enough for the comparison to carry information. (b) is the one that
+    # could silently fail: if the generator's per-block argmax already happened to be a legal
+    # subtree everywhere, the control would be a tautology and every `pref_rate` would be 0.5 by
+    # construction. The rates are printed, not just asserted, so the gate is visible.
+    ms_lz = build_move_set(layout, tb, device, lazy_twins=True)
+    twin_of = {(m["channel"], m["level"], m["node"]): i for i, m in enumerate(ms_lz["moves"])
+               if not m.get("lazy")}
+    n_pairs, diff_rows, diff_blocks, tot_blocks, illegal_l2, tot_l2 = 0, 0, 0, 0, 0, 0
+    for mv in ms_lz["moves"]:
+        if not mv.get("lazy"):
+            continue
+        cm = ms_lz["moves"][twin_of[(mv["channel"], mv["level"], mv["node"])]]
+        with torch.no_grad():
+            f_lz, pos_lz = _node_features(generator, x, mv, ms_lz, tb)
+            f_cm, pos_cm = _node_features(generator, x, cm, ms_lz, tb)
+            # the lazy features must BE the independent per-block argmax
+            blocks = torch.arange(mv["blk0"], mv["blk0"] + mv["span"], device=device)
+            obs = x.clone().scatter_(1, pos_lz, torch.full_like(pos_lz, -1))
+            ref = generator.block_logits(obs)[:, blocks, :].argmax(-1)
+        assert bool((pos_lz == pos_cm).all()), f"C3 FAILED: twin spans differ for {mv}"
+        assert bool((f_lz == ref).all()), f"C3 FAILED: lazy twin is not the per-block argmax, {mv}"
+        n_pairs += 1
+        diff_blocks += int((f_lz != f_cm).sum())
+        tot_blocks += f_lz.numel()
+        diff_rows += int((f_lz != f_cm).any(dim=1).sum())
+        if mv["level"] == 2:                      # cheap legality check at the smallest deep level
+            rules = layout["channels"][mv["channel"]]["rules"]
+            table = rules[layout["channels"][mv["channel"]]["depth"] - 2]      # (v, m, s)
+            kid = f_lz.cpu().numpy()                                          # (n, 2)
+            hit = (table[None] == kid[:, None, None, :]).all(-1).any(-1).any(-1)
+            illegal_l2 += int((~hit).sum())
+            tot_l2 += len(kid)
+    assert n_pairs > 0, "C3 FAILED: lazy_twins produced no pairs"
+    assert diff_rows > 0, ("C3 FAILED: the lazy twin never differs from its committed twin -- the "
+                           "matched-span control would be vacuous")
+    print(f"C3 PASS: {n_pairs} twin pairs, spans identical; the lazy twin differs from the "
+          f"commitment on {diff_rows / (n_pairs * n) * 100:.1f}% of rows "
+          f"({diff_blocks / max(tot_blocks, 1) * 100:.1f}% of blocks)")
+    if tot_l2:
+        print(f"  at level 2, the lazy span is NOT a legal level-2 subtree on "
+              f"{illegal_l2 / tot_l2 * 100:.1f}% of rows -- which is what makes it a control "
+              f"rather than a rival move")
     print("\nselfcheck OK")
 
 
@@ -570,6 +865,33 @@ def selfcheck_remote(tree_depth: int = 4):
     return True
 
 
+@app.function(image=image, timeout=1800, memory=16384)
+def certify_damage_remote(v: int = 8, s: int = 2, tree_depth: int = 4, n_corrupt: int = 3,
+                          struct_depths: str = "2,2", levels: str = "0,1,2,3"):
+    """G-D across damage levels -- the DGP gate, CPU only, no training involved.
+
+    `on_grammar` is the whole point: the published damage (level 0) is off-grammar and so can be
+    localised one block at a time; hierarchical damage is 1.000 on-grammar at every level, so the
+    only way to see the error is to hold a hypothesis about a level-`ell` node.
+    """
+    import torch
+
+    device = torch.device("cpu")
+    spec = make_spec(tree_depth=tree_depth,
+                     struct_depths=[int(x) for x in struct_depths.split(",")],
+                     struct_ms=[2, 4], noise_blocks=[1, 1])
+    layout = make_layout(v, s, spec)
+    tb_np = tb_numpy(build_block_tables(layout, device))
+    print(f"{'damage':>7s} {'on-grammar':>11s} {'d* mean':>9s} {'d*==0':>8s}")
+    out = []
+    for lv in [int(x) for x in levels.split(",")]:
+        c = certify_damage(layout, tb_np, level=lv, n_corrupt=n_corrupt, n=4096)
+        out.append(c)
+        print(f"{lv:>7d} {c['on_grammar']:>11.4f} {c['dstar_mean']:>9.3f} "
+              f"{c['dstar_zero_frac']:>8.4f}")
+    return out
+
+
 @app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=14400, memory=32768)
 def level_probe(v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
                 tree_depth: int = 4, struct_depths: str = "2,2", struct_ms: str = "2,4",
@@ -578,7 +900,8 @@ def level_probe(v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
                 value_steps: int = 12_000, value_episodes: int = 40_000,
                 batch_size: int = 256, n_corrupt: int = 3, edit_budget: int = 6,
                 explore_eps: float = 0.3, n_eval: int = 512,
-                arms: str = "flat,level", tag: str = "v1", quick: bool = False):
+                arms: str = "flat,level", lazy_twins: bool = False, damage_level: int = 0,
+                tag: str = "v1", quick: bool = False):
     """Train the value on each action space, then probe BOTH with the level-indexed move set.
 
     Controller and generator are trained once and shared, so the arms differ in exactly one
@@ -615,6 +938,9 @@ def level_probe(v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
 
     ms_level = build_move_set(layout, tb, device)
     ms_flat = flat_move_set(layout, tb, device)
+    # The twins are a paired CONTROL and never an action: no arm ever trains on them, so the two
+    # value arms are exactly the published ones and only the probe's column set grows.
+    ms_probe = (build_move_set(layout, tb, device, lazy_twins=True) if lazy_twins else ms_level)
     print(f"Level-indexed action space on the distractor DGP: T={T} tokens / {n_blocks} blocks")
     for ch in layout["channels"]:
         print(f"  {ch['name']:9s} {ch['kind']:6s} blocks[{ch['blk0']:2d}:{ch['blk1']:2d}]"
@@ -622,6 +948,9 @@ def level_probe(v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
     print(f"  flat  move set: {ms_flat['n_moves']:3d} moves  {json.dumps(moves_table(ms_flat, tb))}")
     print(f"  level move set: {ms_level['n_moves']:3d} moves  "
           f"{json.dumps(moves_table(ms_level, tb))}")
+    if lazy_twins:
+        print(f"  PROBE move set: {ms_probe['n_moves']:3d} moves  "
+              f"{json.dumps(moves_table(ms_probe, tb))}   (`~` = lazy twin, control only)")
 
     # ---- shared frozen instruments ------------------------------------------------------
     pool = sample_pool(layout, 20_000 if quick else 100_000, seed)
@@ -644,10 +973,26 @@ def level_probe(v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
             p.requires_grad_(False)
     del train_leaves, train_roots, pool
 
+    # the damage model. level 0 = the published random-symbol corruption; level >= 1 swaps a
+    # level-`damage_level` subtree for a legal derivation of a feature it cannot produce, so the
+    # error is invisible block-locally and only a commitment at that level or above can see it.
+    tb_np = tb_numpy(tb)
+    damage = make_damage(layout, tb_np, damage_level)
+    cert = certify_damage(layout, tb_np, level=damage_level, n_corrupt=n_corrupt,
+                          n=1024 if quick else 4096)
+    print(f"  damage_level={damage_level}: tree blocks on-grammar {cert['on_grammar']:.4f}, "
+          f"d* mean {cert['dstar_mean']:.3f}, d*==0 on {cert['dstar_zero_frac']:.4f} of rows")
+    if damage_level >= 1:
+        assert cert["on_grammar"] > 0.999, (
+            f"G-D FAILED: hierarchical damage left {1 - cert['on_grammar']:.4f} of tree blocks "
+            f"off-grammar, so the error is still visible block-locally")
+        assert cert["dstar_zero_frac"] < 0.05, (
+            f"G-D FAILED: {cert['dstar_zero_frac']:.3f} of rows have d*==0, i.e. no damage")
+
     # one frozen probe set, shared by every arm -- the arms must be read on identical states
-    x_eval, r_eval = sample_states(layout, tb, generator, n=n_eval, n_corrupt=n_corrupt,
-                                   presteps=0, seed=seed + 42, device=device, render=render,
-                                   gen=gen)
+    x_eval, r_eval = sample_states_damaged(layout, tb, generator, n=n_eval, n_corrupt=n_corrupt,
+                                           presteps=0, seed=seed + 42, device=device,
+                                           render=render, gen=gen, damage=damage)
 
     out = {}
     for arm in arm_list:
@@ -657,7 +1002,7 @@ def level_probe(v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
         cfg, rts, suc = collect_value_buffer_moves(
             controller, generator, layout, tb, ms_train, n_episodes=value_episodes,
             batch_size=1024, n_corrupt=n_corrupt, budget=edit_budget, epsilon=explore_eps,
-            seed=seed + 31, render=render, gen=gen, device=device)
+            seed=seed + 31, render=render, gen=gen, device=device, damage=damage)
         print(f"  buffer {cfg.shape[0]} states, terminal success {suc.mean().item():.3f}")
         value = ValueHead(state_dim, v).to(device)
         _train_value_mc(value, controller, cfg, rts, suc, batch_size=512, n_steps=value_steps,
@@ -668,7 +1013,7 @@ def level_probe(v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
         terminal_success = float(suc.mean())
         del cfg, rts, suc
 
-        res = level_value_probe(value, controller, generator, layout, tb, ms_level,
+        res = level_value_probe(value, controller, generator, layout, tb, ms_probe,
                                 x_eval, r_eval, render=render, gen=gen, device=device)
         res["terminal_success"] = terminal_success
         res["train_move_set"] = {"n_moves": ms_train["n_moves"],
@@ -684,11 +1029,14 @@ def level_probe(v: int = 8, s: int = 2, seed: int = 1, state_dim: int = 96,
                    "share_mode": share_mode, "state_dim": state_dim,
                    "value_episodes": value_episodes, "edit_budget": edit_budget,
                    "n_corrupt": n_corrupt, "explore_eps": explore_eps, "n_eval": n_eval,
-                   "arms": arm_list, "quick": quick},
+                   "arms": arm_list, "lazy_twins": lazy_twins, "damage_level": damage_level,
+                   "quick": quick},
+        "damage_certification": cert,
         "channels": [{k: ch[k] for k in ("name", "kind", "depth", "m", "blk0", "blk1")}
                      for ch in layout["channels"]],
-        "move_set": {"n_moves": ms_level["n_moves"], "census": moves_table(ms_level, tb),
-                     "moves": ms_level["moves"]},
+        # what the probe's cells refer to; identical to the training set when lazy_twins is off
+        "move_set": {"n_moves": ms_probe["n_moves"], "census": moves_table(ms_probe, tb),
+                     "moves": ms_probe["moves"]},
         "arms": out,
         "elapsed_seconds": time.time() - started,
     }

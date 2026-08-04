@@ -296,6 +296,24 @@ discrete feature at 0.69 is evidently not enough to regress a precise latent del
    inside that same floor. Until a readout with better resolution exists, neither sweep's flatness
    is evidence about the geometry, and more cells or seeds buy little.
 
+> **A sibling instrument failure, and the general lesson (2026-08-03).**
+> [`../level_moves/`](../level_moves/README.md) §9 hit the same class of problem from the other
+> direction and its resolution is worth carrying here. That node's confound-correction was a
+> **regression** — ΔV regressed on true Δ`d*`, differenced per level — and it never resolved across
+> four attempts (per-seed +0.739 / −0.430 / −0.020). Two **structural** corrections resolved
+> immediately: a null *channel* whose ground-truth value is certified 0.000, and a *paired* control
+> matched by construction rather than by covariate adjustment. Stated generally, and it applies to
+> this node's §7 item 2 gate as much as to that one: **when a readout's components are not
+> independent, a matched control does what a matched regression cannot** — which is the same lesson
+> §4b of [`heterogeneous_graders`](../../../../../ideas/heterogeneous_graders.md) records about the
+> withdrawn `R_comp`/`R_res` partition, now with a second instance.
+>
+> Also worth recording as a reuse: **this node's depth-matched `structA` is what made that null
+> possible.** `--struct-depths 4,2` was built here so the sharing splice could be depth-matched, and
+> it doubles as a full depth-4 channel with Δ`d*` certified exactly 0.000 at every level — the only
+> thing in the repo that can separate "the value rates deep moves higher" from "deep moves perturb
+> the latent more".
+
 ## 8. Children
 
 | Child | What |

@@ -303,13 +303,32 @@ sweep running at a 4.5× spread. `stationary_theta` / `calibrate_sigma_event` fi
 **Two children added 2026-08-03, both about what the value system can be *asked*.**
 [`full_loop/level_moves/`](full_loop/level_moves/README.md) supplies the axis the node never had —
 a move that commits to one level-ℓ feature and renders the legal subtree beneath it, where the flat
-action space could only ever score level-1 block edits — and finds the value's preference for higher
-levels of the hierarchy **real, monotone and correctly ordered, at 5.0× per-node at the root against
-a privileged oracle's 8.2×**, over a DGP in which depth raises the *floor* rather than the ceiling (a
-random deep move buys 6.7× a random shallow one; the best move is nearly flat across levels). A span
-null — distractor channels, where Δ`d*` is exactly 0.000 at every level, yet |ΔV| still rises 43%
-from L1 to L2 — shows a naive magnitude reading of that profile is substantially the branching
-factor, and the node's 13–18× relevance separation turns out to be level-invariant.
+action space could only ever score level-1 block edits. Its **first reading did not survive its own
+confound and was corrected in the same node**: a level-ℓ move rewrites `s**ℓ` tokens and so
+displaces the value's pooled latent more regardless of what it buys, and against a *depth-matched*
+distractor whose Δ`d*` is certified 0.000 at every level the null rises **2.79×** from L1 to L4
+where the tree rises **2.56×** — so the |ΔV| level profile is the branching factor, and the
+per-node top-1 headline (5.0× at the root) is one seed of three carrying a mean whose sd equals it.
+Two structural corrections replace it, and both are reusable. A **matched-span paired control**
+pairs each committed move with a *lazy twin* rewriting identical tokens without committing, so the
+confound cancels inside the pair: on it the value genuinely prefers the abstract commitment
+(**0.557 ± 0.018** at L2, **0.618 ± 0.052** at L3, against an exact oracle's 0.610 / 0.642), and it
+is task-referenced rather than grammaticality — only **4.4%** of the premium survives in channels
+where legality buys Δ`d*` = 0. And a **DGP repair**: the published damage writes random symbols,
+which is off-grammar in **29%** of tree blocks and therefore repairable one block at a time, so
+abstraction never had to matter. Under **hierarchical damage** — a level-k subtree swapped for a
+legal derivation of a feature `possible_sets` proves it cannot produce, 100% on-grammar at matched
+`d*` — the value's abstraction premium is **graded by whether a commitment at that level can reach
+the error** (L2 slope **−0.033, t = −6.81**, 3/3 seeds, against the oracle's −0.025, t = −4.14,
+while the oracle's L3 slope is half that), and value–oracle rank agreement roughly **doubles**,
++0.290 → **+0.583**, t = +8.14, *while* terminal success falls 0.475 → 0.307 — the internal control
+against a value that merely got flatter. **So the node's claim is sensitivity to the hierarchy's
+compositional structure, not to depth as such**, with a systematic conservatism that widens as
+errors deepen. Two by-products: the 13–18× relevance separation now holds at **all four levels
+against a full depth-4 distractor** (12.1× / 13.1× / 12.7× / 11.1×), the one result that came out
+stronger; and the **root cell is structurally unreadable** — a level-4 move masks every tree token,
+so its Δ`d*` premium is bit-identical across all three damage levels, which is why it never resolved
+anywhere in the node and why more seeds cannot fix it.
 [`full_loop/partial_hetero/shared_surface/`](full_loop/partial_hetero/shared_surface/README.md)
 splices the *bottom* rule tables instead of the top, giving *the same alphabet composed differently*
 where the published geometry gave *the same composition in an alien alphabet*; the cross-channel code
@@ -318,6 +337,26 @@ retiring the hypothesis that the missing vocabulary was intrinsic to the constru
 curve is flat, **but it also measures that instrument's run-to-run floor at ±0.0117 on an identical
 DGP — larger than every cell either sweep reports**, so neither flatness is currently evidence about
 the geometry.
+
+**And a grandchild added 2026-08-04, which closes the node's longest-standing open item in an
+unexpected direction.** [`full_loop/level_moves/level_ladder/`](full_loop/level_moves/level_ladder/README.md)
+builds the *allocation* half `full_loop` open item 2 has wanted since July — the span forward model
+that was its standing blocker (small, as it turns out, and bit-identical to the published block FM
+at level 1), a budget spent over (channel, level) cells, a level-indexed planner and ballistic
+grader, and a damage schedule that moves the error **deeper across the run** so that climbing is
+necessary rather than merely available. Every gate passes: the exact DP's best move level climbs
+1 → 2 → 3 with the damage depth, and a privileged allocator follows it (slope **+0.287 ± 0.038**,
+t = +13.15, 3/3 seeds). **And it buys nothing** — with the channel allocation held fixed, the level
+index is worth **+0.00016 ± 0.00226 (t = +0.13)** against a paired within-run floor of ±0.0009, and
+a level-*blind* oracle recovers **99.2%** of the +0.0217 allocation prize. That is a null about the
+geometry with every instrument certified, not a null about a readout. The complementary contrast is
+large: swapping only the *action space* from block-only to level-indexed, at matched task and
+matched allocation, moves ballistic control **0.121 → 0.424 (3.51×**, t = +10.40) — while making the
+FM *worse* on its dense proxy at the one shared cell (−0.106, t = −3.14), a quantified grader
+disagreement. **The suggested reading, offered as an argument rather than a measurement: on this
+geometry levels are an action-space axis, not an allocation-space one** — channels are disjoint sets
+of positions, so allocating over them changes which parameters receive data, whereas levels are
+*nested* on the same blocks and none can be starved by spending at another.
 
 ## Caveats
 
