@@ -40,39 +40,83 @@ The manifests under `benchmark/manifests/` encode their config in the `data_root
 `..._easy_bidirectional_fixed_n_323_t123` is fixed `N=323`, train `T ∈ {1,2,3}`. The tiers vary
 along **three** axes, not one: `fixed_n` (one modulus, vary `T`), `fixed_t` (one `T`, vary the
 modulus — the arity axis), and `variable` (both). The `bNNNN` field is the *bit width* of `N`.
-Evaluation is a common ladder, `T = 1, 2, 4, 8, 16, 32, 64`.
+
+**The score is mean exact accuracy** — an example counts only when *every* target token is
+correct. Easy/Medium average `test` (held-out **prompts**, i.e. held-out `(N,x,T)` tuples at
+trained depths, so bases recur) with their merged `ood` split, equally. Hard equally averages a
+hidden test split, a held-out-**depth** split, and a jointly held-out **modulus/depth** split.
+
+**The depth ask on the public tiers is one doubling.** Read off `scripts/generate_datasets.sh`
+(not the manifests, which only name the `data_root`): every public dataset has exactly *one* OOD
+depth, and in all ten it is **2× the max trained depth** — E1 {1,2,3}→6, E2 {1,2,4}→7, E3/E4
+{2}→4, E5 {1,2,3}→6, M1/M2 {4,8,16}→32, M3 {2}→4, M4 {8}→16, M5 {2,4,8}→16.
+
+**The `T = 1,2,4,8,16,32,64` ladder is Hard's, and it is gated.** From the live leaderboard: each
+cell shows the next `T` to certify and its accuracy, and *"once every example at that T is
+correct, the target advances."* 100% exact, not an average. Two tracks are shown — in-distribution
+number sizes and **out-of-distribution number sizes**.
+
+**Retracted (2026-08-03).** An earlier version of this section reported that ladder as the common
+evaluation for *all* tiers and concluded the deep rungs were substantially degenerate (the "only
+14.3% of Easy `e5`'s band clears 64" figure). Both are wrong: that ladder is Hard-only, and
+against the real OOD depths upstream's moduli are clean. Recomputed with our own
+`depth_first_repeat`:
+
+| dataset | OOD `T` | first depth-repeat | clean? |
+|---|---|---|---|
+| E1 `N=323` / E2 `N=899` | 6 / 7 | 10 / 14 | ✅ |
+| M1 `N=10403` / M2 `N=38021` | 32 / 32 | 42 / 48 | ✅ |
+| E5 (10–11 bit population) | 6 | — | 99.0% of 308 |
+| M4 (14/16-bit) / M5 (12–16 bit) | 16 | — | 96.3% / 95.2% |
+
+Upstream chose its OOD depths carefully. What survives is the *design* point, not a criticism:
+**our modulus sits at Easy's scale but is deliberately much deeper** — 10 bits, same as Easy's
+variable range, with a periodicity margin of **67** against Easy `e1`'s 10, because we evaluate
+to T=60 where upstream stops at 6.
+
+| | modulus | bits | first depth-repeat | train `T` | eval `T` |
+|---|---|---|---|---|---|
+| Easy `e1` (fixed_n) | 323 = 17×19 | 9 | 10 | 1,2,3 | 6 |
+| Medium `m1` (fixed_n) | 10403 = 101×103 | 14 | 42 | 4,8,16 | 32 |
+| Easy `e5` (variable) | 10–11 bits | 10–11 | — | 1,2,3 | 6 |
+| Medium `m5` (variable) | 12/14/16 bits | 12–16 | — | 2,4,8 | 16 |
+| **ours** | **893 = 19×47** | **10** | **67** | 1..6 | **1..60** |
+| ours, next rung | 9853 = 59×167 | 14 | 1149 | 1..6 | 1..120 |
+
+**Hard may not be repeated squaring at all.** The problem statement: *"Hard is a hidden task
+evaluation and may change aspects of the recurrence itself; do not assume it is repeated
+squaring."* The repo agrees — `generator_family: str = "rsa_repeated_squaring"` is a *named*
+field, `data/counting.py` is generic plumbing from a different task family, and
+`tests/test_release.py` asserts no `h100_hard_*.json` manifest ships. Squaring-mod is the carrier,
+chosen for three properties (inherently serial without the factorisation, exact cheap labels via
+an evaluator-only trapdoor, monotone work in `T`); the competition's object is an architecture and
+optimizer for *function composition*, and a public fixed recurrence would be memorisable — which
+[`ballistic_depth/`](ballistic_depth/README.md) demonstrates by scoring 1.000 at T=60 having
+learned only a 207-entry lookup table and how to compose it.
+
+**The public leaderboard is stuck at `T=1` (checked 2026-08-03).** Every entry is an exact
+multiple of 1/768: the best submission scores **6/768 = 0.78%** on in-distribution number sizes
+and 3/768 on OOD ones; ranks 8–16 are at 0. Nobody has certified a *single* application of the
+hidden map. That is the signature of a model banking only the free `x² < N` no-reduction cases —
+the analytic floor [`variable_modulus/`](variable_modulus/README.md) §3 computes as `≈1/√N` — and
+it independently reproduces that cut's central negative at Hard-tier compute with 16 participants.
+**The benchmark's live frontier is rule acquisition, not depth.**
+
+[`rule_acquisition/exact_atom/`](rule_acquisition/exact_atom/README.md) gives that a quantitative
+form. Because the ladder gate is *every* example correct and
+[`ballistic_depth/`](ballistic_depth/README.md) §9 turns a depth-`T` rollout into `T` depth-1
+problems at test time for free, certifying rung `T` needs one-step error `eps <~ 9e-4/T` over
+768 examples. So the rungs are a **log-error ladder**: each doubling of `T` costs one factor of
+two in `eps`, `T=1` to `T=64` is 64×, and essentially all of the difficulty sits at rung zero.
+That is why the leaderboard is stuck where it is, and it is the unit every number in that node
+is reported in.
 
 **The tier unit is wall-clock, not steps** (read off the manifests, 2026-08-02): `h100_easy_*`
 allow **60 training seconds**, `medium` **600**, hard **3600**, on an H100 at bf16+AMP, batch 512,
-under a `maximum_elements: 500,000,000` model-size cap. Our runs are ~1500 L4-seconds ≈ 190
-H100-equivalent seconds at **5.8M** parameters — i.e. compute between Easy and Medium, at ~85×
-under the permitted model size. Any comparison to the tiers should be made in those units.
-
-**The deep rungs of the small-modulus tiers are substantially degenerate**, extending the
-`N=323`/`N=10403` observation below to the *variable* tiers. Of the 308 distinct-odd-prime
-semiprimes in Easy `e5`'s 10–11 bit band, only **14.3%** have a depth-repeat margin above 64 and
-**30.8%** above 32 — so for most moduli there, the `T=32` and `T=64` rungs are not measuring 32
-or 64 serial squarings. This is a small-modulus effect that largely washes out with scale (75.2%
-of 16-bit semiprimes clear 64), which is consistent with the reading that the harder tiers carry
-the real difficulty.
-
-| | modulus | bits | first depth-repeat | train `T` |
-|---|---|---|---|---|
-| Easy `e1` (fixed_n) | 323 = 17×19 | 9 | **10** | 1,2,3 |
-| Medium `m1` (fixed_n) | 10403 = 101×103 | 14 | **42** | 4,8,16 |
-| Easy `e5` (variable) | 10–11 bits | 10–11 | — | 1,2,3 |
-| Medium `m5` (variable) | 12/14/16 bits | 12–16 | — | 2,4,8 |
-| **ours** | **893 = 19×47** | **10** | **67** | 1..6 |
-| ours, next rung | 9853 = 59×167 | 14 | 1149 | — |
-
-Two things follow. **Our modulus sits at Easy's scale but is deliberately much deeper**: 10 bits,
-same as Easy's variable range, with a periodicity margin of 67 against Easy's 10. And **the
-upstream ladder's deep rungs are partly degenerate on its own moduli** — for `N=323` (tail 4,
-period 6) the maps at `T=16`, `32`, `64` are *exactly* the maps at `T=4`, `8`, `4`, so nothing
-past `T=8` requires further composition; for `N=10403` (tail 2, period 40) `T=64` reproduces
-`T=24`. This is a property of the moduli, not a criticism of the benchmark — the tiers that carry
-the real difficulty are the `fixed_t` and `variable` ones, where the modulus is the held-out axis
-and depth is short.
+under a `maximum_elements: 500,000,000` model-size cap. `ballistic_depth`'s 8000-step runs are
+~1500 L4-seconds ≈ 190 H100-equivalent seconds at **2.1M** parameters — compute between Easy and
+Medium, ~240× under the permitted model size. `variable_modulus`'s 60k-step runs at **5.8M**
+parameters are Medium-to-Hard-scale compute (not logged). Any comparison should be in those units.
 
 ## Cuts
 
@@ -123,6 +167,25 @@ gradient steps is *worse*, reproducing
 [`metering_sweep`](../rhm/directed_sculpting/full_loop/metering_sweep/README.md)'s within-round
 overfitting on a new substrate.
 
+**Scaling to `N = 9853`** (11.6× the state set) breaks two things and taught us to distrust a
+third. The cycle term at §7's optimum **collapses at this scale** (ID 0.001, closure 0.998),
+capacity-independently — the cause is the *schedule*, not the weight, and repairing it restores
+learning but not the advantage. That makes explicit that **closure is only interpretable
+conditional on in-distribution competence**. The horizon numbers at that scale then turned out to
+be **unconverged** — 2× the budget takes exact-match at T=7 from 0.176 to 0.996 with ID saturated
+at 1.000 in both runs, while `N=893` is converged under a 2.5× control
+([`horizon_convergence/`](ballistic_depth/horizon_convergence/README.md)). So `N=9853` horizons
+are lower bounds, no cross-scale horizon comparison is quotable yet, and §1–§9 stand. And the
+child node
+[`rule_structure/`](ballistic_depth/rule_structure/README.md) reads the representation in the CRT
+coordinate where squaring is exactly the doubling map: across six trained encoders there is **no
+group organisation beyond a permutation null** — all below the weakest synthetic group signal the
+instrument still detects — and scaling the state set moved it *down* rather than up, the opposite
+of what "lookup is merely cheaper than the algorithm" predicts. **Scoped by
+[`rule_acquisition/`](rule_acquisition/README.md) §5**: an arm that generalises at 0.920 reads at
+the same null, so the statistic bounds *group-character-linear organisation*, not learnability —
+that node's own caveats say as much, and its **unreachable** headline should be read accordingly.
+
 ### [`variable_modulus/`](variable_modulus/README.md) — the arity-2 cut: sampling `N` instead of fixing it
 
 Fixed-`N` never forces the operator to be *conditioned on the rule*, so this cut samples `N` per
@@ -154,6 +217,44 @@ the command changes every step. An early "more moduli → shorter horizon" readi
 — it was a fixed-depth readout on a steep curve; horizons are 8.6–11.6 across a 7× state-count
 range. Three `ballistic_depth` results replicate unchanged: the flat oracle plateau, the chain
 model, and the collapse at α=0.5.
+
+### [`rule_acquisition/`](rule_acquisition/README.md) — why the one-step map is memorised
+
+The atom, not its composition. `variable_modulus` §3 says the model cannot compute a *single*
+modular squaring on an unseen input, and `rule_structure` read that as **unreachable**. Testing
+that node's remedy list at depth 1 with half of every modulus's bases held out: **nine arms sit at
+or below the no-reduction floor** — base-2 encoding, place-value embeddings, 8 encoder layers, 8
+serial operator steps per task step, 4096-wide FFN, 17.75× more moduli, staged supervision on the
+intermediate product, and a 21M-parameter arm stacking all of them (**0.051** against floor 0.049).
+
+The **reduce** generalises once shown its own input space — `x^2 -> x^2 mod N` reads
+**0.773–0.996** uniformly sampled against **0.022** on the inputs `x^2` actually supplies. Its
+space is `N` times larger than the multiply's at equal sample count, so within these scales what
+makes the atom memorisation-only is **coverage**, not the reachability of the algorithm — which
+retro-explains the nine nulls, since none of those interventions manufactures coverage. Division
+degrades gracefully with quotient range (0.996 → 0.982 → 0.773), not off a cliff. *An earlier
+version of this section reported the multiply generalising at 0.920; that is **retracted** as a
+per-modulus-split artefact — see the child below.*
+
+The surviving barrier is the **rule** axis: held-out `N` is at or below floor at 8 moduli even
+where held-out problems read 0.982, and reaches only 0.058 (3.8× floor) at 142 moduli, both arms
+undertrained. Single seed throughout; two pre-registered predictions failed.
+
+Its child [`exact_atom/`](rule_acquisition/exact_atom/README.md) re-reads the atom against the
+**exactness** target Hard gates on. Under `ballistic_depth` §9's re-projection at `k=1`, rung `T`
+needs one-step error `eps <~ 9e-4/T`, so each rung is worth one factor of two and the whole
+ladder `T=1..64` is 64× — depth is the cheap axis. Against it the atom decomposes into three
+measured quantities: fed the true `Enc(DIV, N, x^2)` from inside a trained composed model the
+reduce reads **0.953** on held-out `x` (converting the coverage inference into a measurement),
+the multiply reads **0.068** on a clean split, and the composition reads 0.0035. The multiply's
+failure is ordinary — at 3 digits `x` has under 1000 values; at 50k inputs and 27.4M parameters
+it reaches **0.909** and is still improving steeply, and a pre-registered "generalisation
+appears where memorisation becomes infeasible" mechanism **failed in both directions**. The two
+widths tested bracket the problem: at 3 digits the reduce works and the multiply does not; at 4
+digits the multiply improves and the *full-range* reduce collapses to 0.0004 while
+bounded-quotient reads 0.986, so the reduce's limit is the **quotient range** — which `x^2`
+spans by construction. Held-out `N` stays at or below floor everywhere, including under an
+oracle state.
 
 ## Shared machinery (lives at this node)
 
@@ -191,15 +292,26 @@ entrypoint. Each cut's README carries its exact commands. Modal volume layout:
 
 ## Next steps
 
-1. **Scale `N`.** Everything so far is `N = 893`. `N = 9853 = 59 × 167` (2407 reachable states,
-   first depth-repeat 1149) is already characterised in `squaring_mod.py`.
-2. ~~**Held-out modulus** — the arity-2 cut.~~ — done; see [`variable_modulus/`](variable_modulus/README.md).
+1. **Scale `N`** — *base arm done, grounded arm pending a repair sweep.* See `ballistic_depth/`
+   §10. The base horizon halves (13 → 7) and is capacity-independent; the cycle arm at w=10
+   collapses at this scale, so the headline question — does the closure advantage survive a
+   larger state space — is open until `scale9853_w{1,3}` / `_w3_warm6` report. §9's `p = 0.871`
+   also remains unseparated, because that needs a grounded arm that trained.
+2. ~~**The axis the benchmark is actually stuck on is rule acquisition, not depth.**~~ — opened;
+   see [`rule_acquisition/`](rule_acquisition/README.md). Our depth results remain about composing
+   a *memorised* operator, but the reason the operator is memorised is now measured rather than
+   assumed: the atom's reduce stage is starved of coverage by its own composition, and both halves
+   generalise when each is given its own input space. What is left open there is the **rule** axis
+   — generalising the reduce across moduli — which is the same axis `variable_modulus` hit from
+   the other direction. Its next step 2 (auxiliary dense-division loss on `sq`) is the direct
+   remedy the diagnosis implies, and is legal for a real submission.
+3. ~~**Held-out modulus** — the arity-2 cut.~~ — done; see [`variable_modulus/`](variable_modulus/README.md).
    The arity axis turned out to be the *weakest* result in it: a static rule is cheap to carry, so
    `fold` and `cond` differ by 2 depths and share a re-projection ceiling. The connection to the
    length-gen finalizer's *"width amplifies arity in an open loop"* is **not** established here —
    that setting has a rule that changes every step, which this one does not. A substrate with a
    non-static rule is the open version of this question.
-3. ~~**Does closure predict the horizon across arms?**~~ — done; see `ballistic_depth/` §6–§7.
+4. ~~**Does closure predict the horizon across arms?**~~ — done; see `ballistic_depth/` §6–§7.
    Kept below for the original framing. Twelve-plus configurations are already run;
    closure-at-fixed-`t` against horizon would turn the mechanism claim from a two-arm contrast
    into a slope.

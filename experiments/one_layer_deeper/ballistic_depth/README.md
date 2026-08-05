@@ -2,7 +2,16 @@
 
 **Up**: [../README.md](../README.md) (one_layer_deeper) · **Files**: [FILES.md](FILES.md)
 **Substrate**: repeated modular squaring, `y = x^(2^T) mod N`, from [tilde-research/one-layer-deeper](https://github.com/tilde-research/one-layer-deeper)
-**Status**: complete — 5 arms + 3 ablations + a 4-point weight sweep + an instrument calibration, 3 seeds each. **Date**: 2026-08-02.
+**Status**: complete at `N=893`; scale cut in progress. 5 arms + 3 ablations + a 4-point weight
+sweep + an instrument calibration, 3 seeds each. **Date**: 2026-08-02.
+**Extended 2026-08-03** by §10–§11 and two child nodes. At `N=9853` (11.6× the state set) the
+cycle term at §7's optimum **collapses** (closure 0.998, ID 0.001 — a documented blind spot in the
+closure instrument), repairable by schedule but not restoring the advantage; group structure in
+the representation falls to the permutation null
+([`rule_structure/`](rule_structure/README.md)); and the horizon numbers at that scale are
+**not converged** — 2× the budget moves T=7 from 0.176 to 0.996 with ID saturated throughout
+([`horizon_convergence/`](horizon_convergence/README.md)), so `N=9853` horizons are lower bounds.
+`N=893` *is* converged, which leaves §1–§9 intact.
 **Extended 2026-08-02** by a micro-cut (§6–§9): a closure-vs-horizon regression over every run,
 a 7-point cycle-weight sweep that **moves the headline horizon from 35 to 51**, a cold-start probe
 showing the operator is sound at every depth tested, and a test-time re-projection cut in which
@@ -450,6 +459,83 @@ depth axis and the `x` axis are separate, and only the first one is finished her
 
 ---
 
+# Scale (2026-08-03): the same cut at `N = 9853`
+
+§9 put the grounded arm at 1.000 at T=60 against a first depth-repeat of 67, so `N=893` could no
+longer measure its own best configuration. `N = 9853 = 59 × 167` gives 9628 units, **2407**
+reachable states (11.6× the 207) and a first depth-repeat of **1149**. Two tags, because 2407
+states is well past what the operator's width was chosen for: the **narrow** one changes only
+`N`, the **wide** one takes the operator from `d_ff` 1024 to 8192. 3 seeds each, 60k steps
+(7.5× §1's budget), cycle weight at §7's optimum w=10, eval to T=120.
+
+## 10. At scale the cycle term collapses; the horizon numbers are **not converged**
+
+| | operator | params | steps | ID (T≤6) | horizon (per seed) | closure@1 |
+|---|---|---|---|---|---|---|
+| `base` `N=893` *(§1)* | 1024 | 2.1M | 8k | 1.000 | 15, 13, 13 | 0.187 |
+| `+cycle` w=10 `N=893` *(§7)* | 1024 | 2.1M | 8k | 1.000 | **51.0 ±3.6** | 0.999 |
+| `base` `N=9853` narrow | 1024 | 2.1M | 60k | 0.958 | 7, 7, 7 | 0.099 |
+| `base` `N=9853` **wide** | 8192 | 5.8M | 60k | **1.000** | 7, 7, 7 | 0.130 |
+| `base` `N=9853` wide, **2× budget** | 8192 | 5.8M | **120k** | 1.000 | **≥10, climbing** | — |
+| `+cycle` w=10 `N=9853` narrow | 1024 | 2.1M | 60k | **0.024** | 1, 1, 1 | 0.976 |
+| `+cycle` w=10 `N=9853` wide | 8192 | 5.8M | 60k | **0.001** | 1, 1, 1 | 0.998 |
+
+**Read the horizon column at `N=9853` as a lower bound, not a measurement.** An earlier version of
+this section reported the base horizon "halving, 13 → 7, independent of capacity". The capacity
+control is real — 8× width moves ID 0.958 → 1.000 and leaves the horizon at 7 — but
+capacity-independence with saturated ID is *not* evidence of convergence, and it isn't:
+doubling the budget takes exact-match at T=7 from **0.176 to 0.996** and the horizon to **10**,
+still climbing, with ID already 1.000 in both runs. `N=893` *is* converged (2.5× the budget leaves
+it at 13). See [`horizon_convergence/`](horizon_convergence/README.md) — **no `N=893` vs `N=9853`
+horizon comparison should be quoted until both sides are converged**, and everything below about
+the cycle term at scale inherits the same caveat, since those arms all ran at 60k.
+
+**The cycle term at its `N=893` optimum fails to learn the task at all**, and widening makes it
+*worse* (ID 0.024 → 0.001), so this is not capacity. It is §5's "error correction, achieved and
+useless" with the cycle term now in the role of the failed intervention, and gotcha 1 at a new
+scale: the term unlocks at 30% warmup, calibrated where CE saturated in ~2k steps; at `N=9853` CE
+has not converged by step 18k, so the self-generated target teaches while the model is still bad
+and the degenerate solution satisfies it perfectly.
+
+**Repairing the schedule confirms the diagnosis and does not restore the advantage** — at 60k
+steps, single seed, wide operator:
+
+| cycle w | warmup | ID | T=7 | horizon | closure@1 | closure@20 |
+|---|---|---|---|---|---|---|
+| — *(base)* | — | 1.000 | 0.176 | 7 | 0.137 | −0.047 |
+| 1 | 0.3 | 0.311 | 0.001 | 1 | 0.814 | 0.355 |
+| 3 | 0.3 | 0.003 | 0.001 | 1 | 0.991 | 0.161 |
+| **3** | **0.6** | **0.996** | 0.102 | 7 | 0.898 | −0.158 |
+| **10** | **0.6** | **0.994** | 0.117 | 7 | 0.892 | 0.182 |
+| 30 | 0.6 | 0.000 | 0.000 | 1 | 0.998 | 0.998 |
+
+It is the **schedule, not the weight**: w=3 reaches ID 0.996 at warmup 0.6 and 0.003 at 0.3, and
+no weight rescues it on the old schedule. With the schedule fixed, no weight extends the horizon
+past base's 7, and raising the weight moves closure@20 monotonically (−0.158 → 0.182 → 0.998)
+while the horizon does not follow (7 → 7 → 1) — a decoupling that would matter if the baseline
+were converged. **It is not**, so *whether the cycle advantage survives scale remains open*, and
+the run launched to settle it was killed after its `base` arm.
+
+**Closure has a blind spot and it fired here.** The collapsed arm reads closure **0.998** with
+in-distribution accuracy **0.001**: [`rule_structure/`](rule_structure/README.md) §6 confirms the
+mechanism — every embedding is the same point, and `on_manifold_cos` is trivially maximised by
+collapse. Every closure claim in §2/§6/§7 is measured where ID = 1.000 and stands, and §6 already
+restricted its correlation to ID-competent runs, but the rule should now be explicit: **closure
+is only interpretable conditional on in-distribution competence.**
+
+## 11. Does the rule get learned at scale? No — see [`rule_structure/`](rule_structure/README.md)
+
+A larger state set is also the capacity-economics test for
+[`variable_modulus/`](../variable_modulus/README.md) §3's finding that nothing learns modular
+squaring: if lookup were merely *cheaper* than the algorithm, an 11.6× bigger table should shift
+the balance. Measured in the CRT coordinate where squaring is exactly the doubling map, group
+structure **fell to the permutation null** (translation R² 0.040 → 0.007 against a 0.006 null) on
+the ID-perfect wide model. It also shows the cycle term's held-out-`x` gain (0.001 → 0.32) is
+real but **not** group-based, and kills a proposed `Enc(x²) ≈ M·Enc(x)` training term. Full
+writeup, positive controls and caveats in the child node.
+
+---
+
 ## Honest caveats
 
 - **Single modulus, single scale.** `N=893`, 828 units, d=256. Whether the cycle advantage
@@ -492,7 +578,10 @@ depth axis and the `x` axis are separate, and only the first one is finished her
    the cycle result and reproduces
    [`metering_sweep`](../../rhm/directed_sculpting/full_loop/metering_sweep/README.md)'s
    within-round overfitting (+0.117 tree error at 16× steps) on a new substrate.
-5. **Check the depth-periodicity margin before choosing `N`, and quote `tail + period`, not the
+5. **`--eval-max-depth` must be ≥ the deepest training depth.** The trajectory table is built to
+   the eval depth, so a smaller value indexes off the end mid-training (`IndexError: index 5 is
+   out of bounds`) rather than failing at startup.
+6. **Check the depth-periodicity margin before choosing `N`, and quote `tail + period`, not the
    tail.** `x^(2^T)` is eventually periodic in `T`, so a badly-chosen modulus lets a model pass
    "depth extrapolation" by discovering a cycle. An earlier version of this line reported the
    upstream Easy margins as "T=4 (N=323) and T=2 (N=899)" — those are the *tails*. The first
@@ -563,6 +652,21 @@ python3 one_layer_deeper/ballistic_depth/sweep_figure.py
 python3 one_layer_deeper/ballistic_depth/closure_horizon.py   # §6 + §7, no GPU
 python3 one_layer_deeper/ballistic_depth/coldstart_figure.py  # §8
 
+# --- scale N (running, 2026-08-03) ---
+# `--p/--q` and `--d-op-ff` all default to the old behaviour (19/47, operator width =
+# encoder width), so every command above reproduces unchanged.
+# N = 9853: 9628 units, 2407 reachable states, first depth-repeat 1149.
+# Two tags: the narrow one is the controlled continuation (only N changes); the wide one
+# hedges the capacity confound, since 2407 states is 11.6x the 207 the width was set for.
+for s in 0 1 2; do
+  modal run --detach ...::ballistic_depth --tag scale9853 --arms "base,consist" \
+    --p 59 --q 167 --steps 60000 --eval-max-depth 120 --eval-cap 4096 \
+    --consist-cycle 10.0 --consist-reentry 0.0 --seed $s --save-ckpt
+  modal run --detach ...::ballistic_depth --tag scale9853_ff8192 --arms "base,consist" \
+    --p 59 --q 167 --d-op-ff 8192 --steps 60000 --eval-max-depth 120 --eval-cap 4096 \
+    --consist-cycle 10.0 --consist-reentry 0.0 --seed $s --save-ckpt
+done
+
 # test-time re-projection (§9) — loads checkpoints, trains nothing
 for s in 0 1 2; do
   modal run --detach one_layer_deeper/ballistic_depth/reprojection.py::reprojection \
@@ -578,11 +682,13 @@ Modal volume `one-layer-deeper-data`, results at `/ballistic_depth/<tag>/results
 
 ## Next steps
 
-1. **Scale `N` — now forced, not just advisable.** §9 puts the grounded arm at 1.000 at T=60,
-   and `N=893` repeats in depth at T=67, so this substrate can no longer measure its own best
-   configuration. `N = 9853 = 59 × 167` (2407 reachable states, first depth-repeat 1149) is
-   already characterised in `squaring_mod.py`. Scaling also separates the two things mixed into
-   §9's `p = 0.871`, since the base pool would no longer be ~90% seen.
+1. **Scale `N` — now forced, not just advisable.** *Running as tag `scale9853` (2026-08-03).*
+   §9 puts the grounded arm at 1.000 at T=60, and `N=893` repeats in depth at T=67, so this
+   substrate can no longer measure its own best configuration. `N = 9853 = 59 × 167` (9628 units,
+   2407 reachable states, first depth-repeat 1149) buys ~19× the depth headroom; `base` vs
+   `+cycle` at §7's optimum w=10, eval to T=120. It also separates the two things mixed into §9's
+   `p = 0.871`: the base pool is still 90% of units, but those cover a 4× larger reachable set,
+   so held-out-`x` failure and re-entry noise stop moving together.
 2. **Held-out modulus.** Everything here is fixed-`N`, so the operator never had to be
    *conditioned on the rule*. Sampling `N` turns this into the arity-2 question — a rule-blind
    operator can only predict the `N`-averaged next state — and is the cut that connects to

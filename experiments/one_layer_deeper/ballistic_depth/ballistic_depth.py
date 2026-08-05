@@ -149,9 +149,12 @@ def _make_model(cfg, n_answer_digits, arm, max_len, device):
         def __init__(self):
             super().__init__()
             self.norm = nn.LayerNorm(d)
-            self.net = nn.Sequential(
-                nn.Linear(d, cfg["d_ff"]), nn.GELU(), nn.Linear(cfg["d_ff"], d)
-            )
+            # The *operator's* width, held separate from the encoder's (cf. `d_op_ff` in
+            # `variable_modulus.py`): the capacity that has to cover `reachable_states` is
+            # the tied block's, not the encoder's, so it is the knob the scale axis moves.
+            # Absent (every run before 2026-08-03) it falls back to the encoder's width.
+            d_op = cfg.get("d_op_ff") or cfg["d_ff"]
+            self.net = nn.Sequential(nn.Linear(d, d_op), nn.GELU(), nn.Linear(d_op, d))
 
         def forward(self, h):
             return h + self.net(self.norm(h))
@@ -265,8 +268,8 @@ def _make_model(cfg, n_answer_digits, arm, max_len, device):
 @app.function(
     volumes={DATA_DIR: volume},
     gpu="L4",
-    timeout=7200,
-    memory=8192,
+    timeout=21600,
+    memory=16384,
 )
 def ballistic_depth(
     tag: str = "smoke",
@@ -276,6 +279,13 @@ def ballistic_depth(
     eval_max_depth: int = 20,
     eval_cap: int = 2000,
     train_depths: str = "1,2,3,4,5,6",
+    # The modulus, exposed so the scale axis is a CLI knob. Defaults are CFG's N = 893,
+    # so every command in this cut's README reproduces unchanged; `--p 59 --q 167` is the
+    # next rung (N = 9853, 9628 units, 2407 reachable states, first depth-repeat 1149).
+    p: int = 19,
+    q: int = 47,
+    # 0 -> the encoder's `d_ff`, which is what every run before 2026-08-03 used.
+    d_op_ff: int = 0,
     lr: float = 3e-4,
     batch_size: int = 256,
     d_model: int = 256,
@@ -297,6 +307,9 @@ def ballistic_depth(
         "arms": arms,
         "steps": steps,
         "seed": seed,
+        "p": p,
+        "q": q,
+        "d_op_ff": d_op_ff or CFG["d_ff"],
         "eval_max_depth": eval_max_depth,
         "eval_cap": eval_cap,
         "train_depths": train_depths,
