@@ -1,56 +1,174 @@
-# HISTORY — experiments/mjc
+# History of `experiments/mjc`
 
-*A big-picture history of the MuJoCo physical-control substrate, 2026-07-16 → present. See [README.md](README.md) for current status and [FILES.md](FILES.md) for the file index. This document is auto-regenerable — overwrite freely.*
+A big-picture pass over this node's arc, read from its READMEs and git history, not day-to-day.
+Written fresh; see [README.md](README.md) and [FILES.md](FILES.md) for the standing synthesis this
+draws on.
 
 ## Why this substrate exists
 
-`mjc/` was founded on 2026-07-16 ([`../../ideas/physical_control_substrate.md`](../../ideas/physical_control_substrate.md)) to fill a specific rung the program's ladder was missing: continuous, contact-rich dynamics with a *real* command channel, sitting between RHM's discrete known-DGP world and language's opaque one. The founding memo drew one line that every later cut inherited as a discipline: this is a **controllable-dynamics DGP to sweep**, not a robotics benchmark to RL-to-SOTA. Policies are obtained the cheap way; every result is a knob-sweep dissociation against a vanilla baseline, never a single success number ([README.md](README.md) "Discipline"). That single methodological choice — refuse the RL-maxxing path even when it would be easier — is the load-bearing decision the entire node's trustworthiness rests on, and it never gets revisited.
+Founded from [`ideas/physical_control_substrate.md`](../../ideas/physical_control_substrate.md)
+(2026-07-16) to fill a gap in the existing ladder: RHM/MNIST-reaching gives known latents but
+discrete, constructed dynamics; language gives realism but no controllable DGP. MuJoCo sits between
+them — continuous, contact-rich, a *real* command channel — but the memo drew one hard line at
+founding that the whole node has held to since: **a controllable-dynamics DGP whose knobs get swept
+against a vanilla baseline, never an RL-to-SOTA benchmark.** No PPO-maxxing. Every cut below is a
+slope or a dissociation, not a leaderboard number.
 
-## Act 1 — Three foundation cuts, and the taste they set (07-16 → 07-24)
+## Phase 1 — does physical realism survive the toy results? (contact_residual, arity_torque, dynamics_shift)
 
-Cuts #1–#3 ([`contact_residual/`](contact_residual/README.md), [`arity_torque/`](arity_torque/README.md), [`dynamics_shift/`](dynamics_shift/README.md)) ported three a2a/RHM findings onto physics in one week. Each refused to stop at a clean headline number: Cut #1 didn't just show the residual is bigger at contact (8.1×) but drove to an onset-aligned event-triggered average to prove it marks a *transition*, not a *state* — and explicitly retracted an initial rank-based framing that didn't hold. Cut #2 didn't just show arity-2 beats arity-1 but used i.i.d.-command collection to kill a generator-recovery confound and an interventional probe to make the observational→interventional case physical. Cut #3 — reframed mid-flight from a "degradation slope" idea into the sharper factorization claim that a dynamics shift corrupts *only* the world-model factor — found a near-null on its first pass (per-step replanning let feedback substitute for the model) before committing the controller open-loop revealed the real effect, gated by a `replan_every` composition horizon.
+The first three cuts were a stress test: do the RHM/a2a claims still hold on real contact and torque,
+or do they wash out once dynamics stop being hand-constructed? They held, cleanly.
+[`contact_residual/`](contact_residual/README.md) found the forward-model residual concentrates
+**8.1×** at contact and is an *event* detector, not a *state* detector. [`arity_torque/`](arity_torque/README.md)
+reproduced the arity-1 floor under real torque, with the received-wisdom confound (i.i.d. commands)
+explicitly killed. Then [`dynamics_shift/`](dynamics_shift/README.md) — Cut #3 — did more than confirm:
+by intervening on the *transition operator* rather than sensing or reward, it found reward-free
+re-adaptation recovers to the oracle ceiling from ~50 transitions while a matched model-free policy
+needs ~240× more reward-labeled data. This is the node's real foundation stone — nearly every later
+node builds its substrate on Cut #3's shift, and its `replan_every` ablation (the benefit peaks at the
+FM's composition horizon, then decays) is the first hint of the **ballistic vs. reactive** distinction
+that would not get named for another dozen nodes.
 
-That `replan_every` knob turned out to be the single most consequential artifact of this act: read biologically as "how ballistic is this movement," it is named explicitly as the seed of the entire ballistic arc four months later ([README.md](README.md) §Cut #3). The taste these three cuts set — pair every effect with a mechanism-isolating control, retire a plausible intermediate hypothesis the moment data contradicts it, localize claims to the precise dimension they hold on — is the constant against which every later act should be read.
+Early on, one instrument was tried and abandoned: contact_residual's rank-based reading of the
+residual did not hold, and that thread stayed live — see the retraction below.
 
-## Act 2 — The value↔FM interface: from stationary control to a reward loop that rediscovers value (Cuts #4→#4e)
+## Phase 2 — the value↔FM interface arc, and a long detour through blind graders
 
-[`ideas/two_timescale_value_loop.md`](../../ideas/two_timescale_value_loop.md) supplied the frame this whole act tests: a value function is a forward model read out through reward, it should re-allocate FM capacity (efferent) and direct collection (afferent), and it only earns its keep once the objective is non-stationary. [`value_shaping/`](value_shaping/README.md) built the **stationary control** first — after a naive linear distractor gave nothing to see, a deliberately capacity-hungry nonlinear puck field made value-driven re-allocation robust and legible, with the "capacity efficiency" bonus honestly flagged as a fragile, data-scarce effect rather than folded into the headline.
+The center of mass of this node's work is the question the idea doc barely poses: *how does a reward
+signal shape what a forward model represents, and does it help?* [`value_shaping/`](value_shaping/README.md)
+set the **stationary** control first — a value signal re-allocates a capacity-limited FM away from a
+reducible-but-irrelevant force field, with an irreducible contact impulse as the foil. Robust core,
+fragile "teeth" (capacity efficiency only shows under data scarcity).
 
-[`directed_readapt/`](directed_readapt/README.md) then asked whether a disagreement-directed drive speeds re-adaptation, and returned two *instructive* negatives rather than one confirming positive: a global shift gives no scarcity (null), and a localized shift gives scarcity but disagreement is blind to a *confidently wrong* prior — it agrees on the stale, incorrect prediction inside the unvisited patch. This is the first appearance of a pattern that recurs across the whole node: an uncertainty-based signal fails not from noise but from false confidence, and the fix is never "make the signal better," it's "give it a different job." The two negatives explicitly triggered a stated pivot — from verifying atoms in isolation to phenomenon-first work — that [`meta_adapt/`](meta_adapt/README.md) then executed as one continuous arc: #4 found the meta-learning gap collapses on an easy 1-D family (the RHM anchor) but opens monotonically under actuator-rotation conflict; #4b showed a context latent can decode the task perfectly while adaptation-benefit is orthogonal to that decode (system-ID ⊥ usefulness); #4c found value-of-information collection is a robust negative when the task is low-dimensional enough that "biggest command" is already the informative one; #4d showed value-shaping and meta-conditioning are separable capacity levers whose control benefit appears *only* under capacity competition; #4e closed the loop for real — a reward-only outer loop rediscovers V's support from scratch, with two reusable gotchas (normalize the weight budget or the loop games loss-scale, not allocation; read the converged distribution, not the cherry-picked best).
+[`directed_readapt/`](directed_readapt/README.md) then delivered two negatives that set the tone for
+everything downstream: a global shift gives no scarcity to exploit (null), and under a local shift the
+disagreement-based exploration drive is **blind to a confidently-wrong region** — it doesn't visit
+where it's needed. This is the arc's first "blind grader" — a signal that looks like it should work but
+is structurally unable to see the thing that matters — and it triggered an explicit pivot away from
+single dissociations toward phenomenon-first work.
 
-## Act 3 — Making the loop actually online: obstruction, reframed twice (curiosity → online loop → drift loop)
+[`meta_adapt/`](meta_adapt/README.md) (Cut #4→#4e) is the arc's spine. The 1-D damping floor collapses
+(the RHM anchor — meta buys nothing when there's nothing to disambiguate) while an actuator-rotation
+*conflict* opens the meta-vs-pooled gap monotonically — the same "which confound is doing the work"
+discipline the arity cut used. #4b showed a context latent decodes the task parameter perfectly, yet
+system-ID is orthogonal to adaptation-benefit — knowing the parameter and using it are different
+achievements. #4c is another scarcity-gated negative (VoI-directed identification can't beat a trivial
+heuristic). #4d isolates value-shaping and meta-conditioning as two *separable* capacity levers, only
+paying off under capacity competition. #4e closes the loop end to end and surfaces a wireheading
+gotcha: an unnormalized weight budget lets the outer loop game loss-scale instead of allocation.
 
-[`curiosity_control/`](curiosity_control/README.md) built the afferent complement — an intrinsic reducible-surprise drive that tracks a moving frontier — and found its own noisy-TV pathology (disagreement chases aleatoric noise, inverting an earlier active-vision result), fixed not by filtering but by **grounding**: adding the exploit/value term as a second additive drive with an interior optimum. [`online_value_loop/`](online_value_loop/README.md) then tried to make both taps self-tuning in one continuously-running system and was obstructed on both — CEM-MPC control turned out robust to the explore drive's tracking gain, and the efferent re-allocation benefit was real but only as a pre-convergence transient invisible to any online probe short enough not to degenerate into a full retrain.
+[`curiosity_control/`](curiosity_control/README.md) supplied the afferent half — where to collect, as
+a reducible frontier *drifts*. It tracks the moving frontier and helps specifically because the target
+is non-stationary (ties on a static one), but on its own it inverts the a2a active-vision result:
+disagreement chases aleatoric noise (a noisy-TV pathology) on low-dimensional control. The fix,
+grounding with the exploit signal as an additive second drive, is the arc's first constructive resolution
+rather than a negative — afferent and efferent wired as one system.
 
-This is the act's hinge: obstruction was read as **structural evidence**, not failure — value is a slow, committed, offline-estimable quantity, so the two-timescale split is *forced*, and its payoff is adaptation *speed*, which matters specifically because perpetual drift never lets anything converge. [`drift_value_loop/`](drift_value_loop/README.md) tested the resulting prediction across a sequence of drifts and delivered the act's sharpest correction: compounding re-adaptation is real, but it comes from the *memory* architecture (an amortized context-latent FM), not from value-carving — value-carving stayed capacity-gated and control-robust exactly as before. The reason surfaced on inspection: the meta-loop was being graded by control, a near-blind grader indifferent to model quality under replanning. Swapping the teacher to the value-relevant FM's own prediction error — making the cerebellum→VTA framing literal — immediately produced a clean interior optimum the control-graded loop could never see. **The missing piece across this whole act was the teacher, not the value structure.**
+[`online_value_loop/`](online_value_loop/README.md) tried to build the fully-online keystone the idea
+doc names, and got obstructed on *both* levers at once: CEM-MPC control absorbs the curiosity drive's
+tracking effect, and the value-shaping benefit turns out to be a slow, pre-convergence transient, not a
+converged-competence gain. Read as confirmation rather than failure — value is a **slow, committed**
+quantity, which is why the two-timescale split is forced rather than a design choice.
+[`drift_value_loop/`](drift_value_loop/README.md) took that finding three cuts deeper under perpetual
+drift and located the actual missing piece: not the value structure, but the **teacher** — grading the
+meta-loop by value-relevant FM prediction-error (not control) gives the explore/exploit balance a clean
+interior optimum. Control, again, was the blind grader.
 
-## Act 4 — The hidden variable was control mode ([`ballistic/`](ballistic/README.md))
+[`ballistic/`](ballistic/README.md) is where the recurring "FM → behavior doesn't transmit" pattern
+finally gets a *mechanism*: replanning re-grounds past a stale model every step, so reactive control is
+structurally blind to FM quality. A ballistic (feedforward, committed) controller makes the FM ~3×
+more behaviorally load-bearing, and reward-free re-adaptation restores ballistic competence ~4.3× more
+than reactive after a drift. This reframes several earlier "obstructed" results as artifacts of control
+mode, not of the value machinery — and its lead reading (the cerebellar FM as both the
+reward-free-maintainable *and* the feedforward-critical asset) is the node's clearest biological payoff.
+Its child, [`ballistic/directed/`](ballistic/directed/README.md), tried to land a directed-collection
+ladder on top of this — but its S2 cut had to be **retracted**: the per-region monitoring survey was
+free and global, a 22× measurement subsidy that made the "where to collect" question unmeasurable. That
+retraction, not a positive result, is what set up the next phase.
 
-Ballistic control resolves the puzzle Act 3 left standing: why does a better FM never seem to produce better control under CEM-MPC? Because replanning re-grounds every step and *absorbs* FM error — a blind grader, not a broken value signal. A feedforward, open-loop (ballistic) controller — the biologically forced regime, since you cannot replan faster than sensorimotor delay — makes the FM ~3–3.3× more behaviorally load-bearing, and after a drift, reward-free re-adaptation restores ballistic competence ~4.3× more than reactive. The synthesis this act crystallizes and every later act quotes: the cerebellar FM is simultaneously the one motor asset maintainable *without* reward and the asset feedforward control specifically depends on — the same object, not a coincidence.
+## Phase 3 — making realism itself a variable (arm_substrate, on_policy, metered_repair)
 
-Its child, [`ballistic/directed/`](ballistic/directed/README.md), is this node's clearest lesson in auditing your own instrument: an S1 result (relevance-weighted collection recovers the oracle allocation) looked confirmed, but the S2 online-loop follow-up first reported a real-looking null, with a plausible story ("one-time repair cost, amortized"). A subsequent audit found the null was an artifact of a 22× measurement subsidy — free, global, teleported surveying doing the relevance term's job for it — and downgraded the claim from "falsified" to "untested," a distinction the node treats as consequential rather than semantic. [`arm_substrate/`](arm_substrate/README.md) then generalized orthogonally, retiring the "single-family" caveat and discovering along the way that "nonlinear" and "capacity-hungry" are separate axes — a 2-link arm is nonlinear but doesn't bind capacity; only chain length ≥5, or a literal passive-mass tool, does.
+Two axes had been fixed all along: the plant (one pusher) and how experience gets acquired (free
+teleportation). Both got turned into movable knobs. [`arm_substrate/`](arm_substrate/README.md) built a
+second task family — an N-link arm — specifically to retire the "single family" caveat and to get
+capacity competition intrinsic to the plant rather than manufactured; it verified every precondition
+the arc needed (capacity binds only at n≥5, ballistic transmits FM quality 6.0×, composition horizon
+14–23 steps) before any cut was ported.
 
-## Act 5 — Confronting the substrate's own unrealism ([`on_policy/`](on_policy/README.md))
+[`on_policy/`](on_policy/README.md), seeded by [`COLLECTION_REALISM.md`](on_policy/COLLECTION_REALISM.md),
+is the more consequential move: it names every prior result's teleportation as a form of unrealism and
+sorts every claim into safe/inflated/unaskable tiers. Its E0–E3 arc is the node's best example of an
+instrument correcting itself in public. **E0** found that most of on-policy's apparent advantage was
+not embodiment at all but a *mistuned teleport knob* — an oracle teleporter told where to look closed
+almost the whole gap; what's genuinely structural is command-state entanglement from continuity itself,
+which quietly retires Cut #2's i.i.d.-command premise as a teleport-only luxury. **E1** showed a
+*global* drift is repaired equally well under any collection mode — the memo's core hypothesis
+("on-policy will stretch the recovery") **refuted**, and the earlier "gradual" recovery diagnosed as
+the same mistuned knob showing up in a live cut. **E2** made the drift *local* and finally found the
+real cost: on-policy needs 2.5× more transitions, broad teleport never repairs the region at all, and
+the mechanism is bootstrap data-quality (bad-model data is wrong-distributed), not the "coverage grows"
+story the memo guessed. **E3** ([`directed_on_policy/`](on_policy/directed_on_policy/README.md)) is the
+payoff: the retracted `ballistic/directed` S2 cut, re-run with the survey itself metered (1.84× not
+22×) — both halves of the ladder reproduce for real, and the on-policy substrate dissolves one of the
+two decoys (you only go where you reach, so "visited-but-irrelevant" territory doesn't exist).
 
-The 22× subsidy that sank S2 turned out to be a symptom of something the whole node had been running on since Cut #1: teleported collection (`set_state` to anywhere, free, omniscient). [`on_policy/COLLECTION_REALISM.md`](on_policy/COLLECTION_REALISM.md) named this directly and sorted every prior claim into three tiers — dissociations are safe, absolute sample counts are inflated upper bounds, and anything about *where* to collect is structurally unaskable — then proposed the fix as a flag, not a new environment, on the standing "keep every prior result reproducible" principle.
+[`on_policy/metered_repair/`](on_policy/metered_repair/README.md) (E4/E5, the most recent work, still
+warm) is the clearest instance of cross-pollination with [`rhm/`](../rhm/) in this node's history. It
+ports RHM's diagnosis that a fixed-budget counterfactual learning-progress tap is *inverted* (measures
+data-starvation, not reducibility) — and the diagnosis **ports exactly** (separation flips sign,
+matching RHM's finding). But the repair that fixed it on RHM **does not cash out** on mjc (no
+significant gain over the unrepaired tap). What the two substrates' complementary blind spots — RHM has
+no visited-but-irreducible cell, mjc has no visited-but-irrelevant one — jointly enable is a genuinely
+new result neither could show alone: once a visited-but-irreducible region is placed, relevance *alone*
+becomes the ladder's *worst* arm, and adding reducibility is what rescues it. E5's necessity question
+returns a clean architectural negative: with spatially-disjoint drift, repairing one region does not
+repair an identically-drifting other — an MLP over a fixed-DOF plant has no route to shared-parameter
+inference. This sharpens, rather than repeats, [`expansion/`](expansion/README.md)'s conclusion below.
 
-What followed is the node's most recent and most self-correcting thread. **E0** found most of on-policy's apparent advantage was a *mistuned teleport knob*, not embodiment — an oracle teleporter recovers almost the whole gap; what's genuinely structural is command-state entanglement. **E1** then directly tested and *refuted* the memo's own headline hypothesis (that embodiment would stretch Cut 4c-arm's step-like recovery into something gradual) — under global drift, on-policy reproduces the step, and the "gradualness" of default teleport was itself E0's bad knob. **E2** finally located the real cost by sharpening the manipulation from global to local drift: on-policy needs 2.5× more transitions, and broad teleport never repairs the region at all — not because coverage grows slower, but because data gathered while the model is wrong is itself wrong-distributed (bootstrap data-quality). Only once drift was *local* did "where should I practice?" become a real, askable question. [`on_policy/directed_on_policy/`](on_policy/directed_on_policy/README.md) (E3) is the payoff: the retracted S2 directed-collection result, re-run with looking itself metered (a 1.84× ratio, not 22×), reproduces cleanly — relevance beats learning-progress-only, reducibility-awareness beats error-only — and a genuinely new-to-this-substrate fact appears: on-policy visitation concentrates so tightly on the target that "visited-but-irrelevant" territory, the decoy that separated conditions under teleport, simply cannot be placed.
+## Phase 4 — Cut #5, the "ambitious extension," run and closed
 
-[`on_policy/metered_repair/`](on_policy/metered_repair/README.md) (E4/E5) is the frontier as of this writing: it ports a broken reducibility-tap diagnosis from the RHM substrate and confirms the same estimator is inverted here too, but finds the repair — though it measurably cleans up *process* (less leakage into irreducible regions) — does not cash out into a better *outcome* on this substrate (1/3 seeds, not RHM's clean 3/3). A genuinely new positive lands instead: placing a visited-but-irreducible cell (something neither substrate alone could construct) makes relevance-alone the *worst* arm and the full conjunction win decisively. E5 returns a clean negative in the other direction — even with identical, verified curl gains across two spatially separate regions, repairing one does not repair the other, because a fixed-DOF plant with spatially-gated fields gives the model no route to shared-parameter inference. §3 of that README documents, more explicitly than anywhere else in the node, the self-correcting instrument pattern this whole history exhibits: four separate gates catching bugs that would otherwise have silently read as null results.
+The founding idea doc's most speculative bet was that drifting dynamics is a free novelty generator —
+that non-stationarity alone should push a forward model to expand its representable directions.
+[`expansion/`](expansion/README.md) finally ran this, after three earlier instrument failures forced a
+calibrate→measure→calibrate design rather than a single rank-shaped readout. The result: drift does
+**not** open the frontier (±0.08 directions against a +0.72±0.42 calibration from a genuine support
+increase — ~10× smaller). The idea doc's own motivating paragraph has since been edited in place to
+mark this **retired**: drift moves the target function, expansion grows the space of representable
+functions, and a fixed-DOF motor plant never has the latter to offer. What survives is the *realism*
+argument for drift (Type-2 non-stationarity, load-bearing for the whole `drift_value_loop`/`on_policy`
+line) — only its special status vis-à-vis representational growth is gone.
 
-## Act 6 — Testing and retiring the founding memo's flagship claim ([`expansion/`](expansion/README.md))
+## Recurring shapes, visible only at this distance
 
-Cut #5 sits apart from the acquisition-realism thread but shares its instinct. The founding 07-16 memo had proposed, almost as an aside, that drifting dynamics might be a "novelty generator" — that non-stationarity should drive a forward model's representational frontier to expand ([`../../ideas/physical_control_substrate.md`](../../ideas/physical_control_substrate.md)). Unrun for months, it was finally measured directly: perpetual drift under fixed degrees of freedom moves the frontier ±0.08 directions against a **+0.72 ± 0.42** calibration from a genuine support increase (deliberately unlocking DOF) — roughly 10× smaller, de-confounded across drift geometry. Built as calibrate → measure → calibrate specifically because rank-shaped instruments had already failed three separate times in this repo (Cut #1's own contact-residual rank claim among them) — see [`../../beliefs/dimensionality_expansion.md`](../../beliefs/dimensionality_expansion.md) for the cross-domain accounting of why. The founding memo's flagship framing is explicitly retired: **drift moves the target function; expansion grows the space of representable functions**, and a fixed-DOF plant only has the first available to it. What survives, deliberately not thrown out with it: drift remains essential to the whole on-policy/drift-loop lineage for *realism*, and the belief's actual core claim — does novelty grow representable directions — has still never been tested anywhere, because it needs a domain with hierarchy to expand into, which points back out of `mjc/` toward [`../rhm/residual_decomposition/`](../rhm/residual_decomposition/README.md).
+- **Blind graders, everywhere.** Disagreement blind to a confident-wrong shift
+  ([`directed_readapt/`](directed_readapt/README.md)), control blind to converged FM quality
+  ([`online_value_loop/`](online_value_loop/README.md), [`drift_value_loop/`](drift_value_loop/README.md)),
+  replanning blind to a stale model by construction ([`ballistic/`](ballistic/README.md)), and ballistic
+  control itself blind in [`metered_repair/`](on_policy/metered_repair/README.md) E4 (near-saturated,
+  forcing every conclusion onto the FM-error grader alone). The node's single most repeated move is
+  swapping the grader, not the mechanism, to unblind a result.
+- **Mistuned defaults masquerading as findings, twice.** [`on_policy/`](on_policy/README.md) E0 and E1
+  both found that what looked like a structural embodiment effect was a teleport sampling knob nobody
+  had tuned to the task. The fix (`teleport_matched`) is now a standing recommendation for any future
+  teleport cut.
+- **Rank/triple readouts don't survive contact with this substrate.** contact_residual's early rank
+  angle failed; the `(R_act, R_comp, R_res)` triple written into the original Cut #5 spec was formally
+  retracted (2026-07-26, [see commit `40a6826`](../../experiments/mjc)) once direct measurement on
+  a2a/RHM showed `R_comp` isn't independent of `R_act`. Both times the fix was to fall back to a
+  behavioral or gap-width readout rather than patch the rank instrument.
+- **Duplication over edits, consistently.** New cuts are copy-and-modify descendants of their parent
+  script (`metered_repair`'s scripts vs. `directed_on_policy`'s) rather than in-place edits — the
+  node's applied version of "keep prior results reproducible."
+- **Cross-substrate pollination is now routine**, not incidental: `expansion/` imports the RHM frontier
+  instrument directly; `metered_repair/` ports both a diagnosis and a necessity design from
+  `rhm/directed_sculpting/full_loop/`. The two DGPs are increasingly read as one program with two
+  instruments, each catching what the other's degenerate geometry cannot.
 
-## Recurring epistemic patterns, read across the whole arc
+## Where the live thread stands
 
-A few things this node keeps doing, independent of which cut is running, are worth naming because they are closer to *how this program thinks* than any single result:
-
-- **A clean number is never the deliverable; a dissociation with an isolated mechanism is.** Every act above eventually adds a control (i.i.d. commands, cosine similarity, `replan_every` ablations, matched nulls, calibration pieces) precisely when a single headline ratio would otherwise be ambiguous about *why*.
-- **Negatives are instructive, not discarded.** Directed_readapt's two nulls, #4c's VoI negative, online_value_loop's double obstruction, E1's refutation of its own predicting memo, E5's no-shared-parameter finding — each one sharpened the next question rather than being quietly dropped.
-- **The recurring failure mode is a blind grader, not a broken effect.** Control-under-replanning absorbs FM error; a control-graded meta-loop can't see what value does; a 22× measurement subsidy erases the thing being measured; a rank-shaped residual instrument reads a saturated noise floor as signal. Three different acts (ballistic, drift_value_loop, expansion) independently rediscover that the fix is to change *what grades the claim*, not to re-run the same measurement harder.
-- **Retraction is treated as consequential, not a setback.** "Falsified" and "untested" are kept distinct (the S2 audit), and a founding motivating hypothesis (drift-as-novelty) is retired in public, with what survives and what doesn't stated explicitly rather than left implicit.
-
-## Where things stand
-
-The live thread is on-policy, local-drift directed collection ([README.md](README.md) §Next steps #0) — metering the monitor itself, and asking whether ensemble disagreement, which failed on this exact question under teleport, recovers a job now that on-policy collection creates genuinely unvisited territory. Cut #5 is closed and its instrument findings (degenerate readout at both saturation and divergence; β unusable below ~10 state dims) are flagged for reuse elsewhere rather than further pursued here. Two threads are explicitly deferred outward: the belief's real test (novelty → expansion) belongs in a hierarchical domain, not a motor plant, and the interface-arc findings (value as a slow/committed quantity; the teacher, not the structure, was missing) are named as belief-shaped but not yet crystallized into the belief tree.
+The open edge, per [README.md](README.md) "Next steps" and `metered_repair/`'s own next steps: explain
+why E4's allocation outcome isn't predicted by any process column (a scheduled-burst control is
+proposed to test whether the ladder has been measuring timing rather than reducibility); give the FM a
+route to a genuinely shared parameter before re-asking E5's necessity question; and back-translate the
+interface arc's headline findings (value is slow/committed; the teacher, not the structure, was
+missing; control mode gates transmission) into the belief tree, which has not yet happened.
