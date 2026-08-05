@@ -86,7 +86,24 @@ class GPT(nn.Module):
 
     def forward(self, idx, targets=None, return_intermediates=False,
                 cerebellar_fn=None, cerebellar_input_block=0,
-                cerebellar_inject_block=1):
+                cerebellar_inject_block=1,
+                cerebellar_mode="add", cerebellar_readd_block=None):
+        """cerebellar_mode:
+          "add"    -- summation / side-channel: x = x + inj at the inject block.
+                      The historical behaviour; every prior result used this path
+                      and it is bit-identical to before when the new args default.
+          "cancel" -- efference copy / Rao-Ballard: x = x - inj at the inject block,
+                      the RESIDUAL propagates, and inj is restored at
+                      `cerebellar_readd_block` (defaults to the inject block, i.e. a
+                      no-op; callers should set it to the FM's target block).
+                      See ideas/efference_copy_cancellation.md.
+
+        Under "cancel", `intermediates[f"post_block{k}"]` at the re-add block is the
+        DEVIATION stream (recorded pre-re-add, consistent with every other block);
+        the restored read-out is exposed separately as `post_block{k}_eff`. The FM's
+        training target must be the `_eff` tensor, or the loop is degenerate (the FM
+        would chase the deviation its own forecast creates, driving inj -> 0).
+        """
         B, T = idx.size()
         assert T <= self.block_size
         tok_emb = self.transformer.wte(idx)
@@ -97,7 +114,15 @@ class GPT(nn.Module):
         if return_intermediates:
             intermediates["post_embed"] = x
 
+        readd_block = (cerebellar_inject_block if cerebellar_readd_block is None
+                       else cerebellar_readd_block)
+        if cerebellar_mode == "cancel" and cerebellar_fn is not None:
+            # Otherwise the forecast is subtracted and silently never restored.
+            assert cerebellar_inject_block <= readd_block < len(self.transformer.h), (
+                f"cancel needs inject_block ({cerebellar_inject_block}) <= readd_block "
+                f"({readd_block}) < n_layer ({len(self.transformer.h)})")
         cerebellar_injection = None
+        held_injection = None
         for i, block in enumerate(self.transformer.h):
             x = block(x)
             if return_intermediates:
@@ -105,8 +130,17 @@ class GPT(nn.Module):
             if cerebellar_fn is not None and i == cerebellar_input_block:
                 cerebellar_injection = cerebellar_fn(x)
             if cerebellar_injection is not None and i == cerebellar_inject_block:
-                x = x + cerebellar_injection
+                if cerebellar_mode == "cancel":
+                    x = x - cerebellar_injection
+                    held_injection = cerebellar_injection
+                else:
+                    x = x + cerebellar_injection
                 cerebellar_injection = None
+            if held_injection is not None and i == readd_block:
+                x = x + held_injection
+                held_injection = None
+                if return_intermediates:
+                    intermediates[f"post_block{i}_eff"] = x
 
         x = self.transformer.ln_f(x)
         logits = self.lm_head(x)

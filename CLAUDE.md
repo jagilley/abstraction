@@ -37,6 +37,7 @@ Each project subdirectory has its own CLAUDE.md with setup instructions and conv
 - We should edit documentation whenever appropriate to persist learnings.
 - Running quick tests to ensure code works before kicking off longer training jobs is usually a good idea.
 - I hold my intuitive priors strongly, but hold priors about the metrics used to measure them weakly.
+- Don't hyperfixate on negative results. If we run something, we'll document it because it's a data point we generated that we should persist. Usually, a negative result just means that we had a slightly misdirected intuition; it's bad practice to view that as epistemically significant.
 
 ## Conventions (important to follow)
 - We run most of our experiments on Modal. Before running anything there, please invoke the Claude Skill `/run-experiment-on-modal` for explicit guidance.
@@ -58,10 +59,6 @@ Do NOT `--amend --reset-author` or `rebase --exec` in response. No amount of
 rewriting can clear it, and it needlessly rewrites branch history.
 If the committer email is something *other* than `noreply@anthropic.com`,
 that part of the warning is real — fix the email.
-
-## Shared directories
-
-Reading, ideas, beliefs, and conversations are shared across projects. Experiments can live in project directories (`fer/experiments/`, `glp/experiments/`), but may be consolidated later.
 
 ## Conversation transcripts
 - Claude Code transcripts are symlinked into `conversations/claude-code-transcripts/`.
