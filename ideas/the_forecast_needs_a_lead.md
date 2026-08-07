@@ -1,7 +1,37 @@
 # The forecast needs a lead: why depth-wise self-prediction is computational by construction, and why the null needs a local rule
 
-**Status**: Conceptual, from a 2026-08-04/05 discussion. Arguments, with one supporting dissociation.
-Nothing here has been built.
+> ## ⚠️ OUTDATED (2026-08-07) — superseded by [revision_not_surprisal.md](revision_not_surprisal.md)
+>
+> Kept for the record, not deleted: §4 and Gate 0 are still the good parts, and the successor doc is
+> only legible against this one. But the **stated mechanism does not survive scrutiny**. Do not build
+> from this file.
+>
+> **Retired here:**
+> - **§1's axis.** Depth-vs-time is not the operative variable; the *conditioning gap* and its content
+>   type is. `post_block0[t] → post_block6[t+1]` is depth-wise *and* has a lead.
+> - **§1's vocabulary.** *Epistemic* / *computational* are used inverted relative to standard usage
+>   (epistemic uncertainty **is** the reducible, capacity-limited kind), which broke the retro-explanation
+>   of `OOD_ROBUSTNESS` Exp. A — that experiment tested competence calibration, which §1's own taxonomy
+>   says a capacity-shortfall residual should carry. The correct reading of the depth residual is
+>   **legibility** (a property of the `(M, FM)` pair), which four existing results already support.
+> - **§2's causal claim.** The `mjc/ballistic` transposition credits *commitment* with what the
+>   **exogenous codomain** actually supplies. The physics FM has both; the reading axis inherits only
+>   the gap. Timing governs causal *use*; conditioning governs *content*.
+> - **§5 outright.** *"Global backprop injects gradient regardless of local activity"* is **false**
+>   (`∂L/∂W = δ ⊗ a`). The skip connection, not backprop's globality, is what blocks a null — which is
+>   why `CANCELLATION_README` found directional, not magnitude, cancellation. And *"NTP has no null"* is
+>   wrong; what NTP lacks is an **aleatoric** null. The replacement is two-factor, two-timescale
+>   precision weighting, not local plasticity.
+>
+> **Retained and sharpened in the successor:** §4's marginal-vs-conditional object (now the exact
+> compression/revision decomposition, with the martingale collapse in belief space), Gate 0's
+> anti-localisation, and the one-liner *"felt surprise is how much a word changes your model, not how
+> improbable it was"* — which is now the title claim and is measurable against an exact oracle.
+>
+> Successor spec: `rhm/conditional_revision/SPEC.md`[^private].
+
+**Status**: **OUTDATED** — superseded 2026-08-07, see banner above. Originally: conceptual, from a
+2026-08-04/05 discussion; arguments with one supporting dissociation. Nothing here was built.
 **Date**: 2026-08-05
 **Prompt**: *"When humans read a book … each word comes in, and we register things like its innate
 surprise to us, what ideas it provokes … Is consuming your own 'experience' of the text the same as
