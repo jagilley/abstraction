@@ -816,3 +816,167 @@ def slip_gate2(
     volume.commit()
     print(f"\nSaved -> {out_dir}/{name}   ({time.time() - started:.0f}s)", flush=True)
     return results
+
+
+# ===========================================================================
+# Closeout -- how big is the prize, as a function of the FM's data budget?
+# ===========================================================================
+#
+# Step 2 came back null, but the more useful number was that the PRIZE was
+# ~0.03: d1_clean - d2_unweighted read +0.0347 rank-corr, +0.0449 beam w64, and
+# value_top1_agree EXACTLY +0.0000. No estimator can beat a ceiling that small.
+#
+# Why it was small is predictable from the design. E[dz|z,k] is affine in the
+# intended outcome, so Design 2's population optimum RANKS identically to Design
+# 1's -- the whole cost of the conditioning gap is estimation variance. Then
+# every arm got 12k steps x batch 256 = 3.07M samples, which averages that
+# variance away. The repo's directed-sculpting arc is METERED (budgets of
+# 100-400 transitions, monitor:collect 1.78-1.84x) precisely because allocation
+# only pays when data is the scarce resource; Step 2 was an unmetered version of
+# a metered question.
+#
+# So sweep the budget and watch the ceiling, using only the three arms that
+# bound it. Two-sided and pre-registered:
+#   prize GROWS as data shrinks -> the branch is alive in the scarce regime, and
+#     that is where a measured (repeat-execution) Pi would be worth building.
+#   prize stays ~0.03 at every budget -> suppressing the aleatoric component
+#     buys nothing here at any budget. Clean negative; stop.
+#
+# Run:
+#   modal run --detach -m rhm.conditional_revision.sculpt_slip.slip_gate::slip_budget \
+#       --slip 0.25 --tag budget
+
+
+@app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=28800, memory=32768)
+def slip_budget(
+    v: int = 8, s: int = 2, depth: int = 4, m: int = 2, rule_seed: int = 0, train_seed: int = 1,
+    n_train_episodes: int = 100_000, state_dim: int = 96,
+    controller_steps: int = 12_000, generator_steps: int = 12_000, value_steps: int = 12_000,
+    value_episodes: int = 40_000, batch_size: int = 256, n_corrupt: int = 3,
+    edit_budget: int = 6, region_size: int = 1, slip: float = 0.25,
+    fm_step_grid: str = "12000,3000,750,200", n_eval_episodes: int = 2_048,
+    beam_widths: str = "16,64", explore_eps: float = 0.3,
+    quick: bool = False, tag: str = "", seed: int = 42,
+):
+    """Closeout: the ceiling (d1_clean) minus the floor (d2_unweighted), and what
+    perfect gating (d2_oracle_gate) recovers of it, as the FM's data shrinks."""
+    import time
+    import torch
+    from rhm.rhm_sculpt_latent import _fm_check
+    from rhm.rhm_sculpt_latent_stoch import _latent_beam_stoch
+
+    sequence_length = s ** depth
+    n_blocks = sequence_length // s
+    widths = [int(x) for x in beam_widths.split(",")]
+    grid = [int(x) for x in fm_step_grid.split(",")]
+    if quick:
+        controller_steps = generator_steps = value_steps = 800
+        n_train_episodes, value_episodes, n_eval_episodes = 20_000, 6_000, 512
+        grid = [200, 60]
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch.manual_seed(train_seed); np.random.seed(train_seed)
+    torch.set_float32_matmul_precision("high")
+    print(f"SCULPT-SLIP closeout: q={slip} fm_step_grid={grid}", flush=True)
+    started = time.time()
+
+    rules = generate_rules_distinct(v, s, depth, m, seed=rule_seed)
+    inverse_maps = build_inverse_maps(rules)
+    bottom_map = torch.from_numpy(inverse_maps[-1]).to(device)
+    canon = torch.from_numpy(np.ascontiguousarray(rules[depth - 1][:, 0, :])).to(device)
+    region_index, n_regions = _region_index(n_blocks, region_size, device)
+    train_roots_np, train_leaves_np = _sample_pool(rules, n_train_episodes, s, train_seed)
+    train_leaves = torch.from_numpy(train_leaves_np)
+    train_roots = torch.from_numpy(train_roots_np)
+
+    RichController = _build_rich_controller(); BlockInfiller = _build_generator()
+    MCValueHead = _build_value_head(); BlockLatentFM = _build_block_fm()
+    ck_dir = f"{DATA_DIR}/rhm_sculpt_slip"
+    os.makedirs(ck_dir, exist_ok=True)
+    stem = (f"v{v}_s{s}_L{depth}_m{m}_sd{state_dim}_ep{n_train_episodes}_"
+            f"cs{controller_steps}_gs{generator_steps}_vs{value_steps}_seed{train_seed}"
+            f"{'_quick' if quick else ''}")
+    inst_path = f"{ck_dir}/instruments_{stem}.pt"
+    controller = RichController(v, sequence_length, s, state_dim, n_head=4, n_layer=2).to(device)
+    generator = BlockInfiller(v, sequence_length, s, state_dim, n_head=4, n_layer=2,
+                              root_conditioned=False).to(device)
+    value = MCValueHead(state_dim, v).to(device)
+    if os.path.exists(inst_path):
+        sd = torch.load(inst_path, map_location=device)
+        controller.load_state_dict(sd["controller"]); generator.load_state_dict(sd["generator"])
+        value.load_state_dict(sd["value"])
+        print(f"loaded cached instruments <- {inst_path}", flush=True)
+    else:
+        raise FileNotFoundError(f"no cached instruments at {inst_path}; run slip_gate1 first "
+                                f"so every step of this cut shares one substrate")
+    for mod in (controller, generator, value):
+        mod.eval()
+        for p in mod.parameters():
+            p.requires_grad_(False)
+
+    planner_batch = min(1024, n_eval_episodes)
+    eval_roots_np, eval_leaves_np = _sample_pool(rules, planner_batch, s, train_seed + 99)
+    rng = np.random.default_rng(train_seed + 2)
+    leaves0 = torch.from_numpy(_corrupt(eval_leaves_np, n_blocks, n_corrupt, v, s, rng))
+    targets = torch.from_numpy(eval_roots_np)
+
+    ARMS = ["d1_clean", "d2_unweighted", "d2_oracle_gate"]
+    results = {"config": {"slip": slip, "fm_step_grid": grid, "batch_size": batch_size,
+                          "arms": ARMS, "beam_widths": widths, "tag": tag,
+                          "train_seed": train_seed}, "per_budget": {}}
+    for steps in grid:
+        print(f"\n{'=' * 74}\nfm_steps = {steps}  ({steps * batch_size:,} samples)\n{'=' * 74}",
+              flush=True)
+        row = {"samples": steps * batch_size, "arms": {}}
+        for arm in ARMS:
+            fm = BlockLatentFM(state_dim, n_blocks, n_head=4, n_layer=2).to(device)
+            _train_fm_arm(arm, fm, controller, generator, train_leaves_np, canon,
+                          region_index, n_regions, n_steps=steps, batch_size=batch_size,
+                          n_blocks=n_blocks, v=v, s=s, n_corrupt=n_corrupt,
+                          budget=edit_budget, lr=1e-3, slip=slip, device=device, seed=777,
+                          precision_rank=8, precision_alpha=0.1, precision_every=10 ** 9,
+                          precision_buffer=1, log_every=max(steps, 1))
+            chk = _fm_check(fm, value, controller, generator, leaves0, targets, canon,
+                            region_index, n_regions, s, device)
+            beams = {str(w): _latent_beam_stoch(
+                controller, generator, fm, value, leaves0, targets, canon, region_index,
+                n_regions, rules, s=s, budget=edit_budget, beam_width=w, slip=slip, v=v,
+                seed=train_seed + 5 + w, device=device) for w in widths}
+            row["arms"][arm] = {**chk, "beam_success": beams}
+            print(f"  {arm:<16} rank_corr={chk['value_rank_corr']:.4f} "
+                  f"top1={chk['value_top1_agree']:.4f}  "
+                  + "  ".join(f"w{w} {beams[str(w)]:.4f}" for w in widths), flush=True)
+        f, c, o = (row["arms"]["d2_unweighted"], row["arms"]["d1_clean"],
+                   row["arms"]["d2_oracle_gate"])
+        row["prize"] = {
+            "rank_corr": c["value_rank_corr"] - f["value_rank_corr"],
+            "top1": c["value_top1_agree"] - f["value_top1_agree"],
+            **{f"beam_w{w}": c["beam_success"][str(w)] - f["beam_success"][str(w)]
+               for w in widths}}
+        row["oracle_recovery"] = {
+            "rank_corr": ((o["value_rank_corr"] - f["value_rank_corr"])
+                          / (c["value_rank_corr"] - f["value_rank_corr"])
+                          if abs(c["value_rank_corr"] - f["value_rank_corr"]) > 1e-9
+                          else float("nan"))}
+        results["per_budget"][str(steps)] = row
+        print(f"  PRIZE (clean - unweighted): " +
+              "  ".join(f"{k} {x:+.4f}" for k, x in row["prize"].items()), flush=True)
+
+    print(f"\n{'=' * 74}\nCLOSEOUT: does the prize grow as data shrinks?\n{'=' * 74}")
+    print(f"  {'fm_steps':>9}{'samples':>11}{'prize rank_corr':>17}{'prize top1':>12}"
+          + "".join(f"{f'prize w{w}':>12}" for w in widths))
+    for steps in grid:
+        r = results["per_budget"][str(steps)]
+        print(f"  {steps:>9}{r['samples']:>11,}{r['prize']['rank_corr']:>17.4f}"
+              f"{r['prize']['top1']:>12.4f}"
+              + "".join(f"{r['prize'][f'beam_w{w}']:>12.4f}" for w in widths))
+    print("\n  Registered: prize GROWS as data shrinks -> the branch is alive in the "
+          "scarce regime. Prize flat ~0.03 -> suppressing the aleatoric component buys "
+          "nothing here at any budget; stop.", flush=True)
+
+    name = f"budget{'_' + tag if tag else ''}_q{slip}_seed{train_seed}.json"
+    with open(f"{ck_dir}/{name}", "w") as f_:
+        json.dump(results, f_, indent=2, cls=NumpyEncoder)
+    volume.commit()
+    print(f"\nSaved -> {ck_dir}/{name}   ({time.time() - started:.0f}s)", flush=True)
+    return results

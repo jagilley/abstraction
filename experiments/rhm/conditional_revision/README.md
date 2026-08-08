@@ -1,6 +1,7 @@
 # Conditional revision: is "how much the token moved my beliefs" separable from "how surprising the token was"?
 
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md) · **Design doc**: [SPEC.md](SPEC.md)
+**Child**: [sculpt_slip/README.md](sculpt_slip/README.md) — the same question on a control substrate
 **Idea**: [`ideas/revision_not_surprisal.md`](../../../ideas/revision_not_surprisal.md)
 **Sibling / predecessor**: [`../endogenous_teacher/`](../endogenous_teacher/README.md) — this is the
 measurement that cut needed before its interventions.
@@ -254,6 +255,18 @@ masking it — which is why the guarded multi-column table is reported rather th
 The binding constraint on the whole measurement turned out to be **belief depth, not the conditioning
 gap**: the signal exists only where the model represents the latent, and this base model's root
 recovery is 0.088.
+
+## Child: sculpt_slip — the same question on a control substrate
+
+[`sculpt_slip/`](sculpt_slip/README.md) ports the conditioning gap to RHM sculpting, where a slippery
+actuator supplies an **exact binary aleatoric label** (we own the RNG), a behavioural readout, and a
+noise level we set. **Step 1 is positive**: the slip is identifiable in the FM residual, but only
+directionally — 0.70–0.75 AUC once ‖r‖ is matched, against 0.50 for the norm, with the norm getting
+*worse* and the direction *better* as slip becomes more common. **Step 2 is a null**: a low-rank
+precision operator recovers nothing its geometry control does not, and the prize it was chasing was
+only ~0.03 (with `top1` exactly 0) because the noise is additive-and-uniform, which makes the
+mean-predictor rank identically to the intended-outcome predictor and leaves estimation variance as
+the whole cost of the gap.
 
 ## Reproduction
 

@@ -12,6 +12,12 @@
 | `probe_diag.py` | **Probe diagnostic.** Answers "is the probe weak or is the task hard" three ways: the repo's own single-node probe as an anchor on the checkpoint (must reproduce d1 0.979 / d3 0.836 / d6 0.088), the exact Bayes ceiling for every variant's task, and a hyperparameter sweep (lr, capacity, per-position standardisation, per-level heads). Also splits every node by its relation to the current position — **current (ancestor chain) / past (already resolved) / future (unseen)** — against the Bayes ceiling for each, which is the measurement behind the next-token-sufficient-statistic finding. |
 | `__init__.py` | package marker |
 
+## Children
+
+| child | contents |
+|---|---|
+| [`sculpt_slip/`](sculpt_slip/README.md) | The conditioning gap on a **control** substrate (RHM sculpting + Stage 3d's slippery actuator), where the aleatoric label is exact and there is a behavioural readout. Step 1 positive (the slip is directionally identifiable, 0.70–0.75 matched vs 0.50 for the residual norm); Step 2 null (a precision operator recovers nothing its geometry control does not, against a prize of only ~0.03). Also records, with numbers, why a learning-progress estimator was **not** built. Per-file: [sculpt_slip/FILES.md](sculpt_slip/FILES.md) |
+
 ## Auxiliary docs
 
 | file | contents |
