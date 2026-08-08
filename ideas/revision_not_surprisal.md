@@ -1,8 +1,11 @@
 # Revision, not surprisal: the conditioning gap, the aleatoric null, and why the residual needs an oracle
 
-**Status**: Conceptual. Nothing built. The measurement it implies is specified at
-[`rhm/conditional_revision/SPEC.md`](../experiments/rhm/conditional_revision/SPEC.md).
-**Date**: 2026-08-07
+**Status**: Gates 0, A and B **run** (2026-08-08) —
+[`rhm/conditional_revision/`](../experiments/rhm/conditional_revision/README.md); design at
+[`SPEC.md`](../experiments/rhm/conditional_revision/SPEC.md). §5's precision proposal has a first test,
+on a control substrate ([`sculpt_slip/`](../experiments/rhm/conditional_revision/sculpt_slip/README.md)),
+and it is a **null**. §8 is still unrun. Per-claim verdicts are inline in *What would kill this*.
+**Date**: 2026-08-07 · **Results appended**: 2026-08-08
 **Supersedes**: [the_forecast_needs_a_lead.md](the_forecast_needs_a_lead.md) (retained, marked
 outdated). That doc's §4 is the surviving object; its §1–§3 mechanism and its §5 are revised here.
 **Builds on**: [self_model_needs_a_loop.md](self_model_needs_a_loop.md),
@@ -323,6 +326,10 @@ replaces which.
 - **Revision turns out monotone in token surprisal under the constructed contrast** (nll held fixed by
   design, not merely regressed out). Then this document is bookkeeping. This is the primary kill and
   it is Gate B of the spec.
+  → **Did not fire, at the levels where the model has a belief.** With position *and* exact surprisal
+  matched and the shuffled null at 0.501, the model's revision separates the families at **0.690 (d2)**
+  and **0.614 (d3)** against surprisal's ~0.49. Nothing above d3. d1 is *untestable* rather than null:
+  within a position, exact surprisal separates the families at AUC **1.000**, so no matched pair exists.
 - **Cheap early version of the same kill.** The minimal instantiation of §1 is a one-line change to the
   existing FM — shift the target by one position instead of six blocks, `FM(h₆[≤t]) → h₆[t+1] − h₆[t]`,
   frozen main model, open-loop. `endogenous_teacher` Gate 0 measured the *depth* residual at
@@ -330,17 +337,37 @@ replaces which.
   positive and align. **Two-sided kill**: `corr ≈ 0` means the axis change did nothing; `R² > 0.9`
   means the residual is surprisal re-expressed in state space. Half a day, no new machinery, and it
   gates everything else — [SPEC](../experiments/rhm/conditional_revision/SPEC.md) Gate 0.
+  → **Passed**: `corr` −0.337 → **+0.652**, level profile −0.786 → **+0.484**, `R²` 0.425 (kill was
+  >0.9), with a protocol-matched `depth_frozen` control at −0.328 so the flip is the axis change.
+  But Gate B then showed **most of what flipped is surprisal** — the residual's AUC falls 0.64–0.75
+  → 0.50–0.52 once `nll` is matched, so `R² > 0.9` was too lenient a form of this kill.
 - **The revision estimate moves with FM capacity.** Then we are measuring `ε₂ − ε₁`, not revision.
+  → **Unrun** (Gate C).
 - **The model's belief revision is orthogonal to the oracle's** given `nll`. Then no forecast of that
   belief can carry the signal, and the substrate is wrong before any FM is trained.
+  → **Not orthogonal where the model has a belief, and orthogonal where it does not.** Partial
+  `R²(M~B|nll)` vs `R²(M~nll|B)` runs **0.150 vs 0.005** at d1 and reverses to **0.008 vs 0.082** at the
+  root, tracking the probe's distance from its exact Bayes ceiling (90% at d1, 18% at root). The
+  binding constraint on this whole idea is therefore **belief depth**, not the conditioning gap.
 - **A precision-weighted teaching signal beats `uniform` only as much as any scalar reweighting does.**
   Then the aleatoric null is real as a measurement and inert as a lever — which is still worth knowing,
   and is the fourth scalar-gating null.
+  → **First test is a null**, on a control substrate where the aleatoric label is exact
+  ([`sculpt_slip/`](../experiments/rhm/conditional_revision/sculpt_slip/README.md)). A low-rank,
+  label-free `Π` recovered nothing its **geometry control** did not. Two caveats on how much this
+  bounds §5: the prize was only ~0.03 (`top1` exactly 0) because additive-uniform noise makes the
+  mean-predictor rank identically to the intended-outcome predictor, leaving estimation variance as
+  the entire cost of the gap; and the estimator assumed the aleatoric part is the high-variance
+  subspace, where this substrate could have *measured* it by repeat execution. Weighting by the
+  instantaneous residual magnitude was, as predicted, the **worst** arm.
 - **§8 specifically**: a local loss with an exogenous conditioning gap (`h_ℓ[t] → h_ℓ[t+1]`, LL-alone)
   reproduces the *same* signature as the depth version — FM cos → ~1, SK → 0, brittleness of the same
   order. Then the conditioning gap is not the operative variable and §8's degeneracy reading is wrong;
   the simplicity collapse would be a property of any auxiliary "be predictable" term. This is a cheap,
   direct test and it should be run before the teaching intervention.
+  → **Unrun**, and still the sharpest open test of §1. The base checkpoint and FMs the gates ran on are
+  cached at `/data/v16_s2_L6_m4_distinct/conditional_revision/` (chromatic), so an RHM arm can reuse the
+  exact substrate rather than retraining.
 
 **Standing prior against.** Four independent replications say endogenous targets cap — `LL` (FM cos
 0.997, SK ≈ 0), `λ_local` (ΔSK −0.06 → −1.54), `data2vec` (+23% vs grounded MLM's +44%), `fm_cotrain`
