@@ -266,7 +266,9 @@ directionally — 0.70–0.75 AUC once ‖r‖ is matched, against 0.50 for the 
 precision operator recovers nothing its geometry control does not, and the prize it was chasing was
 only ~0.03 (with `top1` exactly 0) because the noise is additive-and-uniform, which makes the
 mean-predictor rank identically to the intended-outcome predictor and leaves estimation variance as
-the whole cost of the gap.
+the whole cost of the gap. **A closeout budget sweep kills the line**: the prize is flat (+0.023 to
++0.045) across a 60× data range, because the FM is bias-dominated rather than variance-dominated at
+every budget — an aleatoric filter can only pay when the learner is variance-limited.
 
 ## Reproduction
 

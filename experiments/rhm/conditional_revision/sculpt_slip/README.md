@@ -3,7 +3,8 @@
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md)
 **Substrate**: [`../../RHM_SCULPTING_README.md`](../../RHM_SCULPTING_README.md) Stage 3d
 **Idea**: [`ideas/revision_not_surprisal.md`](../../../../ideas/revision_not_surprisal.md) §5
-**Date**: 2026-08-08 · **Status**: Step 1 positive, Step 2 null. Single seed throughout.
+**Date**: 2026-08-08 · **Status**: Step 1 positive, Step 2 null, closeout **kills the line**. Single
+seed throughout.
 
 ## Why this substrate
 
@@ -113,13 +114,34 @@ monitor:collect 1.78–1.84×, budgets of 100–400 transitions) precisely becau
 data is the scarce resource. This was an unmetered version of a metered question. The closeout below
 sweeps the budget to find out whether the prize exists anywhere.
 
-## Closeout — does the prize grow as data shrinks?
+## Closeout — does the prize grow as data shrinks? No. Stop.
 
-*(running; `slip_budget`, three bounding arms across fm_steps 12000 / 3000 / 750 / 200)*
+Pre-registered two-sided: prize grows as data shrinks → the branch is alive in the scarce regime;
+prize flat at ~0.03 → suppressing the aleatoric component buys nothing at any budget, and this line
+stops. Three bounding arms across a 60× data range:
 
-Pre-registered, two-sided: **prize grows as data shrinks** → the branch is alive in the scarce regime
-and that is where a measured `Π` would be worth building; **prize flat at ~0.03 at every budget** →
-suppressing the aleatoric component buys nothing here at any budget, and this line stops.
+| fm_steps | samples | floor `rank_corr` | ceiling `rank_corr` | **prize** | prize `top1` | prize beam w64 |
+|---|---|---|---|---|---|---|
+| 12000 | 3,072,000 | 0.5205 | 0.5553 | +0.0347 | +0.0000 | +0.0449 |
+| 3000 | 768,000 | 0.4134 | 0.4584 | +0.0450 | +0.0078 | +0.0020 |
+| 750 | 192,000 | 0.2809 | 0.3040 | +0.0230 | −0.0410 | −0.0234 |
+| 200 | 51,200 | 0.1234 | 0.1627 | +0.0393 | −0.0078 | +0.0352 |
+
+**Flat and non-monotone across 60× of data.** The second branch fires: perfect noise-blindness is worth
+~0.03 at every budget, so no estimator of the aleatoric component can be worth building here.
+
+**The prediction that motivated this sweep was wrong, and the reason is the useful part.** The argument
+was that the only cost of the conditioning gap is estimation variance, which scales as 1/n, so
+shrinking data 60× should inflate the prize. It doesn't — because the FM is **bias-dominated, not
+variance-dominated, at every budget tested.** Watch the floor column: `rank_corr` climbs 0.12 → 0.28 →
+0.41 → 0.52 and is *still climbing* at the largest budget. The FM is nowhere near the regime where
+noise in its targets is what limits it; its own approximation shortfall is. Slip-induced target noise
+never becomes the binding constraint, so removing it never buys much.
+
+Generalising past this substrate: **an aleatoric filter can only pay when the learner is
+variance-limited.** Most forward models in this repo are bias-limited — still improving with more
+data or capacity — which is a cheap precondition to check (two arms: clean-target ceiling vs
+realised-target floor) before building any machinery to separate reducible from irreducible error.
 
 ## Why we did not build a learning-progress estimator
 
@@ -183,6 +205,9 @@ Results land on the `rhm-scaling-data` volume (**`chromatic` workspace**) under 
   part) is what turned an apparent small win into a null.
 - **Check the size of the prize before building the estimator.** `d1_clean − d2_unweighted` costs two
   arms and bounds everything downstream. Here it was 0.03, and `top1` was exactly 0.
+- **Check bias vs variance before building an aleatoric filter.** It can only pay when the learner is
+  variance-limited; if the FM is still improving with data or capacity, its own approximation error is
+  the binding constraint and removing target noise buys nothing. Two arms settle it.
 - **The affine trap.** When the noise is additive-and-uniform, the mean-predictor ranks identically to
   the intended-outcome predictor, so a conditioning gap costs *variance only*. Any experiment testing
   an aleatoric filter under such noise must be data-limited or there is nothing to win.
