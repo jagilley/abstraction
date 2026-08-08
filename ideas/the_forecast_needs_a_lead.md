@@ -28,7 +28,7 @@
 > anti-localisation, and the one-liner *"felt surprise is how much a word changes your model, not how
 > improbable it was"* — which is now the title claim and is measurable against an exact oracle.
 >
-> Successor spec: `rhm/conditional_revision/SPEC.md`[^private].
+> Successor spec: [`rhm/conditional_revision/SPEC.md`](../experiments/rhm/conditional_revision/SPEC.md).
 
 **Status**: **OUTDATED** — superseded 2026-08-07, see banner above. Originally: conceptual, from a
 2026-08-04/05 discussion; arguments with one supporting dissociation. Nothing here was built.

@@ -1,7 +1,7 @@
 # Revision, not surprisal: the conditioning gap, the aleatoric null, and why the residual needs an oracle
 
 **Status**: Conceptual. Nothing built. The measurement it implies is specified at
-`rhm/conditional_revision/SPEC.md`[^private].
+[`rhm/conditional_revision/SPEC.md`](../experiments/rhm/conditional_revision/SPEC.md).
 **Date**: 2026-08-07
 **Supersedes**: [the_forecast_needs_a_lead.md](the_forecast_needs_a_lead.md) (retained, marked
 outdated). That doc's §4 is the surviving object; its §1–§3 mechanism and its §5 are revised here.
@@ -303,7 +303,7 @@ predicts.**
 **The constructive consequence, and the degeneracy it swaps in.** A non-degenerate local loss needs a
 target conditioned on something the predictor lacks: `h_ℓ[t] → h_ℓ[t+1]`, co-determined by `x_{t+1}`.
 That is this doc's revision object used as a *training signal* rather than a measurement — so the
-SPEC[^private]'s gated follow-up is also the fix for the
+[SPEC](../experiments/rhm/conditional_revision/SPEC.md)'s gated follow-up is also the fix for the
 local loss. But it trades one degeneracy for another: minimizing `‖FM(h[t]) − h[t+1]‖²` collapses by
 making `h[t+1]` **insensitive to `x_{t+1}`** — ignore the input. That is data2vec's known failure mode,
 and we already built anti-collapse machinery for it ([`rhm_sculpt_data2vec.py`](../experiments/rhm/rhm_sculpt_data2vec.py)).
@@ -329,7 +329,7 @@ replaces which.
   `corr(rres, nll) = −0.336`, anti-localised against the hierarchy. The temporal residual should flip
   positive and align. **Two-sided kill**: `corr ≈ 0` means the axis change did nothing; `R² > 0.9`
   means the residual is surprisal re-expressed in state space. Half a day, no new machinery, and it
-  gates everything else — SPEC[^private] Gate 0.
+  gates everything else — [SPEC](../experiments/rhm/conditional_revision/SPEC.md) Gate 0.
 - **The revision estimate moves with FM capacity.** Then we are measuring `ε₂ − ε₁`, not revision.
 - **The model's belief revision is orthogonal to the oracle's** given `nll`. Then no forecast of that
   belief can carry the signal, and the substrate is wrong before any FM is trained.
