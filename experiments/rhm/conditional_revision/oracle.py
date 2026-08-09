@@ -311,7 +311,8 @@ def irreducible_entropy(rules, seqs, level_features, D, plen):
 
 
 def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
-                         verbose=True, anc_mask=None):
+                         verbose=True, anc_mask=None,
+                         return_chain_marginals=False):
     """The full oracle: B (joint + marginal), H_tot, H_irr, true surprisal.
 
     Returns a dict of arrays. Signal axis is t = 0..T-2 ("the token x_{t+1}
@@ -339,6 +340,22 @@ def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
     the exact Bayes accuracy of decoding each masked (position, node) pair from
     x_{<=t}, per level. That is the ceiling for the probe that produces M, so
     "the probe is weak" and "the model cannot know this" stay distinguishable.
+
+    return_chain_marginals (default False -- prior callers are unaffected): also
+    emit `chain_marg`, the UNSUBTRACTED per-state node posteriors that B_chain
+    collapses into a single KL. Four (n, T-1, L, v) float64 arrays:
+
+        new_prev[.,t,d] = P(z_{a_d(t+1)} | x_{<=t})     the node M reads, before
+        new_cur [.,t,d] = P(z_{a_d(t+1)} | x_{<=t+1})   the node M reads, after
+        old_prev[.,t,d] = P(z_{a_d(t)}   | x_{<=t})     the node the chain LEAVES
+        old_cur [.,t,d] = P(z_{a_d(t)}   | x_{<=t+1})
+
+    `new_*` is exactly the pair whose KL is B_chain's level-d term; `old_*` is the
+    node that drops off the chain at a constituent boundary and is what a
+    replacement (as opposed to insertion) would show up in. This is the tracking
+    analysis of Petersen et al. 1998 PNAS 95:853: instrument every region in every
+    state and keep both signed contrasts, because a single difference cannot tell
+    "B = A + new" from "B = A - old + new".
     """
     v, m, s = rules[0].shape
     L = len(rules)
@@ -355,6 +372,9 @@ def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
     node_off = {d: (s ** d - 1) // (s - 1) for d in range(L)}
     bayes_hit = np.zeros(L)
     bayes_cnt = np.zeros(L)
+    cm = ({k: np.zeros((n, T - 1, L, v))
+           for k in ("new_prev", "new_cur", "old_prev", "old_cur")}
+          if return_chain_marginals else None)
 
     for c0 in range(0, n, chunk):
         c1 = min(n, c0 + chunk)
@@ -380,6 +400,12 @@ def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
             for d in range(Dmax + 1):
                 j = (t + 1) // (s ** (L - d))
                 chain[:, d] = _kl(cur[0][d][:, j], prev[0][d][:, j], axes=1)
+                if cm is not None:
+                    jo = t // (s ** (L - d))
+                    cm["new_prev"][c0:c1, t, d] = prev[0][d][:, j]
+                    cm["new_cur"][c0:c1, t, d] = cur[0][d][:, j]
+                    cm["old_prev"][c0:c1, t, d] = prev[0][d][:, jo]
+                    cm["old_cur"][c0:c1, t, d] = cur[0][d][:, jo]
             for D in Ds:
                 out["B_joint"][D][c0:c1, t] = joint_kl(
                     cur[0], prev[0], cur[1], prev[1], D, s)
@@ -392,13 +418,16 @@ def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
         if verbose:
             print(f"  oracle: {c1}/{n} sequences", flush=True)
 
-    return {"B_joint": out["B_joint"], "B_marg": out["B_marg"],
-            "B_chain": out["B_chain"],
-            "H_post": out["H_post"], "H_irr": out["H_irr"],
-            "H_tot": H_tot, "surprisal": surprisal, "Ds": Ds, "L": L, "s": s,
-            "bayes_acc_chain": (None if anc_mask is None else
-                                {f"d{L - d}": float(bayes_hit[d] / max(bayes_cnt[d], 1))
-                                 for d in range(L)})}
+    res = {"B_joint": out["B_joint"], "B_marg": out["B_marg"],
+           "B_chain": out["B_chain"],
+           "H_post": out["H_post"], "H_irr": out["H_irr"],
+           "H_tot": H_tot, "surprisal": surprisal, "Ds": Ds, "L": L, "s": s,
+           "bayes_acc_chain": (None if anc_mask is None else
+                               {f"d{L - d}": float(bayes_hit[d] / max(bayes_cnt[d], 1))
+                                for d in range(L)})}
+    if cm is not None:
+        res["chain_marg"] = cm
+    return res
 
 
 def self_check(res, tol=0.02):

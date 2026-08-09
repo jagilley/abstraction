@@ -1,7 +1,8 @@
 # Conditional revision: is "how much the token moved my beliefs" separable from "how surprising the token was"?
 
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md) · **Design doc**: [SPEC.md](SPEC.md)
-**Child**: [sculpt_slip/README.md](sculpt_slip/README.md) — the same question on a control substrate
+**Children**: [sculpt_slip/README.md](sculpt_slip/README.md) — the same question on a control substrate ·
+[local_loss/README.md](local_loss/README.md) — the same conditioning gap used as a *training* signal
 **Idea**: [`ideas/revision_not_surprisal.md`](../../../ideas/revision_not_surprisal.md)
 **Sibling / predecessor**: [`../endogenous_teacher/`](../endogenous_teacher/README.md) — this is the
 measurement that cut needed before its interventions.
@@ -270,6 +271,27 @@ the whole cost of the gap. **A closeout budget sweep kills the line**: the prize
 +0.045) across a 60× data range, because the FM is bias-dominated rather than variance-dominated at
 every budget — an aleatoric filter can only pay when the learner is variance-limited.
 
+## Child: local_loss — the same conditioning gap used as a training signal
+
+[`local_loss/`](local_loss/README.md) takes the temporal target from Gate 0 and uses it as an auxiliary
+*training* term rather than a measurement, against the incumbent depth version
+([`RHM_FM_REGULARIZER`](../RHM_FM_REGULARIZER_README.md)) as a matched control — the idea doc's §8 asks
+whether an exogenous conditioning gap changes what a local loss does to the model. Three results, all
+at m2 and a single seed. **The raw local-loss term is ~90% gauge**: in both arms it falls 19× while
+scale-free predictability moves only 1.6–1.9×, and the collapse is prompt (during the λ ramp, while the
+task is still being learned) rather than a saturation artifact — the incumbent's rank-based headline is
+scale-invariant and unaffected. **The temporal target compresses more, not less** (39.4% FM-free act
+rank at 80k vs the depth arm's 42.9% at 300k, knowledge preserved at d6 0.93–0.95). And **on the
+self-knowledge axis it reproduced the depth signature rather than escaping it**, further along: each
+loss reduces generalizable `meta` most on the axis it optimizes, temporal taking `Tmeta` +0.551 →
+−2.630 where depth takes `Dmeta` +0.121 → −0.929. No evidence of selective synonym discarding (the rule
+probe reads 1.000 in every arm).
+
+Important scope limit, stated at length there: this scores the **local-loss arc's** axis (self-knowledge),
+not the epistemic-content axis this cut is about — Gate A/B readouts on the trained checkpoints were not
+computed — and it runs on **m2**, where the model is knowledge-saturated, while every measurement above
+is on m4.
+
 ## Reproduction
 
 ```bash
@@ -310,3 +332,203 @@ Results land on the `rhm-scaling-data` volume (**`chromatic` workspace**) under
   surprisal estimate would clear that bar without being revision.
 - **`M` must be read on the ancestor chain.** Summing over all latent nodes buries the signal in probe
   noise from the ~57 nodes the model does not represent.
+
+---
+
+# Appendix — the tracking analysis: an instrument audit of Gates A and B
+
+**Appended**: 2026-08-08 · **Code**: [`tracking/tracking.py`](tracking/tracking.py) · **Status**: run,
+single seed, same regime and same cached checkpoint as everything above. Nothing in `gates_ab.py`
+changed; `oracle.py` gained one default-off kwarg (`return_chain_marginals`) and its self-test still
+passes at 2.2e-16 / 3.3e-15.
+**Reading**: Petersen, van Mier, Fiez & Raichle (1998), *The effects of practice on the functional
+anatomy of task performance*, PNAS 95:853–860[^private]
+— the "'Problems' with Cognitive Subtraction" section (pp. 854–855) and Fig. 1.
+
+## Why
+
+Everything above reads a **difference**: `M = Σ_d KL(q_{t+1}^{a_d} ‖ q_t^{a_d})`, and Gate 0's residual.
+Petersen et al. audited their own 1989 hierarchical-subtraction PET design and named the failure mode a
+difference cannot see — **replacement, not addition**: *"some of the processes used in word reading are
+replaced when verb generation is performed."* `B − A` cannot distinguish `B = A + new` from
+`B = A − old + new`. They locate the assumption precisely — *"image subtraction does not make the
+assumption of pure insertion: experimental designs, analysis choices, and interpretive strategies
+do"* — and their fix is not a better contrast but a refusal to read any one contrast alone:
+instrument every region in every **state**, keep both signed contrasts, classify each as
+common / insertion / **replacement** (their replacement case, the left insula, is positive in
+`read − passive` and equivalently *negative* in `generate − read`).
+
+SPEC's Gate C.2 guards the capacity residue (`ε₂ − ε₁`) but is structurally blind to replacement: it
+would pass while the `t+1` representation had dropped something the `t` representation held. And the
+probe finding above says the model does exactly that — *"does not summarise resolved structure
+forward"*, past constituents at 0.20 against a Bayes ceiling of ~1.0.
+
+## The instrument reproduces what it audits
+
+`tracking.py` replays `gates_ab.py`'s construction order so the global torch RNG state matches and the
+`chain` probe is **bit-identical** to the one that produced the published numbers. Gate A and Gate B
+come back at **max |Δ| = 4.2e-05** on every cell (0.1500 d1 / 0.1018 d2; 0.6138 d3 / 0.6898 d2). This
+is an audit of the same `M`, not a re-run of it.
+
+## The suspected confound is not what holds up Gates A and B
+
+Families are defined by the oracle `B_joint` on positions, so excluding cells cannot change membership
+(syn/dis counts identical before and after: D4 60341/48567, D3 70970/43264). The live risks are lost
+mass and ties at zero, measured against a **size-matched random exclusion** (10 draws):
+
+| level | `M` | `M_replexcl` | random exclusion | frac cells | frac `M` mass | z |
+|---|---|---|---|---|---|---|
+| d4 | 0.5261 | 0.5056 | 0.5117 ± 0.0038 | 0.349 | 0.477 | 1.6 |
+| d3 | 0.6138 | 0.5522 | **0.5580 ± 0.0118** | 0.413 | 0.575 | **0.5** |
+| d2 | 0.6898 | 0.5615 | **0.6277 ± 0.0158** | 0.425 | 0.529 | **4.2** |
+
+At d3 `M_replexcl` sits **inside the random null** — the whole 0.614 → 0.552 drop is the price of
+discarding 41% of cells and 58% of the `M` mass, not evidence of contamination. At d2 it is 4.2 sd
+*below* the random control, i.e. the flagged cells carry **more** Gate-B signal than average.
+
+Three further readouts point the same way, and the non-circular exclusions leave the result intact:
+
+| level | `M` | `M_cont` (class-change terms dropped) | `M_bdry` (only class-change terms) |
+|---|---|---|---|
+| d3 | 0.6138 | **0.6134** | 0.5004 |
+| d2 | 0.6898 | **0.6671** | 0.5322 |
+
+- **The position split runs the wrong way for the confound.** Separation is *concentrated* where no node
+  is replaced: d3 continuation (88.9% of positions) 0.6144 vs boundary 0.5352; d2 continuation (76.2%)
+  **0.7006** vs boundary 0.6373. Gate A likewise — `M_cont` beats `M` at every level (d1 0.1810 vs
+  0.1500, d2 0.1363 vs 0.1018, d3 0.0596 vs 0.0394), so boundary terms are dilution.
+- **Where a family-dependent readability change exists, its sign suppresses Gate B.** At d2/continuation,
+  synonym excess **+0.050** (probe 0.821 → 0.871 while Bayes is flat at 0.965, because `B ≡ 0` — an
+  unwarranted gain that *inflates* `M` exactly where it should be zero) and disambiguating excess
+  **−0.052** (probe +0.369 against a Bayes gain of +0.421). Both push AUC toward 0.5. The 0.690 is
+  measured *despite* this, not because of it.
+- **All twenty guards land at 0.4887–0.5064**, including the shuffled control restricted to the
+  `replexcl` subset (0.4943 / 0.5016 / 0.4937 / 0.5064 / 0.4977, D0–D4).
+
+**Gates A and B survive the audit.** The 4.2 sd at d2 is the one number this does not close; see
+*What this does not settle*.
+
+## What the audit did find
+
+### 1. `M ≈ B` at d6–d4 is two large opposite readout errors cancelling
+
+The exact identity `M − B = d_den + d_num` (`d_den` = the `t`-state readout's contribution, `d_num` =
+the `t+1`-state readout's), continuation cells:
+
+| level | `M` | `B` | `d_den` (`t`-state) | `d_num` (`t+1`-state) | `M − B` |
+|---|---|---|---|---|---|
+| d6 | 0.053 | 0.039 | **+1.187** | **−1.174** | 0.014 |
+| d5 | 0.112 | 0.062 | +1.549 | −1.499 | 0.050 |
+| d4 | 0.276 | 0.109 | +1.502 | −1.335 | 0.167 |
+| d3 | 0.621 | 0.207 | +0.861 | −0.448 | 0.414 |
+| d2 | 0.730 | 0.363 | +0.464 | −0.097 | 0.367 |
+| d1 | 0.877 | 0.550 | +0.335 | **−0.008** | 0.327 |
+
+`d_den` equals the before-state probe error to three decimals at the top levels (an identity when
+`B ≈ 0`: `d_den → KL(p₀‖q₀)`), and `d_num` is dominated by `H(p₁) − H(q₁)`, the after-state probe being
+far flatter than the truth (d6: 0.065 vs 0.372).
+
+**This corrects a framing above.** `M` = 0.053 against a true `B` = 0.039 at the root reads as the probe
+recovering ~36% of the oracle's revision; it is in fact two >1-nat readout errors offsetting. The
+`compression_B_minus_M` column and the "matched term-for-term by `B_chain`" framing are **not
+interpretable at d6–d4** — the agreement there is cancellation, not measurement. By d1–d2 the
+cancellation is gone (`d_num` −0.008) and `M − B` is essentially all `d_den`; Gate A agrees that this is
+where the oracle structure lives — partial `R²(d_den ~ B | nll)` = **0.0700 / 0.0596 / 0.0473**
+(d1/d2/d3) against `d_num`'s **0.0003 / 0.0000 / 0.0001**.
+
+So the instrument invalidates the difference *where the gates read null* and certifies it *where the
+gates fire*.
+
+### 2. At d2/d3 most of `M`'s discriminative content is a before-state readout
+
+AUC under the primary position × exact-surprisal matching:
+
+| | d6 | d5 | d4 | d3 | d2 |
+|---|---|---|---|---|---|
+| `M` | 0.4963 | 0.5077 | 0.5261 | 0.6138 | 0.6898 |
+| `M_pointmass` = `−log q_t(argmax q_{t+1})` | 0.5119 | 0.5275 | 0.5369 | **0.6111** | **0.6396** |
+| `negH_t` — `H(q_t)` alone, no `t+1` | 0.4811 | 0.4764 | 0.4629 | 0.4035 | 0.3863 |
+| `negH_t1` — after-state only | 0.5007 | 0.4961 | 0.4883 | 0.4669 | 0.4799 |
+| `H_post_oracle` — **exact** posterior entropy at `t` | 0.8006 | 0.7933 | 0.7546 | 0.7324 | 0.7316 |
+| `M_swapT` — before-state content destroyed | 0.5015 | 0.5034 | 0.4947 | 0.4865 | 0.4966 |
+
+`M_pointmass` uses the after-state only to *name* a value and recovers **99.6% (d3) and 93% (d2)** of
+`M`'s AUC; `H(q_t)` alone separates at 0.6137 / 0.5965. The increment from actually differencing across
+the step is **+0.017 (d3)** and **+0.076 (d2)**. Mechanism: at these levels the after-state probe is
+near-degenerate (d1/continuation 0.947 against a ceiling of 0.968), and for `q₁ ≈ δ_ŷ`,
+`KL(q₁‖q₀) = −log q₀(ŷ) − H(q₁) → −log q₀(ŷ)`.
+
+Two things this does **not** license. `M_swapT` at chance says the before-state's sequence-specific
+content is essential — the honest statement is "the after-state contributes the identity of the resolved
+value, not a magnitude", not "the after-state contributes nothing". And Gate B's own claim is unaffected:
+`nll` reads 0.4949 and exact surprisal 0.4994, pinned by construction, so **a model-internal signal does
+separate reducible from irreducible surprise at matched surprisal** whether or not that signal is a
+difference. What is under pressure is specifically the idea doc's §3 framing of the object as a
+*two-forecast difference*; §4 is untouched.
+
+### 3. The replacement is real, and it is on the node `M` never reads
+
+At a constituent boundary the ancestor chain leaves a node. `M` reads `a_d(t+1)` in both states and never
+looks at `a_d(t)`:
+
+| level (boundary cells) | probe @`t` | probe @`t+1` | Bayes @`t` | Bayes @`t+1` | excess |
+|---|---|---|---|---|---|
+| d1 | 0.946 | **0.350** | 0.967 | 0.981 | **−0.610** |
+| d2 | 0.875 | 0.502 | 0.946 | 0.957 | −0.384 |
+| d3 | 0.693 | 0.253 | 0.938 | 0.943 | −0.445 |
+| d4 | 0.260 | 0.139 | 0.948 | 0.949 | −0.122 |
+
+The readout collapses across a single step while the truth becomes *more* determined — the sign flip
+Petersen et al. describe. Mean excess is **−0.0012** on the node `M` reads and **−0.0763** on the node it
+leaves. This localises the probe finding above (*"does not summarise resolved structure forward"*) to
+the exact step where it happens, with the Bayes ceiling pinned so it cannot be attributed to
+unknowability.
+
+## What this does not settle
+
+- **The d2 4.2 sd anomaly is open.** The most likely reading is that the flagged cells are largely an
+  *activity* proxy rather than a contamination flag: Spearman(mean `B` per level, flagged fraction per
+  level) = **+0.829**, running 9.5% at d6 (`B` 0.039) to 71.4% at d1 (`B` 0.699), so excluding flagged
+  cells preferentially removes informative ones. That is supported but not closed — closing it needs a
+  cell criterion orthogonal to cell activity, which was not built. The classification is at least
+  *reliable*: split-half `r` = **+0.910** (Spearman–Brown 0.953), sd(excess) 0.0493 against an implied
+  noise sd of 0.0107, per level 0.34 / 0.77 / 0.91 / 0.91 / 0.86 / 0.92 (d6→d1). Reliability is not
+  validity.
+- **Whether a before-state readout "counts" as revision is a framing question, not a measurement.** The
+  numbers in §2 are unambiguous; what they imply for the idea doc is a separate call and belongs in
+  [`ideas/revision_not_surprisal.md`](../../../ideas/revision_not_surprisal.md), not here.
+- **This is one substrate and the contrast may be close to definitional on it.** Oracle revision is zero
+  exactly when the prefix already determined the structure, so "prefix uncertainty predicts
+  informativeness" is much less surprising on RHM than it would be on language.
+- The original mechanism hypothesis — that the node swap at constituent boundaries drives the effect —
+  is **not** what the classification tracks: flagged cells are mostly continuation (d1 30/45, d2 24/30,
+  d3 34/38, all of d4–d6), and `|excess|` is *smaller* at boundaries than continuations (d1 0.0348 vs
+  0.0766). §3 above is the boundary effect stated on its own terms.
+- Single seed, one regime, inherited throughout.
+
+## Reproduction
+
+```bash
+cd experiments
+# smoke, attached, ~6 min
+modal run -m rhm.conditional_revision.tracking.tracking::tracking \
+    --n-probe-train 400 --n-calib 200 --n-test 200 --probe-steps 400 --tag smoke
+# the real thing, ~40 min on an L4 (base + FMs load from cache)
+modal run --detach -m rhm.conditional_revision.tracking.tracking::tracking --tag track2
+```
+
+Output: `tracking_track2_seed42.json` on the same volume path as the gates. **Use `track2`** —
+`track1` predates the random-exclusion control and the before-state columns.
+
+## Gotchas worth not rediscovering
+
+- **A partial `R²` of exactly 1.0000 is an estimator artefact, not a finding.** `M_bdry` ≡ 0 at D0
+  (there are no boundary positions at the root: 0 / 1 / 3 / 7 / 15 / 31 for d6→d1), and `_r2` returns
+  1.0 on zero residual variance.
+- **Exclusion-based controls need a size-matched random null.** Dropping 41% of cells costs ~0.056 AUC
+  at d3 on its own; without the random baseline that reads as a confound.
+- **Reliability and validity are different questions.** The per-cell excess is highly reliable
+  (split-half 0.910) and still not a valid contamination flag — it largely tracks how much happens in
+  the cell.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
