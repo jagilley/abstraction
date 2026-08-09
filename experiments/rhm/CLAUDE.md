@@ -33,7 +33,7 @@ For experiments that need language-like complexity, use: **L=6, m=4, v=8, s=2** 
 - `model.py` — GPT-2 with `return_intermediates` and cerebellar callback support
 - `measure.py` — Scaling exponent fitting
 
-All computation runs on Modal (workspace `jagilley`). Data lives on the `rhm-scaling-data` volume.
+All computation runs on Modal. Data lives on the `rhm-scaling-data` volume on profile `jagilley` (do not run new runs on `jagilley` though.)
 
 ## Primitives
 
