@@ -67,11 +67,10 @@ that part of the warning is real — fix the email.
 - Be sure to run the `conversations/parse_transcripts.py` script prior to reading the file, even if the file already exists. If you don't, you may read an out-of-date version of the convo.
 
 ## Notes
-- For long-running e.g. training jobs (long running = anything that takes more than 2 mins), please follow this procedure to manage things:
-    1. Kick off the job, make sure it runs, etc. You can do this by using a detached Modal run with a 2-minute timeout and then auto-backgrounding the shell.
-    2. Then, don't monitor any further, halt your work, and just wait for the background notification that the job has completed. Under no circumstances should you read logs in consecutive tool calls as a means of waiting for the run to finish.
+- For long-running training jobs (long running = anything that takes more than 2 mins), please follow the halting procedure described in `/run-experiment-on-modal` to avoid burning tokens.
 - If you're going to use an Explore subagent, please use Sonnet or Opus as the executor model. But for short tasks often nothing beats just looking at the data/code yourself.
 - For coding-type tasks where not burning context spuriously is important, using subagents up front to ground yourself in the state of our work can be worth it. For analysis-type tasks where the goal is more to provide an ideological synthesis to the user, consuming the relevant context directly (rather than with a subagent intermediary) is often load-bearing for interpreting results properly. Subagents, especially those that run smaller models, risk misinterpreting results in subtle domains.
+- Treat prior experiments and results with a grain of salt. Prior positive results can be reproduced with updated machinery quite trivially. Prior negative results should not derail our current lines of inquiry; we often had different priors at the time we implemented them.
 
 ## Quotes
 
