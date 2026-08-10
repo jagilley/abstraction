@@ -312,7 +312,8 @@ def irreducible_entropy(rules, seqs, level_features, D, plen):
 
 def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
                          verbose=True, anc_mask=None,
-                         return_chain_marginals=False):
+                         return_chain_marginals=False,
+                         return_leaf_posteriors=False):
     """The full oracle: B (joint + marginal), H_tot, H_irr, true surprisal.
 
     Returns a dict of arrays. Signal axis is t = 0..T-2 ("the token x_{t+1}
@@ -356,6 +357,28 @@ def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
     analysis of Petersen et al. 1998 PNAS 95:853: instrument every region in every
     state and keep both signed contrasts, because a single difference cannot tell
     "B = A + new" from "B = A - old + new".
+
+    return_leaf_posteriors (default False -- prior callers are unaffected): also
+    emit the two NEXT-TOKEN distributions whose entropies are H_tot and H_irr[D].
+    They are already computed here and thrown away; only the entropies survive.
+
+        leaf_post   (n, T-1, v)      P(x_{t+1} = a | x_{<=t})
+        irr_post    {D: (n, T-1, v)} P(x_{t+1} = a | z_{<=D} = true, x_{<=t})
+
+    H_tot == H(leaf_post) and H_irr[D] == H(irr_post[D]) by construction, so the
+    self-check above also certifies these. They are the BP-exact weights for the
+    law-of-total-variance split of the STATE UPDATE that mirrors the surprisal
+    split: conditional on the prefix, a causal model's h[t+1] takes only v values
+    (one per arriving token), so
+
+        Var(h[t+1] | x_{<=t})  =  E_z[ Var(h[t+1] | z_{<=D}, x_{<=t}) ]   ALEATORIC
+                               +  Var_z( E[h[t+1] | z_{<=D}, x_{<=t}] )   EPISTEMIC
+
+    is an exact v-term weighted sum, `leaf_post` weighting the outer variance and
+    `irr_post[D]` the inner one. The observed sequence's true z is itself a draw
+    from P(z | x_{<=t}), so averaging the inner term over the dataset is an
+    unbiased one-sample estimator of E_z[.] -- no enumeration or sampling of z.
+    See aleatoric_fraction/.
     """
     v, m, s = rules[0].shape
     L = len(rules)
@@ -375,6 +398,9 @@ def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
     cm = ({k: np.zeros((n, T - 1, L, v))
            for k in ("new_prev", "new_cur", "old_prev", "old_cur")}
           if return_chain_marginals else None)
+    lp = np.zeros((n, T - 1, v)) if return_leaf_posteriors else None
+    ip = ({D: np.zeros((n, T - 1, v)) for D in Ds}
+          if return_leaf_posteriors else None)
 
     for c0 in range(0, n, chunk):
         c1 = min(n, c0 + chunk)
@@ -385,6 +411,8 @@ def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
             # H_tot / surprisal for predicting x_{t+1} from x_{<=t}: prefix length t+1
             leaf_post = prev[2]
             H_tot[c0:c1, t] = _ent(leaf_post, axes=1)
+            if lp is not None:
+                lp[c0:c1, t] = leaf_post
             obs = sq[:, t + 1]
             surprisal[c0:c1, t] = -np.log(
                 np.clip(leaf_post[np.arange(c1 - c0), obs], EPS, None))
@@ -412,8 +440,10 @@ def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
                 out["B_marg"][D][c0:c1, t] = marginal_kl_sum(cur[0], prev[0], D)
                 out["B_chain"][D][c0:c1, t] = chain[:, :D + 1].sum(1)
                 out["H_post"][D][c0:c1, t] = joint_entropy(prev[0], prev[1], D, s)
-                out["H_irr"][D][c0:c1, t] = irreducible_entropy(
-                    rules, sq, lf, D, t + 1)[0]
+                h_irr, irr_p = irreducible_entropy(rules, sq, lf, D, t + 1)
+                out["H_irr"][D][c0:c1, t] = h_irr
+                if ip is not None:
+                    ip[D][c0:c1, t] = irr_p
             prev = cur
         if verbose:
             print(f"  oracle: {c1}/{n} sequences", flush=True)
@@ -427,6 +457,9 @@ def revision_and_entropy(rules, seqs, level_features, Ds=None, chunk=256,
                                 for d in range(L)})}
     if cm is not None:
         res["chain_marg"] = cm
+    if lp is not None:
+        res["leaf_post"] = lp
+        res["irr_post"] = ip
     return res
 
 

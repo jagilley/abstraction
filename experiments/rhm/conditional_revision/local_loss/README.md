@@ -6,6 +6,10 @@
 **Date**: 2026-08-08 · **Status**: run. Single seed, one regime (m2), one axis (self-knowledge).
 The epistemic-content readouts this cut was ultimately *about* were **not** computed — see
 [What this does not establish](#what-this-does-not-establish).
+**Followed up 2026-08-09**: [`../aleatoric_fraction/`](../aleatoric_fraction/README.md) sizes the prize
+this cut was pushing on (headroom 0.0078 against a ceiling of 0.045), and
+[`../synonym_retention/`](../synonym_retention/README.md) runs a scale-free content-axis version of the
+arm comparison (a null, not gauge-confounded) and **re-scopes Finding 4's `syn/str`**.
 
 ## What we tried
 
@@ -142,6 +146,18 @@ Deep feature η² rises over base in both arms (d6 0.2425 → 0.3046 temporal λ
 λ=1.0@300k), so neither arm is degenerately collapsing; this reproduces the incumbent's
 "functional compression, not collapse" and does not distinguish the arms.
 
+> **Re-scoped 2026-08-09 by [`../synonym_retention/`](../synonym_retention/README.md).** `syn/str = 0.635`
+> **reproduces** (0.638 on `lam0_base` at the same cell) and is **distance-robust** (0.62–0.73 on m4 across
+> read distances `w = 0…16`), so it is not an artifact of the read position. What it cannot support is the
+> *inference*: `str` is `leaf` **plus** a rule bump — strictly a larger perturbation of the same span — and
+> both arms hold the constituent's own feature fixed, so the ratio compares two nested perturbation
+> magnitudes and neither arm isolates the latent. The cell is also flagged `ntp_defined: False` (the read
+> position is the last token, so NTP constrains that state not at all). Finding 4's stated conclusion — no
+> evidence of selective synonym discarding *attributable to the loss* — is **unaffected**, and is
+> corroborated: on the distance axis the discarding is real and large (rule retention +0.858 at `w=0` →
+> chance by `w=16`, ~3× faster than feature identity) and is **already present at λ=0**, with the arm
+> comparison at matched compression reading +0.392 depth vs +0.393 temporal.
+
 ## What this does not establish
 
 This is the part worth reading carefully. The cut answers a narrower question than the one that
@@ -209,6 +225,11 @@ exists so the incumbent can never be clobbered.
   for anything short of catastrophic change.
 - **Counterfactual twins need matched perturbation size**, or a sensitivity difference is just a
   perturbation-size difference. Both twins are legal DGP productions with overlapping Hamming
-  distributions (3.56 vs 3.75) and bit-identical prefixes.
+  distributions (3.56 vs 3.75) and bit-identical prefixes. **Matching is not enough when the arms are
+  nested** — `str` = `leaf` + a bump on the same span, so `syn/str` is a ratio of two magnitudes rather
+  than a selectivity readout; see the re-scoping note in Finding 4.
+- **A retention readout needs a read position outside the perturbed span.** `_swap_sensitivity` reads the
+  last position of the sequence while perturbing a span that contains it, so NTP places no constraint on
+  that state. [`../synonym_retention/`](../synonym_retention/README.md) supplies the distance axis.
 - **The temporal arm can raise cosine by smoothing** (`h6[t+1] ≈ h6[t]`) with no conditioning effect at
   all, because its source is its target block. Read predictability jointly with `delta_over_tgt`.

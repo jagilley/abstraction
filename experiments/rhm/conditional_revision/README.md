@@ -290,7 +290,41 @@ probe reads 1.000 in every arm).
 Important scope limit, stated at length there: this scores the **local-loss arc's** axis (self-knowledge),
 not the epistemic-content axis this cut is about — Gate A/B readouts on the trained checkpoints were not
 computed — and it runs on **m2**, where the model is knowledge-saturated, while every measurement above
-is on m4.
+is on m4. Two children below revisit it: [`aleatoric_fraction/`](aleatoric_fraction/README.md) shows the
+raw term's gauge collapse leaves that comparison hard to read, and
+[`synonym_retention/`](synonym_retention/README.md) supplies a scale-free content-axis version of the same
+arm comparison and **re-scopes Finding 4's `syn/str = 0.635`**.
+
+## Child: aleatoric_fraction — is there anything for an aleatoric filter to remove?
+
+[`aleatoric_fraction/`](aleatoric_fraction/README.md) sizes the prize before any §8 training intervention,
+on the frozen m4 base with no FM and no training. The object is the law-of-total-variance split of the
+*state update* mirroring §4's surprisal identity — `Var(h[t+1]|x_≤t) = E_z[Var(·|z)] + Var_z(E[·|z])` — with
+BP-exact 16-term weights, so the readout `A_D/(A_D+E_D)` is scale-free and immune to the gauge collapse.
+**The conditioning gap does give the residual a large aleatoric component** (0.665 of the ideal arity-1
+residual's variance at the tightest reading, against 0 by construction for the depth target). **But the
+model sits on the measured NTP-protected floor at every rung**: headroom 0.0078 against a model-free
+ceiling of 0.045, `D`-invariant, with 98.7% of the aleatoric variance at constituent-opening positions
+where the synonym choice determines the sibling. The floor is nonzero even at completing positions (0.034)
+from parse ambiguity. `A` and `E` are not separable above k≈16 against a proper ceiling and null, which
+bears on §5's precision-operator question. An analytic survey of ~60 RHM variants found none creates
+non-degenerate headroom, and flagged a defect in the criterion — it is *instantaneous*, so content that is
+load-bearing for a while and then stops scores zero.
+
+## Child: synonym_retention — the distance axis, and a cleaner version of the §8 arm comparison
+
+[`synonym_retention/`](synonym_retention/README.md) perturbs a constituent and reads the state `w`
+positions after it **closes**, with the perturbation frozen across the sweep so only read distance varies.
+**At λ=0, with no local loss anywhere, the m4 base already sheds closed-constituent synonym identity**:
+rule retention +0.858 at `w=0` → +0.079 by `w=8` → chance by `w=16`, against an exact Bayes ceiling of
+0.97–0.99 that *rises* in `w`, so this is discarding rather than loss of access. It sheds the synonym bit
+~3× faster than the constituent's feature identity — the selective ordering §8 proposed a local loss would
+induce. **The arm comparison is a null**: across ten `local_loss` checkpoints spanning 53.4 → 39.4%
+activation rank, retention is flat to within 0.038 and the no-local-loss anchor sits mid-range; at matched
+compression depth reads +0.392 and temporal +0.393. Unlike the SK result this null is not gauge-confounded,
+since retention is pinned between chance and an exact Bayes ceiling. Compression touches *presence* (ρ
++0.891, p=0.001 at `w=0`) but not *persistence* (ρ +0.394, p=0.26 in the tail). Open: causal displacement
+still reads 80–100σ at `w ≥ 16` where the linear probe reads exactly zero.
 
 ## Reproduction
 
