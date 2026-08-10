@@ -16,6 +16,15 @@ residual carries revision content, directionally) ·
 (residual *magnitude* is output entropy at R² 0.901; *direction* separates at 0.996) ·
 [`local_loss/`](../experiments/rhm/conditional_revision/local_loss/README.md) (training on the temporal
 target reproduces the depth signature — a live reason the answer here could be no)
+**Reading**: Binz, Dasgupta, Jagadish, Botvinick, Wang & Schulz (2023), *Meta-Learned Models of
+Cognition*[^private] — the canonical citation for this
+doc's premise that a trained model's forward pass *is* amortized Bayesian inference (their Box 1:
+the converged objective's optimum is the posterior predictive). Two of its threads anchor this design:
+Argument 4's Wang et al. 2018 reading (a slow dopaminergic loop *builds* a fast in-activation
+updater — the biological frame for reading revision off activations at all), and §4.1's lament that
+meta-learned models offer "no underlying mathematical expression" to inspect — which is what running
+the battery against an exact belief oracle answers: the composite's report is scored against the
+analytical object their framework says the model approximates.
 **Attribution**: the question is Jasper's, asked in two halves: *"if the main model + FM system is
 introspective, would the token offset make that introspection epistemically-charged rather than
 epistemically-inert?"* and *"the predictive-distribution revision does you no good if that signal is
@@ -165,3 +174,5 @@ and this design does not settle it — run OL first, CL as the follow-up arm.
 - Does the observer-ladder shape (flat in capacity — access-limited) survive the axis change? On the
   depth axis this was the sharpest single result; if the temporal ladder *climbs*, the privacy
   argument needs revisiting for world-facing content.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

@@ -9,6 +9,18 @@ impossibility result this substrate lifts), [`../aleatoric_fraction/`](../aleato
 **Ancestry**: [`ratchet/RHM_META_LEARNING`](../../ratchet/RHM_META_LEARNING_README.md) (weight-space meta
 across rule sets: collapse) · [`mjc/meta_adapt`](../../../mjc/meta_adapt/README.md) (the floor/conflict
 lesson and the context-latent positive this design transposes to in-context inference)
+**Reading**: Binz, Dasgupta, Jagadish, Botvinick, Wang & Schulz (2023), *Meta-Learned Models of
+Cognition*[^private] — the theoretical charter
+for this cut, read after the fact. Its Box 1 (Aitchison/Ortega: the converged meta-learner's optimum
+*is* the Bayes-optimal posterior predictive) is the premise that makes "ICL fraction" a well-defined
+quantity, and its §4.2 confesses exactly the gap this cut fills: *"no guarantee that a fully converged
+meta-learned model actually implements a Bayes-optimal learning algorithm… future work should come up
+with techniques to verify meta-learned models."* This substrate is such a technique — an exact
+per-token ceiling plus the first controlled dissociation of supply from realization (their cited
+failure case, Wang et al. 2021, is an existence report; R128-vs-R64 is the same phenomenon with the
+cause isolated on a dial). Their Kumar et al. discussion — meta-learning easier on *non*-structured
+than structured tasks, fixed by natural-language grounding — is the published cousin of the
+R128/RHM_META_LEARNING collapse and of this repo's "grounding is the pivot."
 **Date**: 2026-08-09/10 · **Status**: Gate −1, Gate 0 (+ 36k retrain), diagnostics, retention
 (parts 1–2), and Gate 1 all run. Gate 2 not run — its pre-registered precondition was not met.
 Single seed throughout.
@@ -234,3 +246,5 @@ removed from the DGP); an unmatched single-arm ICL reading before ~6k steps is a
 under random phase, later window positions carry more context on average (the +0.046 floor artifact);
 and in this regime any magnitude-based "residual decays over context" readout is entropy by
 construction — direction or nothing.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
