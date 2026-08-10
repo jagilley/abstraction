@@ -2,7 +2,10 @@
 
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md) · **Design doc**: [SPEC.md](SPEC.md)
 **Children**: [sculpt_slip/README.md](sculpt_slip/README.md) — the same question on a control substrate ·
-[local_loss/README.md](local_loss/README.md) — the same conditioning gap used as a *training* signal
+[local_loss/README.md](local_loss/README.md) — the same conditioning gap used as a *training* signal ·
+[aleatoric_fraction/README.md](aleatoric_fraction/README.md) — how much irreducible content the state carries, and how much is discardable ·
+[synonym_retention/README.md](synonym_retention/README.md) — the distance axis ·
+[rule_family/README.md](rule_family/README.md) — the meta-regime: rule families, in-context rule inference, and the readability boundary
 **Idea**: [`ideas/revision_not_surprisal.md`](../../../ideas/revision_not_surprisal.md)
 **Sibling / predecessor**: [`../endogenous_teacher/`](../endogenous_teacher/README.md) — this is the
 measurement that cut needed before its interventions.
@@ -325,6 +328,23 @@ compression depth reads +0.392 and temporal +0.393. Unlike the SK result this nu
 since retention is pinned between chance and an exact Bayes ceiling. Compression touches *presence* (ρ
 +0.891, p=0.001 at `w=0`) but not *persistence* (ρ +0.394, p=0.26 in the tail). Open: causal displacement
 still reads 80–100σ at `w ≥ 16` where the linear probe reads exactly zero.
+
+## Child: rule_family — the meta-regime, where reducibility is state-dependent
+
+[`rule_family/`](rule_family/README.md) draws each context window from one of R rule sets, so the model
+must infer the active rules in-context and this cut's static-reducibility premise no longer holds; the
+incumbent substrate is its zero-conflict floor. The exact oracle survives as a mixture over R junction
+trees, with the slow (rule-revision) channel budget-capped at `ln R` nats per window. **First positive
+ICL reading on RHM**: the learnable design reaches **0.645 of the exact oracle ceiling** (lower bound;
+shape corr +0.997) and **transfers to unseen rule sets (~108%)**, while a higher-dimensional-inference
+design stays at 0.022 despite 3× the available signal — realization is gated by inference
+dimensionality, not supply. The regime re-prices retention (rule evidence carried across boundaries,
+paid for with parse detail; the discard schedule is keyed to predictive relevance), and supplies the
+NTP-required-at-distance positive control `synonym_retention/` proves impossible on fixed rules. The
+belief-coordinate revision readout (Gate 1) reads chance there at current probe quality — a third
+point on this cut's own probe-decodability curve (82–90% of ceiling → readable; 11–18% → chance) —
+while the function is simultaneously strong, so readout failure and phenomenon presence were measured
+apart. Follow-on design: [`ideas/temporal_confabulation_test.md`](../../../ideas/temporal_confabulation_test.md).
 
 ## Reproduction
 

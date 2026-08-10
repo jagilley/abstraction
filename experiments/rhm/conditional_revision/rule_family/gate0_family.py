@@ -80,7 +80,7 @@ def gate0(
     design: str = "d2_R128_nF4",
     # DGP -- conditional_revision's regime so the reference lines transfer
     v: int = 16, s: int = 2, depth: int = 6, m: int = 4, family_seed: int = 0,
-    k_seqs: int = 8,
+    k_seqs: int = 8, phase: str = "aligned",
     # Model
     n_layer: int = 8, n_head: int = 8, n_embd: int = 256,
     deep_block: str = "post_block6",
@@ -98,6 +98,7 @@ def gate0(
     log_interval: int = 1000,
     arms: str = "family,floor",
     icl_trace_every: int = 0, n_trace_pairs: int = 512,
+    ckpt_every: int = 0,
     heldout: bool = True, force_retrain: bool = False,
     save_ckpt: bool = True,
     seed: int = 42, tag: str = "",
@@ -149,12 +150,22 @@ def gate0(
             pool[r] = one[:, 0]
         pools[arm] = torch.from_numpy(pool)
 
+    arange_G = torch.arange(G)
+
     def get_batch(arm, gen):
         pool = pools[arm]
         rid = torch.randint(0, R, (batch_size,), generator=gen)
-        idx = torch.randint(0, per_rule, (batch_size, k_seqs), generator=gen)
-        win = pool[rid[:, None], idx]                       # (B, K, T)
-        return win.reshape(batch_size, G).to(device), rid.to(device)
+        if phase == "aligned":
+            idx = torch.randint(0, per_rule, (batch_size, k_seqs), generator=gen)
+            win = pool[rid[:, None], idx]                   # (B, K, T)
+            return win.reshape(batch_size, G).to(device), rid.to(device)
+        if phase != "hidden":
+            raise ValueError(f"phase must be 'aligned' or 'hidden' (got {phase!r})")
+        idx = torch.randint(0, per_rule, (batch_size, k_seqs + 1), generator=gen)
+        stream = pool[rid[:, None], idx].reshape(batch_size, (k_seqs + 1) * T)
+        off = torch.randint(0, T, (batch_size, 1), generator=gen)
+        return (stream.gather(1, off + arange_G[None, :]).to(device),
+                rid.to(device))
 
     # ---------------- matched depth-swap eval set ----------------
     # For each pair-window: one probe sequence P and K-1 fillers, all from one rule set.
@@ -213,7 +224,9 @@ def gate0(
     results = {"config": {"design": design, "R": R, "differ_levels": dl,
                           "n_differ_features": nF, "mode": mode,
                           "v": v, "s": s, "L": L, "m": m, "k_seqs": k_seqs, "G": G,
-                          "n_layer": n_layer, "n_head": n_head, "n_embd": n_embd,
+                          "phase": phase,
+                          "n_layer": n_layer, "n_head": n_head,
+                          "n_embd": n_embd,
                           "base_steps": base_steps, "batch_size": batch_size,
                           "lr": lr, "pool_tokens": pool_tokens,
                           "per_rule_sequences": per_rule, "n_pairs": n_pairs,
@@ -284,7 +297,8 @@ def gate0(
         opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
         gen = torch.Generator().manual_seed(seed)
 
-        ckpt = (f"{DATA_DIR}/{key}/rule_family/{design}_K{k_seqs}_{arm}_"
+        ph = "" if phase == "aligned" else f"_{phase}"
+        ckpt = (f"{DATA_DIR}/{key}/rule_family/{design}_K{k_seqs}{ph}_{arm}_"
                 f"{n_layer}L{n_head}H{n_embd}D_steps{base_steps}_seed{seed}.pt")
         if os.path.exists(ckpt) and not force_retrain:
             print(f"  loading cached {ckpt}", flush=True)
@@ -303,12 +317,21 @@ def gate0(
                     model.eval()
                     dl_ = depth_losses(model, pair_pack[arm][0], n_trace_pairs)
                     trace.append({'step': step,
+                                  'ntp': float(loss.item()),
                                   'depth_loss': dl_.tolist(),
                                   'decline': float(dl_[0] - dl_[-1])})
                     print(f"    trace step {step:6d}  depth0 {dl_[0]:.4f}  "
                           f"depth{k_seqs - 1} {dl_[-1]:.4f}  "
                           f"decline {dl_[0] - dl_[-1]:+.5f}", flush=True)
                     model.train()
+                if ckpt_every and (step + 1) % ckpt_every == 0:
+                    ip = ckpt.replace('.pt', f'_at{step + 1}.pt')
+                    os.makedirs(os.path.dirname(ip), exist_ok=True)
+                    torch.save({'model': model.state_dict(),
+                                'config': results['config'],
+                                'step': step + 1}, ip)
+                    volume.commit()
+                    print(f'    checkpoint -> {ip}', flush=True)
             trace_by_arm[arm] = trace
             if save_ckpt:
                 os.makedirs(os.path.dirname(ckpt), exist_ok=True)
@@ -488,7 +511,8 @@ def gate0(
 
     out_dir = f"{DATA_DIR}/{key}/rule_family"
     os.makedirs(out_dir, exist_ok=True)
-    name = f"gate0_{design}_K{k_seqs}{'_' + tag if tag else ''}_seed{seed}.json"
+    ph = "" if phase == "aligned" else f"_{phase}"
+    name = f"gate0_{design}_K{k_seqs}{ph}{'_' + tag if tag else ''}_seed{seed}.json"
     with open(f"{out_dir}/{name}", "w") as f:
         json.dump(results, f, indent=2, cls=NumpyEncoder)
     volume.commit()
