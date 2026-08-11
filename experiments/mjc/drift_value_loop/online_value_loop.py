@@ -382,14 +382,19 @@ def run_online_value_loop(cfg: dict) -> dict:
         return np.bincount(pos_to_cell(pts), minlength=n_cells).astype(np.float64)
 
     def grounded_scores(fms, rnd, b):
-        """b*reducible + (1-b)*exploit — the e-tap + p-tap as two additive drives."""
+        """b*reducible + (1-b)*exploit — the e-tap + p-tap as two additive drives.
+
+        Returns (scores, err). `err` is the per-cell FM prediction error that the drive already
+        computes EVERY round; the sparse teacher recomputes the same quantity once per epoch and
+        throws these away. Returning it is what makes the dense teacher free.
+        """
         err = score_error(fms, rnd); dis = score_disagree(fms)
         en = (err - err.min()) / (err.max() - err.min() + 1e-9)
         dn = (dis - dis.min()) / (dis.max() - dis.min() + 1e-9)
         exn = en * dn
         ap = score_exploit(rnd)
         apn = (ap - ap.min()) / (ap.max() - ap.min() + 1e-9)
-        return b * exn + (1 - b) * apn + 1e-6
+        return b * exn + (1 - b) * apn + 1e-6, err
 
     # ===================================================================== #
     # run one arm
@@ -424,6 +429,7 @@ def run_online_value_loop(cfg: dict) -> dict:
         base = None; run_sq = None                               # REINFORCE baseline / advantage-normalizer
         warmup = cfg["outer_warmup"]
 
+        dense_acc = []                                           # per-round corridor err, this epoch
         occ = np.zeros(n_cells); occ_hist = []; recs = []
         patch_frac_hist = []; noise_frac_hist = []; b_hist = []; outer_hist = []
 
@@ -433,6 +439,8 @@ def run_online_value_loop(cfg: dict) -> dict:
             is_epoch_end = (rnd % M == M - 1) or (rnd == cfg["rounds"] - 1)
 
             # --- outer loop: choose b for this epoch (online) ---
+            if is_epoch_start:
+                dense_acc = []
             if is_online and is_epoch_start:
                 cur_eps = 0.0 if epoch < warmup else cfg["outer_sigma"] * float(arng.standard_normal())
                 cur_b = sigmoid(max(-4.0, min(4.0, theta + cur_eps)))
@@ -443,7 +451,8 @@ def run_online_value_loop(cfg: dict) -> dict:
             if arm == "random":
                 scores = np.ones(n_cells)
             else:
-                scores = grounded_scores(fms, rnd, b_r)
+                scores, _round_err = grounded_scores(fms, rnd, b_r)
+                dense_acc.append(float(np.mean(_round_err[corridor_cells])))
             sc = scores / (scores.sum() + 1e-12)
             logit = np.log(sc + 1e-12) / cfg["temp"]
             p = np.exp(logit - logit.max()); p /= p.sum()
@@ -472,8 +481,15 @@ def run_online_value_loop(cfg: dict) -> dict:
                 all_err = score_error(fms, rnd)                  # per-cell FM prediction error
                 fr_err = float(all_err[fc])                      # error AT the (privileged) needle cell
                 corr_err = float(np.mean(all_err[corridor_cells]))  # value-relevant TEACHER (fair)
+                # DENSE TEACHER: average the M per-round corridor errors the drive already computed
+                # with this epoch-end probe. Logged unconditionally so any run measures the
+                # within-epoch correlation; only USED as the teacher when cfg["dense_teacher"].
+                corr_err_dense = float(np.mean(dense_acc + [corr_err])) if dense_acc else corr_err
+                teach_err = corr_err_dense if cfg.get("dense_teacher") else corr_err
                 recs.append({"round": rnd, "epoch": epoch, "control_dist": cdist,
                              "frontier_err": fr_err, "corridor_err": corr_err,
+                             "corridor_err_dense": corr_err_dense,
+                             "dense_samples": list(dense_acc),
                              "b": b_val, "noise": noise_on(rnd)})
                 occ_hist.append(occ.copy())
 
@@ -481,7 +497,7 @@ def run_online_value_loop(cfg: dict) -> dict:
                     # THE TEACHER SWAP: 'front' grades by the value-relevant FM re-adaptation
                     # error (higher R = lower corridor error); 'control' by downstream goal-dist
                     # (the parent's near-blind grader). Reward normalized to be scale-agnostic.
-                    R = -corr_err if teacher == "front" else -cdist
+                    R = -teach_err if teacher == "front" else -cdist
                     adv = 0.0 if base is None else (R - base)
                     base = R if base is None else cfg["outer_rho"] * base + (1 - cfg["outer_rho"]) * R
                     # lazy-init the advantage-normalizer on the RIGHT scale (so a fixed run_sq=1
@@ -496,7 +512,10 @@ def run_online_value_loop(cfg: dict) -> dict:
                         theta = max(-4.0, min(4.0, theta + cfg["outer_alpha"] * grad))
                     outer_hist.append({"epoch": epoch, "theta": float(theta), "b_used": float(b_r),
                                        "eps": float(cur_eps), "reward": float(R), "teacher": teacher,
-                                       "adv": float(adv), "b_theta": float(sigmoid(theta))})
+                                       "adv": float(adv), "b_theta": float(sigmoid(theta)),
+                                       "corr_err": float(corr_err),
+                                       "corr_err_dense": float(corr_err_dense),
+                                       "dense_teacher": int(bool(cfg.get("dense_teacher")))})
                     print(f"  [{arm:12s} e{epoch:2d} r{rnd:3d}] b={b_r:.3f} theta={theta:+.2f} "
                           f"ctrl={cdist:.4f} corr_err={corr_err:.4f} R={R:+.4f} adv={adv:+.4f}", flush=True)
                 else:
@@ -699,6 +718,10 @@ def online_value_loop(
     outer_sigma: float = 0.7,             # exploration std in theta-space
     outer_rho: float = 0.8,               # EMA for baseline + advantage-normalizer
     outer_warmup: int = 2,                # epochs at b_init before tuning (warms the baseline)
+    dense_teacher: bool = False,          # grade the outer loop on the epoch MEAN of the per-round
+                                          # corridor FM error (M samples the drive already computes)
+                                          # instead of the single epoch-end probe. Default off =>
+                                          # every prior Cut-3 result reproduces bit-for-bit.
     b_init: float = 0.5,                  # neutral prior set-point (partially-frozen start)
     # env / family (Cut #3's momentum reaching — a KNOWN-WORKING controller)
     frame_skip: int = 12,
@@ -768,6 +791,7 @@ def online_value_loop(
         noise_onset=noise_onset, task_geom=task_geom, corridor_r=corridor_r,
         outer_m=outer_m, outer_alpha=outer_alpha, outer_sigma=outer_sigma,
         outer_rho=outer_rho, outer_warmup=outer_warmup, b_init=b_init,
+        dense_teacher=bool(dense_teacher),
         frame_skip=frame_skip,
         dgp_base=dict(arena_half=arena_half, gear=gear, joint_damping=joint_damping, pusher_r=0.12),
         patch_amp=patch_amp, patch_sigma=patch_sigma, patch_phase=patch_phase,
