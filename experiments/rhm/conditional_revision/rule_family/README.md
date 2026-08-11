@@ -1,6 +1,11 @@
 # Rule-family RHM: in-context rule inference, and what a conditioning gap is worth to the full system
 
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md) · **Working notes / handoff**: [NOTES.md](NOTES.md)
+**Child**: `precision/SPEC.md`[^private] — *designed, not run.* Whether the state-dependent
+reducibility this substrate creates is **computed** and whether weighting the loss by it pays. This is the
+only regime in the repo where reducibility is not a DGP constant the weights can memorize, which is the
+best available diagnosis of §5's four precision nulls; the R64/R128 pair brackets `sculpt_slip`'s
+variance-limited precondition on a dial already run.
 **Idea**: [`ideas/revision_not_surprisal.md`](../../../../ideas/revision_not_surprisal.md) · follow-on design: [`ideas/temporal_confabulation_test.md`](../../../../ideas/temporal_confabulation_test.md)
 **Siblings this converged with**: [`../synonym_retention/`](../synonym_retention/README.md) (whose
 impossibility result this substrate lifts), [`../aleatoric_fraction/`](../aleatoric_fraction/README.md)

@@ -7,6 +7,11 @@
 against an *exactness* target rather than an accuracy one. It **retracts §2's multiply result**
 (see the note there), converts §3's central inference into a direct measurement, and finds the
 reduce and the multiply fail at different digit widths.
+**Extended 2026-08-10** by [`staged_reduce/`](staged_reduce/README.md), which decomposes the
+reduce into bounded-quotient stages chained at test time. It moves **§4's rule axis** — held-out
+`N` from at-or-below floor to 0.98 across two seeds — but only as an interaction with modulus
+count, and it leaves §4's height-of-the-barrier question answered rather than the barrier
+removed.
 
 ---
 
@@ -197,6 +202,14 @@ Both many-moduli arms are **undertrained, not saturated**: `redmod_q64_many` was
 data at all, where the same task at 8 moduli reached 0.891. So `qfull_many`'s 0.043 records
 "did not fit in this budget", not a ceiling.
 
+**Superseded in part (2026-08-10).** [`staged_reduce/`](staged_reduce/README.md) reaches **0.9826
+/ 0.9790** on held-out `N` at 142 moduli, against the 0.058 above. The barrier is real as measured
+here but it is not a property of the rule axis as such: it dissolves when the reduce is decomposed
+into bounded-quotient stages *and* the modulus set is wide, and neither of those alone does
+anything. What this section got right is that modulus count matters and that these arms were
+undertrained; what it could not see is that count only pays off once the function being learned
+has a shared form across moduli.
+
 ## 5. A group-structure null does not license "no algorithm"
 
 `rule_structure` already carried this as a stated caveat; this cut supplies a demonstration.
@@ -242,6 +255,38 @@ collapses to 0.0004, while a bounded-quotient reduce at the same width reads 0.9
 reduce's difficulty is the *quotient range*, which `x^2` spans in full by construction.
 Also: a closure loss must be scale-free (an MSE seam reached 0.0010 at cosine **0.081**), and
 a closure statistic is only interpretable if its target branch is independently grounded.
+
+### [`staged_reduce/`](staged_reduce/README.md) — decomposing the reduce until its stages are coverable
+
+**Goal**: act on [`exact_atom/`](exact_atom/README.md) §5, which localised the reduce's failure to
+the **quotient range** — spanned in full by `x^2` by construction — and showed a bounded-quotient
+reduce is fine at both widths. Schoolbook long division makes every stage a bounded-quotient
+reduce; the chain is applied **at test time only**, with the remainder re-grounded through the
+model's own decode, so it is `ballistic_depth` §9's re-projection one level down and the snap is
+exact rather than a projection onto a learned manifold.
+
+**Finding**: the decomposition works, and it moves the axis this cut's §4 left open. Step-matched
+at 600k, 3 digits, staged reads **0.9968** against a monolithic control at 0.4841; at 4 digits —
+where the control reads 0.0005, reproducing `div4_qfull`'s 0.0004 — staged reads **0.9899**. It is
+generalisation rather than coverage: on rejection-sampled chains where *no* stage query was ever
+trained on, the staged arm reads **0.9925**. And held-out `N` goes from at-or-below floor to
+**0.9826 / 0.9790** across two seeds, per-modulus minimum 0.851 across 36 unseen moduli, against
+`redmod_q64_many`'s 0.058 — the first movement on the rule axis in this program.
+
+That movement is an **interaction, not a main effect**. A family-matched 8-modulus arm (same
+178-modulus family, only the count varies) sits at floor on held-out `N` (0.0042) while reading
+0.9943 on held-out `y` — it learns staged division essentially perfectly and still cannot transfer
+it. Breadth without staging moves held-out `N` only 0.0012 → 0.0025. Suggestively: staging does not
+teach the rule, it changes the function into one that *has* a shared form across moduli, and
+breadth supplies the evidence that the form is shared.
+
+Also there: the compute control is **not** null (6 serial operator applications without
+re-grounding recover roughly a third of the gap in `eps`), so re-grounding *dominates* compute
+rather than being the only thing that matters; a reading that 774 moduli generalise worse than 142
+is **retracted** as an artefact of a degenerate held-out selector, and on matched moduli the
+774-arm is marginally better; and the bug exposed that transfer is uniform across minimum prime
+factor and magnitude but collapses on a final-digit class absent from training. No cell certifies
+rung `T=1` — best `eps` 3.16e-3 against 9.0e-4.
 
 ## Predictions that failed
 
@@ -313,11 +358,12 @@ both parent cuts, `modal volume get` needs `--force` and a full per-file destina
    [`exact_atom/`](exact_atom/README.md) §4. The auxiliary installs a reduce that reads 0.953
    on the inputs `x^2` supplies, but the composed map stays at floor because the *multiply*
    cannot construct the state to hand it. The `{div aux} × {seam closure}` 2×2 is null as posed.
-3. **Longer budgets on the many-moduli arms**, which is the only way to put a height on §4's
-   barrier rather than a lower bound. Still open, and still the axis nothing has moved:
-   `exact_atom/` §3's attempt to widen the rule set — legal because division needs neither a
-   factorisation nor a periodicity margin, so `N` can be drawn from all 900 three-digit
-   integers rather than ~178 semiprimes — did not train.
+3. ~~**Longer budgets on the many-moduli arms**, the only way to put a height on §4's barrier.~~
+   — largely answered, and not by budget; see [`staged_reduce/`](staged_reduce/README.md) §3.
+   Held-out `N` reaches 0.98 once the reduce is staged *and* the modulus set is wide. The
+   dense-`N` widening `exact_atom/` §3 could not train does train under staging, but its own
+   held-out selector turned out to be degenerate, so **whether breadth keeps helping past 142
+   moduli is still open** — that node's next step 1.
 4. ~~**Read the reduce out from inside a trained `sq`**~~ — done; see
    [`exact_atom/`](exact_atom/README.md) §4's oracle-seam probe, which is
    `ballistic_depth` §8's cold-start probe moved to the multiply/reduce seam.

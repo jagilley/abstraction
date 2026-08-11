@@ -154,6 +154,12 @@ ARMS: dict[str, dict] = {
     # because it was paired with the full quotient range, which staging removes.
     "sr3_r10_many": dict(radix=10, min_margin=2, max_moduli=0),
     "sr3_mono_many": dict(radix=0, min_margin=2, max_moduli=0),
+    # The family-matched 8-modulus control. `sr3_r10` is at floor on held-out `N`, but it
+    # draws from the `min_margin=20` family (59 moduli, range 177-995) while `_many` draws
+    # from `min_margin=2` (178 moduli, range 111-995) — so the 8-vs-142 contrast confounds
+    # modulus *count* with the family. This arm holds the family fixed and varies only the
+    # count, which is what the "breadth is the second factor" claim needs.
+    "sr3_r10_m8": dict(radix=10, min_margin=2, max_moduli=8),
     "sr3_r10_dense": dict(radix=10, dense_n=True, min_margin=2, max_moduli=0),
     "sr3_r2_dense": dict(radix=2, dense_n=True, min_margin=2, max_moduli=0),
     "sr3_mono_dense": dict(radix=0, dense_n=True, min_margin=2, max_moduli=0),

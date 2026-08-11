@@ -44,6 +44,12 @@ before any GPU time.
 | `gate1.py` | **Gate 1** (Modal: 8 CPU oracle shards + one L4). Does the model's state express *rule* revision separably from surprisal? Scores `M_rule = KL(q^rule_{t+1} ‖ q^rule_t)` from a temperature-calibrated, position-agnostic rule probe, against the oracle's exact `rule_rev`, under progressively stronger matching (raw / `n_open` / `n_open × exact mixture surprisal` / absolute position × surprisal / `n_open ×` model `nll`), per context depth, family arm vs floor arm on the *same* family windows. Carries the parent's before-state decomposition (`M_pointmass`, `negH_t`, `negH_t1`, `dH`), the graded partial `R²(M_rule ~ rule_rev | nll_mix)` on positive cells, window-bootstrap SEs, and the language sibling's `h_before_dir` / `h_after_dir` / `h_swap_dir` state decodes. Two amendments to the design doc and one smoke-caught guard bug are recorded in `NOTES.md` §8.1 — the primary cell set is **restricted to differing-ancestor cells** to remove a parse confound, and the `flat-in-depth ⇒ identity` threshold is shown to be weaker than written because the oracle's depth decay is base rate, not per-event magnitude. |
 | `__init__.py` | package marker |
 
+## Children
+
+| child | summary |
+|---|---|
+| `precision/`[^private] | **Designed, not run** — SPEC only; `README.md` lands after the run. Takes the state-dependent reducibility this substrate creates and asks the standing [`revision_not_surprisal`](../../../../ideas/revision_not_surprisal.md) §5 question on it: is reducibility *computed* in-context, and does weighting the NTP loss by it pay? The framing argument is that §5's four nulls (`endogenous_teacher`'s `\|E\|` arm, `MNIST_LOCAL_LOSS`'s inverse-variance weighting, [`../sculpt_slip/`](../sculpt_slip/README.md), `mjc/on_policy/metered_repair` E4) all ran where reducibility was a DGP constant an NTP-optimal model can bake into weights — so there was no precision computation to find. Three gates, cheapest first: a CPU-only per-token three-way split of the mixture oracle (does the reducible fraction vary beyond position-in-window?), an oracle-Π weighted training arm as the grounded upper bound, then endogenous estimators against a mandatory **observer-simulated twin** (the temporal-confabulation OL run found belief revision is *public*, so Π may need no self-access). `d2_R64_nF2` (0.645 of ceiling, still climbing) vs `d2_R128_nF4` (flat from step 2k) brackets `sculpt_slip`'s "an aleatoric filter only pays when the learner is variance-limited" as a prediction rather than a caveat. Primary threat, and the reason every arm carries a phase-matched random control: rule revision decays as the posterior concentrates, so oracle Π correlates hard with position-in-window |
+
 ## Conventions worth not rediscovering
 
 - **`rules[d]` vs `d{k}` naming.** `rules[d]` expands a level-d feature (d = 0 root,
@@ -57,3 +63,5 @@ before any GPU time.
   "the token x_{t+1} arrives", so it returns T−1 columns. Inside a window that position is
   real, and the joint identity fails there unless it is computed — hence
   `sequence_revision_all`.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

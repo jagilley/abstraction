@@ -256,6 +256,27 @@ bounded-quotient reads 0.986, so the reduce's limit is the **quotient range** �
 spans by construction. Held-out `N` stays at or below floor everywhere, including under an
 oracle state.
 
+Its sibling [`staged_reduce/`](rule_acquisition/staged_reduce/README.md) acts on that
+localisation and **moves the rule axis** — the one nothing in this program had moved. Schoolbook
+long division makes every stage a bounded-quotient reduce, chained *at test time only* with the
+remainder re-grounded through the model's own decode: §9's re-projection one level down, and
+exact rather than a manifold projection because the remainder is a digit string. Step-matched at
+600k it reads **0.9968** against a monolithic control's 0.4841 at 3 digits and **0.9899** against
+**0.0005** at 4 digits — the width where the composed atom's reduce blade had failed — and
+rejection-sampled chains none of whose stage queries was ever trained on read **0.9925**, so this
+is generalisation rather than coverage. Held-out `N` goes from at-or-below floor to **0.9826 /
+0.9790** across two seeds, per-modulus minimum 0.851 over 36 unseen moduli, against the 0.058 that
+was the prior best.
+
+The mechanism is an **interaction**, which is the transferable part: a family-matched 8-modulus
+arm learns staged division essentially perfectly (0.9943 on held-out `y`) and still sits at floor
+on held-out `N` (0.0042), while breadth without staging moves it only 0.0012 → 0.0025.
+Suggestively, staging does not teach the rule — it changes the function into one that *has* a
+shared form across moduli, and breadth supplies the evidence that the form is shared. Two scope
+limits: the compute control is **not** null, so re-grounding dominates compute rather than being
+the whole story; and no cell certifies rung `T=1` (best `eps` 3.16e-3 against 9.0e-4), so this
+moves the axis that was stuck without clearing the ladder.
+
 ## Shared machinery (lives at this node)
 
 **`squaring_mod.py`** — the task, vendored from upstream. Token ids, decimal digit encoding,
@@ -301,10 +322,14 @@ entrypoint. Each cut's README carries its exact commands. Modal volume layout:
    see [`rule_acquisition/`](rule_acquisition/README.md). Our depth results remain about composing
    a *memorised* operator, but the reason the operator is memorised is now measured rather than
    assumed: the atom's reduce stage is starved of coverage by its own composition, and both halves
-   generalise when each is given its own input space. What is left open there is the **rule** axis
-   — generalising the reduce across moduli — which is the same axis `variable_modulus` hit from
-   the other direction. Its next step 2 (auxiliary dense-division loss on `sq`) is the direct
-   remedy the diagnosis implies, and is legal for a real submission.
+   generalise when each is given its own input space. The **rule** axis — generalising the reduce
+   across moduli, the same axis `variable_modulus` hit from the other direction — is no longer
+   the open one: [`staged_reduce/`](rule_acquisition/staged_reduce/README.md) takes held-out `N`
+   from floor to 0.98 by decomposing the reduce into bounded-quotient stages *and* widening the
+   modulus set, neither of which works alone. What is open now is narrower and more concrete:
+   whether breadth keeps paying past 142 moduli (that node's dense arm had a degenerate held-out
+   selector and cannot answer it), and whether the composed atom works at 4 digits now that its
+   reduce blade does.
 3. ~~**Held-out modulus** — the arity-2 cut.~~ — done; see [`variable_modulus/`](variable_modulus/README.md).
    The arity axis turned out to be the *weakest* result in it: a static rule is cheap to carry, so
    `fold` and `cond` differ by 2 depths and share a re-projection ceiling. The connection to the

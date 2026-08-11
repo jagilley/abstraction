@@ -98,8 +98,11 @@ def main():
         t = te.get("chain_heldout_y", {})
         pm = (f"{hy.get('per_modulus_min', float('nan')):.3f}/"
               f"{hy.get('per_modulus_max', float('nan')):.3f}") if "per_modulus_min" in hy else "-"
+        # ACHIEVED steps, not configured: several arms were stopped early by design, and
+        # quoting the configured budget next to a partial curve would misstate the control.
+        got = r["train_log"][-1]["step"] if r["train_log"] else 0
         print(f"{a:<20}{sp.get('n_digits',3):>2}{sp.get('radix',0):>7}{r['n_stages']:>4}"
-              f"{sp.get('inner_steps',1):>6}{r['_cfg']['steps']:>8}"
+              f"{sp.get('inner_steps',1):>6}{str(got) + ('' if r.get('complete') else '*'):>8}"
               f"{hy.get('acc',float('nan')):>11.4f}{hy.get('eps',float('nan')):>10.2e}"
               f"{certifiable_T(hy.get('eps',1)):>9.3g}"
               f"{r['floor_no_reduction'].get('chain_heldout_y',float('nan')):>8.4f}"
