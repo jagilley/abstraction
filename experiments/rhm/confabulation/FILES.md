@@ -14,4 +14,6 @@ Helpers inside `rhm_confabulation.py` worth knowing by name: `_kmeans_fit`/`_kme
 
 ## Children
 
-None — this is a leaf.
+| Folder | Summary |
+|---|---|
+| [`temporal/`](temporal/README.md) ([FILES](temporal/FILES.md)) | The same battery with the FM's conditioning gap shifted from six blocks to one token, both arms on one frozen M at matched report positions, plus the exact BP oracle. Privileged access survives the axis change (+0.014 to +0.027) but its partial `R²` against oracle belief revision at matched surprisal is 0.0000 — self-report and observer track `B_t` equally, so the charge is real and public. Supplies this battery's first validated ceiling (`O_h6`). |

@@ -125,6 +125,23 @@ This *improves* the interpretation. The residual is **essentially equally DGP-st
 6. The introspection, if granted, arguably belongs to the composite (M + FM) rather than to M alone — which matches the cerebellar analogy but should be said rather than elided.
 7. OL requires ~8× larger perturbations for the same KL (eps ≈ 15 vs 1.8), so OL and CL steering magnitudes are not directly comparable; only the within-condition residual/prediction ratio is.
 
+## Child: temporal — is the privileged access epistemically *charged*?
+
+[`temporal/`](temporal/README.md) shifts the FM's conditioning gap from six blocks to one token
+(`h6[t+1] = h6[t] + FM_T(h6[≤t]) + r_temp`) and runs both decompositions on one frozen M at one set
+of report positions, so inert-vs-charged is a within-experiment comparison. **Privileged access
+survives the axis change** (+0.014 to +0.027 against a control band of +0.002 to +0.011, and this
+battery's depth arm at +0.053 to +0.059, which reproduces the published OL row) — **but the
+privileged part is not the charged part**: the advantage's partial `R²` against the exact oracle's
+belief revision `B_t` at matched surprisal is **0.0000** at every capacity and level, to a resolution
+two orders of magnitude below Gate A's positive on the same substrate. The decomposed columns say
+why — self-report and capacity-matched observer track `B_t` *equally well* (0.007 each), so the
+difference carries none of it. **The temporal residual is charged and the charge is public.** The
+null reproduces on `conditional_revision`'s own frozen base. Two by-products: this battery's missing
+ceiling finally exists (`O_h6` 0.905 > self 0.899 > `O_io` 0.884, and the ladder stays flat in
+capacity), and the depth arm's steering asymmetry turns out to need the latent aux target (0.87× on a
+plain-NTP base against 1.71× here).
+
 ## Reproduction
 
 ```bash
