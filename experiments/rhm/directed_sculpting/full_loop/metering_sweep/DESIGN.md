@@ -1,7 +1,7 @@
-# Pre-registration — the metering sweep
+# Design — the metering sweep
 
 **Written before any run.** Committed ahead of the launch so the direction, the mechanism, the
-discriminators and the kill criteria are on record. Nothing below is a result.
+discriminators and the thresholds are on record. Nothing below is a result.
 
 **Date**: 2026-08-01. **Claim under test**:
 [`ideas/meta_learning_under_metered_data.md`](../../../../../ideas/meta_learning_under_metered_data.md)
@@ -81,7 +81,7 @@ term's job. That mechanism acts on **tap-driven** arms. It cannot act on the uni
 prize, because neither arm has a tap. If the prize collapses at `r = 22` here, the cause is
 starvation, not subsidy — and §6 below says how to tell.
 
-## 3. Pre-registered predictions
+## 3. Predictions, written before the run
 
 | # | prediction | direction |
 |---|---|---|

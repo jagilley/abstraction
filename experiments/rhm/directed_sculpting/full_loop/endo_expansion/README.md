@@ -1,7 +1,7 @@
 # E4 — can an ENDOGENOUS evaluative grader expand? Yes, and the readout that said so was wrong
 
 **Status**: built and run. 9 arms × 3 seeds × 10 rounds, static world, one warm start per seed.
-Predictions written down before the first launch in [PREREGISTRATION.md](PREREGISTRATION.md).
+Predictions written down before the first launch in [DESIGN.md](DESIGN.md).
 **Date**: 2026-08-01.
 **Up**: [../README.md](../README.md) (full_loop) · **Node**: [../../../README.md](../../../README.md) (rhm) · **Files**: [FILES.md](FILES.md)
 **The gap this closes**: [`ideas/meta_learning_under_metered_data.md`](../../../../../ideas/meta_learning_under_metered_data.md)
@@ -340,7 +340,7 @@ distinguished them.
   `endo_random` is the true zero-information floor.
 - **The `evaluative` arm teaches its lowest-index tie-break on the 3.6% of states where no move
   lowers `d*`.** Measured, small, and inherited from the published teacher. New arms break ties
-  uniformly and mask those states — see [PREREGISTRATION.md](PREREGISTRATION.md)'s appendix, which
+  uniformly and mask those states — see [DESIGN.md](DESIGN.md)'s appendix, which
   records that and two other smoke-driven fixes made before launch.
 - **10 rounds.** `endo_rollout`'s PR was still climbing at r10 (+0.140/round) — but so was
   `endo_random`'s, which is the whole point of §3.

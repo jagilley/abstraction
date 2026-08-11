@@ -6,7 +6,7 @@ pre-registered before its own launch and gated before its own read. **Date**: 20
 **Idea doc**: [`ideas/meta_learning_under_metered_data.md`](../../../../../ideas/meta_learning_under_metered_data.md)
 §Predictions bullet 1 — *"Falsified if the uniform→oracle gap does not shrink toward zero as the
 monitor:collect ratio goes to zero. That is the whole content of the metering claim."*
-**Pre-registration**: [PREREGISTRATION.md](PREREGISTRATION.md), committed before the first run.
+**Design doc**: [DESIGN.md](DESIGN.md), written before the first run.
 
 ---
 
@@ -163,7 +163,7 @@ numerically identical, so nothing turns on the reclassification.
 > gate results below stand.
 
 E1-A, price at fixed total spend. `uniform` and `oracle` absolute levels are shown because the
-pre-registration makes them the saturation-vs-starvation discriminator.
+design doc makes them the saturation-vs-starvation discriminator.
 
 | `r` | `B` | uniform | oracle | **prize** | sem | floor |
 |---|---|---|---|---|---|---|
@@ -243,7 +243,7 @@ Sign matters; the bug is recorded in [FILES.md](FILES.md) and was caught by the 
 
 ## 6. The prize is two effects moving in opposite directions
 
-`E(d)` **does not collapse across arms** — the check the pre-registration built in as
+`E(d)` **does not collapse across arms** — the check the design doc built in as
 self-falsifying. At matched tree data, `uniform` carries systematically more tree error:
 
 | `d` | cell | err | vs `d` | cell | err | Δ |
@@ -353,7 +353,7 @@ measurement being the expensive, noisy half (`floor_n × floor_draws` is 53% of 
 # Round 2 — what survives, and what the claim actually needed
 
 **Status**: 63 further GPU runs (21 points × 3 seeds), five limbs, pre-registered in
-[PREREGISTRATION_ROUND2.md](PREREGISTRATION_ROUND2.md). Round 2 **overturns round 1's
+[DESIGN_ROUND2.md](DESIGN_ROUND2.md). Round 2 **overturns round 1's
 headline** (§11–§12), **refutes its own central premise** (§13), produces the node's sharpest
 result on the value of a tap (§14), and re-runs the published ladder without the over-training
 (§18). **Date**: 2026-08-01.
@@ -459,7 +459,7 @@ nothing and collects all of it:
 Pooled over three totals, per 1000 monitor sequences bought:
 
 > **relevance +0.1286 tree-err · reducibility +0.0001 · a ~1200× difference in
-> cost-effectiveness**, where the pre-registration predicted 25–30×.
+> cost-effectiveness**, where the design doc predicted 25–30×.
 
 At `T` = 45568 the reducibility tap recovers **−0.0001** — priced, it is not worth buying at
 all, where the equal-charge ladder credited it with 13–18% of the prize. **The whole of its

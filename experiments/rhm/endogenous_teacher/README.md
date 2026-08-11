@@ -1,7 +1,7 @@
 # Endogenous teacher: is the model's own surprise separable from the text's, and can it teach?
 
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md) · **Child**: [cancellation/README.md](cancellation/README.md)
-**Design doc**: [PREREGISTRATION.md](PREREGISTRATION.md) · **Idea**: [ideas/the_forecast_needs_a_lead.md](../../../ideas/the_forecast_needs_a_lead.md)
+**Design doc**: [DESIGN.md](DESIGN.md) · **Idea**: [ideas/the_forecast_needs_a_lead.md](../../../ideas/the_forecast_needs_a_lead.md)
 **Date**: 2026-08-04/05 · **Status**: one positive measurement, one null. Single seed.
 
 ## Goal
@@ -132,7 +132,7 @@ developed in [`ideas/the_forecast_needs_a_lead.md`](../../../ideas/the_forecast_
 
 ```bash
 cd experiments
-# gate 0 only (cheap kill check)
+# gate 0 only (cheap check)
 modal run -m rhm.endogenous_teacher.endogenous_teacher::endogenous_teacher \
     --arms "" --base-steps 2000 --tag gate0
 # the full cut (~1h on an L4)

@@ -44,7 +44,7 @@ this is the complete listing.
 
 | Path | Relation |
 |---|---|
-| [ideas/confabulation_test.md](../../../ideas/confabulation_test.md) | The design doc / pre-registration this implements |
+| [ideas/confabulation_test.md](../../../ideas/confabulation_test.md) | The design doc this implements |
 | [experiments/rhm/rhm_confabulation.py](../../rhm/rhm_confabulation.py) | Sibling instantiation on RHM; source of the instrument-capacity sweep and the `ens_cos` gate |
 | [../stages.py](../stages.py) | `a2a_loop_train` — the wake recipe this forks |
 | [../README.md](../README.md) | Parent experiment; Run 6 (controlled retrain) and OOD_ROBUSTNESS (self-knowledge is computational, not epistemic) are the load-bearing priors |

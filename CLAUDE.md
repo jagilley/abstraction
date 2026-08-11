@@ -68,7 +68,7 @@ that part of the warning is real — fix the email.
 
 ## Notes
 - For long-running training jobs (long running = anything that takes more than 2 mins), please follow the halting procedure described in `/run-experiment-on-modal` to avoid burning tokens.
-- For coding-type tasks where not burning context spuriously is important, using subagents up front to ground yourself in the state of our work is a good idea. If you're going to use an Explore subagent, please use Sonnet or Opus as the executor model. For analysis-type tasks where the goal is more to provide an ideological synthesis to the user, consuming the relevant context directly (rather than with a subagent intermediary) is often load-bearing for interpreting results properly. Subagents, especially those that run smaller models, risk misinterpreting results in subtle domains.
+- For coding-type tasks where not burning context spuriously is important, using subagents up front to ground yourself in the state of our work is a good idea. If you're going to use an Explore subagent, please use Sonnet or Opus as the executor model (and naturally, wait for it to come back before proceding). For analysis-type tasks where the goal is more to provide an ideological synthesis to the user, consuming the relevant context directly (rather than with a subagent intermediary) is often load-bearing for interpreting results properly. Subagents, especially those that run smaller models, risk misinterpreting results in subtle domains.
 - Treat prior experiments and results with a grain of salt. Prior positive results can be reproduced with updated machinery quite trivially. Prior negative results should not derail our current lines of inquiry; we often had different priors at the time we implemented them.
 
 ## Quotes

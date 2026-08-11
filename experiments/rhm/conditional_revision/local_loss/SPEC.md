@@ -1,7 +1,7 @@
 # SPEC — does the simplicity collapse survive an exogenous conditioning gap?
 
 **Parent**: [`../README.md`](../README.md) · **Idea**: [`ideas/revision_not_surprisal.md`](../../../../ideas/revision_not_surprisal.md) §8
-**Status**: unrun. Pre-registered 2026-08-08.
+**Status**: unrun. Designed 2026-08-08, before any run.
 
 ## The question
 
@@ -39,7 +39,7 @@ already showed is weak — deprioritized. The precision/teaching line is a measu
 mechanism behind it ([`sculpt_slip`](../sculpt_slip/README.md): an aleatoric filter can only pay when
 the learner is variance-limited, and ours was bias-dominated across a 60× budget range). §8 is the one
 unrun claim that can falsify the idea doc's central mechanism rather than tune an allocator.
-The parent [SPEC](../SPEC.md) pre-registered this exit: *"if the goal is to test the reframe rather
+The parent [SPEC](../SPEC.md) already named this exit: *"if the goal is to test the reframe rather
 than to build the allocator, it may be the better first cut."*
 
 ## Design
@@ -77,7 +77,7 @@ Two things worth thinking about before you build:
    everything downstream except through the latent. So one available outcome is that the temporal local
    loss discards synonym identity and keeps structure — which would be the **aleatoric null showing up
    as a representational consequence rather than as a weighting**. That is a different result from
-   either branch of the pre-registered kill and it would be the most interesting one.
+   either outcome sketched above, and it would be the most interesting one.
 
 This suggests an instrument the parent already has the machinery for: **swap the token at `t+1` among
 its synonyms (the oracle labels them exactly, `B ≡ 0`) and measure how far `h6[t+1]` moves; separately
@@ -117,7 +117,7 @@ The synonym-swap instrument works on both (m2 has 2 synonymous rules per feature
 
 - **Whether the temporal local loss helps anything.** LL's learning-speed win (+2.5pp at step 500, 31%
   lower final val) is real, orthogonal, and unexplained by the degeneracy reading (§8). Not this cut.
-- Injection, distillation, or any closed loop. LL-alone, per §8's kill.
+- Injection, distillation, or any closed loop. LL-alone, per §8.
 - Whether the residual is a good revision signal. Gate B answered that; it is not the question here.
 
 ## Conventions

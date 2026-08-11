@@ -6,13 +6,13 @@
 
 | file | purpose |
 |---|---|
-| `endogenous_teacher.py` | The whole cut: trains a shared base (plain NTP + open-loop FM), runs Gate 0 (`R²(rres ~ nll)`, the kill criterion), then the five loss-weighting arms (`uniform`, `nll`, `res`, `res_orth`, `res_shuffled`) from that shared base. One Modal L4 function. |
+| `endogenous_teacher.py` | The whole cut: trains a shared base (plain NTP + open-loop FM), runs Gate 0 (`R²(rres ~ nll)`, the cheap check that the residual is not just surprisal), then the five loss-weighting arms (`uniform`, `nll`, `res`, `res_orth`, `res_shuffled`) from that shared base. One Modal L4 function. |
 
 ## Docs
 
 | file | summary |
 |---|---|
-| `PREREGISTRATION.md` | The question (exogenous vs endogenous teaching signal), the rank-normalised weighting design, Gate 0's kill criterion, and the registered depth-profile prediction — written before the run. |
+| `DESIGN.md` | The question (exogenous vs endogenous teaching signal), the rank-normalised weighting design, Gate 0's threshold, and the depth-profile prediction — all written down before the run. |
 | `README.md` | Results writeup. *(pending — results not yet discussed)* |
 
 ## Key design points a future agent should not re-derive

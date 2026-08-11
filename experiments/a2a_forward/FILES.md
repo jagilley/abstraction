@@ -86,7 +86,7 @@ Full file-by-file reference for the experiment. Summarized in [README.md](README
 | `synthetic_input_manifold.py` | Manifold-matched rungs for `synthetic_input.py`: fitted GMM (K-means + per-cluster cov) and mixup (real-sequence interpolation); gate-verified against the saved ladder |
 | `README.md` | This file |
 
-**`confabulation/` subpackage** — the language Confabulation Test lives in the `a2a_forward.confabulation` subpackage with its own [`README.md`](confabulation/README.md) (pre-registration + design) and [`FILES.md`](confabulation/FILES.md). It imports parent modules (`a2a_forward.shared`, `a2a_forward.model`, `a2a_forward.forward_model`) unchanged. **Workspace gotcha**: the FineWeb-Edu token shards live on the `jagilley` volume, not `chromatic`.
+**`confabulation/` subpackage** — the language Confabulation Test lives in the `a2a_forward.confabulation` subpackage with its own [`README.md`](confabulation/README.md) (design) and [`FILES.md`](confabulation/FILES.md). It imports parent modules (`a2a_forward.shared`, `a2a_forward.model`, `a2a_forward.forward_model`) unchanged. **Workspace gotcha**: the FineWeb-Edu token shards live on the `jagilley` volume, not `chromatic`.
 
 **`reaching/` subpackage** — the seven active-control (reaching) files above (`reaching/reaching_vit.py`, `reaching/mnist_reaching*.py`, `reaching/mnist_active_vision*.py`) live in the `a2a_forward.reaching` subpackage with its own pan-arc index [`reaching/README.md`](reaching/README.md). They import parent modules (`a2a_forward.shared`, `a2a_forward.vit`, `a2a_forward.forward_model`, `a2a_forward.looped_vit`) unchanged; the shared `GlimpseLoopedViT` / `LoopedViT` stay in the parent `looped_vit.py`.
 

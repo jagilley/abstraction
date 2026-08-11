@@ -1,6 +1,6 @@
-# Pre-registration — the endogenous teaching signal
+# Design — the endogenous teaching signal
 
-**Up**: [../README.md](../README.md) · **Date**: 2026-08-04 · **Status**: pre-registered, unrun
+**Up**: [../README.md](../README.md) · **Date**: 2026-08-04 · **Status**: designed, unrun
 
 ## The question
 
@@ -52,14 +52,14 @@ scale, weight variance, and effective-learning-rate as confounds by construction
 The FM is co-trained on-policy in every arm with an unweighted MSE, so it stays a fair frontier
 map. `fwd_cos` is logged (the lag/collapse diagnostic).
 
-## Gate 0 — the kill criterion, run before any arm
+## Gate 0 — the cheap check, run before any arm
 
 If `rres` is a deterministic restatement of `nll`, the whole question is empty. On the *training*
 distribution (flat concatenated windows, which is what the weights actually see) we measure
 
 `R²( rres ~ nll )`  pooled, and within-position.
 
-> **Kill if R² > 0.9** — the endogenous signal carries nothing the exogenous one does not, and the
+> **R² > 0.9 would mean** the endogenous signal carries nothing the exogenous one does not, and the
 > honest finding is "your experience of the text is a function of the text's surprisal."
 > **Proceed if R² < 0.5**, i.e. there is a real `res_orth` component to weight by. Between 0.5 and
 > 0.9 we proceed but report the arms as underpowered.
@@ -73,7 +73,7 @@ Prior from four independent replications that endogenous self-prediction caps or
 ([`MNIST_LOCAL_LOSS`](../../a2a_forward/MNIST_LOCAL_LOSS_README.md) `LL`;
 [`RHM_LATENT_LOOP`](../RHM_LATENT_LOOP_README.md) λ_local; `data2vec` and `fm_cotrain` in
 [`RHM_SCULPTING`](../RHM_SCULPTING_README.md)): **we expect no total-learning win.** The
-registered prediction is about composition, not magnitude:
+prediction written here is about composition, not magnitude:
 
 1. **`res` ≈ `res_shuffled` ≈ `uniform` on val NTP loss.** Endogenous weighting does not buy loss.
 2. **`nll` concentrates learning at shallow levels** (d1–d2), because on RHM the deep levels are

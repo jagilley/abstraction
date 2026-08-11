@@ -1,7 +1,7 @@
-# Pre-registration — round 2: reaching the domain where the claim is testable
+# Design — round 2: reaching the domain where the claim is testable
 
 **Written before any round-2 run.** Round 1's result and its two scoping limits are in
-[README.md](README.md); this fixes the direction and the kill criteria for the follow-up.
+[README.md](README.md); this fixes the direction and the thresholds for the follow-up.
 **Date**: 2026-08-01.
 
 ---
@@ -41,7 +41,7 @@ That corner is ~15× past round 1's most abundant point, at ~1/8 its cost. This 
 below the noise floor by step 7500. *Inert is what saturation looks like*, and it is exactly where
 the metering claim says the prize must vanish.
 
-## Pre-registered predictions
+## Predictions, written before the run
 
 | # | experiment | prediction |
 |---|---|---|

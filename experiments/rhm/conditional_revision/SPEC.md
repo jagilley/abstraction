@@ -8,12 +8,13 @@ measurement that cut needed before its interventions.
 ([`oracle.py`](oracle.py)); Gates A+B implemented ([`gates_ab.py`](gates_ab.py)) and running.
 `README.md` lands after the run and after discussing results (repo convention).
 
-**Run order**: Gate 0 → A → B → C. Each is a kill point. Gate 0 is half a day and needs no new
-machinery; do not build the oracle until it passes.
+**Run order**: Gate 0 → A → B → C, cheapest first — each one's result should inform whether the next
+is still the right thing to run. Gate 0 is half a day and needs no new machinery, so there is little
+point building the oracle before seeing what it says.
 
-**Gate 0 result (2026-08-07).** Passed on the registered prediction, both sides of the kill clear.
+**Gate 0 result (2026-08-07).** Came out roughly as expected, and clear of both thresholds below.
 Against the depth FM's `corr(rres, nll) = −0.336`, the temporal FM reads **+0.652** pooled on flat
-windows with `R² = 0.425` (kill was >0.9) and **57.5%** of residual variance orthogonal to `nll`;
+windows with `R² = 0.425` (>0.9 would have meant pure surprisal) and **57.5%** of residual variance orthogonal to `nll`;
 the level profile flips from **−0.786** (anti-localised) to **+0.484** (aligned). Two controls hold:
 `depth_cotrain` reproduces `endogenous_teacher`'s Gate 0 to three decimals (−0.337 / 0.114 / 88.6%),
 so the substrate is the same one, and a protocol-matched `depth_frozen` arm reads −0.328, so the
@@ -119,8 +120,8 @@ rollout and does **not** transfer to one-step prediction. Do not import that pes
 ### Four design choices, each forced by a prior result
 
 1. **Predict at the deepest block, not the shallowest.** `h₀[t+1]` is essentially the embedding of
-   `x_{t+1}`, so its residual would be token surprisal *by construction* — the kill built into the
-   design. `h₆[t+1]` is what the new token did to the accumulated representation. That is the object.
+   `x_{t+1}`, so its residual would be token surprisal *by construction* — the failure mode built into
+   the design. `h₆[t+1]` is what the new token did to the accumulated representation. That is the object.
 2. **Predict the update `Δ_t`, not the state.** [`ACTIVE_VISION`](../../a2a_forward/reaching/ACTIVE_VISION_README.md):
    predicting `s_{t+1}` scored **0.94 by echoing carried state**. Residual streams carry state forward
    hard; this will be worse on the reading axis than it was there.
@@ -148,18 +149,19 @@ is lowest at 0.802; residual minimal near root at 0.269 where `nll` peaks at 2.6
 
 **Measure the same statistics for the temporal FM's residual `r_temporal`.**
 
-**Two-sided kill:**
+**Reading the outcomes.** Both directions are informative — a *saturating* correlation counts against
+the idea as much as a null does, which is worth stating because only one of those looks like failure:
 
 | outcome | reading |
 |---|---|
-| `corr(r_temporal, nll) ≈ 0` and the level profile still anti-localised | the axis change did nothing. **Stop.** |
-| `R²(r_temporal ~ nll) > 0.9` | the temporal residual is token surprisal re-expressed in state space. **This is the idea doc's primary kill, arriving cheap.** Stop. |
-| positive, moderate correlation; level profile **aligns** with `nll` instead of inverting it; a substantial `nll`-orthogonal component remains | the residual is a genuine mixture and there is something to decompose. **Proceed to Gate A.** |
+| `corr(r_temporal, nll) ≈ 0` and the level profile still anti-localised | the axis change did nothing. Not much reason to continue down this path. |
+| `R²(r_temporal ~ nll) > 0.9` | the temporal residual is token surprisal re-expressed in state space — the idea doc's central worry, arriving cheap. |
+| positive, moderate correlation; level profile **aligns** with `nll` instead of inverting it; a substantial `nll`-orthogonal component remains | the residual is a genuine mixture and there is something to decompose. Gate A is the natural next step. |
 
 Report both pooled and within-position, and on aligned sequences (where the level map exists) as well
 as flat concatenated windows (what training sees) — same as the predecessor Gate 0.
 
-**Registered prediction**: `corr` flips from −0.336 to clearly positive, and the level profile inverts
+**What I expect, written before the run**: `corr` flips from −0.336 to clearly positive, and the level profile inverts
 to track `nll`'s (high near root, low leaf-adjacent). Magnitude unknown; the interesting outcome is
 positive-but-not-saturating.
 
@@ -212,9 +214,11 @@ One existing checkpoint + probes + BP; no training.
 - partial `R²( M ~ nll | B )` — how much of it is just surprisal?
 - `R²( B ~ nll )` — how separable the two references are at all.
 
-**Kill**: partial `R²(M ~ B | nll) < 0.05` at every level → the model's internal revision is a
-restatement of token surprisal; §3–§4 of the idea doc are bookkeeping.
-**Proceed**: > 0.15 at any level. Between: proceed and report underpowered.
+**Reading it**: partial `R²(M ~ B | nll) < 0.05` at every level would say the model's internal
+revision is a restatement of token surprisal, making §3–§4 of the idea doc bookkeeping. Above ~0.15
+at any level is a real signal. In between, it is worth continuing while reporting it as underpowered.
+These numbers are the ones that looked meaningful before seeing any data — treat them as a prior,
+not a verdict, and say so if the measured distribution suggests different ones.
 
 ## Gate B — the constructed contrast (the load-bearing test)
 
@@ -235,11 +239,11 @@ non-overlapping tails):
 **Readout**: AUC of each of `{nll, M, r_temporal, B}` at separating the two families, per level.
 Report all four; `B` is the ceiling (it defines the families) and `nll` is the incumbent.
 
-**Registered prediction**: `M` beats `nll` on AUC at levels 1–3 (where synonymy and disambiguation are
-distinguishable), and does not at leaf-adjacent levels.
+**What I expect, written before the run**: `M` beats `nll` on AUC at levels 1–3 (where synonymy and
+disambiguation are distinguishable), and does not at leaf-adjacent levels.
 
-**Kill**: `M` ranks the families like `nll` and not like `B` → revision is surprisal re-expressed in
-state space. **This is the primary kill for the whole idea doc.**
+**Reading it**: if `M` ranks the families like `nll` and not like `B`, revision is surprisal
+re-expressed in state space — the outcome that would matter most for the idea doc as a whole.
 
 ## Gate C — the forecast version, the martingale test, and the ε-control
 
@@ -276,8 +280,8 @@ works only when read against the oracle and not from the model's own estimate, t
 a fifth time**, and it should be reported as such rather than as a new positive.
 
 **Why the predecessor missed, in two lessons worth not repeating.**
-[`endogenous_teacher`](../endogenous_teacher/README.md) ran two interventions and both fired the
-pre-registered falsification. The causes were structural, not bad luck: (1) it **intervened before
+[`endogenous_teacher`](../endogenous_teacher/README.md) ran two interventions and both came out
+against the hypothesis. The causes were structural, not bad luck: (1) it **intervened before
 establishing the signal was real** — this cut is measurement-only for that reason; (2) it **collapsed a
 directional object to its norm** and used it as a loss multiplier, testing the part already known to
 carry nothing (vector probe ΔR² +0.18 vs scalar +0.03). Anything built on top of this cut must keep the
@@ -318,7 +322,7 @@ one route to the claim and not the claim itself:
 
 | confound | handling |
 |---|---|
-| revision magnitude ∝ `H(x\|prefix)` ≈ `nll` | Gate B holds `nll` fixed by construction; partial correlations everywhere else; Gate 0's kill is explicitly two-sided so a saturating correlation counts against us |
+| revision magnitude ∝ `H(x\|prefix)` ≈ `nll` | Gate B holds `nll` fixed by construction; partial correlations everywhere else; Gate 0 is read two-sided, so a saturating correlation counts against us |
 | temporal residual is trivially the token | predict at `h₆`, not `h₀` (design choice 1) |
 | echo degeneracy | predict the *update* (design choice 2); belief space makes the echo the *correct* arity-1 forecast (§3), so it is structural rather than patched |
 | depth/temporal FMs not perfectly matched | acknowledged; no perfect match exists (`h₆[≤t] → h₆[t]` is the identity). The claim is about presence of an aleatoric component, not relative FM quality |
@@ -352,7 +356,7 @@ A found competence probes transfer identically across all conditions and **outpu
 activation probe** (ρ 0.49 vs ≤0.38 ID; retention 0.64–0.74 vs ≤0.65). The temporal residual is the
 first residual here that could compete, because it contains a term governed by `H(x_{t+1}|prefix)` —
 which is what output entropy measures. That makes the test unusually clean: **matching output entropy
-is the kill** (it is predictive entropy in state space); **beating it is the finding**. Instruments,
+means it is predictive entropy in state space**; **beating it is the finding**. Instruments,
 corpora and baselines all exist; it is a probe swap on cached checkpoints.
 
 **2. The teaching signal.** If 0–C pass: re-run the `endogenous_teacher` weighting cut with the right
@@ -366,7 +370,7 @@ input-invariance degeneracy becomes live (idea doc §8), so the anti-collapse ma
 [`../rhm_sculpt_data2vec.py`](../rhm_sculpt_data2vec.py) is a prerequisite.
 
 **3. The local-loss fix.** The same temporal target used as an auxiliary *training* signal is idea doc
-§8's candidate non-degenerate local loss. Its own cheap kill is stated there: if LL-alone with the
+§8's candidate non-degenerate local loss. Its own cheap test is stated there: if LL-alone with the
 exogenous gap reproduces the depth version's signature (FM cos → ~1, SK → 0, comparable brittleness),
 the conditioning gap is not the operative variable.
 

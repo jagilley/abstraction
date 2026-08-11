@@ -21,7 +21,7 @@ the plan term train on a filtered state pool while the dense term keeps the full
 
 | File | What |
 |---|---|
-| `PREREGISTRATION.md` | The eight predictions, the falsifiers, and the stated limits, **written before the first launch**. Carries a dated appendix recording three implementation fixes a `--quick` smoke forced before the real run — including a lowest-index tie-break that was handing `alloc_uniform` a free on-target teacher — because one of them materially affects an arm's prediction and hiding it in a diff would be dishonest |
+| `DESIGN.md` | The eight predictions, what would count against them, and the stated limits, **written before the first launch**. Carries a dated appendix recording three implementation fixes a `--quick` smoke forced before the real run — including a lowest-index tie-break that was handing `alloc_uniform` a free on-target teacher — because one of them materially affects an arm's prediction and hiding it in a diff would be dishonest |
 
 ## Results
 

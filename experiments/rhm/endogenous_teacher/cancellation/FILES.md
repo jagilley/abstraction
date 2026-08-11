@@ -1,6 +1,6 @@
 # FILES — cancellation (RHM port)
 
-**Up**: [../README.md](../README.md) · [../PREREGISTRATION.md](../PREREGISTRATION.md)
+**Up**: [../README.md](../README.md) · [../DESIGN.md](../DESIGN.md)
 **Idea**: [`ideas/efference_copy_cancellation.md`](../../../../ideas/efference_copy_cancellation.md) ·
 **Prior run**: [`a2a_forward/CANCELLATION_README.md`](../../../a2a_forward/CANCELLATION_README.md) (looped ViT)
 

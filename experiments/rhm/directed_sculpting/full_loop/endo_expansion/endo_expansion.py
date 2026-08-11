@@ -51,7 +51,7 @@ diagnosed as *"the outer loop is identical to the inner loop"*, and `fm_cotrain`
 the no-loop floor is the same failure in a different costume. So every arm carries a per-round
 GRADER-DISAGREEMENT readout on one frozen probe: does the outer signal ever prefer a move the
 dense inner signal scores worse, and by how much. Pre-registered predictions in
-PREREGISTRATION.md. The one that matters: IF THE ENDOGENOUS ARM'S DISAGREEMENT SITS AT THE
+DESIGN.md. The one that matters: IF THE ENDOGENOUS ARM'S DISAGREEMENT SITS AT THE
 HOMOGENEOUS FLOOR, THE LOOPS HAVE COLLAPSED and any gain it shows is an inner-loop gain wearing
 an outer-loop label -- that diagnosis takes precedence over the headline.
 

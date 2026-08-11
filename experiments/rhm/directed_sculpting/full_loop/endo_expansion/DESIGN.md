@@ -1,7 +1,7 @@
-# Pre-registration — can an ENDOGENOUS evaluative grader expand?
+# Design — can an ENDOGENOUS evaluative grader expand?
 
 **Written**: 2026-08-01, **before any arm was run.** Nothing below is edited after the first
-launch; corrections are appended to the README as "what the pre-registration got wrong".
+launch; corrections are appended to the README as "what the design doc got wrong".
 
 > **Appended 2026-08-01, after a `--quick` smoke and before the real launch.** No prediction
 > changed. Three implementation fixes the smoke forced, recorded here because one of them

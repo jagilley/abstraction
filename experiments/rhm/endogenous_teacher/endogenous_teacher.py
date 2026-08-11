@@ -6,7 +6,7 @@ smallest measurable version of that: holding the exogenous signal (token surpris
 fixed, does an endogenously-generated one (the FM residual on the model's own
 activations) change WHAT the model learns?
 
-Design (see PREREGISTRATION.md):
+Design (see DESIGN.md):
   base = plain-NTP RHM model + open-loop co-trained FM (post_block0 -> post_block6)
   arms = continued training from the shared base, differing ONLY in how the
          per-position NTP loss is weighted:

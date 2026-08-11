@@ -10,13 +10,13 @@ launch commands, rather than being written into a README where it can drift from
 E1-A holds T and M fixed and sweeps the PRICE: B = T/(1+r), price = r*B/M. Information is
 constant (the taps see bit-identical monitoring quantities at every point) and only the price
 moves -- which is the only way price can bite, because nothing in `ladder.py` reads the meter,
-so a price multiplier on its own is a provable no-op (see PREREGISTRATION.md §2).
+so a price multiplier on its own is a provable no-op (see DESIGN.md §2).
 
 E1-B relaxes T (price fixed at 1.0, collection raised) -- the "data becomes free" limb the
 fixed-T design cannot reach, and the source of the matched-ratio pairs.
 
 E2 holds B and price fixed and sweeps the monitoring QUANTITY -- the amount-sweep, which by
-PREREGISTRATION.md §2(ii) must NOT move the uniform->oracle prize, and is run as the control on
+DESIGN.md §2(ii) must NOT move the uniform->oracle prize, and is run as the control on
 that argument.
 
 Usage (from experiments/):

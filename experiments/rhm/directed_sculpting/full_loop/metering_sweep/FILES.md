@@ -1,6 +1,6 @@
 # Files — `metering_sweep/`
 
-See [README.md](README.md) for the result and [PREREGISTRATION.md](PREREGISTRATION.md) for the
+See [README.md](README.md) for the result and [DESIGN.md](DESIGN.md) for the
 design as it was fixed before any run.
 
 ## Code files
@@ -44,7 +44,7 @@ rather than "dead". `modal app logs <id>` is what distinguishes them.
 
 | File | Change |
 |---|---|
-| [`../ladder.py`](../ladder.py) | `PricedMeter(Meter)` + `mon_price` / `meter_budget` kwargs. At `mon_price=1.0` the charge takes the original `int(n)` path, so every prior repro command is bit-identical. The price is **report-only inside the loop** — see [PREREGISTRATION.md](PREREGISTRATION.md) §2(i) — and bites only through the `collect_budget` it displaces. |
+| [`../ladder.py`](../ladder.py) | `PricedMeter(Meter)` + `mon_price` / `meter_budget` kwargs. At `mon_price=1.0` the charge takes the original `int(n)` path, so every prior repro command is bit-identical. The price is **report-only inside the loop** — see [DESIGN.md](DESIGN.md) §2(i) — and bites only through the `collect_budget` it displaces. |
 | [`../channel_env.py`](../channel_env.py) | `allocate` gains an `oracle_dup` branch: a bit-for-bit duplicate of `oracle`, run as a second arm so `oracle_dup − oracle` measures the instrument noise floor **at each operating point**. Deliberately **not** added to `POLICIES`, so no default run's arm set changes. |
 
 ## Round-2 additions to `../ladder.py` (both additive, both default-off)
@@ -75,5 +75,5 @@ to [`figures/`](figures/), with the full aggregator output saved as
 
 | File | Summary |
 |---|---|
-| [`PREREGISTRATION_ROUND2.md`](PREREGISTRATION_ROUND2.md) | Round 2's design, fixed before any round-2 run: the damage-sweep premise (refuted by its own 2×2), the data-vs-compute cut (which overturned round 1), and the honest ladder. Predictions P7–P10 with their kill criteria. P8's premise was wrong and P10 was right by ~40×. |
-| [`PREREGISTRATION.md`](PREREGISTRATION.md) | The design, the derived mechanism, six numbered predictions, the five calibration gates and the outcome-reading table — all committed before the first run. Its §2 is the load-bearing part: the meter is *inert* in the published ladder, so a bare price multiplier is a provable no-op and a sweep of it alone would return a flat curve for reasons unrelated to metering. |
+| [`DESIGN_ROUND2.md`](DESIGN_ROUND2.md) | Round 2's design, fixed before any round-2 run: the damage-sweep premise (refuted by its own 2×2), the data-vs-compute cut (which overturned round 1), and the honest ladder. Predictions P7–P10 and how to read them. P8's premise was wrong and P10 was right by ~40×. |
+| [`DESIGN.md`](DESIGN.md) | The design, the derived mechanism, six numbered predictions, the five calibration gates and the outcome-reading table — all written down before the first run. Its §2 is the load-bearing part: the meter is *inert* in the published ladder, so a bare price multiplier is a provable no-op and a sweep of it alone would return a flat curve for reasons unrelated to metering. |
