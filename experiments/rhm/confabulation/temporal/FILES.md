@@ -28,4 +28,6 @@ arithmetic like `a * K + b` silently aliases, a documented `gates_ab` gotcha).
 
 ## Children
 
-None — this is a leaf.
+| Folder | Summary |
+|---|---|
+| [`epistemics/`](epistemics/README.md) ([FILES](epistemics/FILES.md)) | The same harness repointed from **privacy** to **composition** — report channel, observer ladder, steering, confabulator and CL dropped; frozen M, report positions, instrument sweep, guards and oracle kept. A source × target decode matrix at matched *readout* capacity. **The pre-registered concentration effect is absent**: the raw update `Δ` decodes oracle belief revision at least as well as the residual `r` everywhere (d2/MLP-64: 0.449 vs 0.362 on `ntp_aux`, 0.411 vs 0.366 on `cr_base`), and an **exact ε₁ = 0 innovation** built by counterfactual substitution only ties `Δ` on `cr_base` — so this is not forecaster weakness, and the temporal FM looks epistemically inert as a signal-former, leaving timing as its remaining claim. Runs `conditional_revision`'s never-run **Gate C** end to end: capacity invariance passes, the martingale calibration gets an exact null (0.99 self-sampled / 1.09 corpus), and `ε₁` is measured rather than bounded. |

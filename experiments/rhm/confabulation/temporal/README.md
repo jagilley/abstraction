@@ -274,6 +274,31 @@ revises beliefs. This does **not** reproduce on `cr_base` (z = −0.1, +1.3, +1.
 and should be treated as substrate-specific noise, not a finding. It is recorded here because the
 sign consistency looked compelling in one arm and was not.
 
+## Child: `epistemics/` — the question this result opened, and its answer
+
+Publicity is a *feature* for the operational question, and this harness is the right instrument for
+it: it reads the temporal channel at 0.899 against a validated 0.905 ceiling, where `rule_family`'s
+belief probe died at 11–17% of its ceiling, and no privileged access is needed to measure a public
+channel. [`epistemics/`](epistemics/README.md) therefore repoints the battery from **privacy** to
+**composition** — dropping the report channel, ladder, steering and CL, keeping the frozen M (the same
+checkpoint, `val` 1.5447), the report positions, the instrument sweep, the guards and the oracle — and
+measures a source × target decode matrix at matched *readout* capacity.
+
+**The pre-registered concentration effect is not there.** The raw update `Δ` decodes the oracle's
+belief revision at least as well as the residual `r` at every readout capacity, every level, every
+instrument capacity and on both substrates (d2, MLP-64: `Δ` 0.449 vs `r` 0.362 on `ntp_aux`; 0.411 vs
+0.366 on `cr_base`), and the subtraction is mildly lossy. This is not forecaster weakness: the arm
+carries an **exact ε₁ = 0 innovation** built by counterfactual substitution, which itself only ties
+`Δ` on `cr_base`, and on `cr_base` the learned forecast already reaches `cos = 0.989` with the exact
+conditional mean. So on this substrate the temporal FM looks **epistemically inert as a signal-former**,
+leaving *timing* as its remaining distinct claim — a control-topology question this design cannot
+reach. It also runs `conditional_revision`'s never-run **Gate C** end to end: capacity invariance
+passes (flat in instrument capacity at the linear rung), and the martingale calibration gets an exact
+null (0.99 self-sampled, 1.09 corpus) against which the learned residual's 2.0–4.0 drift is mostly ε₁
+bias. Two by-products: 13–17% of surprisal-residualised `B` turns out to be pure **position**, and the
+design doc's magnitude negative control — falsified in this experiment's own `TEMP-MAG` row — behaves
+exactly as predicted under a direct decode.
+
 ## Reproduction
 
 ```bash

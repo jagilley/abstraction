@@ -253,6 +253,17 @@ battery is now the control-arm construction, not the experiment.
 
 ## The next thing to run: temporal FM epistemics, on this harness
 
+**Built** (2026-08-11) as
+[`rhm/confabulation/temporal/epistemics/`](../experiments/rhm/confabulation/temporal/epistemics/README.md).
+Everything below is implemented as specified. Two things were added on top of it, both because the
+counterfactual machinery the A/E target needs supplies them for free: an **exact `ε₁ = 0` source**
+`r_mart = h[t+1] − E_{a∼p_M}[h[t+1] | x_{t+1}=a]` (the residual a forecaster with zero compression
+error would leave, so §6's `ε₁` is *measured*, not bounded, and the concentration question acquires a
+ceiling), and the exact form of the martingale add-on — under `p⁻_mart` the drift null holds *by
+construction* on self-sampled continuations, so the corpus cell reads the model's calibration error
+projected onto the state-update map. A one-hot-position **floor** was added alongside the shuffled
+null, since on the RHM everything is position-coupled.
+
 The privacy question is settled; the operational question this program actually cares about — **does
 the temporal FM's signal carry genuine epistemic content, and does the FM do any epistemic work in
 producing it?** — is now cleanly separated from it, and this harness is the right instrument: it
