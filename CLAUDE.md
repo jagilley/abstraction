@@ -28,16 +28,17 @@ Each project subdirectory has its own CLAUDE.md with setup instructions and conv
 ## Research taste
 - We prefer seeking the fundamental causal structure over scoring high on the test.
 - We prefer solutions that generalize across domains.
+- Controlling variables is absolutely essential for good science.
 
 ## Good practices
 - We must keep all prior results reproducible. You're welcome to edit the code used in prior experiments, as long as you keep it backwards-compatible (within reason). If we're making too many backwards-compatible modifications, it's probably time to copy things over to a new folder/file. Keeping folders and files semantically meaningful is more important than not duplicating code.
-- Controlling variables is absolutely essential for good science.
 - Please always discuss results with me before writing a new README or idea doc. These things can be difficult to interpret sometimes.
 - Don't get discouraged. If something didn't work, there's a reason for it, and we should understand what that reason is before we update our priors on why we wanted to try that thing in the first place.
 - We should edit documentation whenever appropriate to persist learnings.
 - Running quick tests to ensure code works before kicking off longer training jobs is usually a good idea.
 - I hold my intuitive priors strongly, but hold priors about the metrics used to measure them weakly.
 - Don't hyperfixate on negative results. If we run something, we'll document it because it's a data point we generated that we should persist. Usually, a negative result just means that we had a slightly misdirected intuition; it's bad practice to view that as epistemically significant.
+- There is often a temptation to map out the space of possible experimental results *a priori* — this has been hyperstitioned into existence several independent times by agents working in this repo, without any instructions to this end. This is bad science, because information is strictly gained in the process of gathering data. Engaging in behavior like "pre-registering kill criteria for the idea" or even pre-registering possible positive interpretations for the results over-constrains the space of interpretations at the time we receive the results. (And at any rate, making ideological course corrections is at least partially the job of a value system, which Claudes don't have.) Anything bordering on the territory of an update to priors should be strictly made *a posteriori* on new data.
 
 ## Conventions (important to follow)
 - We run most of our experiments on Modal. Before running anything there, please invoke the Claude Skill `/run-experiment-on-modal` for explicit guidance.
