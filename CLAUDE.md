@@ -68,15 +68,15 @@ that part of the warning is real — fix the email.
 
 ## Notes
 - For long-running training jobs (long running = anything that takes more than 2 mins), please follow the halting procedure described in `/run-experiment-on-modal` to avoid burning tokens.
-- For coding-type tasks where not burning context spuriously is important, using subagents up front to ground yourself in the state of our work is a good idea. If you're going to use an Explore subagent, please use Sonnet or Opus as the executor model (and naturally, wait for it to come back before proceding). For analysis-type tasks where the goal is more to provide an ideological synthesis to the user, consuming the relevant context directly (rather than with a subagent intermediary) is often load-bearing for interpreting results properly. Subagents, especially those that run smaller models, risk misinterpreting results in subtle domains.
+- For coding-type tasks where not burning context spuriously is important, using subagents up front to ground yourself in the state of our work is a good idea. If you're going to use an Explore subagent, please use Sonnet or Opus as the executor model (and naturally, wait for it to come back before proceding). For analysis-type tasks where the goal is more to provide an ideological synthesis to the user, consuming the relevant context directly is often load-bearing for interpreting results properly. Subagents, especially those that run smaller models, risk misinterpreting results in subtle domains, so you can either do the exploring yourself or read the files it surfaces for yourself to align on the interpretation.
 - Treat prior experiments and results with a grain of salt. Prior positive results can be reproduced with updated machinery quite trivially. Prior negative results should not derail our current lines of inquiry; we often had different priors at the time we implemented them.
 
 ## Quotes
 
-- "If an explanation is long, there's a high chance that it's wrong" - Ilya Sutskever
 - "It's not helpful to think of problems as of 'hard'. It's better to think that we merely don't know how to solve them yet." - Ilya Sutskever
 - "Creativity is an inverse problem" - Ilya Sutskever
 - "Creativity = novelty + value" - Ilya Sutskever
+- "If an explanation is long, there's a high chance that it's wrong" - Ilya Sutskever
 - "psychology should become more and more applicable to AI as it gets smarter" - Ilya Sutskever
 - "The art of doing mathematics consists in finding that special case which contains all the germs of generality." - David Hilbert
 - "The whole idea of Science is, simply, reflective reasoning about a more reliable process for making the contents of your mind mirror the contents of the world." - Eliezer Yudkowsky
