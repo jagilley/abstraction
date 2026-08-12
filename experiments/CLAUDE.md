@@ -8,6 +8,7 @@ Iterating fast on our ideas is the most important goal. This means:
     - We should always start by running and waiting for a single-seed version of the full experiment to verify that things work as intended and get a sense of the described effect
     - *If and only if* it seems like the result is epistemically meaningful and may be sensitive to seed-dependence, *then* you should autonomously launch multiple seed-experiments in parallel.
 I, personally, don't want to have to think about seed-dependence, as it's a non-substantive low-level implementation detail. This is something that you should manage.
+- Subagents may NOT run multi-seeded or high-DoP experiments without authorization from their supervisor agent.
 
 ## Canonical experiment-README format
 
