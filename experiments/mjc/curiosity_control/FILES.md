@@ -12,6 +12,12 @@ node because every experiment there imports them.
 |---|---|
 | `curiosity_control.py` | **Curiosity on control — the afferent explore drive + grounding (interface next-piece #1).** `run_curiosity_control(cfg)`: on Cut #3's puck-free reaching, an intrinsic drive directs **where to collect** as a scarce reducible **`field_patch` drifts** (RPF ensemble `build_member` + recency FIFO; teleport-region collection over a G×G grid; CEM-MPC control readout + unbiased frontier-tracking error). Drives (all share FM/init/update; only collection differs): `surprise`, `disagree`, **`reducible`** (error×disagreement), `lp` (`−d‖e‖/dt`), `taskonly` (on-policy), `random`, and **`grounded@b`** (`b·reducible + (1−b)·exploit`, exploit = start→goal path density = the `p`-tap). Findings: the drive **tracks the moving frontier** (non-stationary effect, ties when static); **value-relevance gates usefulness** (tracks off-path but only pays on-path); **pure curiosity chases the noisy TV** (disagreement fails on low-dim aleatoric noise); **grounding (two additive drives) cures it** with an intermediate-balance optimum. Knobs: `--drift-mode morph|none`, `--value-rel on|off`, `--noise`, `--arms` (incl. `grounded@<b>`), `--frontier-task`, `--balance`. Entrypoint `curiosity_control(...)`. See [README.md](README.md). |
 
+## Children
+
+| Folder | Content |
+|---|---|
+| `benchmark_vs_cost/` | **Experiment 3 of [ideas/performance_error_is_the_bridge.md](../../../ideas/performance_error_is_the_bridge.md) §8** — pure re-analysis (no new runs) discriminating the benchmark-subtracted value signal `δ = b − e` from the cost model `−α‖e‖ + β(−d‖e‖/dt)` on logged error sequences: a2a curiosity Phase-1/2/2b regime trajectories (pulled to `data/`) + this cut's `frontier_err` records. `analyze_benchmark_vs_cost.py` → `figures/` + `summary.json`. Writeup: [`benchmark_vs_cost/README.md`](benchmark_vs_cost/README.md). |
+
 ## Env support (in the parent, shared)
 
 | Symbol | Purpose |

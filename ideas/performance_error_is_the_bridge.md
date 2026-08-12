@@ -364,4 +364,105 @@ that on 2026-07-29: the `full_loop` 2×2 separates world motion from grader type
 grader expands the belief *identically* in static and drifting worlds. The operative conditions are grader
 **type** and **metered sample price**, not world motion. Any rewrite should not lean on drift.
 
+---
+
+## 13. Three tests run (2026-08-11, same day): the gate is load-bearing, the gain works, the cost term is unsupported
+
+**Sources of truth** (pointers, not summaries of record — read the nodes):
+[`agency_gate`](../experiments/mjc/agency_gate/README.md) ·
+[`plasticity_gain`](../experiments/mjc/plasticity_gain/README.md) ·
+[`benchmark_vs_cost`](../experiments/mjc/curiosity_control/benchmark_vs_cost/README.md).
+The re-scoping they follow: re-reading Gadagkar against §12 showed the bird's benchmark is **per-syllable
+(context-conditioned) and estimable only through massive repetition of a recurring context**, and its δ is
+consumed as a **per-trial gain on plasticity** — never as a reward for a low-sample meta-parameter search.
+So Experiment 1 was replaced (the gain consumption, §1's own efferent arm) rather than repaired, and
+Experiments 2–3 ran as specified.
+
+**(a) Experiment 2 landed: the agency gate carries the discrimination.** On identical sensory sequences, δ
+fires at sensory-distortion events when the trajectory is self-produced and is statistically silent under
+passive playback (−0.0330 ± 0.0009 vs −0.00009 ± 0.00021, ~369×), with the bidirectional signature
+(suppression on worse-than-predicted, activation on omitted distortion). The dissection: the *ungated*
+`b−e` fires in **both** conditions — so §9's "gate might be decorative" risk is answered (it is not), and
+"δ might fire in PLAYBACK" did not occur. **One correction to §1**: σ(0)=0.5, so the literal σ(g/θ) leaks
+half the sensory channel when passive; the gate must be **centered**, σ((g−g₀)/θ), with cheap
+self-supervised calibration. Agency also came out **graded** (g tracks ‖u‖; an efference copy of "do
+nothing" grants no agency), not binary.
+
+**(b) The gain consumption works — and localizes what the benchmark is for.** δ multiplying per-sample FM
+plasticity beats ungated learning on ballistic re-adaptation speed at matched average learning rate (3/3
+seeds; ballistic-specific; speed, not ceiling). A raw-error gain matches δ on *control*; δ's specific
+content is **allocation and retention** — it withdraws plasticity from unimprovable noise where the raw
+gain fixates ~19% of its budget forever. **Second correction to §1**: the benchmark must be
+**context-conditional b(s)** — the bird's temporally-aligned per-syllable benchmark, which the paper shows
+is evaluated independently per target — because the literal scalar EWMA sits below a noise region's error
+permanently and fixates on it *worse than raw error*.
+
+**(c) Experiment 3: no standing cost term.** The predicted disagreement cell is real (noisy TV: `b−e`
+statistically zero; cost model permanently negative), and everywhere the cost term changes a sign the
+change is wrong or indifferent. [GATED_RATCHET](../experiments/a2a_forward/GATED_RATCHET_README.md)'s
+"high static residual = frustrating" is *reconciled*, not vindicated: frustration falls out of `b−e` as a
+**transient at re-opening**, exactly when it is informative. Two limits: the benchmark timescale has an
+**interior optimum** (above sampling jitter, below competence drift — §12(c)'s estimability condition made
+quantitative), and `b−e` is a **gain/value signal, not an allocation score** (at re-opening it is actively
+repulsive where the derivative is merely blind; allocation stays with ensemble disagreement, per
+CURIOSITY_DRIVE Phase 2b). It also does not fix the derivative's steady-state disengagement — same
+estimator family.
+
+**Untouched by all three**: §6's separate-channel bet, and §7's two clocks. Experiment 4's gate ("1 and 2
+both land") referenced the retired Experiment 1; on these results the natural re-gate is (a)+(b). One
+citation fix for §5/§7: the paper's activation latency is **51 ± 20 ms**, not 81 — the latency range is
+51–58 ms, *more* firmly in the cerebellar regime.
+
+---
+
+## 14. The second round (2026-08-11): §6 and §7 supported, the assembly closed, and the matched-filter reading
+
+**Sources of truth**: [`two_clocks`](../experiments/mjc/two_clocks/README.md) ·
+[`bridge_assembly`](../experiments/mjc/bridge_assembly/README.md). Both 3 seeds on the headline claims.
+
+**(a) §6's load-bearing bet survived its first direct test — in a stronger form than bet.** At matched
+capacity, with identical signals/budget/FM/data and the *only* difference being kernel architecture, a
+two-channel design (fast performance-error trace + slow reward trace, each delay-matched) beats every
+shared-window variant in every seed — and **sharing is destructive interference**: every shared variant is
+worse than *both* single channels. The mechanism is content, not capacity: δ carries per-transition
+**precision** (when/where; value-blind by construction), reward carries **value-relevance** (what-for; no
+per-sample precision recoverable from a delayed trial-level scalar). Credit assignment factorizes into
+(which experiences) × (toward what end), the factors have different temporal supports, and an eligibility
+window is a delay hypothesis that can match only one. This *dissolves* the Parvin tension rather than
+merely evading it: performance error does not modulate the reward channel because routing it there would
+destroy the reward channel. §7's flag also landed: the eligibility optimum sits exactly at τ = d and the
+fidelity peak **moves with the circuit's delay** (Suvrathan's per-circuit matching, in silico).
+
+**(b) §11's assembly gap is closed as a mechanism claim, and the gain's net value is regime-dependent.**
+The corrected δ — context-conditional b(s), centered gate σ((g−g₀)/θ), gain consumption — ran live with
+every component behaving (gate calibrated, non-degenerate, budget-neutral; benchmark habituating noise
+while boosting repair). With retention made behaviorally load-bearing, **δ's hygiene advantage over a
+raw-error gain reaches control** (fixed < delta < raw, 3/3 seeds) — via the *reactive* controller. But
+**ungated uniform plasticity won this short-recovery regime outright**, and the mechanism is the benchmark
+lag (late δ>0 down-weights the still-improving frontier — §13(c)'s LP-family caveat, now in closed loop).
+Joint reading with `plasticity_gain` (delta ≻ fixed 3/3 on a long recovery): **δ-over-uniform pays where
+recovery transients are long/hard; δ-over-raw hygiene is unconditional in our data.** Consistent with the
+biology this doc started from: Kim et al.'s effect is *attenuation on success* — a protection mechanism,
+not a universal accelerator.
+
+**(c) A transferable law the round forced: transmission is spatial matching.** Which controller transmits
+an FM difference depends on where the difference's mass lives: a ballistic controller is a deep, narrow
+line-integral along its committed corridor (localized on-path error transmits ~3×; off-path and diffuse
+mass invisible in its execution variance); a reactive controller is a shallow, wide surface-average
+(diffuse churn accumulates; localized staleness is re-grounded past). The arc's "control is a blind
+grader" episodes become a matching condition, not a fixed property.
+
+**The synthesis we currently hold (interpretation, discussed 2026-08-11 — suggested by these results, not
+tested as such): the FM↔value interface is a set of matched filters.** A signal is legible only to a
+reader whose structure matches it — spatially for behavior reading the model (c), temporally for
+plasticity reading its teachers (a), and in estimability for a benchmark reading competence (§13).
+Mismatched readers see nothing (blind graders) or anti-signal (destructive interference). Open biological
+mapping flagged by Jasper: whether the two controller-functionals align with corticocerebellar vs
+spinocerebellar divisions is a question worth a literature pass, not a claim.
+
+**Still open after this round**: whether δ-over-uniform wins when recovery difficulty is varied
+continuously (the regime-dependence claim tested on one axis); closed-loop trial behavior in two_clocks
+(reward annealing there comes from benchmark habituation by design); and the compounding question — does
+δ-gated adaptation compound across a drift *sequence* (the meta-layer connection).
+
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
