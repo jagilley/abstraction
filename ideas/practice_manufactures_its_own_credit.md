@@ -105,6 +105,65 @@ contexts, chunk-level `b(s)`, chunk-level agency (the arity gap of the chunk com
 Neither process is exotic and both already exist as code; what has never existed is the **gate between them**
 (δ-silence triggering consolidation) and the **re-instantiation after** (credit rebuilt at the compiled level).
 
+## 3½. Where the chunk lives before consolidation: the FM is the holding structure
+
+The question this section answers (raised by Jasper, 2026-08-12): does compilation deposit the quarter-note
+instruction directly in cortex, alongside the 16th-note instructions — or does the new chunk need a
+hippocampus-analog to hold it in a holding pattern until sleep integrates it?
+
+Neither, exactly: **the holding structure exists, and it is the cerebellar side — the FM itself.**
+[DISTILLATION](../experiments/a2a_forward/DISTILLATION_README.md) already has the full shape of the mechanism:
+during wake, the composite system (model + FM injection) outperforms the model alone — the FM is *carrying* content
+the cortex does not yet own, live in the loop; sleep trains the injection-free student to match the injection-active
+teacher; the dependency gap closes (105.6%, at +0.030 nats vs open-loop). Mapped onto §3: in the interim state the
+new chunk exists in cortex only as a thin command token, and the corridor it unpacks into lives in fast cerebellar
+weights — which is just what ballistic execution already is, an FM bet along a committed corridor. Compilation
+happens *in the structure that executes the chunk*; no third structure is required. DISTILLATION Phase 3 even shows
+the step after: post-consolidation, a fresh FM finds *different* innovation structure — the cerebellum re-pointing
+at the reorganized cortex, which is §1's re-instantiation-one-level-up seen from the FM's side.
+
+**Why no episodic buffer is needed.** The complementary-learning-systems argument for the hippocampus (McClelland,
+McNaughton & O'Reilly) is that fast cortical learning of *arbitrary one-shot* content catastrophically interferes,
+so a fast binder plus interleaved replay into the slow learner is required. Chunk content is the opposite regime by
+construction: massively recurrent, low-variance, and pre-regularized by having driven `b−e → 0`. The recurrence
+that makes `b(s)` estimable is the same recurrence that makes direct slow consolidation safe — **repetition is the
+interleaving; practice manufactures its own consolidation safety.** The two fast learners then split cleanly by
+data regime: the hippocampus is the fast store for content that *cannot recur* (episodes, n=1, arbitrary binding);
+the cerebellum is the fast store for content that *recurs by construction* (procedures). The classic amnesia
+dissociations are the empirical backing: hippocampal patients acquire motor skills at normal rates across sessions
+while having no episodic memory of having practiced (§11 — recalled as well-established, to be cite-checked).
+
+**Routing, not pruning.** The primitive level is not deleted after compilation, and should not be: what is scarce
+is the serial closed-loop channel (attention), not storage. Automatization changes the *default routing* — the
+chunk becomes the policy's unit and the primitive level stops being consulted per step — while the primitives
+persist as the fallback (an expert can always drop back into slow practice, i.e. deliberately re-enter the reactive
+regime). Choking under pressure is the tell that they persist: explicit monitoring mid-performance re-engages
+per-primitive control exactly where per-primitive credit and correction are illegible (§5's tempo threshold), and
+execution breaks — nothing pruned-away could be re-engaged. On the DISTILLATION evidence, what sleep prunes is
+**dependency** (reliance on the FM's carry — the literally measured quantity), not representation.
+
+**The honest residual: the target register.** One object in the loop genuinely has the one-shot, must-hold
+profile — the *target*. The benchmark requires a stable target held across the whole practice window, and
+ecologically that target is often acquired in a single exposure: the songbird memorizes the tutor song fast, then
+practices against the stored template for months; a pianist reads the score once and holds what-it-should-sound-like
+for weeks. In every experiment in this repo, that role is played by the task specification — *the experimenter is
+the hippocampus*. So the information-processing necessity reduces to a small, stable target register; nothing about
+the loop requires that register to be a large episodic memory system. This *sharpens* rather than threatens the
+repo's standing premise that the hippocampus is an artifact of biological necessity more than
+information-processing necessity: on this account it is load-bearing for target *acquisition* (one-shot capture in
+a world where the tutor does not repeat himself), inert for the loop itself.
+
+Where the uncertainty genuinely lives: **reasoning-chunks.** The replay/schema-formation literature is heavily
+relational; cognitive material recurs far more thinly than motor material; and first-person phenomenology includes
+rest-time replay episodes that rehearse recently-practiced material unprompted (Jasper's report, presumably
+hippocampal). Two readings stay open: hippocampal involvement may be real and load-bearing for chunks whose
+recurrence is thin — with §6's drill/schooling technology being precisely the machinery for moving content *out of*
+the episodic regime *into* the practice regime — or rest-time replay may be a **scarce-data adaptation** (flagged
+by Jasper): a rehearsal amplifier biological learners need because their trials are metered, which machine learners
+with abundant recurrence largely do not. That connects it to
+[meta_learning_under_metered_data](meta_learning_under_metered_data.md)'s sample-price condition, and it is a
+question for the literature pass, not a claim.
+
 ## 4. Why the wake/sleep ratchet didn't ratchet on its own — a retrodiction
 
 Flagged by Jasper: the wake/sleep distillation work predates all of this vocabulary, and the missing pieces are now
@@ -274,5 +333,15 @@ recorded as anchor, not evidence.
   whether "enhanced" is the right reading per §7.2); Nádasdy et al.
 - **Overspeed training**: sprint towing / over-under weighted throwing programs — the sports analog of §5's
   forced-commitment corner.
+- **Amnesia dissociations** (§3½'s empirical backing): Milner / Corkin on H.M. — mirror tracing and other motor
+  skills acquired at normal rates with no episodic memory of the practice sessions. Recalled as well-established;
+  cite-check before leaning on specifics.
+- **Complementary learning systems**: McClelland, McNaughton & O'Reilly 1995 — the interference argument §3½
+  inverts for the massively-recurrent regime.
+- **Explicit monitoring / choking**: Beilock & Carr (and successors) — attention to automatized components degrades
+  skilled execution; §3½'s routing-not-pruning tell.
+- **Schema formation**: Tse et al. 2007 (rapid cortical consolidation when new material fits a prior schema) — the
+  relational counterpart relevant to §3½'s reasoning-chunk uncertainty; also awake rest replay (Foster & Wilson)
+  for the rest-time rehearsal phenomenology.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
