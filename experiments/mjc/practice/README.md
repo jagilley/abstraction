@@ -20,6 +20,13 @@ node; the fourth lives under `bridge_assembly/` because it is that node's runner
 | priced plasticity | [`priced_plasticity/`](priced_plasticity/) | FM capacity, replay, total plasticity spend | 1 (+ interior grid) |
 | aleatoric flip | [`aleatoric_flip/`](aleatoric_flip/) | flip amplitude on a mastered region | 1 (+ calibration) |
 
+A fifth run, added 2026-08-12, is **not** a δ-consumption run and does not share the substrate
+below — it is the first node in this arc with *sequence* structure:
+
+| run | location | what varies | seeds |
+|---|---|---|---|
+| étude arc | [`etude/`](etude/) | compilation of mastered segments into committed ballistic units: the δ-silence gate, the compile op itself, and sequential assembly | **written up** — sequential assembly with seam-matched selection dominates never-compiling on both axes, 3/3 seeds |
+
 ## Shared substrate
 
 All four run on the puck-free corridor world (`../pusher_env.py`, damping 2.0 — the `ballistic`
@@ -185,6 +192,24 @@ variants; `conj` (δ × disagreement). f0 duplicates of the key arms.
 Seeds: 1 (`af_s0`), plus the calibration sweep (`afcal_s0`). No README was written by the
 implementing agent; `analyze_flip.py` regenerates all readouts from `data/af_s0.json`.
 
+### étude arc — [`etude/`](etude/README.md) (2026-08-12 → 08-14, written up)
+
+**Goal**: instantiate the practice loop's third component — re-chunking/compilation — on a task
+with *sequence* structure (a fixed 4-segment piece, one hard passage), where the difficulty axis is
+composition rather than per-step severity, and δ is consumed only as a **detector** (this audit's
+surviving role for it). Eleven runs: calibrations, the E-gate compile-trigger test, two
+compile-op discriminators, selection (E-3/E-3b), sequential assembly (E-4), consolidation +
+3-seed replication (E-5).
+
+**Headline**: sequential assembly with seam-matched selection **dominates never-compiling on both
+axes in 3/3 seeds** (piece error 0.0772 ± 0.0097 vs 0.1066 ± 0.0059 at 34–53% less priced time).
+En route: compilation is *selection + commitment*, not distillation-by-regression (averaging valid
+renditions is what destroys them); selection must rank by expected performance under the
+consumption distribution (winner's curse and the 4.5 σ practice→performance seam-state shift are
+the two measured ways to get this wrong); committed units never degrade here and fusion is vacuous —
+hierarchy needs boundaries that carry information, which sets the next round's design. Full
+findings, retractions and per-run tables: [`etude/README.md`](etude/README.md).
+
 ## Reproduce
 
 ```bash
@@ -218,6 +243,7 @@ Modal volume (`mujoco-control-data`): `/data/bridge_assembly/dsw_<cell>_s<seed>/
 
 ## Per-node file indexes
 
+[`etude/FILES.md`](etude/FILES.md) ·
 [`estimability/FILES.md`](estimability/FILES.md) ·
 [`priced_plasticity/FILES.md`](priced_plasticity/FILES.md) ·
 [`aleatoric_flip/FILES.md`](aleatoric_flip/FILES.md) ·

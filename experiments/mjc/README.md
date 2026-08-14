@@ -2,7 +2,7 @@
 
 **Idea docs**: [ideas/physical_control_substrate.md](../../ideas/physical_control_substrate.md) (the substrate program) · [ideas/two_timescale_value_loop.md](../../ideas/two_timescale_value_loop.md) (the value↔FM interface the later arcs test)
 **Cousins**: a2a reaching arc ([REACHING_INTERNAL](../a2a_forward/reaching/REACHING_INTERNAL_README.md), [ACTIVE_VISION](../a2a_forward/reaching/ACTIVE_VISION_README.md)), [RHM sculpting](../rhm/RHM_SCULPTING_README.md)
-**Status**: Cuts #1–#3 done; the value↔FM interface arc runs eight nodes deep and is live; **cut #5 (dimensionality expansion) is run and closed** — [`expansion/`](expansion/README.md). File index: [FILES.md](FILES.md).
+**Status**: Cuts #1–#3 done; the value↔FM interface arc runs eight nodes deep and is live; **cut #5 (dimensionality expansion) is run and closed** — [`expansion/`](expansion/README.md); **the practice/étude arc is written up** — compilation is selection-not-averaging, and sequential assembly with seam-matched selection dominates never-compiling on both axes, 3/3 seeds ([`practice/etude/`](practice/etude/README.md)). File index: [FILES.md](FILES.md).
 
 > **Naming**: this directory is `mjc/`, not `mujoco/` — a local package named `mujoco` would shadow the real `mujoco` pip package on Modal's `sys.path` and break every experiment. The Modal volume (`mujoco-control-data`) and app (`mujoco-control`) keep their original names, so all prior results stay addressable.
 

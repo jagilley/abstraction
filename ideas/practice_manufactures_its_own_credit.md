@@ -344,4 +344,26 @@ recorded as anchor, not evidence.
   relational counterpart relevant to §3½'s reasoning-chunk uncertainty; also awake rest replay (Foster & Wilson)
   for the rest-time rehearsal phenomenology.
 
+---
+
+## 12. What we ran (2026-08-12 → 08-14): the étude arc
+
+**Source of truth**: [`experiments/mjc/practice/etude/README.md`](../experiments/mjc/practice/etude/README.md)
+— the joint writeup of the whole arc (E-gate → compile-op discriminators → E-3/E-3b → E-4 → E-5 +
+3-seed replication). **This section is a pointer, not a summary of record** — read that node for
+findings, tables, retractions and reproduction.
+
+Where the doc's claims landed, in that writeup's terms: §1's re-chunking trigger (δ-silence as the
+committability certificate) **works**; §3's compile op was corrected in kind — "self-imitation of
+one's own reactive trace" is right only read *singular*: compilation is **selection + commitment**
+of one realisation, ranked by expected performance under the consumption distribution, and
+distillation-by-regression (averaging renditions) is what destroys committed units. §5's overspeed
+corner **inverted** as candidate generation (closed-loop traces are the better candidates), and
+sloppy practice's catastrophe was regression's property — the weak form (compiled error persists)
+stands. §2's hierarchy derivations acquire a stated precondition: **boundaries must carry
+information** for re-chunking to be a real operation. New, not anticipated here: the
+practice→performance **seam-state shift** (audition vs consumption distribution), assembly's
+benchmark-reset cost, and chain compounding. The headline: sequential assembly with seam-matched
+selection dominates never-compiling on both axes, 3/3 seeds.
+
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
