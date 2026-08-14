@@ -366,4 +366,41 @@ practice→performance **seam-state shift** (audition vs consumption distributio
 benchmark-reset cost, and chain compounding. The headline: sequential assembly with seam-matched
 selection dominates never-compiling on both axes, 3/3 seeds.
 
+---
+
+## 13. What we ran (2026-08-14): the RHM port — [`crystallize`](../experiments/rhm/practice/crystallize/README.md)
+
+**Source of truth**: [`experiments/rhm/practice/crystallize/README.md`](../experiments/rhm/practice/crystallize/README.md)
+(arc index: [`experiments/rhm/practice/README.md`](../experiments/rhm/practice/README.md)).
+**This section is a pointer, not a summary of record** — read that node for findings, tables,
+retractions, the calibration record and reproduction.
+
+Why the move: §12's arc closed on a precondition it could not test — *boundaries must carry
+information* — because a committed unit in the corridor world was a state-independent command
+sequence. Sculpting removes that degeneracy and adds an exact DP oracle.
+
+Where the doc's claims landed, in that node's terms. §2's precondition **is now measured**:
+state-conditioned commitment (a library selected at launch by the observed context) beats
+state-independent commitment by 1.8–3.0× in 6/6 commit states, so the Schmidt-shaped fix §12 proposed
+is the load-bearing one. §3's "compilation is selection + commitment" **reproduces with a sharper
+mechanism**: RHM makes the nonconvexity exact — the position-wise mean of valid renditions went
+off-grammar in half its blocks while every contributing rendition was fully on-grammar, and averaging
+costs 3.6–5.0×. The winner's curse reproduces at 3.3×, and selecting *per library key* is measurably
+more curse-prone than selecting one global unit.
+
+And §1's certificate acquires a **scope condition** (interpretation, discussed 2026-08-14): δ-silence
+gates compilation only where practice moves the **executor**. The étude's practice trained the
+forward model its ballistic units bet on, so mastery of the model was mastery of the unit; the RHM
+port trains the *judge* while the generator that executes a committed program is frozen — so the
+committable content is flat from cycle 1, commit-at-cycle-1 is optimal (26× less priced time than
+never-compiling), and there is nothing to certify. Practice on a frozen plant makes you better at
+improvising, and improvisation is exactly what does not compile. The constructive form (Jasper's):
+the certificate should be conditioned on the **learning progress of the committable content** — a
+shadow-compile audition trajectory that goes positive and then silent — not on task-performance level
+or task-LP, both of which conflate selector improvement with plant improvement. A precheck in that
+node confirms the diagnosis (let the plant learn and the committed-unit ceiling moves at 31–66× the
+metering noise floor) and scopes the proposed next round, which composes a learning plant, a unit-LP
+certificate, a depth-laddered damage schedule, and committed macros re-entering the practice action
+space as primitives.
+
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
