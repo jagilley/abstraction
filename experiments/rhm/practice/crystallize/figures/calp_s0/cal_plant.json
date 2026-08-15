@@ -1,0 +1,209 @@
+{
+  "config": {
+    "v": 8,
+    "s": 2,
+    "depth": 4,
+    "m": 2,
+    "rule_seed": 0,
+    "train_seed": 1,
+    "seed": 0,
+    "state_dim": 96,
+    "n_train_episodes": 100000,
+    "controller_steps": 12000,
+    "generator_steps": 12000,
+    "value_steps": 12000,
+    "value_episodes": 40000,
+    "value_batch_collect": 1024,
+    "batch_size": 256,
+    "value_lr": 0.0003,
+    "value_lr_online": null,
+    "shadow_compile": false,
+    "n_corrupt": 3,
+    "explore_eps": 0.3,
+    "max_level": null,
+    "with_noop": false,
+    "budget": 3,
+    "pr_width": 16,
+    "perf_width": 1,
+    "n_pr": 64,
+    "n_rt": 384,
+    "n_score": 256,
+    "n_ref": 512,
+    "n_cand": 32,
+    "n_span": 32,
+    "n_cycles": 40,
+    "n_grad": 8,
+    "value_batch": 256,
+    "replay_frac": 0.5,
+    "buf_cap": 200000,
+    "trace_window": 6,
+    "alpha": 0.2,
+    "sil_c": 0.06,
+    "sil_cv": 0.1,
+    "sil_W": 5,
+    "sil_hold": 2,
+    "sil_min_cycle": 4,
+    "cert_cal": 3,
+    "sched_early": 1,
+    "sched_late": 30,
+    "d_fb": 1.0,
+    "c_mat": 0.05,
+    "checkpoint_every": 5,
+    "discriminate": true,
+    "probe_widths": [
+      4,
+      16
+    ],
+    "probe_every": 5
+  },
+  "contexts": [
+    {
+      "name": "deep",
+      "level": 2,
+      "nodes": [
+        1
+      ]
+    },
+    {
+      "name": "shallow",
+      "level": 1,
+      "nodes": [
+        6,
+        7
+      ]
+    }
+  ],
+  "n_cycles": 20,
+  "gen_lr": 0.0001,
+  "gen_steps": 20,
+  "before": {
+    "deep": {
+      "len1": {
+        "best_in": 0.384765625,
+        "best_in_prog": [
+          "L2n1"
+        ],
+        "best_out": 0.38671875,
+        "best_out_prog": [
+          "L2n1"
+        ],
+        "median": 0.982421875,
+        "lib_in": 0.28515625,
+        "lib_out": 0.30078125
+      },
+      "len2": {
+        "best_in": 0.291015625,
+        "best_in_prog": [
+          "L2n1",
+          "L1n3"
+        ],
+        "best_out": 0.3203125,
+        "best_out_prog": [
+          "L2n1",
+          "L1n2"
+        ],
+        "median": 0.8671875,
+        "lib_in": 0.142578125,
+        "lib_out": 0.2109375
+      },
+      "beam_w16": 0.201171875
+    },
+    "shallow": {
+      "len1": {
+        "best_in": 0.35546875,
+        "best_in_prog": [
+          "L2n3"
+        ],
+        "best_out": 0.359375,
+        "best_out_prog": [
+          "L2n3"
+        ],
+        "median": 0.99609375,
+        "lib_in": 0.306640625,
+        "lib_out": 0.30859375
+      },
+      "len2": {
+        "best_in": 0.29296875,
+        "best_in_prog": [
+          "L2n3",
+          "L1n7"
+        ],
+        "best_out": 0.28125,
+        "best_out_prog": [
+          "L2n3",
+          "L1n7"
+        ],
+        "median": 0.89453125,
+        "lib_in": 0.197265625,
+        "lib_out": 0.22265625
+      },
+      "beam_w16": 0.2578125
+    }
+  },
+  "after": {
+    "deep": {
+      "len1": {
+        "best_in": 0.361328125,
+        "best_in_prog": [
+          "L2n1"
+        ],
+        "best_out": 0.34375,
+        "best_out_prog": [
+          "L2n1"
+        ],
+        "median": 0.986328125,
+        "lib_in": 0.162109375,
+        "lib_out": 0.15234375
+      },
+      "len2": {
+        "best_in": 0.28125,
+        "best_in_prog": [
+          "L2n1",
+          "L1n3"
+        ],
+        "best_out": 0.2578125,
+        "best_out_prog": [
+          "L2n1",
+          "L1n3"
+        ],
+        "median": 0.90234375,
+        "lib_in": 0.115234375,
+        "lib_out": 0.09375
+      },
+      "beam_w16": 0.30859375
+    },
+    "shallow": {
+      "len1": {
+        "best_in": 0.345703125,
+        "best_in_prog": [
+          "L2n3"
+        ],
+        "best_out": 0.359375,
+        "best_out_prog": [
+          "L2n3"
+        ],
+        "median": 0.99609375,
+        "lib_in": 0.107421875,
+        "lib_out": 0.109375
+      },
+      "len2": {
+        "best_in": 0.33984375,
+        "best_in_prog": [
+          "L2n3",
+          "L1n7"
+        ],
+        "best_out": 0.35546875,
+        "best_out_prog": [
+          "L2n3",
+          "L1n7"
+        ],
+        "median": 0.916015625,
+        "lib_in": 0.08203125,
+        "lib_out": 0.12890625
+      },
+      "beam_w16": 0.244140625
+    }
+  },
+  "noise_floor": 0.003,
+  "elapsed": 205.0084092617035
+}
