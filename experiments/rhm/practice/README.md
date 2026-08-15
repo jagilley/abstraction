@@ -40,6 +40,28 @@ a frozen plant makes you better at improvising, and improvisation is what does n
 precheck closes the loop: let the plant learn and the committed-unit ceiling moves at 31–66× the
 metering noise floor, which is what the next round is built on.
 
+### [`ratchet/`](ratchet/README.md) — earning a level-indexed vocabulary, one depth era at a time (2026-08-14)
+
+**Goal**: give practice something it can actually move — its own **action space** — by mining a
+level-indexed macro vocabulary from the agent's own successful repairs, over a depth-laddered damage
+schedule, and grade it against the DGP's true vocabulary handed over for free.
+
+**Finding**: **earning the vocabulary recovers 68–98% of what being given it buys**, at 0.85× the
+priced time, and it flattens the cost-to-depth curve 4.1× against base moves (error growth +0.072
+across three depth eras vs `never_base`'s +0.293) in a regime where depth is *unaffordable* rather
+than merely harder — the base action space's privileged exact-DP oracle and its width-16 beam at 5.9×
+the declared budget both lose to one level-2 macro at width 1. Commitment timing matters
+catastrophically: **committing one cycle into an era is worse than never committing at all**
+(earned-vs-given fraction −0.372), because a compiled level-2 error forecloses level 3's
+*representation* — the learned tables are nested (`T3 ⊆ T2 × T2`), so a frozen bad vocabulary makes the
+next level unrepresentable rather than merely worse. The unit-LP certificate fires within one cycle of
+its offline prediction at level 2, and **correctly refuses at level 3**, where the macro is auditioned
+on shallower damage than it was built for and the audition *understates* it by 1.75× — the étude's
+seam law with its sign flipped, and the refusal costs the era. The plant stayed inert throughout
+(a manufactured frontier was measured and failed: the agent must be able to *fund* crossing it), so
+the whole descent is vocabulary-carried, which is round 1's scope condition satisfied by the action
+space rather than by the executor.
+
 ## Reproduce
 
 ```bash
@@ -51,6 +73,13 @@ python3 rhm/practice/crystallize/launch_detached.py --fn crystallize --tag cg_s0
     --sil-c 0.06 --sil-cv 0.10 --sil-win 5 --sil-hold 2 --sched-early 1 --sched-late 30 \
     --probe-every 4 --shadow-compile
 python3 rhm/practice/crystallize/analyze_crystallize.py --tag cg_s0 --fetch --figures
+
+python3 rhm/practice/ratchet/launch_detached.py --fn ratchet --tag rr_s0 --seed 0 \
+    --arms "never_base,given,practice_gated,practice_early,practice_late" \
+    --eras "1:6,2:3,3:1" --era-cycles 30 --budget 4 --g-budget 58 --mine-cap 8 \
+    --sil-c 0.06 --sil-cv 0.15 --lp-min-drop 0.10 --late-offset 3 --probe-every 4
+python3 rhm/practice/ratchet/analyze_ratchet.py --tag rr_s0 --fetch --figures
 ```
 
-Full commands, calibrations and volume layout: [`crystallize/README.md`](crystallize/README.md).
+Full commands, calibrations and volume layout: [`crystallize/README.md`](crystallize/README.md),
+[`ratchet/README.md`](ratchet/README.md).

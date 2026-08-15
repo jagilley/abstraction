@@ -403,4 +403,50 @@ metering noise floor) and scopes the proposed next round, which composes a learn
 certificate, a depth-laddered damage schedule, and committed macros re-entering the practice action
 space as primitives.
 
+---
+
+## 14. What we ran (2026-08-14): the ratchet round — [`ratchet`](../experiments/rhm/practice/ratchet/README.md)
+
+**Source of truth**: [`experiments/rhm/practice/ratchet/README.md`](../experiments/rhm/practice/ratchet/README.md)
+(arc index: [`experiments/rhm/practice/README.md`](../experiments/rhm/practice/README.md)).
+**This section is a pointer, not a summary of record** — read that node for findings, tables, the
+retraction, the calibration record and reproduction.
+
+Why the move: §13 closed on a scope condition — the certificate gates compilation only where practice
+moves something the unit depends on — and a precheck saying the plant was the missing lever. The plant
+turned out **not to be the lever**: with the generator fine-tuning on the agent's own solved repairs,
+its clean-config accuracy and its true-table audition are flat across 90 cycles, and a deliberately
+manufactured frontier (withholding grammar from the setup corpus) failed too, recovering ≤11% of the
+headroom it created and in several cells moving backwards. §13's precheck did not reproduce as movement
+in the committable content; the hypothesis on the record is that its readout took a max over an
+enumerated program family and was far more sensitive than a single operator.
+
+What *did* move is the **action space**, and that is where this round lands §1's third component.
+Practice mines a level-indexed macro vocabulary from its own successful repairs — the same max-sum
+operator the DGP's true level move uses, over a learned table — and the tables are nested (`T[l]` is
+built from `T[l−1]` entries). Where §13's claims landed: §1's re-chunking is now **earned rather than
+handed over**, recovering **68–98%** of what the true vocabulary buys at 0.85× the priced time, and
+flattening a cost-to-depth curve 4.1× in a regime where depth is unaffordable to the primitive action
+space at any search width. §3's committability certificate **fires within one cycle of its offline
+prediction** at level 2 — its first non-vacuous firing anywhere in the arc — and the "positive *and*
+then flat" clause is load-bearing rather than decorative (silence alone certifies mid-descent).
+
+Three things are new and not anticipated here. **Premature compilation forecloses representation, not
+just accuracy**: an early-committed one-entry vocabulary made the next level's vocabulary literally
+unrepresentable, and that arm finished worse than never compiling at all — a strictly stronger form of
+§12's weak-form poison. **The seam law acquires a depth coordinate**: audition must match the
+consumption distribution in *level* as well as in state, and where the étude's mismatch made audition
+optimistic by 3.0×, this round's makes it pessimistic by 1.75× — which is why the certificate refused
+at level 3 and lost the era. And **the earned vocabulary is an empirical consumption prior**: the
+grammar defines what is possible, the task distribution what is probable, and the unit's value is
+concentration rather than coverage (a mined 8-entry table beats a random 8-entry subset of the true 14
+by ~0.20).
+
+The round's own next step names the component none of §1's three has yet had built: **re-instantiation
+of the evaluation layer**. The failure mode is exactly a grader that has not climbed — and Jasper's
+note for the record is that this is one of a teacher's primary functions: to lend the student an
+already-climbed grader (hearing the phrase-level signal across bar-level noise) until the student's own
+evaluation layer catches up. **Teaching as transfer of the grader, not of the content** — which sits
+next to the schooling-as-manufactured-recurrence thread rather than apart from it.
+
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
