@@ -449,4 +449,73 @@ already-climbed grader (hearing the phrase-level signal across bar-level noise) 
 evaluation layer catches up. **Teaching as transfer of the grader, not of the content** — which sits
 next to the schooling-as-manufactured-recurrence thread rather than apart from it.
 
+---
+
+## 15. What we ran (2026-08-15): the grader climbs — [`ear`](../experiments/rhm/practice/ear/README.md)
+
+**Source of truth**: [`experiments/rhm/practice/ear/README.md`](../experiments/rhm/practice/ear/README.md)
+(arc index: [`experiments/rhm/practice/README.md`](../experiments/rhm/practice/README.md)).
+**This section is a pointer, not a summary of record.**
+
+§14's named component was built: the evaluation layer climbed on two coordinates at once
+(audition **context** and **evaluator**), and the seam law is now three-coordinate — audition
+must match consumption in state (§12), level (§14), and evaluator (this round), at which point
+it predicts realised performance at **0.97**. The measurement problem behind §14's level-3
+refusal is solved. What the solved measurement revealed is a **second scope condition on §3's
+certificate**, sibling to §13's: an LP gate is informative only while the policy is far from the
+unit's value — an agent already holding level-k vocabulary leaves a level-(k+1) candidate almost
+no headroom to demonstrate, so even a perfectly calibrated audition truthfully reports no
+progress and the gate starves. (§16 later sharpens "starves" to "is slow, and was
+clock-truncated" — and shows the conclusion survives the sharpening.) What rescued the frontier
+era was **provisional commitment at the era boundary, graded in consumption**, whose recert
+safety net fired zero times: committed content was already safe because §12's
+selection-not-averaging operates upstream, at mining time. The teacher thread (§14 (e)) gains
+its second half — the teacher lends an ear *and schedules the recital* — and §1's component (1)
+acquires a new domain: grading itself is priced (5–29% of the feedback budget), so *where to
+evaluate* is an allocation decision.
+
+---
+
+## 16. What we ran (2026-08-15): self-paced eras — [`recital`](../experiments/rhm/practice/recital/README.md)
+
+**Source of truth**: [`experiments/rhm/practice/recital/README.md`](../experiments/rhm/practice/recital/README.md).
+**This section is a pointer, not a summary of record.**
+
+§1's first component — allocation — wired into the arc at last, as the curriculum decision: the
+era clock removed, each arm deciding when to advance the depth ladder under one priced budget.
+Across three independent worlds, **no internal signal we built prices what time at the bottom of
+the ladder buys**: the certificate reads commit-readiness (advances earliest, finishes
+bottom-half everywhere), task progress starves at the bottom (never advances in 2 of 3 worlds),
+and vocabulary growth saturates before the level's value is extracted (predicted exactly, still
+early). A fixed bottom-heavy schedule is rank 1 in every world and **beats the DGP's own
+vocabulary outright in both independent worlds** — §14's concentration-over-coverage climbing to
+the schedule level. The mechanism check locates the seed-stable predictor of the deep grade in
+the **next level's table**: the value of practice at level k is expressed in level k+1's mining
+yield, a place no within-level signal looks — which gives §2's hierarchy derivations an
+allocation-side counterpart (deep value of shallow practice is invisible to shallow
+measurement). The teacher thread gains its third clause: alongside lending the grader (§14) and
+scheduling the recital (§15), the teacher **holds the student at the bottom** — recorded as
+suggestive on one substrate, but it is the round's most stable fact.
+
+---
+
+## 17. What we ran (2026-08-15→16): the depth-6 port — [`tall`](../experiments/rhm/practice/tall/README.md)
+
+**Source of truth**: [`experiments/rhm/practice/tall/README.md`](../experiments/rhm/practice/tall/README.md).
+**This section is a pointer, not a summary of record.**
+
+Built to break the confound every level-3 statement in §§14–16 carries (deepest-earnable vs
+grammar-ceiling), the port established its setting by measurement — the repo's L=6/m=4 LM
+default is **inadmissible** for sculpting; synonymy flattens cost-to-depth to nothing — and then
+**voided its main run**: at 64 tokens the value head is signal-starved and the loop never
+sculpted, so the boundary-artifact-vs-frontier-effect discriminator **remains open**. Two
+findings are regime-independent and act on the doc: **endogenous pacing cannot traverse a ladder
+longer than the earnable range** (beyond it the certificate and admission-rate signals are
+undefined, not noisy — the teacher thread's sharpest clause: past your conceptual reach,
+self-pacing is impossible by construction), and **the mined table cannot churn** (§16's
+same-table-or-different mechanism question retired a priori). One open observation worth
+carrying: under priced search, committing a unit costs action-space rent that at 64 tokens
+exceeds what the macros buy — **a chunk pays only when it covers a meaningful fraction of the
+problem** — conditional on the pricing model, and a hard prerequisite for any re-run.
+
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

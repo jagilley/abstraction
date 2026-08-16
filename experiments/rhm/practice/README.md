@@ -62,6 +62,56 @@ seam law with its sign flipped, and the refusal costs the era. The plant stayed 
 the whole descent is vocabulary-carried, which is round 1's scope condition satisfied by the action
 space rather than by the executor.
 
+### [`ear/`](ear/README.md) — climbing the evaluation layer (2026-08-15)
+
+**Goal**: build the grader the ratchet's level-3 refusal said was missing — audition contexts and
+evaluators that match the consumption distribution — and grade certificate-driven commitment
+against provisional commitment at the era boundary.
+
+**Finding**: climbing the grader fixes the **measurement** (a consumption-matched in-policy
+audition is calibrated to 0.97, completing the seam law's third coordinate) and not the
+**decision**: every certificate arm still refused level 3, because an arm already holding level-2
+vocabulary leaves a new unit almost no learning-progress headroom to demonstrate. What rescued
+era 3 was **committing provisionally at the boundary and letting consumption grade** —
+`practice_prov`/`practice_climb` are the arc's first arms to beat `given` — and the recert safety
+net fired 0 times in 24: boundary commitment is safe because mining is selection-filtered
+upstream. Evaluation itself costs 5–29% of priced time.
+
+### [`recital/`](recital/README.md) — self-paced eras (2026-08-15)
+
+**Goal**: remove the era clock — each arm holds one priced budget and decides when to advance the
+depth ladder; advancement policy is the only variable. Can any internal signal place the
+boundaries?
+
+**Finding**: **none of three internal signals prices what time at the bottom buys** — the
+certificate advances earliest and finishes bottom-half in all three independent worlds
+(commit-readiness ≠ level-exhaustion), task-progress starves at the bottom in 2 of 3 (degenerates
+to never advancing), and the vocabulary-growth pacer behaves exactly as predicted and is still
+early (saturation ≠ sufficiency). A fixed bottom-heavy schedule (50% of budget in era 1) is
+**rank 1 of 8 in every world** and beats the DGP's own tables outright in both independent
+worlds; corr(first boundary, mean error) = −0.94/−0.69/−0.79. The mechanism check rules out "late
+buys the L2 table" (the post-saturation increment prices at zero) and locates the seed-stable
+predictor in the **next level's** table — a quantity no within-level signal reads. Methodology
+export: recovery *fractions* at one RNG stream position carry ±0.15; rank orderings are the
+currency.
+
+### [`tall/`](tall/README.md) — the depth-6 port attempt (2026-08-15→16, closed)
+
+**Goal**: break the arc's standing confound — at depth 4, level 3 is both the deepest earnable
+level and one below the grammar's ceiling, so frontier effects and boundary artifacts cannot be
+told apart. At depth 6 the ladder (5 levels) outruns the earnable range (2–3).
+
+**Finding**: the setting was established by measurement (m=4 is **inadmissible** for sculpting —
+synonymy flattens the depth ladder 1.06× vs m=2's 3.25× and walls off every level above 3), the
+structural gates all passed, and the main run was **voided**: the value head is signal-starved at
+64 tokens (stale-rollout success 0.076 vs depth-4's 0.296) and no arm sculpted. A densification
+gate showed the fix direction is real but insufficient, and surfaced a pricing inversion
+(committing grows the action set and costs beam width more than the macros are worth at this
+scale). Two regime-independent findings stand: **endogenous pacers cannot traverse a ladder
+longer than the earnable range** (their signals are undefined there, not noisy), and **the mined
+table cannot churn** (recital's same-table-or-different question retired a priori). The
+boundary-vs-frontier discriminator remains open; the full re-run recipe is recorded.
+
 ## Reproduce
 
 ```bash
@@ -82,4 +132,6 @@ python3 rhm/practice/ratchet/analyze_ratchet.py --tag rr_s0 --fetch --figures
 ```
 
 Full commands, calibrations and volume layout: [`crystallize/README.md`](crystallize/README.md),
-[`ratchet/README.md`](ratchet/README.md).
+[`ratchet/README.md`](ratchet/README.md), [`ear/README.md`](ear/README.md),
+[`recital/README.md`](recital/README.md) (+ its `FILES.md` for the fidelity replay and the
+seed-triple convention), [`tall/README.md`](tall/README.md).
