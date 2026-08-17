@@ -48,7 +48,7 @@ keep their original names, so all prior results stay addressable at the same `/d
 | File | Content |
 |---|---|
 | [`COLLECTION_REALISM.md`](on_policy/COLLECTION_REALISM.md) | **Teleport collection — the substrate's standing unrealism, and the fix.** Every FM in this node trains on teleported, omnisciently-covering, free, cheap-to-measure transitions (`arm_env.py:378`; `PusherEnv.set_state`). Sorts every claim into three tiers: **(A) safe** — all dissociations/ratios, where teleportation is genuinely the control (Cuts #1–#3, 4b, 4c, 4c-arm, `arm_substrate` P0–P6); **(B) inflated** — every absolute sample-count ("~50 transitions", "~400"), which measures re-adaptation under free i.i.d. coverage and should be quoted as an upper bound; **(C) unaskable** — anything whose dependent variable is the allocation of experience. **Recommends on-policy collection as a `collection_mode` flag** on the existing envs (one substrate, not two), notes that the flag is itself the decomposition, and states the real cost — it couples model quality to data quality, buying realism by spending a control. Also: the live hypothesis that 4c-arm's step-like recovery *is* a teleportation artifact; two stopgaps; four tells; and the warning that Cut 4a's embodied attempt was abandoned for a *geometry* confound and should not be re-abandoned for the same reason. **Read before designing any new cut, and before quoting any sample count from this node.** |
-| [`HISTORY.md`](HISTORY.md) | Qualitative "big history" of the node — what was set out, what happened, where the thinking turned. Auto-generatable; overwrite freely. |
+| `HISTORY.md`[^private] | Qualitative "big history" of the node — what was set out, what happened, where the thinking turned. Auto-generatable; overwrite freely. |
 
 ## Local outputs at this node
 
@@ -62,3 +62,5 @@ keep their original names, so all prior results stay addressable at the same `/d
 Every node's `/data/<experiment>/<tag>/` prefix is set **in-script** and is independent of source
 location — the reorganization did not move any result. The complete list is in [README.md](README.md);
 each child's `FILES.md` lists the prefixes it owns.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
