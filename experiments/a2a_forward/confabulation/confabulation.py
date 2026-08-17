@@ -411,6 +411,18 @@ def confabulation_test(
     obs_steps: int = 2000, obs_lr: float = 3e-4, obs_bs: int = 32,
     obs_topk: int = 64, observer_causal: bool = False,
     full_ladder_every_cap: bool = False,
+    # --- component control (Test 1b) ---
+    # Is the advantage about the RESIDUAL, or about having the state at all? Adds two
+    # extra report targets built with identical machinery (same k, same clustering, same
+    # ladder) that differ only in which function of the state is reported:
+    #   PRED -- the theory-visible component FM(a_i)
+    #   AJ   -- the whole state a_j
+    # An observer route to PRED is short (tokens -> a_i is one block, then re-fit the
+    # small FM); a route to AJ or r has to cross the whole predicted span. Whatever the
+    # three advantages come out to, they say whether the FM decomposition is load-bearing
+    # for Finding 1 or only for Finding 3.
+    component_control: bool = False,
+    skip_fixed_targets: bool = False, skip_steering: bool = False,
     # Test 3
     steer_n_pc: int = 32, steer_eps: float = 1.0, steer_target_kl: float = 0.01,
     steer_n_seq: int = 128, steer_chunk: int = 16,
@@ -945,12 +957,42 @@ def confabulation_test(
             ic_obs = run_ladder(y_impl_cos, n_embd, "cos", ic_rep["full"],
                                 f"IMPL_COS/{cap_tag}", light)
 
+            # ---- Test 1b: the same battery on the other two components of a_j ----
+            comp_rep, comp_obs = {}, {}
+            if component_control:
+                for cname, Mtx in (("PRED", P), ("AJ", flat(aj))):
+                    c_cents = _kmeans_fit(Mtx[tr].to(device), impl_k, seed=seed)
+                    y_c = _kmeans_assign(Mtx.to(device), c_cents).cpu()
+                    y_c_cos = F.normalize(Mtx, dim=-1)
+                    base[cname] = _balance(y_c[te], impl_k)
+                    base[f"{cname}_COS"] = 0.0
+                    cw_, cb_, cs_ = _cluster_quality(Mtx.to(device), y_c.to(device), c_cents)
+                    print(f"      {cname} cluster quality: within={cw_:.3f} "
+                          f"between={cb_:.3f} separation={cs_:.3f} "
+                          f"chance={base[cname]:.3f}")
+                    r_, _ = report_row(y_c, impl_k, "cls", X_variants,
+                                       f"{cname}/{cap_tag}")
+                    comp_rep[cname] = r_
+                    comp_obs[cname] = run_ladder(y_c, impl_k, "cls", r_["full"],
+                                                 f"{cname}/{cap_tag}", light)
+                    rc_, _ = report_row(y_c_cos, n_embd, "cos", X_variants,
+                                        f"{cname}_COS/{cap_tag}")
+                    comp_rep[f"{cname}_COS"] = rc_
+                    comp_obs[f"{cname}_COS"] = run_ladder(
+                        y_c_cos, n_embd, "cos", rc_["full"], f"{cname}_COS/{cap_tag}", light)
+                    comp_rep[cname]["cluster_quality"] = {
+                        "within": cw_, "between": cb_, "separation": cs_}
+                    del y_c, y_c_cos, c_cents, Mtx
+                    torch.cuda.empty_cache()
+
             # The FM-independent targets are run once, at the default capacity, since
             # neither their labels nor X_full depend on the instrument. (Their ablation
             # columns do, so they are reported alongside that capacity.)
             fixed_rep, fixed_obs = {}, {}
             h_behav = None
-            if not fixed_done:              # inst_caps[0] == the default instrument
+            if skip_fixed_targets:
+                fixed_done = True
+            elif not fixed_done:            # inst_caps[0] == the default instrument
                 for tn, (yv_, nc_, kd_) in fixed_targets.items():
                     fixed_rep[tn], h_ = report_row(yv_, nc_, kd_, X_variants, tn)
                     fixed_obs[tn] = run_ladder(yv_, nc_, kd_, fixed_rep[tn]["full"], tn)
@@ -958,7 +1000,7 @@ def confabulation_test(
                         h_behav = h_
                         h_behav_keep = h_
                 fixed_done = True
-            else:
+            elif not skip_fixed_targets:
                 h_behav = h_behav_keep
 
             # ---- Test 3: matched-KL steering, residual span vs self-theory span ----
@@ -968,87 +1010,89 @@ def confabulation_test(
             # becomes a built-in control that should come out equal across families.
             # Prediction: residual-span steering moves the IMPL report more than
             # prediction-span steering. A theory-driven report cannot show that asymmetry.
-            idx = torch.randperm(len(tr), generator=torch.Generator().manual_seed(seed + 17))
-            sel_ = tr[idx[:min(50000, len(tr))]]
+            steer = {}
+            if not (skip_steering or skip_fixed_targets):
+              idx = torch.randperm(len(tr), generator=torch.Generator().manual_seed(seed + 17))
+              sel_ = tr[idx[:min(50000, len(tr))]]
 
-            def top_pcs(M_):
-                sub = M_[sel_].to(device)
-                return torch.linalg.svd(sub - sub.mean(0), full_matrices=False)[2][:steer_n_pc]
+              def top_pcs(M_):
+                  sub = M_[sel_].to(device)
+                  return torch.linalg.svd(sub - sub.mean(0), full_matrices=False)[2][:steer_n_pc]
 
-            # Memory note: a full-sequence log-prob tensor here is
-            # n_seq x (T-1) x 50257 floats -- at 256 sequences that is 6.6 GB, and the
-            # baseline has to stay resident alongside the perturbed one, which OOMs a
-            # 22 GB card. So steering runs in sequence-chunks and accumulates scalars;
-            # the baseline log-probs are cached on the CPU in fp16 (the KL here is ~1e-2,
-            # far above fp16 resolution) and only one chunk is ever on the GPU.
-            steer_seqs = s_te[:min(steer_n_seq, len(s_te))]
-            base_aj = aj[steer_seqs]                                    # kept on CPU
+              # Memory note: a full-sequence log-prob tensor here is
+              # n_seq x (T-1) x 50257 floats -- at 256 sequences that is 6.6 GB, and the
+              # baseline has to stay resident alongside the perturbed one, which OOMs a
+              # 22 GB card. So steering runs in sequence-chunks and accumulates scalars;
+              # the baseline log-probs are cached on the CPU in fp16 (the KL here is ~1e-2,
+              # far above fp16 resolution) and only one chunk is ever on the GPU.
+              steer_seqs = s_te[:min(steer_n_seq, len(s_te))]
+              base_aj = aj[steer_seqs]                                    # kept on CPU
 
-            def _fwd(aj_chunk):
-                z = aj_chunk.to(device)
-                for blk in mids:
-                    z = blk(z)
-                z = z[:, :T - 1]
-                return (F.log_softmax(model.lm_head(ln_f(z)), -1),
-                        h_impl(z).argmax(-1), h_behav(z).argmax(-1))
+              def _fwd(aj_chunk):
+                  z = aj_chunk.to(device)
+                  for blk in mids:
+                      z = blk(z)
+                  z = z[:, :T - 1]
+                  return (F.log_softmax(model.lm_head(ln_f(z)), -1),
+                          h_impl(z).argmax(-1), h_behav(z).argmax(-1))
 
-            base_lp_c, base_impl_c, base_behav_c = [], [], []
-            with torch.no_grad():
-                for i in range(0, len(base_aj), steer_chunk):
-                    lp_, ri_, rb_ = _fwd(base_aj[i:i + steer_chunk])
-                    base_lp_c.append(lp_.half().cpu())
-                    base_impl_c.append(ri_); base_behav_c.append(rb_)
+              base_lp_c, base_impl_c, base_behav_c = [], [], []
+              with torch.no_grad():
+                  for i in range(0, len(base_aj), steer_chunk):
+                      lp_, ri_, rb_ = _fwd(base_aj[i:i + steer_chunk])
+                      base_lp_c.append(lp_.half().cpu())
+                      base_impl_c.append(ri_); base_behav_c.append(rb_)
 
-            def probe_dir(u, eps):
-                kl_s = im_s = bh_s = 0.0
-                n_tok = n_pos = 0
-                with torch.no_grad():
-                    for ci, i in enumerate(range(0, len(base_aj), steer_chunk)):
-                        chunk = base_aj[i:i + steer_chunk].to(device) + eps * u.view(1, 1, -1)
-                        lp_, ri_, rb_ = _fwd(chunk)
-                        b_lp = base_lp_c[ci].to(device).float()
-                        kl_s += float(F.kl_div(lp_.reshape(-1, vocab_size),
-                                               b_lp.reshape(-1, vocab_size),
-                                               log_target=True, reduction="sum"))
-                        n_tok += b_lp.shape[0] * b_lp.shape[1]
-                        im_s += float((ri_ != base_impl_c[ci]).float().sum())
-                        bh_s += float((rb_ != base_behav_c[ci]).float().sum())
-                        n_pos += ri_.numel()
-                        del lp_, b_lp, chunk
-                return kl_s / n_tok, im_s / n_pos, bh_s / n_pos
+              def probe_dir(u, eps):
+                  kl_s = im_s = bh_s = 0.0
+                  n_tok = n_pos = 0
+                  with torch.no_grad():
+                      for ci, i in enumerate(range(0, len(base_aj), steer_chunk)):
+                          chunk = base_aj[i:i + steer_chunk].to(device) + eps * u.view(1, 1, -1)
+                          lp_, ri_, rb_ = _fwd(chunk)
+                          b_lp = base_lp_c[ci].to(device).float()
+                          kl_s += float(F.kl_div(lp_.reshape(-1, vocab_size),
+                                                 b_lp.reshape(-1, vocab_size),
+                                                 log_target=True, reduction="sum"))
+                          n_tok += b_lp.shape[0] * b_lp.shape[1]
+                          im_s += float((ri_ != base_impl_c[ci]).float().sum())
+                          bh_s += float((rb_ != base_behav_c[ci]).float().sum())
+                          n_pos += ri_.numel()
+                          del lp_, b_lp, chunk
+                  return kl_s / n_tok, im_s / n_pos, bh_s / n_pos
 
-            steer = {"target_kl": steer_target_kl, "families": {}}
-            for fam, M_ in (("residual", R), ("prediction", P)):
-                pcs = top_pcs(M_)
-                per = []
-                for k in range(min(steer_n_pc, pcs.shape[0])):
-                    u = pcs[k]
-                    kl0, _, _ = probe_dir(u, steer_eps)
-                    if kl0 <= 1e-9:
-                        continue
-                    # KL is locally quadratic in eps, so this lands close in one shot;
-                    # one refinement pass tightens it. Cap eps so we stay near-local.
-                    eps_k = min(steer_eps * (steer_target_kl / kl0) ** 0.5, 20 * steer_eps)
-                    kl1, _, _ = probe_dir(u, eps_k)
-                    if kl1 > 1e-9:
-                        eps_k = min(eps_k * (steer_target_kl / kl1) ** 0.5, 20 * steer_eps)
-                    kl_f, fi, fb = probe_dir(u, eps_k)
-                    per.append({"pc": k, "eps": eps_k, "kl": kl_f,
-                                "impl_flip": fi, "behav_flip": fb})
-                agg = lambda kk: float(np.mean([p_[kk] for p_ in per])) if per else float("nan")
-                steer["families"][fam] = {"per_pc": per, "kl": agg("kl"), "eps": agg("eps"),
-                                          "impl_flip": agg("impl_flip"),
-                                          "behav_flip": agg("behav_flip")}
-                print(f"  [steer/{fam:10s}] @matched KL={agg('kl'):.4f}  "
-                      f"IMPL report-flip={agg('impl_flip'):.3f}  "
-                      f"BEHAV report-flip={agg('behav_flip'):.3f}  (eps={agg('eps'):.3f})")
-            rs_, ps_ = steer["families"]["residual"], steer["families"]["prediction"]
-            steer["impl_flip_ratio"] = (rs_["impl_flip"] / ps_["impl_flip"]
-                                        if ps_["impl_flip"] > 0 else float("inf"))
-            print(f"  [steer] residual/prediction IMPL-flip ratio at matched behaviour = "
-                  f"{steer['impl_flip_ratio']:.2f}x")
-            del base_lp_c, base_impl_c, base_behav_c, base_aj
-            torch.cuda.empty_cache()
+              steer = {"target_kl": steer_target_kl, "families": {}}
+              for fam, M_ in (("residual", R), ("prediction", P)):
+                  pcs = top_pcs(M_)
+                  per = []
+                  for k in range(min(steer_n_pc, pcs.shape[0])):
+                      u = pcs[k]
+                      kl0, _, _ = probe_dir(u, steer_eps)
+                      if kl0 <= 1e-9:
+                          continue
+                      # KL is locally quadratic in eps, so this lands close in one shot;
+                      # one refinement pass tightens it. Cap eps so we stay near-local.
+                      eps_k = min(steer_eps * (steer_target_kl / kl0) ** 0.5, 20 * steer_eps)
+                      kl1, _, _ = probe_dir(u, eps_k)
+                      if kl1 > 1e-9:
+                          eps_k = min(eps_k * (steer_target_kl / kl1) ** 0.5, 20 * steer_eps)
+                      kl_f, fi, fb = probe_dir(u, eps_k)
+                      per.append({"pc": k, "eps": eps_k, "kl": kl_f,
+                                  "impl_flip": fi, "behav_flip": fb})
+                  agg = lambda kk: float(np.mean([p_[kk] for p_ in per])) if per else float("nan")
+                  steer["families"][fam] = {"per_pc": per, "kl": agg("kl"), "eps": agg("eps"),
+                                            "impl_flip": agg("impl_flip"),
+                                            "behav_flip": agg("behav_flip")}
+                  print(f"  [steer/{fam:10s}] @matched KL={agg('kl'):.4f}  "
+                        f"IMPL report-flip={agg('impl_flip'):.3f}  "
+                        f"BEHAV report-flip={agg('behav_flip'):.3f}  (eps={agg('eps'):.3f})")
+              rs_, ps_ = steer["families"]["residual"], steer["families"]["prediction"]
+              steer["impl_flip_ratio"] = (rs_["impl_flip"] / ps_["impl_flip"]
+                                          if ps_["impl_flip"] > 0 else float("inf"))
+              print(f"  [steer] residual/prediction IMPL-flip ratio at matched behaviour = "
+                    f"{steer['impl_flip_ratio']:.2f}x")
+              del base_lp_c, base_impl_c, base_behav_c, base_aj
+              torch.cuda.empty_cache()
 
             by_cap[cap_tag] = {
                 "d_head": dh, "mlp_mult": mm, "fm_params": fm_params,
@@ -1056,8 +1100,10 @@ def confabulation_test(
                 "fwd_cosine": fwd_cos, "res_norm": res_norm,
                 "ens_cos": ens, "syntactic_eta2": eta2, "residual_structure": rstruct,
                 "cluster_quality": {"within": cq_w, "between": cq_b, "separation": cq_sep},
-                "report": {"IMPL": impl_rep, "IMPL_COS": ic_rep, **fixed_rep},
-                "observers": {"IMPL": impl_obs, "IMPL_COS": ic_obs, **fixed_obs},
+                "report": {"IMPL": impl_rep, "IMPL_COS": ic_rep,
+                           **comp_rep, **fixed_rep},
+                "observers": {"IMPL": impl_obs, "IMPL_COS": ic_obs,
+                              **comp_obs, **fixed_obs},
                 "baselines": dict(base), "steering": steer, "light_ladder": light,
             }
             del pred, resid, R, P, X_variants, y_impl, y_impl_cos
@@ -1075,7 +1121,9 @@ def confabulation_test(
            "report_block": report_block, "inject_after_block": inject_after_block,
            "n_steps": n_steps, "impl_k": impl_k, "observer_caps": observer_caps,
            "observer_causal": observer_causal, "obs_topk": obs_topk, "seed": seed,
-           "inst_caps": inst_caps_str, "ens_n": ens_n, "n_pred_params": n_pred_params}
+           "inst_caps": inst_caps_str, "ens_n": ens_n, "n_pred_params": n_pred_params,
+           "component_control": component_control,
+           "skip_fixed_targets": skip_fixed_targets, "skip_steering": skip_steering}
     out_dir = f"{DATA_DIR}/a2a_forward/confabulation"
     os.makedirs(out_dir, exist_ok=True)
     fn = f"{out_dir}/{(tag + '_') if tag else ''}results.json"
@@ -1108,7 +1156,38 @@ def confabulation_test(
                   f"{c['report']['IMPL']['full'] - c['report']['IMPL']['confab']:+7.3f} | "
                   f"{c['report']['IMPL_COS']['full']:6.3f} {adv('IMPL_COS'):+7.3f} "
                   f"{c['report']['IMPL_COS']['full'] - c['report']['IMPL_COS']['confab']:+7.3f} | "
-                  f"{c['steering']['impl_flip_ratio']:5.2f}x")
+                  + (f"{c['steering']['impl_flip_ratio']:5.2f}x"
+                     if "impl_flip_ratio" in c["steering"] else "    --"))
+        if component_control:
+            # Test 1b. IMPL is the residual, PRED the theory-visible component, AJ the
+            # whole state. Same head, same ladder, same k -- only the reported function
+            # of the state differs, so the three advantages are directly comparable.
+            print("\n    component control (Test 1b): which function of a_j is private?")
+            print("      raw advantage confounds privacy with how well the self can")
+            print("      report the target at all -- self saturates on PRED/AJ and does")
+            print("      not on IMPL. `frac` is the fraction of the achievable-above-")
+            print("      chance score an I/O-only observer reaches, ceiling taken as the")
+            print("      better of the self-report and the state-access observer. Lower")
+            print("      frac = more of the fact has to be paid for by reconstruction.")
+            print(f"      {'instrument':11s} {'target':9s} {'self':>6s} {'bestOio':>8s} "
+                  f"{'advant':>7s} {'O_act':>7s} {'chance':>7s} {'frac':>6s}")
+            for cap_tag, c in rr["by_capacity"].items():
+                for tn in ("IMPL", "PRED", "AJ", "IMPL_COS", "PRED_COS", "AJ_COS"):
+                    if tn not in c["report"]:
+                        continue
+                    obs = c["observers"][tn]
+                    bio = max(v_ for k_, v_ in obs.items()
+                              if k_.startswith("O_io") and "half" not in k_)
+                    oact = next((v_ for k_, v_ in obs.items()
+                                 if k_.startswith("O_act")), float("nan"))
+                    self_ = c["report"][tn]["full"]
+                    ch_ = c["baselines"].get(tn, 0.0)
+                    ceil_ = max(self_, oact if oact == oact else self_)
+                    frac = ((bio - ch_) / (ceil_ - ch_)) if ceil_ - ch_ > 1e-6 else float("nan")
+                    print(f"      {cap_tag:11s} {tn:9s} {self_:6.3f} "
+                          f"{bio:8.3f} {self_ - bio:+7.3f} "
+                          f"{oact:7.3f} {ch_:7.3f} {frac:6.3f}")
+
         d0 = next(iter(rr["by_capacity"].values()))
         print(f"    control targets @ default instrument (advantage should be ~0):")
         for tn in ("BEHAV", "ENT", "WORLD"):

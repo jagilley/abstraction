@@ -33,12 +33,21 @@ this is the complete listing.
 | `--full-ladder-every-cap` | off | Runs the full observer ladder at every instrument capacity (~4× observer cost) instead of only at the default |
 | `--report-native` | off | Additionally re-reads the CL arm through its native injected forward pass rather than standalone |
 | `--obs-topk` | `64` | Size of the top-k output summary handed to `O_io` (four full-distribution scalars are always included alongside) |
+| `--component-control` | off | Test 1b. Adds `PRED`/`PRED_COS` (the theory-visible component `FM(a_i)`) and `AJ`/`AJ_COS` (the whole state) as report targets alongside `IMPL`, with identical k-means/head/ladder, and prints the headroom-normalized `frac` column. See [component_control/README.md](component_control/README.md) |
+| `--skip-fixed-targets` | off | Skips `BEHAV`/`ENT`/`WORLD`. They do not depend on the instrument, so a control run that only needs the IMPL-family ladders can drop them |
+| `--skip-steering` | off | Skips Test 3. Steering needs the `BEHAV` head as its matched-behaviour control, so it is additionally gated on `--skip-fixed-targets` |
 
 ## Auxiliary READMEs
 
 | File | Summary |
 |---|---|
 | `README.md` | **The writeup.** Positive on the core dissociation (implementation targets +0.21…+0.37 advantage over the best third-party observer at every instrument capacity; I/O-map and input controls at 0 or *negative* — `ENT` is −0.287, the observer predicts M's entropy better than M reports it), clean channel ablation (`shuffle_r` collapses the report, `shuffle_p` does not), modest matched-KL steering (1.4–2.1×). **Null on loop-necessity** (CL−OL ≤0.004 everywhere) with the leading confound named: the CL arm is net *worse* than OL here, and its co-trained FM is at 42% of the predicted blocks, i.e. saturation. **Disagrees with the RHM sibling**, which found CL > OL on every secondary measure — unresolved, with three candidate explanations and the tests that would separate them. Also documents the location-vs-scale η² gotcha and the `after_punct` taxonomy difference |
+
+## Children
+
+| Folder | Summary |
+|---|---|
+| [`component_control/`](component_control/README.md) | **Test 1b — is the advantage about the residual, or about having the state?** Varies which function of `a_j` is reported (`PRED` = `FM(a_i)`, `AJ` = the whole state) against `IMPL` = the residual, with identical machinery. The best I/O observer reaches ~0.87 / ~0.84 of the achievable headroom on `PRED` / `AJ` and only 0.19–0.26 on `IMPL`, so the forward-model decomposition is load-bearing for Finding 1 and not only for the steering test. Also: a tokens-only observer nearly solves `PRED` at 1L/64D while staying near the floor on `IMPL` at every capacity. Weaker on the continuous targets, where the separation from `AJ` depends on the headroom normalization. Language only, single seed, two of the four instrument capacities |
 
 ## Related, outside this folder
 

@@ -180,6 +180,37 @@ lands on target to 4 decimals (0.0100 in every cell).
 This is the weakest of the four positives. The untrained smoke run suggested 3–4.6×; on the
 trained model it is roughly half that.
 
+## Result 5 — the component control (Test 1b): the decomposition is load-bearing
+
+**Child**: [`component_control/`](component_control/README.md)
+
+Results 1–4 leave one reading open: the report head sits downstream of `a_j` and the observers
+see only tokens and outputs, so the advantage could be about **having the state at all** rather
+than about having the *un-theorized part* of it. Test 1b varies which function of `a_j` is
+reported — `PRED` (the theory-visible component `FM(a_i)`) and `AJ` (the whole state) against
+`IMPL` (the residual) — holding the k-means, the head, the ladder and the splits fixed.
+
+Fraction of achievable-above-chance score the best I/O observer reaches (lower = more expensive
+to reconstruct from outside):
+
+| instrument | `IMPL` | `PRED` | `AJ` |
+|---|---|---|---|
+| h16m0.5 | **0.260** | 0.873 | 0.841 |
+| h4m0.25 | **0.189** | 0.867 | 0.825 |
+| h16m0.5 (`_COS`) | **0.462** | 0.725 | 0.690 |
+| h4m0.25 (`_COS`) | **0.503** | 0.733 | 0.690 |
+
+The observer nearly solves the theory-visible component and the whole state and stays near the
+floor on the residual. It holds on raw advantage too on the categorical targets (`IMPL` +0.272
+against `AJ` +0.124) despite `IMPL`'s self-report being the lowest of the three. On `_COS` the
+separation from `AJ` depends on the headroom normalization (raw: +0.318 vs +0.297), so the claim
+rests on the categorical rows. `IMPL`/`IMPL_COS` re-run in the same job reproduce this README's
+numbers exactly, so the contrast is within-run.
+
+**Caveat worth carrying**: `AJ` tracks `PRED`, not `IMPL` — at cosine 0.915 the direction of
+`a_j` is mostly the direction of `FM(a_i)`. The defensible sentence is not "internal state is
+private" but "the un-theorized part of the state is the expensive part".
+
 ## The junk-residual trap, and why it is disarmed
 
 An over-capacity FM saturates and `r` degenerates into architectural-mismatch noise — which
@@ -275,7 +306,10 @@ Candidate explanations, in the order we would test them:
    to language) — isolates explanation 3 from explanation 2.
 4. **Harden steering** if it is to carry weight: more PCs, several target-KL levels to check the
    ratio is not KL-specific.
-5. **The token channel.** Everything here uses an aux head; the design doc's variant (b) routes
+5. **Port Test 1b to RHM.** [`component_control/`](component_control/README.md) is language-only;
+   RHM's 6-block predicted span is a much longer reconstruction route than language's 2, and the
+   cross-substrate agreement is load-bearing everywhere else in this program.
+6. **The token channel.** Everything here uses an aux head; the design doc's variant (b) routes
    the report through M's own LM head over a reserved report vocabulary, which is the version
    that is actually a *report* rather than a probe.
 
