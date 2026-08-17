@@ -518,4 +518,127 @@ carrying: under priced search, committing a unit costs action-space rent that at
 exceeds what the macros buy — **a chunk pays only when it covers a meaningful fraction of the
 problem** — conditional on the pricing model, and a hard prerequisite for any re-run.
 
+---
+
+## 18. How the pieces fit together (2026-08-16): distribution is forced, and introspection is level-bounded
+
+**Status**: conceptual synthesis of the arc as run (§12–§17), from a 2026-08-16 discussion with
+Jasper. No new data. The question it answers: why does practice have to be a *distributed*
+meta-learning system with a forward model capable of something like introspection, when the
+field's default (LLM pretraining) is monolithic — and are all the parts necessary?
+
+**The components accumulated in dependency order, not by design.** Each round was built because
+the previous one failed in a specific, named way (étude → crystallize → ratchet → ear → recital →
+tall: untestable precondition → scope condition → grader → decision rule → allocation → earnable
+range). That is a constructive necessity argument — running the system without each component and
+measuring the specific failure — which is stronger epistemic ground than an architecture proposal.
+
+**Distribution is forced, on three grounds, all measured:**
+
+1. **Type-incompatibility.** Compilation is selection + verbatim commitment; averaging valid
+   renditions destroys them (étude 2.1×; crystallize 3.6–5.0×, mechanism exact). Gradient descent
+   *is* averaging — regression to the mean is its defining move — so the unit-creating op cannot
+   emerge from the learner's own descent. It is a discrete external operator whose output changes
+   the **action space** (the conditions of learning), not the weights: §1's "change of variables in
+   what credit can address" is not expressible as a step in the current variables.
+2. **Currency mismatch across orders.** Dense error is a functional of the *state*; δ and unit-LP
+   are functionals of the *competence trajectory* ([two_timescale_value_loop](two_timescale_value_loop.md)
+   §(a): second-order); and the value of level-k practice is denominated in **level k+1's mining
+   yield** (§16, finding 9 — the arc's most seed-stable fact), which no within-level signal reads. A
+   monolithic objective cannot contain functionals of its own training trajectory, still less of a
+   counterfactual frozen copy of itself. This is grader heterogeneity
+   ([full_loop](../experiments/rhm/directed_sculpting/full_loop/README.md) §5) in motor clothes: a
+   homogeneous outer loop has no license to disagree and collapses into the inner loop.
+3. **The meter.** Every decision in the arc matters only because feedback is priced, and depth is
+   *unaffordable* to the primitive action space, not merely harder (§14: the exact-DP oracle and a
+   width-16 beam at 5.9× budget lose to one L2 macro at width 1). Per
+   [meta_learning_under_metered_data](meta_learning_under_metered_data.md): grader *type* makes the
+   second loop pay; the *meter* makes it necessary.
+
+**Introspection and distribution are mutual preconditions.** The audit ops (audition,
+shadow-compile, unit-LP) are introspection in a precise, non-mystical sense: running a
+counterfactual frozen copy of a piece of oneself and reading that counterfactual's quality
+trajectory. It is only *possible* because the system is distributed — there must be a separable
+committable content to audit — and distribution is only *safe* because of it — you must know which
+part moved before freezing one (§13's judge-vs-plant lesson), and commitment without audit is the
+poison, in strong form representational foreclosure (§14). The two properties are not independently
+stapled on; each is the other's precondition.
+
+**Epistemic updates — what the arc demoted.** One demotion was already on the record (δ as
+per-sample metered plasticity → a detector; the mjc audit, confirmed arc-wide from the étude on).
+The two genuinely new revisions from this synthesis:
+
+- **The certificate is an instrument, not the decision-maker.** Well-calibrated within its scope
+  (fires within one cycle of its offline prediction at L2, in both §14 and §15), scope-conditioned
+  twice (§13 executor-moving; §15 headroom), and beaten at every frontier by **provisional
+  commitment graded in consumption**, whose recert net fired 0/24 (§15) and 0/288 (§16) — because
+  mining is selection-filtered upstream, verification load migrated from gate-time to mining-time.
+  §15's phrasing is the epigram: climbing the grader fixed the *measurement*, not the *decision*.
+  Introspection's real job is to make the system legible enough that the simple boundary rule can
+  be certified safe.
+- **Allocation cannot be endogenized: introspection is level-bounded.** Three signals, three
+  worlds, none prices bottom-time; a fixed bottom-heavy schedule is rank 1 everywhere (§16); beyond
+  the earnable range the signals are *undefined, not noisy* (§17). The mechanism is ground 2's
+  currency mismatch — the value of the crossing is denominated in the next level's currency,
+  invisible from below by construction. This is why the teacher thread kept re-deriving itself
+  (§14 lend the grader, §15 schedule the recital, §16 hold at the bottom): the architecture *needs
+  an open port* for an already-climbed evaluation layer. Introspection certifies content;
+  consumption grades boundaries; teachers carry ladders longer than your reach.
+
+**Why LLM monolithicity is the degenerate case, not a counterexample.** The field's resistance to
+modular architectures was resistance to hand-decomposing the *hypothesis space*, where end-to-end
+gradients search better than we do. This decomposition never touches the hypothesis space: it
+decomposes the **conditions of the optimization** — what data exists (allocation), what units
+credit addresses (compilation), what counts as error (the grader), when content freezes (the
+boundary policy) — exactly where gradients structurally can't reach, and almost none of its
+components are networks (a schedule, a selection rule, a trigger, a nested table). The
+distributedness is of *loops and timescales*, not parameters. Pretraining is then the correct
+degenerate solution when the meter is off (free i.i.d. recurrence, audition ≡ consumption, one
+homogeneous grader, nothing ever frozen and re-entered as a primitive): every constraint that
+forces a component is absent, so every component correctly degenerates away — and wherever LLM
+practice *does* become metered, the components reappear piecemeal with a human in the role
+(data-mixture ablation = allocation; reward models = the grader; agent skill libraries = the
+vocabulary; §3½'s "the experimenter is the hippocampus"). The compressed form: a monolithic
+learner *consumes* credit that already exists in its data; practice *manufactures* credit that
+does not yet exist — recurrence for estimability, units for addressability, matched audition for
+measurability, coarser actions for affordability — and the one thing the factory cannot
+manufacture is the price of its own next level, which is why every ladder tops out at a teacher.
+
+---
+
+## 19. What we ran (2026-08-16): the crossed pair — [`transpose`](../experiments/rhm/practice/transpose/FILES.md) × [`setlist`](../experiments/rhm/practice/setlist/FILES.md)
+
+**Source of truth**: [`experiments/rhm/practice/typed_gaps/README.md`](../experiments/rhm/practice/typed_gaps/README.md)
+(the joint writeup; the two nodes carry machinery/calibration `FILES.md` records, no READMEs by
+policy). **This section is a pointer, not a summary of record.**
+
+§18 closed on a caveat this pair was built to test: every demotion of the introspective
+machinery had been measured in worlds where post-commit invalidation is structurally impossible
+— no round had ever combined the compile op with a live conditioning gap. The pair installs the
+gap twice, once per candidate currency of news, and the result is a **crossed double
+dissociation**. `transpose` drifts *what is true* (grammar rule cells, demand fixed): the dense
+learner degrades, recert stays silent (1/62), a 36%-invalidated frozen table tracks the current
+truth to within ±0.05, and a stale mined table *beats* the full current truth — **a chunk is not
+a belief**; it stores demand-concentration, which truth-news cannot touch. `setlist` drifts
+*what is asked* (OU on the derivation distribution, precision-vs-truth pinned at 1.000 by gate):
+recert wakes under its native currency (9/62, every swap coverage-improving; the ablation costs
+Δ0.271 deep, ≈8× noise), and the oracle bracket prices concentration's full sign structure —
+current concentration > coverage > stale concentration.
+
+Where §18's claims landed: the demotion of **pre-commit certification stands everywhere** (the
+gate refused the frontier for a third round; abstinence never pays). The demotion of
+**post-commit verification was substrate-conditioned exactly as the caveat suspected**, and is
+now rehabilitated *currency-specifically*: maintenance of committed skill is demand-tracking,
+not truth-tracking, evaluative rather than entropic (decay-forgetting costs coverage;
+audit-and-reselect works — selection, not averaging, at both ends of a chunk's life), and priced
+(≈8% of feedback budget matches a perfect tracking oracle). §18's "conditioning gap" matures
+from a binary into a **type system**: the gap must be aimed at the studied component, in the
+currency it stores, at admissible loudness (level-2 drift and σ=2.5 both destroy the experiment
+— measured, both rounds), and each component of §1's assembly is the organ for one currency of
+change — dense learning ↔ truth, repair/metering ↔ interface (the mjc bridge arc, in
+retrospect), evaluative re-selection ↔ demand, the teacher ↔ level (the currency §§16–17 proved
+undefined from below). The monolith corollary sharpens accordingly: a training regime whose
+world drifts in one currency needs one organ, and is right to. Single seed; ranks are the claim;
+the seed pair is the named hardening.
+
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

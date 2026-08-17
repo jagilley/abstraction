@@ -112,6 +112,47 @@ longer than the earnable range** (their signals are undefined there, not noisy),
 table cannot churn** (recital's same-table-or-different question retired a priori). The
 boundary-vs-frontier discriminator remains open; the full re-run recipe is recorded.
 
+### [`transpose/`](transpose/FILES.md) — truth-news: within-run grammar drift (2026-08-16)
+
+**Goal**: install the news gap every prior round lacked — hard rule-cell resampling mid-run, so
+committed content can become wrong after commitment — and re-run the commit-policy comparison.
+
+**Finding**: level-2 drift is **inadmissible** (it degrades the executor, not the vocabulary —
+arm separation collapses to noise while the DP floor itself moves); at admissible level-3 drift
+the static ordering survives, the post-commit flat baseline breaks by **world-hardening rather
+than invalidation** ((held − true) ≤ 0.05, sign-inconsistent; a 36%-invalidated frozen table
+tracks the current truth), recert stays near-silent (1/62), and a mined *stale* table **beats
+the full current true table** in audition — concentration dominates currency. Findings record:
+[`typed_gaps/`](typed_gaps/README.md); machinery: [transpose/FILES.md](transpose/FILES.md).
+
+### [`setlist/`](setlist/FILES.md) — demand-news: the consumption distribution drifts (2026-08-16)
+
+**Goal**: the complement — grammar fixed, OU drift on the derivation distribution, so *what is
+asked* moves while nothing becomes false (precision-vs-truth pinned at 1.000 by gate).
+
+**Finding**: the verification channel wakes under its native currency — **9/62 recert swaps,
+every one coverage-improving**, and ablating recert costs **Δ0.271 deep error (≈8× noise)** on a
+clean isolation; the oracle bracket prices concentration (tracking 1.00–1.24 vs frozen 0.35–0.75
+earned-vs-given); the earned, recert-maintained vocabulary finishes rank 1, matching the tracking
+oracle at 7.9% grader cost; forgetting-by-decay costs coverage while audit-and-reselect works.
+Findings record: [`typed_gaps/`](typed_gaps/README.md); machinery:
+[setlist/FILES.md](setlist/FILES.md).
+
+### [`typed_gaps/`](typed_gaps/README.md) — the crossed pair, jointly written up (2026-08-16)
+
+**Goal**: test §18's conditioning-gap caveat — no round had ever combined the compile op with a
+live news channel — by running the two candidate currencies of news as a crossed pair.
+
+**Finding**: a **double dissociation** — truth-drift degrades the dense learner (plant parse
+0.62→0.50) and leaves recert silent (1/62); demand-drift leaves the plant flat (0.59→0.60) and
+fires recert (9/62). Chunks are not beliefs: they store demand-concentration, so maintenance of
+committed skill is **demand-tracking, not truth-tracking**, evaluative rather than entropic.
+Pre-commit certification stays demoted (third consecutive frontier refusal); post-commit
+verification is rehabilitated **currency-specifically**. The conditioning gap matures into a
+type system — one organ per currency of change (dense learning ↔ truth; repair/metering ↔
+interface; evaluative re-selection ↔ demand; the teacher ↔ level). Single seed; ranks are the
+claim.
+
 ## Reproduce
 
 ```bash
@@ -134,4 +175,6 @@ python3 rhm/practice/ratchet/analyze_ratchet.py --tag rr_s0 --fetch --figures
 Full commands, calibrations and volume layout: [`crystallize/README.md`](crystallize/README.md),
 [`ratchet/README.md`](ratchet/README.md), [`ear/README.md`](ear/README.md),
 [`recital/README.md`](recital/README.md) (+ its `FILES.md` for the fidelity replay and the
-seed-triple convention), [`tall/README.md`](tall/README.md).
+seed-triple convention), [`tall/README.md`](tall/README.md),
+[`transpose/FILES.md`](transpose/FILES.md), [`setlist/FILES.md`](setlist/FILES.md)
+(joint findings: [`typed_gaps/README.md`](typed_gaps/README.md)).

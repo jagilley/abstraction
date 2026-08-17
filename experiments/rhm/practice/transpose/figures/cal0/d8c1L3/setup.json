@@ -1,0 +1,576 @@
+{
+  "config": {
+    "v": 8,
+    "s": 2,
+    "depth": 4,
+    "m": 2,
+    "rule_seed": 0,
+    "train_seed": 1,
+    "seed": 0,
+    "state_dim": 96,
+    "n_train_episodes": 100000,
+    "controller_steps": 12000,
+    "generator_steps": 12000,
+    "reader_steps": 6000,
+    "plant_holdout": 0,
+    "holdout_seed": 11,
+    "value_steps": 12000,
+    "value_episodes": 40000,
+    "value_batch_collect": 1024,
+    "batch_size": 256,
+    "value_lr": 0.0003,
+    "value_lr_online": 3e-05,
+    "n_corrupt": 3,
+    "explore_eps": 0.3,
+    "budget": 4,
+    "pr_width": 16,
+    "g_budget": 58,
+    "max_macro_level": 3,
+    "n_pr": 64,
+    "n_rt": 384,
+    "n_score": 512,
+    "n_probe_clean": 512,
+    "era_cycles": 40,
+    "n_grad": 4,
+    "value_batch": 256,
+    "replay_frac": 0.5,
+    "buf_cap": 100000,
+    "gen_lr": 0.0001,
+    "gen_steps": 20,
+    "mine_support": 3,
+    "mine_from": "chosen",
+    "mine_cap": 8,
+    "alpha": 0.2,
+    "sil_c": 0.06,
+    "sil_cv": 0.15,
+    "sil_W": 5,
+    "sil_hold": 2,
+    "sil_min_cycle": 6,
+    "lp_min_drop": 0.1,
+    "early_offset": 1,
+    "late_offset": 3,
+    "n_aud": 192,
+    "mfg_min_bank": 32,
+    "bank_cap": 1024,
+    "mfg_render": "canon",
+    "mfg_source": "child",
+    "recert_every": 5,
+    "recert_margin": 0.05,
+    "prov_offset": 0,
+    "d_fb": 1.0,
+    "c_mat": 0.05,
+    "checkpoint_every": 5,
+    "probe_widths": [
+      1,
+      4,
+      16
+    ],
+    "probe_every": 8,
+    "t_budget": 0.0,
+    "max_cycles": 45,
+    "sf1": 0.33,
+    "sf2": 0.67,
+    "probe_t_n": 12,
+    "drift_every": 8,
+    "drift_cells": 1,
+    "drift_level": 3,
+    "drift_start": 6,
+    "drift_seed": 0,
+    "mine_decay": 0.95,
+    "mine_floor": 0.5,
+    "recert_all": true
+  },
+  "eras": [
+    {
+      "level": 1,
+      "node": 6,
+      "name": "L1n6"
+    }
+  ],
+  "refs": {
+    "stale": [
+      0.33072916666666663
+    ],
+    "stale_true": [
+      0.23177083333333337
+    ],
+    "floor": [
+      0.17447916666666663
+    ],
+    "d0": [
+      1.5625
+    ],
+    "on_grammar": [
+      1.0
+    ],
+    "width_base": [
+      2
+    ],
+    "width_true": [
+      1
+    ],
+    "g_base": [
+      58.0
+    ],
+    "g_true": [
+      57.0
+    ],
+    "macro_true": [
+      {
+        "2": 0.3359375,
+        "3": 0.49479166666666663
+      }
+    ]
+  },
+  "world": [
+    {
+      "epoch": 0,
+      "cycle": 0,
+      "n_changed": 0,
+      "changed": [],
+      "mag": {
+        "vs_init": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 56,
+            "n_b": 56,
+            "n_shared": 56,
+            "survival": 1.0,
+            "novel": 0.0
+          }
+        },
+        "vs_prev": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 56,
+            "n_b": 56,
+            "n_shared": 56,
+            "survival": 1.0,
+            "novel": 0.0
+          }
+        },
+        "corpus_vs_init": 1.0
+      },
+      "refs": {
+        "d0": [
+          1.5625
+        ],
+        "on_grammar": [
+          1.0
+        ],
+        "stale": [
+          0.33072916666666663
+        ],
+        "stale_true": [
+          0.23177083333333337
+        ],
+        "floor": [
+          0.1953125
+        ],
+        "macro_true": [
+          {
+            "2": 0.3359375,
+            "3": 0.49479166666666663
+          }
+        ]
+      }
+    },
+    {
+      "epoch": 1,
+      "cycle": 6,
+      "n_changed": 1,
+      "changed": [
+        {
+          "feature": 6,
+          "rule": 0,
+          "old": [
+            7,
+            0
+          ],
+          "new": [
+            7,
+            2
+          ]
+        }
+      ],
+      "mag": {
+        "vs_init": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 56,
+            "n_b": 58,
+            "n_shared": 54,
+            "survival": 0.9642857142857143,
+            "novel": 0.06896551724137931
+          }
+        },
+        "vs_prev": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 56,
+            "n_b": 58,
+            "n_shared": 54,
+            "survival": 0.9642857142857143,
+            "novel": 0.06896551724137931
+          }
+        },
+        "corpus_vs_init": 0.85546875
+      },
+      "refs": {
+        "d0": [
+          1.5286458333333333
+        ],
+        "on_grammar": [
+          1.0
+        ],
+        "stale": [
+          0.45833333333333337
+        ],
+        "stale_true": [
+          0.4296875
+        ],
+        "floor": [
+          0.234375
+        ],
+        "macro_true": [
+          {
+            "2": 0.44010416666666663,
+            "3": 0.5885416666666667
+          }
+        ]
+      }
+    },
+    {
+      "epoch": 2,
+      "cycle": 14,
+      "n_changed": 1,
+      "changed": [
+        {
+          "feature": 3,
+          "rule": 0,
+          "old": [
+            6,
+            6
+          ],
+          "new": [
+            5,
+            3
+          ]
+        }
+      ],
+      "mag": {
+        "vs_init": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 56,
+            "n_b": 60,
+            "n_shared": 54,
+            "survival": 0.9642857142857143,
+            "novel": 0.1
+          }
+        },
+        "vs_prev": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 58,
+            "n_b": 60,
+            "n_shared": 58,
+            "survival": 1.0,
+            "novel": 0.03333333333333333
+          }
+        },
+        "corpus_vs_init": 0.7265625
+      },
+      "refs": {
+        "d0": [
+          1.5026041666666667
+        ],
+        "on_grammar": [
+          1.0
+        ],
+        "stale": [
+          0.46354166666666663
+        ],
+        "stale_true": [
+          0.45052083333333337
+        ],
+        "floor": [
+          0.234375
+        ],
+        "macro_true": [
+          {
+            "2": 0.43489583333333337,
+            "3": 0.6354166666666667
+          }
+        ]
+      }
+    },
+    {
+      "epoch": 3,
+      "cycle": 22,
+      "n_changed": 1,
+      "changed": [
+        {
+          "feature": 7,
+          "rule": 0,
+          "old": [
+            2,
+            5
+          ],
+          "new": [
+            7,
+            4
+          ]
+        }
+      ],
+      "mag": {
+        "vs_init": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 56,
+            "n_b": 58,
+            "n_shared": 50,
+            "survival": 0.8928571428571429,
+            "novel": 0.13793103448275862
+          }
+        },
+        "vs_prev": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 60,
+            "n_b": 58,
+            "n_shared": 56,
+            "survival": 0.9333333333333333,
+            "novel": 0.034482758620689655
+          }
+        },
+        "corpus_vs_init": 0.705078125
+      },
+      "refs": {
+        "d0": [
+          1.4817708333333333
+        ],
+        "on_grammar": [
+          1.0
+        ],
+        "stale": [
+          0.48958333333333337
+        ],
+        "stale_true": [
+          0.47135416666666663
+        ],
+        "floor": [
+          0.2421875
+        ],
+        "macro_true": [
+          {
+            "2": 0.45052083333333337,
+            "3": 0.6197916666666667
+          }
+        ]
+      }
+    },
+    {
+      "epoch": 4,
+      "cycle": 30,
+      "n_changed": 1,
+      "changed": [
+        {
+          "feature": 5,
+          "rule": 0,
+          "old": [
+            1,
+            3
+          ],
+          "new": [
+            3,
+            4
+          ]
+        }
+      ],
+      "mag": {
+        "vs_init": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 56,
+            "n_b": 60,
+            "n_shared": 48,
+            "survival": 0.8571428571428571,
+            "novel": 0.2
+          }
+        },
+        "vs_prev": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 58,
+            "n_b": 60,
+            "n_shared": 56,
+            "survival": 0.9655172413793104,
+            "novel": 0.06666666666666667
+          }
+        },
+        "corpus_vs_init": 0.515625
+      },
+      "refs": {
+        "d0": [
+          1.5182291666666667
+        ],
+        "on_grammar": [
+          1.0
+        ],
+        "stale": [
+          0.5703125
+        ],
+        "stale_true": [
+          0.6302083333333333
+        ],
+        "floor": [
+          0.34375
+        ],
+        "macro_true": [
+          {
+            "2": 0.5546875,
+            "3": 0.7942708333333334
+          }
+        ]
+      }
+    },
+    {
+      "epoch": 5,
+      "cycle": 38,
+      "n_changed": 1,
+      "changed": [
+        {
+          "feature": 1,
+          "rule": 1,
+          "old": [
+            0,
+            6
+          ],
+          "new": [
+            6,
+            4
+          ]
+        }
+      ],
+      "mag": {
+        "vs_init": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 56,
+            "n_b": 60,
+            "n_shared": 44,
+            "survival": 0.7857142857142857,
+            "novel": 0.26666666666666666
+          }
+        },
+        "vs_prev": {
+          "2": {
+            "n_a": 14,
+            "n_b": 14,
+            "n_shared": 14,
+            "survival": 1.0,
+            "novel": 0.0
+          },
+          "3": {
+            "n_a": 60,
+            "n_b": 60,
+            "n_shared": 56,
+            "survival": 0.9333333333333333,
+            "novel": 0.06666666666666667
+          }
+        },
+        "corpus_vs_init": 0.470703125
+      },
+      "refs": {
+        "d0": [
+          1.5182291666666667
+        ],
+        "on_grammar": [
+          1.0
+        ],
+        "stale": [
+          0.5963541666666667
+        ],
+        "stale_true": [
+          0.6380208333333333
+        ],
+        "floor": [
+          0.3515625
+        ],
+        "macro_true": [
+          {
+            "2": 0.5546875,
+            "3": 0.7942708333333334
+          }
+        ]
+      }
+    }
+  ]
+}
