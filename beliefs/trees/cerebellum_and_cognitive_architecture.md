@@ -1,7 +1,7 @@
 # Cerebellum and Cognitive Architecture
 
 *Domain: neuroscience, cognitive architecture, AI implications*
-*Last updated: 2026-07-25*
+*Last updated: 2026-08-16*
 
 
 ## The brain's cognitive power arises from multiple specialized subsystems teaching the cortex, not from cortical computation alone
@@ -38,6 +38,27 @@
 - But those members were **homogeneous** — same objective, different seeds. Blindness that is *structural* is shared by every member, so homogeneous disagreement is blind exactly where its members are. Heterogeneous graders do not inherit this: a grader blind for a structural reason stays blind while a differently-typed one does not.
 - Existence proof from our own data: the control grader and the FM-error grader disagreed *precisely at* control's structural blind spot (the bullets in the parent node).
 - **Open, and the proposed test**: make grader disagreement itself the allocation signal, with homogeneous seed-ensemble disagreement as the honest baseline, under a **local** drift ([E2](../../experiments/mjc/on_policy/README.md) — global drift leaves no place-dependent blindness to detect) and with the noisy-TV control retained, since irreducible noise also produces disagreement; the discriminator is that noise-disagreement does not *close* when you collect there — [ideas/heterogeneous_graders.md §9](../../ideas/heterogeneous_graders.md)
+
+
+### Each learning organ consumes exactly one currency of world-change, so a learner needs as many organs as its niche has drift currencies
+*Confidence: strong*
+
+- The measured core is a crossed double dissociation on one substrate: drifting *what is true* (grammar rule cells, demand fixed) degrades the dense learner (plant parse 0.62→0.50) and leaves post-commit verification silent (1 recert swap in 62), while drifting *what is asked* (derivation distribution, truth pinned at precision 1.000 by gate) leaves the dense learner flat and fires verification decisively (9/62 swaps, all coverage-improving; ablating it costs Δ0.271 deep error, ≈8× measured stream noise) — each news type moved exactly its predicted organ and left the other flat, in both directions — [typed_gaps](../../experiments/rhm/practice/typed_gaps/README.md)
+- Two further cells of the map are retrospective rather than newly measured: **interface-news ↔ repair/metering** (the mjc bridge/damage-recovery arc is where δ earned its keep — [mjc/practice](../../experiments/mjc/practice/README.md)), and **level-news ↔ the teacher** (pacing signals beyond the earnable range are undefined, not noisy, so that currency cannot be self-consumed — [recital](../../experiments/rhm/practice/recital/README.md), [tall](../../experiments/rhm/practice/tall/README.md))
+- The gap must be **aimed** for any organ to be exercised at all: news in the executor's currency or at inadmissible loudness destroys the experiment rather than testing the component (level-2 grammar drift and σ=2.5 demand drift, both measured inadmissible by the same arms-stop-separating signature) — [typed_gaps](../../experiments/rhm/practice/typed_gaps/README.md)
+- Corollary for monoliths: a training regime whose world drifts in a single currency (pretraining: fact-content) needs the single matching organ and is correct to have only it; where LLM practice becomes metered, the missing organs reappear piecemeal with humans in the role — consistent with this tree's "expansion loop implemented in humans" reading — [meta_learning_under_metered_data](../../ideas/meta_learning_under_metered_data.md), [heterogeneous_graders §4b](../../ideas/heterogeneous_graders.md)
+- Scope: the crossed measurement is single-seed and single-substrate; the load-bearing contrasts are ≥8× measured stream noise and the dissociation spans two independent runs, but the four-organ map has two cells measured directly and two inherited — [typed_gaps §Caveats](../../experiments/rhm/practice/typed_gaps/README.md)
+
+See also: [No single learning signal can be both dense and evaluative](#no-single-learning-signal-can-be-both-dense-and-evaluative--so-the-two-teacher-structure-is-derived-not-designed) — the signal-side derivation of the same multi-organ conclusion; this node is the world-side derivation, and their convergence is what makes the architecture look forced rather than contingent.
+
+#### A committed chunk stores demand-concentration, not truth — so skill maintenance is demand-tracking, evaluative rather than entropic
+*Confidence: strong*
+
+- Truth-immunity measured directly: a frozen committed table with 36% of its entries invalidated (precision 1.000→0.643) tracks the *current* truth's performance to within ±0.05, and a stale mined table **beats the full current true table** in audition throughout — a falsification test run on content that turned out not to be propositional — [typed_gaps](../../experiments/rhm/practice/typed_gaps/README.md)
+- The value sign structure, from an oracle bracket differing only in tracking: current concentration (earned-vs-given 1.00–1.24) > full coverage (1.0 by construction) > stale concentration (0.345–0.754) — concentration is a leveraged bet on demand with a decay time set by demand drift, and coverage is the unleveraged hedge — same source
+- Maintenance mechanism: evaluative re-selection works (recert swaps all coverage-improving; the earned, maintained vocabulary matches a perfect demand-tracking oracle at ≈8% of feedback budget) while passive decay-forgetting *costs* coverage — selection, not averaging, at both ends of a chunk's life — same source
+- Introspection splits accordingly: pre-commit certification stays demoted in every regime tested (three consecutive frontier refusals; abstinence never pays), while post-commit verification is load-bearing only under demand-drift — self-examination reconciles the frozen past with the moving present, it does not gate the future — same source
+- Antecedent within the arc: the mined vocabulary was already an *empirical consumption prior* under a static world (a mined 8-entry table beats matched-size random subsets of the true table by ~0.20; value is concentration over coverage) — [ratchet](../../experiments/rhm/practice/ratchet/README.md)
 
 
 ### The cerebellum is a domain-general prediction engine, not merely a motor controller
