@@ -1,0 +1,695 @@
+{
+  "config": {
+    "v": 8,
+    "s": 2,
+    "depth": 4,
+    "m": 2,
+    "rule_seed": 0,
+    "train_seed": 1,
+    "seed": 0,
+    "state_dim": 96,
+    "n_train_episodes": 100000,
+    "controller_steps": 12000,
+    "generator_steps": 12000,
+    "reader_steps": 6000,
+    "plant_holdout": 0,
+    "holdout_seed": 11,
+    "value_steps": 12000,
+    "value_episodes": 40000,
+    "value_batch_collect": 1024,
+    "batch_size": 256,
+    "value_lr": 0.0003,
+    "value_lr_online": 3e-05,
+    "n_corrupt": 3,
+    "explore_eps": 0.3,
+    "era": "2:3",
+    "deep_era": "3:1",
+    "key_level": 2,
+    "key_node": 3,
+    "max_macro_level": 2,
+    "budget": 4,
+    "pr_width": 16,
+    "g_budget": 58,
+    "with_noop": false,
+    "n_pr": 64,
+    "n_rt": 384,
+    "n_deep": 192,
+    "n_probe_clean": 512,
+    "phase1": 50,
+    "rot_period": 10,
+    "rot_step": 1,
+    "probe_shift": 3,
+    "max_cycles": 130,
+    "demand_sigma": 0.0,
+    "demand_kappa": 0.15,
+    "demand_levels": "0/1",
+    "demand_seed": 0,
+    "demand_n_cand": 48,
+    "mine_support": 3,
+    "mine_cap": 24,
+    "mine_decay": 0.95,
+    "mine_floor": 0.5,
+    "ring_cap": 48,
+    "cell_min_obs": 8,
+    "recert_every": 5,
+    "recert_margin": 0.05,
+    "n_recert": 32,
+    "merge_every": 5,
+    "merge_tol": 0.05,
+    "merge_max_per_check": 2,
+    "merge_audit": true,
+    "merge_audit_margin": 0.05,
+    "n_screen": 32,
+    "merge_persist": 2,
+    "screen_min_n": 32,
+    "screen_min_mass": 0.02,
+    "rekey_every": 5,
+    "rekey_bank": 512,
+    "rekey_min_bank": 128,
+    "rekey_min_gain": 2,
+    "rekey_steps": 400,
+    "rekey_conf": 0.5,
+    "rekey_margin": 0.02,
+    "n_gate": 64,
+    "collapse_win": 5,
+    "collapse_delta": 0.1,
+    "revert_every": 5,
+    "revert_margin": 0.05,
+    "revert_persist": 2,
+    "n_revert": 24,
+    "n_grad": 4,
+    "value_batch": 256,
+    "replay_frac": 0.5,
+    "buf_cap": 100000,
+    "wall_lr_mult": 20.0,
+    "gen_lr": 0.0001,
+    "gen_steps": 20,
+    "mine_from": "chosen",
+    "d_fb": 1.0,
+    "c_mat": 0.05,
+    "checkpoint_every": 5,
+    "probe_every": 5,
+    "probe_widths": [
+      1,
+      4,
+      16
+    ]
+  },
+  "refs": {
+    "n": 384,
+    "d0": 2.1640625,
+    "on_grammar": 1.0,
+    "key_entropy": 1.5810022541677662,
+    "key_mass": {
+      "0": 0.28125,
+      "1": 0.057291666666666664,
+      "2": 0.078125,
+      "3": 0.3697916666666667,
+      "4": 0.03125,
+      "5": 0.026041666666666668,
+      "6": 0.15625,
+      "7": 0.0
+    },
+    "mean_consistent": 1.8125,
+    "p_random_feature": 0.2265625,
+    "frac_uniquely_determined": 0.2421875,
+    "true_f_consistent": 1.0,
+    "consistent_hist": [
+      0,
+      93,
+      270,
+      21,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "e_act_true_unkeyed": 0.390625,
+    "e_act_true_keyed": 0.0,
+    "e_pol_base": 0.5885416666666667,
+    "width_base": 2,
+    "g_base": 58.0,
+    "e_pol_true_unkeyed": 0.3828125,
+    "width_true_unkeyed": 1,
+    "g_true_unkeyed": 37.0,
+    "e_pol_true_allnodes": 0.37760416666666663,
+    "width_true_allnodes": 1,
+    "g_true_allnodes": 49.0,
+    "e_pol_true_keyed": 0.20833333333333337,
+    "e_pol_base_noop": 0.6171875,
+    "width_base_noop": 1,
+    "g_base_noop": 37.0,
+    "e_pol_true_unkeyed_noop": 0.3828125,
+    "width_true_unkeyed_noop": 1,
+    "g_true_unkeyed_noop": 41.0,
+    "e_pol_true_allnodes_noop": 0.37760416666666663,
+    "width_true_allnodes_noop": 1,
+    "g_true_allnodes_noop": 53.0,
+    "e_pol_true_keyed_noop": 0.20833333333333337,
+    "id_acc_unkeyed_dp": 0.5182291666666666,
+    "floor_base": 0.4296875,
+    "probe": {
+      "acc": 0.9267578125,
+      "majority": 0.374267578125,
+      "n_train": 16384,
+      "n_hold": 4096
+    }
+  },
+  "world": {
+    "key_mass": {
+      "0": 0.28125,
+      "1": 0.057291666666666664,
+      "2": 0.078125,
+      "3": 0.3697916666666667,
+      "4": 0.03125,
+      "5": 0.026041666666666668,
+      "6": 0.15625,
+      "7": 0.0
+    },
+    "key_entropy": 1.5810022541677662,
+    "demand_stats": null
+  },
+  "schedule": [
+    {
+      "cycle": 1,
+      "q": 0
+    },
+    {
+      "cycle": 2,
+      "q": 0
+    },
+    {
+      "cycle": 3,
+      "q": 0
+    },
+    {
+      "cycle": 4,
+      "q": 0
+    },
+    {
+      "cycle": 5,
+      "q": 0
+    },
+    {
+      "cycle": 6,
+      "q": 0
+    },
+    {
+      "cycle": 7,
+      "q": 0
+    },
+    {
+      "cycle": 8,
+      "q": 0
+    },
+    {
+      "cycle": 9,
+      "q": 0
+    },
+    {
+      "cycle": 10,
+      "q": 0
+    },
+    {
+      "cycle": 11,
+      "q": 0
+    },
+    {
+      "cycle": 12,
+      "q": 0
+    },
+    {
+      "cycle": 13,
+      "q": 0
+    },
+    {
+      "cycle": 14,
+      "q": 0
+    },
+    {
+      "cycle": 15,
+      "q": 0
+    },
+    {
+      "cycle": 16,
+      "q": 0
+    },
+    {
+      "cycle": 17,
+      "q": 0
+    },
+    {
+      "cycle": 18,
+      "q": 0
+    },
+    {
+      "cycle": 19,
+      "q": 0
+    },
+    {
+      "cycle": 20,
+      "q": 0
+    },
+    {
+      "cycle": 21,
+      "q": 0
+    },
+    {
+      "cycle": 22,
+      "q": 0
+    },
+    {
+      "cycle": 23,
+      "q": 0
+    },
+    {
+      "cycle": 24,
+      "q": 0
+    },
+    {
+      "cycle": 25,
+      "q": 0
+    },
+    {
+      "cycle": 26,
+      "q": 0
+    },
+    {
+      "cycle": 27,
+      "q": 0
+    },
+    {
+      "cycle": 28,
+      "q": 0
+    },
+    {
+      "cycle": 29,
+      "q": 0
+    },
+    {
+      "cycle": 30,
+      "q": 0
+    },
+    {
+      "cycle": 31,
+      "q": 0
+    },
+    {
+      "cycle": 32,
+      "q": 0
+    },
+    {
+      "cycle": 33,
+      "q": 0
+    },
+    {
+      "cycle": 34,
+      "q": 0
+    },
+    {
+      "cycle": 35,
+      "q": 0
+    },
+    {
+      "cycle": 36,
+      "q": 0
+    },
+    {
+      "cycle": 37,
+      "q": 0
+    },
+    {
+      "cycle": 38,
+      "q": 0
+    },
+    {
+      "cycle": 39,
+      "q": 0
+    },
+    {
+      "cycle": 40,
+      "q": 0
+    },
+    {
+      "cycle": 41,
+      "q": 0
+    },
+    {
+      "cycle": 42,
+      "q": 0
+    },
+    {
+      "cycle": 43,
+      "q": 0
+    },
+    {
+      "cycle": 44,
+      "q": 0
+    },
+    {
+      "cycle": 45,
+      "q": 0
+    },
+    {
+      "cycle": 46,
+      "q": 0
+    },
+    {
+      "cycle": 47,
+      "q": 0
+    },
+    {
+      "cycle": 48,
+      "q": 0
+    },
+    {
+      "cycle": 49,
+      "q": 0
+    },
+    {
+      "cycle": 50,
+      "q": 0
+    },
+    {
+      "cycle": 51,
+      "q": 1
+    },
+    {
+      "cycle": 52,
+      "q": 1
+    },
+    {
+      "cycle": 53,
+      "q": 1
+    },
+    {
+      "cycle": 54,
+      "q": 1
+    },
+    {
+      "cycle": 55,
+      "q": 1
+    },
+    {
+      "cycle": 56,
+      "q": 1
+    },
+    {
+      "cycle": 57,
+      "q": 1
+    },
+    {
+      "cycle": 58,
+      "q": 1
+    },
+    {
+      "cycle": 59,
+      "q": 1
+    },
+    {
+      "cycle": 60,
+      "q": 1
+    },
+    {
+      "cycle": 61,
+      "q": 2
+    },
+    {
+      "cycle": 62,
+      "q": 2
+    },
+    {
+      "cycle": 63,
+      "q": 2
+    },
+    {
+      "cycle": 64,
+      "q": 2
+    },
+    {
+      "cycle": 65,
+      "q": 2
+    },
+    {
+      "cycle": 66,
+      "q": 2
+    },
+    {
+      "cycle": 67,
+      "q": 2
+    },
+    {
+      "cycle": 68,
+      "q": 2
+    },
+    {
+      "cycle": 69,
+      "q": 2
+    },
+    {
+      "cycle": 70,
+      "q": 2
+    },
+    {
+      "cycle": 71,
+      "q": 3
+    },
+    {
+      "cycle": 72,
+      "q": 3
+    },
+    {
+      "cycle": 73,
+      "q": 3
+    },
+    {
+      "cycle": 74,
+      "q": 3
+    },
+    {
+      "cycle": 75,
+      "q": 3
+    },
+    {
+      "cycle": 76,
+      "q": 3
+    },
+    {
+      "cycle": 77,
+      "q": 3
+    },
+    {
+      "cycle": 78,
+      "q": 3
+    },
+    {
+      "cycle": 79,
+      "q": 3
+    },
+    {
+      "cycle": 80,
+      "q": 3
+    },
+    {
+      "cycle": 81,
+      "q": 4
+    },
+    {
+      "cycle": 82,
+      "q": 4
+    },
+    {
+      "cycle": 83,
+      "q": 4
+    },
+    {
+      "cycle": 84,
+      "q": 4
+    },
+    {
+      "cycle": 85,
+      "q": 4
+    },
+    {
+      "cycle": 86,
+      "q": 4
+    },
+    {
+      "cycle": 87,
+      "q": 4
+    },
+    {
+      "cycle": 88,
+      "q": 4
+    },
+    {
+      "cycle": 89,
+      "q": 4
+    },
+    {
+      "cycle": 90,
+      "q": 4
+    },
+    {
+      "cycle": 91,
+      "q": 5
+    },
+    {
+      "cycle": 92,
+      "q": 5
+    },
+    {
+      "cycle": 93,
+      "q": 5
+    },
+    {
+      "cycle": 94,
+      "q": 5
+    },
+    {
+      "cycle": 95,
+      "q": 5
+    },
+    {
+      "cycle": 96,
+      "q": 5
+    },
+    {
+      "cycle": 97,
+      "q": 5
+    },
+    {
+      "cycle": 98,
+      "q": 5
+    },
+    {
+      "cycle": 99,
+      "q": 5
+    },
+    {
+      "cycle": 100,
+      "q": 5
+    },
+    {
+      "cycle": 101,
+      "q": 6
+    },
+    {
+      "cycle": 102,
+      "q": 6
+    },
+    {
+      "cycle": 103,
+      "q": 6
+    },
+    {
+      "cycle": 104,
+      "q": 6
+    },
+    {
+      "cycle": 105,
+      "q": 6
+    },
+    {
+      "cycle": 106,
+      "q": 6
+    },
+    {
+      "cycle": 107,
+      "q": 6
+    },
+    {
+      "cycle": 108,
+      "q": 6
+    },
+    {
+      "cycle": 109,
+      "q": 6
+    },
+    {
+      "cycle": 110,
+      "q": 6
+    },
+    {
+      "cycle": 111,
+      "q": 7
+    },
+    {
+      "cycle": 112,
+      "q": 7
+    },
+    {
+      "cycle": 113,
+      "q": 7
+    },
+    {
+      "cycle": 114,
+      "q": 7
+    },
+    {
+      "cycle": 115,
+      "q": 7
+    },
+    {
+      "cycle": 116,
+      "q": 7
+    },
+    {
+      "cycle": 117,
+      "q": 7
+    },
+    {
+      "cycle": 118,
+      "q": 7
+    },
+    {
+      "cycle": 119,
+      "q": 7
+    },
+    {
+      "cycle": 120,
+      "q": 7
+    },
+    {
+      "cycle": 121,
+      "q": 8
+    },
+    {
+      "cycle": 122,
+      "q": 8
+    },
+    {
+      "cycle": 123,
+      "q": 8
+    },
+    {
+      "cycle": 124,
+      "q": 8
+    },
+    {
+      "cycle": 125,
+      "q": 8
+    },
+    {
+      "cycle": 126,
+      "q": 8
+    },
+    {
+      "cycle": 127,
+      "q": 8
+    },
+    {
+      "cycle": 128,
+      "q": 8
+    },
+    {
+      "cycle": 129,
+      "q": 8
+    },
+    {
+      "cycle": 130,
+      "q": 8
+    }
+  ]
+}

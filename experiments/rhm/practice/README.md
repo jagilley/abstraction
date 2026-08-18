@@ -153,6 +153,38 @@ type system — one organ per currency of change (dense learning ↔ truth; repa
 interface; evaluative re-selection ↔ demand; the teacher ↔ level). Single seed; ranks are the
 claim.
 
+### Specced, unbuilt (2026-08-17)
+
+`reread/SPEC.md`[^private] — is a fixed archive renewable to a learner whose vocabulary has
+climbed? (mining yield per pass: vocabulary-gated vs novelty-gated). `merge/SPEC.md`[^private]
+— the merge op plus an unmetered dense arm: invariance-by-enumeration vs invariance-by-merge. Both
+from the 2026-08-17 metered-data reframes — see the bracketed caveat in
+[`meta_learning_under_metered_data`](../../../ideas/meta_learning_under_metered_data.md).
+
+### [`fourwall/`](fourwall/README.md) — the spurious index: scaffold, debt, merge, re-key, retire (2026-08-17)
+
+**Goal**: first contact for [recurrence_manufactures_confounds](../../../ideas/recurrence_manufactures_confounds.md)
+— manufacture a spurious-but-free library key (a "wall" token perfectly correlated with the true
+level-2 latent under narrow demand), rotate the correlation away unannounced, and measure the
+scaffold's value, the confound debt, and what "whittling toward the compressed form" actually
+consists of.
+
+**Finding**: the scaffold delivers **oracle-index value for free** while the correlation holds
+(≈`given_key` within noise, +0.10–0.13 over no index) and the debt is real (+0.19–0.41 per
+rotation); "whittling" then decomposes into **three ops, of which the idea doc named one** —
+*merge* deletes distinctions but can only recover the no-index baseline (deletion cannot build),
+*re-key* moves the library onto a basis earned by functional addressing ("same unit serves them")
+and closes a third of the terminal gap, becoming rotation-proof, and *retire* recovers the
+maintenance rent on the abandoned scaffold (16→10% of priced time, error improving), with
+mothball-vs-delete a priced bet on demand recurrence — the c121 identity return revives mothballed
+content and cannot revive deleted content. A good scaffold **raises the bar for its own
+replacement** (rational stickiness under a consumption-graded gate; a coverage-graded gate locks
+it in forever — the seam law's evaluator coordinate applied to the index), the earned quotient is
+**capped by the unit vocabulary** (ARI ~0.5–0.6; the address ladder is funded by the action
+ladder), no spontaneous binding formed (available ≠ taken), and tear-down preceded stress in every
+round that had the op. Single seed; ranks are the claim; the node also measured stream-position
+sensitivity exceeding the ±0.034 floor in adoption timing, which is the seed pair's named job.
+
 ## Reproduce
 
 ```bash
@@ -178,3 +210,5 @@ Full commands, calibrations and volume layout: [`crystallize/README.md`](crystal
 seed-triple convention), [`tall/README.md`](tall/README.md),
 [`transpose/FILES.md`](transpose/FILES.md), [`setlist/FILES.md`](setlist/FILES.md)
 (joint findings: [`typed_gaps/README.md`](typed_gaps/README.md)).
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
