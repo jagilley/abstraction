@@ -211,9 +211,16 @@ and each merge is worth its price only if demand exercises that invariance. Two 
 
 ## 8. Testability (cheap, mostly existing machinery)
 
-**2026-08-17: specced — [`rhm/practice/merge/SPEC.md`[^private],
-which adds one arm beyond this section's list: an unmetered dense learner under free i.i.d.
-variation, to test invariance-by-enumeration against invariance-by-merge.]**
+**[2026-08-17: specced and run same day — [`rhm/practice/merge/`](../experiments/rhm/practice/merge/README.md)
+(spec: [`SPEC.md`](../experiments/rhm/practice/merge/SPEC.md)), which adds arms beyond this
+section's list: unmetered dense learners under free and under self-generated variation. Headlines
+against this doc: §5's merge op works as specified and *refuses* genuinely distinguishable cells —
+paced rotation (§6's manufactured decorrelation) is what renders them indistinguishable, i.e. the
+licensing condition for merge, measured as mechanism; the §4 rate axis shows rotation and merge
+are substitutes on task error but **not** on next-level minability (the index withholds
+collectively-held content at every rate); §3's scaffold value did not reproduce there (§9's named
+risk — though the sibling [`fourwall/`](../experiments/rhm/practice/fourwall/README.md) run
+supports the weak form on a different instrument).]**
 
 The [`setlist`](../experiments/rhm/practice/setlist/FILES.md) machinery already does most of it.
 The instantiation: give the learner a free observable context feature spuriously correlated with
@@ -275,5 +282,3 @@ Places we'd expect to learn something, not falsifiers we commit to:
   and "start-anywhere" pedagogy — §6's biggest un-varied correlate.
 - **Simplicity bias as curriculum**: work on networks learning spurious/simple features first and
   invariances later — whether the scaffold-then-merge trajectory already has an in-silico signature.
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

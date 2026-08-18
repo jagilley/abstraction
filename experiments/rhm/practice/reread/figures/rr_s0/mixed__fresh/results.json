@@ -1,0 +1,1467 @@
+{
+  "cell": "mixed__fresh",
+  "mix": "mixed",
+  "arm": "fresh",
+  "config": {
+    "v": 8,
+    "s": 2,
+    "depth": 4,
+    "m": 2,
+    "rule_seed": 0,
+    "train_seed": 1,
+    "seed": 0,
+    "state_dim": 96,
+    "n_train_episodes": 100000,
+    "controller_steps": 12000,
+    "generator_steps": 12000,
+    "reader_steps": 6000,
+    "plant_holdout": 0,
+    "holdout_seed": 11,
+    "value_steps": 12000,
+    "value_episodes": 40000,
+    "value_batch_collect": 1024,
+    "batch_size": 256,
+    "value_lr": 0.0003,
+    "value_lr_online": 3e-05,
+    "n_corrupt": 3,
+    "explore_eps": 0.3,
+    "budget": 4,
+    "pr_width": 16,
+    "g_budget": 58,
+    "max_macro_level": 3,
+    "n_pr": 64,
+    "n_rt": 256,
+    "n_score": 256,
+    "n_probe_clean": 512,
+    "era_cycles": 24,
+    "n_grad": 4,
+    "value_batch": 256,
+    "replay_frac": 0.5,
+    "buf_cap": 100000,
+    "gen_lr": 0.0001,
+    "gen_steps": 20,
+    "mine_support": 3,
+    "mine_from": "chosen",
+    "mine_cap": 0,
+    "alpha": 0.2,
+    "sil_c": 0.06,
+    "sil_cv": 0.1,
+    "sil_W": 5,
+    "sil_hold": 2,
+    "sil_min_cycle": 6,
+    "lp_min_drop": 0.05,
+    "early_offset": 1,
+    "late_offset": 2,
+    "d_fb": 1.0,
+    "c_mat": 0.05,
+    "checkpoint_every": 5,
+    "probe_widths": [
+      1,
+      4,
+      16
+    ],
+    "probe_every": 4,
+    "n_arch": 192,
+    "chunk": 64,
+    "n_passes": 9,
+    "arch_seed": 424242,
+    "commit_pass": {
+      "2": 3,
+      "3": 6
+    },
+    "n_rand": 3,
+    "novelty_probe": true
+  },
+  "archive": {
+    "mix": "mixed",
+    "n": 192,
+    "seed": 424242,
+    "sha": "0a8691b42077db73"
+  },
+  "content": {
+    "2": {
+      "n": 18,
+      "n_true": 14
+    },
+    "3": {
+      "n": 64,
+      "n_true": 37
+    }
+  },
+  "passes": [
+    {
+      "pass": 1,
+      "cycle": 3,
+      "t_cum": 115891.2,
+      "meter": {
+        "L1n6": 0.3671875,
+        "L2n3": 0.5859375,
+        "L3n1": 0.6953125
+      },
+      "vocab": {
+        "2": {
+          "n_entries": 9,
+          "n_correct": 8,
+          "n_content": 9,
+          "n_content_total": 18,
+          "n_content_true": 8,
+          "n_content_true_total": 14,
+          "n_new": 9,
+          "committed": false,
+          "miner": {
+            "level": 2,
+            "n_obs": 85,
+            "n_distinct": 12,
+            "n_at_support": {
+              "1": 12,
+              "2": 9,
+              "3": 9,
+              "5": 6,
+              "10": 4
+            }
+          },
+          "n_seen_fresh": 18,
+          "aud": 0.33203125,
+          "n_used": 8,
+          "n_new_used": 8,
+          "d_aud": null,
+          "rand_k": 0.4427083333333333,
+          "closure": 0.51953125,
+          "closure_entries": 64,
+          "closure_used": 21,
+          "comp_k": 0.8841145833333334,
+          "true": 0.30078125
+        },
+        "3": {
+          "n_entries": 9,
+          "n_correct": 7,
+          "n_content": 9,
+          "n_content_total": 64,
+          "n_content_true": 7,
+          "n_content_true_total": 37,
+          "n_new": 9,
+          "committed": false,
+          "miner": {
+            "level": 3,
+            "n_obs": 85,
+            "n_distinct": 34,
+            "n_at_support": {
+              "1": 34,
+              "2": 16,
+              "3": 10,
+              "5": 7,
+              "10": 1
+            }
+          },
+          "n_seen_fresh": 64,
+          "aud": 0.74609375,
+          "n_used": 7,
+          "n_new_used": 7,
+          "d_aud": null,
+          "rand_k": 0.6145833333333334,
+          "closure": 0.76953125,
+          "closure_entries": 81,
+          "closure_used": 9,
+          "comp_k": 0.8776041666666666,
+          "true": 0.48828125
+        }
+      },
+      "probe": {
+        "reread": {
+          "n": 192,
+          "solved": 73,
+          "e": 0.6197916666666667,
+          "L2": {
+            "n_entries": 8,
+            "n_correct": 7,
+            "n_content": 8,
+            "n_content_true": 7
+          },
+          "L3": {
+            "n_entries": 8,
+            "n_correct": 6,
+            "n_content": 8,
+            "n_content_true": 6
+          }
+        },
+        "fresh": {
+          "n": 192,
+          "solved": 88,
+          "e": 0.5416666666666667,
+          "L2": {
+            "n_entries": 7,
+            "n_correct": 6,
+            "n_content": 7,
+            "n_content_true": 6
+          },
+          "L3": {
+            "n_entries": 8,
+            "n_correct": 6,
+            "n_content": 8,
+            "n_content_true": 6
+          }
+        },
+        "fresh_sha": "adf2094fb5a9dde9"
+      },
+      "n_moves": 8,
+      "width": 2,
+      "arch_sha": "0a8691b42077db73",
+      "n_solved_pass": 85,
+      "n_mined_pass": 85,
+      "plant": {
+        "parse_acc": 0.630859375,
+        "infill_acc": 0.68359375,
+        "read_acc": 1.0
+      }
+    },
+    {
+      "pass": 2,
+      "cycle": 6,
+      "t_cum": 231782.4,
+      "meter": {
+        "L1n6": 0.33984375,
+        "L2n3": 0.55078125,
+        "L3n1": 0.69921875
+      },
+      "vocab": {
+        "2": {
+          "n_entries": 11,
+          "n_correct": 10,
+          "n_content": 11,
+          "n_content_total": 18,
+          "n_content_true": 10,
+          "n_content_true_total": 14,
+          "n_new": 2,
+          "committed": false,
+          "miner": {
+            "level": 2,
+            "n_obs": 188,
+            "n_distinct": 13,
+            "n_at_support": {
+              "1": 13,
+              "2": 11,
+              "3": 11,
+              "5": 9,
+              "10": 6
+            }
+          },
+          "n_seen_fresh": 18,
+          "aud": 0.26953125,
+          "n_used": 8,
+          "n_new_used": 0,
+          "d_aud": 0.0625,
+          "rand_k": 0.53515625,
+          "closure": 0.45703125,
+          "closure_entries": 64,
+          "closure_used": 20,
+          "comp_k": 0.7994791666666666,
+          "true": 0.26171875
+        },
+        "3": {
+          "n_entries": 20,
+          "n_correct": 13,
+          "n_content": 20,
+          "n_content_total": 64,
+          "n_content_true": 13,
+          "n_content_true_total": 37,
+          "n_new": 11,
+          "committed": false,
+          "miner": {
+            "level": 3,
+            "n_obs": 188,
+            "n_distinct": 45,
+            "n_at_support": {
+              "1": 45,
+              "2": 28,
+              "3": 20,
+              "5": 14,
+              "10": 5
+            }
+          },
+          "n_seen_fresh": 78,
+          "aud": 0.4921875,
+          "n_used": 8,
+          "n_new_used": 2,
+          "d_aud": 0.25390625,
+          "rand_k": 0.5390625,
+          "closure": 0.546875,
+          "closure_entries": 121,
+          "closure_used": 11,
+          "comp_k": 0.75390625,
+          "true": 0.4765625
+        }
+      },
+      "probe": {
+        "reread": {
+          "n": 192,
+          "solved": 78,
+          "e": 0.59375,
+          "L2": {
+            "n_entries": 9,
+            "n_correct": 8,
+            "n_content": 9,
+            "n_content_true": 8
+          },
+          "L3": {
+            "n_entries": 9,
+            "n_correct": 7,
+            "n_content": 9,
+            "n_content_true": 7
+          }
+        },
+        "fresh": {
+          "n": 192,
+          "solved": 83,
+          "e": 0.5677083333333333,
+          "L2": {
+            "n_entries": 9,
+            "n_correct": 8,
+            "n_content": 9,
+            "n_content_true": 8
+          },
+          "L3": {
+            "n_entries": 9,
+            "n_correct": 7,
+            "n_content": 9,
+            "n_content_true": 7
+          }
+        },
+        "fresh_sha": "7fb95af36ecb7b00"
+      },
+      "n_moves": 8,
+      "width": 2,
+      "arch_sha": "25cf87d48dd3d44b",
+      "n_solved_pass": 103,
+      "n_mined_pass": 103,
+      "plant": {
+        "parse_acc": 0.632080078125,
+        "infill_acc": 0.689453125,
+        "read_acc": 1.0
+      }
+    },
+    {
+      "pass": 3,
+      "cycle": 9,
+      "t_cum": 347673.6,
+      "meter": {
+        "L1n6": 0.3125,
+        "L2n3": 0.56640625,
+        "L3n1": 0.6875
+      },
+      "vocab": {
+        "2": {
+          "n_entries": 11,
+          "n_correct": 10,
+          "n_content": 11,
+          "n_content_total": 18,
+          "n_content_true": 10,
+          "n_content_true_total": 14,
+          "n_new": 0,
+          "committed": false,
+          "miner": {
+            "level": 2,
+            "n_obs": 295,
+            "n_distinct": 13,
+            "n_at_support": {
+              "1": 13,
+              "2": 11,
+              "3": 11,
+              "5": 9,
+              "10": 8
+            }
+          },
+          "n_seen_fresh": 19,
+          "aud": 0.33984375,
+          "n_used": 8,
+          "n_new_used": 0,
+          "d_aud": -0.0703125,
+          "rand_k": 0.3098958333333333,
+          "closure": 0.5,
+          "closure_entries": 64,
+          "closure_used": 18,
+          "comp_k": 0.83984375,
+          "true": 0.33203125
+        },
+        "3": {
+          "n_entries": 29,
+          "n_correct": 20,
+          "n_content": 27,
+          "n_content_total": 64,
+          "n_content_true": 19,
+          "n_content_true_total": 37,
+          "n_new": 9,
+          "committed": false,
+          "miner": {
+            "level": 3,
+            "n_obs": 295,
+            "n_distinct": 50,
+            "n_at_support": {
+              "1": 50,
+              "2": 36,
+              "3": 29,
+              "5": 18,
+              "10": 9
+            }
+          },
+          "n_seen_fresh": 86,
+          "aud": 0.67578125,
+          "n_used": 8,
+          "n_new_used": 1,
+          "d_aud": -0.18359375,
+          "rand_k": 0.5598958333333334,
+          "closure": 0.6875,
+          "closure_entries": 121,
+          "closure_used": 11,
+          "comp_k": 0.71484375,
+          "true": 0.57421875
+        }
+      },
+      "probe": {
+        "reread": {
+          "n": 192,
+          "solved": 84,
+          "e": 0.5625,
+          "L2": {
+            "n_entries": 9,
+            "n_correct": 8,
+            "n_content": 9,
+            "n_content_true": 8
+          },
+          "L3": {
+            "n_entries": 12,
+            "n_correct": 8,
+            "n_content": 12,
+            "n_content_true": 8
+          }
+        },
+        "fresh": {
+          "n": 192,
+          "solved": 91,
+          "e": 0.5260416666666667,
+          "L2": {
+            "n_entries": 8,
+            "n_correct": 7,
+            "n_content": 8,
+            "n_content_true": 7
+          },
+          "L3": {
+            "n_entries": 12,
+            "n_correct": 8,
+            "n_content": 12,
+            "n_content_true": 8
+          }
+        },
+        "fresh_sha": "2f16a67f741a6fdd"
+      },
+      "n_moves": 12,
+      "width": 2,
+      "arch_sha": "fa581b1d813bb908",
+      "n_solved_pass": 107,
+      "n_mined_pass": 107,
+      "plant": {
+        "parse_acc": 0.631103515625,
+        "infill_acc": 0.6953125,
+        "read_acc": 1.0
+      }
+    },
+    {
+      "pass": 4,
+      "cycle": 12,
+      "t_cum": 499084.8,
+      "meter": {
+        "L1n6": 0.21484375,
+        "L2n3": 0.15234375,
+        "L3n1": 0.4140625
+      },
+      "vocab": {
+        "2": {
+          "n_entries": 11,
+          "n_correct": 10,
+          "n_content": 11,
+          "n_content_total": 18,
+          "n_content_true": 10,
+          "n_content_true_total": 14,
+          "n_new": 0,
+          "committed": true,
+          "miner": {
+            "level": 2,
+            "n_obs": 452,
+            "n_distinct": 13,
+            "n_at_support": {
+              "1": 13,
+              "2": 11,
+              "3": 11,
+              "5": 11,
+              "10": 9
+            }
+          },
+          "n_seen_fresh": 19,
+          "aud": 0.30078125,
+          "n_used": 7,
+          "n_new_used": 0,
+          "d_aud": 0.0390625,
+          "rand_k": 0.3268229166666667,
+          "closure": 0.4140625,
+          "closure_entries": 64,
+          "closure_used": 19,
+          "comp_k": 0.8138020833333334,
+          "true": 0.30078125
+        },
+        "3": {
+          "n_entries": 30,
+          "n_correct": 21,
+          "n_content": 28,
+          "n_content_total": 64,
+          "n_content_true": 20,
+          "n_content_true_total": 37,
+          "n_new": 1,
+          "committed": false,
+          "miner": {
+            "level": 3,
+            "n_obs": 452,
+            "n_distinct": 51,
+            "n_at_support": {
+              "1": 51,
+              "2": 37,
+              "3": 30,
+              "5": 21,
+              "10": 13
+            }
+          },
+          "n_seen_fresh": 86,
+          "aud": 0.56640625,
+          "n_used": 8,
+          "n_new_used": 0,
+          "d_aud": 0.109375,
+          "rand_k": 0.5546875,
+          "closure": 0.64453125,
+          "closure_entries": 121,
+          "closure_used": 10,
+          "comp_k": 0.7604166666666666,
+          "true": 0.55078125
+        }
+      },
+      "probe": {
+        "reread": {
+          "n": 192,
+          "solved": 131,
+          "e": 0.31770833333333337,
+          "L2": {
+            "n_entries": 8,
+            "n_correct": 7,
+            "n_content": 8,
+            "n_content_true": 7
+          },
+          "L3": {
+            "n_entries": 13,
+            "n_correct": 10,
+            "n_content": 13,
+            "n_content_true": 10
+          }
+        },
+        "fresh": {
+          "n": 192,
+          "solved": 125,
+          "e": 0.34895833333333337,
+          "L2": {
+            "n_entries": 7,
+            "n_correct": 6,
+            "n_content": 7,
+            "n_content_true": 6
+          },
+          "L3": {
+            "n_entries": 10,
+            "n_correct": 8,
+            "n_content": 10,
+            "n_content_true": 8
+          }
+        },
+        "fresh_sha": "8675bacced74ef9f"
+      },
+      "n_moves": 12,
+      "width": 1,
+      "arch_sha": "016b69b51298f662",
+      "n_solved_pass": 157,
+      "n_mined_pass": 157,
+      "plant": {
+        "parse_acc": 0.629638671875,
+        "infill_acc": 0.705078125,
+        "read_acc": 1.0
+      }
+    },
+    {
+      "pass": 5,
+      "cycle": 15,
+      "t_cum": 650496.0,
+      "meter": {
+        "L1n6": 0.19921875,
+        "L2n3": 0.16796875,
+        "L3n1": 0.44921875
+      },
+      "vocab": {
+        "2": {
+          "n_entries": 11,
+          "n_correct": 10,
+          "n_content": 11,
+          "n_content_total": 18,
+          "n_content_true": 10,
+          "n_content_true_total": 14,
+          "n_new": 0,
+          "committed": true,
+          "miner": {
+            "level": 2,
+            "n_obs": 616,
+            "n_distinct": 13,
+            "n_at_support": {
+              "1": 13,
+              "2": 12,
+              "3": 11,
+              "5": 11,
+              "10": 9
+            }
+          },
+          "n_seen_fresh": 19,
+          "aud": 0.2734375,
+          "n_used": 7,
+          "n_new_used": 0,
+          "d_aud": 0.02734375,
+          "rand_k": 0.3841145833333333,
+          "closure": 0.390625,
+          "closure_entries": 64,
+          "closure_used": 15,
+          "comp_k": 0.6575520833333334,
+          "true": 0.2734375
+        },
+        "3": {
+          "n_entries": 31,
+          "n_correct": 22,
+          "n_content": 28,
+          "n_content_total": 64,
+          "n_content_true": 20,
+          "n_content_true_total": 37,
+          "n_new": 1,
+          "committed": false,
+          "miner": {
+            "level": 3,
+            "n_obs": 616,
+            "n_distinct": 52,
+            "n_at_support": {
+              "1": 52,
+              "2": 40,
+              "3": 31,
+              "5": 23,
+              "10": 18
+            }
+          },
+          "n_seen_fresh": 90,
+          "aud": 0.49609375,
+          "n_used": 6,
+          "n_new_used": 0,
+          "d_aud": 0.0703125,
+          "rand_k": 0.53125,
+          "closure": 0.5234375,
+          "closure_entries": 121,
+          "closure_used": 9,
+          "comp_k": 0.6822916666666666,
+          "true": 0.4921875
+        }
+      },
+      "probe": {
+        "reread": {
+          "n": 192,
+          "solved": 127,
+          "e": 0.33854166666666663,
+          "L2": {
+            "n_entries": 9,
+            "n_correct": 8,
+            "n_content": 9,
+            "n_content_true": 8
+          },
+          "L3": {
+            "n_entries": 12,
+            "n_correct": 9,
+            "n_content": 12,
+            "n_content_true": 9
+          }
+        },
+        "fresh": {
+          "n": 192,
+          "solved": 141,
+          "e": 0.265625,
+          "L2": {
+            "n_entries": 10,
+            "n_correct": 9,
+            "n_content": 10,
+            "n_content_true": 9
+          },
+          "L3": {
+            "n_entries": 10,
+            "n_correct": 8,
+            "n_content": 10,
+            "n_content_true": 8
+          }
+        },
+        "fresh_sha": "b88020c6b0af1b56"
+      },
+      "n_moves": 12,
+      "width": 1,
+      "arch_sha": "8fbe903f1e113ab2",
+      "n_solved_pass": 164,
+      "n_mined_pass": 164,
+      "plant": {
+        "parse_acc": 0.644287109375,
+        "infill_acc": 0.712890625,
+        "read_acc": 1.0
+      }
+    },
+    {
+      "pass": 6,
+      "cycle": 18,
+      "t_cum": 801907.2,
+      "meter": {
+        "L1n6": 0.203125,
+        "L2n3": 0.1640625,
+        "L3n1": 0.44140625
+      },
+      "vocab": {
+        "2": {
+          "n_entries": 11,
+          "n_correct": 10,
+          "n_content": 11,
+          "n_content_total": 18,
+          "n_content_true": 10,
+          "n_content_true_total": 14,
+          "n_new": 0,
+          "committed": true,
+          "miner": {
+            "level": 2,
+            "n_obs": 773,
+            "n_distinct": 13,
+            "n_at_support": {
+              "1": 13,
+              "2": 12,
+              "3": 11,
+              "5": 11,
+              "10": 9
+            }
+          },
+          "n_seen_fresh": 19,
+          "aud": 0.28515625,
+          "n_used": 8,
+          "n_new_used": 0,
+          "d_aud": -0.01171875,
+          "rand_k": 0.2955729166666667,
+          "closure": 0.37109375,
+          "closure_entries": 64,
+          "closure_used": 19,
+          "comp_k": 0.9583333333333334,
+          "true": 0.28515625
+        },
+        "3": {
+          "n_entries": 34,
+          "n_correct": 25,
+          "n_content": 31,
+          "n_content_total": 64,
+          "n_content_true": 23,
+          "n_content_true_total": 37,
+          "n_new": 3,
+          "committed": false,
+          "miner": {
+            "level": 3,
+            "n_obs": 773,
+            "n_distinct": 55,
+            "n_at_support": {
+              "1": 55,
+              "2": 43,
+              "3": 34,
+              "5": 25,
+              "10": 20
+            }
+          },
+          "n_seen_fresh": 92,
+          "aud": 0.46484375,
+          "n_used": 7,
+          "n_new_used": 1,
+          "d_aud": 0.03125,
+          "rand_k": 0.53125,
+          "closure": 0.484375,
+          "closure_entries": 121,
+          "closure_used": 10,
+          "comp_k": 0.6484375,
+          "true": 0.46484375
+        }
+      },
+      "probe": {
+        "reread": {
+          "n": 192,
+          "solved": 136,
+          "e": 0.29166666666666663,
+          "L2": {
+            "n_entries": 9,
+            "n_correct": 8,
+            "n_content": 9,
+            "n_content_true": 8
+          },
+          "L3": {
+            "n_entries": 13,
+            "n_correct": 10,
+            "n_content": 13,
+            "n_content_true": 10
+          }
+        },
+        "fresh": {
+          "n": 192,
+          "solved": 139,
+          "e": 0.27604166666666663,
+          "L2": {
+            "n_entries": 8,
+            "n_correct": 7,
+            "n_content": 8,
+            "n_content_true": 7
+          },
+          "L3": {
+            "n_entries": 13,
+            "n_correct": 10,
+            "n_content": 13,
+            "n_content_true": 10
+          }
+        },
+        "fresh_sha": "7a10a46a3fdc5f38"
+      },
+      "n_moves": 14,
+      "width": 1,
+      "arch_sha": "c6aef8158dc01684",
+      "n_solved_pass": 157,
+      "n_mined_pass": 157,
+      "plant": {
+        "parse_acc": 0.640869140625,
+        "infill_acc": 0.69921875,
+        "read_acc": 1.0
+      }
+    },
+    {
+      "pass": 7,
+      "cycle": 21,
+      "t_cum": 983558.3999999999,
+      "meter": {
+        "L1n6": 0.13671875,
+        "L2n3": 0.1171875,
+        "L3n1": 0.24609375
+      },
+      "vocab": {
+        "2": {
+          "n_entries": 11,
+          "n_correct": 10,
+          "n_content": 11,
+          "n_content_total": 18,
+          "n_content_true": 10,
+          "n_content_true_total": 14,
+          "n_new": 0,
+          "committed": true,
+          "miner": {
+            "level": 2,
+            "n_obs": 947,
+            "n_distinct": 13,
+            "n_at_support": {
+              "1": 13,
+              "2": 12,
+              "3": 11,
+              "5": 11,
+              "10": 9
+            }
+          },
+          "n_seen_fresh": 19,
+          "aud": 0.29296875,
+          "n_used": 8,
+          "n_new_used": 0,
+          "d_aud": -0.0078125,
+          "rand_k": 0.4140625,
+          "closure": 0.4140625,
+          "closure_entries": 64,
+          "closure_used": 16,
+          "comp_k": 0.89453125,
+          "true": 0.29296875
+        },
+        "3": {
+          "n_entries": 34,
+          "n_correct": 25,
+          "n_content": 31,
+          "n_content_total": 64,
+          "n_content_true": 23,
+          "n_content_true_total": 37,
+          "n_new": 0,
+          "committed": true,
+          "miner": {
+            "level": 3,
+            "n_obs": 947,
+            "n_distinct": 55,
+            "n_at_support": {
+              "1": 55,
+              "2": 43,
+              "3": 36,
+              "5": 25,
+              "10": 21
+            }
+          },
+          "n_seen_fresh": 92,
+          "aud": 0.5078125,
+          "n_used": 7,
+          "n_new_used": 0,
+          "d_aud": -0.04296875,
+          "rand_k": 0.5052083333333334,
+          "closure": 0.5234375,
+          "closure_entries": 121,
+          "closure_used": 11,
+          "comp_k": 0.703125,
+          "true": 0.5078125
+        }
+      },
+      "probe": {
+        "reread": {
+          "n": 192,
+          "solved": 156,
+          "e": 0.1875,
+          "L2": {
+            "n_entries": 7,
+            "n_correct": 7,
+            "n_content": 7,
+            "n_content_true": 7
+          },
+          "L3": {
+            "n_entries": 8,
+            "n_correct": 8,
+            "n_content": 8,
+            "n_content_true": 8
+          }
+        },
+        "fresh": {
+          "n": 192,
+          "solved": 161,
+          "e": 0.16145833333333337,
+          "L2": {
+            "n_entries": 7,
+            "n_correct": 6,
+            "n_content": 7,
+            "n_content_true": 6
+          },
+          "L3": {
+            "n_entries": 11,
+            "n_correct": 9,
+            "n_content": 11,
+            "n_content_true": 9
+          }
+        },
+        "fresh_sha": "d7ef0b33a005f623"
+      },
+      "n_moves": 14,
+      "width": 1,
+      "arch_sha": "42f2e9ec9dd2b51f",
+      "n_solved_pass": 174,
+      "n_mined_pass": 174,
+      "plant": {
+        "parse_acc": 0.63623046875,
+        "infill_acc": 0.69921875,
+        "read_acc": 1.0
+      }
+    },
+    {
+      "pass": 8,
+      "cycle": 24,
+      "t_cum": 1165209.5999999999,
+      "meter": {
+        "L1n6": 0.13671875,
+        "L2n3": 0.12109375,
+        "L3n1": 0.1875
+      },
+      "vocab": {
+        "2": {
+          "n_entries": 11,
+          "n_correct": 10,
+          "n_content": 11,
+          "n_content_total": 18,
+          "n_content_true": 10,
+          "n_content_true_total": 14,
+          "n_new": 0,
+          "committed": true,
+          "miner": {
+            "level": 2,
+            "n_obs": 1120,
+            "n_distinct": 13,
+            "n_at_support": {
+              "1": 13,
+              "2": 12,
+              "3": 11,
+              "5": 11,
+              "10": 9
+            }
+          },
+          "n_seen_fresh": 19,
+          "aud": 0.296875,
+          "n_used": 8,
+          "n_new_used": 0,
+          "d_aud": -0.00390625,
+          "rand_k": 0.50390625,
+          "closure": 0.3828125,
+          "closure_entries": 64,
+          "closure_used": 17,
+          "comp_k": 0.94140625,
+          "true": 0.29296875
+        },
+        "3": {
+          "n_entries": 34,
+          "n_correct": 25,
+          "n_content": 31,
+          "n_content_total": 64,
+          "n_content_true": 23,
+          "n_content_true_total": 37,
+          "n_new": 0,
+          "committed": true,
+          "miner": {
+            "level": 3,
+            "n_obs": 1120,
+            "n_distinct": 55,
+            "n_at_support": {
+              "1": 55,
+              "2": 45,
+              "3": 39,
+              "5": 25,
+              "10": 21
+            }
+          },
+          "n_seen_fresh": 92,
+          "aud": 0.546875,
+          "n_used": 8,
+          "n_new_used": 0,
+          "d_aud": -0.0390625,
+          "rand_k": 0.5833333333333334,
+          "closure": 0.60546875,
+          "closure_entries": 121,
+          "closure_used": 11,
+          "comp_k": 0.7630208333333334,
+          "true": 0.546875
+        }
+      },
+      "probe": {
+        "reread": {
+          "n": 192,
+          "solved": 150,
+          "e": 0.21875,
+          "L2": {
+            "n_entries": 7,
+            "n_correct": 7,
+            "n_content": 7,
+            "n_content_true": 7
+          },
+          "L3": {
+            "n_entries": 8,
+            "n_correct": 8,
+            "n_content": 8,
+            "n_content_true": 8
+          }
+        },
+        "fresh": {
+          "n": 192,
+          "solved": 164,
+          "e": 0.14583333333333337,
+          "L2": {
+            "n_entries": 9,
+            "n_correct": 8,
+            "n_content": 9,
+            "n_content_true": 8
+          },
+          "L3": {
+            "n_entries": 11,
+            "n_correct": 10,
+            "n_content": 11,
+            "n_content_true": 10
+          }
+        },
+        "fresh_sha": "57a0637574c0b098"
+      },
+      "n_moves": 14,
+      "width": 1,
+      "arch_sha": "d72dfd53d09f188a",
+      "n_solved_pass": 173,
+      "n_mined_pass": 173,
+      "plant": {
+        "parse_acc": 0.6396484375,
+        "infill_acc": 0.708984375,
+        "read_acc": 1.0
+      }
+    },
+    {
+      "pass": 9,
+      "cycle": 27,
+      "t_cum": 1346860.7999999998,
+      "meter": {
+        "L1n6": 0.1484375,
+        "L2n3": 0.1484375,
+        "L3n1": 0.24609375
+      },
+      "vocab": {
+        "2": {
+          "n_entries": 11,
+          "n_correct": 10,
+          "n_content": 11,
+          "n_content_total": 18,
+          "n_content_true": 10,
+          "n_content_true_total": 14,
+          "n_new": 0,
+          "committed": true,
+          "miner": {
+            "level": 2,
+            "n_obs": 1294,
+            "n_distinct": 13,
+            "n_at_support": {
+              "1": 13,
+              "2": 12,
+              "3": 11,
+              "5": 11,
+              "10": 9
+            }
+          },
+          "n_seen_fresh": 19,
+          "aud": 0.32421875,
+          "n_used": 9,
+          "n_new_used": 0,
+          "d_aud": -0.02734375,
+          "rand_k": 0.6692708333333334,
+          "closure": 0.42578125,
+          "closure_entries": 64,
+          "closure_used": 18,
+          "comp_k": 0.7239583333333334,
+          "true": 0.3203125
+        },
+        "3": {
+          "n_entries": 34,
+          "n_correct": 25,
+          "n_content": 31,
+          "n_content_total": 64,
+          "n_content_true": 23,
+          "n_content_true_total": 37,
+          "n_new": 0,
+          "committed": true,
+          "miner": {
+            "level": 3,
+            "n_obs": 1294,
+            "n_distinct": 57,
+            "n_at_support": {
+              "1": 57,
+              "2": 45,
+              "3": 41,
+              "5": 26,
+              "10": 21
+            }
+          },
+          "n_seen_fresh": 92,
+          "aud": 0.52734375,
+          "n_used": 6,
+          "n_new_used": 0,
+          "d_aud": 0.01953125,
+          "rand_k": 0.5299479166666666,
+          "closure": 0.5390625,
+          "closure_entries": 121,
+          "closure_used": 11,
+          "comp_k": 0.8736979166666666,
+          "true": 0.52734375
+        }
+      },
+      "probe": {
+        "reread": {
+          "n": 192,
+          "solved": 154,
+          "e": 0.19791666666666663,
+          "L2": {
+            "n_entries": 7,
+            "n_correct": 7,
+            "n_content": 7,
+            "n_content_true": 7
+          },
+          "L3": {
+            "n_entries": 7,
+            "n_correct": 7,
+            "n_content": 7,
+            "n_content_true": 7
+          }
+        },
+        "fresh": {
+          "n": 192,
+          "solved": 154,
+          "e": 0.19791666666666663,
+          "L2": {
+            "n_entries": 8,
+            "n_correct": 7,
+            "n_content": 8,
+            "n_content_true": 7
+          },
+          "L3": {
+            "n_entries": 9,
+            "n_correct": 8,
+            "n_content": 9,
+            "n_content_true": 8
+          }
+        },
+        "fresh_sha": "544fee3fee278947"
+      },
+      "n_moves": 14,
+      "width": 1,
+      "arch_sha": "0385d1593845d479",
+      "n_solved_pass": 174,
+      "n_mined_pass": 174,
+      "plant": {
+        "parse_acc": 0.625244140625,
+        "infill_acc": 0.69140625,
+        "read_acc": 1.0
+      }
+    }
+  ],
+  "cycles": [
+    {
+      "cycle": 1,
+      "pass": 1,
+      "e_practice": 0.609375,
+      "n_solved": 25,
+      "gloss": 0.8219668865203857,
+      "vloss": 0.5013624429702759
+    },
+    {
+      "cycle": 2,
+      "pass": 1,
+      "e_practice": 0.53125,
+      "n_solved": 30,
+      "gloss": 1.4401870965957642,
+      "vloss": 0.49295544624328613
+    },
+    {
+      "cycle": 3,
+      "pass": 1,
+      "e_practice": 0.53125,
+      "n_solved": 30,
+      "gloss": 0.564170777797699,
+      "vloss": 0.5255824327468872
+    },
+    {
+      "cycle": 4,
+      "pass": 2,
+      "e_practice": 0.453125,
+      "n_solved": 35,
+      "gloss": 0.9536248445510864,
+      "vloss": 0.5392335653305054
+    },
+    {
+      "cycle": 5,
+      "pass": 2,
+      "e_practice": 0.46875,
+      "n_solved": 34,
+      "gloss": 0.43950149416923523,
+      "vloss": 0.5603460073471069
+    },
+    {
+      "cycle": 6,
+      "pass": 2,
+      "e_practice": 0.46875,
+      "n_solved": 34,
+      "gloss": 1.4554070234298706,
+      "vloss": 0.49998152256011963
+    },
+    {
+      "cycle": 7,
+      "pass": 3,
+      "e_practice": 0.46875,
+      "n_solved": 34,
+      "gloss": 0.7135215401649475,
+      "vloss": 0.5116986036300659
+    },
+    {
+      "cycle": 8,
+      "pass": 3,
+      "e_practice": 0.4375,
+      "n_solved": 36,
+      "gloss": 1.443231225013733,
+      "vloss": 0.5255650877952576
+    },
+    {
+      "cycle": 9,
+      "pass": 3,
+      "e_practice": 0.421875,
+      "n_solved": 37,
+      "gloss": 0.9858657121658325,
+      "vloss": 0.48016804456710815
+    },
+    {
+      "cycle": 10,
+      "pass": 4,
+      "e_practice": 0.140625,
+      "n_solved": 55,
+      "gloss": 1.1185945272445679,
+      "vloss": 0.5031678676605225
+    },
+    {
+      "cycle": 11,
+      "pass": 4,
+      "e_practice": 0.234375,
+      "n_solved": 49,
+      "gloss": 0.6096765398979187,
+      "vloss": 0.5863475203514099
+    },
+    {
+      "cycle": 12,
+      "pass": 4,
+      "e_practice": 0.171875,
+      "n_solved": 53,
+      "gloss": 0.311723530292511,
+      "vloss": 0.5702919363975525
+    },
+    {
+      "cycle": 13,
+      "pass": 5,
+      "e_practice": 0.125,
+      "n_solved": 56,
+      "gloss": 0.41073694825172424,
+      "vloss": 0.5665441751480103
+    },
+    {
+      "cycle": 14,
+      "pass": 5,
+      "e_practice": 0.15625,
+      "n_solved": 54,
+      "gloss": 1.3625805377960205,
+      "vloss": 0.5586052536964417
+    },
+    {
+      "cycle": 15,
+      "pass": 5,
+      "e_practice": 0.15625,
+      "n_solved": 54,
+      "gloss": 0.512059211730957,
+      "vloss": 0.5267391204833984
+    },
+    {
+      "cycle": 16,
+      "pass": 6,
+      "e_practice": 0.21875,
+      "n_solved": 50,
+      "gloss": 1.143816351890564,
+      "vloss": 0.5353758335113525
+    },
+    {
+      "cycle": 17,
+      "pass": 6,
+      "e_practice": 0.140625,
+      "n_solved": 55,
+      "gloss": 0.9332389235496521,
+      "vloss": 0.5272724032402039
+    },
+    {
+      "cycle": 18,
+      "pass": 6,
+      "e_practice": 0.1875,
+      "n_solved": 52,
+      "gloss": 1.309138536453247,
+      "vloss": 0.516675591468811
+    },
+    {
+      "cycle": 19,
+      "pass": 7,
+      "e_practice": 0.140625,
+      "n_solved": 55,
+      "gloss": 0.3443405032157898,
+      "vloss": 0.5222848653793335
+    },
+    {
+      "cycle": 20,
+      "pass": 7,
+      "e_practice": 0.09375,
+      "n_solved": 58,
+      "gloss": 1.038965106010437,
+      "vloss": 0.5986380577087402
+    },
+    {
+      "cycle": 21,
+      "pass": 7,
+      "e_practice": 0.046875,
+      "n_solved": 61,
+      "gloss": 0.4585437774658203,
+      "vloss": 0.5395150780677795
+    },
+    {
+      "cycle": 22,
+      "pass": 8,
+      "e_practice": 0.078125,
+      "n_solved": 59,
+      "gloss": 1.0670130252838135,
+      "vloss": 0.5602242350578308
+    },
+    {
+      "cycle": 23,
+      "pass": 8,
+      "e_practice": 0.125,
+      "n_solved": 56,
+      "gloss": 1.3192346096038818,
+      "vloss": 0.5033687353134155
+    },
+    {
+      "cycle": 24,
+      "pass": 8,
+      "e_practice": 0.09375,
+      "n_solved": 58,
+      "gloss": 0.4592989385128021,
+      "vloss": 0.4500032365322113
+    },
+    {
+      "cycle": 25,
+      "pass": 9,
+      "e_practice": 0.140625,
+      "n_solved": 55,
+      "gloss": 1.2758647203445435,
+      "vloss": 0.594623327255249
+    },
+    {
+      "cycle": 26,
+      "pass": 9,
+      "e_practice": 0.09375,
+      "n_solved": 58,
+      "gloss": 0.3072340786457062,
+      "vloss": 0.6389271020889282
+    },
+    {
+      "cycle": 27,
+      "pass": 9,
+      "e_practice": 0.046875,
+      "n_solved": 61,
+      "gloss": 0.6947765350341797,
+      "vloss": 0.5716953873634338
+    }
+  ],
+  "events": [
+    {
+      "kind": "commit",
+      "cell": "mixed__fresh",
+      "level": 2,
+      "pass_": 3,
+      "cycle": 9,
+      "n_entries": 11,
+      "n_moves_after": 12,
+      "tab_n_learned": 11,
+      "tab_n_true": 14,
+      "tab_n_correct": 10,
+      "tab_precision": 0.9090909090909091,
+      "tab_recall": 0.7142857142857143
+    },
+    {
+      "kind": "commit",
+      "cell": "mixed__fresh",
+      "level": 3,
+      "pass_": 6,
+      "cycle": 18,
+      "n_entries": 34,
+      "n_moves_after": 14,
+      "tab_n_learned": 34,
+      "tab_n_true": 56,
+      "tab_n_correct": 25,
+      "tab_precision": 0.7352941176470589,
+      "tab_recall": 0.44642857142857145
+    }
+  ],
+  "complete": true
+}

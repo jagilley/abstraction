@@ -2,7 +2,7 @@
 
 **Up**: [../README.md](../README.md) (the practice arc)
 **Idea doc**: [recurrence_manufactures_confounds](../../../../ideas/recurrence_manufactures_confounds.md)
-— this node is that doc's first contact with data. **Spec sibling**: `../merge/SPEC.md`[^private]
+— this node is that doc's first contact with data. **Spec sibling**: [`../merge/SPEC.md`](../merge/SPEC.md)
 (this node builds a narrowed slice; see FILES.md *Scope*).
 **Files & machinery**: [FILES.md](FILES.md) — arms, gates, calibration record, Gate 0 in full, the
 coverage-is-not-the-objective machinery note, and everything inherited from
@@ -261,6 +261,4 @@ python3 rhm/practice/fourwall/analyze_fourwall.py --tag fw_s3 --fetch --figures
 Seed pair with the two named jobs above · the graded-substrate (mjc) port for the
 contamination/repair half of §5 · the strong-form §3 regime · the idea-doc revision
 (§3 stickiness clause; §5 → merge/re-key/retire; §7 resolution cap; §6 the audit-prosthetic
-reading) · relation to `../merge/SPEC.md`[^private]'s unmetered dense arm.
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
+reading) · relation to [`../merge/SPEC.md`](../merge/SPEC.md)'s unmetered dense arm.

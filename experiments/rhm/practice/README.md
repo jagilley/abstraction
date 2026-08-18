@@ -153,13 +153,46 @@ type system — one organ per currency of change (dense learning ↔ truth; repa
 interface; evaluative re-selection ↔ demand; the teacher ↔ level). Single seed; ranks are the
 claim.
 
-### Specced, unbuilt (2026-08-17)
+### [`reread/`](reread/README.md) — is a fixed archive renewable as the vocabulary climbs? (2026-08-17)
 
-`reread/SPEC.md`[^private] — is a fixed archive renewable to a learner whose vocabulary has
-climbed? (mining yield per pass: vocabulary-gated vs novelty-gated). `merge/SPEC.md`[^private]
-— the merge op plus an unmetered dense arm: invariance-by-enumeration vs invariance-by-merge. Both
-from the 2026-08-17 metered-data reframes — see the bracketed caveat in
-[`meta_learning_under_metered_data`](../../../ideas/meta_learning_under_metered_data.md).
+**Goal**: test the metered-data caveat's reframe iv (a token's extractable news is indexed by
+the reader's current vocabulary) by holding an archive byte-frozen across 9 passes and reading
+mining yield, competence, and a paired frozen-vs-fresh novelty probe against vocabulary stage.
+
+**Finding**: on sculpting, the archive is **renewable in competence, not vocabulary** — yield
+decays to zero with no re-arm at commits while metered error keeps falling (gains 0.19–0.50
+where eight dense epochs buy ≤0.09) — a negative scoped by the instrument (the exogenous reader
+rewrites what it reads, so vocabulary-gated perception is inexpressible there). The child
+[`reread/lm/`](reread/lm/README.md) rebuilds the question with an **endogenous reader** (NTP vs
+exact BP oracles) and the claim reproduces: extraction is strictly level-ordered in every arm,
+and a 6.4×-re-read corpus is **fully renewable at zero token penalty** (two independent
+instruments) — bounded by a corpus-size wall below which re-reading is *capped*, not slowed
+(**~10× distinct corpus per half level of achievable depth**). Side finding with legs: archive
+depth-mix is a curriculum — a deep-only archive mines a worse-than-random L2 that structurally
+forecloses L3 ([`recital`](recital/README.md)'s bottom-heavy law on the data side). Single seed.
+
+### [`merge/`](merge/README.md) — the merge op, enumeration vs merge, and self-play's holes (2026-08-17)
+
+**Goal**: build the index-coarsening op ([recurrence_manufactures_confounds](../../../ideas/recurrence_manufactures_confounds.md)
+§5/§8) and test §18's "correct degenerate solution" clause: is invariance-by-enumeration the
+same object as invariance-by-merge, and is free data free coverage?
+
+**Finding**: two dissociations. **Round 1**: rotation and merge are substitutes for the quotient
+on *task error* — but not on the next level: at every rotation rate the enumerated index's
+operative cell supports |T3| = 12 vs the merged 67 against its own union of 68 — **the content
+is collectively there; the index withholds it** (§16's currency claim measured on the index
+axis). The merge op refuses genuinely distinguishable cells; **paced rotation is what renders
+them indistinguishable** — manufactured decorrelation as the licensing condition for merging,
+measured as mechanism (18→1 collapse, 8× less storage). The affordance-matched unmetered
+monolith ties in-distribution and keeps full minability — it never fractured, having never been
+forced to key. **Round 2**: an unmetered learner whose practice distribution is its own
+competence-amplified footprint (β=2) is rank 1 by its own grading (beats the DGP's table) and
+second-worst on coverage, with holes 30–70× starved, positive tail excess, and 18% less of the
+next level representable; a yoked placement-matched, strictly-narrower exogenous control
+reproduces only 22% of the loss — **the damage is the competence coupling's collapse dynamics,
+not narrowness** — and the onset is a cliff between β=1.5 and β=2. Self-grading inflation
+(`own−world`) turned out to be a narrowness artifact (correction on the record). Single seed;
+ranks and signs are the claims.
 
 ### [`fourwall/`](fourwall/README.md) — the spurious index: scaffold, debt, merge, re-key, retire (2026-08-17)
 
@@ -210,5 +243,3 @@ Full commands, calibrations and volume layout: [`crystallize/README.md`](crystal
 seed-triple convention), [`tall/README.md`](tall/README.md),
 [`transpose/FILES.md`](transpose/FILES.md), [`setlist/FILES.md`](setlist/FILES.md)
 (joint findings: [`typed_gaps/README.md`](typed_gaps/README.md)).
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

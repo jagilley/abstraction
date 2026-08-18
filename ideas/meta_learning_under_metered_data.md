@@ -39,6 +39,58 @@ This reconciles the Scaling-Era answer ("train on all of it") as **the correct d
 an allocation problem whose meter is off**, and it predicts that the cheap kind of data curation is the
 weak kind.
 
+> ⚠️ **[2026-08-17 — reframes in progress: the "correct degenerate solution" clause is under
+> challenge. Work in progress — intuition-stage, gathering data; nothing below this bracket has been
+> revised, and revision waits on results per repo norms. From a discussion with Jasper; the seed
+> intuitions are his.]** Four connected reframes, in one paragraph each:
+> **(i) "Correct" was graded by a within-level signal.** The clause certifies the monolith by
+> in-distribution loss — the one currency it is built to win — and the practice arc's own most
+> seed-stable result ([practice_manufactures_its_own_credit](practice_manufactures_its_own_credit.md)
+> §16: the value of level-k practice is denominated in level k+1's currency, invisible to
+> within-level signals) applies to the comparison itself. The quotient's value (invariance, transfer,
+> next-level representability) is denominated in currencies the in-distribution grader structurally
+> cannot read, and the deficiency is silent by construction
+> ([operators_not_footprints](../beliefs/trees/operators_not_footprints.md): loss sees quality, not
+> character). Suspicion on the record: AlphaZero is a degenerate solution but perhaps not a *correct*
+> one relative to a hypothetical full-loop player. Recalled external anchor (cite-check): adversarial
+> policies vs KataGo-class engines — self-play collapses the question model onto the answer model
+> (the demand distribution is the policy's own footprint), and the holes sit where demand never
+> exercised an invariance.
+> **(ii) The meter generalizes.** This doc's meter is price-per-sample; the arc since suggests the
+> operative object is *any pressure against enumeration* — samples, capacity, time, or self-imposed
+> constraint. Grokking-under-weight-decay is the monolith's own boundary case (a capacity meter buying
+> the invariant circuit, slowly). Practice's meters are **aimed** (per-dimension, scheduled,
+> demand-weighted — [recurrence_manufactures_confounds](recurrence_manufactures_confounds.md)'s
+> manufactured decorrelation); SGD's are diffuse.
+> **(iii) A full loop self-meters.** In human practice domains, limitation-setting and drift are
+> *sought out* as refinement technology (the four-wall rotation; constraint drills), so "the meter is
+> off" is never a fact about the world for a full-loop learner — it prices its own data. The
+> candidate rewrite of this clause and of §18's, when data licenses it: **pretraining is the
+> degenerate solution that mistakes free data for free extraction.**
+> **(iv) Free data ≠ free extraction.** A token's extractable news is indexed by the reader's current
+> vocabulary ([ratchet](../experiments/rhm/practice/ratchet/README.md)'s nesting: a missing level
+> makes the next unrepresentable, hence unminable) — the reread phenomenon, and the sense in which a
+> loop learner has effectively unlimited data over a fixed archive.
+> Instruments specced 2026-08-17: [`rhm/practice/reread/SPEC.md`](../experiments/rhm/practice/reread/SPEC.md)
+> (is mining yield over a fixed archive vocabulary-gated or novelty-gated?) and
+> [`rhm/practice/merge/SPEC.md`](../experiments/rhm/practice/merge/SPEC.md)
+> (invariance-by-enumeration vs invariance-by-merge, with an unmetered dense arm).
+> **[Run, same day — all four reframes survived contact, each sharpened**; single seed, discussed
+> with Jasper before this note. (i) measured directly: task error identical under rotation while
+> next-level representability differs 12-vs-67 ([`merge`](../experiments/rhm/practice/merge/README.md)
+> round 1). (ii) relocated: the cost lands on the *fractured index* (unpaid confound-debt), not
+> on the unmetered monolith per se — exogenous free variation never fractures; the capacity-meter
+> (weight-decay) probe stayed a weak null. (iii) supported with a threshold: a competence-coupled
+> question distribution (self-play, β=2) manufactures 30–70× starved holes and 18% next-level
+> foreclosure that neither size- nor placement-matched exogenous narrowness reproduces (yoked
+> control: 22%), with a cliff onset between β=1.5 and β=2 ([`merge`](../experiments/rhm/practice/merge/README.md)
+> round 2); `own−world` self-grading inflation is a narrowness artifact, corrected on the record.
+> (iv) supported where the reader climbs: extraction strictly level-ordered; a 6.4×-re-read corpus
+> fully renewable at zero token penalty, capped (not slowed) below a corpus-size wall at ~10×
+> distinct corpus per half level ([`reread/lm`](../experiments/rhm/practice/reread/lm/README.md);
+> executor-side scope in [`reread`](../experiments/rhm/practice/reread/README.md)). The §-level
+> revision of this doc's One-liner and §6, and of §18 of the practice doc, remains queued.]
+
 ---
 
 ## 1. The claim being amended

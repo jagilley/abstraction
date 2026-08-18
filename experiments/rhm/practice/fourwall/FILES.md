@@ -6,7 +6,7 @@ writeup, 2026-08-17). This file documents **machinery and calibration only**.
 **Idea doc**:
 [`recurrence_manufactures_confounds`](../../../../ideas/recurrence_manufactures_confounds.md)
 (§2 the confound debt, §3 the scaffold's value, §4 the rotation typed, §5 the merge op, §8 the
-instrument list). **Spec sibling**: `../merge/SPEC.md`[^private] — this node builds a
+instrument list). **Spec sibling**: [`../merge/SPEC.md`](../merge/SPEC.md) — this node builds a
 narrowed slice of it (see *Scope, and what was deliberately left out* below).
 **Machinery donors**: [`../ratchet/`](../ratchet/README.md) (substrate, macros, beam, pricing,
 online plant and selector), [`../setlist/`](../setlist/FILES.md) (`DecayMiner` via
@@ -356,7 +356,7 @@ zero, the lr caveat travels with the number.
 
 ## Scope, and what was deliberately left out
 
-Narrowed from `../merge/SPEC.md`[^private] to one lever and one question. **Not
+Narrowed from [`../merge/SPEC.md`](../merge/SPEC.md) to one lever and one question. **Not
 built** (all named as follow-ups, not as oversights): drift-rate sweeps; paced-vs-sudden
 rotation (sudden only); contamination arms whose programs read `w`; the loudness sweep over
 which frozen features bind; the unmetered dense learner under free i.i.d. variation (that arm is
@@ -464,5 +464,3 @@ rule draws, so orderings and signs are the reported quantities.
 `../crystallize/units.py` (`build_move_set`, `corrupt_hier`, `grade`, `oracle_rollout`),
 and `rhm/rhm_drift.py` (`sample_derivations_weighted`, for its `return_trace`). Nothing in
 those files is modified.
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

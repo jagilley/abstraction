@@ -1,0 +1,140 @@
+{
+  "config": {
+    "v": 8,
+    "s": 2,
+    "depth": 4,
+    "m": 2,
+    "rule_seed": 0,
+    "train_seed": 1,
+    "seed": 0,
+    "state_dim": 96,
+    "n_train_episodes": 100000,
+    "controller_steps": 12000,
+    "generator_steps": 12000,
+    "reader_steps": 6000,
+    "plant_holdout": 0,
+    "holdout_seed": 11,
+    "value_steps": 12000,
+    "value_episodes": 40000,
+    "value_batch_collect": 1024,
+    "batch_size": 256,
+    "value_lr": 0.0003,
+    "value_lr_online": 3e-05,
+    "n_corrupt": 3,
+    "explore_eps": 0.3,
+    "budget": 4,
+    "pr_width": 16,
+    "g_budget": 58,
+    "max_macro_level": 3,
+    "n_pr": 64,
+    "n_rt": 256,
+    "n_score": 256,
+    "n_probe_clean": 512,
+    "era_cycles": 24,
+    "n_grad": 4,
+    "value_batch": 256,
+    "replay_frac": 0.5,
+    "buf_cap": 100000,
+    "gen_lr": 0.0001,
+    "gen_steps": 20,
+    "mine_support": 3,
+    "mine_from": "chosen",
+    "mine_cap": 0,
+    "alpha": 0.2,
+    "sil_c": 0.06,
+    "sil_cv": 0.1,
+    "sil_W": 5,
+    "sil_hold": 2,
+    "sil_min_cycle": 6,
+    "lp_min_drop": 0.05,
+    "early_offset": 1,
+    "late_offset": 2,
+    "d_fb": 1.0,
+    "c_mat": 0.05,
+    "checkpoint_every": 5,
+    "probe_widths": [
+      1,
+      4,
+      16
+    ],
+    "probe_every": 4,
+    "n_arch": 192,
+    "chunk": 64,
+    "n_passes": 9,
+    "arch_seed": 424242,
+    "commit_pass": {
+      "2": 3,
+      "3": 6
+    },
+    "n_rand": 3,
+    "novelty_probe": true
+  },
+  "mixes": [
+    "mixed",
+    "deep",
+    "shallow"
+  ],
+  "arms": [
+    "reread",
+    "fresh",
+    "dense_reread",
+    "dense_fresh",
+    "given_reread"
+  ],
+  "archives": {
+    "deep": {
+      "mix": "deep",
+      "n": 192,
+      "seed": 424242,
+      "sha": "200f262d166ab422"
+    },
+    "mixed": {
+      "mix": "mixed",
+      "n": 192,
+      "seed": 424242,
+      "sha": "0a8691b42077db73"
+    },
+    "shallow": {
+      "mix": "shallow",
+      "n": 192,
+      "seed": 424242,
+      "sha": "e9cea3eeb3e24182"
+    }
+  },
+  "content": {
+    "deep": {
+      "2": {
+        "n": 15,
+        "n_true": 12
+      },
+      "3": {
+        "n": 64,
+        "n_true": 41
+      }
+    },
+    "mixed": {
+      "2": {
+        "n": 18,
+        "n_true": 14
+      },
+      "3": {
+        "n": 64,
+        "n_true": 37
+      }
+    },
+    "shallow": {
+      "2": {
+        "n": 14,
+        "n_true": 12
+      },
+      "3": {
+        "n": 61,
+        "n_true": 39
+      }
+    }
+  },
+  "truth_sizes": {
+    "2": 14,
+    "3": 56
+  }
+}
