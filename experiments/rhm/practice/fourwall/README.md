@@ -219,6 +219,29 @@ migration depth itself varies 0.60–0.93 across stream positions at identical c
    learners *without* the audit. Reading (conceptual, for the doc revision): the four-wall
    choreography is a cultural prosthetic for the missing audit.
 
+## Children
+
+### [`lm/`](lm/README.md) — the endogenous twin: the index ops asked of a real NTP reader (2026-08-18)
+
+**Goal**: port this node's shape onto an endogenous reader (`reread/lm`'s NTP-vs-exact-BP-oracle
+pattern) — a free prefix key bijective with a level-2 latent, rotated unannounced, the ops as
+**readouts** rather than arms — making the idea doc §9's discreteness question well-posed, then
+(round 2) supply the missing op exogenously and price it.
+
+**Finding**: this node's binding null **inverts** (available *is* taken — instantly, to the full
+exact 0.152-nat bracket); the debt is flat, the identity return costs full price (weights hold no
+mothball — the old map is overwritten, not shelved), and the reader **tracks and never quotients**
+at any rotation rate, ending with its token-derived inference pathway threefold suppressed
+(0.27–0.30 vs controls' 0.84 against a 0.921 ceiling, `true_wall` included) — invisible to task
+error. The supplied op (input-stream collapse; conditions, not weights) repairs exactly that
+failure at ~zero price, later merging *dominates* earlier on the lifetime integral (this node's
+rational stickiness as measured economics), and the within-level ledger votes against merging at
+all — the op and its justification must both come from outside. One correction on the record:
+round 1's `wall_fast` penalty was ~8× a checkpoint-grid artifact (corrected net +0.019), aligning
+the endogenous reader with `mg_s0`'s substitutes-on-task-error. Single seed; per-arm workers with
+identical seeds remove this node's stream-position confound, so cross-arm contrasts are licensed
+there.
+
 ## Caveats
 
 - **Single seed throughout; ranks and signs only.** And this node sharpened the arc's noise

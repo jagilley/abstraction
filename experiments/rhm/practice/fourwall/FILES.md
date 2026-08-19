@@ -49,6 +49,12 @@ Arms whose programs read `w` are a deliberate non-goal.
 | `analyze_fourwall.py` | Reduction. `--fetch` pulls from the volume; the report runs Gate 0, phase-1 priced time-to-competence, the rotation response, phase-2 error and spend, **library key cardinality over time** (the MDL readout), recert, merge (with phase 1 as its negative control), the wall-permutation probe, the first-rotation forced-transfer profile, and the instruments. `--figures` writes fig1–fig4 |
 | `launch_detached.py` | `setlist`'s session-isolated launcher (`start_new_session=True`), retargeted |
 
+## Children
+
+| Folder | Summary |
+|---|---|
+| [`lm/`](lm/README.md) | The endogenous twin (`fwlm0` + `fwlm1`): a real NTP reader takes the free key instantly and fully, tracks (fast, accelerating) and never quotients at any rotation rate, and holds no mothball (the identity return costs full price); the exogenously supplied merge op repairs the withheld inference pathway at ~zero price, while the within-level lifetime ledger votes against running it — op and reason must both be supplied. Machinery: [`lm/FILES.md`](lm/FILES.md) |
+
 ## Arms
 
 The library key is the **only** difference. Everything else — substrate, damage cell, plant,

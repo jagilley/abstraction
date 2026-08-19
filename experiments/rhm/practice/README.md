@@ -218,6 +218,18 @@ ladder), no spontaneous binding formed (available ≠ taken), and tear-down prec
 round that had the op. Single seed; ranks are the claim; the node also measured stream-position
 sensitivity exceeding the ±0.034 floor in adoption timing, which is the seed pair's named job.
 
+**Update (2026-08-18, [`fourwall/lm/`](fourwall/lm/README.md))**: the endogenous twin — the same
+shape asked of a real NTP reader against exact BP oracles (`reread/lm`'s pattern), then the missing
+op supplied exogenously and priced. The binding null **inverts** (available *is* taken — instantly,
+to the full exact bracket); the reader tracks and **never quotients** at any rotation rate, holds
+no mothball (the identity return costs full price), and ends with its token-derived inference
+pathway threefold suppressed, invisibly to task error; the supplied merge op (an input-stream
+collapse — conditions, not weights) repairs exactly that failure at ~zero price, while the
+within-level lifetime ledger *rewards* never merging — **the op and its justification must both
+come from outside the loop**. (One correction on the record: round 1's `wall_fast` penalty was ~8×
+a checkpoint-grid artifact; corrected +0.019, aligning the endogenous reader with `merge/`'s
+substitutes-on-task-error.)
+
 ## Reproduce
 
 ```bash
