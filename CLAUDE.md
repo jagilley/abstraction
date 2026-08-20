@@ -83,3 +83,4 @@ that part of the warning is real — fix the email.
 - "The art of doing mathematics consists in finding that special case which contains all the germs of generality." - David Hilbert
 - "The whole idea of Science is, simply, reflective reasoning about a more reliable process for making the contents of your mind mirror the contents of the world." - Eliezer Yudkowsky
 - "Music is your own experience, your own thoughts, your wisdom. If you don't live it, it won't come out of your horn. They teach you there's a boundary line to music. But, man, there's no boundary line to art." - Charlie Parker
+- "It's a beautiful thing when a person who doesn't know how to play an instrument plays it. They always find something beautiful because they don’t know what they’re not supposed to do." - Ornette Coleman
