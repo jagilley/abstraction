@@ -107,6 +107,35 @@ Neither process is exotic and both already exist as code; what has never existed
 
 ## 3½. Where the chunk lives before consolidation: the FM is the holding structure
 
+**Revision (2026-08-20).** Read against Iwane, Hayward, Karunathilake, Buch & Cohen 2026
+(`reading/Hippocampal skill memory expansion.pdf`[^private])
+and the arc as run (§§14–20), the answer below is half right. "The FM is the holding structure"
+stands for the chunk's **corridor** (§20: committed routing, FM-unpacked, dominates every frozen op
+inside the composition horizon). It does not stand for the chunk's **identity** — which primitives
+constitute the unit, in what order — and "why no episodic buffer is needed" drew the
+hippocampus/cerebellum split on the wrong criterion. The split is **arbitrary binding vs. derivable
+content**, not non-recurrent vs. recurrent: chunk *content* recurs, so CLS is still right that slow
+consolidation is safe; chunk *identity* is an association the primitives do not imply (§19: a chunk
+stores demand-concentration, not truth) and has to be stored fast, as a binding — the hippocampal
+profile by this section's own criterion. The arc built that organ without naming it. The **mined
+table** (§14) — distinct from both the dense learner and the executor, populated offline between
+bouts by *selection* over stored traces, level-indexed and nested, growing while the within-level
+ledger is flat (§16; `teacher_slot`) — has the profile Iwane et al. attribute to the hippocampus in
+early skill learning: hippocampal θ/γ coupling is the one regional signal predicting within-trial
+chunk content; chunk *count* holds at ~7 while chunk *size* grows with practice and keeps growing
+after speed plateaus; the profile is absent for non-repeating sequences; and the expansion rides on
+rest-break replay (Buch et al. 2021; causal in Griffin et al. 2025) — the mining step, at a 10 s
+cadence rather than sleep. So the interim chunk has two homes — identity in the table, corridor in
+the FM — and "inert for the loop itself" below is retracted; the target register survives as one
+more binding the same organ holds (in a keypress task the target *is* the chunk identity, which is
+why that paper cannot separate the two roles). The residual's two readings of rest-time replay
+collapse under the meter: it is load-bearing *because* trials are metered — our priced arc's action
+space grows only at mining time, and in the human the micro-offline gains dominate early learning.
+The convergence is in the organ decomposition and the currency each stores, not in mechanism; and
+the amnesia dissociation cited below should be re-read against Hayward et al. 2024 (hippocampal
+procedural deficits) before it is leaned on — H.M.'s skills may be the consolidated end of the
+process, not its expansion phase.
+
 The question this section answers (raised by Jasper, 2026-08-12): does compilation deposit the quarter-note
 instruction directly in cortex, alongside the 16th-note instructions — or does the new chunk need a
 hippocampus-analog to hold it in a holding pattern until sleep integrates it?
@@ -129,7 +158,8 @@ construction: massively recurrent, low-variance, and pre-regularized by having d
 that makes `b(s)` estimable is the same recurrence that makes direct slow consolidation safe — **repetition is the
 interleaving; practice manufactures its own consolidation safety.** The two fast learners then split cleanly by
 data regime: the hippocampus is the fast store for content that *cannot recur* (episodes, n=1, arbitrary binding);
-the cerebellum is the fast store for content that *recurs by construction* (procedures). The classic amnesia
+the cerebellum is the fast store for content that *recurs by construction* (procedures) *[criterion
+revised 2026-08-20, above: arbitrary binding, not non-recurrence]*. The classic amnesia
 dissociations are the empirical backing: hippocampal patients acquire motor skills at normal rates across sessions
 while having no episodic memory of having practiced (§11 — recalled as well-established, to be cite-checked).
 
@@ -151,7 +181,8 @@ the hippocampus*. So the information-processing necessity reduces to a small, st
 the loop requires that register to be a large episodic memory system. This *sharpens* rather than threatens the
 repo's standing premise that the hippocampus is an artifact of biological necessity more than
 information-processing necessity: on this account it is load-bearing for target *acquisition* (one-shot capture in
-a world where the tutor does not repeat himself), inert for the loop itself.
+a world where the tutor does not repeat himself), inert for the loop itself *[retracted 2026-08-20,
+above]*.
 
 Where the uncertainty genuinely lives: **reasoning-chunks.** The replay/schema-formation literature is heavily
 relational; cognitive material recurs far more thinly than motor material; and first-person phenomenology includes
