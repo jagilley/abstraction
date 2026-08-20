@@ -1,0 +1,448 @@
+{
+  "config": {
+    "tag": "Lsmoke",
+    "seed": 0,
+    "curl_b": 14.0,
+    "push_a": 0.0,
+    "waypoints": [
+      [
+        0.0359,
+        0.5248
+      ],
+      [
+        0.382,
+        0.2739
+      ],
+      [
+        0.6029,
+        0.6696
+      ],
+      [
+        0.1968,
+        0.7785
+      ]
+    ],
+    "h_app": 14,
+    "h_seg": [
+      20,
+      20,
+      20
+    ],
+    "patch_seg": 1,
+    "q_jit": 0.15,
+    "null_jit": 0.3,
+    "start_mode": "iso",
+    "patch_sigma": 0.08,
+    "patch_center": null,
+    "push_sigma": 0.08,
+    "push_center": null,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      1.1,
+      0.8
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "timestep": 0.002,
+    "wrap_limit": 3.0,
+    "pool_ou": 1500,
+    "pool_reach": 2500,
+    "exclude_w": 0.1,
+    "n_corridor": 3,
+    "corridor_replan": 5,
+    "ep_len": 14,
+    "n_par": 16,
+    "op_q_range": 0.25,
+    "sigma_u": 0.15,
+    "ou_sigma": 0.7,
+    "ou_theta": 0.15,
+    "collect_k_shoot": 512,
+    "collect_cem_iters": 5,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1200,
+    "fm_steps_boot": 600,
+    "adapt_lr": 0.0003,
+    "n_grad": 6,
+    "replay_frac": 0.5,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5,
+    "vel_pen_mid": 0.0,
+    "commit_lookahead": 20,
+    "react_look": 20,
+    "plan_max_elems": 40000000,
+    "calp": {
+      "1": [
+        256,
+        4
+      ],
+      "2": [
+        256,
+        4
+      ],
+      "3": [
+        256,
+        4
+      ]
+    },
+    "n_cycles": 8,
+    "commit_seg": [
+      2,
+      3,
+      4
+    ],
+    "commit_phrase": 5,
+    "interleave_period": 3,
+    "reselect_every": 3,
+    "reselect_n_cand": 4,
+    "reselect_n_score": 8,
+    "batch": 8,
+    "n_rt": 12,
+    "n_eval": 12,
+    "probe_every": 2,
+    "trace_window": 3,
+    "sigma_practice": 0.15,
+    "sigma_perf": 0.06,
+    "d_fb": 0.1,
+    "n_cand": 6,
+    "n_score": 12,
+    "n_cand_phrase": 6,
+    "n_score_phrase": 12,
+    "n_lib": 2,
+    "pol_hidden": 128,
+    "pol_layers": 2,
+    "pol_lr": 0.001,
+    "pol_steps": 300,
+    "arm": "seg_plan_launch"
+  },
+  "arm": "seg_plan_launch",
+  "complete": true,
+  "setup": {
+    "ref_stale": 0.16157338551305606,
+    "ref_ceiling": 0.1582906169536036,
+    "ref_reactive": 0.21147198103212345,
+    "usable_range": 0.003282768559452448,
+    "exclude_keep_frac": 0.9975,
+    "corr_reach": {
+      "max_abs_corr": 0.6298290038517432,
+      "mean_abs_corr": 0.11676236074374444
+    },
+    "pool_diag": {
+      "n": 3990,
+      "max_abs_corr": 0.6883727688524826,
+      "mean_abs_corr": 0.17001544343399988,
+      "speed_mean": 6.550581455230713,
+      "speed_p95": 15.668653202056882,
+      "max_absq": 2.9912068843841553
+    }
+  },
+  "log": {
+    "cycle": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "t_cum": [
+      151.60000000000002,
+      303.20000000000005,
+      432.00000000000006,
+      507.6000000000001,
+      545.2,
+      628.4000000000001,
+      666.0,
+      703.5999999999999
+    ],
+    "e_rt": [
+      0.20368489275956875,
+      0.1426228653210628,
+      0.14771823742532328,
+      0.1982446700939702,
+      0.19050711057827818,
+      0.1801636569242735,
+      0.2047459265758872,
+      0.1995012990165818
+    ],
+    "e_practice": [
+      0.2263052939390134,
+      0.17297280708178883,
+      0.13984623934486518,
+      0.2628068319180503,
+      0.20424819861637117,
+      0.11601088987115757,
+      0.22412058079643143,
+      0.20940906321290917
+    ],
+    "committed": [
+      0,
+      1,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    "steps_agent": [
+      1480,
+      2960,
+      4440,
+      5920,
+      7400,
+      8880,
+      10360,
+      11840
+    ],
+    "plans_agent": [
+      1200,
+      2400,
+      3372,
+      3812,
+      3872,
+      4388,
+      4448,
+      4508
+    ],
+    "delib_agent": [
+      20684800,
+      41369600,
+      57630720,
+      63569920,
+      65617920,
+      75120640,
+      77168640,
+      79216640
+    ]
+  },
+  "ladder": [
+    {
+      "cycle": 0,
+      "t_cum": 0.0,
+      "n_committed": 0,
+      "steps_agent": 0,
+      "plans_agent": 0,
+      "delib_agent": 0,
+      "e_perf": 0.2852242395287747,
+      "e_perf_mean": 0.22413904477523558,
+      "e_perf_by_seg": [
+        0.14683194304636366,
+        0.45943170776206105,
+        0.24603649144643394
+      ],
+      "e_app": 0.0336157599734394,
+      "n_fb_perf": 61,
+      "t_piece_perf": 7.580000000000001,
+      "e_react": 0.14229948841503118,
+      "e_ball_seg": 0.15098694480318053,
+      "e_ball_phrase": 0.2915342682821551
+    },
+    {
+      "cycle": 2,
+      "t_cum": 303.20000000000005,
+      "n_committed": 1,
+      "steps_agent": 2960,
+      "plans_agent": 2400,
+      "delib_agent": 41369600,
+      "e_perf": 0.17724000385406827,
+      "e_perf_mean": 0.17691792028542752,
+      "e_perf_by_seg": [
+        0.261059228234786,
+        0.23273482631960435,
+        0.022469034204478662
+      ],
+      "e_app": 0.045192800299979366,
+      "n_fb_perf": 42,
+      "t_piece_perf": 5.680000000000001,
+      "e_react": 0.1353466098438813,
+      "e_ball_seg": 0.33290443258084024,
+      "e_ball_phrase": 0.30304812831069505
+    },
+    {
+      "cycle": 4,
+      "t_cum": 507.6000000000001,
+      "n_committed": 3,
+      "steps_agent": 5920,
+      "plans_agent": 3812,
+      "delib_agent": 63569920,
+      "e_perf": 0.22059378991521328,
+      "e_perf_mean": 0.2153178504767931,
+      "e_perf_by_seg": [
+        0.2389458260478209,
+        0.2866527934491788,
+        0.123372827555538
+      ],
+      "e_app": 0.041427918453140256,
+      "n_fb_perf": 4,
+      "t_piece_perf": 1.8800000000000001,
+      "e_react": 0.15242628749561554,
+      "e_ball_seg": 0.2287197486369314,
+      "e_ball_phrase": 0.2783488225061652
+    },
+    {
+      "cycle": 6,
+      "t_cum": 628.4000000000001,
+      "n_committed": 3,
+      "steps_agent": 8880,
+      "plans_agent": 4388,
+      "delib_agent": 75120640,
+      "e_perf": 0.2106037013378116,
+      "e_perf_mean": 0.20051144074075458,
+      "e_perf_by_seg": [
+        0.3196981780924732,
+        0.16476866740126994,
+        0.11083655506903267
+      ],
+      "e_app": 0.03466683369881125,
+      "n_fb_perf": 4,
+      "t_piece_perf": 1.8800000000000001,
+      "e_react": 0.15155915444147197,
+      "e_ball_seg": 0.2038669336529012,
+      "e_ball_phrase": 0.3415532608516135
+    },
+    {
+      "cycle": 8,
+      "t_cum": 703.5999999999999,
+      "n_committed": 3,
+      "steps_agent": 11840,
+      "plans_agent": 4508,
+      "delib_agent": 79216640,
+      "e_perf": 0.19837381067401516,
+      "e_perf_mean": 0.19259030593181495,
+      "e_perf_by_seg": [
+        0.29384016526245527,
+        0.24212468318125274,
+        0.04398858570377235
+      ],
+      "e_app": 0.03630368771676529,
+      "n_fb_perf": 4,
+      "t_piece_perf": 1.8800000000000001,
+      "e_react": 0.1525365215837819,
+      "e_ball_seg": 0.20134988087481398,
+      "e_ball_phrase": 0.36704155703349906
+    }
+  ],
+  "events": [
+    {
+      "kind": "commit",
+      "cycle": 2,
+      "arm": "seg_plan_launch",
+      "seg_lo": 0,
+      "n_segs": 1,
+      "span": 20,
+      "content": "plan_launch",
+      "t_cum": 303.20000000000005,
+      "reason": "schedule",
+      "chosen_score": null,
+      "note": "live content: routing commits, content is planned at launch under the current FM; no audition"
+    },
+    {
+      "kind": "commit",
+      "cycle": 3,
+      "arm": "seg_plan_launch",
+      "seg_lo": 1,
+      "n_segs": 1,
+      "span": 20,
+      "content": "plan_launch",
+      "t_cum": 432.00000000000006,
+      "reason": "schedule",
+      "chosen_score": null,
+      "note": "live content: routing commits, content is planned at launch under the current FM; no audition"
+    },
+    {
+      "kind": "commit",
+      "cycle": 4,
+      "arm": "seg_plan_launch",
+      "seg_lo": 2,
+      "n_segs": 1,
+      "span": 20,
+      "content": "plan_launch",
+      "t_cum": 507.6000000000001,
+      "reason": "schedule",
+      "chosen_score": null,
+      "note": "live content: routing commits, content is planned at launch under the current FM; no audition"
+    }
+  ],
+  "ledger": {
+    "steps_agent": 11840,
+    "steps_instrument": 22200,
+    "fb_agent": 4668,
+    "fb_instrument": 6540,
+    "plans_agent": 4508,
+    "plans_instrument": 6240,
+    "delib_agent": 79216640,
+    "delib_instrument": 115998720,
+    "t_priced": 703.5999999999999,
+    "t_by_kind": {
+      "practice": 196.64,
+      "metering": 385.68000000000006,
+      "practice_interleave": 121.28
+    },
+    "n_by_kind": {
+      "practice": {
+        "steps": 3552,
+        "fb": 1256,
+        "plans": 1208,
+        "delib": 21381120
+      },
+      "metering": {
+        "steps": 7104,
+        "fb": 2436,
+        "plans": 2340,
+        "delib": 41287680
+      },
+      "practice_interleave": {
+        "steps": 1184,
+        "fb": 976,
+        "plans": 960,
+        "delib": 16547840
+      }
+    }
+  },
+  "summary": {
+    "final_e_perf": 0.19837381067401516,
+    "final_e_react": 0.1525365215837819,
+    "final_e_ball_seg": 0.20134988087481398,
+    "final_e_ball_phrase": 0.36704155703349906,
+    "final_e_perf_by_seg": [
+      0.29384016526245527,
+      0.24212468318125274,
+      0.04398858570377235
+    ],
+    "t_priced": 703.5999999999999,
+    "n_commits": 3,
+    "commit_cycles": [
+      2,
+      3,
+      4
+    ],
+    "n_interleaved": 2,
+    "n_reselect": 0,
+    "fb_per_piece_perf": 4,
+    "post_commit_sd": 0.008548691497334887,
+    "post_commit_drift": 0.0012566289226116079
+  }
+}

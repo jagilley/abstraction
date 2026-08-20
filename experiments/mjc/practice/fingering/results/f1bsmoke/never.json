@@ -1,0 +1,310 @@
+{
+  "config": {
+    "tag": "f1bsmoke",
+    "seed": 0,
+    "curl_b": 14.0,
+    "push_a": 0.0,
+    "w1": [
+      0.3063,
+      0.4778
+    ],
+    "w2": [
+      0.7463,
+      0.4778
+    ],
+    "h_app": 14,
+    "h_drill": 20,
+    "q_jit": 0.15,
+    "null_jit": 0.3,
+    "start_mode": "iso",
+    "patch_sigma": 0.08,
+    "patch_center": null,
+    "push_sigma": 0.08,
+    "push_center": null,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      1.1,
+      0.8
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "timestep": 0.002,
+    "wrap_limit": 3.0,
+    "pool_ou": 1500,
+    "pool_reach": 2500,
+    "exclude_w": 0.1,
+    "n_corridor": 3,
+    "corridor_replan": 5,
+    "ep_len": 14,
+    "n_par": 16,
+    "op_q_range": 0.25,
+    "sigma_u": 0.15,
+    "ou_sigma": 0.7,
+    "ou_theta": 0.15,
+    "collect_k_shoot": 512,
+    "collect_cem_iters": 5,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1200,
+    "fm_steps_boot": 600,
+    "adapt_lr": 0.0003,
+    "n_grad": 6,
+    "replay_frac": 0.5,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.5,
+    "n_cycles": 6,
+    "commit_cycle": 3,
+    "batch": 8,
+    "n_rt": 12,
+    "n_eval": 12,
+    "probe_every": 2,
+    "trace_window": 3,
+    "sigma_practice": 0.15,
+    "sigma_perf": 0.06,
+    "d_fb": 0.1,
+    "bench_alpha": 0.2,
+    "sil_c": 0.06,
+    "sil_cv": 0.1,
+    "sil_W": 2,
+    "sil_hold": 2,
+    "sil_min_cycle": 1,
+    "cert_cal": 3,
+    "max_recert": 1,
+    "n_cand": 6,
+    "n_score": 16,
+    "n_lib": 2,
+    "pol_hidden": 128,
+    "pol_layers": 2,
+    "pol_lr": 0.001,
+    "pol_steps": 300,
+    "commit_early_cycle": 3,
+    "commit_mastery_cycle": 6,
+    "interleave_period": 3,
+    "reselect_every": 4,
+    "reselect_n_cand": 32,
+    "reselect_n_score": 48,
+    "cell_geometry": true,
+    "persist_commit": true,
+    "commit_rationale": "b14 CAL-D: oscillation envelope contracts 2.6x by c10 (span 0.108 -> 0.041); commit at c20 with a 6-cycle (144-trace) pool spanning ~2-3 periods",
+    "mastery_rationale": "round-1 never ballistic, trailing-3 mean, plateau 0.0384+-0.0026; first sustained entry within 1 sd (<=0.0410) is c51 (reactive curve would have said c12 -- wrong clock)",
+    "interleave_rationale": "round-1 rot onset at +7 to +10 pure-committed cycles (0.85x -> 2.04x vs never), saturating 2-3x; period 3 caps consecutive committed cycles at 2",
+    "arm": "never"
+  },
+  "arm": "never",
+  "complete": true,
+  "setup": {
+    "ref_stale": 0.2391314284917196,
+    "ref_ceiling": 0.16353326510827465,
+    "ref_reactive": 0.19425313781969206,
+    "usable_range": 0.07559816338344494,
+    "exclude_keep_frac": 0.99825,
+    "corr_reach": {
+      "max_abs_corr": 0.6419019771775298,
+      "mean_abs_corr": 0.11519276624651632
+    },
+    "pool_diag": {
+      "n": 3993,
+      "max_abs_corr": 0.6925326375993555,
+      "mean_abs_corr": 0.17214443607418742,
+      "speed_mean": 6.697299480438232,
+      "speed_p95": 15.675734519958496,
+      "max_absq": 2.995882034301758
+    }
+  },
+  "log": {
+    "cycle": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "t_cum": [
+      55.6,
+      111.2,
+      166.8,
+      222.40000000000003,
+      278.00000000000006,
+      333.6000000000001
+    ],
+    "e_rt": [
+      0.16672850665106206,
+      0.11277722937093615,
+      0.08203530406388987,
+      0.03193755950571827,
+      0.03183121839248458,
+      0.04174557966199205
+    ],
+    "b": [
+      0.16672850665106206,
+      0.15593825119503688,
+      0.14115766176880748,
+      0.11931364131618964,
+      0.10181715673144863,
+      0.08980284131755731
+    ],
+    "delta": [
+      0.0,
+      0.053951277280125914,
+      0.073902947131147,
+      0.1092201022630892,
+      0.08748242292370506,
+      0.06007157706945658
+    ],
+    "scale": [
+      0.16672850665106206,
+      0.16672850665106206,
+      0.15709612442782972,
+      0.2071938689860013,
+      0.207300210099235,
+      0.207300210099235
+    ],
+    "sil_run": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "neg_run": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "e_practice": [
+      0.22007454340101718,
+      0.20164177336561717,
+      0.08526955688949744,
+      0.07143475612270525,
+      0.05222366826024537,
+      0.06442404693302214
+    ],
+    "committed": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "steps_agent": [
+      680,
+      1360,
+      2040,
+      2720,
+      3400,
+      4080
+    ]
+  },
+  "ladder": [
+    {
+      "cycle": 0,
+      "t_cum": 0.0,
+      "committed": false,
+      "steps_agent": 0,
+      "e_perf": 0.15375352318610305,
+      "e_perf_mean": 0.17854535024938492,
+      "t_piece_perf": 2.78,
+      "e_app": 0.0959509251889186,
+      "e_react": 0.16559995982132955,
+      "e_ball": 0.16310946528963882
+    },
+    {
+      "cycle": 2,
+      "t_cum": 111.2,
+      "committed": false,
+      "steps_agent": 1360,
+      "e_perf": 0.14154466499947144,
+      "e_perf_mean": 0.1286523279147726,
+      "t_piece_perf": 2.78,
+      "e_app": 0.09857872011858712,
+      "e_react": 0.15920477698627908,
+      "e_ball": 0.19690465520181177
+    },
+    {
+      "cycle": 4,
+      "t_cum": 222.40000000000003,
+      "committed": false,
+      "steps_agent": 2720,
+      "e_perf": 0.11402148852588379,
+      "e_perf_mean": 0.11023651691050607,
+      "t_piece_perf": 2.78,
+      "e_app": 0.09479948793945991,
+      "e_react": 0.07539474282343087,
+      "e_ball": 0.19998803354455247
+    },
+    {
+      "cycle": 6,
+      "t_cum": 333.6000000000001,
+      "committed": false,
+      "steps_agent": 4080,
+      "e_perf": 0.12329895154648195,
+      "e_perf_mean": 0.10490330204571431,
+      "t_piece_perf": 2.78,
+      "e_app": 0.08219761524027312,
+      "e_react": 0.1178294972917048,
+      "e_ball": 0.24849562886624987
+    }
+  ],
+  "events": [],
+  "ledger": {
+    "steps_agent": 4080,
+    "steps_instrument": 6936,
+    "fb_agent": 2520,
+    "fb_instrument": 2532,
+    "t_priced": 333.6000000000001,
+    "t_by_kind": {
+      "practice": 133.44000000000003,
+      "metering": 200.16000000000003
+    },
+    "n_by_kind": {
+      "practice": {
+        "steps": 1632,
+        "fb": 1008
+      },
+      "metering": {
+        "steps": 2448,
+        "fb": 1512
+      }
+    }
+  },
+  "summary": {
+    "final_e_perf": 0.12329895154648195,
+    "final_e_react": 0.1178294972917048,
+    "final_e_ball": 0.24849562886624987,
+    "t_priced": 333.6000000000001,
+    "optimism_gap": null,
+    "certificate_would_fire": null,
+    "recerts": 0,
+    "commit_at": 3,
+    "n_interleaved": 0,
+    "n_reselect": 0,
+    "post_commit_sd": null,
+    "post_commit_drift": null
+  }
+}

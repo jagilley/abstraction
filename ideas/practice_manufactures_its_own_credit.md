@@ -641,4 +641,48 @@ undefined from below). The monolith corollary sharpens accordingly: a training r
 world drifts in one currency needs one organ, and is right to. Single seed; ranks are the claim;
 the seed pair is the named hardening.
 
+---
+
+## 20. What we ran (2026-08-19 → 08-20): the port back — [`fingering`](../experiments/mjc/practice/fingering/README.md) × [`legato`](../experiments/mjc/practice/legato/README.md)
+
+**Sources of truth**: [`experiments/mjc/practice/fingering/README.md`](../experiments/mjc/practice/fingering/README.md)
+and [`experiments/mjc/practice/legato/README.md`](../experiments/mjc/practice/legato/README.md)
+(arc index: [`experiments/mjc/practice/README.md`](../experiments/mjc/practice/README.md)).
+**This section is a pointer, not a summary of record.**
+
+Why the move: the étude's §12 closed on a precondition MuJoCo could not then express — boundaries
+must carry information — and §§13–19 settled the machinery on RHM. The port runs the étude's own
+named next round on an n=3 arm whose redundancy makes hand-over *posture* a genuine boundary
+variable, with everything the detour settled (E-3b selection, provisional commitment, δ as
+detector, tier-C on-policy collection, priced deliberation).
+
+Where the doc's claims landed. **§3½ is vindicated in its strongest form, against our own first
+build**: we compiled frozen content (stored renditions) and live content under committed routing —
+one plan from the current FM at launch, flown open-loop, which is §3½'s "an FM bet along a
+committed corridor" — dominates every frozen op 1.6× at 2.3× less priced time *within the model's
+composition horizon*, self-maintaining its own diet. The frozen-content pathologies measured en
+route (diet-narrowing rot; maintenance restoring the model while buying zero performance; only
+scheduled re-selection converting it) are compensation for freezing bytes instead of routing —
+and they surface a **fifth currency for §19's type system: competence-news**, the staleness of a
+committed unit relative to a still-improving self, invisible to degradation detectors by
+construction and consumed only by a scheduled re-audit. **§2(b) is now measured rather than
+derived**: past the composition horizon (~21 steps; the phrase is 3×), the taxonomy crosses over —
+frozen measured chains beat live planning 1.83×, and the fusion control attributes it (welding is
+free for measured content, 2.2× for live plans): *execution is a perfect model of itself*, so
+chunks extend committed execution past the model's reach rather than beating planning inside it.
+**§6's rarity law reproduces on a priced axis** (never-compiling wins raw error at every feedback
+and deliberation price on short/easy content). The certificate demotion hardens (fires at ~c10
+against measured open-loop mastery at c51–c72, every arm, every run — it reads the earliest of
+three clocks), and §16's level-(k+1) law materializes on the plant: the segment library
+manufactures the phrase pool's addressable diversity (audition said keying a chain is near-inert;
+the closed loop paid 1.34×). New and not anticipated here: **pool coherence** as the mechanism
+variable behind §12's averaging law (damage monotone in it, 4/4 cells × 2 commits); **no
+controller-level seam law** (lookahead across a seam you will not control is monotonically
+harmful — re-grounding supersedes anticipating); and a methodology export — the cost function of
+a multi-segment piece has a two-sided failure mode (ignore waypoints / ignore handoffs), each side
+crippling a different arm of exactly this comparison, so **calibrate to preserve the measurement
+axis under a criterion neutral across granularities**. Single seed throughout (a seed pair was
+cancelled on GPU budget); ranks are the claim, with two-horizon sign consistency and the
+double-sided fusion control as the triangulation.
+
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

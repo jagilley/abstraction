@@ -359,6 +359,45 @@ class ArmEnv:
                                 / (2.0 * sig ** 2)))
         self.data.qfrc_applied[:] += amp * self._noise_rng.standard_normal(self.model.nv)
 
+    def _apply_push_field(self, pf: dict):
+        """A SPATIALLY-LOCAL, POSITION-dependent RADIAL force at the end effector -- a soft
+        obstacle (`a < 0` repels, `a > 0` attracts):
+
+            F_tip = a * u_hat * exp(-r^2 / 2 sigma^2),   u_hat = (tip - center) / r
+            qfrc += J(q)^T F_tip
+
+        Why this shape, and why it is NOT a contact. `practice/fingering/` needs a world in which
+        *valid renditions form more than one mode* -- two ways round the obstruction whose
+        position-wise MEAN is not a way round it at all. Kinematic redundancy alone may or may not
+        deliver that (it is measured, not assumed: gate G2); this is the sanctioned escalation.
+        A real geom would deliver it via CONTACT, which cut #1 established is the stiff,
+        near-discontinuous regime and cut 4b established is open-loop-INCOMPENSABLE -- it would
+        saturate ballistic control and make commitment unmeasurable. A Gaussian-gated radial force
+        is smooth everywhere, so it stays feedforward-compensable (a correct FM plans around it)
+        while still splitting the solution set: going left and going right are both cheap, and
+        going through the middle is not.
+
+        Unlike `_apply_curl_field` this is INDEPENDENT of velocity, so it acts on a body at rest --
+        which is what makes it an obstruction rather than a viscous field. Uses the exact analytic
+        `mj_jacSite` Jacobian, so no approximation enters.
+
+        Additive and off by default: with no `push_fields` key nothing is written and `step()` is
+        byte-identical to the pre-existing arm (gated by `on_policy/verify_backcompat.py`).
+        """
+        import mujoco
+
+        mujoco.mj_jacSite(self.model, self.data, self._jacp, self._jacr, self.tip_sid)
+        J = self._jacp[:2, :]
+        tip = self.data.site_xpos[self.tip_sid][:2]
+        c = np.asarray(pf.get("center", (0.0, 0.0)), dtype=np.float64)
+        d = np.array([tip[0] - c[0], tip[1] - c[1]], dtype=np.float64)
+        r = float(np.linalg.norm(d))
+        if r < 1e-9:
+            return
+        sig = float(pf.get("sigma", 0.3))
+        amp = float(pf.get("a", 0.0)) * float(np.exp(-r ** 2 / (2.0 * sig ** 2)))
+        self.data.qfrc_applied[:] += J.T @ (amp * (d / r))
+
     # ---------------------------------- API ----------------------------------------- #
 
     def tip_pos(self) -> np.ndarray:
@@ -414,8 +453,11 @@ class ArmEnv:
         # dict with its own center/sigma, so several drift/noise regions can sit in one workspace.
         curl_list = self.dgp.get("curl_fields")
         noise_list = self.dgp.get("noise_fields")
+        # LIST of soft obstacles (see `_apply_push_field`). Absent by default, so every prior path
+        # is byte-identical.
+        push_list = self.dgp.get("push_fields")
         active = (curl is not None or trot is not None or jnoise is not None
-                  or curl_list or noise_list)
+                  or curl_list or noise_list or push_list)
         for _ in range(n_sub):
             if active:
                 self.data.qfrc_applied[:] = 0.0
@@ -431,6 +473,9 @@ class ArmEnv:
                 if noise_list:
                     for nf in noise_list:
                         self._apply_gated_noise(nf)
+                if push_list:
+                    for pf in push_list:
+                        self._apply_push_field(pf)
             mujoco.mj_step(self.model, self.data)
         s = self.get_state()
         # Never let a diverged sim pass as data. A light passive link can violate the

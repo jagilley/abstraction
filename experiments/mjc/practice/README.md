@@ -27,6 +27,16 @@ below — it is the first node in this arc with *sequence* structure:
 |---|---|---|---|
 | étude arc | [`etude/`](etude/) | compilation of mastered segments into committed ballistic units: the δ-silence gate, the compile op itself, and sequential assembly | **written up** — sequential assembly with seam-matched selection dominates never-compiling on both axes, 3/3 seeds |
 
+Two further nodes (2026-08-19 → 08-20) port the RHM practice arc back to this substrate — the
+**fingering/legato arc**, the étude's own named next round run with everything the RHM detour
+settled (state-conditioned commitment, the three-coordinate seam law, certificate demotion,
+typed maintenance):
+
+| run | location | what varies | seeds |
+|---|---|---|---|
+| fingering | [`fingering/`](fingering/README.md) | the compile-op taxonomy on a boundary that carries information: frozen (fixed/keyed/regressed/averaged) vs **live** content under committed routing, timing × maintenance, priced deliberation | **written up** — 1 seed/run; f1c's `never` bit-reproduces f1b's |
+| legato | [`legato/`](legato/README.md) | committed **span** vs the model's composition horizon: segment vs phrase granularity × live vs measured content, with a fusion control | **written up** — 1 seed (seed pair cancelled, GPU budget); ranks + two-horizon signs + double-sided control |
+
 ## Shared substrate
 
 All four run on the puck-free corridor world (`../pusher_env.py`, damping 2.0 — the `ballistic`
@@ -210,6 +220,40 @@ the two measured ways to get this wrong); committed units never degrade here and
 hierarchy needs boundaries that carry information, which sets the next round's design. Full
 findings, retractions and per-run tables: [`etude/README.md`](etude/README.md).
 
+### fingering — state-conditioned commitment and the completed op taxonomy (2026-08-19 → 08-20, written up)
+
+**Goal**: run the étude's named next round — commitment on boundaries that carry information — on
+the n=3 arm (arrival-*posture* spread on the redundancy manifold), with the RHM arc's settled
+machinery: E-3b selection, provisional commitment, δ as detector, on-policy collection (tier C),
+priced deliberation.
+
+**Headline**: the RHM laws reproduce where they were born (state-conditioned commitment 1.34×,
+capturing 41% of a 3.27× per-state oracle; averaging damage monotone in **pool coherence**;
+maintenance and refresh strictly separable, with **competence-news** the currency only a scheduled
+re-audit consumes) — and then the taxonomy's completion inverts the frame: **live content under
+committed routing (plan-at-launch) dominates every frozen op 1.6× at 2.3× less priced time and
+self-maintains its own diet**. Within the model's reach, commit the *routing*, not the content.
+`never` wins outright at every feedback and deliberation price (§6 rarity, on a priced axis); the
+certificate fires at c10 against measured mastery c51 in every arm of every run. Full tables:
+[`fingering/README.md`](fingering/README.md).
+
+### legato — the composition-horizon crossover (2026-08-20, written up)
+
+**Goal**: extend the taxonomy past the model's reach — a 4-leg loop whose phrase (60 steps) is ~3×
+the measured composition horizon (~21) — and test whether frozen, measured content re-enters
+there, with a fusion control and a seam-cost calibration chosen by a pre-fixed neutral criterion.
+
+**Headline**: **the crossover** — live content wins inside the horizon (1.25×), frozen measured
+chains win beyond it (1.83×), and fusing is free for measured content (−0.004) while catastrophic
+for live plans (+0.102, 2.2×): *a measured chain was produced by the body, so it carries no
+composition error*. Chunks extend committed execution past the model's reach rather than beating
+planning inside it — §2(b) measured. Plus: a seam cannot be pre-handled (launch keying near-inert
+in audition, lookahead monotonically harmful) yet the closed-loop keying gain is 1.34× because
+**the segment-level library manufactures the phrase pool's diversity** — `recital`'s level-(k+1)
+law on a physical plant. Single seed (seed pair cancelled — GPU budget); `never` still dominates
+raw error; steady-state per-traversal economics favor the fused chain on both axes. Full tables
+and the F1–F5 findings record: [`legato/README.md`](legato/README.md).
+
 ## Reproduce
 
 ```bash
@@ -244,6 +288,8 @@ Modal volume (`mujoco-control-data`): `/data/bridge_assembly/dsw_<cell>_s<seed>/
 ## Per-node file indexes
 
 [`etude/FILES.md`](etude/FILES.md) ·
+[`fingering/FILES.md`](fingering/FILES.md) ·
+[`legato/FILES.md`](legato/FILES.md) ·
 [`estimability/FILES.md`](estimability/FILES.md) ·
 [`priced_plasticity/FILES.md`](priced_plasticity/FILES.md) ·
 [`aleatoric_flip/FILES.md`](aleatoric_flip/FILES.md) ·

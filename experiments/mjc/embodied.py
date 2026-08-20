@@ -140,7 +140,7 @@ class Body:
         self.env.data = self._orig_data
 
     def reset(self, rng: np.random.Generator, q_center, q_range: float,
-              v0_std: float = 0.0, which=None) -> np.ndarray:
+              v0_std: float = 0.0, which=None, q0=None, qd0=None) -> np.ndarray:
         """Start (or restart) episodes at a fresh posture.
 
         A reset is the one remaining teleport, and it is honest to say so: a body does not get put
@@ -150,16 +150,30 @@ class Body:
 
         `q_center`/`q_range` govern the EPISODE-START distribution here, not every sample -- which
         is the substantive difference from teleport collection, where they governed both.
+
+        `q0` / `qd0` (both optional, both `None` by default, so every prior call is byte-identical
+        including its RNG consumption) supply the start postures EXPLICITLY, indexed by position in
+        `which`. They exist because a *piece* is a fixed object: `practice/fingering/` needs every
+        arm to start its run-throughs from the same held-out geometry, and needs start postures
+        drawn along the arm's self-motion manifold rather than from an isotropic box. That is still
+        a reset, still the sanctioned teleport, still counted -- only the distribution it draws
+        from moves out of this method and into the caller.
         """
         idx = range(self.n_par) if which is None else list(which)
         idx = [int(i) for i in idx]
         if self.reset_cost:
             self._charge(self.reset_cost * len(idx))
         qc = np.asarray(q_center, dtype=np.float64)[:self.nq]
-        for b in idx:
-            q = qc + rng.uniform(-q_range, q_range, self.nq)
-            qd = (rng.normal(0.0, v0_std, self.nv) if v0_std > 0
-                  else np.zeros(self.nv, dtype=np.float64))
+        q0 = None if q0 is None else np.asarray(q0, dtype=np.float64)
+        qd0 = None if qd0 is None else np.asarray(qd0, dtype=np.float64)
+        for j, b in enumerate(idx):
+            if q0 is not None:
+                q = q0[j, :self.nq]
+                qd = (np.zeros(self.nv, dtype=np.float64) if qd0 is None else qd0[j, :self.nv])
+            else:
+                q = qc + rng.uniform(-q_range, q_range, self.nq)
+                qd = (rng.normal(0.0, v0_std, self.nv) if v0_std > 0
+                      else np.zeros(self.nv, dtype=np.float64))
             self._select(b)
             self.env.set_state(q, qd)        # harness-side, not agent-side: see class docstring
             self._states[b] = self.env.get_state()
