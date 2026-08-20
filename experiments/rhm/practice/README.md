@@ -230,6 +230,34 @@ come from outside the loop**. (One correction on the record: round 1's `wall_fas
 a checkpoint-grid artifact; corrected +0.019, aligning the endogenous reader with `merge/`'s
 substitutes-on-task-error.)
 
+### [`teacher_slot/`](teacher_slot/README.md) — the teacher slot decomposed: gauge-choice, the learner's own currency, and the verbal channel (2026-08-20)
+
+**Goal**: split `fourwall/lm`'s ending — the merge op *and its justification* must come from
+outside the loop — into testable parts: will a minimal outer loop fund the crossing given the
+right currency (Rung A); can the currency be the learner's own next-level yield (A½); can a
+verbal reasoner make the call pre-rotation, when nothing in-world marks the key as spurious
+(B1); and was the arc's inert plant just a missing backprop handle (`handle/`).
+
+**Finding**: the teacher's scarce part is not judgment but **which gauge is consulted**. A
+thermostat-grade paired-trial rule reading any one-level-up currency — the pathway readout or
+the learner's own d5 next-level yield (at a measured 13× read premium, 9.6% of budget) — merges
+at 1500–2000, *before the first rotation*, with zero bail-outs, and an unrotated control merges
+identically; the same rule reading the learner's own experienced loss **refuses the merge all
+five times it is offered**, posting nearly the arc's best within-level lifetime ledger (1.4690,
+second only to `true_wall`) while ending threefold hollow — the ledger doesn't fail to fund the
+crossing, it votes it down optimally. A blinded text-trained reasoner (pinned Opus, neutral
+vocabulary, 0/3 removals on a dead-token control, 0/2 on a late join) then removes the key 6/6
+sessions before any disruption exists — including 3/3 on the task-only information set the
+numeric refuser had — on stated grounds about what the steering readout should *mean* ("I would
+rather pay a visible loss increase now than carry an invisible dependency that I am the sole
+reason still works"), spontaneously constructing a span-A-vs-span-B contrast instrument the
+numeric loop lacked: the teacher slot is a gauge-choice port, and post-ratchet text carries the
+priors that fill it. Sideline: giving the ratchet's earned macros real vocabulary slots makes
+the inert plant move *negatively*, dose-ordered by engagement — a gradient path buys
+interference, not the hoped-for plant learning. Two corrections queued for the fwlm ledger
+(the `wall` lifetime integral was grid-inflated; never-merge's advantage is larger than
+published). Single seed; one world; A-m and B2 queued.
+
 ## Reproduce
 
 ```bash

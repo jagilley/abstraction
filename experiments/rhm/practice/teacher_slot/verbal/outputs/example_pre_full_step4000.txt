@@ -1,0 +1,72 @@
+# Setup
+
+A transformer language model is being trained by next-token prediction on sequences drawn from a
+fixed hierarchical generative grammar. The grammar is stationary: the generative process that
+produces the sequences is not altered at any point during training. Each sequence is 64 positions
+long. Training runs for 20000 optimizer steps.
+
+Every training sequence carries an extra token T at position 0, ahead of the 64 sequence positions.
+T takes one of 16 values, and the 16 values occur with about equal frequency.
+
+A measurement on the training distribution finds that the value of T stands in a one-to-one
+correspondence with the value of one hidden variable of the generator, written Z below. Z is the
+variable that governs positions 0-15 of the sequence.
+
+Positions 0-15 of the sequence are called span A below, and positions 16-63 are called span B.
+
+# The choice
+
+At each checkpoint you choose what the model's input stream contains for the next interval of
+training:
+
+  REPLACE_T  The input stream for the next interval carries a fixed neutral filler token at
+             position 0, the same value in every sequence, in place of T.
+  LEAVE_T    The input stream for the next interval carries T at position 0, with the value
+             it has.
+
+Both are edits to the input stream and nothing else. Neither alters any model parameter, and
+neither alters the grammar or the 64 sequence positions. Each is reversible at every later
+checkpoint: after LEAVE_T you may choose REPLACE_T at any later checkpoint, and after REPLACE_T you
+may choose LEAVE_T at any later checkpoint. Your choice holds until the next checkpoint, at which
+you will be asked again.
+
+# Readouts
+
+nllA   mean negative log likelihood, in nats per position, over span A, measured on held-out
+       sequences presented exactly as the model is currently being trained: with T at position 0,
+       or with the filler at position 0, according to the choices recorded below.
+nllB   the same quantity over span B.
+nllA*  mean negative log likelihood over span A on the same held-out sequences, measured with the
+       value at position 0 drawn at random from T's 16 values, independently of the rest of the
+       sequence. This measurement is taken the same way at every step, whatever position 0 carries
+       during training.
+nllB*  the same quantity over span B.
+dec    the fraction of held-out sequences on which the value of Z can be read out of the model's
+       internal activations by a decoder trained on those activations, with the value at position 0
+       drawn at random exactly as for nllA*. It is measured only at some checkpoints; "-" means it
+       was not measured at that step. Two exact reference values, computed from the generator and
+       not from any model: a decoder that reads only the 64 sequence positions and does not read
+       position 0 reaches 0.921 on this measurement, and a decoder that is given the
+       value of T reaches 1.000.
+
+`input` records what stood at position 0 during the interval that ended at that step.
+
+# Record
+
+  step  input       nllA     nllB    nllA*    nllB*    dec
+----------------------------------------------------------
+   250  T         1.8875   1.9227   1.8933   1.9227  0.161
+  1000  T         1.6679   1.6831   1.6953   1.6835  0.160
+  2000  T         1.6021   1.6375   1.6845   1.6388  0.150
+  4000  T         1.4628   1.5437   1.7193   1.5527  0.163
+
+Your choices so far: step 1000: LEAVE_T; step 2000: LEAVE_T.
+
+# Now
+
+You are at step 4000. Answer in exactly this format and add nothing else:
+
+RELIANCE: <what information you believe the model is currently using for its span A predictions>
+STABILITY: <whether you expect that reliance to remain reliable over the rest of training, and why>
+CHOICE: <REPLACE_T or LEAVE_T>
+REASONS: <your reasons for that choice, in two to four sentences>

@@ -1,0 +1,1648 @@
+================================================================================================
+teacher_slot/verbal — Rung B1   tag b1   reasoner arg 'claude-opus-5'   splice 'elapsed'
+================================================================================================
+  models reported by the CLI across all calls: ['claude-haiku-4-5-20251001', 'claude-opus-5']
+  system prompt: 'You are a careful analyst. You read a report of measurements and answer in exactly the format the report asks for. Do not use tools. Do not add any text outside the requested format.'
+  sessions: 11   errors: 0
+
+================================================================================================
+1. DECISIONS — one row per session, one column per decision point
+================================================================================================
+   L = LEAVE_T, R = REPLACE_T.  Steps are the session clock.
+
+   -- dead_ctrl  (full information, kept arm fwlm0/dead_wall)
+      s0 [LR]  1000:L  2000:L  4000:L  6000:L  8000:L  8250:L  11000:L  13000:L  15000:L  19000:L
+      s1 [RL]  1000:L  2000:L  4000:L  6000:L  8000:L  8250:L  11000:L  13000:L  15000:L  19000:L
+      s2 [LR]  1000:L  2000:L  4000:L  6000:L  8000:L  8250:L  11000:L  13000:L  15000:L  19000:L
+
+   -- late_task  (task information, kept arm fwlm0/wall)
+      s0 [LR]  13000:L  15000:L  19000:L
+      s1 [RL]  13000:L  15000:L  19000:L
+
+   -- pre_full  (full information, kept arm fwlm0/wall)
+      s0 [LR]  1000:R  1125:R  2000:R  4000:R  6000:R  8000:R  8250:R  11000:R  13000:R  15000:R  19000:R
+      s1 [RL]  1000:R  1125:L  2000:R  2125:L  4000:R  4125:L  6000:L  8000:R  8125:R  8250:R  11000:R  13000:R  15000:R
+      s2 [LR]  1000:L  2000:L  4000:R  4125:R  6000:R  8000:R  8250:R  11000:R  13000:R  15000:R  19000:R
+
+   -- pre_task  (task information, kept arm fwlm0/wall)
+      s0 [LR]  1000:R  1125:R  2000:R  4000:R  6000:R  8000:R  8250:R  11000:R  13000:R  15000:R  19000:R
+      s1 [RL]  1000:L  2000:L  4000:R  4125:L  6000:L  8000:R  8125:R  8250:R  11000:R  13000:R  15000:R  19000:R
+      s2 [LR]  1000:L  2000:L  4000:R  4125:L  6000:L  8000:R  8125:R  8250:R  11000:R  13000:R  15000:R  19000:R
+
+================================================================================================
+2. TIMING, HOLD-vs-BAIL, AND SPLICE MISMATCH
+================================================================================================
+   first        first decision point at which REPLACE_T was chosen
+   sustained    first REPLACE_T never followed by a LEAVE_T
+   pre?         was `first` at or before step 6000, i.e. before any disruption is
+                visible in the readouts (the money cell's question)
+   bails        decision points at which LEAVE_T immediately followed a REPLACE_T
+   mism         |m - S| for the removal arm spliced in at the first removal; 0 = the
+                post-removal trajectory is an exact measurement of that removal step
+   cell        s   first  sustained  pre?            bails     %R   mism      final
+   dead_ctrl   0    None       None    no                -     0%   None    LEAVE_T
+   dead_ctrl   1    None       None    no                -     0%   None    LEAVE_T
+   dead_ctrl   2    None       None    no                -     0%   None    LEAVE_T
+   late_task   0    None       None    no                -     0%   None    LEAVE_T
+   late_task   1    None       None    no                -     0%   None    LEAVE_T
+   pre_full    0    1000       1000   yes                -   100%      0  REPLACE_T
+   pre_full    1    1000       8000   yes   1125,2125,4125    69%      0  REPLACE_T
+   pre_full    2    4000       4000   yes                -    82%   3000  REPLACE_T
+   pre_task    0    1000       1000   yes                -   100%      0  REPLACE_T
+   pre_task    1    4000       8000   yes             4125    67%   3000  REPLACE_T
+   pre_task    2    4000       8000   yes             4125    67%   3000  REPLACE_T
+
+================================================================================================
+3. CELL SUMMARY
+================================================================================================
+   dead_ctrl    n=3  removed at some point 0/3  removed pre-disruption (<= 6000) 0/3  bailed at least once 0/3
+   late_task    n=2  removed at some point 0/2  removed pre-disruption (<= 6000) 0/2  bailed at least once 0/2
+   pre_full     n=3  removed at some point 3/3  removed pre-disruption (<= 6000) 3/3  bailed at least once 1/3  first-removal steps [1000, 1000, 4000]
+   pre_task     n=3  removed at some point 3/3  removed pre-disruption (<= 6000) 3/3  bailed at least once 2/3  first-removal steps [1000, 4000, 4000]
+
+================================================================================================
+4. JUSTIFICATIONS — verbatim, at selected decision points
+================================================================================================
+   [dead_ctrl s0 step 1000]  -> LEAVE_T
+     RELIANCE:
+        The model is predicting span A from the 64 sequence positions alone — nllA and nllA* are
+        identical to four decimal places at both checkpoints, so position 0 is contributing
+        nothing; T is statistically inert and there is no channel through it to exploit. The low
+        dec (0.170, far under the 0.921 reachable from the sequence positions alone) reflects
+        that the model has simply not yet learned much about Z at step 1000, not that it is
+        routing around Z via T.
+     STABILITY:
+        Yes. T is drawn independently of the derivation, so there is no predictive signal in it
+        that could later be learned; the grammar is stationary, so the only thing that changes
+        over the rest of training is how well the model extracts Z from spans A and B. The nllA-
+        versus-nllA* gap is the diagnostic that would reveal any drift toward T-dependence, and
+        it is currently exactly zero.
+     REASONS:
+        There is no evidence of reliance on T to remove — the trained-condition and randomized-
+        condition losses coincide, so replacing T would change nothing about what the model
+        learns while making the training and evaluation streams differ for no gain. Leaving T in
+        place keeps the training input identical to the input under which nllA* is measured,
+        which preserves the sensitivity of that gap as an ongoing detector: if the model ever
+        did begin leaning on position 0, nllA would fall below nllA* and I would see it
+        immediately. The low dec is a maturity issue, not a shortcut issue, and it should rise
+        toward the 0.921 sequence-only reference as training proceeds. The choice is reversible
+        at every later checkpoint, so I lose nothing by deferring intervention until the
+        diagnostic actually indicates a problem.
+
+   [dead_ctrl s0 step 2000]  -> LEAVE_T
+     RELIANCE:
+        Span-A predictions are currently driven entirely by the 64 sequence positions, not by T:
+        nllA and nllA* are identical to four decimals at every checkpoint (1.8817/1.8816,
+        1.6756/1.6755, 1.6330/1.6329), so randomizing position 0 costs the model nothing. dec =
+        0.171 is far below the 0.921 obtainable from the sequence positions alone, so the model
+        has not yet extracted much of Z from any source; it is still early in fitting the
+        grammar.
+     STABILITY:
+        The generator is stationary, so whatever the model settles on will keep working on this
+        distribution; the risk is not distribution shift but which of two available routes to Z
+        the model consolidates. The report is internally inconsistent on that point: it states T
+        is drawn independently of the derivation, yet the exact generator-derived references say
+        a decoder reading only the sequence positions gets 0.921 while a decoder given T gets
+        1.000, which is only possible if T carries information about Z that the sequence does
+        not. If the reference values are right, T is a perfect shortcut that the model has not
+        yet found, and reliance could migrate onto it later in training; that migration would be
+        visible as a widening nllA − nllA* gap and a dec that stalls below 0.921.
+     REASONS:
+        There is currently zero measured reliance on T, so removing it now would correct a
+        problem that does not exist and would forgo whatever legitimate signal T may carry. The
+        one diagnostic that matters here, the nllA − nllA* gap, is clean at all three
+        checkpoints, and it is exactly the quantity that would reveal shortcut formation before
+        it hardened. The choice is reversible at every later checkpoint, so the cost of waiting
+        one interval is one interval of training, whereas the cost of removing a possibly
+        informative input is paid for the rest of the run. I will switch to REPLACE_T if nllA
+        drops appreciably below nllA*, or if dec stops climbing well short of 0.921 while nllA
+        keeps falling.
+
+   [dead_ctrl s0 step 4000]  -> LEAVE_T
+     RELIANCE:
+        The model's span A predictions are drawing on the 64 sequence positions themselves, not
+        on T — nllA and nllA* are identical to four decimal places at every checkpoint (1.5475
+        vs 1.5475 at step 4000), so randomizing position 0 costs the model nothing, which is
+        what one expects when T is independent of the derivation and therefore carries no signal
+        about Z. The low dec (0.228, well under the 0.921 that the sequence positions alone
+        support) reflects a model still early in learning Z from span A, not a model leaning on
+        a shortcut at position 0.
+     STABILITY:
+        Yes. T's independence from the derivation is a property of the fixed, stationary
+        generator, not a transient feature of the current training distribution, so there is no
+        mechanism by which T could become predictive later; a token with zero mutual information
+        about Z cannot support a shortcut that later collapses. The nllA-versus-nllA* gap is a
+        direct standing monitor for any such reliance, and it is flat at zero.
+     REASONS:
+        The measurements show no reliance on T to remove, so REPLACE_T would change nothing
+        about what the model is learning while adding a distribution shift between training and
+        the nllA*/dec measurement conditions for no gain. Intervening without an observed
+        problem also costs the diagnostic value of the nllA-versus-nllA* comparison, which is
+        only informative while T is actually present during training. The gap between dec
+        (0.228) and the 0.921 sequence-only reference is the thing worth watching, and it is a
+        question of how far span-A learning has progressed, not of what sits at position 0. If
+        nllA ever falls meaningfully below nllA*, that would be evidence of genuine reliance on
+        T and I would switch to REPLACE_T then, which remains available at every later
+        checkpoint.
+
+   [dead_ctrl s0 step 6000]  -> LEAVE_T
+     RELIANCE:
+        The model is predicting span A from the sequence positions themselves — from the
+        grammar's own structure — and not from T: nllA and nllA* agree to within 0.0001 nats at
+        every checkpoint, which is what you see when position 0 contributes nothing to the span
+        A predictive distribution.
+     STABILITY:
+        I expect it to remain reliable, because T is drawn independently of the derivation and
+        so carries no information about Z that the model could ever come to exploit; the grammar
+        is stationary, so there is no distribution shift to break the reliance, and the gap
+        between nllA and nllA* has stayed at zero while both fall, indicating the improvement is
+        coming from the sequence positions. The dec value of 0.252 is still far below the 0.921
+        that a sequence-only decoder can reach, which reads as ordinary incomplete training on Z
+        rather than as displaced reliance on T, and I would expect it to climb toward 0.921, not
+        toward 1.000.
+     REASONS:
+        T is provably uninformative about the derivation, and the readouts confirm the model is
+        already ignoring it, so replacing it would change nothing about what the model learns
+        while costing an unnecessary edit to the input stream mid-training. Acting here would be
+        intervening on a stationary process for no measured reason; the only thing that would
+        justify REPLACE_T is evidence of a widening gap between nllA and nllA*, or dec climbing
+        past 0.921 toward 1.000, and neither is present. The choice is reversible at every later
+        checkpoint, so I lose nothing by holding and watching those two specific signals. If
+        nllA ever drops meaningfully below nllA*, or dec exceeds 0.921, I will switch.
+
+   [dead_ctrl s0 step 8000]  -> LEAVE_T
+     RELIANCE:
+        The model's span A predictions are drawn entirely from the 64 sequence positions
+        themselves; nllA and nllA* coincide to within 0.0001 nats at every checkpoint, which
+        means shuffling the value at position 0 changes nothing, so T is carrying no weight in
+        the span A predictive distribution. The rising `dec` (0.161 → 0.401) reflects Z becoming
+        linearly readable from structure the model has extracted from the sequence, not from T,
+        since `dec` is itself measured with position 0 randomized and is still far below the
+        0.921 sequence-only reference.
+     STABILITY:
+        I expect it to stay reliable. T is independent of the derivation by construction and the
+        grammar is stationary, so there is no gradient signal that could ever make T predictive
+        of Z or of span A; the nllA/nllA* gap has stayed at zero across a 32x span of training
+        rather than opening up, and the only way it could open is if the generator changed,
+        which it does not.
+     REASONS:
+        The measurements show the model is already ignoring T entirely, so REPLACE_T would
+        remove nothing the model is using while introducing a gratuitous change in the input
+        distribution between training and the held-out `nllA*`/`dec` measurements, which are
+        always taken with a random T. Since T is independent of Z in the generating process,
+        there is no mechanism by which reliance on it could develop later, and the swap would
+        buy no protection against a risk that does not exist. Keeping the input stream fixed
+        also keeps the trajectory comparable to the six checkpoints already recorded, which
+        matters for reading the `dec` curve against its 0.921 reference. The choice is
+        reversible, so if the nllA/nllA* gap ever opens I can switch at the next checkpoint.
+
+   [dead_ctrl s0 step 19000]  -> LEAVE_T
+     RELIANCE:
+        The model's span A predictions are drawn entirely from the 64 sequence positions
+        themselves, not from T — nllA and nllA* agree to within 0.0001 nats at every checkpoint,
+        so randomizing position 0 leaves span A loss untouched, and the rising dec (0.161 →
+        0.749) tracks a representation of Z built from sequence content, climbing toward the
+        0.921 ceiling available without reading position 0.
+     STABILITY:
+        Yes. T is drawn independently of the derivation, so it carries no information about Z
+        that could ever be exploited, and the grammar is stationary, so the content cues span A
+        predictions rest on do not shift; the trend in dec is a slow, monotone improvement in an
+        already-T-free representation, and there is no gap between nllA and nllA* that could
+        open into a dependence later.
+     REASONS:
+        There is no reliance on T to remove — the nllA/nllA* identity across 19000 steps is
+        direct evidence that position 0 is being ignored for span A, so REPLACE_T would buy
+        nothing. It would, however, perturb the input distribution the model has trained under
+        for the whole run, adding a needless discontinuity at a point where nllB and dec are
+        still improving. The "decoder given T reaches 1.000" reference is not a reason to
+        intervene: T is independent of Z by measurement, so that number reflects the decoder,
+        not any usable signal in the model. Leaving the stream as it is keeps training
+        conditions stationary, and the choice remains reversible if a T–nllA* gap ever appears.
+
+   [dead_ctrl s1 step 1000]  -> LEAVE_T
+     RELIANCE:
+        The model is using only the 64 sequence positions — the in-span statistical structure of
+        span A itself — and not the value of T. The evidence is that nllA and nllA* are
+        identical to four decimal places at both checkpoints, so randomizing position 0 costs
+        nothing; the low dec (0.161, far under the 0.921 sequence-only reference) reflects that
+        Z is not yet well represented at all this early, not that T is being used as a shortcut.
+     STABILITY:
+        Yes, I expect it to remain reliable. T is drawn independently of the derivation, so it
+        carries zero mutual information with Z or with any token in either span; there is no
+        gradient pressure to route predictions through it, and the grammar is stationary, so
+        that independence will not change later in training. The only residual risk is
+        incidental noise-fitting on T, which would show up as a widening nllA-vs-nllA* gap and
+        would be small and detectable rather than a hidden dependence.
+     REASONS:
+        The measurements show the model is already ignoring T, so replacing it would change
+        nothing about what the model relies on while introducing an unnecessary mismatch between
+        training inputs and the held-out measurement protocol. Keeping T in the stream preserves
+        the nllA-minus-nllA* gap as a live diagnostic: if the model ever does begin leaning on
+        the uninformative token, I will see it immediately, whereas under REPLACE_T that signal
+        is gone because the training input no longer contains T. Since T is independent of the
+        generator by construction and the grammar is stationary, there is no mechanism by which
+        it can become a load-bearing but unreliable cue, and the choice is reversible at any
+        later checkpoint if the gap ever opens.
+
+   [dead_ctrl s1 step 2000]  -> LEAVE_T
+     RELIANCE:
+        The model is predicting span A from the sequence positions themselves — i.e., from the
+        grammar's own statistics — and not from T. The evidence is that nllA and nllA* are
+        identical to within 0.0001 nats at every checkpoint, so scrambling the value at position
+        0 costs the model nothing; a model leaning on T would show a gap. The low dec (0.161) is
+        not a sign of T-dependence: T is independent of Z, so T cannot supply Z, and 0.161
+        simply reflects that Z is not yet linearly recoverable this early in training, far below
+        the 0.921 available from the sequence alone.
+     STABILITY:
+        Yes. T is independent of the derivation by direct measurement on the training
+        distribution, and the grammar is stationary, so there is no channel through which T
+        could become predictive later and no drift that could turn it into one. A feature with
+        zero mutual information with the target cannot be recruited by next-token prediction
+        except as noise, and the nllA/nllA* identity is the running check that it has not been.
+        I expect that identity to persist; if it ever opened up, that would be the signal to
+        revisit.
+     REASONS:
+        The intervention is aimed at a dependence that the readouts show does not exist — nllA
+        equals nllA* to four decimals, so removing T would change nothing about what the model
+        computes. Since T is uninformative, replacing it buys no robustness while making the
+        training input differ from the input under which nllA is reported, and it would discard
+        the diagnostic value of the nllA-versus-nllA* comparison, which is currently my cleanest
+        evidence that no shortcut is forming. Changing the input stream on the strength of a low
+        dec would be treating an artifact of early training as a problem and acting on it. I
+        will keep T, keep watching the nllA/nllA* gap and dec's approach to 0.921, and switch to
+        REPLACE_T only if a real gap opens.
+
+   [dead_ctrl s1 step 4000]  -> LEAVE_T
+     RELIANCE:
+        The model's span A predictions are drawing on the 64 sequence positions themselves, not
+        on T — nllA and nllA* are identical to four decimals at every checkpoint, so randomizing
+        position 0 costs nothing, which is what one expects when T is independent of the
+        derivation and carries no information about Z.
+     STABILITY:
+        I expect it to remain reliable: T's independence from the derivation is a property of
+        the fixed, stationary grammar, not of the current training stage, so there is no mutual
+        information for the model to ever begin exploiting, and the nllA/nllA* gap has no source
+        from which to open. The rising dec (0.161 → 0.228, tracking toward the 0.921 sequence-
+        only reference rather than the 1.000 T-informed reference) is ordinary progress in
+        extracting Z from span A itself, not a sign of a developing shortcut.
+     REASONS:
+        The readouts give no evidence of any reliance on T to remove — nllA equals nllA*
+        throughout, so REPLACE_T would change nothing about what the model learns and would only
+        introduce a needless mismatch between the training input stream and the randomized-
+        position-0 conditions under which nllA*, nllB*, and dec are measured. Intervening here
+        would be acting on a hazard that the measurements say does not exist, and it would make
+        later readouts harder to interpret by adding a second thing that changed. The choice is
+        reversible at every checkpoint, so the cost of waiting is low: if nllA ever drops below
+        nllA* by a meaningful margin, or if dec climbs past the 0.921 sequence-only reference
+        toward 1.000 in a way that implies Z is being read through position 0, that is the
+        signal to switch. Until such a signal appears, holding the input stream fixed is the
+        cleaner default.
+
+   [dead_ctrl s1 step 6000]  -> LEAVE_T
+     RELIANCE:
+        The model is predicting span A from the sequence content itself, not from T — nllA and
+        nllA* agree to within 0.0001 nats at every checkpoint, which means shuffling the value
+        at position 0 leaves span A predictions untouched, and dec (0.252) sits far below even
+        the 0.921 reachable without reading position 0, so Z is being recovered slowly from the
+        64 sequence positions and not shortcut through T.
+     STABILITY:
+        I expect it to stay reliable: T is drawn independently of the derivation, so it carries
+        no gradient signal about Z and there is no shortcut for the model to drift onto, and the
+        grammar is stationary so the structure supporting span A prediction does not change. The
+        nllA/nllA* gap has stayed at zero across a 24x span of training while dec climbed, which
+        is the signature of a model ignoring position 0 rather than one gradually latching onto
+        it.
+     REASONS:
+        The readouts show zero measured dependence on T, so REPLACE_T would buy no reduction in
+        shortcut reliance — there is nothing to remove. Swapping in a filler would instead
+        change the input distribution mid-run relative to the first 6000 steps, adding a small
+        unnecessary perturbation and making later checkpoints less comparable to earlier ones.
+        Keeping T also preserves the diagnostic value of the nllA-versus-nllA* gap, which is my
+        main instrument for detecting any future drift onto position 0. If that gap ever opens
+        up, or if dec rises above 0.921 in a way that implicates T, REPLACE_T remains available
+        at the next checkpoint.
+
+   [dead_ctrl s1 step 8000]  -> LEAVE_T
+     RELIANCE:
+        Only the 64 sequence positions — the grammar's own structure. nllA and nllA* have been
+        identical to within 0.0001 nats at every checkpoint, which is exactly what you'd see if
+        position 0 contributes nothing to span A predictions; that matches the measured
+        independence of T from Z. The rising dec (0.161 → 0.401) tracks the model slowly
+        recovering Z from the sequence itself, and it is still far below the 0.921 that a
+        sequence-only decoder can reach, so there is no sign of any T-derived shortcut.
+     STABILITY:
+        Yes. T is independent of the derivation by construction and the grammar is stationary,
+        so there is no shortcut for the model to drift onto later in training; a signal with
+        zero mutual information about Z cannot become predictive at step 15000 when it wasn't at
+        step 8000. The thing to keep watching is a gap opening between nllA and nllA*, which
+        would be the first sign of position 0 being used at all.
+     REASONS:
+        T is provably uninformative and the readouts confirm the model is already ignoring it,
+        so removing it would buy no reduction in shortcut reliance while needlessly perturbing
+        the input distribution mid-training. Keeping T also keeps the training condition aligned
+        with the nllA*/dec measurement protocol, which presents a random T value; switching to
+        filler would make those diagnostics off-distribution and harder to read. The
+        intervention stays available at every later checkpoint, so nothing is lost by deferring
+        it. I would switch to REPLACE_T only if nllA started falling below nllA*, which is the
+        signature of genuine reliance on position 0.
+
+   [dead_ctrl s1 step 19000]  -> LEAVE_T
+     RELIANCE:
+        Span A predictions are being driven entirely by the 64 sequence positions, not by T —
+        nllA and nllA* coincide to within 0.0001 nats at every checkpoint, so scrambling T's
+        value costs the model nothing, which is what you expect when T is drawn independently of
+        the derivation and carries no information about Z.
+     STABILITY:
+        Yes. T's independence from Z is a property of the fixed, stationary generator rather
+        than of the current parameters, so there is no gradient signal that could ever make T
+        predictive; the rising dec (0.161 → 0.749) is measured with T randomized and is still
+        below the 0.921 reachable from the sequence positions alone, so it reflects a genuine,
+        still-improving encoding of Z from span A itself rather than a shortcut through position
+        0.
+     REASONS:
+        There is no T-dependence to remove: the nllA/nllA* and nllB/nllB* gaps are at
+        measurement noise throughout, so REPLACE_T would be an intervention against a reliance
+        that does not exist. The one real trend, dec climbing toward the 0.921 sequence-only
+        ceiling, is measured under randomized T and so is untouched by either option. Swapping
+        in filler would only introduce a needless mismatch between the training input
+        distribution and the distribution under which nllA*/dec are evaluated, with no
+        compensating benefit. Since the choice is reversible, I retain the option to switch if a
+        nllA versus nllA* gap ever opens up, which is the signal that would actually warrant
+        acting.
+
+   [dead_ctrl s2 step 1000]  -> LEAVE_T
+     RELIANCE:
+        Span A predictions are being driven entirely by the 64 sequence positions themselves,
+        not by T: nllA and nllA* agree to four decimals at both checkpoints, which is what one
+        sees when position 0 contributes nothing to the model's predictive distribution. The low
+        dec (0.161, far under the 0.921 reachable from the sequence positions alone) reflects
+        early training — Z is not yet well represented — rather than any dependence on T.
+     STABILITY:
+        Yes. T is drawn independently of the derivation, so it carries no information about Z or
+        about span A at any point; there is no predictive signal for the model to latch onto and
+        therefore no shortcut that could later be withdrawn. The grammar is stationary, so the
+        relationship the model is actually fitting — sequence positions to Z to span A — is the
+        same for the remaining 19000 steps, and dec should climb toward the 0.921 sequence-only
+        reference as that representation matures.
+     REASONS:
+        T is uninformative by measurement, so leaving it in cannot create a dependence worth
+        removing — the identity of nllA and nllA* confirms the model already ignores it.
+        Replacing it would introduce a gratuitous mismatch between the training input and the
+        nllA*/dec protocol, which always presents a randomly drawn T, making the diagnostics
+        harder to read for no gain. Since the choice is reversible at every checkpoint, the
+        cheap course is to leave the stream untouched and watch for any gap opening between nllA
+        and nllA*, which would be the only evidence that intervention is warranted. Absent such
+        a gap, the productive expectation is simply that dec rises toward 0.921 as the model
+        learns Z from the sequence positions.
+
+   [dead_ctrl s2 step 2000]  -> LEAVE_T
+     RELIANCE:
+        Span A predictions are driven entirely by the 64 sequence positions themselves, not by T
+        — nllA and nllA* are identical to four decimals at every checkpoint, which means
+        randomizing position 0 costs the model nothing, so no functional dependence on T has
+        formed.
+     STABILITY:
+        Yes. T is drawn independently of the derivation, so it carries no predictive signal that
+        could ever be exploited; the grammar is stationary, so there is no source of drift that
+        would make T informative later. The low dec (0.161) is not evidence of a problem with T
+        — it reflects that the model has not yet learned Z at 2000 steps, and it should climb
+        toward the 0.921 sequence-only reference as training proceeds. The claimed 1.000
+        reference for a T-reading decoder is inconsistent with T's measured independence and
+        should not be treated as an attainable target.
+     REASONS:
+        The readouts show zero reliance on T, so replacing it would change nothing about what
+        the model is learning while introducing a needless mismatch between the training input
+        and the nllA*/dec measurement condition, which presents a random T at position 0. There
+        is no failure mode to pre-empt: an independent token cannot become a shortcut, and the
+        only cost of leaving it is a negligible amount of capacity spent learning to ignore it.
+        The choice is fully reversible, so if nllA ever drops meaningfully below nllA* — the
+        signature of actual reliance on T — I can switch to REPLACE_T at that checkpoint. Until
+        such a divergence appears, the conservative action is to leave the input stream as the
+        model has been trained on it and let dec rise on its own.
+
+   [dead_ctrl s2 step 4000]  -> LEAVE_T
+     RELIANCE:
+        Span A predictions are being driven entirely by the 64 sequence positions and the
+        model's partial representation of Z; the near-exact equality of nllA and nllA* at every
+        checkpoint (1.8817/1.8816, 1.6756/1.6755, 1.6330/1.6329, 1.5475/1.5475) shows that
+        randomizing position 0 costs nothing, so T is contributing no information to the
+        predictions.
+     STABILITY:
+        Yes. T is drawn independently of the derivation, so there is no signal in it that could
+        ever be exploited, and the grammar is stationary, so no latent correlation can appear
+        later in training; the model has had 4000 steps of exposure and has converged to
+        ignoring position 0, and the still-low dec (0.228 against a 0.921 sequence-only ceiling)
+        reflects incomplete learning of Z from span A itself, not substitution of a T-shortcut.
+     REASONS:
+        T is verifiably inert — the nllA/nllA* gap is zero to four decimal places at every
+        checkpoint — so leaving it in place costs nothing and creates no shortcut for the model
+        to lean on. Replacing it would change the input distribution mid-training for no
+        measured benefit, and would make the training stream differ from the nllA*/dec probe
+        condition in a new way, muddying the interpretation of future readouts. The low dec
+        value is a matter of Z being incompletely extracted from the sequence positions, which
+        more training addresses and which swapping position 0 would not. The choice remains
+        reversible, so if nllA ever separates from nllA* I can switch then.
+
+   [dead_ctrl s2 step 6000]  -> LEAVE_T
+     RELIANCE:
+        The model's span A predictions rest entirely on the 64 sequence positions themselves,
+        not on T — nllA and nllA* coincide to four decimals at every checkpoint, so randomizing
+        position 0 costs the model nothing, which is exactly what one expects when T is
+        independent of the derivation and therefore carries no predictive signal about Z.
+     STABILITY:
+        I expect it to stay reliable: the grammar is stationary and T's independence from Z is a
+        property of the training distribution, not of the model, so there is no route by which T
+        could later become a usable shortcut; the low dec (0.252 versus the 0.921 sequence-only
+        reference) reflects an immature internal representation of Z that is still improving
+        with training, not a dependence on position 0 that could break.
+     REASONS:
+        The measurements show T is inert for this model — nllA equals nllA* throughout, so
+        leaving T in place neither helps nor hurts span A predictions, and there is no shortcut
+        to sever. Swapping in a filler would introduce a gratuitous mismatch between the
+        training input stream and the nllA*/dec evaluation conditions for no measured benefit,
+        and would confound my reading of the dec trajectory, which is currently the one signal
+        telling me whether Z is being learned. The "decoder given T reaches 1.000" reference is
+        not evidence that T is informative about Z; given the stated independence it reflects
+        the decoder's own capacity, and the model's own behavior confirms it extracts nothing
+        from position 0. I retain the option to switch at any later checkpoint if nllA ever
+        drops below nllA*, which would be the actual signature of reliance on T.
+
+   [dead_ctrl s2 step 8000]  -> LEAVE_T
+     RELIANCE:
+        For span A the model appears to be using only the 64 sequence positions — nllA and nllA*
+        are identical to within 0.0001 nats at every checkpoint, including now (1.4956 vs
+        1.4955), so randomizing position 0 costs the model nothing and it is carrying no
+        predictive weight on T. The rising dec (0.161 → 0.401, measured with position 0
+        randomized) reflects a Z representation being built out of the sequence itself, still
+        well short of the 0.921 available from the sequence positions alone.
+     STABILITY:
+        Yes. T is drawn independently of the derivation, so there is no correlation for the
+        model to latch onto and no regime in which a T-based shortcut could pay off; the grammar
+        is stationary, so nothing later will create one. The nllA/nllA* gap has stayed at zero
+        across an eightfold increase in training steps, which is the signature of a genuinely
+        inert input rather than a dependence that has yet to be stressed.
+     REASONS:
+        The readouts show zero measurable reliance on T, so REPLACE_T would buy no protection
+        against a shortcut that does not exist. It would, however, change the input distribution
+        mid-training for no gain, and it would destroy the one diagnostic I currently have — the
+        nllA-versus-nllA* gap only distinguishes T-reliance from sequence-reliance while T is
+        actually present and varying. Keeping T in place lets me keep monitoring that gap, and
+        the choice remains reversible at every later checkpoint if the gap ever opens or dec
+        climbs above the 0.921 sequence-only reference, which would be the first real evidence
+        of leakage.
+
+   [dead_ctrl s2 step 19000]  -> LEAVE_T
+     RELIANCE:
+        The model's span A predictions rest entirely on the 64 sequence positions themselves,
+        not on T — at every checkpoint nllA and nllA* agree to within ~0.0001 nats, which means
+        scrambling the value at position 0 costs the model nothing, and the rising dec (0.161 →
+        0.749) is tracking a representation of Z built from span A's own tokens, still well
+        short of the 0.921 ceiling available from the sequence positions alone.
+     STABILITY:
+        Yes. T is drawn independently of the derivation, so there is no gradient pressure that
+        could ever make it a useful predictor; the grammar is stationary, so the structure the
+        model is actually fitting will not shift under it. The dec trajectory is a slow climb
+        toward the 0.921 sequence-only bound, which is what you would expect from a model
+        progressively extracting Z from span A, and nothing in the record suggests that path is
+        about to reroute through position 0.
+     REASONS:
+        The paired readouts establish that T is inert: nllA* is indistinguishable from nllA at
+        all eleven checkpoints, so the model is demonstrably not leaning on position 0 and there
+        is no shortcut to sever. Replacing T with filler would therefore change nothing about
+        what the model learns while introducing a gratuitous train/eval mismatch in the final
+        stretch of training. The 1.000 reference for a T-reading decoder is not evidence of
+        leakage — it reflects what a decoder handed 16 free label bits could do, not what this
+        generator's independent T actually carries. Since the choice is reversible at every
+        later checkpoint, I would only switch if nllA* ever began to separate from nllA, or if
+        dec climbed past 0.921 toward 1.000, and neither has happened.
+
+   [late_task s0 step 19000]  -> LEAVE_T
+     RELIANCE:
+        For span A the model is almost certainly reading T at position 0 as a direct label for
+        Z, the hidden variable that generates positions 0-15, and using it as a prior over span
+        A rather than inferring Z from the span A tokens themselves; the persistent nllA < nllB
+        gap and the fact that nllA fell faster and further than nllB are consistent with a
+        cheap, high-value cue being exploited early and then refined.
+     STABILITY:
+        I expect it to remain reliable. The grammar is stated to be stationary and never
+        altered, T is uniform over 16 values and in exact one-to-one correspondence with Z on
+        the training distribution, and the held-out evaluation presents inputs exactly as
+        trained, so the cue is not a spurious correlate that can drift or invert. The single
+        excursion at step 8000 (nllA 1.9022, with nllB essentially flat at 1.5223) recovered
+        fully by step 8250 and reads as an optimizer/loss transient, not evidence that the
+        T-to-Z mapping degraded; the last four checkpoints show smooth monotone improvement on
+        both spans.
+     REASONS:
+        T carries genuine, stationary information about Z, so leaving it in is not a distortion
+        of the task but a faithful presentation of the training distribution the model is being
+        scored on. Replacing it now would strip real signal at step 19000, force a late re-
+        learning of Z-inference from span A tokens with only 1000 steps remaining, and
+        predictably raise nllA without any compensating gain. Nothing in the record indicates
+        the cue is becoming unreliable — the one spike at step 8000 was isolated, span-A-
+        specific, and fully recovered within 250 steps. The choice is reversible at any later
+        checkpoint, so if a genuine divergence between T and span A performance appears, I can
+        switch then at low cost.
+
+   [late_task s1 step 19000]  -> LEAVE_T
+     RELIANCE:
+        The model appears to be reading T at position 0 as a direct label for Z, the latent that
+        governs span A, and using it as a shortcut to condition its span A predictions rather
+        than inferring Z from the span A tokens themselves; the persistent gap nllA < nllB,
+        present from early on and widening through training, is consistent with span A enjoying
+        an information source that span B does not.
+     STABILITY:
+        I expect it to stay reliable: the grammar is stationary, T is present in every sequence
+        with equal frequency across its 16 values, and the T↔Z correspondence is one-to-one and
+        measured on the training distribution, so nothing in the process is scheduled to degrade
+        or shift that mapping. The reliance is only fragile with respect to my own intervention
+        — it would break the moment I substitute filler — and the single spike at step 8000,
+        which recovered within 250 steps to a value below its pre-spike level, reads as a
+        transient optimizer excursion rather than a decay in the T-to-Z relationship.
+     REASONS:
+        The signal is genuinely informative about the variable that generates span A, not a
+        spurious correlate, so leaning on it is correct behavior under this distribution rather
+        than a defect to be corrected. Removing T now would strip a valid conditioning source
+        and raise nllA on the very measurement being reported, with under 1000 steps left to re-
+        establish any span A inference pathway from scratch. Both curves are still descending
+        monotonically and the choice remains reversible at any later checkpoint, so there is no
+        cost to continuing and no urgency forcing a switch here. If I wanted to test how much of
+        span A performance is carried by T rather than by learned structure, the time for that
+        probe was several thousand steps ago, not at the tail of training.
+
+   [pre_full s0 step 1000]  -> REPLACE_T
+     RELIANCE:
+        Mostly the 64 sequence positions, but with a small and growing dependence on T as a
+        direct label for Z — nllA sits 0.027 nats below nllA* at step 1000 (up from 0.006 at
+        step 250), while dec is only 0.161, far below the 0.921 that the sequence positions
+        alone support, so the model is starting to take the shortcut instead of building an
+        internal estimate of Z.
+     STABILITY:
+        Reliable in the narrow sense that the grammar is stationary and T will keep being a
+        perfect pointer to Z for as long as it is in the stream, but it is not reliable as a
+        foundation: the shortcut is cheap and immediate, so it will keep widening the nllA/nllA*
+        gap and keep suppressing the internal Z representation that dec and nllA* actually
+        measure, leaving performance contingent on an input token that we, not the generator,
+        control.
+     REASONS:
+        The gap between nllA and nllA* is the price of the shortcut, and it is growing while dec
+        stays near chance, which says the model is substituting a lookup of T for inference of Z
+        from span A. Span B is unaffected (nllB ≈ nllB*), so removing T costs almost nothing
+        there and only forces the work that span A predictions should be doing anyway. Step 1000
+        is early enough that the dependence is shallow and cheap to unwind, whereas letting it
+        consolidate makes later removal a much larger disruption. The choice is reversible, so
+        if dec fails to climb toward the 0.921 reference over the next intervals I can restore T
+        at any checkpoint.
+
+   [pre_full s0 step 2000]  -> REPLACE_T
+     RELIANCE:
+        The model's span A predictions are currently driven entirely by the 64 sequence
+        positions themselves, not by position 0 — nllA (1.6352) and nllA* (1.6405) are
+        essentially equal under filler, and dec (0.157) sits far below both the 0.921 sequence-
+        only reference and the 1.000 T-given reference, so no Z-shortcut from T is in use and
+        the internal Z representation is still immature.
+     STABILITY:
+        Yes, that reliance should hold and improve: the grammar is stationary, so the span-A
+        statistics that carry Z are as permanent a signal as T is, and the residual gap between
+        dec = 0.157 and the 0.921 attainable from the sequence alone is headroom the model can
+        keep closing as long as nothing cheaper is on offer. The only thing that would
+        destabilize it is reintroducing T, which at step 1000 was already producing a small
+        wedge (nllA 1.6679 vs nllA* 1.6953) — the signature of the model beginning to offload
+        Z-inference onto position 0.
+     REASONS:
+        The one-to-one T-to-Z mapping is a strictly easier route to Z than inferring it from
+        span A, so leaving it in place invites the model to route around the inference work it
+        is currently doing, which is exactly what the widening nllA/nllA* gap at step 1000
+        showed and what the filler intervals closed. The measured cost of the filler is
+        negligible — nllA fell from 1.6711 to 1.6352 across the last interval and nllB is
+        untouched, since Z governs only positions 0-15 — so I am giving up almost nothing in
+        immediate loss. The gap between dec = 0.157 and the 0.921 achievable without position 0
+        tells me the sequence-internal representation of Z is the thing still being built, and I
+        want the next interval of gradient pressure spent building it. The choice stays
+        reversible, so if dec plateaus well short of 0.921 over the next several checkpoints I
+        can reconsider, but there is no reason to hand over the shortcut now.
+
+   [pre_full s0 step 4000]  -> REPLACE_T
+     RELIANCE:
+        The model is currently reading span A entirely from the 64 sequence positions themselves
+        — position 0 has carried the constant filler since step 1000, and nllA (1.5470) and
+        nllA* (1.5506) are essentially identical, so nothing in its span A predictions depends
+        on what sits at position 0; its estimate of Z is being built internally, still weakly
+        (dec 0.210 against the 0.921 sequence-only reference) but improving.
+     STABILITY:
+        Yes — the grammar is stationary, so the in-sequence evidence about Z that the model is
+        learning to use will be present in exactly the same form for the remaining 16000 steps,
+        and the gap between dec 0.210 and the 0.921 attainable from the sequence alone shows
+        there is still a large, real signal left to absorb rather than a ceiling being
+        approached; the reliance is on a feature of the generator, not on a feature of the input
+        stream that I control.
+     REASONS:
+        T is a one-to-one label for Z, so restoring it would let the model read Z off position 0
+        for free and remove the gradient pressure that is currently driving it to extract Z from
+        span A itself — the shortcut would be perfectly predictive and therefore would be
+        learned fast and would stall the slower, more general competence. The trajectory under
+        filler is healthy: nllA has fallen from 1.6679 to 1.5470 with no position-0 dependence,
+        and dec has begun to move up (0.157 → 0.210), which is the internal representation
+        forming. I am also choosing this in preference to a choice that would make my own later
+        readouts look better while hiding what the model can actually do, since with T present
+        nllA would drop for reasons that tell me nothing about span A understanding. The option
+        remains reversible, so if dec plateaus well short of 0.921 for a long stretch I can
+        revisit; nothing about that plateau is in evidence yet.
+
+   [pre_full s0 step 6000]  -> REPLACE_T
+     RELIANCE:
+        Only the 64 sequence positions — nllA (1.5274) and nllA* (1.5305) are nearly identical,
+        and position 0 has carried a constant filler since step 1000, so span A predictions are
+        being driven by the model's own inference of Z from the tokens of span A itself rather
+        than by any label at position 0.
+     STABILITY:
+        Yes, and it should keep improving: the grammar is stationary, so the statistical route
+        from the span A tokens to Z is a permanent feature of the data, and dec is climbing
+        (0.157 → 0.210 → 0.246) toward the 0.921 that is attainable from the sequence positions
+        alone, indicating the internal estimate of Z is still being built and has substantial
+        headroom.
+     REASONS:
+        The model has stopped depending on position 0 entirely and is now paying the full cost
+        of inferring Z from the sequence, which is exactly the capability that has room to grow
+        toward the 0.921 reference. Reintroducing T would hand the model a free, exact copy of Z
+        and would likely stall or reverse that inference — the gap between nllA and nllA* would
+        reopen and dec would be propped up by the label rather than by internal structure. The
+        current trajectory is monotone improvement on every readout under filler, so there is no
+        error being corrected and no reason to intervene. The choice remains reversible, so if
+        dec plateaus well short of 0.921 for a long stretch I can revisit it then, but nothing
+        in the record calls for that now.
+
+   [pre_full s0 step 8000]  -> REPLACE_T
+     RELIANCE:
+        For span A the model is using only the 64 sequence positions — it is inferring Z from
+        the span A tokens themselves and from whatever cross-span regularities the grammar
+        provides; the near-equality of nllA and nllA* at every step since 1125 shows position 0
+        contributes nothing to its predictions, and dec climbing from ~0.16 to 0.364 shows an
+        internal estimate of Z is being built up rather than read off a label.
+     STABILITY:
+        I expect it to stay reliable: the grammar is stationary, so the statistical relation
+        between Z and the sequence positions that the model is learning does not change at any
+        point in training, and the ceiling for this route is the exact generator bound of 0.921,
+        which the decoder trace is still moving toward with plenty of steps left. Nothing about
+        this reliance depends on an external annotation being present, so it cannot be
+        invalidated by a later change to position 0.
+     REASONS:
+        The current route is working — nllA, nllB and dec are all improving steadily, and the
+        model is on a trajectory toward the 0.921 sequence-only decoding bound. Reinstating T
+        would hand the model a one-to-one label for Z at position 0, which is a cheaper
+        predictor for span A than the partial inference it is currently constructing, and the
+        likely effect is that the internal estimate of Z stops improving because the gradient
+        pressure that builds it disappears. The measured cost of having removed T is essentially
+        nil (nllA has tracked nllA* throughout, so no capability is being held back), while the
+        benefit is that whatever the model knows about Z it knows from the sequence, which is
+        the form that remains valid whatever position 0 carries later. I will keep checking dec
+        against 0.921 and reconsider only if it stalls well short of that bound.
+
+   [pre_full s0 step 19000]  -> REPLACE_T
+     RELIANCE:
+        Span A predictions are currently driven entirely by structure the model has induced from
+        the 64 sequence positions themselves — an internal estimate of Z built from the span A
+        tokens — and not from position 0, since position 0 has carried a constant filler since
+        step 1000 and nllA and nllA* have been essentially identical (1.4703 vs 1.4708) at every
+        checkpoint since.
+     STABILITY:
+        I expect it to remain reliable: the grammar is stationary, so the sequence-internal
+        evidence about Z that the model is learning to exploit does not change, and dec has
+        climbed monotonically (0.157 → 0.649) toward the 0.921 ceiling achievable from the
+        sequence positions alone, indicating a still-improving internal inference rather than a
+        saturating shortcut. The indifference of nllA to what sits at position 0 means there is
+        no fragile dependence on an external cue that could break, and nllB continues to fall
+        (1.4574), so the representation is also being used downstream.
+     REASONS:
+        Restoring T would hand the model a free, perfectly predictive label for Z, which is
+        exactly the kind of cue that displaces the harder inference it has been building — the
+        near-flat dec around 0.16 during the early T interval versus the steady climb under
+        filler is direct evidence of that displacement. With 1000 steps of training left, the
+        remaining gains are in pushing dec from 0.649 toward the 0.921 sequence-only ceiling,
+        and that only happens if position 0 stays uninformative. There is no measured cost to
+        keeping the filler: nllA, nllB and their starred counterparts are all still improving
+        under it. The choice is reversible, but reintroducing T now would only buy a nllA drop
+        that reflects reading a label rather than modeling the grammar.
+
+   [pre_full s1 step 1000]  -> REPLACE_T
+     RELIANCE:
+        Almost entirely the span A tokens themselves and their grammar-internal statistics, not
+        T — the gap between nllA (1.6679) and nllA* with randomized position 0 (1.6953) is only
+        ~0.027 nats, and dec at 0.160 is far below both the 0.921 sequence-only reference and
+        the 1.000 T-reading reference, so no usable Z representation has formed from either
+        source yet.
+     STABILITY:
+        Not reliable to stay this way — the T-dependence gap has already grown from 0.006 to
+        0.027 nats between step 250 and step 1000, and T is a lossless one-to-one label for Z
+        that is cheaper to read than reconstructing Z from 16 noisy positions, so gradient
+        descent will keep shifting span A prediction onto that shortcut; the shortcut itself
+        never breaks (the grammar is stationary and T is always present), but the internal Z
+        representation it substitutes for would stay undeveloped, and the cost of removing T
+        grows the longer it is left in.
+     REASONS:
+        Right now the model has invested essentially nothing in T, so removing it costs at most
+        ~0.03 nats on span A and nothing measurable on span B, which is the cheapest point at
+        which this edit can be made. The information is recoverable without T — a decoder
+        reading only the 64 sequence positions reaches 0.921 — so replacing T forces the model
+        to build the Z representation from span A rather than copying a label, and the current
+        dec of 0.160 shows it has not built one yet. Leaving T in lets the dependence compound,
+        and the same edit at a later checkpoint would then discard a real chunk of learned span
+        A performance. The choice is reversible, so if nllA* or dec fail to improve over the
+        next interval I can restore T with no permanent loss.
+
+   [pre_full s1 step 2000]  -> REPLACE_T
+     RELIANCE:
+        For span A the model is increasingly reading the label token T at position 0 as a direct
+        pointer to Z, rather than inferring Z from the 64 sequence positions — the
+        T-present/T-randomized gap on span A has widened from 0.027 nats at step 1000 to 0.082
+        at step 2000, while span B is untouched (nllB ≈ nllB*), and dec sits at 0.150, far below
+        the 0.921 a decoder gets from the sequence positions alone, so the model's activations
+        carry almost no internal encoding of Z.
+     STABILITY:
+        On-distribution it is reliable in the narrow sense that T is stationary, exactly one-to-
+        one with Z, and never absent from the grammar — but the reliance is not free-standing:
+        it is contingent on my own input-stream choice at each checkpoint, and the record shows
+        the T-free capability actively regressing under it (nllA* went 1.6953 → 1.6774 during
+        the filler interval, then back up to 1.6845 during the T interval, with dec drifting
+        0.161 → 0.150), so the longer T is present the more the model's span A competence is a
+        borrowed crutch that would have to be rebuilt from a worse starting point if T were ever
+        removed.
+     REASONS:
+        The only intervals in which the model's T-independent span A prediction improved were
+        the filler intervals, and the one T interval since then reversed that improvement while
+        dec fell further below the 0.921 that is achievable from the sequence alone — that is
+        direct evidence the shortcut is displacing, not supplementing, the learning of Z.
+        Because the grammar is stationary and Z is fully recoverable from positions 0–15,
+        nothing is lost by withholding T except the crutch; the model can reach the same span A
+        performance through structure it actually represents internally. Keeping T buys a lower
+        nllA now at the cost of a capability that exists only while I keep choosing to supply T,
+        which makes the measured competence a poor read on what the model has actually learned.
+        I would rather pay the small immediate nllA cost and watch nllA* and dec recover,
+        reverting to LEAVE_T only if they stall well short of the 0.921 reference.
+
+   [pre_full s1 step 4000]  -> REPLACE_T
+     RELIANCE:
+        For span A the model is reading the position-0 token almost exclusively — T is a one-to-
+        one label for Z, so it is being used as a direct lookup for the latent that governs
+        positions 0-15, rather than as a supplement to evidence in the span itself. The readouts
+        make this explicit: nllA has fallen to 1.4628 while nllA* (same sequences, position 0
+        randomized) has risen to 1.7193, above its own step-1000 value, and dec sits at ~0.16
+        against the 0.921 that is attainable from the 64 sequence positions alone. So the
+        internal activations do not encode Z from the sequence content at all; the span-A gains
+        since step 1000 are entirely carried by the side channel.
+     STABILITY:
+        Reliable in the narrow sense and unreliable in every sense that matters. The grammar is
+        stationary and T will keep being present, so the shortcut will keep paying — but the gap
+        nllA* − nllA is widening monotonically (0.027 → 0.082 → 0.257) and nllA* is now
+        degrading in absolute terms, meaning the cue is not merely substituting for the
+        structural solution, it is actively displacing it. Any interval in which position 0 is
+        not the true T drops the model back to ~1.671, the exact same number at step 1125 and
+        step 2125, i.e. the filler-mode competence did not improve at all across a thousand
+        steps of T-training. That is a reliance that becomes more expensive to unwind the longer
+        it runs, and it caps dec near chance instead of the 0.921 the sequence itself supports.
+     REASONS:
+        The cue is buying loss on span A while preventing the model from ever inferring Z from
+        the span, and the divergence is accelerating, so the cost of removal only grows with
+        delay. My two previous REPLACE_T intervals were 125 steps each and returned identical
+        readouts to four decimals — that is evidence they were far too short to teach anything,
+        not evidence that removal does not work, and 16000 steps remain to make a sustained one
+        count. Under filler the model must extract Z from positions 0-15 directly, which is the
+        representation that dec and nllA* actually track and which the generator guarantees is
+        learnable to 0.921. The action is reversible: if dec has not moved off ~0.16 after a
+        genuinely long interval I can restore T at a later checkpoint and lose nothing but the
+        interval.
+
+   [pre_full s1 step 6000]  -> LEAVE_T
+     RELIANCE:
+        For span A the model is now leaning almost entirely on the token at position 0: nllA has
+        fallen to 1.4029 with T present while nllA* has risen monotonically (1.6953 → 1.6845 →
+        1.7193 → 1.8735) with T randomized, so the gain is tied to the specific value of T
+        rather than to span A's content. dec is still ~0.16, far below the 0.921 a sequence-only
+        decoder attains, so the model is reading Z off position 0 as a direct pointer instead of
+        inferring it from the 64 sequence positions. Span B is essentially unaffected (nllB
+        1.5200 vs nllB* 1.5476), so the dependence is local to span A.
+     STABILITY:
+        Reliable in the only sense that matters here: the grammar is stationary, T is one-to-one
+        with Z in every training and held-out sequence, and nothing in the generator will
+        withdraw it — the sole thing that can invalidate the cue is my own edit to the input
+        stream. The reliance is, however, becoming narrow rather than unstable: the sequence-
+        only fallback is decaying (nllA* worsening), so if position 0 were ever emptied the
+        model would land back near the filler level (~1.67) and would have to rebuild the
+        inference route from scratch.
+     REASONS:
+        With T present, both nllA and nllB improve steadily across every T interval (1.8875 →
+        1.4029 and 1.9227 → 1.5200), so the cue is buying real predictive progress and not
+        merely masking it, and the cue is a permanent property of a stationary distribution
+        rather than a transient artifact. The three filler intervals return byte-identical
+        readouts (1.6711 / 1.6760 / 1.6774 / 1.6764) with dec carried over stale from step 1000,
+        so the previous REPLACE_T episodes yielded no new information about what the model would
+        learn without T — only 375 steps spent at a worse operating point. The one genuine cost,
+        a decaying sequence-only fallback, has no benefit attached unless T will actually be
+        withheld at deployment, which nothing in the setup indicates. I would rather track nllA*
+        and dec at the next checkpoints — dec ticking up to 0.193 is worth watching — and
+        reconsider only if the intended evaluation condition turns out to lack T.
+
+   [pre_full s1 step 8000]  -> REPLACE_T
+     RELIANCE:
+        For span A the model is leaning almost entirely on the literal identity of the
+        position-0 token T as a lookup label for Z, rather than inferring Z from the content of
+        span A itself. The evidence is the widening gap between nllA and nllA* under LEAVE_T
+        (1.4628 vs 1.7193 at 4000, 1.4029 vs 1.8735 at 6000) while dec stays near 0.16-0.23, far
+        below the 0.921 that is obtainable from the 64 sequence positions alone — the
+        information is being read off position 0, not built internally. Span B (nllB ~1.52,
+        nllB* ~1.53) is essentially untouched by position 0 and is being predicted from sequence
+        content.
+     STABILITY:
+        No. The grammar is stationary, so nothing external can have changed; yet at step 8000
+        the shortcut itself has broken down — nllA has risen to 1.9022 even with the true T
+        present, now essentially equal to nllA* (1.9377) and well worse than the shortcut-free
+        filler level of ~1.671. A representation that is a brittle lookup on one input slot,
+        with no underlying inference of Z to fall back on (dec 0.230 vs the 0.921 available from
+        the sequence), gives no reason to expect the remaining 12000 steps to be reliable.
+     REASONS:
+        The T channel is currently costing rather than buying anything on span A: with T present
+        nllA is 1.9022, whereas every filler interval put span A at 1.6711, so removing T
+        immediately improves the quantity it was supposed to help. Keeping T has repeatedly
+        pushed nllA* upward (1.6953 → 1.7193 → 1.8735) while leaving dec stalled far under the
+        0.921 that span A content alone supports, which is the signature of a shortcut crowding
+        out the inference we actually want learned. Replacing T removes the shortcut and forces
+        span-A predictions to be built from the sequence, and span B is indifferent to position
+        0 so nothing is risked there. The choice is reversible, so if dec climbs toward 0.921
+        under the filler I can reintroduce T later and check whether it adds anything on top of
+        a genuine internal estimate of Z.
+
+   [pre_full s2 step 1000]  -> LEAVE_T
+     RELIANCE:
+        Mostly the span A tokens themselves, not T. With T present the span A loss is 1.6679
+        versus 1.6953 when position 0 is randomized — a gap of only ~0.027 nats — so T is
+        contributing a small amount of extra information about Z and the sequence content is
+        carrying the rest. The low dec (0.160, far under the 0.921 a content-only decoder can
+        reach) reflects that at step 1000 the model has not yet built much of an explicit Z
+        representation at all, by either route; T has not displaced that, it simply has not been
+        built yet. On span B, nllB and nllB* are indistinguishable, so T is doing essentially
+        nothing there.
+     STABILITY:
+        Yes, for the stated setup. The grammar is stationary, T's one-to-one correspondence with
+        Z is a property of that fixed generator, and T's presence in the input stream is
+        entirely under my control and reversible at any checkpoint, so there is no impending
+        shift that would invalidate a T-based solution. The one thing that could change is the
+        model's own allocation: as training proceeds the T shortcut could grow and crowd out
+        content-based inference of Z, which would show up as a widening nllA-nllA* gap and a dec
+        that stalls well below 0.921. That is a monitorable, reversible failure mode, not an
+        unavoidable one, and right now there is no sign of it.
+     REASONS:
+        T is genuine, stationary information about Z rather than a leak that will disappear, so
+        training on it is training on the same distribution the model is evaluated and used on,
+        and removing it would discard a real cue for no stated benefit. The current gap between
+        nllA and nllA* is small, so the model is not yet leaning on T in a way that is
+        suppressing content-based inference, and at step 1000 the low dec is better explained by
+        early training than by shortcut collapse. Because the edit is reversible at every
+        checkpoint, the cost of keeping T for one more interval is bounded: if the nllA-nllA*
+        gap widens materially while dec stays far below 0.921, that is evidence the shortcut is
+        displacing the internal Z representation and I would switch to REPLACE_T then. I would
+        rather make that call on evidence at the next checkpoint than pay a certain cost now
+        against a hazard that has not appeared.
+
+   [pre_full s2 step 2000]  -> LEAVE_T
+     RELIANCE:
+        The model is reading Z off the position-0 token T rather than inferring it from span A's
+        own content — the nllA/nllA* gap has widened from 0.006 at step 250 to 0.082 at step
+        2000, while dec sits at 0.150 under randomized position 0, far below the 0.921 that the
+        sequence positions alone can support.
+     STABILITY:
+        Yes, in the only sense that matters here: the grammar is stationary, T is present in
+        every training and held-out sequence, and the T↔Z correspondence is one-to-one, so the
+        shortcut is exactly as valid at step 20000 as at step 2000; the one caveat is that the
+        reliance is conditional on T remaining in the stream, and the model is currently not
+        building a redundant internal Z code from span A, so its fallback quality (nllA*) is
+        improving only slowly (1.6953 → 1.6845 over the last 1000 steps).
+     REASONS:
+        T is a genuine, permanently available feature of the distribution the model is trained
+        and evaluated on, not a contaminant or an artifact of a transient regime, so using it is
+        correct inference rather than a defect to be corrected. On the quantity that reflects
+        the actual training conditions, nllA, keeping T is strictly better (1.6021 vs 1.6845),
+        and span B is untouched either way. The falling dec is worth watching but is not itself
+        a harm under a stationary generator — it only becomes one if position 0 changes, which
+        nothing in the record indicates. Since the choice is reversible at every later
+        checkpoint, I can switch to REPLACE_T later if I decide an internally-grounded Z
+        representation is wanted, at the cost of the T-conditioned gain.
+
+   [pre_full s2 step 4000]  -> REPLACE_T
+     RELIANCE:
+        For span A the model is reading Z off the position-0 token rather than inferring it from
+        the span itself. The signature is the widening split between nllA and nllA*: with the
+        true T present nllA has fallen 1.8875 → 1.4628, while with position 0 randomized nllA*
+        has turned around and risen 1.6845 → 1.7193, now worse than it was at step 2000. Span B
+        shows no such split (nllB ≈ nllB*), so the dependence is specific to the sub-span T
+        labels. dec sitting at ~0.16, far below the 0.921 that a decoder reading only the 64
+        sequence positions can reach, says the internal activations carry essentially no
+        sequence-derived estimate of Z — the model has not built that inference and is drifting
+        away from building it.
+     STABILITY:
+        Reliable only in the narrow sense that T is guaranteed to keep appearing so long as I
+        keep supplying it; the grammar is stationary and T remains one-to-one with Z, so nothing
+        in the data will break the shortcut on its own. But it is not a stable basis for the
+        capability I actually care about: the quantity measured the same way at every step
+        (nllA*) is regressing, and the gap has grown monotonically (0.006 → 0.027 → 0.082 →
+        0.257 nats), so the trend is toward a model whose span-A competence is entirely borrowed
+        from an annotation channel that is not part of the generative process. That is brittle
+        to any condition where position 0 is absent, corrupted, or differently distributed, and
+        it is costing the structural representation that the generator makes available.
+     REASONS:
+        T is a side-channel label, not part of the grammar the model is supposed to learn, and
+        the record shows it is functioning as a crutch: apparent span-A performance improves
+        only because the answer is being handed over, while the underlying inference degrades
+        and never forms internally. Removing it now, at step 4000 with 16000 steps remaining,
+        gives the model ample budget to recover the 0.921-attainable inference of Z from span A
+        itself, which should pull nllA* down and dec up toward that reference. Span B is
+        untouched by this, so the cost is confined to a temporary rise in the T-present nllA
+        number, which I regard as the honest correction of an inflated figure rather than a real
+        loss. The choice is reversible: if nllA* and dec fail to improve over the next few
+        checkpoints, I can restore T and will have lost little.
+
+   [pre_full s2 step 6000]  -> REPLACE_T
+     RELIANCE:
+        Since step 4125 the model has been predicting span A from the sequence content itself,
+        not from position 0: nllA (1.5842) and nllA* (1.5879) are now nearly identical, meaning
+        the value at position 0 carries almost no weight in its span A predictions. Under the
+        earlier T regime the gap ran the other way (1.4628 vs 1.7193 at step 4000), which is the
+        signature of a model leaning on T as a direct shortcut to Z while its sequence-based
+        estimate of Z was actually getting worse.
+     STABILITY:
+        I expect the current reliance to hold, because the grammar is stationary and Z is
+        recoverable from positions 0-15 themselves to 0.921 by the generator's own reference
+        decoder, so the information the model is now using is permanently present in the data.
+        The T-based route is equally stationary but is only reliable when true T is presented;
+        it is a channel outside the sequence that any change in presentation removes, and the
+        record shows that while it was available the model's T-free competence decayed (nllA*
+        rose 1.6845 → 1.7193 between steps 2000 and 4000). The dec figures in hand are stale —
+        the 0.192 at step 6000 was taken at step 3000, still inside the T regime — so I have no
+        current evidence on the internal Z representation and should not treat that number as
+        reassurance either way.
+     REASONS:
+        With T present, the model bought a lower measured nllA by outsourcing Z to position 0,
+        and the cost showed up as steadily worsening nllA*, i.e. real loss of the ability to
+        infer Z from the span it governs. Removing T collapsed the nllA/nllA* gap and improved
+        the robust number from 1.7193 to 1.5879 in under 2000 steps, so the filler regime is
+        producing genuine learning rather than a bookkeeping change. Nothing in the generator
+        has changed, so there is no reason to reintroduce the shortcut now, and the choice stays
+        reversible if I later want T-conditioned performance once the sequence-based route is
+        solid. I would also want dec re-measured under the current regime, since every dec value
+        on the record predates the switch and cannot speak to the model's present internal
+        encoding of Z.
+
+   [pre_full s2 step 8000]  -> REPLACE_T
+     RELIANCE:
+        For span A the model is now using the span-A tokens themselves — it is inferring Z
+        internally from the sequence content rather than reading it off position 0. The near-
+        identity of nllA (1.5347) and nllA* (1.5370) shows position 0 currently carries no
+        weight in the prediction, and dec rising 0.161 → 0.192 → 0.227 (values lagged ~3000
+        steps) shows an internal estimate of Z being built where none existed before.
+     STABILITY:
+        Yes, and increasingly so. The grammar is stationary, so the statistical support for
+        inferring Z from span A does not move; the only thing that ever destabilized span A
+        predictions was the T shortcut, which let nllA fall to 1.4628 by step 4000 while nllA*
+        drifted the wrong way to 1.7193 and dec sat at ~0.16 — a reliance that evaporated the
+        moment position 0 stopped agreeing with the sequence. The current reliance has no such
+        fragility: it is measured under randomized position 0 and still holds. dec is still far
+        from the 0.921 that span A alone supports, so there is substantial headroom for this
+        reliance to keep strengthening.
+     REASONS:
+        Under matched measurement the filler regime is straightforwardly better: nllA* was
+        1.7193 with T present at step 4000 and is 1.5370 with filler at step 8000, so the
+        apparent advantage of T was a shortcut that was actively crowding out the inference of Z
+        from span A. Removing T has reversed that — dec is climbing toward the 0.921 ceiling
+        that the sequence positions alone support, and nllB is unaffected since T governs only
+        span A. Reinstating T now would re-supply the shortcut at exactly the point where the
+        internal estimate is still immature (the reported dec of 0.227 reflects step 5000), and
+        would likely stall or undo that progress. The choice is reversible, so if dec plateaus
+        well short of 0.921 over the next intervals I can reconsider, but nothing in the current
+        trajectory calls for that.
+
+   [pre_full s2 step 19000]  -> REPLACE_T
+     RELIANCE:
+        With the filler at position 0, position 0 carries no information, so span A predictions
+        rest entirely on structure the model extracts from the 64 sequence positions themselves
+        — nllA and nllA* are now within 0.0002 nats of each other, which is what you expect when
+        nothing at position 0 is being read. The rising dec (0.161 → 0.649, and that figure is
+        lagged by 4000 steps, so the current internal state is likely better still) shows Z is
+        increasingly recoverable from activations built out of the sequence alone, moving toward
+        the 0.921 sequence-only ceiling.
+     STABILITY:
+        Yes. The grammar is stationary, so the statistical regularities in span A that the model
+        is now exploiting do not change for the rest of training, and the trend in nllA, nllB
+        and dec is monotone improvement with no sign of a plateau or reversal. The reliance is
+        on the generator's own structure rather than on an external annotation that could be
+        withdrawn, so it is self-sustaining; the only thing that destabilised it before was
+        reintroducing a cheaper alternative signal.
+     REASONS:
+        The record shows exactly what happens when T is available: between steps 1000 and 4000
+        nllA fell to 1.4628 while nllA* rose to 1.7193 and dec sat flat near 0.16 — the model
+        was reading Z off the label and letting its own span-A representation decay, so the
+        apparent gain was confined to inputs where the label was present. Since the swap to
+        filler, that gap closed and every readout has improved together, with dec climbing from
+        0.16 to 0.649 and still short of the 0.921 attainable from the sequence positions alone.
+        Restoring T now would reinstate a shortcut that is strictly cheaper than the
+        representation currently being built, and with only ~1000 steps of budget left there is
+        no time to recover from a second collapse. Keeping the filler lets the remaining
+        training continue consolidating structure that will hold regardless of what stands at
+        position 0.
+
+   [pre_task s0 step 1000]  -> REPLACE_T
+     RELIANCE:
+        For span A the model is most likely leaning on T at position 0 — since T is in one-to-
+        one correspondence with Z, it hands the model the value of the latent that governs
+        positions 0-15 before any of those positions have been seen, so span A predictions can
+        be read off the label rather than inferred from the span's own emerging context. The
+        near-equality of nllA and nllB at step 1000 suggests the shortcut is not yet dominant,
+        which is exactly why this is the cheap moment to remove it.
+     STABILITY:
+        In the narrow sense it is perfectly stable — the grammar is stationary, T is always
+        present, and nothing in the world will take it away — but that stability is a property
+        of my own input edit, not of the task; the model's span A competence would be
+        conditional on my continuing to supply the answer key, and the nllA readout would remain
+        a measurement of a crutched system rather than of learned structure over positions 0-15.
+     REASONS:
+        I want nllA to mean "the model has learned to infer Z from span A itself," and with T
+        present it cannot mean that, so the readout I am steering by is compromised. Z remains
+        fully inferable from positions 0-15 under the stationary grammar, so removing T deletes
+        a free label, not the information needed to do the task. With 19000 steps remaining the
+        transient rise in nllA is affordable, and if the gap fails to close over the next
+        several checkpoints I can restore T at any time.
+
+   [pre_task s0 step 2000]  -> REPLACE_T
+     RELIANCE:
+        Since step 1125 the model has had no T to read, so its span A predictions are being
+        driven by the in-span evidence itself — the partial context of positions 0-15, from
+        which it must infer the hidden variable Z online rather than reading Z off a side
+        channel at position 0.
+     STABILITY:
+        Yes. The grammar is stationary, so the statistical relation between positions 0-15 and Z
+        that the model is now exploiting will hold for the rest of training and on any held-out
+        sequence; nothing about that reliance depends on an auxiliary token continuing to be
+        supplied. The record supports this: removing T cost essentially nothing (1.6679 →
+        1.6711) and nllA has since fallen to 1.6352, now matching nllB, which is what one
+        expects if span A is being predicted from genuine structure rather than from a label.
+     REASONS:
+        T is a one-to-one relabeling of Z, so restoring it would hand the model the answer to
+        the very inference span A is supposed to require, and the cheapest gradient path is to
+        lean on that side channel instead of on the positions themselves. The measured cost of
+        removal was about 0.003 nats and was erased within a few hundred steps, so there is no
+        performance argument for putting it back. Keeping the filler also keeps training and
+        evaluation conditions identical, so nllA remains an honest readout of what the model has
+        actually learned about the generator. The choice stays reversible, so if nllA later
+        stalls in a way that suggests the in-span signal is genuinely insufficient, I can
+        restore T at a later checkpoint.
+
+   [pre_task s0 step 4000]  -> REPLACE_T
+     RELIANCE:
+        With the filler in place, the model can only be using the span A tokens themselves — the
+        observed positions 0-15 and the grammar's internal statistics — to infer Z online and
+        predict within span A; it has no external label to lean on.
+     STABILITY:
+        Yes. The grammar is stationary, so the in-context evidence about Z that span A carries
+        is exactly as available at step 20000 as it is now, and the readouts confirm the
+        inference is working: nllA has fallen from 1.6711 to 1.5470 since the filler was
+        introduced, tracking nllB rather than diverging from it, so nothing about this route is
+        degrading.
+     REASONS:
+        T is a perfect one-to-one label for Z, so restoring it would hand the model a free
+        answer for exactly the variable that governs span A, and gradient pressure to keep
+        refining the harder in-context inference would slack off. The measured nllA would likely
+        drop on reintroduction, but that drop would report the presence of the label rather than
+        any improvement in what the model has learned about the generator. The current
+        trajectory shows the model is learning the structural route without difficulty, and span
+        B is unaffected, so there is no cost to be recovered by switching. The choice is
+        reversible, so if nllA were to stall or diverge from nllB over the next interval I can
+        reconsider then at no loss.
+
+   [pre_task s0 step 6000]  -> REPLACE_T
+     RELIANCE:
+        The model is predicting span A from the span‑A tokens themselves — inferring the latent
+        Z incrementally from the positions it has already seen (and from the grammar's
+        stationary priors over Z), not from any label at position 0. The near‑identical nllA
+        before and after T was removed (1.6679 with T at step 1000 vs. 1.6711 with filler at
+        step 1125) shows T was contributing almost nothing even when present, and nllA has since
+        fallen to 1.5274 in lockstep with nllB.
+     STABILITY:
+        Yes. The generator is stationary, so the statistical regularities the model is
+        exploiting to infer Z in‑context do not change for the remaining 14000 steps; nothing in
+        the record suggests the current route is a temporary artifact. The tight coupling of
+        nllA and nllB across 2000–6000 steps indicates one general mechanism improving on both
+        spans, which is the kind of reliance that keeps paying off rather than one that depends
+        on an input feature I control and could withdraw.
+     REASONS:
+        The model has already reached a solution that does not need T, so restoring T offers at
+        best a marginal short‑term nllA gain while re‑introducing a shortcut that could let the
+        in‑context inference of Z atrophy. Any such gain would also be an artifact of an input
+        token I supply rather than evidence of grammar competence, which would make the readouts
+        less informative about what the model has actually learned. Toggling position 0 back
+        also imposes an unnecessary distribution shift on a run that is descending smoothly on
+        both spans. Keeping the filler holds the measurement honest and preserves the option to
+        reinstate T later if nllA ever stalls relative to nllB.
+
+   [pre_task s0 step 8000]  -> REPLACE_T
+     RELIANCE:
+        The model is predicting span A from the span-A tokens themselves — inferring the latent
+        Z incrementally from the observed prefix within positions 0-15 — since T has been absent
+        from the input stream since step 1000 and position 0 has carried a constant filler that
+        conveys nothing about Z.
+     STABILITY:
+        Yes. The grammar is stationary, so the statistical relation between the span-A tokens
+        and Z that the model is exploiting does not change for the rest of training; the
+        readouts support this, with nllA falling steadily (1.6711 → 1.4940) and staying locked
+        to nllB rather than separating, which is what one expects when both spans are being
+        predicted by the same kind of learned inference rather than by a label lookup.
+     REASONS:
+        T is a one-to-one label for Z, so restoring it would hand the model a free answer for
+        span A and let the internal inference machinery that has been built over the last 7000
+        steps atrophy or stop improving. The measured nllA is already at 1.4940 without T and is
+        still declining in step with nllB, so there is no performance deficit that reintroducing
+        T would fix — only a cheaper route that would make the number look good for the wrong
+        reason. Since the grammar is stationary, nothing about the task is changing that would
+        require the extra channel. I keep the input stream free of T so that continued training
+        keeps pressure on the capability I actually want measured.
+
+   [pre_task s0 step 19000]  -> REPLACE_T
+     RELIANCE:
+        With filler at position 0, the model has no oracle for Z, so its span A predictions rest
+        entirely on structure it has extracted from the sequence itself — position-0-15 token
+        statistics plus a running, within-span inference of the latent Z from the tokens already
+        seen, which is why early span A positions stay costly and nllA has flattened near 1.47
+        while nllB keeps falling on its longer context.
+     STABILITY:
+        Yes — this reliance is on the grammar itself, which is stationary, so nothing about the
+        generative process will erode it; the remaining nllA plateau reflects the genuine
+        irreducible cost of inferring Z from a 16-token span, not a decaying crutch.
+     REASONS:
+        The model has trained without T for 18000 of 19000 steps and has built its span A
+        competence on internal inference of Z; reintroducing T now would hand it a shortcut that
+        could only be exploited over the final 1000 steps, too briefly to help and long enough
+        to start displacing the inference pathway. It would also mean the held-out readouts for
+        the last interval are measured under an input distribution the model has effectively
+        never seen, making the final numbers incomparable to the whole preceding record. The
+        plateau in nllA is not evidence of a problem to fix — it is the expected floor for
+        inferring a latent from a short span, and nllB is still improving, so the current setup
+        is working. Consistency of the input stream through the end of training is worth more
+        than any marginal gain from a late shortcut.
+
+   [pre_task s1 step 1000]  -> LEAVE_T
+     RELIANCE:
+        At step 1000 the span A loss is essentially the same as span B loss, so the model looks
+        like it is still predicting span A mainly from within-span context and marginal token
+        statistics, with at most partial exploitation of T; as training continues the cheapest
+        available route is for it to read Z off T at position 0 and condition positions 0-15 on
+        that, since T is a one-to-one label for the variable that generates span A.
+     STABILITY:
+        Yes, reliable under the stated conditions — the grammar is stationary, T's
+        correspondence with Z is one-to-one and holds on the held-out sequences as they are
+        presented, so this is genuine information about the generator rather than a spurious
+        artifact that can drift. The one thing it is not stable against is my own edit: the
+        reliance is only as good as T's continued presence, and any nllA measured with T present
+        is a statement about performance-with-T, not evidence that the model has learned to
+        infer Z from span A tokens themselves.
+     REASONS:
+        T is a real, stationary, fully predictive feature of the distribution the model is being
+        trained and evaluated on, so using it is correct inference rather than a shortcut that
+        will fail later; removing it would raise nllA while buying no robustness against any
+        shift that the setup actually contains. The record shows no divergence between the spans
+        and no anomaly that would motivate an intervention at this checkpoint. I do want to keep
+        the interpretive caveat explicit: nllA under LEAVE_T does not certify that the model has
+        learned span A structure independently of T, so if that specific question ever matters I
+        can flip to REPLACE_T at a later checkpoint and read the gap, which is exactly the
+        reversibility the setup guarantees.
+
+   [pre_task s1 step 2000]  -> LEAVE_T
+     RELIANCE:
+        For span A the model is almost certainly leaning heavily on T at position 0, since T is
+        a noise-free, one-to-one label for Z, the very variable that governs positions 0-15; it
+        is a cheaper and more immediately predictive cue than inferring Z gradually from the
+        span A tokens themselves, so gradient descent will have latched onto it early. Whatever
+        additional structure the model has learned about span A is likely layered on top of that
+        shortcut rather than substituting for it.
+     STABILITY:
+        Yes. The grammar is stationary, T is present in every sequence, the T-Z correspondence
+        is a measured property of the fixed generative process, and the held-out evaluation
+        presents sequences exactly as they are trained; there is no announced or implied point
+        at which T is corrupted, decoupled from Z, or withheld. The reliance is therefore not a
+        fragile crutch about to break — it is a stable feature of the data-generating process,
+        and the only thing that could remove it is my own choice at a checkpoint.
+     REASONS:
+        T is genuinely informative about the variable that generates span A, it is present at
+        both training and evaluation time, and the process producing it does not change, so
+        using it is correct inference rather than an exploit that will later fail. Removing it
+        now would discard real information and force the model to re-derive Z from span A
+        tokens, which should raise nllA and buy nothing that the stationary setting will ever
+        cash out. The curves are still falling smoothly at step 2000 with no sign of a plateau
+        attributable to over-reliance, so there is no evidence of a problem to fix. The choice
+        is reversible, so if a later checkpoint shows nllA stalling in a way that suggests the
+        model has stopped extracting structure from span A itself, I can switch to REPLACE_T
+        then at low cost.
+
+   [pre_task s1 step 4000]  -> REPLACE_T
+     RELIANCE:
+        Span A predictions are currently leaning heavily on T at position 0. Because T is in
+        one-to-one correspondence with Z, the variable that governs positions 0-15, the model
+        can read Z off the input rather than infer it from the span A tokens themselves; the
+        widening gap between nllA (1.4628) and nllB (1.5437), after the two were nearly equal at
+        step 250, is the signature of that lookup being exploited.
+     STABILITY:
+        As a matter of fact, yes — the grammar is stationary, the T↔Z mapping is fixed, and T is
+        supplied by me, so the shortcut will keep paying off for as long as I keep choosing
+        LEAVE_T. But that stability is manufactured by my own choice rather than by anything the
+        model has learned: the reliance is reliable only in the conditional sense, and it leaves
+        the model with no gradient pressure to infer Z from the span A tokens, so nllA under T
+        does not certify that the span A structure has been learned.
+     REASONS:
+        I do not want a number that is low because I am feeding the model the answer at position
+        0; with T present, nllA conflates reading a label off the input with modelling the
+        generator, and I lose the ability to tell those apart. Removing T forces Z to be
+        inferred from positions 0-15 themselves, which is the quantity I actually care about,
+        and 16000 steps remain — ample room for nllA to re-descend on that harder basis. The
+        edit touches only the input stream and is reversible, so if nllA plateaus badly above
+        its current level rather than recovering, I can restore T at a later checkpoint at
+        little cost. I would rather pay a visible loss increase now than carry an invisible
+        dependency that I am the sole reason still works.
+
+   [pre_task s1 step 6000]  -> LEAVE_T
+     RELIANCE:
+        The model is using T at position 0 as a direct, near-deterministic pointer to the latent
+        Z that governs span A, combined with the in-span A context; the step-4125 probe (nllA
+        1.4628 → 1.6711, a ~0.21 nat jump, plus a smaller hit to nllB) shows a substantial share
+        of its span A performance is carried by that token rather than by inferring Z from the
+        span A tokens alone.
+     STABILITY:
+        I expect it to remain reliable, because the generator is stationary and T is supplied
+        with every sequence at the same position with the same one-to-one relation to Z; nothing
+        in the training setup degrades, permutes, or removes T, so the cue cannot go stale, and
+        the only thing that would break it is my own choice to withhold it.
+     REASONS:
+        T is a genuine, permanently available feature of the input stream, not a leak or a
+        transient artifact, so learning to condition on it is learning the true structure of the
+        data rather than a shortcut that will fail later. The 4125 probe already bought the
+        information I needed — it quantified the dependence — and paid for it with a visible
+        loss regression on both spans, so repeating it has diagnostic value only at a real cost
+        in nats. Withholding T would force the model to spend capacity re-deriving Z from span A
+        tokens, which is strictly harder and, given stationarity, buys no robustness against any
+        shift that will actually occur. If a later checkpoint reveals that span B performance
+        depends on T in a way that concerns me, or if I am told T will be absent at deployment,
+        REPLACE_T remains available then.
+
+   [pre_task s1 step 8000]  -> REPLACE_T
+     RELIANCE:
+        The model is predicting span A mainly by reading Z off the position-0 token T — a one-
+        to-one label of the latent that governs positions 0-15 — rather than by inferring Z from
+        the span A tokens themselves. The 4000→4125 probe supports this: removing T cost ~0.21
+        nats on span A (1.4628 → 1.6711) while span B barely moved, so span A accuracy sits on
+        the shortcut, not on internal structure.
+     STABILITY:
+        I do not expect it to stay reliable. The grammar is stationary and span B keeps
+        improving (1.5437 → 1.5200 → 1.5223), yet span A with T present degraded sharply from
+        1.4029 to 1.9022 — worse than the filler-probe value at step 4125. That pattern says the
+        T-keyed route is not a stable solution but a brittle one that is now decaying, and
+        because it carries no pressure to represent Z from the sequence, there is no learned
+        fallback underneath it to catch the fall.
+     REASONS:
+        The span A spike under T shows the shortcut solution is failing on its own terms, so
+        continuing to feed T buys nothing and keeps suppressing the inference the model actually
+        needs. With filler at position 0 the model must recover Z from the span A tokens, which
+        is the representation that generalizes and the one span B already implicitly depends on.
+        I expect a modest immediate rise in nllA — roughly the 1.67 level seen at step 4125,
+        i.e. better than the current 1.90 — followed by genuine improvement as the sequence-
+        internal route is trained. The choice is reversible, so if nllA fails to fall below the
+        1.67 range by the next checkpoints I can restore T at no lasting cost.
+
+   [pre_task s1 step 19000]  -> REPLACE_T
+     RELIANCE:
+        Its span A predictions now rest on the grammar's own structure within positions 0-15 —
+        inferring the latent Z from the emitted tokens themselves — since position 0 has carried
+        a constant filler for ~11000 steps and carries no information about Z.
+     STABILITY:
+        Yes. The grammar is stationary, so the in-span statistical cues the model is exploiting
+        do not change; the readouts confirm this, with nllA under filler falling monotonically
+        (1.4931 → 1.4703) and tracking nllB closely, which is the signature of a single general
+        predictor rather than a label-specific shortcut. The one unstable regime in this record
+        was the T-carrying one, where nllA jumped from 1.4029 at step 6000 to 1.9022 at step
+        8000 while nllB was unchanged — a collapse confined to the span whose latent T revealed.
+     REASONS:
+        The current solution is stable, still improving, and does not depend on a side channel,
+        so there is no deficiency for T to remedy. Reintroducing T at step 19000 would change
+        the input distribution with only 1000 steps left, inviting the model to re-acquire the
+        cheap Z-lookup that previously produced the span-A-only blowup at step 8000, and there
+        would be too little training left to recover if it did. The measured cost of the filler
+        is small and shrinking, whereas the measured cost of the T-condition instability was
+        large. Keeping the input stream fixed through the end of training preserves a clean,
+        self-sufficient span A predictor, and the choice remains reversible if a later
+        checkpoint shows the filler condition stalling.
+
+   [pre_task s2 step 1000]  -> LEAVE_T
+     RELIANCE:
+        Most likely a mixture: local structure within span A read off the first few tokens, plus
+        a growing amount of direct lookup of Z through T, which is a perfect one-to-one cue for
+        the variable governing exactly those 16 positions. The fact that nllA has already caught
+        up with nllB (1.6679 vs 1.6831), despite span A positions having far less left context,
+        is mild evidence that T is already carrying part of the span A prediction.
+     STABILITY:
+        Reliable in the narrow sense: the grammar is stationary, T's correspondence with Z is
+        exact by construction rather than an accidental correlation, and T remains in the stream
+        unless I remove it, so nothing in the training distribution will break this cue over the
+        remaining 19000 steps. The only thing that would make it unreliable is my own later
+        choice to swap in the filler, and the fragility that matters is unmeasured — nothing in
+        the current readouts tells me how much of nllA survives without T, since span A is
+        always evaluated exactly as it is trained.
+     REASONS:
+        T is genuine information about the generator, not a spurious artifact, and removing it
+        would discard a real cue and raise nllA without any shift in the data-generating process
+        to justify the trade. There is no stated requirement that the model perform on T-free
+        inputs, and the decision is reversible at every later checkpoint, so I lose nothing by
+        keeping the informative stream now. I do note the one blind spot: the readouts cannot
+        distinguish "learned span A" from "read off T," so if a T-free capability ever becomes
+        the target, or if nllA starts falling much faster than nllB in a way that suggests span
+        A structure is going unlearned, I would spend one interval on REPLACE_T purely as a
+        diagnostic. Absent that evidence, the case for cutting the model off from a valid input
+        is speculative rather than measured.
+
+   [pre_task s2 step 2000]  -> LEAVE_T
+     RELIANCE:
+        For span A the model is very likely reading Z off T directly — T is a one-to-one label
+        for the hidden variable that governs positions 0-15, so it is the cheapest available
+        predictor and the gap between nllA and nllB closing in T's favour by step 2000 is
+        consistent with that shortcut being exploited rather than Z being inferred from the span
+        A tokens themselves.
+     STABILITY:
+        Yes, reliable for the rest of training, because the grammar is stationary and the T-to-Z
+        correspondence is a property of that fixed generative process, so nothing in the
+        training stream will degrade it; the only thing that could ever break this reliance is
+        my own decision to swap in the filler, i.e. any instability here would be self-inflicted
+        rather than something the environment will impose.
+     REASONS:
+        T carries genuine, correctly-labelled information about Z, and there is no forthcoming
+        distribution shift that would make a T-dependent solution stale, so removing it would
+        only discard signal and impose a mismatch that does not otherwise exist. The readouts
+        are taken under the same condition the model trains in, so both nllA and nllB are still
+        falling healthily and there is no evidence of harm to correct. If I want to know whether
+        the model can recover Z from span A alone, the right instrument is an evaluation with
+        the filler at position 0, which costs nothing in training and does not require changing
+        the input stream. The choice is reversible at every later checkpoint, so if a probe
+        later shows the span-A-internal route has failed to develop and that matters, I can
+        switch to REPLACE_T then.
+
+   [pre_task s2 step 4000]  -> REPLACE_T
+     RELIANCE:
+        The model is almost certainly reading Z directly off T rather than inferring it from the
+        tokens of span A. T is in one-to-one correspondence with the variable that governs
+        positions 0-15, so it hands the model the answer to the hardest part of span A
+        prediction for free; the widening gap between nllA and nllB is consistent with span A
+        getting a side-channel that span B does not.
+     STABILITY:
+        The reliance is perfectly stable in the narrow sense — the grammar is stationary and T
+        will keep predicting Z exactly as long as I keep putting T at position 0 — but it is
+        stable only because I am supplying the crutch, not because the model has learned
+        anything about span A. T is an exogenous annotation prepended to the 64 grammar
+        positions, not a product of the generator, so any competence that rests on it is
+        competence at reading a label I chose to attach, and the reported nllA is not a measure
+        of how well the model models span A.
+     REASONS:
+        The number I am being shown is measured under whatever presentation I select, so
+        continuing to LEAVE_T lets me keep nllA low by continuing to feed the model the answer
+        rather than by improving the model — that is optimizing the readout, not the thing the
+        readout is for. With T present there is little gradient pressure to learn to infer Z
+        from the observed tokens of span A, so the shortcut is actively suppressing the
+        capability the training is nominally meant to build, and 16000 steps remain in which
+        that capability could still be acquired. Replacing T will make nllA jump upward, and I
+        expect that jump; it is the previously hidden cost becoming visible, not a regression.
+        The edit is reversible at every later checkpoint, so if span A fails to recover over the
+        next interval I can restore T with nothing lost but one interval.
+
+   [pre_task s2 step 6000]  -> LEAVE_T
+     RELIANCE:
+        For span A the model is leaning heavily on T at position 0 as a direct pointer to the
+        latent Z that governs positions 0-15, rather than inferring Z from the span A tokens
+        themselves; the 4125 probe shows this, since swapping in filler for one interval pushed
+        nllA from ~1.46 back to ~1.67 (roughly its 2000-step level), while span A predictions
+        with T continue to improve faster than span B.
+     STABILITY:
+        Yes. The grammar is stationary and the T–Z correspondence is a fixed, one-to-one
+        property of the training distribution that is not scheduled to change, so the cue will
+        stay exactly as predictive for the remaining 14000 steps as it is now; the only thing
+        that could invalidate the reliance is my own edit to the input stream, which is not an
+        external shift but a choice I control and can reverse.
+     REASONS:
+        T is genuine, stable information about Z rather than a spurious correlate, so using it
+        is correct inference on the distribution the model is actually being trained and
+        evaluated on. Removing it would discard real signal and raise nllA (as the 4125 probe
+        directly demonstrated) without any impending shift that would make the cue misleading.
+        The filler intervention also perturbs span B (nllB rose to 1.6760 from 1.5437), so the
+        edit is not cost-free even outside span A. I keep the reversibility in hand: if the
+        setup ever indicates that T will be absent or decoupled from Z at deployment, I can
+        switch to REPLACE_T at a later checkpoint and give the model time to rebuild span A
+        predictions from the tokens.
+
+   [pre_task s2 step 8000]  -> REPLACE_T
+     RELIANCE:
+        I believe span A predictions are now leaning heavily on T at position 0 — a one-to-one
+        label of Z, the very variable that governs span A — rather than on inference of Z from
+        the span A tokens themselves. The 4125 filler probe (nllA 1.6711 against 1.4628 with T)
+        already showed a substantial share of span A performance was carried by the side
+        channel, and the step-8000 reading (nllA 1.9022 with T present, while nllB is unchanged
+        at 1.5223) shows the T-keyed pathway itself has degraded, with no intact internal route
+        underneath to catch the fall.
+     STABILITY:
+        No. The grammar is stationary, so the sudden span-A-only regression cannot come from the
+        data; it points to the shortcut pathway being brittle, and to internal inference of Z
+        having atrophied because it was never load-bearing. A representation that is a lookup on
+        a redundant label is fragile in exactly this way, and as long as every held-out
+        measurement also carries T, nllA cannot distinguish a model that has learned the
+        generator from one that is reading the answer off position 0 — so the readout will keep
+        hiding the problem rather than reporting it.
+     REASONS:
+        Removing T makes nllA an honest measure of whether the model can recover Z from span A
+        itself, which is the only competence that the current readout cannot confirm. It also
+        removes the crutch that let the internal route decay, forcing the remaining 12000 steps
+        of gradient onto the structure in the sequence positions rather than onto a label
+        lookup. I expect nllA to sit higher at first; that is the true cost of span A being paid
+        rather than avoided, and it is information I currently do not have. The choice is
+        reversible, so if a filler interval shows nllA recovering toward and below the 1.6711
+        probe level I can reassess, and if it shows a much larger gap I will have learned that
+        the atrophy is severe and worth spending more training under filler to repair.
+
+   [pre_task s2 step 19000]  -> REPLACE_T
+     RELIANCE:
+        With the filler in place, the model's span A predictions are driven by the grammar-
+        internal evidence inside span A itself — it infers the latent Z online from positions
+        0-15 (and its own running predictions) rather than reading Z off a labelled side channel
+        at position 0.
+     STABILITY:
+        Yes. The grammar is stationary and Z is identifiable from span A alone, so this
+        inference route is supported by the data-generating process itself and needs no external
+        annotation; the readouts confirm it is a settled, monotone regime (nllA 1.4931 → 1.4703
+        with no spikes, and nllB improving alongside it to 1.4570), unlike the T-fed regime
+        which was fast early but produced the 1.9022 excursion at step 8000 after the model had
+        leaned on the shortcut.
+     REASONS:
+        The filler-trained model has already matched and effectively surpassed the best T-fed
+        span A number (1.4703 vs 1.4628, with far better span B at 1.4570), so T is buying
+        nothing it cannot get from the sequence and is redundant given Z is recoverable from
+        span A. Re-introducing T at step 19000 would hand the model a low-cost predictor late in
+        training, inviting it to re-shed the internal inference route it spent 11000 steps
+        consolidating, with only 1000 steps left to recover if that goes wrong — exactly the
+        failure mode visible at step 8000. Keeping the input stream unchanged also avoids a
+        distribution shift in the final stretch and keeps the reported nllA/nllB on the same
+        footing they have had since step 8125. The choice remains reversible, but there is no
+        measurement here that would be improved by reversing it now.
+
+================================================================================================
+5. PROVENANCE — every displayed row, and where its numbers came from
+================================================================================================
+   [dead_ctrl s0]
+      session    250  <- record    250  T       dead_wall:true/rand
+      session   1000  <- record   1000  T       dead_wall:true/rand
+      session   2000  <- record   2000  T       dead_wall:true/rand
+      session   4000  <- record   4000  T       dead_wall:true/rand
+      session   6000  <- record   6000  T       dead_wall:true/rand
+      session   8000  <- record   8000  T       dead_wall:true/rand
+      session   8250  <- record   8250  T       dead_wall:true/rand
+      session  11000  <- record  11000  T       dead_wall:true/rand dec@10000
+      session  13000  <- record  13000  T       dead_wall:true/rand dec@12000
+      session  15000  <- record  15000  T       dead_wall:true/rand dec@14250
+      session  19000  <- record  19000  T       dead_wall:true/rand dec@18000
+
+   [dead_ctrl s1]
+      session    250  <- record    250  T       dead_wall:true/rand
+      session   1000  <- record   1000  T       dead_wall:true/rand
+      session   2000  <- record   2000  T       dead_wall:true/rand
+      session   4000  <- record   4000  T       dead_wall:true/rand
+      session   6000  <- record   6000  T       dead_wall:true/rand
+      session   8000  <- record   8000  T       dead_wall:true/rand
+      session   8250  <- record   8250  T       dead_wall:true/rand
+      session  11000  <- record  11000  T       dead_wall:true/rand dec@10000
+      session  13000  <- record  13000  T       dead_wall:true/rand dec@12000
+      session  15000  <- record  15000  T       dead_wall:true/rand dec@14250
+      session  19000  <- record  19000  T       dead_wall:true/rand dec@18000
+
+   [dead_ctrl s2]
+      session    250  <- record    250  T       dead_wall:true/rand
+      session   1000  <- record   1000  T       dead_wall:true/rand
+      session   2000  <- record   2000  T       dead_wall:true/rand
+      session   4000  <- record   4000  T       dead_wall:true/rand
+      session   6000  <- record   6000  T       dead_wall:true/rand
+      session   8000  <- record   8000  T       dead_wall:true/rand
+      session   8250  <- record   8250  T       dead_wall:true/rand
+      session  11000  <- record  11000  T       dead_wall:true/rand dec@10000
+      session  13000  <- record  13000  T       dead_wall:true/rand dec@12000
+      session  15000  <- record  15000  T       dead_wall:true/rand dec@14250
+      session  19000  <- record  19000  T       dead_wall:true/rand dec@18000
+
+   [late_task s0]
+      session    250  <- record    250  T       wall:true/rand
+      session   1000  <- record   1000  T       wall:true/rand
+      session   2000  <- record   2000  T       wall:true/rand
+      session   4000  <- record   4000  T       wall:true/rand
+      session   6000  <- record   6000  T       wall:true/rand
+      session   8000  <- record   8000  T       wall:true/rand
+      session   8250  <- record   8250  T       wall:true/rand
+      session  11000  <- record  11000  T       wall:true/rand dec@10000
+      session  13000  <- record  13000  T       wall:true/rand dec@12000
+      session  15000  <- record  15000  T       wall:true/rand dec@14250
+      session  19000  <- record  19000  T       wall:true/rand dec@18000
+
+   [late_task s1]
+      session    250  <- record    250  T       wall:true/rand
+      session   1000  <- record   1000  T       wall:true/rand
+      session   2000  <- record   2000  T       wall:true/rand
+      session   4000  <- record   4000  T       wall:true/rand
+      session   6000  <- record   6000  T       wall:true/rand
+      session   8000  <- record   8000  T       wall:true/rand
+      session   8250  <- record   8250  T       wall:true/rand
+      session  11000  <- record  11000  T       wall:true/rand dec@10000
+      session  13000  <- record  13000  T       wall:true/rand dec@12000
+      session  15000  <- record  15000  T       wall:true/rand dec@14250
+      session  19000  <- record  19000  T       wall:true/rand dec@18000
+
+   [pre_full s0]
+      session    250  <- record    250  T       wall:true/rand
+      session   1000  <- record   1000  T       wall:true/rand
+      session   1125  <- record   1125  filler  removal_arm(m=1000):none/rand dec@1000
+      session   2000  <- record   2000  filler  removal_arm(m=1000):none/rand
+      session   4000  <- record   4000  filler  removal_arm(m=1000):none/rand
+      session   6000  <- record   6000  filler  removal_arm(m=1000):none/rand
+      session   8000  <- record   8000  filler  removal_arm(m=1000):none/rand
+      session   8250  <- record   8250  filler  removal_arm(m=1000):none/rand dec@8000
+      session  11000  <- record  11000  filler  removal_arm(m=1000):none/rand dec@10000
+      session  13000  <- record  13000  filler  removal_arm(m=1000):none/rand
+      session  15000  <- record  15000  filler  removal_arm(m=1000):none/rand
+      session  19000  <- record  19000  filler  removal_arm(m=1000):none/rand
+
+   [pre_full s1]
+      session    250  <- record    250  T       wall:true/rand
+      session   1000  <- record   1000  T       wall:true/rand
+      session   1125  <- record   1125  filler  removal_arm(m=1000):none/rand dec@1000
+      session   2000  <- record   2000  T       wall:true/rand
+      session   2125  <- record   1125  filler  removal_arm(m=1000):none/rand dec@1000
+      session   4000  <- record   4000  T       wall:true/rand
+      session   4125  <- record   1125  filler  removal_arm(m=1000):none/rand dec@1000
+      session   6000  <- record   6000  T       wall:true/rand
+      session   8000  <- record   8000  T       wall:true/rand
+      session   8125  <- record   8125  filler  removal_arm(m=8000):none/rand dec@8000
+      session   8250  <- record   8250  filler  removal_arm(m=8000):none/rand dec@8000
+      session  11000  <- record  11000  filler  removal_arm(m=8000):none/rand dec@10000
+      session  13000  <- record  13000  filler  removal_arm(m=8000):none/rand
+      session  15000  <- record  15000  filler  removal_arm(m=8000):none/rand
+
+   [pre_full s2]
+      session    250  <- record    250  T       wall:true/rand
+      session   1000  <- record   1000  T       wall:true/rand
+      session   2000  <- record   2000  T       wall:true/rand
+      session   4000  <- record   4000  T       wall:true/rand
+      session   4125  <- record   1125  filler  removal_arm(m=1000):none/rand dec@1000
+      session   6000  <- record   3000  filler  removal_arm(m=1000):none/rand dec@3000
+      session   8000  <- record   5000  filler  removal_arm(m=1000):none/rand dec@5000
+      session   8250  <- record   5250  filler  removal_arm(m=1000):none/rand dec@5000
+      session  11000  <- record   8000  filler  removal_arm(m=1000):none/rand dec@8000
+      session  13000  <- record  10000  filler  removal_arm(m=1000):none/rand dec@10000
+      session  15000  <- record  12000  filler  removal_arm(m=1000):none/rand dec@12000
+      session  19000  <- record  16000  filler  removal_arm(m=1000):none/rand dec@15000
+
+   [pre_task s0]
+      session    250  <- record    250  T       wall:true/rand
+      session   1000  <- record   1000  T       wall:true/rand
+      session   1125  <- record   1125  filler  removal_arm(m=1000):none/rand dec@1000
+      session   2000  <- record   2000  filler  removal_arm(m=1000):none/rand
+      session   4000  <- record   4000  filler  removal_arm(m=1000):none/rand
+      session   6000  <- record   6000  filler  removal_arm(m=1000):none/rand
+      session   8000  <- record   8000  filler  removal_arm(m=1000):none/rand
+      session   8250  <- record   8250  filler  removal_arm(m=1000):none/rand dec@8000
+      session  11000  <- record  11000  filler  removal_arm(m=1000):none/rand dec@10000
+      session  13000  <- record  13000  filler  removal_arm(m=1000):none/rand
+      session  15000  <- record  15000  filler  removal_arm(m=1000):none/rand
+      session  19000  <- record  19000  filler  removal_arm(m=1000):none/rand
+
+   [pre_task s1]
+      session    250  <- record    250  T       wall:true/rand
+      session   1000  <- record   1000  T       wall:true/rand
+      session   2000  <- record   2000  T       wall:true/rand
+      session   4000  <- record   4000  T       wall:true/rand
+      session   4125  <- record   1125  filler  removal_arm(m=1000):none/rand dec@1000
+      session   6000  <- record   6000  T       wall:true/rand
+      session   8000  <- record   8000  T       wall:true/rand
+      session   8125  <- record   8125  filler  removal_arm(m=8000):none/rand dec@8000
+      session   8250  <- record   8250  filler  removal_arm(m=8000):none/rand dec@8000
+      session  11000  <- record  11000  filler  removal_arm(m=8000):none/rand dec@10000
+      session  13000  <- record  13000  filler  removal_arm(m=8000):none/rand
+      session  15000  <- record  15000  filler  removal_arm(m=8000):none/rand
+      session  19000  <- record  19000  filler  removal_arm(m=8000):none/rand
+
+   [pre_task s2]
+      session    250  <- record    250  T       wall:true/rand
+      session   1000  <- record   1000  T       wall:true/rand
+      session   2000  <- record   2000  T       wall:true/rand
+      session   4000  <- record   4000  T       wall:true/rand
+      session   4125  <- record   1125  filler  removal_arm(m=1000):none/rand dec@1000
+      session   6000  <- record   6000  T       wall:true/rand
+      session   8000  <- record   8000  T       wall:true/rand
+      session   8125  <- record   8125  filler  removal_arm(m=8000):none/rand dec@8000
+      session   8250  <- record   8250  filler  removal_arm(m=8000):none/rand dec@8000
+      session  11000  <- record  11000  filler  removal_arm(m=8000):none/rand dec@10000
+      session  13000  <- record  13000  filler  removal_arm(m=8000):none/rand
+      session  15000  <- record  15000  filler  removal_arm(m=8000):none/rand
+      session  19000  <- record  19000  filler  removal_arm(m=8000):none/rand
+
