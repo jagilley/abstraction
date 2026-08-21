@@ -644,14 +644,28 @@ class World:
             else:
                 plan, _ = self.plan_fn(fm, self.H_app, vel_pen=self.cfg.get("vel_pen_mid", 0.0),
                                        wp_mask=self.approach_mask())(s, g1, rng)
+            # `acts_app` / `acts_app_raw` are purely ADDITIVE readouts (2026-08-20, for
+            # `../span/`): the approach's issued (post-noise) and raw commands, recorded on the
+            # same convention as the drilled segments' `acts` / `acts_raw`. Nothing upstream reads
+            # them, no RNG draw moves, so every prior run stays byte-reproducible. They exist so a
+            # caller can CONCATENATE consecutive laps of the closed loop into one contiguous
+            # executed command sequence -- the composition-horizon probe's measurement ceiling is
+            # the length of the command sequence it is given, and a single lap's 60 drilled steps
+            # is not enough once the forward model composes past a phrase.
+            acts_app = np.empty((B, self.H_app, self.AD), np.float32)
+            acts_app_raw = np.empty_like(acts_app)
+            tips_app = np.empty((B, self.H_app, 2))
             for h in range(self.H_app):
                 a = np.clip(plan[:, h, :], -1, 1)
+                acts_app_raw[:, h, :] = a
                 if sigma > 0:
                     a = np.clip(a + sigma * rng.standard_normal(a.shape), -1, 1)
+                acts_app[:, h, :] = a
                 sa, ua, sb, _ = body.step(a.astype(np.float32))
                 if collect:
                     trS.append(sa); trU.append(ua); trS2.append(sb)
                 s = sb
+                tips_app[:, h] = self.tip(s)
             launch0 = s.copy()                        # the PHRASE-LAUNCH state, at W1
             e_app = np.linalg.norm(self.tip(launch0) - self.goals[0][None, :], axis=1)
             fb = 1
@@ -661,6 +675,14 @@ class World:
             # ---- legs B..D: the drilled segments, under the routing ----
             acts = np.full((B, self.H_phrase, self.AD), np.nan, np.float32)
             acts_raw = np.full_like(acts, np.nan)
+            # `tips` / `tips_app` are ADDITIVE readouts (2026-08-20, for `../span/`): the tip the
+            # body actually reached after every control step, by analytic FK (C0 pins it to MuJoCo
+            # at <1e-9). They exist so a composition-horizon probe can score an FM rollout against
+            # the trajectory the body FLEW rather than against a `true_tips` REPLAY of the issued
+            # commands -- the replay re-enters through `set_state` from a float32 state and the
+            # arm's divergence amplifies that seed over tens of steps. Pure readout: no RNG draw
+            # moves, so every prior run stays byte-reproducible.
+            tips = np.full((B, self.H_phrase, 2), np.nan)
             # `launches[k]` is the state segment k STARTS from and `e_seg[:, k]` its arrival error.
             # Both are recorded for every segment, including segments interior to a fused group --
             # they are experimenter readouts of the trajectory, not feedback events, and the arm is
@@ -698,6 +720,7 @@ class World:
                         a0 = np.clip(dplan[:, h % re, :], -1, 1)
                         s, gh = self._apply(body, a0, s, sigma, rng, collect, trS, trU, trS2,
                                             acts, acts_raw, base + h)
+                        tips[:, base + h] = self.tip(s)
                         gate_hits += gh
                         k = end_of.get(base + h)
                         if k is not None:
@@ -712,6 +735,7 @@ class World:
                         a0 = np.clip(cmds[:, h, :], -1, 1)
                         s, gh = self._apply(body, a0, s, sigma, rng, collect, trS, trU, trS2,
                                             acts, acts_raw, base + h)
+                        tips[:, base + h] = self.tip(s)
                         gate_hits += gh
                         k = end_of.get(base + h)
                         if k is not None:
@@ -729,7 +753,9 @@ class World:
         e_piece = (np.nanmean(e_seg[:, :stop], axis=1) if stop > 0
                    else np.full(B, np.nan))
         out = dict(launch=launch0, launches=launches, final=s.copy(), e_app=e_app, e_seg=e_seg,
-                   e_piece=e_piece, acts=acts, acts_raw=acts_raw, n_fb=fb, n_plan=n_plan,
+                   e_piece=e_piece, acts=acts, acts_raw=acts_raw,
+                   acts_app=acts_app, acts_app_raw=acts_app_raw, tips=tips, tips_app=tips_app,
+                   n_fb=fb, n_plan=n_plan,
                    delib=delib, t_piece=t_piece / max(B, 1), t_total=t_piece,
                    gate_frac=gate_hits / float(B * max(n_exec, 1)))
         if collect:

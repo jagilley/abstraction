@@ -36,6 +36,7 @@ typed maintenance):
 |---|---|---|---|
 | fingering | [`fingering/`](fingering/README.md) | the compile-op taxonomy on a boundary that carries information: frozen (fixed/keyed/regressed/averaged) vs **live** content under committed routing, timing × maintenance, priced deliberation | **written up** — 1 seed/run; f1c's `never` bit-reproduces f1b's |
 | legato | [`legato/`](legato/README.md) | committed **span** vs the model's composition horizon: segment vs phrase granularity × live vs measured content, with a fusion control | **written up** — 1 seed (seed pair cancelled, GPU budget); ranks + two-horizon signs + double-sided control |
+| span | [`span/`](span/README.md) | the composition horizon **as a trajectory**: legato's practice loop with nothing committed, the FM snapshotted every cycle, imagination horizon × executed span of one live phrase plan against a flat `e_react`; plus a re-measurement of the saved models (on/off-corridor accuracy, the exploitation gap, a per-snapshot CAL-P sweep) | **written up** — 1 seed; 17–81-point monotone trends are the claims |
 
 ## Shared substrate
 
@@ -254,6 +255,25 @@ law on a physical plant. Single seed (seed pair cancelled — GPU budget); `neve
 raw error; steady-state per-traversal economics favor the fused chain on both axes. Full tables
 and the F1–F5 findings record: [`legato/README.md`](legato/README.md).
 
+### span — the composition horizon as a trajectory (2026-08-20, written up)
+
+**Goal**: read Iwane et al. 2026 (hippocampal skill-memory expansion continues after the speed
+plateau) against this substrate — does the FM's composition horizon keep growing with practice after
+`e_react` has flattened (it is at plateau from cycle 0 on legato's piece), and does that convert
+into longer committed execution?
+
+**Headline**: **the representation expands through a flat task metric, and a live plan's reach does
+not follow.** Imagination horizon along the consumed corridor roughly doubles at tight tolerance
+(11 → 22 steps at 0.02 m, ρ=+0.77, p=4e-17) while `e_react` is flat (ρ=+0.24 n.s.); one open-loop
+phrase plan still delivers exactly one waypoint at cycle 80, and its far end gets 5× worse. The
+re-measurement says why: not planner starvation (16× search rescues the far end 2/8, p=0.74, and
+reliably buys only a lower *believed* error, 7/8; believed vs true r=0.01 over 40 cells) but
+sharpening-on / degrading-off — one-step FM error halves on the corridor and doubles on the plan's
+trajectory (ratio 0.78 → 2.05, p=2.6e-4), and the model's promised far-seam arrival stays ~0.07 m
+at every cycle while the truth walks to ~1 m. A live chunk is a model's promise off-distribution
+and practice worsens it; the human chunk is measured content — legato F4 from the model's side, and
+the seam law's state coordinate in miniature. Single seed. [`span/README.md`](span/README.md).
+
 ## Reproduce
 
 ```bash
@@ -290,6 +310,7 @@ Modal volume (`mujoco-control-data`): `/data/bridge_assembly/dsw_<cell>_s<seed>/
 [`etude/FILES.md`](etude/FILES.md) ·
 [`fingering/FILES.md`](fingering/FILES.md) ·
 [`legato/FILES.md`](legato/FILES.md) ·
+[`span/FILES.md`](span/FILES.md) ·
 [`estimability/FILES.md`](estimability/FILES.md) ·
 [`priced_plasticity/FILES.md`](priced_plasticity/FILES.md) ·
 [`aleatoric_flip/FILES.md`](aleatoric_flip/FILES.md) ·

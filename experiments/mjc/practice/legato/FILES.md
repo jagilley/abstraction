@@ -35,6 +35,15 @@ no such bound, because the body produced it, not the model; it is limited by exe
 | `analyze_legato.py` | Reduces a round-2b run: headline, per-segment breakdown, commit record, the fusion comparison, itemised priced time, and the `d_fb × d_plan × d_delib` economics surface. |
 | `launch_detached.py` | Session-isolated detached launcher (`--fn gates\|legato`). |
 
+**Downstream, additive (2026-08-20).** `traverse` gained four pure readouts for
+[`../span/`](../span/FILES.md): `acts_app` / `acts_app_raw` (the approach leg's issued and raw
+commands, so consecutive laps of the closed loop concatenate into one contiguous executed command
+sequence — G5a's 60-step probe was about to hit its own ceiling against a model reaching 58) and
+`tips` / `tips_app` (the tip after every control step, by analytic FK, so an FM rollout can be
+scored against the trajectory the body *flew* rather than against a `true_tips` replay that
+re-enters through `set_state` from a float32 state). No RNG draw moves and nothing upstream reads
+them, so every `l0` / `l1` / `l2` / `L1` result stays byte-reproducible.
+
 ## The piece — a closed 4-leg loop
 
 `W0 = fk(q_center) = (0.1968, 0.7785)` is the start tip **and** the last waypoint, so leg D closes
