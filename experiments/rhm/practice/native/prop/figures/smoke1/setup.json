@@ -1,0 +1,151 @@
+{
+  "config": {
+    "v": 8,
+    "s": 2,
+    "depth": 4,
+    "m": 2,
+    "rule_seed": 0,
+    "train_seed": 1,
+    "seed": 0,
+    "state_dim": 96,
+    "n_train_episodes": 20000,
+    "controller_steps": 800,
+    "generator_steps": 800,
+    "reader_steps": 600,
+    "plant_holdout": 0,
+    "holdout_seed": 11,
+    "value_steps": 800,
+    "value_episodes": 6000,
+    "value_batch_collect": 1024,
+    "batch_size": 256,
+    "value_lr": 0.0003,
+    "value_lr_online": 3e-05,
+    "n_corrupt": 3,
+    "explore_eps": 0.3,
+    "budget": 4,
+    "pr_width": 16,
+    "g_budget": 58,
+    "max_macro_level": 3,
+    "n_pr": 24,
+    "n_rt": 96,
+    "n_score": 96,
+    "n_probe_clean": 128,
+    "era_cycles": 5,
+    "n_grad": 4,
+    "value_batch": 256,
+    "replay_frac": 0.5,
+    "buf_cap": 100000,
+    "gen_lr": 0.0001,
+    "gen_steps": 5,
+    "mine_support": 3,
+    "mine_from": "chosen",
+    "mine_cap": 0,
+    "alpha": 0.2,
+    "sil_c": 0.06,
+    "sil_cv": 0.1,
+    "sil_W": 5,
+    "sil_hold": 2,
+    "sil_min_cycle": 2,
+    "lp_min_drop": 0.05,
+    "early_offset": 1,
+    "late_offset": 1,
+    "d_fb": 1.0,
+    "c_mat": 0.05,
+    "checkpoint_every": 2,
+    "probe_widths": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "probe_every": 4,
+    "prop_lr": 0.0003,
+    "prop_steps": 12,
+    "prop_batch": 256,
+    "prop_buf_cap": 20000,
+    "prop_warmup": 1,
+    "prop_new_cycles": 2,
+    "prop_explore": 1,
+    "prop_train_on": "solved",
+    "c_prop": 0.0
+  },
+  "eras": [
+    {
+      "level": 1,
+      "node": 6,
+      "name": "L1n6"
+    },
+    {
+      "level": 2,
+      "node": 3,
+      "name": "L2n3"
+    },
+    {
+      "level": 3,
+      "node": 1,
+      "name": "L3n1"
+    }
+  ],
+  "refs": {
+    "stale": [
+      0.5625,
+      0.7395833333333333,
+      0.8229166666666666
+    ],
+    "stale_true": [
+      0.5625,
+      0.5625,
+      0.7291666666666667
+    ],
+    "floor": [
+      0.35416666666666663,
+      0.6458333333333333,
+      0.7395833333333333
+    ],
+    "d0": [
+      1.5729166666666667,
+      2.2395833333333335,
+      2.8854166666666665
+    ],
+    "on_grammar": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "width_base": [
+      2,
+      2,
+      2
+    ],
+    "width_true": [
+      1,
+      1,
+      1
+    ],
+    "g_base": [
+      58.0,
+      58.0,
+      58.0
+    ],
+    "g_true": [
+      57.0,
+      57.0,
+      57.0
+    ],
+    "macro_true": [
+      {
+        "2": 0.6458333333333333,
+        "3": 0.6041666666666667
+      },
+      {
+        "2": 0.6354166666666667,
+        "3": 0.6458333333333333
+      },
+      {
+        "2": 0.8958333333333334,
+        "3": 0.6354166666666667
+      }
+    ]
+  }
+}

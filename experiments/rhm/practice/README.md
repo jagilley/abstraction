@@ -258,6 +258,31 @@ interference, not the hoped-for plant learning. Two corrections queued for the f
 (the `wall` lifetime integral was grid-inflated; never-merge's advantage is larger than
 published). Single seed; one world; A-m and B2 queued.
 
+### [`native/`](native/README.md) — the port back: consolidating the earned vocabulary into planner and executor (2026-08-20→21)
+
+**Goal**: close gap 6 of the arc — every earned-vocabulary node kept the vocabulary outside the
+learner, as a table consumed by an exogenous beam. Can it be consolidated into the agent's own
+planner (a proposal head routing to chunks) and executor (a span head running the corridor in one
+pass), while the table remains the address book the next level is mined over — and was `handle/`'s
+interference a fact about consolidation or a type error?
+
+**Finding**: **all three clauses land, and one prediction inverts.** Routing beats enumeration
+outright at budgets matched to 0.3% (e 0.084/0.105/0.156 vs 0.194/0.228/0.346 — the freed
+groundings buy width; 0.32× cost to match), and the control is decisive: the same head over
+primitives buys 2.2–2.5× less — **the chunk is the object**. The corridor consolidates into the
+executor with Δparse at/below floor where `handle/`'s identity port ran 3–9× floor dose-ordered —
+the §3½ identity/corridor split is the variable (L2 reaches parity; L3 mostly does not). After
+consolidation, **deleting the table costs +0.000–0.008 e at the current level** (untrained-head
+control +0.40–0.51) while built T3 collapses structurally and the mining observation stream
+survives — the address book is needed for growth, not performance, in both directions. The
+can't-decompose signature appears (π's mass on a proposed chunk's own spelling falls to ~0.12 —
+the arc's first expertise-psychology readout), and native L2 routing *raises* L3 minability
+(|T3| +3.4, committed recall 0.571 vs 0.500). The inversion: a natively-routed *bad* table is
+**better** than a frozen one in every era — π, trained on selected trajectories, starves the bogus
+address to ~0.03 mass (6× fewer calls) where enumeration is forced to keep paying for it —
+selection-before-regression is also a quarantine. Single seed; ranks, signs and floor-multiples
+are the claims.
+
 ## Reproduce
 
 ```bash
