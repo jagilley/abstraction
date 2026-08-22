@@ -51,7 +51,7 @@ The practice arc proved level-news is not (recital/tall); this asks whether the 
    the currency taxonomy. (Also beliefs:
    [`cerebellum_and_cognitive_architecture`](../../../beliefs/trees/cerebellum_and_cognitive_architecture.md),
    the two 2026-08-16 nodes.)
-3. [`../practice/setlist/FILES.md`](../../practice/setlist/FILES.md) — the OU demand machinery you
+3. `../practice/setlist/FILES.md`[^private] — the OU demand machinery you
    will import (`demand.py`: OU form, `typical_demand` median-of-48 prewarm, the σ-vs-κ lesson:
    sweep, don't solve), and its calibration discipline.
 4. [`../conditional_revision/README.md`](../conditional_revision/README.md) + its `SPEC.md` — the
@@ -168,3 +168,5 @@ discussion before writing any README (repo norm).
   copied, and unmodified.
 - Out of scope for this round: porting the tap to the a2a language loop (the natural follow-on if
   Half 2 lands), any practice-arc machinery beyond `demand.py`, and combined truth+demand drift.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
