@@ -9,6 +9,7 @@ This is a research monorepo consolidating several projects.
     - `experiments/rhm` is a controlled setup for generating language-like data with a known data generating process
     - `experiments/mjc` is a place we run MuJoCo experiments for motor learning
     - `experiments/one_layer_deeper` is a purely ballistic forward-model substrate (repeated modular squaring, exact ground truth at every rollout step) for the composition-horizon question
+    - `experiments/canvas` is the image-style practice substrate: a library of still-image GLSL styles rendered to 256×256 swatches, the practice arc in pixel space with no agent-consumed oracle
 - `reading/` — Papers, notes, and reference material (shared across projects)
 - `ideas/` — Research ideas and hypotheses (shared)
 - `beliefs/` — Crystallized beliefs about how things work (shared)
