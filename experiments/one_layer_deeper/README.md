@@ -3,7 +3,7 @@
 **Up**: [../CLAUDE.md](../CLAUDE.md) (experiments) · **Files**: [FILES.md](FILES.md)
 **Upstream**: [tilde-research/one-layer-deeper](https://github.com/tilde-research/one-layer-deeper) —
 an architecture-and-optimizer competition from Core Automation × Tilde Research.
-**Status**: one cut complete. **Date**: 2026-08-02.
+**Status**: four cuts complete plus the submission harness ([`dress_rehearsal/`](dress_rehearsal/README.md)). **Date**: 2026-08-22.
 
 ## What this is
 
@@ -13,8 +13,10 @@ the outer loop and hands the participant the architecture, the optimizer, **and 
 loss**, with depth deliberately unconstrained.
 
 We use it the way we use [RHM](../rhm/README.md) and [`mjc/`](../mjc/README.md): as a
-**controllable DGP whose knobs we set and sweep**, not as a leaderboard to climb. No submission
-has been built and none is required for the science. What the substrate buys that ours do not:
+**controllable DGP whose knobs we set and sweep**, not as a leaderboard to climb. None of the
+science required a submission; one was nonetheless built and measured on the hosted tiers in
+[`dress_rehearsal/`](dress_rehearsal/README.md) (2026-08-21/22), which is where the program's
+findings meet the organizers' grader. What the substrate buys that ours do not:
 
 - **It is purely ballistic.** The model commits at step 0 and never observes an intermediate
   state. Every controller in `mjc/` needed commitment installed as a knob, because reactive
@@ -100,7 +102,7 @@ and 3/768 on OOD ones; ranks 8–16 are at 0. Nobody has certified a *single* ap
 hidden map. That is the signature of a model banking only the free `x² < N` no-reduction cases —
 the analytic floor [`variable_modulus/`](variable_modulus/README.md) §3 computes as `≈1/√N` — and
 it independently reproduces that cut's central negative at Hard-tier compute with 16 participants.
-**The benchmark's live frontier is rule acquisition, not depth.**
+**The benchmark's live frontier is rule acquisition, not depth.** *(Re-checked 2026-08-21 by [`dress_rehearsal/`](dress_rehearsal/README.md): still nobody has certified `T=1`, but rank 1 is now **16.54% = 127/768** on seen-`N` `T=1` with **0.00%** OOD, over 107 ranked entries. Ranks 2–6 sit at exactly 6/768 seen-`N` and 3/768 OOD — and that node measures the `[12,14,16]`-bit no-reduction floor as exactly 6/768, so the tier below rank 1 is the floor.)*
 
 [`rule_acquisition/exact_atom/`](rule_acquisition/exact_atom/README.md) gives that a quantitative
 form. Because the ladder gate is *every* example correct and
@@ -276,6 +278,36 @@ shared form across moduli, and breadth supplies the evidence that the form is sh
 limits: the compute control is **not** null, so re-grounding dominates compute rather than being
 the whole story; and no cell certifies rung `T=1` (best `eps` 3.16e-3 against 9.0e-4), so this
 moves the axis that was stuck without clearing the ladder.
+
+### [`dress_rehearsal/`](dress_rehearsal/README.md) — the organizers' evaluator, a submission port, and the first full-budget Hard measurements
+
+The one node here that uses the benchmark *as* a benchmark. It runs the **organizers' evaluator
+unmodified** (upstream `4ceff95`) on the organizers' data — our own Modal H100 for smoke only,
+then the hosted Easy/Medium/Hard tiers, which are free H100 time that return the **full seven-rung
+profile** — with a port of this node's machinery into the competition contract: one file, two arms
+sharing every parameter, `control` (terminal CE) vs `closure` (plus `ballistic_depth` §2's
+label-free cycle + re-entry via `auxiliary`), loop-on-`T`. **15 hosted runs, all saved.**
+
+Three things came out. **(1) The board is legible.** The `[12,14,16]`-bit no-reduction floor
+measures **exactly 6/768** at the gating rung — ranks 2–6's score to the example (a model that
+learned the multiply and not the reduce); only 14 twelve-bit moduli exist, so that cell is
+necessarily dense and rank 1's 127/768 with 0% OOD is what interpolating it would score; Hard's
+split names pin a modulus-grouped generator. **(2) At full Hard budget the control arm memorises
+58% of the hidden training set and transfers nothing** — 0/768 at every rung on both profiles,
+test loss 11.4 nats — the rule-acquisition wall of
+[`variable_modulus/`](variable_modulus/README.md) and [`rule_acquisition/`](rule_acquisition/README.md)
+measured on someone else's DGP at 3600 H100-seconds; the organizers' own baseline and ranks
+39–107 sit below the floor too. **(3) `ballistic_depth`'s fresh-`x` result (0.001 → 0.32) did not
+reproduce in the port**, even with the cycle term rebuilt to the research mechanism and verified
+(gradient into the real encoder, bit-exact re-encode, ramp on a fully-memorised model): on a single
+seen modulus with 90% of units seen, control / closure-v2 / closure-v3 read **2 / 4 / 1 of 140**
+fresh `x` at `T=1` against a floor of 4. Two port defects explain the earlier hosted nulls and are
+recorded (a soft rung-selector that could not memorise; a clock-gated aux ramp that froze an
+un-memorised model). The only whisper is v3 sitting just above the OOD-`N` floor on two datasets —
+counts of 2–4, single seed, noted not claimed. Best leaderboard position: rank 31 of 109 via one
+correct example. Next-step possibilities — a digit-arithmetic architecture aimed at the floor tier,
+an ablation back toward cut1 to find what was load-bearing for fresh-`x`, epochs-vs-updates levers —
+are in the node.
 
 ## Shared machinery (lives at this node)
 
