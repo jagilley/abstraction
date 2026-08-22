@@ -1,200 +1,53 @@
-# History of `experiments/rhm`
+# History of experiments/rhm
 
-*A big-picture account of the thinking, not the day-to-day. See linked files for numbers and commands.*
+*A big-picture reading of ~10 weeks of work (2026-06-20 → 2026-08-21), tracing how the questions and priors moved, not a log of every run. For blow-by-blow detail, follow the linked READMEs — this file is the connective tissue between them.*
 
-## Why this experiment exists
+## Origins: a DGP we can actually control
 
-RHM was adopted as a controlled substrate after natural-language work
-([`language_reduction/STATUS.md`](../language_reduction/STATUS.md)) hit a wall: vocab reduction
-turned out to be a channel intervention (β not γ), and every attempt to change language's
-*data-generating process* was entangled with the statistics used to measure it. The Random Hierarchy
-Model (Cagnetta & Wyart) offered what language couldn't: a generative process with a knob for depth
-(`L`), per-level ambiguity (`m`), and a known ground truth any decomposition could be checked exactly
-against. The founding bet was that exact ground truth would let the team tell apart questions
-language conflates — see [`README.md`](README.md) for the per-experiment index and
-[`FILES.md`](FILES.md) for the file-level map.
+The RHM line exists because natural-language experiments ([`experiments/language_reduction/STATUS.md`](../language_reduction/STATUS.md)) left an unresolvable confound: vocab reduction changes β not γ, and spectral denoising was entangled with the very statistics being measured. The Random Hierarchy Model ([`README.md`](README.md)) was adopted specifically to buy back what language couldn't give: a generative process with a known ground truth at every level, where DGP interventions (depth `L`, synonymic multiplicity `m`) can be cleanly separated from channel interventions (vocab `v`). Almost every later pivot in this history is a consequence of *taking that promise seriously* — building instruments that check whether an effect is really about the DGP, or just about the measuring apparatus.
 
-## Phase 1 — scaling laws, and the first instrument crisis (through 2026-06-21)
+## Phase 1 — scaling and residual structure: capacity, not objective, gates composition
 
-The opening sweep ([`SWEEP_README.md`](SWEEP_README.md)) found `m` (synonymic multiplicity) dominates
-the scaling exponent over `L` (depth) roughly 3:1 — per-level entropy, not raw depth, is the scaling
-bottleneck. The team then tried to read a forward model's (FM) residual rank as a proxy for "how much
-DGP complexity the model has internalized" ([`RESIDUAL_RANK_README.md`](RESIDUAL_RANK_README.md)) and
-immediately hit the pattern
-that would recur for the rest of the project's life: **the obvious scalar instrument was measuring
-something else.** Rank tracked learning quality, not DGP complexity, and also tracked head-count
-mismatch between model and FM — an architectural artifact unrelated to computation. This first
-crisis produced the project's standing habit: build a metric, adversarially ask what confound could
-produce the same number, then build the matched-architecture control.
-[`REGIME_TRANSITION_README.md`](REGIME_TRANSITION_README.md) and
-[`PER_LEVEL_LOSS_README.md`](PER_LEVEL_LOSS_README.md) then established the mechanistic picture that
-holds for the rest of the project: learning is bottom-up (level 0 first), and depth composition
-saturates a small model within 1–2 levels regardless of NTP objective shape — label smoothing, focal
-loss, and confidence thresholding ([`LABEL_SMOOTHING_README.md`](LABEL_SMOOTHING_README.md),
-[`LOSS_WEIGHTING_README.md`](LOSS_WEIGHTING_README.md)) can reallocate *which* levels get gradient but
-cannot lift the composition ceiling itself — the ceiling is a capacity/signal constraint, not an
-objective-induced sharpness bias.
+The opening sweeps ([`SWEEP_README.md`](SWEEP_README.md)) found `m` dominates scaling over `L` by ~3:1 — synonymic entropy per level, not hierarchy depth, is the scaling bottleneck. The forward-model (FM) residual-rank line ([`RESIDUAL_RANK_README.md`](RESIDUAL_RANK_README.md), [`REGIME_TRANSITION_README.md`](REGIME_TRANSITION_README.md), [`PER_LEVEL_LOSS_README.md`](PER_LEVEL_LOSS_README.md)) established the mechanistic picture behind it: models learn the hierarchy bottom-up, and a small model plateaus after 1-2 composed levels — a genuine *composition-depth ceiling*. Two loss-shaping interventions then asked whether that ceiling is an artifact of cross-entropy's sharpening incentive. Label smoothing ([`LABEL_SMOOTHING_README.md`](LABEL_SMOOTHING_README.md)) was a clean negative — it hurts every level equally, changing nothing about composition depth — while focal loss and confidence thresholding ([`LOSS_WEIGHTING_README.md`](LOSS_WEIGHTING_README.md)) *reallocate* gradient without changing what's learnable, but do make the model's computation more legible to an FM. The prior that crystallized here — **the composition ceiling is a capacity constraint, not an objective-induced bias, though objective shaping can improve self-model legibility for free** — held up for the rest of the program and is why later arcs attack capacity, data, or the substrate itself rather than the loss function.
 
-## Phase 2 — what's learnable is not what's recoverable (2026-06-30)
+A second, quieter correction belongs here too: [`RESIDUAL_RANK_README.md`](RESIDUAL_RANK_README.md)'s original rank metric was later shown ([`residual_decomposition/README.md`](residual_decomposition/README.md), 2026-07-27) to conflate a residual's *shape* (β, invariant to FM capacity) with its *level* (participation ratio, which moves 1.8× across the same sweep) — explaining three separate historical "rank" negatives (here, in language, and in `mjc`) as all reading a saturated FM's noise floor. This is the first instance of a pattern that recurs constantly below: **an instrument built early gets superseded once its confound is understood, and the superseding note is left in place rather than erased.**
 
-[`RHM_FRONTIER_AND_LEGIBILITY_README.md`](RHM_FRONTIER_AND_LEGIBILITY_README.md) sharpened this into
-a trichotomy that organizes everything downstream: a feature can be **recoverable** (occupancy sets
-an information ceiling), **representable** (capacity + the right signal reaches it — oracle-aux
-proves this), or **learnable by plain NTP** (which turns out to be gated by `m` alone, independent of
-occupancy — two DGPs with identical recoverability ceilings can have opposite learned depth). On the
-one substrate where NTP does reach the root (m=2), the FM residual becomes hierarchy-legible exactly
-where and when the base model is learning each level — the first direct evidence for **"the
-self-model amplifies structure the base objective already extracted; it does not manufacture
-structure."** This amplifier-not-source hypothesis explained, retroactively, why every earlier
-closed-loop attempt (all run at m≥4) had seen a diffuse, illegible residual — there was nothing yet
-to amplify.
+## Phase 2 — the ratchet arc: a negative result that redirects the whole program
 
-## Phase 3 — the ratchet's negative, and the concept of a moving frontier (2026-06-23→29)
+[`ratchet/README.md`](ratchet/README.md) asked the natural next question: does the MNIST gated-ratchet phenomenon (self-knowledge compounding across cycles) transfer to RHM? Ten-plus experiments spent a week (06-23 → 06-29) systematically eliminating explanations for why it doesn't — FM-capacity mismatch, task structure (fixed by RL supervision), the distillation bottleneck (fixed by generation-based distillation), FM-cosine regime — and every dynamic of the MNIST phenomenon reproduced (gate closing, crossover timing, robustness dissociation) while the *magnitude* never did. [`RHM_FOMAML_README.md`](ratchet/RHM_FOMAML_README.md) closed the loop: no outer objective makes FM-predictability pressure improve compositional NTP on stationary data. The arc's own diagnosis — **compounding requires a moving frontier, and a fixed corpus cannot supply one** — is the single most consequential prior-update in this history: it is the explicit reason the program turns, over the following six weeks, toward active querying, editable (sculpted) substrates, and eventually a practice/action-space arc, all of which manufacture a moving frontier by construction.
 
-The MNIST wake-sleep ratchet compounds (34%→48% over 4 cycles); the whole point of porting it to RHM
-([`ratchet/README.md`](ratchet/README.md)) was to ask why, with exact ground truth to watch. The arc
-reproduced every *dynamic* of the MNIST ratchet (gate closing, FM tracking, the robustness
-dissociation) but never the *magnitude* — and methodically ruled out capacity, task structure (RL),
-the distillation bottleneck, and FM-cosine regime as the cause, catching and correcting its own
-instrument confounds along the way (an oversized FM had been silently saturating cosine in Run 1; a
-REINFORCE-based outer loop's stuck gate was diagnosed as meta-gradient variance, not evidence, and
-re-run deterministically to confirm). The verdict that survived: **on stationary data, no outer
-objective makes FM-predictability pressure improve compositional NTP, because the outer loop ends up
-identical to the inner loop.** Compounding needs a *moving* frontier — MNIST's root-level supervision
-is an implicit curriculum (strokes → parts → classes) that keeps refilling the residual from above;
-stationary RHM has no such refill and every ratchet variant exhausts after ~1 cycle. This
-"moving-frontier" idea — first named here as a negative explanation — becomes the organizing concept
-for two later positive threads: the latent-loop line (make the *target* move up the tree) and
-directed sculpting (manufacture drift in the *data* itself).
+## Phase 3 — active inference vs. control: when does "internalizing a forward model" even apply?
 
-## Phase 4 — self-knowledge finally appears, but only under a latent target (2026-07-04→08)
+In parallel, [`ACTIVE_RHM_README.md`](ACTIVE_RHM_README.md) ported the sibling `a2a_forward` reaching arc's active-query machinery. The arity result ported (a mean-Δ forward model cannot represent query-conditional structure any better here than there), but *usability* didn't: a value-of-information/expected-entropy head was needed to turn queries into a working planner, and even then `m=4` was a *principled* null — the value of a query lives in content the belief state never carries, at any capacity. The arc's Phase 4 punchline is a small piece of general theory that shows up again later: internalizing a forward model (letting an agent's own forecast reshape its representation) only has headroom when **acting and forecasting are separable computations that a model-free learner can shortcut between** (true in reaching/control) — on an inference task, where acting already requires forming the same belief a planner would use (**act ≈ plan**), there is nothing left to internalize. This "control vs. inference" distinction becomes the organizing question for the rest of the RHM line: which of our tasks are actually controllable, and does that change what a self-model is for?
 
-[`RHM_LATENT_LOOP_README.md`](RHM_LATENT_LOOP_README.md) is the hinge document for everything that
-follows. It found that closing the cerebellar loop produces genuine, generalizable self-knowledge on
-RHM for the first time — but *only* when the model is trained toward its own lifted latent structure,
-never toward tokens at any depth or loop strength. A pre-registered prediction ("a deep residual
-should be sufficient") was explicitly tested and **falsified** by an m=2 control: token-NTP there
-already reaches the root and has a deep-structured residual, yet self-knowledge still fails to
-generalize. A follow-on decomposition (meta vs. object-level, ported from the MNIST local-loss
-probes) found the whole effect lives in a *meta* channel ("where my self-model errs"), and a
-distillation ablation found that on RHM's compact, rule-derivable grammar **sleep/distillation
-transfers nothing** — RHM's shared rule table makes 5% of positions sufficient to recover the whole
-grammar, so distillation is solving an already-solved problem. This "residual = frontier map" framing
-becomes the lens for reinterpreting three historical "high-rank residual" negatives —
-[`residual_decomposition/README.md`](residual_decomposition/README.md) (2026-07-27) shows all three
-were reading a *saturated FM's noise floor*, and replaces naive rank with two properly-typed numbers
-(β and `R_res_participation`), falsifying the `R_act ≈ R_comp + R_res` partition in
-[`beliefs/dimensionality_expansion.md`](../../beliefs/dimensionality_expansion.md).
+## Phase 4 — sculpting: building something to control
 
-## Phase 5 — self-knowledge is separable from function; complexity rises then hits a floor, not zero
+The sculpting arc ([`RHM_DEEP_COMPOSITION_README.md`](RHM_DEEP_COMPOSITION_README.md), [`RHM_FRONTIER_AND_LEGIBILITY_README.md`](RHM_FRONTIER_AND_LEGIBILITY_README.md), [`RHM_LATENT_LOOP_README.md`](RHM_LATENT_LOOP_README.md)) opens by naming the trilemma the ratchet arc left behind: deep structure is recoverable and representable but not *learnable* by any local self-supervised objective — and, crucially, that **grounded targets move the frontier while endogenous/self-referential targets cap it**. This grounded-vs-endogenous law is discovered independently, in different guises, in nearly every arc that follows (complexodynamics' annealer requirement, directed_sculpting's grader-type finding, endogenous_teacher's scalar-weighting null) — it is the closest thing this history has to a crystallized cross-cutting belief.
 
-[`RHM_FM_REGULARIZER_README.md`](RHM_FM_REGULARIZER_README.md) (2026-07-01) showed structured
-FM-predictability pressure beats weight decay's functional-complexity floor at preserved knowledge:
-"self-knowledge is *not* load-bearing for functional simplification."
-[`RHM_COMPLEXODYNAMICS_README.md`](RHM_COMPLEXODYNAMICS_README.md) (2026-07-07) then read the saved
-trajectories from that arc against Aaronson's "First Law of Complexodynamics" and amended it twice: the
-rise-and-fall needs an annealer (SGD alone freezes mid-descent, a glass not a liquid), and the descent
-lands on the **DGP's own sophistication relative to the bound**, not zero. [`confabulation/README.md`](confabulation/README.md)
-(2026-07-22) then asked the question from the *report* side: a self-report about the residual shows a
-first-person advantage no capacity-matched observer can match, a report about behavior is a dead null —
-and, a second falsified pre-registration, the closed loop turns out **not necessary** for this
-dissociation: closing the loop changes how well the model *knows* itself, not what there is to know.
+[`RHM_EDIT_CONTROL_README.md`](RHM_EDIT_CONTROL_README.md) then executes Phase 3's implied next step directly: make the agent *edit* toward a target instead of just querying. This makes editing plannable (reversing the query-arity null) but surfaces a genuinely new problem — belief-space planning can drive success to ~1 while true grammatical success stays near zero, because the agent can game its own belief off-manifold. Fixing this (on-manifold action generation + a self-consistency veto) establishes **belief faithfulness as a second, independent axis of controllability**, separate from whether a belief carries a plannable signal at all. [`RHM_SCULPTING_README.md`](RHM_SCULPTING_README.md) and [`RHM_SCULPT_CONTINUAL_README.md`](RHM_SCULPT_CONTINUAL_README.md) then build out full sculpting stages under repeated self-correction (an early "task is greedy-solvable" reading turned out to be an oracle artifact, caught by [`sculpting_control_task.md`](sculpting_control_task.md) before any learning happened) and find, again, a *weak* ratchet — representational headroom exhausts in one pass, reinforcing Phase 2's lesson that a fixed task cannot sustain compounding. [`specialization/README.md`](specialization/README.md) (initially read as a negative — RHM's shared ruleset admits no specialized deep structure) was later reread as the *enabling condition* for what comes next, not a defect.
 
-## Phase 6 — autonomous vs. controlled, and manufacturing a real control task
+Two adjacent notes from this period: [`RHM_FM_REGULARIZER_README.md`](RHM_FM_REGULARIZER_README.md) shows FM-predictability pressure compresses *functional* complexity where weight decay's L2 floor cannot, and [`RHM_COMPLEXODYNAMICS_README.md`](RHM_COMPLEXODYNAMICS_README.md) reads that trajectory against Aaronson's "First Law of Complexodynamics," finding the rise-and-fall needs an annealer (SGD alone freezes mid-descent) and that the floor is the DGP's own sophistication, not zero.
 
-[`ACTIVE_RHM_README.md`](ACTIVE_RHM_README.md) asked whether the a2a reaching-control machinery
-(query-conditioned forward models, internalization) ports back onto RHM's native, autonomous
-querying task. It doesn't: value-of-information (not mean-Δ) is the right forecast target for
-epistemic actions, and internalization has **no headroom** on RHM's active-query task because acting
-*already is* planning there (act ≈ plan) — no model-free shortcut splits the forecast from the
-forecaster the way reaching's policy splits from its dynamics model. This motivated deliberately
-turning RHM into a genuine control task with a real action/dynamics split —
-[`RHM_EDIT_CONTROL_README.md`](RHM_EDIT_CONTROL_README.md) and
-[`RHM_SCULPTING_README.md`](RHM_SCULPTING_README.md) (Stages 1–6) — where belief-space editing *is*
-plannable, latent planning beats token planning once the observation channel is lossy, and
-[`RHM_SCULPT_CONTINUAL_README.md`](RHM_SCULPT_CONTINUAL_README.md) finally gets a **weak ratchet**:
-value-iteration is the big compounding lever, belief internalization a one-shot ceiling-setter, and
-continuous re-internalization adds almost nothing once the frontier saturates in a single pass.
+## Phase 5 — does a self-report track the implementation, or a theory of self?
 
-[`directed_sculpting/README.md`](directed_sculpting/README.md) then supplied the missing ingredient
-for porting MJC's full control-loop machinery: RHM's rule usage is *uniform by construction*, so the
-naive port's `value = learning-progress × visitation` collapses to `lprog` — a null by construction.
-Three primitives fixed this (distractor channels for structural irrelevance, support-fixed rule drift
-for non-stationarity without task-switching, and a repair-cost instrument built because raw
-cross-entropy is *exactly* blind to this drift), each catching a real confound (an 11.9× per-level mis-scaling; a "static" control that was secretly a handicap). The full loop
-([`directed_sculpting/full_loop/README.md`](directed_sculpting/full_loop/README.md)) found a
-reward-free relevance signal is a smoking gun, and — the central pivot — that **expansion is a
-property of the grader's type, not of non-stationarity itself**: an evaluative grader expands the
-belief where an endogenous dense grader caps below the no-loop floor, in both static and drifting
-worlds. A "climbing null" was re-scoped through repeated instrument repair (each repair removing a
-bias favoring the positive reading) until starving samples-per-event at fixed drift produced the
-arc's first real depth-vs-drift positive. This grader-type-matters finding and Phase 3's
-moving-frontier idea converge directly into the practice arc below.
+[`confabulation/README.md`](confabulation/README.md) (07-22) operationalizes the Nisbett & Wilson worry directly from the FM decomposition: `FM(a_i)` is everything a self-theory could produce, so genuine self-*access* can only live in the residual. The result is a real if narrow positive — an implementation-targeted report has a first-person advantage a capacity-matched observer cannot match, and it does not require the closed loop (open-loop shows the same, weaker, dissociation). This is the program's first clean positive on introspection.
 
-## Phase 7 — typing a token's "news" exactly (2026-08-04→17)
+## Phase 6 — porting a full control loop, and the confounds that come with it
 
-A parallel thread used RHM's exact Bayesian tractability to pull apart categories that are
-inseparable in natural language. [`endogenous_teacher/README.md`](endogenous_teacher/README.md)
-measured that 89% of the FM residual's variance is orthogonal to token surprisal and the two are
-*anti-localized* across the hierarchy — but reweighting NTP by that residual is a clean null, scoped
-to *scalar* weighting (self-knowledge is directional, not scalar, per two prior
-[a2a](../a2a_forward/EMOTION_INJECTION_README.md) results). Its
-[`cancellation/`](endogenous_teacher/cancellation/README.md) child found the corollary-discharge
-mechanism replicates across substrates but its downstream payoffs don't — what matters is *a*
-forecast existing, not *this* forecaster's content. [`conditional_revision/README.md`](conditional_revision/README.md)
-then built the missing instrument itself: an exact belief-propagation oracle splitting surprisal into
-*reducible* (taught new structure) and *irreducible* (a synonym of known structure) — the model's
-belief revision tracks the reducible component only where it has a belief at all, capped by belief
-depth, not by the measurement gap. [`question_model/README.md`](question_model/README.md) (2026-08-17)
-closed the line with a third exact term for *what the world is currently asking* (a drifting demand
-distribution): NTP tracks it only above an evidence-density threshold, and a "demand-keyed
-self-knowledge" readout is a vacuous null on an unmetered generalist — the premise, not the organ, is
-absent. In parallel, [`specialization/README.md`](specialization/README.md) found the first real
-RHM-vs-language disanalogy: restricting training to a subtree doesn't buy depth (inert), and
-concentrating even a *direct* deep target on a subtree actively hurts it — broad beats narrow, because
-RHM's shared rule set has no domain-specific deep structure to specialize into — motivating
-heterogeneous-DGP variants and the self-training work in [`minting/README.md`](minting/README.md).
+[`directed_sculpting/README.md`](directed_sculpting/README.md) (07-28) tries to port `mjc`'s full inner/outer control loop onto RHM sculpting and immediately hits a wall the earlier arcs hadn't needed to face: RHM's rule usage is uniform by construction, so a naive port is a confounded null before it even starts. Repairing the substrate (distractor channels, support-fixed rule drift, a repair-cost instrument) became necessary groundwork, not an aside. The resulting [`full_loop/`](directed_sculpting/full_loop/README.md) work is this history's densest demonstration of instrument paranoia: a reward-free relevance signal ports cleanly and is a genuine positive, but two follow-on "expansion" results are retracted once their own instruments are shown to be biased toward the positive (an own-world grading artifact, an uninformative OU anchor) — and a level-preference finding ([`level_moves/README.md`](directed_sculpting/full_loop/level_moves/README.md)) *corrects itself within the same writeup* into a cleaner span-vs-abstraction distinction once matched controls are built. [`endogenous_teacher/README.md`](endogenous_teacher/README.md) (08-04/05) runs the same question one level down and finds the model's own surprise is a real signal, anti-localised against token surprisal — but unusable as a scalar loss weight; it is directional information, not magnitude, which converges with what [`directed_sculpting/full_loop/composed_loop/README.md`](directed_sculpting/full_loop/composed_loop/README.md) finds independently about scalar outcome-only teachers carrying no depth information at all.
 
-## Phase 8 — the practice arc: instruments correcting themselves in real time (2026-08-14→21, ongoing)
+## Phase 7 — belief revision, separated from surprisal, and its expanding branches
 
-The newest and now-dominant thread ([`practice/README.md`](practice/README.md)) ports "practice" — a
-control loop over the *conditions and units* of learning, not the model itself — from
-[`mjc/practice/etude/`](../mjc/practice/etude/README.md), whose conclusion had been blocked by a
-degenerate substrate (state-independent committed units, so post-commit drift was exactly zero), which
-sculpting removes. What stands out across its now eleven-plus rounds is not any single finding but the
-rate of self-correction: the compile certificate is demoted three consecutive times, each round
-finding a different reason it has nothing genuine to certify
-([`crystallize/README.md`](practice/crystallize/README.md),
-[`ear/README.md`](practice/ear/README.md)); [`recital/README.md`](practice/recital/README.md) finds no
-internal pacing signal prices the ladder, and a fixed bottom-heavy schedule beats every adaptive one;
-[`tall/README.md`](practice/tall/README.md) is voided outright by measurement mid-arc (m=4 declared
-inadmissible for sculpting); and [`merge/`](practice/merge/README.md) /
-[`fourwall/`](practice/fourwall/README.md) each catch and publish their own prior measurement errors
-(a grid-inflated penalty, a self-grading artifact). The clearest positive result, the crossed pair
-[`transpose/`](practice/transpose/FILES.md) × [`setlist/`](practice/setlist/FILES.md) jointly written
-up in [`typed_gaps/README.md`](practice/typed_gaps/README.md), delivers a double dissociation:
-drifting *what is true* degrades the learner and leaves verification silent; drifting *what is asked*
-leaves the learner flat and fires verification decisively. **Committed chunks store
-demand-concentration, not truth; maintaining a skill is demand-tracking, not entropic** — the arc's
-"conditioning gap" becomes an explicit type system (one organ per currency of change), echoing
-directed sculpting's grader-type lesson (Phase 6). The most recent rounds
-([`fourwall/lm/`](practice/fourwall/lm/README.md), [`teacher_slot/README.md`](practice/teacher_slot/README.md),
-[`native/README.md`](practice/native/README.md)) push further — what an endogenous reader can
-self-correct unaided, what a verbal (LLM) reasoner adds over a numeric rule on identical evidence, and
-whether earned vocabulary can consolidate into the agent's own planner/executor — live threads, not
-settled ones, as of this writing.
+[`conditional_revision/README.md`](conditional_revision/README.md) (08-07/08) gives the endogenous-teacher question an exact instrument: an oracle belief-propagation computation splits token surprisal into reducible (structural) and irreducible (synonymic) components exactly, rather than by correlation. The headline — belief revision is separable from surprisal, but **only at the levels where the model actually has a belief** (bounded by belief depth, not by the conditioning gap) — spawned a wide fan of branches ([`local_loss/`](conditional_revision/local_loss/README.md), [`aleatoric_fraction/`](conditional_revision/aleatoric_fraction/README.md), [`synonym_retention/`](conditional_revision/synonym_retention/README.md), [`rule_family/`](conditional_revision/rule_family/README.md), [`sculpt_slip/`](conditional_revision/sculpt_slip/README.md)) that mostly *narrow* rather than overturn the main claim: the aleatoric prize is real but tiny and NTP-protected at every rung, plain NTP already discards synonym information faster than feature identity, and reducibility itself turns out to be a fixed-rule-regime artifact that a rule-family generalization can lift. [`confabulation/temporal/`](confabulation/temporal/README.md) and its [`epistemics/`](confabulation/temporal/epistemics/README.md) child then merge the confabulation and revision threads on a new axis (time instead of depth) and land on a genuinely different note than Phase 5: **the revision is charged, but the charge is public** — self-report and an ideal observer track the belief-revision quantity equally well. Read together with confabulation's depth-axis positive, this is an open tension worth flagging rather than resolving: whichever axis a self-model result is measured on (representational depth vs. temporal position) may determine whether introspective privilege shows up at all.
 
-## The throughline
+## Phase 8 — the practice arc: compilation under priced feedback, and its portability
 
-Read end to end, the arc is less a sequence of findings than a sequence of **instrument
-corrections**, each dissolving an apparent property of the model into a property of the measurement:
-residual rank was a noise floor, not complexity; a deep residual was not sufficient for
-self-knowledge without the right target; weight-norm compression was not circuit compression; token
-surprisal was not belief revision; committed practice chunks were not beliefs. The recurring
-constructive move surviving this scrutiny is the **moving frontier** — first named as why the ratchet
-fails on stationary RHM (Phase 3), then engineered via a latent training target (Phase 4), then via
-manufactured DGP drift (Phase 6), and now the organizing variable of the practice arc's
-demand-vs-truth typing (Phase 8). The project's discipline has visibly tightened: later arcs
-pre-register falsifiable predictions and treat their failure as informative (the m2 control,
-confabulation's loop-not-necessary, the endogenous-teacher scalar null), and documented, real-time
-self-auditing of one's own metric is now the default mode rather than an occasional correction.
+[`practice/README.md`](practice/README.md) (08-14) ports the `mjc` étude's compile-op — committing to a unit only under a δ-silence certificate — onto sculpting, which finally supplies what MuJoCo's corridor couldn't: boundary-carrying commitments plus an exact DP oracle. [`practice/crystallize/README.md`](practice/crystallize/README.md) answers the étude's open question (state-conditioned commitment beats averaging, 1.8-3×) but also removes the certificate's own job, because the plant was frozen — motivating [`practice/ratchet/README.md`](practice/ratchet/README.md) (distinct from the earlier meta-learning `ratchet/` arc) to give practice something to move: its own action space, mined from successful repairs. That round finds the seam law from the étude reappears with its **sign flipped** — auditions now *understate* rather than overstate a committed unit's value, because the mismatch coordinate moved from state to hierarchy level. [`practice/ear/`](practice/ear/README.md), [`practice/recital/`](practice/recital/README.md), and [`practice/tall/`](practice/tall/README.md) (08-15/16) climb the evaluation layer, remove the era clock (finding no internal signal prices time-at-the-bottom), and diagnose a depth-6 port failure to an apparatus limit rather than a real ceiling. Round 6, [`practice/typed_gaps/README.md`](practice/typed_gaps/README.md) (08-16), crosses two kinds of drift (what's true vs. what's asked) and finds a genuine double dissociation — **one organ per currency of change** (dense learning tracks truth, evaluative re-selection tracks demand) — probably the most crystallized belief this whole history produces.
+
+The most recent two weeks (08-17 → 08-21) test whether that typed-gap map survives contact with a real learner rather than a DP-scaffolded one. [`practice/reread/README.md`](practice/reread/README.md), [`practice/merge/README.md`](practice/merge/README.md), and [`practice/fourwall/lm/README.md`](practice/fourwall/lm/README.md) each find organs the map predicted (merge, re-key, mothball) are simply *absent* from a plain NTP gradient — vocabulary maintenance has to be built, not assumed. [`practice/teacher_slot/README.md`](practice/teacher_slot/README.md) (08-20) is this period's sharpest result: the scarce ingredient in a working teacher isn't judgment but *which gauge it reads* — a thermostat-simple rule suffices once it reads a signal outside the learner's own within-level ledger. [`practice/native/README.md`](practice/native/README.md) (08-20/21), the newest writeup in the tree, splits the port along an identity/corridor distinction and confirms the chunk-as-object finding (a native table beats primitive-only control 2.2-2.5×) while honestly flagging that level-3 corridors mostly never cleared their own gate — the native port is currently an L2-only result, not yet a full one.
+
+Alongside this, [`question_model/README.md`](question_model/README.md) (08-17) extends the conditional-revision identity by a third, exactly-computable term for "question-news" (what the world is currently asking), reusing the same BP substrate. Its headline decomposition closes cleanly, but its priority target — a demand-keyed self-knowledge readout — comes back a **vacuous null**, because an unmetered generalist model has no competence spread for such a signal to predict against. This retires a framing (self-knowledge as something a generalist model should show under demand pressure) that had been implicit since the confabulation work, and is the most recent update to this program's priors: self-knowledge phenomena so far seem to require some form of scarcity or metering to even be measurable, not just present.
+
+## Where this leaves things
+
+Three cross-cutting shifts are worth holding in mind when reading any individual node above: (1) **capacity/substrate structure, not the loss function, gates what's learnable** (Phase 1); (2) **compounding self-improvement needs a moving frontier**, which is why the program moved from passive RHM → active queries → editable sculpting → a priced action-space economy over ten weeks (Phases 2-4, 8); and (3) **grounded/exogenous signals move a frontier while endogenous/self-referential ones cap it**, discovered independently at least four times (Phases 4, 6). The self-knowledge questions (Phases 5, 7, and `question_model`) remain the least settled thread — results flip depending on which axis (depth vs. time) and which regime (metered vs. generalist) they're measured in, which is itself the finding worth carrying forward rather than a loose end to tidy up.
