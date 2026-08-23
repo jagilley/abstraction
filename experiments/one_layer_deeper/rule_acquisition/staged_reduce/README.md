@@ -335,6 +335,18 @@ under an existing tag overwrites the first arm's curve; use a new tag and reasse
 `--detach` and detect completion by fetching the result file. `modal volume get` needs `--force`
 and a full per-file destination path.
 
+## Child — [`terminal_only/`](terminal_only/NOTES.md): the decomposition is not discoverable from terminal labels
+
+Run 2026-08-22/23 for the competition question (written up in
+[`dress_rehearsal/second_pass/`](../../dress_rehearsal/second_pass/README.md) §3): the same task,
+pools and parameter count as `sr3_mono*`, but the forward pass is `S=6` applications of one tied
+stage map with the remainder re-grounded through the model's own decode, and the loss is on the
+final remainder only. All four cells (8/142 moduli × straight-through/soft seam) sit at floor with
+CE flat from 25k to 600k where `sr3_mono` descends on identical data; the seam collapses to ~12
+distinct values; `restart`/`depth`/`stagefn` probes are flat, including at `q=0`. A degenerate
+fixed point: the staging has to be *installed* (by the single-stage distribution), and this node's
+interaction (staging × breadth) does not self-organise from the terminal label.
+
 ## Next steps
 
 1. **Fix the dense selector and re-ask the breadth question.** `(N * 2246822519) % 10 == 0` is

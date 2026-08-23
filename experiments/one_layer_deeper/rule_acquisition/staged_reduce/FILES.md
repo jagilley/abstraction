@@ -23,6 +23,12 @@
 | `sr3_r10_m8` | §3 | **the family-matched control** — 8 moduli subsampled from the same 178-modulus family the `_many` arms use, so only the count varies. Establishes that staging alone does not move the rule axis |
 | `sr3_r10_dense` / `sr3_mono_dense` / `sr3_r2_dense` | §4 | `N` drawn from all 900 three-digit integers instead of ~178 semiprimes. `mono_dense` and `r2_dense` were cancelled for compute |
 
+## Children
+
+| child | one-liner |
+|---|---|
+| [`terminal_only/`](terminal_only/NOTES.md) | **The staged forward pass under terminal-only supervision** (2026-08-22/23; written up in [`dress_rehearsal/second_pass/`](../../dress_rehearsal/second_pass/README.md) §3). Same task, pools and parameter count as `sr3_mono*`; `S=6` tied stage applications with the remainder re-grounded through the model's own decode; loss on the final remainder only; 2×2 of 8/142 moduli × straight-through/soft seam. All four cells at floor, CE flat from 25k to 600k where the monolithic control descends; the seam collapses to ~12 distinct values. Architecture alone does not discover the decomposition. `terminal_only.py` (verbatim fork + diff table), `reprobe.py` (depth/restart/stagefn/crossprobe), `analyze.py`, `NOTES.md`, `FILES.md`, `results/<tag>/`. |
+
 ## Results layout
 
 Modal volume `one-layer-deeper-data`; results at `/staged_reduce/<tag>/results_seed<N>.json`,

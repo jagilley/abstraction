@@ -18,8 +18,8 @@ this program's machinery actually lands. Three things came out.
 
 1. **The leaderboard's structure is now legible.** The `[12,14,16]`-bit no-reduction floor measures
    **exactly 6/768** at the gating rung, which is exactly the score of ranks 2–6; the 12-bit cell
-   is necessarily dense (only 14 such moduli exist, and `m5`'s training split already covers ~84%
-   of all possible 12-bit prompts); and rank 1's 127/768 ≈ half of one 256-example cell with 0% OOD
+   is necessarily dense (only 14 such moduli exist, and `m5`'s training split already covers 58%
+   of all possible 12-bit `(N, x)` pairs); and rank 1's 127/768 ≈ half of one 256-example cell with 0% OOD
    is what "interpolates the dense cell, nothing else" would score. Hard's scored-split names pin
    it to a **modulus-grouped** generator config. (§2, §4.)
 2. **At full Hard budget, our control arm memorises 58% of the hidden training set and transfers
@@ -110,7 +110,10 @@ Consequences, measured by `audit_dataset.py` on the public `m5` (`[12,14,16]`, `
 - **Data volume at 12 bits is capped.** 35,624 `(N, x)` unit pairs exist across all fourteen
   12-bit moduli; each `T` cell needs distinct pairs and the depth cohort needs 256 that appear
   nowhere, so `examples_per_setting ≲ 28k` (30k fails generation). At 10k the training split
-  already holds **~84%** of every possible 12-bit prompt.
+  already holds **58%** of every possible 12-bit `(N, x)` pair (64% across all splits). *An
+  earlier version of this line said ~84%; that counted generated rows over the pair universe and
+  so double-counted pairs reused across the three `T` settings — corrected 2026-08-22 when
+  [`second_pass/board_note/`](second_pass/board_note/README.md) re-derived it.*
 - **Deep rungs are partly degenerate.** `x^(2^T)` is eventually periodic in `T`; on `m5`'s seen-`N`
   profile 191/768 prompts at `T=16` and **357/768 at `T=64`** repeat a lower rung's answer.
   Certification needs 100%, so this hands nobody a rung.
@@ -133,6 +136,9 @@ ranks 2–6 **0.7813% = 6/768** seen-`N` and **0.3906% = 3/768** OOD; 7–10 at 
 floor matching ranks 2–6 to the example is the calibration this node was built for; one bit
 either way gives 17 or 1. The OOD-`N` floor is **not** a usable constraint (11 vs 4 on the same
 widths across two seeds — Poisson noise on a count of ~5).
+
+The externally-readable version of this section and §5's board reading is
+[`second_pass/board_note/`](second_pass/board_note/README.md), with a Discord-length draft beside it; neither is posted.
 
 **Caveat on the neighbourhood**: it is prompt-grouped; Hard is modulus-grouped (§1). The widths
 inference stands, but regenerating `hB–hF` with `--split_group modulus --separate_ood_splits true`
@@ -295,6 +301,20 @@ measure nothing else.
 
 ---
 
+## 6. Second pass (2026-08-22/23) — [`second_pass/`](second_pass/README.md)
+
+Three tracks run in parallel nine days out, written up as one node. **A per-digit carrier** (a
+digit-grid state, `N` as per-slot digit embeddings, loop-on-`T`) answers this node's next-step 1:
+on a single modulus it reads fresh-`x` `T=1` at **35/140, 50/180, 67/290** (23–28%, ~10× floor)
+against this port's 2/140 and 1/180, with the ladder **flat to `T=64`** and an untrained depth at
+99–100% — and on `m5`/Hard it **cannot fit in budget** (Hard: 93.6k steps, 2% memorised vs this
+port's 58%, **0/768** at `T=1`), so the board position is unchanged. Next-step 2 resolves: closure
+is null on the digit carrier because the carrier subsumes it. The one legal lever at the wall — a
+staged forward pass trained terminal-only — is a **degenerate fixed point**
+([`terminal_only/`](../rule_acquisition/staged_reduce/terminal_only/NOTES.md)). The board note
+([`second_pass/board_note/`](second_pass/board_note/README.md)) is written, not posted. Open: where
+between 1 and ~13 moduli the single-modulus result dies.
+
 ## Reproduce
 
 ```bash
@@ -344,19 +364,19 @@ splits; the port used ≤17 s of it. Hard and Medium are serialised behind one j
 
 ## Next steps (possibilities, not a plan)
 
-1. **The floor tier, deliberately.** Replace the pooled-state operator with a per-digit
+1. ~~**The floor tier, deliberately.**~~ *Done — [`second_pass/`](second_pass/README.md) §2: a per-digit carrier reads 25–28% fresh-`x` on three fixed-`N` sets, flat to `T=64`, and cannot fit `m5`/Hard.* Replace the pooled-state operator with a per-digit
    bidirectional transformer carrying digit-position structure (the arithmetic-transformer
    toolkit), keep loop-on-`T`, and read `m6`–`m9`'s fresh-`x` `T=1` rung: the target is *exactly*
    the floor count, which would mean the multiply generalises. Free on Medium; the realistic
    ceiling for the remaining days.
-2. **Why didn't fixed-`N` closure transfer?** One ablation at a time back toward
+2. ~~**Why didn't fixed-`N` closure transfer?**~~ *Resolved — [`second_pass/`](second_pass/README.md) §2.5: on a canonical digit carrier closure is null; the property it bought is structural.* One ablation at a time back toward
    `ballistic_depth` cut1 — depths 1..6, fixed-width fields, the research architecture — on
    `m6`/`m9` with the hosted evaluator as the grader (or the research harness with `m6`'s data).
    A program question worth a cut of its own; the candidates are listed in §5.
 3. **The OOD-`N` whisper.** v3 above the OOD-`N` floor on `m6` and Hard's `ood_n_t` 4 vs 0: a
    variable-`N` Medium set (`m3`/`m4`/`m5`) with control vs closure v3, two seeds, would say whether
    it is anything.
-4. **Epochs vs updates.** Every break-through in the port's probes tracked passes over the data;
+4. ~~**Epochs vs updates.**~~ *Tested in [`second_pass/`](second_pass/README.md) §2.2 (`s1_m5_bs2048`, `s6` throughput arms): more passes do not move `m5` off its plateau at Medium budget; the break is at ~28k steps regardless.* Every break-through in the port's probes tracked passes over the data;
    `Submission.batch_size = 2048` (358 epochs in 600 s vs 199) and the evaluator's legal
    `should_reuse_batch` (≤8 updates per batch) are untested levers.
 5. **Regenerate `hB–hF` modulus-grouped** before any further local use (§2 caveat), and ask

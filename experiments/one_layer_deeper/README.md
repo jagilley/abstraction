@@ -56,7 +56,11 @@ depth, and in all ten it is **2× the max trained depth** — E1 {1,2,3}→6, E2
 **The `T = 1,2,4,8,16,32,64` ladder is Hard's, and it is gated.** From the live leaderboard: each
 cell shows the next `T` to certify and its accuracy, and *"once every example at that T is
 correct, the target advances."* 100% exact, not an average. Two tracks are shown — in-distribution
-number sizes and **out-of-distribution number sizes**.
+number sizes and **out-of-distribution number sizes**. *(Corrected 2026-08-22: the **ranking** is
+Hard's, the **readout** is not — upstream `4ceff95`'s README exposes the same `Max T` / `OOD N Max
+T` fields on this ladder as diagnostics on Easy and Medium too, which is how
+[`dress_rehearsal/`](dress_rehearsal/README.md) reads seven-rung profiles off Medium. Read the
+2026-08-03 retraction below the same way: its "Hard-only" is about what gets ranked.)*
 
 **Retracted (2026-08-03).** An earlier version of this section reported that ladder as the common
 evaluation for *all* tiers and concluded the deep rungs were substantially degenerate (the "only
@@ -345,8 +349,15 @@ entrypoint. Each cut's README carries its exact commands. Modal volume layout:
 
 ## Next steps
 
-1. **Scale `N`** — *base arm done, grounded arm pending a repair sweep.* See `ballistic_depth/`
-   §10. The base horizon halves (13 → 7) and is capacity-independent; the cycle arm at w=10
+1. ~~**Scale `N`** — *base arm done, grounded arm pending a repair sweep.*~~ — the repair sweep
+   is reported; see `ballistic_depth/` §10. It is the **schedule, not the weight**: at warmup 0.6
+   the cycle arm learns again (w=3 reads ID 0.996 against 0.003 at warmup 0.3), and with the
+   schedule fixed no weight extends the horizon past base's 7. Repair restores learning, not the
+   advantage. The `N=9853` baseline is itself unconverged
+   ([`horizon_convergence/`](ballistic_depth/horizon_convergence/README.md)), so whether the
+   closure advantage survives a larger state space is still open and §9's `p = 0.871` is still
+   unseparated. Original framing kept below.
+   The base horizon halves (13 → 7) and is capacity-independent; the cycle arm at w=10
    collapses at this scale, so the headline question — does the closure advantage survive a
    larger state space — is open until `scale9853_w{1,3}` / `_w3_warm6` report. §9's `p = 0.871`
    also remains unseparated, because that needs a grounded arm that trained.

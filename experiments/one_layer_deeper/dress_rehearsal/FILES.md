@@ -21,4 +21,6 @@
 
 ## Children
 
-None.
+| child | one-liner |
+|---|---|
+| [`second_pass/`](second_pass/README.md) | **The second pass (2026-08-22/23)** — one writeup over three parallel tracks: a **per-digit port** (`second_pass/digit_port/`; 11 hosted runs + 6 local sweeps) that on a single modulus reads fresh-`x` `T=1` at 25–28% (~10× floor) with the ladder flat to `T=64` and untrained depth 99–100%, and on `m5`/Hard cannot fit in budget (0/768 — the rule-acquisition wall from a second architecture); the **terminal-only staged reduce** (`../rule_acquisition/staged_reduce/terminal_only/`, linked) — a degenerate fixed point, architecture alone does not discover the decomposition; and the **board note** (`second_pass/board_note/`, `discord.md` beside it, not posted). Closure is null on the digit carrier (the carrier subsumes it). Board position unchanged. |
