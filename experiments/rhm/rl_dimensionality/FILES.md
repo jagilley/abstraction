@@ -15,3 +15,4 @@
 |---|---|
 | `README.md` | The writeup: bounds vs attainment across m ∈ {1,2,3,4,6}, three-mechanism ladder, the validity-up/rules-flat dissociation |
 | `DESIGN.md` | Pre-run design record: knob rationale (m vs L/s/v), verifier choices, pretrain-to-plateau, reference-value findings from self-tests, follow-up-arm rationale, claim framing |
+| `CONVERSATION.md` | Session provenance: Jasper's prompts verbatim + summarized assistant turns, preserving the motivations behind the work for future agents |
