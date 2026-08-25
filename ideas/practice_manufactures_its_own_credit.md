@@ -136,6 +136,22 @@ the amnesia dissociation cited below should be re-read against Hayward et al. 20
 procedural deficits) before it is leaned on — H.M.'s skills may be the consolidated end of the
 process, not its expansion phase.
 
+**Second revision (2026-08-25): the decomposition gains its third member.** The census→assay unit
+([`census/README.md`](../experiments/rhm/practice/census/README.md)) closes what the two homes
+above leave open. Identity in the table and corridor in the FM do not exhaust what a vocabulary is
+worth: oracle surgery crossing amount × truth × arrival on the committed table finds that the full
+true vocabulary, arriving at commit time rather than cycle 1, recovers only a minority of the
+from-birth advantage (era-4 residual 3.24× the measured stream floor, deep-era ranks invariant
+under displacement), and the carrier of the rest is the planner's **trust** in the level — π's
+per-level mass, formed only across practice-time with the table in hand (0.580 from birth vs
+≤0.276 for every late-arrival arm, perfect content included) — not shortcut by gift anywhere in
+the unit. So the decomposition has three members with three acquisition profiles: **content is
+derivable** (the corridor — §20's committed routing, re-derivable from the primitives), **identity
+is storable** (the table — the arbitrary binding this section assigns the hippocampal profile),
+and **use is only earnable** (the trust, on its own slow clock). The named next instrument is the
+trust-formation rate itself, and whether targeted rehearsal of a received vocabulary can compress
+the clock that gift could not skip (queued in the unit's README).
+
 The question this section answers (raised by Jasper, 2026-08-12): does compilation deposit the quarter-note
 instruction directly in cortex, alongside the 16th-note instructions — or does the new chunk need a
 hippocampus-analog to hold it in a holding pattern until sleep integrates it?
