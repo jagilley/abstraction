@@ -334,6 +334,7 @@ def run_setting(
     ei_n: int = 16,                 # rollouts per prompt
     ei_prompts_per_round: int = 4000,   # 6*4000*16 = 384K rollouts = RL budget
     ei_sft_epochs: int = 3,
+    save_round_ckpts: bool = False,  # also save {cond}_r{N}.pt after every EI round
     temperature: float = 1.0,
     # Training
     lr: float = 3e-4,
@@ -869,6 +870,10 @@ def run_setting(
             ckpt = full_eval(model, f"{cond} r{rnd+1}")
             ckpt["selection"] = sel
             checkpoints[rnd + 1] = ckpt
+            if save_round_ckpts:
+                torch.save({k_: p.cpu() for k_, p in model.state_dict().items()},
+                           os.path.join(save_dir, f"{cond}_r{rnd+1}.pt"))
+                volume.commit()
 
         torch.save({k_: p.cpu() for k_, p in model.state_dict().items()},
                    os.path.join(save_dir, f"{cond}_final.pt"))
@@ -914,6 +919,7 @@ def run_setting(
             "only_ei": only_ei, "ei_rounds": ei_rounds, "ei_n": ei_n,
             "ei_prompts_per_round": ei_prompts_per_round,
             "ei_sft_epochs": ei_sft_epochs,
+            "save_round_ckpts": save_round_ckpts,
             "lr": lr, "batch_size": batch_size,
             "seed": seed, "rl_steps": rl_steps,
             "ckpt_interval": ckpt_interval,

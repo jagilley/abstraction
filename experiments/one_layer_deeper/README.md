@@ -3,7 +3,7 @@
 **Up**: [../CLAUDE.md](../CLAUDE.md) (experiments) · **Files**: [FILES.md](FILES.md)
 **Upstream**: [tilde-research/one-layer-deeper](https://github.com/tilde-research/one-layer-deeper) —
 an architecture-and-optimizer competition from Core Automation × Tilde Research.
-**Status**: four cuts complete plus the submission harness ([`dress_rehearsal/`](dress_rehearsal/README.md)). **Date**: 2026-08-22.
+**Status**: four cuts complete plus the submission harness ([`dress_rehearsal/`](dress_rehearsal/README.md)). **Date**: 2026-08-25 (closing note on the practice arc added; last run 2026-08-22).
 
 ## What this is
 
@@ -383,3 +383,68 @@ entrypoint. Each cut's README carries its exact commands. Modal volume layout:
    Kept below for the original framing. Twelve-plus configurations are already run;
    closure-at-fixed-`t` against horizon would turn the mechanism claim from a two-arm contrast
    into a slope.
+
+## Would the practice arc help here? (2026-08-25 — assessed, not run)
+
+Asked by Jasper against [PR #69](https://github.com/jagilley/research/pull/69) and the
+[practice arc](../rhm/practice/README.md): if the learner may **mint new tokens for the phenomena
+it encounters** and run the standard loop over them — mine units from its own solved trajectories,
+commit, re-read the archive with the climbed vocabulary
+([`reread/lm`](../rhm/practice/reread/lm/README.md)), consolidate into planner and executor
+([`native`](../rhm/practice/native/README.md), [`spiral`](../rhm/practice/spiral/README.md)) —
+could that move the atom? The assessment is **no, for a structural reason**, recorded so the next
+agent with the idea finds the argument rather than re-running it.
+
+**Every practice op moves the unit ladder *up*; the wall here is one level *down*.** Practice's
+object is composition — `T[ℓ] ⊆ T[ℓ−1]×T[ℓ−1]`, mined from trajectories over exact finer units,
+committed verbatim, re-grounded at chunk boundaries. On this substrate that axis is depth `T`, and
+depth is the cheap axis: re-projection through the model's own decode gives `p^⌈T/k⌉`
+([`ballistic_depth`](ballistic_depth/README.md) §9), the staged reduce chains at test time with an
+exact digit-string snap, and the per-digit carrier composes flat to `T=64` with held-out depth at
+500/500 ([`second_pass`](dress_rehearsal/second_pass/README.md) §2.3). The *conceptual* content of
+practice — ballistic within, discretise at the boundary, select rather than average — is what
+solved depth here; `digit_port`'s `s4` (removing the per-application gradient contraction from a
+bit-identical forward pass generalises 13× worse) is the same selection-not-averaging fact read
+from the loss side. Practice has, in effect, been applied, and it did what it does.
+
+The stuck axis is the atom's `eps`, and the only thing that ever moved it on the rule axis is a
+**finer** unit than the one we are handed: [`staged_reduce`](rule_acquisition/staged_reduce/README.md)'s
+bounded-quotient long-division stage (held-out `N` floor → 0.98, monotone in stage count — R=10
+beats R=100). That level does not self-organise even when the architecture supplies slots for it
+([`terminal_only`](rule_acquisition/staged_reduce/terminal_only/NOTES.md): seam collapses to ~12
+values, CE flat from the first log point); it had to be *installed* by the single-stage
+distribution.
+
+**The disanalogy with RHM that decides it: RHM's hierarchy is in the data; long division's is in
+the computation.** In RHM every level is literally present as recurring spans of the token stream,
+which is why extraction is bottom-up and why re-reading is renewable as the vocabulary climbs —
+the levels are there to be extracted. Here the levels below the atom (quotient digits, partial
+remainders) never appear in the stream: the learner observes `x` and `y` (and, in research mode,
+the residue trajectory), never `x²`, never a partial remainder. Minting tokens over "phenomena
+encountered" can only name what is encountered — residues (naming them *is* the lookup table the
+model already learns) and pairs of residues (naming those is depth, already cheap). The token that
+would help, "quotient digit at stage *i*", has nothing in the stream to be mined from.
+`mine_from = chosen` — the constraint [two_climbings](../../ideas/two_climbings.md) §5.4 reads as
+practice's virtue (you cannot mine a chunk you have not executed) — is the blocker here.
+
+The other two components address conditions that are already ideal: allocation manufactures
+recurrence (the dataset is fixed and recurs perfectly); metering needs a sighted grader
+(exact-match is fully sighted by construction — the reason this substrate was chosen); arrival
+and trust ([`census`/`assay`](../rhm/practice/census/README.md)) are about a planner learning to
+route among addresses, and there is no planner here — one deterministic thing to do per step.
+
+**What would make this wrong.** Reformulate the substrate so the agent *has* sub-atomic exact
+primitives (digit compare, subtract `kN`, shift a digit in) and emits trajectories over them. Long
+division is then a level-2 macro over solved programs, and the practice arc would plausibly
+reproduce on it — mining, routing, quarantine, trust. But that is program synthesis with a given
+calculator: it abandons the question this node was built to ask (can a network *learn* the atom
+from terminal labels), is illegal under the competition's rules, and has a static rule, so it does
+not even supply the non-static-rule substrate next-step 3 above names as the open version of the
+arity question. It would be RHM with an arithmetic grammar.
+
+**The one practice-shaped question with a cheap form** is already queued in
+[`second_pass`](dress_rehearsal/second_pass/README.md) next-steps 3: warm-start the stage map on the
+single-stage distribution, then fine-tune terminal-only — does a terminal label *maintain* a
+decomposition it cannot *discover*? That is the assay's "content is giftable, use is only earnable"
+asked in this substrate's coordinates (~16 L4-hours). It scopes the practice claims; it does not
+crack the atom. Left queued.

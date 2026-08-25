@@ -8,6 +8,7 @@
 | `aggregate_results.py` | Base-sweep cross-m tables from the five `results.json` |
 | `aggregate_kl.py` | KL-anchored (kl01) vs unanchored comparison |
 | `aggregate_ei.py` | Three-way EI (ei01) vs KL (kl01) vs base comparison |
+| `rl_dimensionality_colab.ipynb` | Self-contained Colab walkthrough: the setup explained, a scaled-down live replica (pretrain-to-plateau → REINFORCE → +KL → EI at one m, ~15 min on a T4), and the full-scale results embedded with the README's interpretation inline. No Modal/repo dependency — upload and run |
 
 ## Auxiliary docs
 
