@@ -283,6 +283,53 @@ address to ~0.03 mass (6× fewer calls) where enumeration is forced to keep payi
 selection-before-regression is also a quarantine. Single seed; ranks, signs and floor-multiples
 are the claims.
 
+### [`spiral/`](spiral/README.md) — the live re-earning spiral on the depth-6 substrate (2026-08-22→23)
+
+**Goal**: run the loop the arc had never run — earn level k live, consolidate it into the
+learner's own planner and executor, earn level k+1 natively over the routed policy — in the
+depth-6 world (`tall/`'s recorded recipe), where the damage ladder outruns the earnable range;
+read whether the crank accelerates, holds, or decays per turn, and which wall bites first.
+
+**Finding**: **the crank holds, narrows, and the certificate cannot see the narrowing.** Routing
+rehabilitates the substrate `tall/` closed (descent gate passes at 0.50–0.59 recovered fraction;
+enum reproduces the broken reference in-run) and dissolves its pricing inversion live (enum's
+commit penalty permanent, routing's a 2-cycle transient; the g722 insurance arm buys nothing).
+The spiral turns twice on its own certificates, at roughly constant cycles per turn — but
+committed coverage falls 0.57–0.79 (L2) to **0.05–0.09** (L3) in every earning arm while the
+certificate fires anyway: the audition-shaped gauge is **satisfiable by concentration**, the
+grader wall in a sharper form than "noisy at depth". The two predicted walls did not bite (the
+observation stream *grows*; L3 corridors reach parity 0.99+ where depth-4's never did). Inside
+the earnable range the earned sliver matches or beats the true-table native ceiling at ~half
+enumeration's priced time (earned ≥ given, natively); beyond it the complete vocabulary pulls
+away by +0.3–0.4 recovered fraction — the measured value of coverage past the demand it was
+earned on. The address book survives live (table deletion ~free, corridor deletion not); the
+both-ports arm underperforms routing-alone in consumption (native's unresolved cell, now a
+two-node pattern). Single seed; ranks, signs, floor-multiples are the claims.
+
+### [`census/`](census/README.md) + [`assay/`](assay/README.md) — amount × truth × arrival, crossed: arrival wins (2026-08-23→25)
+
+**Goal**: the spiral's certificate certifies a level on a <10%-coverage sliver while the complete
+vocabulary wins the deep eras — so is the deep gap a coverage gap? Census: can an endogenous
+gauge buy coverage, and does bought coverage pay? Forensics: when it didn't, why not. Assay:
+oracle surgery on the committed table, isolating which ingredient of `given`'s advantage —
+amount, truth, or arrival — the deep eras actually pay for, certified against a measured
+stream-position floor (single super-writeup: [`census/README.md`](census/README.md)).
+
+**Finding**: **arrival dominates — the value of a vocabulary is mostly not in the table but in
+the policy that grew up with it.** Coverage is buyable (extension: 2.5× the L3 table) and does
+not close the deep gap; the failure is no artifact, and its mechanism is structural — **π vets
+levels, not entries**, so impure additions de-fund the whole level while the executor DP already
+filters junk at execution (a 6.2%-true table yields 71–76% true executions). The decisive cell:
+the full true table arriving at commit time recovers only a minority of the gap to the same
+table held from cycle 1 (era-4 residual **3.24×** the measured floor; deep-era rank order
+invariant under stream displacement), and the carrier is trust — π's L3 mass 0.58/argmax 0.83
+in the from-birth arm vs ≤0.28/0.33 in every late-arrival arm, robust under displacement.
+Gate-later is dead (criterion epiphenomenal, hold free); the gauge blindness recursed (an
+audition under present demand cannot price future coverage); and the unit measured the depth-6
+stream floor itself, demoting fractions, shallow-era orderings, and all L3 cert-cycle arm
+readings across three rounds. Use is only earnable: content transfers, trust does not. Single
+seed; the stream twins bound stream noise, not seed noise.
+
 ## Reproduce
 
 ```bash

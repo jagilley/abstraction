@@ -1,0 +1,320 @@
+==============================================================================
+census / STEP 1 FORENSICS — tag cs_s0 (no GPU, no Modal)
+==============================================================================
+
+==============================================================================
+(1) FORCED-WINDOW CHECK — does an extension trigger what a commit triggers?
+==============================================================================
+  FROM THE CODE (census.py):
+    A commit ends with
+        if prop is not None:
+            for slot in PN.move_slots(ms, offsets):
+                move_age.setdefault(slot, -1)
+    and `port_spec` forces every slot with `move_age < prop_new_cycles` into the expansion,
+    so a commit's NEW slots start at age -1 and are forced for 2 cycles (k_eff 4 -> 20 at L2,
+    4 -> 12 at L3, width 18 -> 3 / 18 -> 5).
+
+    The extension block (g3) does NOT touch `move_age` at all. It rebuilds the TABLE behind
+    the macros and calls `build_ms` / `bind_slots`, but the macro NODES are unchanged, so
+    `PN.move_slots(ms, offsets)` returns the identical slot ids — every one of which already
+    has age >= prop_new_cycles. `forced` is therefore empty and k_eff stays at k.
+
+    Extension adds entries to an existing action; it does not add an action.
+  => PREDICTION FROM CODE: extensions trigger NO forced window.
+
+  arm           kind     lvl cycle  k_eff [c-1..c+3]          width [c-1..c+3]      
+  spiral_route  commit     2    18  [4, 4, 20, 20, 4]         [18, 18, 3, 3, 18]    
+  spiral_route  commit     3    69  [4, 4, 12, 12, 4]         [18, 18, 5, 5, 18]    
+  census_gate   commit     2    35  [4, 4, 20, 20, 4]         [18, 18, 3, 3, 18]    
+  census_gate   commit     3    70  [4, 4, 12, 12, 4]         [18, 18, 5, 5, 18]    
+  yoked_delay   commit     2    35  [4, 4, 20, 20, 4]         [18, 18, 3, 3, 18]    
+  yoked_delay   commit     3    70  [4, 4, 12, 12, 4]         [18, 18, 5, 5, 18]    
+  census_extend commit     2    18  [4, 4, 20, 20, 4]         [18, 18, 3, 3, 18]    
+  census_extend commit     3    70  [4, 4, 12, 12, 4]         [18, 18, 5, 5, 18]    
+  census_extend extend     2    25  [4, 4, 4, 4, 4]           [18, 18, 18, 18, 18]  
+  census_extend extend     2    35  [4, 4, 4, 4, 4]           [18, 18, 18, 18, 18]  
+  census_extend extend     3    73  [12, 4, 4, 4, 4]          [5, 18, 18, 18, 18]   
+  census_extend extend     3    78  [4, 4, 4, 4, 4]           [18, 18, 18, 18, 18]  
+  census_extend extend     3    83  [4, 4, 4, 4, 4]           [18, 18, 18, 18, 18]  
+  census_extend extend     3    88  [4, 4, 4, 4, 4]           [18, 18, 18, 18, 18]  
+  census_extend extend     3    93  [4, 4, 4, 4, 4]           [18, 18, 18, 18, 18]  
+  census_extend extend     2    98  [4, 4, 4, 4, 4]           [18, 18, 18, 18, 18]  
+  census_extend extend     3    98  [4, 4, 4, 4, 4]           [18, 18, 18, 18, 18]  
+  census_extend extend     3   105  [4, 4, 4, 4, 4]           [18, 18, 18, 18, 18]  
+  census_extend extend     2   114  [4, 4, 4, 4]              [18, 18, 18, 18]      
+  census_extend extend     3   114  [4, 4, 4, 4]              [18, 18, 18, 18]      
+
+  local window [c-1, c, c+1, c+2] (cycles inside a COMMIT's forced window excluded):
+    c 25 L2  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c 35 L2  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c 73 L3  k_eff [4, 4, 4]  width [18, 18, 18]  moved=False   [excluded as commit window: [72]]
+    c 78 L3  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c 83 L3  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c 88 L3  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c 93 L3  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c 98 L2  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c 98 L3  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c105 L3  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c114 L2  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+    c114 L3  k_eff [4, 4, 4, 4]  width [18, 18, 18, 18]  moved=False
+  extension events overlapping a COMMIT's forced window: 1 (c73, from the c70 L3 commit)
+
+  extension events whose k_eff moves LOCALLY: 0 of 12
+  extension events whose width moves LOCALLY: 0 of 12
+  commit events whose k_eff moves (the positive control):      8 of 8
+
+  >>> (1) REFUTED — extensions trigger no forced window; the mechanical-artifact hypothesis
+      does not apply. (log-confirmed: True)
+
+==============================================================================
+(2) TRUTH COMPOSITION OF ADMISSIONS, AND pi's MASS
+==============================================================================
+
+  2a. TRUE vs JUNK per admission (n_correct differenced against the previous
+      state of that level; the commit event supplies the baseline)
+    arm           kind      cyc lvl  added  true  junk  n_after  correct  recall
+    spiral_route  commit     18   2     11     8     3       11        8   0.571
+    spiral_route  commit     69   3     12     4     8       12        4   0.071
+    census_gate   commit     35   2     13     9     4       13        9   0.643
+    census_gate   commit     70   3     15     5    10       15        5   0.089
+    yoked_delay   commit     35   2     13     9     4       13        9   0.643
+    yoked_delay   commit     70   3     15     5    10       15        5   0.089
+    census_extend commit     18   2     11     8     3       11        8   0.571
+    census_extend commit     70   3     14     3    11       14        3   0.054
+    census_extend extend     25   2      2     1     1       13        9   0.643
+    census_extend extend     35   2      1     0     1       14        9   0.643
+    census_extend extend     73   3      2     1     1       16        4   0.071
+    census_extend extend     78   3      2     1     1       18        5   0.089
+    census_extend extend     83   3      1     0     1       19        5   0.089
+    census_extend extend     88   3      2     0     2       21        5   0.089
+    census_extend extend     93   3      1     1     0       22        6   0.107
+    census_extend extend     98   2      1     1     0       15       10   0.714
+    census_extend extend     98   3      2     0     2       24        6   0.107
+    census_extend extend    105   3      1     0     1       25        6   0.107
+    census_extend extend    114   2      1     1     0       16       11   0.786
+    census_extend extend    114   3      6     4     2       31       10   0.179
+
+    EXTENSION TOTALS by (arm, level):
+      census_extend  L2  added   5  true   3  junk   2  junk fraction 0.400
+      census_extend  L3  added  17  true   7  junk  10  junk fraction 0.588
+      ALL                 added  22  true  10  junk  12  junk fraction 0.545
+
+  2b. THE ENTRY-LEVEL SPLIT OF pi's MASS IS NOT COMPUTABLE, and the reason is structural,
+      not a logging gap. pi's action space is the (level, node) SLOT vocabulary:
+      `PN.slot_layout(depth, s, max_level)` gives one slot per node per level, and every entry
+      of a level's table shares the same slots. Adding entries to a table does not add an
+      action, so pi cannot propose or starve an individual entry — it proposes the MACRO, and
+      which entry that macro uses is decided inside `macros.macro_features`' max-sum DP, per
+      configuration, and is not logged. What IS measurable is reported below: pi's mass at the
+      LEVEL the entries were added to, and the number of macro materialisations the beam
+      actually ran.
+
+  2c. pi's MASS BY LEVEL (probe-level; `p_macro_all` summed over that level's
+      slots, and `frac_argmax` summed — how often pi's top choice is that macro)
+    arm             cyc era  macro_mass     L2 p  L2 argmax     L3 p  L3 argmax
+    spiral_route     48   1       0.188    0.188      0.000        -          -
+    spiral_route     72   2       0.268    0.246      0.081    0.022      0.000
+    spiral_route     88   2       0.355    0.249      0.156    0.105      0.047
+    spiral_route    100   3       0.424    0.258      0.260    0.166      0.115
+    spiral_route    104   4       0.476    0.260      0.247    0.216      0.219
+    spiral_route    109   4       0.481    0.255      0.229    0.225      0.219
+    spiral_route    112   5       0.478    0.273      0.224    0.205      0.161
+    spiral_route    116   5       0.484    0.250      0.187    0.233      0.234
+    census_gate      48   1       0.097    0.097      0.000        -          -
+    census_gate      72   2       0.275    0.264      0.120    0.010      0.000
+    census_gate      88   2       0.345    0.264      0.216    0.081      0.013
+    census_gate     100   3       0.416    0.242      0.224    0.174      0.109
+    census_gate     104   4       0.428    0.248      0.229    0.180      0.151
+    census_gate     109   4       0.489    0.235      0.169    0.254      0.294
+    census_gate     112   5       0.475    0.249      0.180    0.226      0.224
+    census_gate     116   5       0.486    0.247      0.156    0.239      0.232
+    yoked_delay      48   1       0.097    0.097      0.000        -          -
+    yoked_delay      72   2       0.275    0.264      0.120    0.010      0.000
+    yoked_delay      88   2       0.345    0.264      0.216    0.081      0.013
+    yoked_delay     100   3       0.416    0.242      0.224    0.174      0.109
+    yoked_delay     104   4       0.428    0.248      0.229    0.180      0.151
+    yoked_delay     109   4       0.489    0.235      0.169    0.254      0.294
+    yoked_delay     112   5       0.475    0.249      0.180    0.226      0.224
+    yoked_delay     116   5       0.486    0.247      0.156    0.239      0.232
+    census_extend    48   1       0.202    0.202      0.000        -          -
+    census_extend    72   2       0.247    0.238      0.096    0.009      0.000
+    census_extend    88   2       0.335    0.276      0.208    0.060      0.005
+    census_extend   100   3       0.370    0.268      0.253    0.103      0.029
+    census_extend   104   4       0.417    0.307      0.370    0.110      0.026
+    census_extend   109   4       0.431    0.308      0.393    0.124      0.036
+    census_extend   112   5       0.413    0.269      0.234    0.144      0.091
+    census_extend   116   5       0.430    0.272      0.273    0.158      0.099
+    given_route      48   1       0.660    0.332      0.315    0.328      0.370
+    given_route      72   2       0.710    0.339      0.284    0.372      0.513
+    given_route      88   2       0.698    0.296      0.203    0.402      0.562
+    given_route     100   3       0.744    0.311      0.164    0.433      0.667
+    given_route     104   4       0.732    0.280      0.146    0.452      0.630
+    given_route     109   4       0.785    0.317      0.237    0.468      0.656
+    given_route     112   5       0.803    0.267      0.146    0.536      0.779
+    given_route     116   5       0.827    0.248      0.112    0.580      0.831
+    given_native     48   1       0.663    0.288      0.174    0.375      0.622
+    given_native     72   2       0.687    0.312      0.250    0.374      0.552
+    given_native     88   2       0.708    0.283      0.174    0.425      0.628
+    given_native    100   3       0.718    0.308      0.203    0.410      0.596
+    given_native    104   4       0.740    0.309      0.245    0.431      0.609
+    given_native    109   4       0.742    0.282      0.146    0.459      0.703
+    given_native    112   5       0.791    0.283      0.143    0.507      0.784
+    given_native    116   5       0.787    0.291      0.148    0.496      0.763
+
+  2d. ACTUAL MACRO EXPANSIONS the beam ran (`blocks.mat_dp`, per-cycle mean by era)
+    arm                   era1        era2        era3        era4        era5
+    spiral_route         12579       24829       40730       58051       69502
+    census_gate          11140       25274       35425       54139       68092
+    yoked_delay          11140       25274       35425       54139       68092
+    census_extend        12439       23755       33401       48160       57636
+    given_route         150973      146986      149606      151625      163266
+    given_native        113437       48391       39417       42729       45109
+
+  >>> (2) MIXED — the truth split is measurable and reported above; the entry-level
+      pi split is NOT COMPUTABLE by construction (slot-level action space).
+
+==============================================================================
+(3) e-TRAJECTORY AROUND EACH ADMITTING EXTENSION (+/-4 cycles)
+==============================================================================
+  census_extend: mean |de| = 0.0370, max |de| = 0.3542 over 116 cycles
+
+    cyc era lvl adm true junk  e[c-4..c+4]                                                de(c->c+1)  x noise forced?
+     25   1   2   2    1    1  [0.5, 0.43, 0.482, 0.503, 0.503, 0.456, 0.448, 0.453, 0.529]    -0.0469    -1.27   False
+     35   1   2   1    0    1  [0.526, 0.443, 0.456, 0.469, 0.482, 0.479, 0.461, 0.424, 0.44]    -0.0026    -0.07   False
+     73   2   3   2    1    1  [0.612, 0.62, 0.805, 0.82, 0.625, 0.622, 0.602, 0.589, 0.609]    -0.0026    -0.07    True
+     78   2   3   2    1    1  [0.622, 0.602, 0.589, 0.609, 0.617, 0.565, 0.602, 0.57, 0.552]    -0.0521    -1.41   False
+     83   2   3   1    0    1  [0.565, 0.602, 0.57, 0.552, 0.529, 0.51, 0.57, 0.557, 0.56]    -0.0182    -0.49   False
+     88   2   3   2    0    2  [0.51, 0.57, 0.557, 0.56, 0.552, 0.771, 0.758, 0.766, 0.771]    +0.2188    +5.92   False  <- ERA BOUNDARY
+     93   3   3   1    1    0  [0.771, 0.758, 0.766, 0.771, 0.773, 0.729, 0.737, 0.727, 0.693]    -0.0443    -1.20   False
+     98   3   2   1    0    2  [0.729, 0.737, 0.727, 0.693, 0.698, 0.672, 0.698, 0.924, 0.917]    -0.0260    -0.70   False
+     98   3   3   2    0    2  [0.729, 0.737, 0.727, 0.693, 0.698, 0.672, 0.698, 0.924, 0.917]    -0.0260    -0.70   False
+    105   4   3   1    0    1  [0.924, 0.917, 0.904, 0.911, 0.891, 0.883, 0.872, 0.891, 0.865]    -0.0078    -0.21   False
+    114   5   2   1    4    2  [0.943, 0.945, 0.943, 0.948, 0.945, 0.932, 0.945]             -0.0130    -0.35   False
+    114   5   3   6    4    2  [0.943, 0.945, 0.943, 0.948, 0.945, 0.932, 0.945]             -0.0130    -0.35   False
+
+  events whose next-cycle |de| exceeds 2x the arm's own mean |de|: 1 of 12 (cycles [88])
+  ... of which NOT explained by an era boundary: 0
+
+  >>> (3) REFUTED as an extension effect — the single >2x excursion (c88, +0.219)
+      is the era 2 -> era 3 boundary, where the damage cell moves one level deeper.
+  events inside a forced window: 1 of 12
+
+==============================================================================
+(4) THE ERA-4 CELL, cycle-aligned against the anchor
+==============================================================================
+  era 4 = L4n3 spans c101-c109. `census_extend`'s only era-4 extension event is at c105 (L3, +1 entry, 0 true / 1 junk).
+
+   cycle   spiral_route    census_gate    yoked_delay  census_extend  ext-anchor  gate-anchor
+     101         0.8854         0.8568         0.8568         0.9245     +0.0391      -0.0286
+     102         0.8906         0.8672         0.8672         0.9167     +0.0260      -0.0234
+     103         0.8698         0.8464         0.8464         0.9036     +0.0339      -0.0234
+     104         0.8516         0.8594         0.8594         0.9115     +0.0599      +0.0078
+     105         0.8281         0.8281         0.8281         0.8906     +0.0625      +0.0000
+     106         0.8568         0.8203         0.8203         0.8828     +0.0260      -0.0365
+     107         0.8568         0.8125         0.8125         0.8724     +0.0156      -0.0443
+     108         0.8229         0.7865         0.7865         0.8906     +0.0677      -0.0365
+     109         0.7891         0.7891         0.7891         0.8646     +0.0755      +0.0000
+
+  census_extend - anchor: mean +0.0451 over 9 cycles; worse on 9 of 9
+    c101-c105 (before/at the era-4 extension): +0.0443
+    c106-c109 (after it):                       +0.0462
+  census_gate  - anchor: mean -0.0205; better on 6 of 9
+
+  >>> (4) the census_extend era-4 deficit is spread across the era.
+
+  ORIGIN OF THE census_extend - anchor GAP, per era (mean of the per-cycle diff;
+  positive = census_extend is WORSE):
+     era      cycles  ext-anchor  gate-anchor  n extend evts
+       1      c1-c48     +0.0075      -0.0087              2
+       2     c49-c88     +0.0047      -0.0165              4
+       3    c89-c100     +0.0614      +0.0104              3
+       4   c101-c109     +0.0451      -0.0205              1
+       5   c110-c116     -0.0063      -0.0197              2
+
+  PER-LEVEL CLUE — what each arm's tables held entering era 4 (c101):
+    arm             L2 n  L2 rec  L2 prec  L3 n  L3 rec  L3 prec
+    spiral_route      11   0.571    0.727    12   0.071    0.333
+    census_gate       13   0.643    0.692    15   0.089    0.333
+    yoked_delay       13   0.643    0.692    15   0.089    0.333
+    census_extend     15   0.714    0.667    24   0.107    0.250
+
+==============================================================================
+(5) LIFETIME TRACES — what separates given_route from the earning arms EARLY
+==============================================================================
+
+  5a. `probe.all_eras` — competence on EVERY era's fixed metering set, measured at
+      each probe with the arm's CURRENT action set. Era-4 and era-5 columns read
+      from c1, long before the earning arms hold anything.
+     cycle   spiral_route    census_gate    yoked_delay  census_extend    given_route   given_native
+    -- era4 metering set --
+         1         0.9688         0.9688         0.9688         0.9688         0.9323         0.9401
+         8         0.9714         0.9714         0.9714         0.9714         0.9141         0.8906
+        16         0.9688         0.9688         0.9688         0.9688         0.8411         0.8672
+        32         0.9688         0.9714         0.9714         0.9766         0.8411         0.8385
+        48         0.9714         0.9714         0.9714         0.9766         0.8464         0.8099
+        72         0.9479         0.8880         0.8880         0.8438         0.8047         0.8203
+        88         0.9193         0.9010         0.9010         0.9427         0.7474         0.7891
+       100         0.8776         0.8542         0.8542         0.9323         0.7266         0.7786
+       109         0.7891         0.7891         0.7891         0.8646         0.6146         0.6901
+       116         0.7943         0.7422         0.7422         0.8333         0.6354         0.7057
+      given_route - anchor on the era4 set: c1 -0.0365   c16 -0.1276   c116 -0.1589
+      -> 80.3% of the final gap is already present at c16, before ANY arm has committed a table (first commit c18).
+      -> the four earning arms are identical to each other at c16 on this set: True
+    -- era5 metering set --
+         1         0.9766         0.9766         0.9766         0.9766         0.9505         0.9583
+         8         0.9896         0.9896         0.9896         0.9896         0.9609         0.9531
+        16         0.9922         0.9922         0.9922         0.9922         0.9401         0.9583
+        32         0.9896         0.9870         0.9870         0.9896         0.9219         0.9010
+        48         0.9818         0.9844         0.9844         0.9766         0.9141         0.8958
+        72         0.9844         0.9167         0.9167         0.8750         0.9219         0.8620
+        88         0.9740         0.9557         0.9557         0.9661         0.9036         0.8646
+       100         0.9661         0.9557         0.9557         0.9531         0.9036         0.8854
+       109         0.9401         0.9401         0.9401         0.9401         0.8802         0.8672
+       116         0.9505         0.9401         0.9401         0.9453         0.8229         0.8594
+      given_route - anchor on the era5 set: c1 -0.0260   c16 -0.0521   c116 -0.1276
+      -> 40.8% of the final gap is already present at c16, before ANY arm has committed a table (first commit c18).
+      -> the four earning arms are identical to each other at c16 on this set: True
+
+  5b. TRAJECTORY STATISTICS, eras 1-2 means (before tables diverge much)
+    arm            era      vloss      gloss   n_solved e_practice       dres       succ      width g_per_solv
+    spiral_route     1      0.618      1.146    262.917      0.769      1.120      0.487     16.042    463.792
+    spiral_route     2      0.544      1.044    249.650      0.775      1.516      0.380     17.350    461.750
+    census_gate      1      0.608      1.151    292.667      0.733      1.083      0.495     16.042    463.792
+    census_gate      2      0.593      1.044    267.375      0.757      1.426      0.397     17.350    461.750
+    yoked_delay      1      0.608      1.151    292.667      0.733      1.083      0.495     16.042    463.792
+    yoked_delay      2      0.593      1.044    267.375      0.757      1.426      0.397     17.350    461.750
+    census_extend    1      0.610      1.147    259.729      0.769      1.133      0.479     16.042    463.792
+    census_extend    2      0.584      1.044    256.500      0.765      1.525      0.376     17.350    461.750
+    given_route      1      0.679      1.029    244.333      0.778      1.712      0.358     16.583    461.833
+    given_route      2      0.589      1.027    307.250      0.719      1.592      0.417     18.000    463.000
+    given_native     1      0.684      1.247    211.125      0.812      1.775      0.328     16.583    461.833
+    given_native     2      0.555      1.096    266.725      0.762      1.705      0.376     18.000    463.000
+
+  5c. WIDTH LADDER at the last probe of each era (e at width 1 / 2 / 4)
+    arm                             era1                  era2                  era3                  era4                  era5
+    spiral_route          0.46/0.46/0.47        0.54/0.54/0.53        0.65/0.64/0.63        0.84/0.83/0.82        0.96/0.96/0.95
+    census_gate           0.46/0.45/0.46        0.52/0.50/0.51        0.68/0.68/0.67        0.82/0.81/0.80        0.95/0.94/0.93
+    yoked_delay           0.46/0.45/0.46        0.52/0.50/0.51        0.68/0.68/0.67        0.82/0.81/0.80        0.95/0.94/0.93
+    census_extend         0.45/0.47/0.48        0.59/0.57/0.56        0.74/0.72/0.71        0.89/0.88/0.86        0.95/0.95/0.95
+    given_route           0.52/0.52/0.51        0.57/0.54/0.52        0.58/0.56/0.54        0.68/0.66/0.64        0.90/0.88/0.86
+    given_native          0.58/0.57/0.57        0.60/0.59/0.58        0.66/0.65/0.64        0.72/0.72/0.70        0.90/0.89/0.88
+
+  5d. VALUE LOSS by era (the selector's fit — B's most direct trace)
+    arm                 era1      era2      era3      era4      era5
+    spiral_route      0.6183    0.5445    0.5676    0.5288    0.5033
+    census_gate       0.6080    0.5932    0.5480    0.4988    0.4710
+    yoked_delay       0.6080    0.5932    0.5480    0.4988    0.4710
+    census_extend     0.6100    0.5843    0.4908    0.4917    0.4653
+    given_route       0.6790    0.5891    0.5980    0.5931    0.5505
+    given_native      0.6836    0.5549    0.5603    0.5155    0.4717
+
+  5e. G-Y (L4-shaped tuples at support) by era — reported for completeness
+    arm                 era1      era2      era3      era4      era5
+    spiral_route           6        41        56        64        68
+    census_gate           15        48        57        63        64
+    yoked_delay           15        48        57        63        64
+    census_extend         13        44        57        61        61
+    given_route           25        43        48        49        52
+    given_native          19        38        45        46        46
+
+[forensics] wrote /home/user/research/experiments/rhm/practice/census/figures/forensics/forensics.json

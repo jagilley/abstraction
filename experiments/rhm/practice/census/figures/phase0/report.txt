@@ -1,0 +1,294 @@
+==============================================================================
+census / PHASE 0 — gauge replay over spiral/sp_s0 (no GPU)
+==============================================================================
+
+LADDER (absolute cycles):
+  era 1  L1n25   level 1  c1-c32  (32 cycles)
+  era 2  L2n12   level 2  c33-c88  (56 cycles)
+  era 3  L3n6    level 3  c89-c100  (12 cycles)
+  era 4  L4n3    level 4  c101-c109  (9 cycles)
+  era 5  L5n1    level 5  c110-c116  (7 cycles)
+  NOTE the era-2 boundary is c88, not c56 — era 2 is 56 cycles LONG but spans c33-c88.
+  Frontier mining windows: L2 opens at era 1 (c1); L3 opens at era 2 (c33), since 
+  `run_arm` mines levels 2..min(max_macro_level, era_level+1).
+
+------------------------------------------------------------------------------
+(0) GAUGE G-Y (next-level yield): IS THE T4 STREAM IN THESE LOGS?
+------------------------------------------------------------------------------
+  verdict: NOT OBSERVABLE — no level-4 miner is constructed anywhere in the sp_s0 run (miners span range(2, max_macro_level+1) = levels 2-3), and the logged per-key counts carry no adjacency, so the stream cannot be reconstructed offline.
+  levels present per arm (identical across all seven): miner ['2', '3'], aud ['2', '3'], ablation-mine ['2', '3']; max_macro_level = 3
+  Phase 1 would need: an UNPRICED instrument miner at level 4 (span s**3 = 8 blocks = 16 tokens) observing the era's own level-4 node in every era, decoupled from `max_macro_level` (which caps what may be COMMITTED, not what may be OBSERVED). Level 4 stays unearnable — 1,024 entries, ~384 cycles to cover — so this is a growth-DIRECTION readout only, never a commit candidate.
+
+------------------------------------------------------------------------------
+(1) PRECONDITION: is the frontier stream still climbing at c116?
+    A saturation gauge can only fire on a series that stops.
+------------------------------------------------------------------------------
+
+  level 2   (true table: 14 entries)
+    arm               at_sup end  d(last20)  slope/cyc  live end  d(last20)  slope/cyc
+    enum_live                 17          0      0.000        17          0      0.000
+    spiral_route              19          3      0.148        19          3      0.148
+    spiral                    20          4      0.158        20          4      0.158
+    enum_live_g722            17          0      0.000        17          0      0.000
+
+  level 3   (true table: 56 entries)
+    arm               at_sup end  d(last20)  slope/cyc  live end  d(last20)  slope/cyc
+    enum_live                 35          8      0.400        25          5      0.253
+    spiral_route              40          9      0.287        20          3      0.092
+    spiral                    40          3      0.082        16          0     -0.000
+    enum_live_g722            35          8      0.400        25          5      0.253
+
+------------------------------------------------------------------------------
+(2) G-A (admission rate at support) and G-C (buildable entries): firing cycles
+    over a (W, theta) grid. `sep` = fired - cert_cycle (negative = before the cert).
+------------------------------------------------------------------------------
+
+  G-A level 2  (support=3)
+      W  th |        enum_live    spiral_route          spiral  enum_live_g722
+      3   0 |      c13(-6) n12     c11(-7) n10     c11(-7) n10     c13(-6) n12
+      3   1 |      c12(-7) n12     c11(-7) n10     c11(-7) n10     c12(-7) n12
+      3   2 |       c7(-12) n6      c7(-11) n6      c7(-11) n6      c7(-12) n6
+      5   0 |      c23(+4) n15     c17(-1) n11     c17(-1) n11     c23(+4) n15
+      5   1 |      c14(-5) n12     c13(-5) n11     c13(-5) n11     c14(-5) n12
+      5   2 |      c14(-5) n12     c13(-5) n11     c13(-5) n11     c14(-5) n12
+      8   0 |      c26(+7) n15     c20(+2) n11     c20(+2) n11     c26(+7) n15
+      8   1 |      c23(+4) n15     c16(-2) n11     c16(-2) n11     c23(+4) n15
+      8   2 |      c23(+4) n15     c16(-2) n11     c16(-2) n11     c23(+4) n15
+     12   0 |     c30(+11) n15    c40(+22) n14    c36(+18) n13    c30(+11) n15
+     12   1 |      c27(+8) n15     c20(+2) n11     c20(+2) n11     c27(+8) n15
+     12   2 |      c27(+8) n15     c20(+2) n11     c20(+2) n11     c27(+8) n15
+    cert cycles:   enum_live=19  spiral_route=18  spiral=18  enum_live_g722=19
+    commit cycles: enum_live=19  spiral_route=18  spiral=18  enum_live_g722=19
+
+  G-A level 3  (support=3)
+      W  th |        enum_live    spiral_route          spiral  enum_live_g722
+      3   0 |      c36(-12) n1     c54(+6) n13     c56(+4) n10     c36(-12) n1
+      3   1 |      c36(-12) n1     c47(-1) n10     c40(-12) n5     c36(-12) n1
+      3   2 |      c36(-12) n1      c42(-6) n8     c40(-12) n5     c36(-12) n1
+      5   0 |      c56(+8) n14    c69(+21) n16    c67(+15) n13     c56(+8) n14
+      5   1 |      c55(+7) n14     c55(+7) n13     c57(+5) n10     c55(+7) n14
+      5   2 |      c54(+6) n14     c55(+7) n13     c42(-10) n5     c54(+6) n14
+      8   0 |            never    c72(+24) n16    c99(+47) n16           never
+      8   1 |     c58(+10) n14    c71(+23) n16    c96(+44) n16    c58(+10) n14
+      8   2 |      c57(+9) n14    c70(+22) n16    c90(+38) n16     c57(+9) n14
+     12   0 |            never   c112(+64) n18   c103(+51) n16           never
+     12   1 |            never    c76(+28) n16   c100(+48) n16           never
+     12   2 |     c75(+27) n16    c74(+26) n16    c95(+43) n16    c75(+27) n16
+    cert cycles:   enum_live=48  spiral_route=48  spiral=52  enum_live_g722=48
+    commit cycles: enum_live=48  spiral_route=48  spiral=52  enum_live_g722=48
+
+  G-C level 2  (support=3)
+      W  th |        enum_live    spiral_route          spiral  enum_live_g722
+      3   0 |      c13(-6) n12     c11(-7) n10     c11(-7) n10     c13(-6) n12
+      3   1 |      c12(-7) n12     c11(-7) n10     c11(-7) n10     c12(-7) n12
+      3   2 |       c7(-12) n6      c7(-11) n6      c7(-11) n6      c7(-12) n6
+      5   0 |      c23(+4) n15     c17(-1) n11     c17(-1) n11     c23(+4) n15
+      5   1 |      c14(-5) n12     c13(-5) n11     c13(-5) n11     c14(-5) n12
+      5   2 |      c14(-5) n12     c13(-5) n11     c13(-5) n11     c14(-5) n12
+      8   0 |      c26(+7) n15     c20(+2) n11     c20(+2) n11     c26(+7) n15
+      8   1 |      c23(+4) n15     c16(-2) n11     c16(-2) n11     c23(+4) n15
+      8   2 |      c23(+4) n15     c16(-2) n11     c16(-2) n11     c23(+4) n15
+     12   0 |     c30(+11) n15    c40(+22) n14    c36(+18) n13    c30(+11) n15
+     12   1 |      c27(+8) n15     c20(+2) n11     c20(+2) n11     c27(+8) n15
+     12   2 |      c27(+8) n15     c20(+2) n11     c20(+2) n11     c27(+8) n15
+    cert cycles:   enum_live=19  spiral_route=18  spiral=18  enum_live_g722=19
+    commit cycles: enum_live=19  spiral_route=18  spiral=18  enum_live_g722=19
+
+  G-C level 3  (support=3)
+      W  th |        enum_live    spiral_route          spiral  enum_live_g722
+      3   0 |      c36(-12) n1     c54(+6) n13      c43(-9) n5     c36(-12) n1
+      3   1 |      c36(-12) n1      c43(-5) n8     c40(-12) n5     c36(-12) n1
+      3   2 |      c36(-12) n1      c42(-6) n8     c38(-14) n4     c36(-12) n1
+      5   0 |      c56(+8) n14    c61(+13) n14      c45(-7) n5     c56(+8) n14
+      5   1 |      c55(+7) n14     c55(+7) n13     c42(-10) n5     c55(+7) n14
+      5   2 |      c54(+6) n14      c45(-3) n9     c42(-10) n5     c54(+6) n14
+      8   0 |     c67(+19) n15    c72(+24) n16    c81(+29) n16    c67(+19) n15
+      8   1 |     c58(+10) n14    c59(+11) n14      c45(-7) n5    c58(+10) n14
+      8   2 |      c57(+9) n14    c58(+10) n14      c45(-7) n5     c57(+9) n14
+     12   0 |            never    c76(+28) n16    c85(+33) n16           never
+     12   1 |     c63(+15) n15    c74(+26) n16    c84(+32) n16    c63(+15) n15
+     12   2 |     c62(+14) n15    c63(+15) n15    c81(+29) n16    c62(+14) n15
+    cert cycles:   enum_live=48  spiral_route=48  spiral=52  enum_live_g722=48
+    commit cycles: enum_live=48  spiral_route=48  spiral=52  enum_live_g722=48
+
+------------------------------------------------------------------------------
+(3) G-D (frozen-vs-live divergence): what COMMIT-THEN-EXTEND would have had
+    available at every recert. `avail` = n_live - n_frozen (entries extension
+    could add); `n_diff` = audition answers a whole-table swap would change.
+------------------------------------------------------------------------------
+
+  level 2
+    arm               cycle  frozen  live  avail  n_diff  live rec  live prec  de(live-frozen)
+    enum_live            37      15    15      0       0     0.786      0.733           0.0000
+    enum_live            42      15    15      0       0     0.786      0.733           0.0000
+    enum_live            47      15    15      0       0     0.786      0.733           0.0000
+    enum_live            52      15    15      0       0     0.786      0.733           0.0000
+    enum_live            57      15    16      1       0     0.857      0.750           0.0000
+    enum_live            62      15    16      1       4     0.857      0.750           0.0000
+    enum_live            67      15    16      1       0     0.857      0.750           0.0000
+    enum_live            72      15    16      1       0     0.857      0.750           0.0000
+    enum_live            77      15    16      1       1     0.857      0.750           0.0000
+    enum_live            82      15    17      2      10     0.857      0.706           0.0104
+    enum_live            87      15    17      2      20     0.857      0.706           0.0156
+    spiral_route         37      11    14      3       2     0.643      0.643           0.0000
+    spiral_route         42      11    15      4       5     0.714      0.667           0.0000
+    spiral_route         47      11    15      4       5     0.714      0.667           0.0000
+    spiral_route         52      11    15      4       4     0.714      0.667           0.0000
+    spiral_route         57      11    15      4       7     0.714      0.667           0.0000
+    spiral_route         62      11    15      4       3     0.714      0.667           0.0000
+    spiral_route         67      11    15      4       5     0.714      0.667          -0.0104
+    spiral_route         72      11    16      5       6     0.714      0.625           0.0000
+    spiral_route         77      11    16      5       5     0.714      0.625           0.0052
+    spiral_route         82      11    16      5       5     0.714      0.625           0.0000
+    spiral_route         87      11    16      5       8     0.714      0.625          -0.0052
+    spiral               37      11    13      2       0     0.643      0.692           0.0000
+    spiral               42      11    14      3       1     0.643      0.643           0.0000
+    spiral               47      11    14      3       0     0.643      0.643           0.0000
+    spiral               52      11    14      3       0     0.643      0.643           0.0000
+    spiral               57      11    14      3       4     0.643      0.643           0.0000
+    spiral               62      11    15      4       2     0.643      0.600          -0.0052
+    spiral               67      11    15      4       0     0.643      0.600           0.0000
+    spiral               72      11    15      4       2     0.643      0.600           0.0000
+    spiral               77      11    15      4       0     0.643      0.600           0.0000
+    spiral               82      11    15      4       0     0.643      0.600           0.0000
+    spiral               87      11    15      4       3     0.643      0.600          -0.0052
+    enum_live_g722       37      15    15      0       0     0.786      0.733           0.0000
+    enum_live_g722       42      15    15      0       0     0.786      0.733           0.0000
+    enum_live_g722       47      15    15      0       0     0.786      0.733           0.0000
+    enum_live_g722       52      15    15      0       0     0.786      0.733           0.0000
+    enum_live_g722       57      15    16      1       0     0.857      0.750           0.0000
+    enum_live_g722       62      15    16      1       4     0.857      0.750           0.0000
+    enum_live_g722       67      15    16      1       0     0.857      0.750           0.0000
+    enum_live_g722       72      15    16      1       0     0.857      0.750           0.0000
+    enum_live_g722       77      15    16      1       1     0.857      0.750           0.0000
+    enum_live_g722       82      15    17      2      10     0.857      0.706           0.0104
+    enum_live_g722       87      15    17      2      20     0.857      0.706           0.0156
+
+  level 3
+    arm               cycle  frozen  live  avail  n_diff  live rec  live prec  de(live-frozen)
+    enum_live            93      11    20      9      77     0.143      0.400           0.0156
+    enum_live            98      11    20      9      75     0.143      0.400          -0.0156
+    spiral_route         93      11    17      6      21     0.143      0.471          -0.0156
+    spiral_route         98      11    17      6      12     0.143      0.471          -0.0104
+    spiral               93       9    16      7       1     0.143      0.500           0.0052
+    spiral               98       9    16      7       8     0.143      0.500           0.0000
+    enum_live_g722       93      11    20      9      77     0.143      0.400           0.0156
+    enum_live_g722       98      11    20      9      75     0.143      0.400          -0.0156
+
+  END-OF-RUN frozen vs live (the gap the extension op exists to close):
+    arm              lvl frozen n  f.recall  f.prec  live n  l.recall  l.prec   gap  growing
+    enum_live          2       15     0.786   0.733      17     0.857   0.706     2    False
+    enum_live          3       11     0.054   0.273      25     0.179   0.400    14     True
+    spiral_route       2       11     0.571   0.727      19     0.929   0.684     8     True
+    spiral_route       3       11     0.089   0.455      20     0.179   0.500     9     True
+    spiral             2       11     0.571   0.727      20     0.929   0.650     9     True
+    spiral             3        9     0.071   0.444      16     0.143   0.500     7     True
+    enum_live_g722     2       15     0.786   0.733      17     0.857   0.706     2    False
+    enum_live_g722     3       11     0.054   0.273      25     0.179   0.400    14     True
+
+------------------------------------------------------------------------------
+(4) DEGENERACY VERDICTS
+    degenerate := never fires inside the run, OR fires within +/-2 cycles of the
+    certificate in every arm (nothing to separate).
+------------------------------------------------------------------------------
+  G-A L2: USABLE at W=12, theta=0 — fires 11..22 cycles after the cert
+      enum_live        fire c30   cert c19   sep +11  entries  15 recall  0.786  (post-commit extrapolation: True)
+      spiral_route     fire c40   cert c18   sep +22  entries  14 recall  0.643  (post-commit extrapolation: True)
+      spiral           fire c36   cert c18   sep +18  entries  13 recall  0.643  (post-commit extrapolation: True)
+      enum_live_g722   fire c30   cert c19   sep +11  entries  15 recall  0.786  (post-commit extrapolation: True)
+  G-A L3: USABLE at W=12, theta=2 — fires 26..43 cycles after the cert
+      enum_live        fire c75   cert c48   sep +27  entries  16 recall  0.089  (post-commit extrapolation: True)
+      spiral_route     fire c74   cert c48   sep +26  entries  16 recall  0.125  (post-commit extrapolation: True)
+      spiral           fire c95   cert c52   sep +43  entries  16 recall  0.143  (post-commit extrapolation: True)
+      enum_live_g722   fire c75   cert c48   sep +27  entries  16 recall  0.089  (post-commit extrapolation: True)
+  G-C L2: USABLE at W=12, theta=0 — fires 11..22 cycles after the cert
+      enum_live        fire c30   cert c19   sep +11  entries  15 recall  0.786  (post-commit extrapolation: True)
+      spiral_route     fire c40   cert c18   sep +22  entries  14 recall  0.643  (post-commit extrapolation: True)
+      spiral           fire c36   cert c18   sep +18  entries  13 recall  0.643  (post-commit extrapolation: True)
+      enum_live_g722   fire c30   cert c19   sep +11  entries  15 recall  0.786  (post-commit extrapolation: True)
+  G-C L3: USABLE at W=8, theta=0 — fires 19..29 cycles after the cert
+      enum_live        fire c67   cert c48   sep +19  entries  15 recall  0.071  (post-commit extrapolation: True)
+      spiral_route     fire c72   cert c48   sep +24  entries  16 recall  0.125  (post-commit extrapolation: True)
+      spiral           fire c81   cert c52   sep +29  entries  16 recall  0.143  (post-commit extrapolation: True)
+      enum_live_g722   fire c67   cert c48   sep +19  entries  15 recall  0.071  (post-commit extrapolation: True)
+
+------------------------------------------------------------------------------
+(5) ERA-2 SIZING for a gate-later arm at L3
+------------------------------------------------------------------------------
+  era 2 spans c33-c88 (56 cycles); L3 mining opens at c33.
+  grid settings at which the L3 gauge fires in ALL FOUR arms: 20 of 24
+  latest all-arm firing across those settings: c96 (G-A, W=8, theta=1) -> era 2 would need >= 64 cycles (it has 56).
+
+------------------------------------------------------------------------------
+(5b) ARE G-A AND G-C TWO GAUGES? (at_sup series vs buildable-entries series)
+------------------------------------------------------------------------------
+  enum_live        L2  identical: True   max(stream - buildable) = 0
+  enum_live        L3  identical: False  max(stream - buildable) = 10
+  spiral_route     L2  identical: True   max(stream - buildable) = 0
+  spiral_route     L3  identical: False  max(stream - buildable) = 20
+  spiral           L2  identical: True   max(stream - buildable) = 0
+  spiral           L3  identical: False  max(stream - buildable) = 24
+  enum_live_g722   L2  identical: True   max(stream - buildable) = 0
+  enum_live_g722   L3  identical: False  max(stream - buildable) = 10
+  => at L2 they are the SAME SIGNAL (the ratchet's lower table is the complete base
+     table, so every tuple at support builds). G-C is a distinct gauge only at L3.
+
+------------------------------------------------------------------------------
+(6) SCOPE LIMIT: where this replay is a counterfactual and where it is not
+------------------------------------------------------------------------------
+  cert cycle == commit cycle in every arm at both levels: True (8 of 8)
+  => the replay is EXACT up to the certificate and an EXTRAPOLATION after it, and
+     'gate-later' means 'fires after the certificate' by definition. Every grid
+     setting above that fires later than the cert therefore does so in the
+     extrapolation zone. No gate-later gauge can be VALIDATED on these logs; the
+     replay can only bound what such a gauge could have found (section 7).
+
+------------------------------------------------------------------------------
+(7) THE RATCHET CEILING: what a frozen L2 caps L3 coverage at
+------------------------------------------------------------------------------
+  arm              L2 froz rec L2 live rec L2 on offer  L3 ceiling L3 froz rec L3 live rec stream-built
+  enum_live              0.786       0.857       0.071       0.617       0.054       0.179           10
+  spiral_route           0.571       0.929       0.357       0.327       0.089       0.179           20
+  spiral                 0.571       0.929       0.357       0.327       0.071       0.143           24
+  enum_live_g722         0.786       0.857       0.071       0.617       0.054       0.179           10
+
+  READ: at L3 the observation stream is NOT the binding constraint — every arm
+  observes more L3-shaped tuples at support than it can build (stream-built > 0).
+  The frozen L2 is. At L2 the ratchet's lower table is the BASE table, which is
+  complete by construction, so L2 coverage is capped only by the stream.
+
+------------------------------------------------------------------------------
+(8) EXTENSION WINDOWS: how many chances the extend op gets, and where
+------------------------------------------------------------------------------
+  enum_live        {'L2_era2': 11, 'L3_era3': 2}
+  spiral_route     {'L2_era2': 11, 'L3_era3': 2}
+  spiral           {'L2_era2': 11, 'L3_era3': 2}
+  enum_live_g722   {'L2_era2': 11, 'L3_era3': 2}
+
+  READ: the recert/extension mechanism runs in eras 2 and 3 only. In eras 4-5 —
+  the eras whose recovered fraction is this round's money readout — NO recert fires,
+  because `rc_level = era['level']` is 4 or 5 and no such level is committable.
+  A `census_extend` arm built on the inherited recert path would therefore add
+  nothing during the eras where its value is measured. Phase 1 must widen the
+  recert loop to every COMMITTED level rather than the current era's level.
+
+------------------------------------------------------------------------------
+(9) THE PERFECT-L2 CONTROL: what an L3 gate could reach at BEST, from these logs
+------------------------------------------------------------------------------
+  arm                             role  L2 live rec  L3 at_sup  L3 built  L3 recall  L3 prec
+  given             perfect-L2 control        0.857         35        22      0.286    0.727
+  given_native      perfect-L2 control        0.857         22        13      0.196    0.846
+  fid               perfect-L2 control        0.857         35        22      0.286    0.727
+  enum_live                    earning        0.857         35        25      0.179    0.400
+  spiral_route                 earning        0.929         40        20      0.179    0.500
+  spiral                       earning        0.929         40        16      0.143    0.500
+  enum_live_g722               earning        0.857         35        25      0.179    0.400
+
+  READ: `given` mines L3 for 84 cycles over a COMPLETE L2 and never freezes, and
+  still ends at recall 0.286 (16 of 56) at precision 0.727. That is the empirical CEILING on what any L3
+  gate could deliver inside a ladder of this length — the earning arms' 0.143-0.179
+  is not mostly a gating failure, it is mostly a mining-rate and ratchet fact.
+  It also shows the frozen L2 costs PRECISION as well as recall: 0.727 with a true
+  L2 against 0.400-0.500 with an earned one.
+
+[phase0] wrote /home/user/research/experiments/rhm/practice/census/figures/phase0/phase0.json
