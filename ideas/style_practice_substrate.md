@@ -1,6 +1,8 @@
 # A style-practice substrate: scarce image corpora, a data-defined action alphabet, and taste as the missing organ
 
-**Status**: Idea / research-direction memo (2026-08-21). Nothing run on images. **Updated
+**Status**: Idea / research-direction memo (2026-08-21). **Updated 2026-08-25**: the first node ran
+([`canvas/plant`](../experiments/canvas/plant/README.md)); §11 records what it did to §3a, §4, §5, §6, §8 and §9 —
+the tile grammar is the substrate, aligned, with a support test for truth and typicality for taste. **Updated
 2026-08-22** after the two RHM de-risking twins reported (`critic/`[^private],
 PR #61; `teacher_slot/endo_yield/`[^private], PR #62;
 their READMEs pending discussion): §1's justification, §5's instruments, §6's self-taste, and §8's
@@ -488,5 +490,48 @@ ever operated with the exact grade logged beside it, never without.
 That is the same epistemic position [practice_manufactures_its_own_credit](practice_manufactures_its_own_credit.md)
 §10 recorded for the arc before its first round, and the same sequencing applies: one node,
 forked verbatim, gated bit-for-bit, numbers brought back for discussion before any README.
+
+## 11. What we ran (2026-08-25): the substrate description — [`canvas/plant`](../experiments/canvas/plant/README.md)
+
+**Status**: the first node on canvas, single seed, discussed with Jasper before this section
+was written. Not a practice loop. What it did to the sections above, in one place:
+
+- **§3a / §9 risk 1 ("the alphabet may not factor") — measured, with a mechanism.** On the GLSL
+  library a 16-px k-means codebook did not factor: 2×2 code-block recurrence tracked per-style
+  code entropy (Spearman −0.84), the part-y/texture-y control was null, the depth ladder had no
+  gradient past the marginals, and search bought nothing. The cause is *phase*: random crop
+  offsets spell the same motif differently every time, so only translation-invariant styles
+  recur. The aligned/misaligned tiles twin (one variable, the crop offset, on `tiles.py`) shows
+  that when the code grid nests in the DGP's lattice the miner recovers the tile catalogue as
+  its level-2 vocabulary (purity 0.93–0.98, T[3] nested-representable 0.996) and the ladder is
+  graded; misaligned reproduces the GLSL null. **The alphabet has to nest, and a learned one
+  can.** §1's justification 1 is answered on the aligned tiles substrate.
+- **§5 (the grader) — the typicality reader is the taste organ, not the truth gauge.** Run
+  unchecked as designed, `critic/`'s mean-NLL grade of record was gamed by the marginal mode on
+  the GLSL library (the plant's own bland fills pass above real exemplars, worse as the reader
+  improves), and against *known* validity on aligned tiles it passes invalid-but-in-style
+  `seam` damage more than valid-but-atypical `offstyle`. No tail statistic fixes it: validity is
+  a *relation* between tokens, typicality a *property* of tokens, and on an aligned alphabet the
+  violation falls between two individually legal codes. RHM's grade was never a likelihood —
+  possible-set success is a support test — and `critic/` could not have seen this because the
+  possible set is flat at uniform demand. The learned analogue on canvas is an
+  **adjacency-support test** (every adjacent code pair in the fill must have occurred in genuine
+  exemplars): a conjunction, zero forward passes, AUC .96–.99 seam-vs-offstyle, rejects 96.6 %
+  of the plant's oracle-invalid fills at the clean ceiling. Its scope condition is
+  pairwise-local validity; its binding limit is coverage. §5's instrument list should be read
+  with this split: support for truth, typicality for demand, `own − world` and the teacher A/B
+  probe unchanged.
+- **§6 (style, taste, schools) — the two organs now exist and dissociate.** The panel measures
+  `typed_gaps/`'s one-organ-per-currency on the grader side: support passes rare-but-legal,
+  typicality passes in-style-but-broken. Taste is real on canvas, as a grader with preferences
+  inside the valid set; schools are `tiles.py`'s demand-concentrations, nine per tileset.
+- **§4 (corpora, *open*) — settled: the tile grammar is the substrate.** `tiles.py` was kept as
+  the calibration twin and turned out to be the substrate: nesting alphabet, graded ladder,
+  depth unaffordable to single-tile repair (0.076 / 0.019 at L2 / L3), truth and taste gauges,
+  style drift and truth drift, a withheld oracle, and — unlike the memo's §8 node 1 — a `given`
+  arm from the tile catalogue. The GLSL library (`lib0`) is the taste venue for later.
+- **§8 node 1 — re-specified.** `ratchet` on aligned tiles, support as the grade of record for
+  the value target / mining gate / audition, typicality and `at_support` logged from day one,
+  ranks against `never_base` and `given`. Queued; design choices in the node's next steps.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

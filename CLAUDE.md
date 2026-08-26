@@ -8,7 +8,7 @@ This is a research monorepo consolidating several projects.
     - `experiments/a2a_forward` is our main experiment for training forward self-models for decomposing activations
     - `experiments/rhm` is a controlled setup for generating language-like data with a known data generating process
     - `experiments/mjc` is a place we run MuJoCo experiments for motor learning
-    - `experiments/canvas` is an image-style practice substrate: a library of still-image GLSL styles rendered to 256×256 swatches, the practice arc in pixel space with no agent-consumed oracle
+    - `experiments/canvas` is the image substrate of the practice arc: a tile grammar (`tiles.py`) rendered to 256×256 swatches with the code grid aligned to the tile grid, inpainting as the piece, an adjacency-support truth gauge and a typicality taste gauge, and no agent-consumed oracle; a GLSL style library is kept as a taste venue
 - `reading/` — Papers, notes, and reference material (shared across projects)
 - `ideas/` — Research ideas and hypotheses (shared)
 - `beliefs/` — Crystallized beliefs about how things work (shared)

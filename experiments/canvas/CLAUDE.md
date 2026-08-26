@@ -1,27 +1,32 @@
-# Canvas: the image-style practice substrate
+# Canvas: the image substrate of the practice arc
 
-**Centralized writeup**: none yet — the corpus was built 2026-08-22; no practice node has run. Design memo: [`ideas/style_practice_substrate.md`](../../ideas/style_practice_substrate.md) (§5 grader, §6 style/taste, §8 node sequence).
+**Centralized writeup**: [README.md](README.md) (index) · [`plant/README.md`](plant/README.md) (the substrate description, 2026-08-25). Design memo: [`ideas/style_practice_substrate.md`](../../ideas/style_practice_substrate.md) (§5 grader, §6 style/taste, §8 node sequence, §11 what ran).
 
-Third substrate of the practice arc, after [`rhm/practice/`](../rhm/practice/README.md) and [`mjc/practice/`](../mjc/practice/README.md): image *styles* with scarce exemplars each, inpainting under a token budget as the piece, and no DGP oracle on any agent-consumed path. The learner lives in pixel space (a VQ codebook over 256×256 swatches, a 16×16 code grid); everything human-readable stays in the teacher slot.
+Third substrate of the practice arc, after [`rhm/practice/`](../rhm/practice/README.md) and [`mjc/practice/`](../mjc/practice/README.md): image *styles*, inpainting under a token budget as the piece, and no DGP oracle on any agent-consumed path. The learner lives in pixel space (a k-means codebook over 256×256 swatches, a 16×16 code grid of 16-px patches); everything human-readable stays in the teacher slot.
 
-## What a style is here
+## The substrate is the tile grammar, aligned
 
-A still-image GLSL fragment shader, `shaders/<slug>.glsl` (36 in the library), with a header of human-readable metadata (`title / description / tags`) and a `uniform float seed` that varies the *arrangement* only — palette and geometry are `const`. Exemplars are renders under (seed, crop). The program is the style's latent truth: we hold it (so the exact completion of any masked swatch region is one render call — a reporting-only readout, never consumed), the agent never does. The aesthetic register is the shader swatches of Lluminate (`reading/Lluminate.pdf`); the styles were authored by Claude sessions, not evolved and not API-generated.
+`tiles.py` is the DGP: a hidden 8×8 grid of 32-px tiles with typed edges, valid iff every shared edge agrees; a *school* (tileset + demand weights + affinities + palette) is a style; many schools per tileset = style drift on fixed truth, a new tileset = truth drift. **Crops must be aligned to the tile grid** (offset a multiple of 32 px) so a tile is exactly a 2×2 code block — `plant/tiles_twin/` showed that with alignment the miner recovers the tile catalogue as its level-2 vocabulary and the depth ladder is graded, and that without it every precondition of the arc fails. The oracle (`Tileset.validate`, `valid_blocks`, per-swatch tile ids) is written down beside every run and never consumed.
+
+Two learned graders, one per currency, both oracle-free (`plant/`):
+- **Truth**: the adjacency-support test (`plant/tiles_twin/adjacency.py`) — every oriented adjacent code pair in a fill, including pairs across the hole boundary, must have occurred in genuine exemplars. A conjunction, zero forward passes. Its scope condition is pairwise-local validity, which the tile grammar has by construction. Its binding limit is coverage (the false-reject floor), fixed by more exemplars, not by count thresholds.
+- **Taste**: `critic/`'s typicality reader (`plant/grader.py`) — mean per-token NLL under a second reader on a disjoint split, q = 0.90 per (style, mask-size). It reads *demand*, not truth: on an aligned alphabet it passes in-style-but-invalid fills and fails valid-but-atypical ones, and no tail statistic of it fixes that. Log it; do not use it as the mining gate or the audition.
+
+The GLSL library (`shaders/`, `render_glsl.py`, `corpora/build.py`; 36 styles) is kept as a **taste venue** for later — no lattice, no pairwise-local validity, so only the demand gauge exists there. `taste/clicker.py` is built and has zero clicks.
 
 ## Layout
 
-- `render_glsl.py` — headless moderngl renderer: WebGL-1 dialect → GLSL 330 by a small transpile; crops via `offset`/`zoom` in the vertex stage. Works on macOS now; on Linux/Modal it needs EGL + mesa.
-- `shaders/` — the style library. Format, authoring rules and the checker are in `corpora/build.py`'s docstring. Run `--check` on anything you add.
-- `corpora/build.py` — library → corpus: `corpora/data/<tag>/<style>/NNN.png` + `style.json` (each swatch's seed/offset/zoom) + `index.json` + contact sheet. Data is gitignored; rebuild with
-  `cd experiments && python -m canvas.corpora.build --out canvas/corpora/data/lib0 --n_per_style 64` (~30 s).
-- `taste/clicker.py` — pairwise preferences for the taste gauge: a local UI for a human, or `--manifest` to emit pair images + `pairs.jsonl` for a headless (Claude) rater. Records go to `taste/clicks/*.jsonl`, same schema either way.
-- `tiles.py`, `contact_sheet.py` — an earlier adjacency-tile DGP with an exact validity oracle and a `describe()` of its depth margins. Kept as a possible calibration twin (e.g. misalignment between a hidden grid and the VQ grid, measured exactly), **not** the substrate.
-- `figures/` — contact sheets of everything above.
+- `tiles.py` — the DGP (standalone, no torch) with `describe()`; `contact_sheet.py`.
+- `shared.py` — Modal app `canvas`, volume `canvas-data`, profile `chromatic`.
+- `plant/` — alphabet (`codebook.py`), any-order plant (`model.py`, `sampler.py`), typicality grader (`grader.py`), recurrence (`recur.py`), the Modal node (`plant.py`), reductions. `plant/tiles_twin/` — the tiles corpora (`corpus.py`), oracle columns (`twin.py`), `describe_schools.py`, and the grader re-analyses (`tailgrade.py`, `adjacency.py`). Everything indexed in the two `FILES.md`s.
+- `render_glsl.py`, `shaders/`, `corpora/build.py`, `taste/` — the GLSL library and the taste gauge.
+- `figures/` — contact sheets; node figures live under each node's `figures/` (PNGs gitignored; regenerate per each README's reproduce block).
 
 ## Conventions
 
-- Python env: conda `glp` (torch 2.7, moderngl, PIL, CLIP). Run from `experiments/` as `python -m canvas.<module>`.
+- Python env: conda `glp` (torch 2.7, moderngl, PIL). Run from `experiments/` as `python -m canvas.<module>`. Corpora are rendered locally and put on the volume as tars (`render_glsl.py` needs EGL on Linux; `tiles.py` renders anywhere).
 - **No LLM API calls.** Anything LLM-shaped (authoring styles, rating pairs) is done by Claude sessions or Opus subagents on the subscription.
-- No Modal infrastructure yet. When the first node lands, add a `shared.py` per `one_layer_deeper/shared.py`, render the corpus locally and put it on the volume.
-- The port plan is the arc's: fork `rhm/practice/ratchet/ratchet.py` + `macros.py` verbatim with a fork notice, `critic/`'s learned grade of record (typicality on held-out exemplars, `q = 0.90`, corpus size by the self-manufactured-damage rule), `at_support` logged from day one, ranks against `never_base`. Moves restricted to cells that intersect the mask.
+- Splits are by **seed**, never by swatch (two crops of one seed overlap in pixels). `plant/corpus.py:SPLITS` is the convention; held-out is held out from the codebook too.
+- The port plan for the first practice node is the arc's: fork `rhm/practice/ratchet/ratchet.py` + `macros.py` verbatim with a fork notice, support as the grade of record (value target, mining gate, audition), typicality and `at_support` logged from day one, ranks against `never_base`, and a `given` arm from the tile catalogue. Moves restricted to cells that intersect the mask.
+- Modal's local-source mount aborts if any file under `canvas/` changes during the build — keep live logs outside the package (`launch_detached.py --logdir` / `CANVAS_LOGDIR`).
 - Discuss results before writing READMEs here.
