@@ -1,0 +1,538 @@
+{
+  "config": {
+    "tag": "Osmoke2",
+    "seed": 0,
+    "curl_b": 14.0,
+    "push_a": 0.0,
+    "waypoints": [
+      [
+        0.0359,
+        0.5248
+      ],
+      [
+        0.382,
+        0.2739
+      ],
+      [
+        0.6029,
+        0.6696
+      ],
+      [
+        0.1968,
+        0.7785
+      ]
+    ],
+    "h_app": 14,
+    "h_seg": [
+      20,
+      20,
+      20
+    ],
+    "patch_seg": 1,
+    "q_jit": 0.15,
+    "null_jit": 0.3,
+    "start_mode": "iso",
+    "patch_sigma": 0.08,
+    "patch_center": null,
+    "push_sigma": 0.08,
+    "push_center": null,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      1.1,
+      0.8
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "timestep": 0.002,
+    "wrap_limit": 3.0,
+    "pool_ou": 1500,
+    "pool_reach": 2500,
+    "exclude_w": 0.1,
+    "n_corridor": 3,
+    "corridor_replan": 5,
+    "ep_len": 14,
+    "n_par": 16,
+    "op_q_range": 0.25,
+    "sigma_u": 0.15,
+    "ou_sigma": 0.7,
+    "ou_theta": 0.15,
+    "collect_k_shoot": 512,
+    "collect_cem_iters": 5,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "guard_n": 512,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 1200,
+    "fm_steps_boot": 600,
+    "adapt_lr": 0.0003,
+    "n_grad": 6,
+    "replay_frac": 0.5,
+    "k_shoot": 256,
+    "cem_iters": 4,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.0,
+    "vel_pen_mid": 0.0,
+    "w_waypoint": 16.0,
+    "lookahead_gamma": 0.0,
+    "commit_lookahead": 0,
+    "react_look": 20,
+    "plan_max_elems": 40000000,
+    "calp": {
+      "1": [
+        256,
+        4
+      ],
+      "2": [
+        256,
+        4
+      ],
+      "3": [
+        256,
+        4
+      ]
+    },
+    "n_slot": 3,
+    "lib_add": 12,
+    "commit_seg": [
+      3,
+      5
+    ],
+    "commit_chain": [
+      7,
+      8
+    ],
+    "n_poison": 4,
+    "poison_seg": 0,
+    "early_stash": 2,
+    "k_prop": 2,
+    "explore_eps": 0.15,
+    "aud_horizon": 0,
+    "delib_budget": 0.0,
+    "cem_ladder": [
+      64,
+      128,
+      256
+    ],
+    "prim": 1,
+    "pol_hidden": 128,
+    "pol_layers": 2,
+    "pol_lr": 0.001,
+    "prop_steps": 40,
+    "prop_batch": 256,
+    "prop_cap": 40000,
+    "span_hidden": 256,
+    "span_layers": 2,
+    "span_lr": 0.001,
+    "span_lam": 1.0,
+    "span_batch": 16,
+    "span_cap": 256,
+    "span_hold_cap": 128,
+    "span_hold_frac": 0.15,
+    "span_tau": 0.9,
+    "span_tol": 0.0,
+    "span_min_hold": 8,
+    "n_cycles": 12,
+    "n_cycles_react": 6,
+    "batch": 8,
+    "n_rt": 12,
+    "n_eval": 12,
+    "probe_every": 3,
+    "trace_window": 4,
+    "sigma_practice": 0.15,
+    "sigma_perf": 0.06,
+    "d_fb": 0.1,
+    "arm": "never"
+  },
+  "arm": "never",
+  "complete": true,
+  "setup": {
+    "ref_stale": 0.06322648540618206,
+    "ref_ceiling": 0.09472733426888592,
+    "ref_reactive": 0.04211949910045769,
+    "usable_range": -0.031500848862703865,
+    "exclude_keep_frac": 0.9835,
+    "corr_reach": {
+      "max_abs_corr": 0.7233268641845373,
+      "mean_abs_corr": 0.21230744469387178
+    },
+    "pool_diag": {
+      "n": 3934,
+      "max_abs_corr": 0.7224286631178375,
+      "mean_abs_corr": 0.2035398386654526,
+      "speed_mean": 7.833035469055176,
+      "speed_p95": 16.079151248931883,
+      "max_absq": 2.991584300994873
+    },
+    "guard_fm0": 0.12854154407978058,
+    "n_slots": 23
+  },
+  "log": {
+    "cycle": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "t_cum": [
+      151.60000000000002,
+      303.20000000000005,
+      454.80000000000007,
+      606.4000000000001,
+      758.0000000000001,
+      909.6000000000001
+    ],
+    "e_rt": [
+      0.050530238824304435,
+      0.08994196783621788,
+      0.06155892050766638,
+      0.05181882559343,
+      0.03694371017849499,
+      0.02373262402388988
+    ],
+    "e_practice": [
+      0.11595587573705708,
+      0.06787502208997387,
+      0.09714666043383652,
+      0.07810689391544415,
+      0.06410282766967501,
+      0.04888954206057834
+    ],
+    "steps_agent": [
+      1480,
+      2960,
+      4440,
+      5920,
+      7400,
+      8880
+    ],
+    "plans_agent": [
+      1200,
+      2400,
+      3600,
+      4800,
+      6000,
+      7200
+    ],
+    "delib_agent": [
+      20684800,
+      41369600,
+      62054400,
+      82739200,
+      103424000,
+      124108800
+    ],
+    "aud_agent": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "lib_size": [
+      0,
+      0,
+      40,
+      40,
+      76,
+      76
+    ],
+    "n_open": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "span_loss": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "guard_fm": [
+      0.10179416090250015,
+      0.11558728665113449,
+      0.12000167369842529,
+      0.10691366344690323,
+      0.12086039781570435,
+      0.1323714703321457
+    ],
+    "tape_calls": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "head_calls": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "ladder": [
+    {
+      "cycle": 0,
+      "t_cum": 0.0,
+      "lib": {
+        "1:0": 0,
+        "3:0": 0,
+        "1:1": 0,
+        "2:1": 0,
+        "1:2": 0
+      },
+      "steps_agent": 0,
+      "plans_agent": 0,
+      "delib_agent": 0,
+      "aud_agent": 0,
+      "e_perf": 0.09852783068872756,
+      "e_perf_mean": 0.10368687939369871,
+      "e_perf_by_seg": [
+        0.026666734652740786,
+        0.19458922631603015,
+        0.05074518487402105
+      ],
+      "e_app": 0.01491521535097136,
+      "n_fb_perf": 61.0,
+      "t_piece_perf": 7.580000000000001,
+      "mix": null,
+      "e_react": 0.16826088442192638,
+      "e_ball_seg": 0.0923448059409986,
+      "e_ball_phrase": 0.2949835665312217,
+      "guard_fm": 0.12854154407978058
+    },
+    {
+      "cycle": 3,
+      "t_cum": 454.80000000000007,
+      "lib": {
+        "1:0": 16,
+        "3:0": 0,
+        "1:1": 12,
+        "2:1": 0,
+        "1:2": 12
+      },
+      "steps_agent": 4440,
+      "plans_agent": 3600,
+      "delib_agent": 62054400,
+      "aud_agent": 0,
+      "e_perf": 0.07419890153146433,
+      "e_perf_mean": 0.07429408867711867,
+      "e_perf_by_seg": [
+        0.02390731014596629,
+        0.18425212402378355,
+        0.007847356196047085
+      ],
+      "e_app": 0.01683528246388852,
+      "n_fb_perf": 61.0,
+      "t_piece_perf": 7.580000000000001,
+      "mix": null,
+      "e_react": 0.07649842889699426,
+      "e_ball_seg": 0.20379837904388717,
+      "e_ball_phrase": 0.3840700585273177,
+      "guard_fm": 0.12000167369842529
+    },
+    {
+      "cycle": 6,
+      "t_cum": 909.6000000000001,
+      "lib": {
+        "1:0": 28,
+        "3:0": 0,
+        "1:1": 24,
+        "2:1": 0,
+        "1:2": 24
+      },
+      "steps_agent": 8880,
+      "plans_agent": 7200,
+      "delib_agent": 124108800,
+      "aud_agent": 0,
+      "e_perf": 0.01891029281146839,
+      "e_perf_mean": 0.019069653340736525,
+      "e_perf_by_seg": [
+        0.025584639347511078,
+        0.009656219008962585,
+        0.021865765911559046
+      ],
+      "e_app": 0.01299347544560671,
+      "n_fb_perf": 61.0,
+      "t_piece_perf": 7.580000000000001,
+      "mix": null,
+      "e_react": 0.019008401835085707,
+      "e_ball_seg": 0.16403698194151076,
+      "e_ball_phrase": 0.3049055783835487,
+      "guard_fm": 0.1323714703321457
+    }
+  ],
+  "events": [
+    {
+      "kind": "commit",
+      "cycle": 3,
+      "arm": "never",
+      "reason": "grow_seg",
+      "levels": [
+        1
+      ],
+      "added": {
+        "1:0": 12,
+        "1:1": 12,
+        "1:2": 12,
+        "poison": 4
+      },
+      "sizes": {
+        "1:0": 16,
+        "3:0": 0,
+        "1:1": 12,
+        "2:1": 0,
+        "1:2": 12
+      },
+      "t_cum": 454.80000000000007
+    },
+    {
+      "kind": "commit",
+      "cycle": 5,
+      "arm": "never",
+      "reason": "grow_seg",
+      "levels": [
+        1
+      ],
+      "added": {
+        "1:0": 12,
+        "1:1": 12,
+        "1:2": 12
+      },
+      "sizes": {
+        "1:0": 28,
+        "3:0": 0,
+        "1:1": 24,
+        "2:1": 0,
+        "1:2": 24
+      },
+      "t_cum": 758.0000000000001
+    }
+  ],
+  "ledger": {
+    "steps_agent": 8880,
+    "steps_instrument": 15096,
+    "fb_agent": 7320,
+    "fb_instrument": 5748,
+    "plans_agent": 7200,
+    "plans_instrument": 5544,
+    "delib_agent": 124108800,
+    "delib_instrument": 97935360,
+    "aud_agent": 0,
+    "aud_instrument": 0,
+    "t_priced": 909.6000000000001,
+    "t_by_kind": {
+      "practice": 363.84,
+      "metering": 545.7600000000001
+    },
+    "n_by_kind": {
+      "practice": {
+        "steps": 3552,
+        "fb": 2928,
+        "plans": 2880,
+        "delib": 49643520,
+        "aud": 0
+      },
+      "metering": {
+        "steps": 5328,
+        "fb": 4392,
+        "plans": 4320,
+        "delib": 74465280,
+        "aud": 0
+      }
+    }
+  },
+  "parity": [],
+  "prop": [],
+  "battery": {},
+  "library": {
+    "sizes": {
+      "1:0": 28,
+      "3:0": 0,
+      "1:1": 24,
+      "2:1": 0,
+      "1:2": 24
+    },
+    "spellings": {},
+    "slot_counts": {
+      "1:0": [
+        17,
+        5,
+        2,
+        4
+      ],
+      "3:0": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "1:1": [
+        3,
+        10,
+        11,
+        0
+      ],
+      "2:1": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "1:2": [
+        17,
+        3,
+        4,
+        0
+      ]
+    }
+  },
+  "summary": {
+    "final_e_perf": 0.01891029281146839,
+    "final_e_react": 0.019008401835085707,
+    "final_e_ball_seg": 0.16403698194151076,
+    "final_e_ball_phrase": 0.3049055783835487,
+    "final_e_perf_by_seg": [
+      0.025584639347511078,
+      0.009656219008962585,
+      0.021865765911559046
+    ],
+    "final_mix": null,
+    "final_guard": 0.1323714703321457,
+    "t_priced": 909.6000000000001,
+    "n_cycles": 6,
+    "fb_per_piece_perf": 61.0,
+    "tape_calls": 0,
+    "head_calls": 0,
+    "n_open": 0,
+    "post_commit_sd": 0.014396708193114657,
+    "post_commit_drift": -0.0378262964837765
+  }
+}

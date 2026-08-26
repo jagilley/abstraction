@@ -1,0 +1,158 @@
+
+=== offbook — tag Osmoke2 (seed 0) ===
+arms ['never', 'key_frozen', 'audit_prop_kN', 'audit_prop_k', 'route_native'] · n_cycles 12 (reactive cap 6) · commits seg [3, 5] chain [7, 8] · lib_add 12 · n_slot 3 · k_prop 2 · delib_budget 0.0 · aud_horizon 0
+COMMON HORIZON c6   (truncated/incomplete: ['key_frozen', 'audit_prop_kN', 'audit_prop_k', 'route_native'])
+references (shared): stale 0.0632 · ceiling 0.0947 · reactive 0.0421 · usable range -0.0315
+
+-- headline at the common horizon --
+  arm               e_perf                 by segment   fb/pc   t_priced     plans         delib         aud    guard
+  never             0.0189     [0.0256 0.0097 0.0219]    61.0      909.6      7200     124108800           0  0.13237
+  key_frozen        0.2198     [0.0652 0.3255 0.2607]     4.0      567.6      3600      62054400           0  0.11363
+  audit_prop_kN     0.1636     [0.1030 0.1576 0.1623]     4.0      567.6      3780      65806800        3300  0.10717
+  audit_prop_k      0.1937     [0.0799 0.3186 0.1978]     4.0      567.6      3780      65778160        1868  0.10447
+  route_native      0.1937     [0.0799 0.3186 0.1978]     4.0      567.6      3780      65778160        1868  0.10447
+  rank on e_perf: never(0.0189) < audit_prop_kN(0.1636) < audit_prop_k(0.1937) < route_native(0.1937) < key_frozen(0.2198)
+
+-- in-tag fidelity twins (the assertion, not a hope) --
+  audit_prop_kN vs audit_all: one side absent, twin not asserted
+
+-- what the routing actually chose (final performance configuration) --
+  arm               chain    tape    head    prim  cand/dec  aud/piece   poison
+  never                         —  (no library: reactive throughout)
+  key_frozen        0.280   1.000   0.000   0.000       1.0          0    0.120
+  audit_prop_kN     0.000   0.528   0.000   0.472      42.3       1524    0.000
+  audit_prop_k      0.000   0.278   0.000   0.722      14.0        504    0.000
+  route_native      0.000   0.139   0.000   0.861      13.7        492    0.000
+     (frac_chain = decisions that committed a unit spanning >1 segment — the readout legato
+      F4's crossover predicts should be non-zero only where the unit exceeds the horizon;
+      frac_head = Port 2 serving; cand/dec = the O(K)→O(k) ladder, measured)
+
+-- THE RENT, and what it would be at a different library size --
+  Gate G-K measured competence FLAT past K≈16 (ns=1) and DEGRADING past K=64 (ns=3), so a
+  library far beyond that plateau would manufacture the routing arm's advantage: rent no
+  competent agent needed to pay. K is therefore set AT the plateau. Note what this table
+  shows: the RATIO is a property of the slot partition (n_slot ÷ k_prop), not of K — the
+  absolute price scales with the library, the cut does not.
+  arm              aud/piece       K=16       K=64      K=288
+  key_frozen               0          0          0          0
+  audit_prop_kN         1524        871       3483      15675
+  audit_prop_k           504        288       1152       5184
+  route_native           492        281       1125       5061
+     (linear in K within a cell, which is exact for this design — every cell is grown by the
+      same `lib_add`. Measured K/cell = 28.)
+
+-- PORT 1: trust formation (π's per-level proposal mass over cycles) --
+  audit_prop_kN:
+     cycle     seg   chain    prim  poison    top1       H
+         3   0.700   0.000   0.233   0.067   0.233   1.461
+         6   0.039   0.000   0.961   0.000   0.968   0.097
+         9   0.180   0.001   0.820   0.000   0.888   0.345
+        12   0.198   0.000   0.802   0.000   0.871   0.340
+  audit_prop_k:
+     cycle     seg   chain    prim  poison    top1       H
+         3   0.700   0.000   0.233   0.067   0.233   1.461
+         6   0.054   0.000   0.946   0.000   0.946   0.170
+         9   0.074   0.000   0.925   0.000   0.941   0.199
+        12   0.160   0.005   0.835   0.001   0.851   0.392
+  route_native:
+     cycle     seg   chain    prim  poison    top1       H
+         3   0.700   0.000   0.233   0.067   0.233   1.461
+         6   0.054   0.000   0.946   0.000   0.946   0.170
+         9   0.121   0.000   0.878   0.000   0.919   0.229
+        12   0.120   0.000   0.879   0.000   0.879   0.303
+     (`census/`+`assay/`: the deep-era value of a vocabulary rides on ARRIVAL — trust, π's
+      per-level proposal mass, formed only by time-in-use. This is that series, on a plant.)
+
+-- PORT 1: the can't-decompose signature (mass on a chain's own segment spelling) --
+  audit_prop_kN: π never argmaxes a chain slot at c12 (all-state mass: chain 0.0001 vs spelling 0.1936)
+  audit_prop_k: π never argmaxes a chain slot at c12 (all-state mass: chain 0.0043 vs spelling 0.1585)
+  route_native: π never argmaxes a chain slot at c12 (all-state mass: chain 0.0001 vs spelling 0.1191)
+
+-- PORT 2: parity trajectory (a slot fires from the head only once it clears τ) --
+  route_native: slots with a held-out set 2 · open at end 0 · first open at c— · τ=0.9
+     end parity fractions (top 8): []
+     head calls 0 vs tape calls 131
+     (parity is re-checked EVERY cycle; a slot that drops below τ falls back to tape playback
+      verbatim, so 'below parity → keep the tape' cannot introduce drift)
+
+-- PLANT GUARD: one-step FM error on the fixed corridor probe, and e_react --
+  arm              guard c0  guard end         Δ  e_react c0  e_react end
+  never             0.12854    0.13237   0.00383      0.1683       0.0190
+  key_frozen        0.12854    0.11363  -0.01491      0.1683       0.0445
+  audit_prop_kN     0.12854    0.10717  -0.02137      0.1683       0.0411
+  audit_prop_k      0.12854    0.10447  -0.02407      0.1683       0.0669
+  route_native      0.12854    0.10447  -0.02407      0.1683       0.0669
+     (flat across arms is the pass. Port 2's loss reaches the forward model's own trunk by
+      design — this is where interference would show, and it is the mjc analogue of RHM's
+      parse/infill staying inert under a head on the generator trunk.)
+
+-- the CONSUMPTION-PHASE ledger (legato's named round-3 design item) --
+  one traversal = 74 control steps at dt=0.02s = 1.48s of body time
+  arm               e_perf   fb/pc     t@dfb=0.0     t@dfb=0.1     t@dfb=1.0     t@dfb=3.0
+  never             0.0189    61.0         1.480         7.580        62.480       184.480
+  key_frozen        0.2198     4.0         1.480         1.880         5.480        13.480
+  audit_prop_kN     0.1636     4.0         1.480         1.880         5.480        13.480
+  audit_prop_k      0.1937     4.0         1.480         1.880         5.480        13.480
+  route_native      0.1937     4.0         1.480         1.880         5.480        13.480
+  steady-state per-traversal deliberation (the axis routing is supposed to buy):
+  arm              plans/pc     delib/pc     aud/pc
+  never               600.0     10342400        0.0
+  key_frozen            0.0            0        0.0
+  audit_prop_kN        29.4       641088     1254.4
+  audit_prop_k         29.9       621472      426.0
+  route_native         29.9       621170      420.8
+     (measured over the last third of cycles, i.e. after the final commit — the acquisition
+      phase dominated every mjc ledger so far, which is why `never` always won cumulatively)
+
+-- END-OF-RUN BATTERY on the final trained state --
+  arm             probe          e_perf  minability   tape   head   prim  chain
+  key_frozen      base           0.2445           5   1.00   0.00   0.00   0.41
+  key_frozen      no_prim        0.2847           4   1.00   0.00   0.00   0.61
+  key_frozen      no_table     — keyed frozen library has no addressable slot at this
+  key_frozen      restored       0.2452           5   1.00   0.00   0.00   0.33
+  audit_prop_kN   base           0.0850           5   0.22   0.00   0.78   0.00
+  audit_prop_kN   no_prim        0.1236           8   1.00   0.00   0.00   0.00
+  audit_prop_kN   no_table       0.0798           4   0.00   0.00   1.00   0.00
+  audit_prop_kN   restored       0.1342           4   0.39   0.00   0.61   0.00
+  audit_prop_k    base           0.1365           3   0.19   0.00   0.81   0.00
+  audit_prop_k    no_prim        0.1491           4   1.00   0.00   0.00   0.09
+  audit_prop_k    no_table       0.1056           3   0.00   0.00   1.00   0.00
+  audit_prop_k    restored       0.1513           2   0.09   0.00   0.91   0.03
+  route_native    base           0.1221           2   0.22   0.00   0.78   0.00
+  route_native    no_prim        0.1231           2   1.00   0.00   0.00   0.50
+  route_native    no_table       0.0905           4   0.00   0.00   1.00   0.00
+  route_native    restored       0.1290           2   0.23   0.00   0.77   0.03
+     (`no_table` = the address book deleted: π + the span head must serve. Routing-not-pruning
+      predicts the CURRENT level survives while the next level's BUILT entries do not — and
+      the observation stream, `minability`, is counted table-free from the agent's own chosen
+      traversals, so it is the half that should not move. `fid`'s untrained heads under the
+      same forced-open policy are the negative control.)
+
+-- the POISON TWIN (one plausible-but-bad address in the library) --
+  arm              π mass (end)  launch frac   materialised every seam?
+  never                       -            -            no (π gates it)
+  key_frozen                  -       0.1200 yes (enumeration has no filter)
+  audit_prop_kN          0.0002       0.0000 yes (enumeration has no filter)
+  audit_prop_k           0.0006       0.0000            no (π gates it)
+  route_native           0.0003       0.0000            no (π gates it)
+     (`native/` finding 6 inverted the SPEC's guess: enumeration is FORCED to materialise a
+      bogus address at every tip while a routed policy, trained only on successful
+      traversals, starves it — selection-before-regression is also a filter against a
+      poisoned vocabulary. This is that contrast on a plant.)
+
+-- library at the end --
+  never: sizes {"1:0": 28, "3:0": 0, "1:1": 24, "2:1": 0, "1:2": 24}
+     slot occupancy {"1:0": [17, 5, 2, 4], "3:0": [0, 0, 0, 0], "1:1": [3, 10, 11, 0], "2:1": [0, 0, 0, 0], "1:2": [17, 3, 4, 0]}
+     chain spellings {}
+  key_frozen: sizes {"1:0": 28, "3:0": 24, "1:1": 24, "2:1": 24, "1:2": 24}
+     slot occupancy {"1:0": [14, 8, 2, 4], "3:0": [14, 8, 2, 0], "1:1": [5, 6, 13, 0], "2:1": [7, 7, 10, 0], "1:2": [13, 5, 6, 0]}
+     chain spellings {"4": [0, 3, 8, 10, 17], "5": [1, 2, 3, 9, 10, 16, 18], "6": [1, 10, 18], "12": [10, 18], "13": [9, 10, 18], "14": [8, 10, 17]}
+  audit_prop_kN: sizes {"1:0": 28, "3:0": 24, "1:1": 24, "2:1": 24, "1:2": 24}
+     slot occupancy {"1:0": [17, 5, 2, 4], "3:0": [15, 2, 7, 0], "1:1": [4, 5, 15, 0], "2:1": [13, 8, 3, 0], "1:2": [16, 3, 5, 0]}
+     chain spellings {"4": [0, 1, 3, 10, 16], "5": [0, 10, 16, 18], "6": [0, 8, 16, 17], "12": [10, 16, 17], "13": [8, 16, 17], "14": [10, 18]}
+  audit_prop_k: sizes {"1:0": 28, "3:0": 24, "1:1": 24, "2:1": 24, "1:2": 24}
+     slot occupancy {"1:0": [17, 5, 2, 4], "3:0": [14, 3, 7, 0], "1:1": [5, 5, 14, 0], "2:1": [5, 6, 13, 0], "1:2": [17, 3, 4, 0]}
+     chain spellings {"4": [0, 10, 16], "5": [0, 10, 16], "6": [0, 1, 8, 16, 17], "12": [10, 16], "13": [8, 16, 17], "14": [10, 16]}
+  route_native: sizes {"1:0": 28, "3:0": 24, "1:1": 24, "2:1": 24, "1:2": 24}
+     slot occupancy {"1:0": [17, 5, 2, 4], "3:0": [14, 3, 7, 0], "1:1": [5, 5, 14, 0], "2:1": [4, 6, 14, 0], "1:2": [17, 3, 4, 0]}
+     chain spellings {"4": [0, 10, 16], "5": [0, 10, 16], "6": [0, 1, 8, 16, 17], "12": [10, 16], "13": [8, 16, 17], "14": [10, 16]}

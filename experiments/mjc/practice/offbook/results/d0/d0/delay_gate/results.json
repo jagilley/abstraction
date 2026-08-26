@@ -1,0 +1,449 @@
+{
+  "config": {
+    "tag": "d0",
+    "seed": 0,
+    "delays": [
+      0,
+      2,
+      4,
+      8,
+      16
+    ],
+    "n_warm": 20,
+    "lib_k": 72,
+    "n_slot": 8,
+    "aud_horizon": 0,
+    "n_eval_gate": 24,
+    "curl_b": 14.0,
+    "push_a": 0.0,
+    "waypoints": [
+      [
+        0.0359,
+        0.5248
+      ],
+      [
+        0.382,
+        0.2739
+      ],
+      [
+        0.6029,
+        0.6696
+      ],
+      [
+        0.1968,
+        0.7785
+      ]
+    ],
+    "h_app": 14,
+    "h_seg": [
+      20,
+      20,
+      20
+    ],
+    "patch_seg": 1,
+    "q_jit": 0.15,
+    "null_jit": 0.3,
+    "start_mode": "iso",
+    "patch_sigma": 0.08,
+    "patch_center": null,
+    "push_sigma": 0.08,
+    "push_center": null,
+    "n_links": 3,
+    "link_lengths": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "link_masses": [
+      1.0,
+      1.0,
+      0.6
+    ],
+    "q_center": [
+      0.4,
+      1.1,
+      0.8
+    ],
+    "joint_damping": 0.5,
+    "gear": 8.0,
+    "frame_skip": 10,
+    "timestep": 0.002,
+    "wrap_limit": 3.0,
+    "pool_ou": 6000,
+    "pool_reach": 12000,
+    "exclude_w": 0.1,
+    "ep_len": 14,
+    "n_par": 16,
+    "op_q_range": 0.25,
+    "sigma_u": 0.15,
+    "ou_sigma": 0.7,
+    "ou_theta": 0.15,
+    "collect_k_shoot": 512,
+    "collect_cem_iters": 5,
+    "reach_amp": 1.2,
+    "reach_lo": 0.25,
+    "reach_hi": 0.5,
+    "fm_hidden": 256,
+    "fm_layers": 3,
+    "fm_lr": 0.001,
+    "fm_batch": 512,
+    "fm_steps": 6000,
+    "fm_steps_boot": 3000,
+    "adapt_lr": 0.0003,
+    "n_grad": 6,
+    "replay_frac": 0.5,
+    "k_shoot": 1024,
+    "cem_iters": 8,
+    "cem_elite": 32,
+    "cem_init_sigma": 0.8,
+    "vel_pen": 0.0,
+    "vel_pen_mid": 0.0,
+    "w_waypoint": 16.0,
+    "lookahead_gamma": 0.0,
+    "react_look": 20,
+    "plan_max_elems": 40000000,
+    "calp": {
+      "1": [
+        1024,
+        8
+      ],
+      "2": [
+        4096,
+        12
+      ],
+      "3": [
+        4096,
+        12
+      ]
+    },
+    "batch": 16,
+    "trace_window": 10,
+    "sigma_practice": 0.15,
+    "sigma_perf": 0.06,
+    "d_fb": 0.1,
+    "obs_delay": 0
+  },
+  "complete": true,
+  "criterion": "smallest D with e_chain<=e_live_seg<=e_reactive on mean piece error, subject to min(of the three) <= 2x the best at D=0",
+  "ref_stale": 0.1459625933692181,
+  "sweep": {
+    "0": {
+      "reactive": {
+        "e": 0.011393723932171607,
+        "e_med": 0.009560407546020173,
+        "by_seg": [
+          0.011794796982703934,
+          0.009927669527146826,
+          0.002047260995522126
+        ],
+        "fb": 61.0,
+        "planner_free": false
+      },
+      "live_seg": {
+        "e": 0.19775885978959032,
+        "e_med": 0.11998646637558699,
+        "by_seg": [
+          0.05646876280589211,
+          0.08608795727280368,
+          0.20375659111487016
+        ],
+        "fb": 4.0,
+        "planner_free": false
+      },
+      "chain": {
+        "e": 0.2702827704866995,
+        "e_med": 0.17460709530835186,
+        "by_seg": [
+          0.045119628888491706,
+          0.1251632871922027,
+          0.3129560888525923
+        ],
+        "fb": 2.0,
+        "planner_free": true
+      },
+      "seg_tape": {
+        "e": 0.2681949186447346,
+        "e_med": 0.1911963555795719,
+        "by_seg": [
+          0.062460241743072936,
+          0.25437103130693667,
+          0.29159852798575436
+        ],
+        "fb": 4.0,
+        "planner_free": true
+      }
+    },
+    "2": {
+      "reactive": {
+        "e": 0.11104237620772735,
+        "e_med": 0.09796232626299947,
+        "by_seg": [
+          0.08229007339982647,
+          0.08867934780676309,
+          0.1174349113213092
+        ],
+        "fb": 61.0,
+        "planner_free": false
+      },
+      "live_seg": {
+        "e": 0.2201174605712812,
+        "e_med": 0.07667627975736066,
+        "by_seg": [
+          0.06748793635664142,
+          0.116395535008089,
+          0.1359021759639653
+        ],
+        "fb": 4.0,
+        "planner_free": false
+      },
+      "chain": {
+        "e": 0.294509738109588,
+        "e_med": 0.2282199955751312,
+        "by_seg": [
+          0.051161324762605424,
+          0.14261937280238837,
+          0.4852820034175006
+        ],
+        "fb": 2.0,
+        "planner_free": true
+      },
+      "seg_tape": {
+        "e": 0.20363755920451018,
+        "e_med": 0.1610607654845689,
+        "by_seg": [
+          0.06005688996994904,
+          0.12821682948682755,
+          0.2861715077417909
+        ],
+        "fb": 4.0,
+        "planner_free": true
+      }
+    },
+    "4": {
+      "reactive": {
+        "e": 0.2231425622260043,
+        "e_med": 0.21712595152369546,
+        "by_seg": [
+          0.22844621625517614,
+          0.19427692078494807,
+          0.20244538669063925
+        ],
+        "fb": 61.0,
+        "planner_free": false
+      },
+      "live_seg": {
+        "e": 0.2447183623912815,
+        "e_med": 0.1400794858502657,
+        "by_seg": [
+          0.06171587497754076,
+          0.11340184226364669,
+          0.24623475921022195
+        ],
+        "fb": 4.0,
+        "planner_free": false
+      },
+      "chain": {
+        "e": 0.38600114831045856,
+        "e_med": 0.41977427156896063,
+        "by_seg": [
+          0.06449514840726361,
+          0.22927460052506218,
+          0.8921412275372853
+        ],
+        "fb": 2.0,
+        "planner_free": true
+      },
+      "seg_tape": {
+        "e": 0.2081005707107663,
+        "e_med": 0.1785408067019541,
+        "by_seg": [
+          0.04985457967476818,
+          0.20351196038014896,
+          0.21955974019492042
+        ],
+        "fb": 4.0,
+        "planner_free": true
+      }
+    },
+    "8": {
+      "reactive": {
+        "e": 0.5294248398290052,
+        "e_med": 0.494553402668902,
+        "by_seg": [
+          0.40874555685805236,
+          0.5365916879097218,
+          0.5784154047252552
+        ],
+        "fb": 61.0,
+        "planner_free": false
+      },
+      "live_seg": {
+        "e": 0.3339970834211614,
+        "e_med": 0.4628759897203755,
+        "by_seg": [
+          0.10494038712993214,
+          0.39183490353460615,
+          0.8215911455023714
+        ],
+        "fb": 4.0,
+        "planner_free": false
+      },
+      "chain": {
+        "e": 0.41095129458866,
+        "e_med": 0.43771647466099683,
+        "by_seg": [
+          0.12677103625975383,
+          0.3441864017262791,
+          0.8691871948560811
+        ],
+        "fb": 2.0,
+        "planner_free": true
+      },
+      "seg_tape": {
+        "e": 0.2358095734887661,
+        "e_med": 0.2225527044307863,
+        "by_seg": [
+          0.054354006899793375,
+          0.2448829390829394,
+          0.3432342097488835
+        ],
+        "fb": 4.0,
+        "planner_free": true
+      }
+    },
+    "16": {
+      "reactive": {
+        "e": 0.7189992547763145,
+        "e_med": 0.7093669700552205,
+        "by_seg": [
+          0.6150322061632505,
+          1.0043824299290582,
+          0.5928577204397292
+        ],
+        "fb": 61.0,
+        "planner_free": false
+      },
+      "live_seg": {
+        "e": 0.5310663819745308,
+        "e_med": 0.6108919138142597,
+        "by_seg": [
+          0.22306349954130122,
+          0.5255531554588115,
+          1.0227681313441839
+        ],
+        "fb": 4.0,
+        "planner_free": false
+      },
+      "chain": {
+        "e": 0.4568709925431194,
+        "e_med": 0.3683383073335581,
+        "by_seg": [
+          0.14896224707009997,
+          0.3305407273633838,
+          0.6601845039763314
+        ],
+        "fb": 2.0,
+        "planner_free": true
+      },
+      "seg_tape": {
+        "e": 0.3437046745999914,
+        "e_med": 0.3644977834106145,
+        "by_seg": [
+          0.19862324171403714,
+          0.3381589017899984,
+          0.4449358067924143
+        ],
+        "fb": 4.0,
+        "planner_free": true
+      }
+    }
+  },
+  "verdict": {
+    "best_at_D0": 0.011393723932171607,
+    "guard_ceiling": 0.1459625933692181,
+    "guard_ceiling_original_draft": 0.022787447864343214,
+    "delta_star": null,
+    "rows": [
+      {
+        "delay": 0,
+        "ms": 0.0,
+        "e_reactive": 0.011393723932171607,
+        "e_live_seg": 0.19775885978959032,
+        "e_chain": 0.2702827704866995,
+        "ordered": false,
+        "playable": true,
+        "passes": false,
+        "playable_original_draft": true
+      },
+      {
+        "delay": 2,
+        "ms": 40.0,
+        "e_reactive": 0.11104237620772735,
+        "e_live_seg": 0.2201174605712812,
+        "e_chain": 0.294509738109588,
+        "ordered": false,
+        "playable": true,
+        "passes": false,
+        "playable_original_draft": false
+      },
+      {
+        "delay": 4,
+        "ms": 80.0,
+        "e_reactive": 0.2231425622260043,
+        "e_live_seg": 0.2447183623912815,
+        "e_chain": 0.38600114831045856,
+        "ordered": false,
+        "playable": false,
+        "passes": false,
+        "playable_original_draft": false
+      },
+      {
+        "delay": 8,
+        "ms": 160.0,
+        "e_reactive": 0.5294248398290052,
+        "e_live_seg": 0.3339970834211614,
+        "e_chain": 0.41095129458866,
+        "ordered": false,
+        "playable": false,
+        "passes": false,
+        "playable_original_draft": false
+      },
+      {
+        "delay": 16,
+        "ms": 320.0,
+        "e_reactive": 0.7189992547763145,
+        "e_live_seg": 0.5310663819745308,
+        "e_chain": 0.4568709925431194,
+        "ordered": true,
+        "playable": false,
+        "passes": false,
+        "playable_original_draft": false
+      }
+    ]
+  },
+  "ledger": {
+    "steps_agent": 23680,
+    "steps_instrument": 39072,
+    "fb_agent": 19520,
+    "fb_instrument": 10080,
+    "plans_agent": 19200,
+    "plans_instrument": 9072,
+    "delib_agent": 2647654400,
+    "delib_instrument": 1263267360,
+    "aud_agent": 0,
+    "aud_instrument": 34920,
+    "t_priced": 2425.6000000000004,
+    "t_by_kind": {
+      "practice": 2425.6000000000004
+    },
+    "n_by_kind": {
+      "practice": {
+        "steps": 23680,
+        "fb": 19520,
+        "plans": 19200,
+        "delib": 2647654400,
+        "aud": 0
+      }
+    }
+  }
+}

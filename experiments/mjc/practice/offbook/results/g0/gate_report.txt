@@ -1,0 +1,111 @@
+
+=== offbook Phase A gates — tag g0 (seed 0) ===
+warm cycles 20 · library K/cell 288 · n_slot 8 · k_prop 2 · aud_horizon 0 · complete=True
+
+-- G-F fork fidelity (offbook.World ≡ legato.World on the donor path) --
+  e_piece=0.000  e_seg=0.000  acts=0.000  acts_raw=0.000  tips=0.000  launch=0.000  final=0.000
+  fb_equal=yes  t_equal=yes  PASS=yes
+
+-- G-R rng discipline (minting a head leaves the shared stream untouched) --
+  torch_state_unchanged=yes  prop_out_zero_init=yes  PASS=yes
+
+-- G-P π fidelity: top-k at k=N ≡ full seam audition, bit-for-bit --
+  cmds=0.000  n_segs=0.000  slot=0.000  src=0.000  score=0.000  n_cand=0.000
+  aud_equal=yes  PASS=yes
+
+  cost ladder at one seam (per performer-decision):
+         k   materialisations   aud rollout-steps  cand/perf
+       ALL               4616              184480      577.0
+         1                286               11480       35.8
+         2                531               23180       66.4
+         4               1092               48560      136.5
+         8               1945               70620      243.1
+
+-- G-S pool spread on the GROWN pools (fingering G1's instrument) --
+    seam  posture sd     noise   ratio    tip sd     noise   ratio   speed
+   seam0      0.4125    0.0798    5.17    0.0236    0.0212    1.11   2.296
+   seam1      0.7297    0.3209    2.27    0.0100    0.0060    1.66   6.671
+   seam2      1.3670    1.2242    1.12    0.0322    0.0302    1.07   7.930
+
+-- G-K(a) the planner ladder: realised piece-segment error vs CEM width --
+  32:0.0452  64:0.0249  128:0.0349  256:0.0369  512:0.0480  1024:0.0448  2048:0.0485
+     (monotone falling = the planner is the axis the budget conversion can spend on;
+      flat = the rent has nothing to buy; RISING = search is exploiting model error,
+      `arm_substrate` P3's sign-inversion regime, and the ladder is unusable as a currency)
+
+-- G-K(b) the library curve: realised error of best-of-K seam-time audition --
+  ns:seam   1:0  1:0.0699  4:0.0658  16:0.0472  64:0.0466  144:0.0475  288:0.0482
+  ns:seam   3:0  1:0.4157  4:0.3145  16:0.3097  64:0.2084  144:0.2325  288:0.2903
+  library sizes: {"1:0": 288, "3:0": 288, "1:1": 288, "2:1": 288, "1:2": 288}
+     (CAVEAT, legato F5: this gate's chain pool is harvested from REACTIVE warm-up, which is
+      exactly the configuration F1 measured keying at 1.03× and F5 corrected to 1.34× once the
+      pool came from segment-committed traversals. Read the chain rows as a LOWER bound.)
+
+-- G-K(c) THE RENT TABLE: which CEM rung each policy can still afford --
+  D=20480
+    audit_all spend=23060 rung=None e=-
+    k=1 spend=1435 rung=64 e=0.0249 RENT=-
+    k=2 spend=2898 rung=64 e=0.0249 RENT=-
+    k=4 spend=6070 rung=64 e=0.0249 RENT=-
+    k=8 spend=8828 rung=64 e=0.0249 RENT=-
+  D=40960
+    audit_all spend=23060 rung=64 e=0.0249
+    k=1 spend=1435 rung=128 e=0.0349 RENT=-0.0100
+    k=2 spend=2898 rung=128 e=0.0349 RENT=-0.0100
+    k=4 spend=6070 rung=128 e=0.0349 RENT=-0.0100
+    k=8 spend=8828 rung=128 e=0.0349 RENT=-0.0100
+  D=81920
+    audit_all spend=23060 rung=256 e=0.0369
+    k=1 spend=1435 rung=256 e=0.0369 RENT=0.0000
+    k=2 spend=2898 rung=256 e=0.0369 RENT=0.0000
+    k=4 spend=6070 rung=256 e=0.0369 RENT=0.0000
+    k=8 spend=8828 rung=256 e=0.0369 RENT=0.0000
+  D=163840
+    audit_all spend=23060 rung=512 e=0.0480
+    k=1 spend=1435 rung=512 e=0.0480 RENT=0.0000
+    k=2 spend=2898 rung=512 e=0.0480 RENT=0.0000
+    k=4 spend=6070 rung=512 e=0.0480 RENT=0.0000
+    k=8 spend=8828 rung=512 e=0.0480 RENT=0.0000
+  D=327680
+    audit_all spend=23060 rung=1024 e=0.0448
+    k=1 spend=1435 rung=1024 e=0.0448 RENT=0.0000
+    k=2 spend=2898 rung=1024 e=0.0448 RENT=0.0000
+    k=4 spend=6070 rung=1024 e=0.0448 RENT=0.0000
+    k=8 spend=8828 rung=1024 e=0.0448 RENT=0.0000
+
+-- G-B does a chunk ever pay? piece-level, restricted action sets, per budget --
+         D              prim_only               seg_only             chain_only                        all
+         0     0.0883 k1024 fb4.0     0.1552 k1024 fb4.0     0.1445 k1024 fb2.0  0.0796 k1024 fb4.0 ch0.00
+     20480       0.1829 k64 fb4.0       0.1552 k64 fb4.0        0.1445 k0 fb2.0     0.1221 k0 fb4.0 ch0.00
+     40960      0.0763 k128 fb4.0      0.1552 k128 fb4.0      0.1445 k128 fb2.0   0.1223 k128 fb4.0 ch0.00
+     81920      0.1049 k256 fb4.0      0.1552 k256 fb4.0      0.1445 k256 fb2.0   0.1218 k256 fb4.0 ch0.00
+    163840      0.1548 k512 fb4.0      0.1552 k512 fb4.0      0.1445 k512 fb2.0   0.0841 k512 fb4.0 ch0.00
+    327680     0.0883 k1024 fb4.0     0.1552 k1024 fb4.0     0.1445 k1024 fb2.0  0.0796 k1024 fb4.0 ch0.00
+     (the budget D at which `seg_only`/`chain_only` first beats `prim_only` is the meter
+      the main run has to be set at; if there is none, a chunk never pays on this plant and
+      that is the finding — do not sand it down by widening the library)
+
+-- G-C audition calibration, per level (the `aud_horizon` knob is read off this) --
+   horizon    cell     rho    regret   ratio  optimism  oracle  distinct
+         0     1:0   0.924    0.0313    2.34      2.49    2.23       6/8
+         0     3:0   0.337    0.1378    2.94      1.91    2.71       6/7
+        20     1:0   0.924    0.0313    2.34      2.49    2.23       6/8
+        20     3:0   0.304    0.1809    3.55      2.07    2.71       6/7
+     (rho = per-state rank agreement model↔plant; regret = how much worse the model's pick
+      is than the plant's, in meters; optimism = true/predicted on MATCHED checkpoints;
+      oracle = best-fixed ÷ per-state-oracle, fingering G1's 4.00× is the reference;
+      distinct = how many slots the per-state oracle actually visits — 1 means the library
+      is a `fixed` unit wearing a library's name)
+
+-- G-D cycle cost (what Phase B is sized from) --
+  reactive practice cycle: 15.7 s
+   audit: 1.74 s/traversal  aud=23088  delib=8602560  plans=48  e=0.2007  chain=0.00
+    prop: 1.55 s/traversal  aud=2005  delib=7945220  plans=48  e=0.2539  chain=0.00
+  gate ledger: agent steps 23680 · fb 19520 · delib 2647654400 · aud 0 · t_priced 2425.6s
+
+-- verdict --
+  G-F fork fidelity          PASS
+  G-R rng discipline         PASS
+  G-P π fidelity at k=N      PASS
+  G-K / G-B / G-S / G-C are MEASUREMENTS, not pass/fail — read the tables above and pick
+  (delib_budget, lib_add, aud_horizon, n_cycles) off them, with the reason on the record.

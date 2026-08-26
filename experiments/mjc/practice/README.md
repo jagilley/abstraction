@@ -37,6 +37,7 @@ typed maintenance):
 | fingering | [`fingering/`](fingering/README.md) | the compile-op taxonomy on a boundary that carries information: frozen (fixed/keyed/regressed/averaged) vs **live** content under committed routing, timing × maintenance, priced deliberation | **written up** — 1 seed/run; f1c's `never` bit-reproduces f1b's |
 | legato | [`legato/`](legato/README.md) | committed **span** vs the model's composition horizon: segment vs phrase granularity × live vs measured content, with a fusion control | **written up** — 1 seed (seed pair cancelled, GPU budget); ranks + two-horizon signs + double-sided control |
 | span | [`span/`](span/README.md) | the composition horizon **as a trajectory**: legato's practice loop with nothing committed, the FM snapshotted every cycle, imagination horizon × executed span of one live phrase plan against a flat `e_react`; plus a re-measurement of the saved models (on/off-corridor accuracy, the exploitation gap, a per-snapshot CAL-P sweep) | **written up** — 1 seed; 17–81-point monotone trends are the claims |
+| offbook | [`offbook/`](offbook/README.md) | **the port back** on this substrate: seam-time audition (enumeration) vs π-routing vs both ports, the address-book battery and poison twin — then three canary rounds (credit currency, exposure placement, reflex-loop delay) on why the chain level is never adopted | **written up** — 1 seed/run, bit-identity twins + cross-tag exact controls |
 
 ## Shared substrate
 
@@ -274,6 +275,26 @@ at every cycle while the truth walks to ~1 m. A live chunk is a model's promise 
 and practice worsens it; the human chunk is measured content — legato F4 from the model's side, and
 the seam law's state coordinate in miniature. Single seed. [`span/README.md`](span/README.md).
 
+### offbook — the port back: routing consolidates, trust tracks exposure, the chain level is refused by the task's economics (2026-08-25 → 08-26, written up)
+
+**Goal**: instantiate `rhm/practice/native/`'s consolidation on the motor substrate — the seam as
+the decision point, the library as the action set, seam-time audition as the enumeration analogue,
+π-routing (Port 1) and a parity-gated span head (Port 2) — and ask whether trust in a committed
+motor vocabulary forms, across four canary-staged rounds.
+
+**Headline**: routing consolidates — better error at 5.3× less deliberation, by *selection hygiene*
+under a seam-audition scorer that is measured 5× optimistic about its own pick (the freed budget
+buys nothing here; the CEM ladder is non-monotone). The chain level is never adopted, and the rounds
+assign why at three layers: credit cannot substitute for use (a ×8 cheapness weight rises and
+extinguishes exactly with forced exposure); use requires exposure the policy's own gate won't
+provide (moving the launch-ε upstream at matched budget sustains trust at 25× the control); and
+exposure converts to adoption only when the content is worth adopting — 203 body-graded plays say
+these chains execute 2.8× worse than the median traversal, and an observation delay on the reflex
+loop (degradation ordered exactly by feedback consumption, 63×/2.7×/1.7×/1.28×) opens no playable
+niche for them. Depth on this piece is geometric, not economic — an environment property, with the
+memory-only piece named as the fix. Quarantine of a poisoned address holds even under forced
+exposure. Full record: [`offbook/README.md`](offbook/README.md).
+
 ## Reproduce
 
 ```bash
@@ -311,6 +332,7 @@ Modal volume (`mujoco-control-data`): `/data/bridge_assembly/dsw_<cell>_s<seed>/
 [`fingering/FILES.md`](fingering/FILES.md) ·
 [`legato/FILES.md`](legato/FILES.md) ·
 [`span/FILES.md`](span/FILES.md) ·
+[`offbook/FILES.md`](offbook/FILES.md) ·
 [`estimability/FILES.md`](estimability/FILES.md) ·
 [`priced_plasticity/FILES.md`](priced_plasticity/FILES.md) ·
 [`aleatoric_flip/FILES.md`](aleatoric_flip/FILES.md) ·
