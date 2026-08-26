@@ -1,6 +1,6 @@
 # RL Dimensionality Ablation: what reward optimization can and cannot do to a pretrained basis (2026-08-23)
 
-**Parent**: [../README.md](../README.md) · **Design provenance**: [DESIGN.md](DESIGN.md) · **Code**: `rl_dim_ablation.py` (experiment), `aggregate_results.py` / `aggregate_kl.py` / `aggregate_ei.py` (cross-m tables) · **Colab walkthrough**: [`rl_dimensionality_colab.ipynb`](rl_dimensionality_colab.ipynb) (setup explained, scaled-down live replica, full results + interpretation inline)
+**Parent**: [../README.md](../README.md) · **Design provenance**: [DESIGN.md](DESIGN.md) · **Code**: `rl_dim_ablation.py` (experiment), `aggregate_results.py` / `aggregate_kl.py` / `aggregate_ei.py` (cross-m tables) · **Colab walkthrough**: `rl_dimensionality_colab.ipynb`[^omitted] (setup explained, scaled-down live replica, full results + interpretation inline)
 
 ## Goal
 
@@ -158,3 +158,5 @@ python3 aggregate_ei.py        # EI vs KL vs base
 ```
 
 Results live on the `rhm-scaling-data` volume (chromatic) under `/data/rl_dimensionality/v8_s2_L6_m{M}_both_seed42{,_kl01,_ei01}/` — `results.json` plus `pretrained.pt` and per-condition final checkpoints.
+
+[^omitted]: Omitted from the mirror for size (a raw results dump over the per-file cap). Available on request.
