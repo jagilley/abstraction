@@ -1,0 +1,104 @@
+=== a cappella Phase A — tag asmoke, seed 0 (COMPLETE, 82s wall) ===
+n_proc=8 n_eval=6 n_rt=8 batch=6 n_warm=2 n_cand=4 n_score=4 n_slot=3 cem_iters=4
+
+--- A-F  fork fidelity ---
+A-F1 donor constants: 13 checked, 0 mismatched, pass=True
+A-F2 noisefree  max|delta| = 0.000e+00  fb=True  t=True  pass=True
+A-F2 noisy      max|delta| = 0.000e+00  fb=True  t=True  pass=True
+
+--- the reflex law (gains calibrated on the CLEAN world, then frozen) ---
+kp=5.0 kd=0.25   clean e_piece=0.0123  clean seg=['0.0042', '0.0140', '0.0159', '0.0152']
+ROTATED world: e_piece=0.0150 seg=['0.0043', '0.0294', '0.0096', '0.0165']  fb=136  ground=0  priced=16.9s
+
+--- A-B  the budget ladder (performance tempo, arm-neutral, no library exists) ---
+     G   e_piece                          per-segment  ground/trav   priced s   wall s
+     8    0.7950 ['0.7177', '0.9005', '0.6931', '0.8689']           32       33.0      0.9
+    16    0.6564 ['0.7470', '1.0379', '0.4932', '0.3474']           64       62.3      0.7
+    32    0.5862 ['0.5622', '0.8257', '0.6040', '0.3529']          128      120.9      1.2
+RULE (pre-fixed): smallest G within 5% of the ladder's best piece error -> G* = 32 (ladder best 0.5862)
+instrument — elite MEAN vs best SAMPLED sequence, realised (etude finding 2 on a real rollout; per seam):
+  G=     8 mean=['0.7178', '0.9005', '0.6931', '0.8689']  best=['0.7177', '0.9005', '0.6931', '0.8689']
+  G=    16 mean=['0.7470', '1.0379', '0.4932', '0.3474']  best=['0.7470', '1.0379', '0.4932', '0.3474']
+  G=    32 mean=['0.5622', '0.8257', '0.6043', '0.3529']  best=['0.5622', '0.8257', '0.6040', '0.3529']
+
+--- A-B* the tempo dimension (instrument; the budget rule does not read it) ---
+first block: matched groundings/traversal to the G* cell; second block: R=1 at absolute per-decision budgets (the reactive rung). n_eval=4; instrument, not read by the budget rule
+   R       G   e_piece  ground/trav     fb   priced s
+   1       1    1.0560          136    136      141.4
+  34      32    0.4796          128      4      120.9
+   1       4    1.0277          544    136      515.2
+   1      16    0.6273         2176    136     2010.1
+
+--- A-I  gate 2: does the incumbent reach? ---
+search @ G*=32: e_piece=0.5862 at 121s priced;  étude `never` band [0.1, 0.11]  ->  reaches=False
+reflex law:            e_piece=0.0150 at 16.9s priced
+best cell of the whole incumbent family: e_piece=0.4796 at 121s (tempo_R, R=34, G=32)
+cells beating the reflex on ERROR: 0; cells DOMINATING it (error AND priced time): 0
+PRE-FIXED HALT FIRED: True   (gate pass = False)
+
+--- the library (nested: candidates for seam k harvested with seams < k committed) ---
+sizes {'1:0': 3, '1:1': 3, '1:2': 3, '1:3': 3, '2:2': 3, '3:1': 3, '4:0': 3}   build cost 160 groundings
+      cell   pool  cand   chosen  pool med  curse cf  s0 disp  s0 sprd  s0 speed
+     (1,0)     12     4   0.0545    0.0629    0.0545   0.0267   0.0380     0.115
+     (1,1)     12     4   0.1016    0.3086    0.4617   0.0083   0.0386     0.816
+     (1,2)     12     4   0.1689    0.2678    0.2966   0.0215   0.0744     0.718
+     (1,3)     12     4   0.2013    0.2268    0.3369   0.0599   0.1214     0.772
+     (4,0)     12     4   0.1117    0.1985   | reflex-sourced control: chosen=0.0458 med=0.0733
+     (3,1)     12     4   0.2779    0.2956   | reflex-sourced control: chosen=0.1644 med=0.3030
+     (2,2)     12     4   0.1758    0.2778   | reflex-sourced control: chosen=0.3156 med=0.5538
+
+--- A-C  audition calibration on the plant ---
+A-C0 seam-time audition exactness: max|chosen - realised| = 1.465e-07  exact=True  (the rollout IS the plant, so this op cannot be optimistic)
+A-C1 library-construction audition:  level     cell   chosen  realised    gap
+                                       seg    (1,0)   0.0545    0.0743   1.36
+                                       seg    (1,1)   0.1016    0.1605   1.58
+                                       seg    (1,2)   0.1689    0.2042   1.21
+                                       seg    (1,3)   0.2013    0.2946   1.46
+                                     chain    (4,0)   0.1117    0.1095   0.98
+                                     chain    (3,1)   0.2779    0.2799   1.01
+                                     chain    (2,2)   0.1758    0.1752   1.00
+
+--- A-R  the rent (G* = 32; top-k order is construction-score order, i.e. OPTIMISTIC — no pi in Phase A) ---
+             arm   k   e_piece  ground/trav     fb  aud/dec   priced s   prim  chain
+         key+seg   0    0.1833          0.0    4.0      0.0        3.7   0.00   0.00
+audit_k+seg+chain   1    0.1286        132.0    4.0      1.0      124.6   0.00   0.00
+audit_k+seg+chain   2    0.1512        136.0    4.0      2.0      128.2   0.00   0.00
+audit_k+seg+chain   3    0.1054        140.0    4.0      3.0      131.9   0.00   0.00
+audit_k+seg+chain   4    0.1013        131.3    3.7      3.8      128.8   0.00   0.08
+audit_k+seg+chain   6    0.0966        137.3    3.7      5.2      144.1   0.00   0.08
+audit_all+seg+chain   0    0.0966        137.3    3.7      5.2      144.1   0.00   0.08
+    lib_only+seg   0    0.1054         12.0    4.0      3.0       14.7   0.00   0.00
+lib_only+seg+chain   0    0.0966         20.0    3.7      5.2       36.6   0.00   0.08
+    never_reflex   0    0.0150          0.0  136.0      0.0       16.9   0.00   0.00
+    never_search   0    0.5862        128.0    4.0      0.0      120.9   1.00   0.00
+pricing sensitivity — priced seconds if a grounding costs only its re-grounding event (RHM's convention: n_ground*d_fb, no trial execution time):
+             key k=0   full=      3.7s  fb-only=      3.7s
+         audit_k k=1   full=    124.6s  fb-only=     16.9s
+         audit_k k=2   full=    128.2s  fb-only=     17.3s
+         audit_k k=3   full=    131.9s  fb-only=     17.7s
+         audit_k k=4   full=    128.8s  fb-only=     16.8s
+         audit_k k=6   full=    144.1s  fb-only=     17.4s
+       audit_all k=0   full=    144.1s  fb-only=     17.4s
+        lib_only k=0   full=     14.7s  fb-only=      4.9s
+        lib_only k=0   full=     36.6s  fb-only=      5.6s
+    never_reflex k=0   full=     16.9s  fb-only=     16.9s
+    never_search k=0   full=    120.9s  fb-only=     16.5s
+
+--- A-S  seam information ---
+between-start and within-start spreads are BOTH under practice motor noise (matched); performance is deterministic and noise-free, so its spread is reported separately
+ seam   spread  repeat nz   ratio  pos ratio  perf spread   speed
+    0   0.1476     0.0000    nan        nan        0.1476   0.137   [undefined]
+    1   0.1255     0.1610    0.78       0.95       0.0441   0.787
+    2   0.2363     0.1886    1.25       0.64       0.0142   0.700
+    3   0.1454     0.2155    0.67       1.47       0.0022   0.868
+ seam  best fixed  per-state  oracle gain  distinct argmins
+    0      0.0631     0.0478        1.32x               3/3
+    1      0.1325     0.0994        1.33x               2/3
+    2      0.2210     0.1304        1.69x               2/3
+    3      0.1787     0.1381        1.29x               3/3
+
+--- A-D  cycle cost (what Phase B is sized from) ---
+{"t_A_F": 1.1, "t_reflex_cal": 0.6, "t_A_B": 6.6, "t_library": 16.0, "t_A_C": 2.6, "t_A_R": 17.8, "t_A_S": 1.0}
+search traversal wall-clock by budget: {"8": 0.9, "16": 0.7, "32": 1.2}
+
+*** HALTED AT A-I — Phase B is NOT licensed by this run. ***

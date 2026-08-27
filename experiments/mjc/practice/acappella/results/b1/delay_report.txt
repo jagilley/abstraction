@@ -1,0 +1,122 @@
+=== a cappella B1 — the Δ ladder, tag b1, seed 0 (COMPLETE, 694s wall) ===
+Δ ladder [0, 1, 2, 3, 4, 6, 8, 12, 16] control steps = [0, 24, 48, 72, 96, 144, 192, 288, 384] ms;  n_eval=32  n_slot=8  no forward model anywhere
+
+--- gates ---
+B-F0 donor constants: 13 checked, 0 mismatched, pass=True
+B-F1 cross-tag exact control vs a0 (library build + the Δ=0 rows): max|Δ| = 0.000e+00  applicable=True  pass=True
+       build_chain            0.000e+00
+       build_seg              0.000e+00
+       key_seg                0.000e+00
+       lib_all                0.000e+00
+       lib_seg                0.000e+00
+       reflex_a0gains         0.000e+00
+
+--- anchors (all computed blind to every arm's number) ---
+ref_play = 0.1066  (étude `never` @ performance tempo, 3-seed mean — the pre-fixed guard)
+reported beside: half_leg = 0.4 (vacuous on this piece) · do-nothing floor = 0.7056 · half of it = 0.3528
+
+--- the reflex law, re-fit at every Δ on the CLEAN world (every advantage to the incumbent) ---
+  Δ    ms     kp     kd   clean e  kp edge  kd edge
+  0     0   10.0   2.00    0.0030    False    False
+  1    24    5.0   2.00    0.0061    False    False
+  2    48   10.0   4.00    0.0190    False    False
+  3    72    2.0   0.50    0.0026     True    False
+  4    96    2.0   1.00    0.0227     True    False
+  6   144    2.0   1.00    0.0877     True    False
+  8   192    5.0   4.00    0.1239    False    False
+ 12   288    2.0   8.00    0.2560     True     True
+ 16   384    2.0   8.00    0.4613     True     True
+
+--- the sweep: piece error by Δ × arm (fb/traversal in brackets) ---
+  Δ    ms           reflex          key_seg          lib_seg          lib_all        key_chain        aud_chain
+  0     0    0.0045[136.0]    0.0648[  4.0]    0.0392[  4.0]    0.0352[  3.4]    0.1184[  1.0]    0.0852[  1.0]
+  1    24    0.0102[136.0]    0.0638[  4.0]    0.0459[  4.0]    0.0530[  3.0]    0.1184[  1.0]    0.0852[  1.0]
+  2    48    0.0330[136.0]    0.0592[  4.0]    0.0542[  4.0]    0.0437[  3.2]    0.1184[  1.0]    0.0852[  1.0]
+  3    72    0.0209[136.0]    0.0637[  4.0]    0.0515[  4.0]    0.0520[  3.5]    0.1184[  1.0]    0.0852[  1.0]
+  4    96    0.0675[136.0]    0.0621[  4.0]    0.0644[  4.0]    0.0645[  3.3]    0.1184[  1.0]    0.0852[  1.0]
+  6   144    0.0651[136.0]    0.0832[  4.0]    0.0736[  4.0]    0.0807[  2.9]    0.1184[  1.0]    0.0852[  1.0]
+  8   192    0.1697[136.0]    0.1034[  4.0]    0.0838[  4.0]    0.0922[  2.1]    0.1184[  1.0]    0.0852[  1.0]
+ 12   288    0.4622[136.0]    0.0910[  4.0]    0.1112[  4.0]    0.0922[  2.2]    0.1184[  1.0]    0.0852[  1.0]
+ 16   384    0.5997[136.0]    0.1071[  4.0]    0.1139[  4.0]    0.1090[  3.6]    0.1184[  1.0]    0.0852[  1.0]
+
+groundings/traversal and priced seconds (Δ=0 row; identical across Δ for these arms):
+  reflex     ground=    0.0  fb= 136.0  priced=    16.9s
+  key_seg    ground=    0.0  fb=   4.0  priced=     3.7s
+  lib_seg    ground=   32.0  fb=   4.0  priced=    33.0s
+  lib_all    ground=   49.2  fb=   3.4  priced=    85.4s
+  key_chain  ground=    0.0  fb=   1.0  priced=     3.4s
+  aud_chain  ground=    8.0  fb=   1.0  priced=    30.3s
+
+--- the record rung: the priced search at Δ=0 (A-I retired it as the headline) ---
+  search_G1024 e_piece=0.0810  ground=4096  priced=3756s
+  search_G4096 e_piece=0.0612  ground=16384  priced=15011s
+
+--- THE GATE: the pre-fixed niche criterion ---
+THE GATE. Delta*_niche = the SMALLEST Delta at which the BEST committed-content arm (min over key_seg, lib_seg, lib_all, key_chain, aud_chain) is STRICTLY better than the reflex law on piece error, subject to that arm being <= ref_play. This is the pre-fixed niche criterion; the 3-term ordering below is the donor's depth test and is reported per Delta, distinguishing a SEGMENT-span niche (offbook finding 7d) from a CHAIN-span one.
+  Δ    ms  best committed     fb   e_best  e_reflex    margin   guard m  NICHE
+  0     0         lib_all    3.4   0.0352    0.0045   -0.0307    0.0714  False
+  1    24         lib_seg    4.0   0.0459    0.0102   -0.0356    0.0607  False
+  2    48         lib_all    3.2   0.0437    0.0330   -0.0107    0.0629  False
+  3    72         lib_seg    4.0   0.0515    0.0209   -0.0306    0.0551  False
+  4    96         key_seg    4.0   0.0621    0.0675    0.0054    0.0445   True
+  6   144         lib_seg    4.0   0.0736    0.0651   -0.0085    0.0330  False
+  8   192         lib_seg    4.0   0.0838    0.1697    0.0859    0.0228   True
+ 12   288       aud_chain    1.0   0.0852    0.4622    0.3770    0.0214   True
+ 16   384       aud_chain    1.0   0.0852    0.5997    0.5145    0.0214   True
+
+--- the donor's 3-term depth ordering (chain ≤ seg ≤ reflex), with margins ---
+  Δ    ms   e_chain     e_seg  e_reflex    ch-seg   seg-rfx   guard m  guard %   ord  play  PASS
+  0     0    0.0852    0.0392    0.0045   -0.0459   -0.0348    0.1021    95.8% False  True False
+  1    24    0.0852    0.0459    0.0102   -0.0393   -0.0356    0.0964    90.4% False  True False
+  2    48    0.0852    0.0542    0.0330   -0.0310   -0.0211    0.0736    69.0% False  True False
+  3    72    0.0852    0.0515    0.0209   -0.0337   -0.0306    0.0857    80.4% False  True False
+  4    96    0.0852    0.0644    0.0675   -0.0208    0.0031    0.0422    39.6% False  True False
+  6   144    0.0852    0.0736    0.0651   -0.0116   -0.0085    0.0415    38.9% False  True False
+  8   192    0.0852    0.0838    0.1697   -0.0014    0.0859    0.0228    21.4% False  True False
+ 12   288    0.0852    0.1112    0.4622    0.0260    0.3510    0.0214    20.1%  True  True  True
+ 16   384    0.0852    0.1139    0.5997    0.0287    0.4858    0.0214    20.1%  True  True  True
+
+--- degradation across the ladder (offbook finding 7: ordered by fb consumption) ---
+       arm      fb      e(0)   e(max Δ)    factor
+    reflex   136.0    0.0045     0.5997   134.37x
+   key_seg     4.0    0.0648     0.1071     1.65x
+   lib_seg     4.0    0.0392     0.1139     2.90x
+   lib_all     3.4    0.0352     0.1090     3.10x
+ key_chain     1.0    0.1184     0.1184     1.00x
+ aud_chain     1.0    0.0852     0.0852     1.00x
+
+--- the audition under delay (A-C0 said it is EXACT at Δ=0; this is what Δ costs it) ---
+  Δ        arm  realised/chosen     max|Δ|
+  0    lib_seg            1.000     0.0000
+  0    lib_all            1.000     0.0000
+  0  aud_chain            1.000     0.0000
+  1    lib_seg            1.271     0.0596
+  1    lib_all            1.366     0.0640
+  1  aud_chain            1.000     0.0000
+  2    lib_seg            1.555     0.1174
+  2    lib_all            1.507     0.1174
+  2  aud_chain            1.000     0.0000
+  3    lib_seg            1.539     0.0874
+  3    lib_all            1.606     0.0872
+  3  aud_chain            1.000     0.0000
+  4    lib_seg            1.737     0.1272
+  4    lib_all            1.831     0.1272
+  4  aud_chain            1.000     0.0000
+  6    lib_seg            1.765     0.1586
+  6    lib_all            1.882     0.1586
+  6  aud_chain            1.000     0.0000
+  8    lib_seg            1.097     0.2165
+  8    lib_all            1.172     0.1223
+  8  aud_chain            1.000     0.0000
+ 12    lib_seg            0.742     0.3994
+ 12    lib_all            0.530     0.3994
+ 12  aud_chain            1.000     0.0000
+ 16    lib_seg            0.471     0.4743
+ 16    lib_all            0.452     0.4743
+ 16  aud_chain            1.000     0.0000
+
+*** Δ*_niche = 4 (96 ms) — THE GATE PASSES ***
+3-term ordering Δ* = 12  -> a CHAIN-span niche
+
+STRUCTURAL NOTE carried with every chain number:
+  aud_chain and key_chain decide ONCE, at seam 0, where the piece starts from rest and there is no stale history to read — so obs(Delta) is the true state there for every Delta and these arms are EXACTLY delay-invariant. That is a property of THIS PIECE (etude's loop starts at the first waypoint; offbook's had an approach leg before its first seam), not a property of depth. Any reading of chain flatness must say so.

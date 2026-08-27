@@ -1,0 +1,1326 @@
+{
+  "config": {
+    "tag": "asmoke",
+    "seed": 0,
+    "n_proc": 8,
+    "seg_H": 34,
+    "frame_skip": 12,
+    "d_fb": 0.1,
+    "explore_sigma": 0.25,
+    "g_ladder": [
+      8,
+      16,
+      32
+    ],
+    "r_ladder": [
+      1,
+      34
+    ],
+    "react_ladder": [
+      4,
+      16
+    ],
+    "cem_iters": 4,
+    "cem_init_sigma": 0.8,
+    "cem_elite_frac": 0.125,
+    "vel_pen": 0.5,
+    "kp_grid": [
+      5.0,
+      20.0
+    ],
+    "kd_grid": [
+      0.25,
+      1.0
+    ],
+    "n_eval": 6,
+    "n_eval_tempo": 4,
+    "n_rt": 8,
+    "n_rep": 6,
+    "batch": 6,
+    "n_warm": 2,
+    "n_cand": 4,
+    "n_score": 4,
+    "n_slot": 3
+  },
+  "complete": true,
+  "A_F1": {
+    "donor": "/root/mjc/practice/etude/etude.py",
+    "checked": 13,
+    "mismatches": {},
+    "pass": true
+  },
+  "A_F2": {
+    "noisefree": {
+      "wp_err": 0.0,
+      "acts": 0.0,
+      "raw": 0.0,
+      "final": 0.0,
+      "fb_equal": true,
+      "t_equal": true,
+      "pass": true
+    },
+    "noisy": {
+      "wp_err": 0.0,
+      "acts": 0.0,
+      "raw": 0.0,
+      "final": 0.0,
+      "fb_equal": true,
+      "t_equal": true,
+      "pass": true
+    },
+    "pass": true
+  },
+  "t_A_F": 1.1142475605010986,
+  "log": [
+    "[setup] K=4 H=34 n_proc=8 dt_ctrl=0.0240 d_fb=0.1",
+    "[A-F1] donor constants: 13 checked, 0 mismatched  pass=True",
+    "[A-F2] fork fidelity (noisefree): max|delta| over 4 arrays = 0.000e+00 fb=True t=True pass=True",
+    "[A-F2] fork fidelity (noisy): max|delta| over 4 arrays = 0.000e+00 fb=True t=True pass=True",
+    "[cal] reflex gains kp=5.0 kd=0.25 clean e_piece=0.0123 seg=[0.0042, 0.014, 0.0159, 0.0152]",
+    "[ref] reflex law in the ROTATED world: e_piece=0.0150 seg=[0.0043, 0.0294, 0.0096, 0.0165] fb=136 t=16.86s ground=0",
+    "[A-B] G=    8 e_piece=0.7950 seg=[0.7177, 0.9005, 0.6931, 0.8689] ground/perf=32 t=33.0s wall=0.9s",
+    "[A-B] G=   16 e_piece=0.6564 seg=[0.747, 1.0379, 0.4932, 0.3474] ground/perf=64 t=62.3s wall=0.7s",
+    "[A-B] G=   32 e_piece=0.5862 seg=[0.5622, 0.8257, 0.604, 0.3529] ground/perf=128 t=120.9s wall=1.2s",
+    "[A-B] RULE: smallest G within 5% of ladder best (0.5862) -> G* = 32  (e_piece 0.5862, 128 groundings/traversal, 120.9s priced)",
+    "[A-B*] R=  1 G=    1 e_piece=1.0560 ground/perf=136 fb=136 t=141.4s wall=1.6s",
+    "[A-B*] R= 34 G=   32 e_piece=0.4796 ground/perf=128 fb=4 t=120.9s wall=0.7s",
+    "[A-B*] R=  1 G=    4 e_piece=1.0277 ground/perf=544 fb=136 t=515.2s wall=5.9s",
+    "[A-B*] R=  1 G=   16 e_piece=0.6273 ground/perf=2176 fb=136 t=2010.1s wall=11.1s",
+    "[A-I] search@G* 0.5862 (priced 121s) vs \u00e9tude never band 0.1-0.11 -> reaches=False",
+    "[A-I] reflex law 0.0150 (priced 16.9s); best search cell 0.4796 at 121s (tempo_R, G=32); cells beating reflex on error 0/7, dominating it 0/7",
+    "[A-I] *** PRE-FIXED HALT (SPEC gate 2): the priced planner is worse than the reflex law at every affordable budget AND every tempo. The search is not an incumbent worth beating. PHASE B IS NOT LICENSED. The remaining Phase A gates below are model-free instruments that do not presuppose the search, and are completed so the halt is reported with its context; no treatment arm is run. ***",
+    "[lib] seg cell (1,0): pool=12 cand=4 score=0.0545 med=0.0629 curse_counterfactual=0.0545 s0 disp=0.0267 spread=0.0380 speed=0.115",
+    "[lib] seg cell (1,1): pool=12 cand=4 score=0.1016 med=0.3086 curse_counterfactual=0.4617 s0 disp=0.0083 spread=0.0386 speed=0.816",
+    "[lib] seg cell (1,2): pool=12 cand=4 score=0.1689 med=0.2678 curse_counterfactual=0.2966 s0 disp=0.0215 spread=0.0744 speed=0.718",
+    "[lib] seg cell (1,3): pool=12 cand=4 score=0.2013 med=0.2268 curse_counterfactual=0.3369 s0 disp=0.0599 spread=0.1214 speed=0.772",
+    "[lib] chain cell (4,0): spellings score=0.1117 med=0.1985 | reflex-sourced control score=0.0458 med=0.0733",
+    "[lib] chain cell (3,1): spellings score=0.2779 med=0.2956 | reflex-sourced control score=0.1644 med=0.3030",
+    "[lib] chain cell (2,2): spellings score=0.1758 med=0.2778 | reflex-sourced control score=0.3156 med=0.5538",
+    "[lib] sizes {'1:0': 3, '1:1': 3, '1:2': 3, '1:3': 3, '2:2': 3, '3:1': 3, '4:0': 3}  build cost 160 groundings, 303s priced",
+    "[A-C0] seam-time audition exactness: max|chosen - realised| = 1.465e-07 (the rollout IS the plant)",
+    "[A-C1] seg   (1,0): chosen=0.0545 realised=0.0743 gap=1.36",
+    "[A-C1] seg   (1,1): chosen=0.1016 realised=0.1605 gap=1.58",
+    "[A-C1] seg   (1,2): chosen=0.1689 realised=0.2042 gap=1.21",
+    "[A-C1] seg   (1,3): chosen=0.2013 realised=0.2946 gap=1.46",
+    "[A-C1] chain (4,0): chosen=0.1117 realised=0.1095 gap=0.98",
+    "[A-C1] chain (3,1): chosen=0.2779 realised=0.2799 gap=1.01",
+    "[A-C1] chain (2,2): chosen=0.1758 realised=0.1752 gap=1.00",
+    "[A-R] key       k= 0: e_piece=0.1833 ground/perf=0.0 t=3.7s aud=0.0 prim=0.00 chain=0.00",
+    "[A-R] audit_k   k= 1: e_piece=0.1286 ground/perf=132.0 t=124.6s aud=1.0 prim=0.00 chain=0.00",
+    "[A-R] audit_k   k= 2: e_piece=0.1512 ground/perf=136.0 t=128.2s aud=2.0 prim=0.00 chain=0.00",
+    "[A-R] audit_k   k= 3: e_piece=0.1054 ground/perf=140.0 t=131.9s aud=3.0 prim=0.00 chain=0.00",
+    "[A-R] audit_k   k= 4: e_piece=0.1013 ground/perf=131.3 t=128.8s aud=3.8 prim=0.00 chain=0.08",
+    "[A-R] audit_k   k= 6: e_piece=0.0966 ground/perf=137.3 t=144.1s aud=5.2 prim=0.00 chain=0.08",
+    "[A-R] audit_all k= 0: e_piece=0.0966 ground/perf=137.3 t=144.1s aud=5.2 prim=0.00 chain=0.08",
+    "[A-R] lib_only ('seg',)          : e_piece=0.1054 ground/perf=12.0 t=14.7s chain=0.00",
+    "[A-R] lib_only ('seg', 'chain')  : e_piece=0.0966 ground/perf=20.0 t=36.6s chain=0.08",
+    "[A-S] seam 0: spread=0.1476 repeat_noise=0.0000 ratio=nan (pos 0.0355/0.0000 = nan) perf_spread=0.1476 speed=0.137   [seam 0: repeat spread is 0 by construction]",
+    "[A-S] seam 1: spread=0.1255 repeat_noise=0.1610 ratio=0.78 (pos 0.0205/0.0216 = 0.95) perf_spread=0.0441 speed=0.787",
+    "[A-S] seam 2: spread=0.2363 repeat_noise=0.1886 ratio=1.25 (pos 0.0216/0.0336 = 0.64) perf_spread=0.0142 speed=0.700",
+    "[A-S] seam 3: spread=0.1454 repeat_noise=0.2155 ratio=0.67 (pos 0.0292/0.0199 = 1.47) perf_spread=0.0022 speed=0.868",
+    "[A-S] seam 0 oracle: best_fixed=0.0631 per_state=0.0478 gain=1.32x  distinct argmins=3/3",
+    "[A-S] seam 1 oracle: best_fixed=0.1325 per_state=0.0994 gain=1.33x  distinct argmins=2/3",
+    "[A-S] seam 2 oracle: best_fixed=0.2210 per_state=0.1304 gain=1.69x  distinct argmins=2/3",
+    "[A-S] seam 3 oracle: best_fixed=0.1787 per_state=0.1381 gain=1.29x  distinct argmins=3/3",
+    "[A-D] wall by phase {\"t_A_F\": 1.1, \"t_reflex_cal\": 0.6, \"t_A_B\": 6.6, \"t_library\": 16.0, \"t_A_C\": 2.6, \"t_A_R\": 17.8, \"t_A_S\": 1.0}"
+  ],
+  "wall_s": 81.52662801742554,
+  "reflex_cal": {
+    "grid": [
+      {
+        "kp": 5.0,
+        "kd": 0.25,
+        "e_piece": 0.012344477698206902,
+        "e_seg": [
+          0.004244614392518997,
+          0.01399714220315218,
+          0.01589912548661232,
+          0.015237031504511833
+        ]
+      },
+      {
+        "kp": 5.0,
+        "kd": 1.0,
+        "e_piece": 0.015723461285233498,
+        "e_seg": [
+          0.01565522328019142,
+          0.015746332705020905,
+          0.01574615389108658,
+          0.015746137127280235
+        ]
+      },
+      {
+        "kp": 20.0,
+        "kd": 0.25,
+        "e_piece": 0.050832733511924744,
+        "e_seg": [
+          0.04489603638648987,
+          0.05802896246314049,
+          0.04893331229686737,
+          0.05147262662649155
+        ]
+      },
+      {
+        "kp": 20.0,
+        "kd": 1.0,
+        "e_piece": 0.015561474487185478,
+        "e_seg": [
+          0.015891211107373238,
+          0.015447312965989113,
+          0.015453141182661057,
+          0.015454232692718506
+        ]
+      }
+    ],
+    "chosen": {
+      "kp": 5.0,
+      "kd": 0.25,
+      "e_piece": 0.012344477698206902,
+      "e_seg": [
+        0.004244614392518997,
+        0.01399714220315218,
+        0.01589912548661232,
+        0.015237031504511833
+      ]
+    },
+    "criterion": "min piece error on the CLEAN world, held-out geometry"
+  },
+  "reflex": {
+    "e_piece": 0.014954161830246449,
+    "e_seg": [
+      0.0042922887951135635,
+      0.029354983940720558,
+      0.009623249061405659,
+      0.016546126455068588
+    ],
+    "steps": 136.0,
+    "n_fb": 136.0,
+    "n_ground": 0.0,
+    "ground_steps": 0.0,
+    "t_exec": 16.864,
+    "t_ground": 0.0,
+    "t_piece": 16.864,
+    "raw": {
+      "steps": 816.0,
+      "n_fb": 816.0,
+      "n_ground": 0.0,
+      "ground_steps": 0.0,
+      "n_perf": 6
+    }
+  },
+  "t_reflex_cal": 0.6033999919891357,
+  "A_B": {
+    "ladder": [
+      {
+        "G": 8,
+        "e_piece": 0.7950451374053955,
+        "e_seg": [
+          0.7176560163497925,
+          0.900528609752655,
+          0.6930539608001709,
+          0.868942141532898
+        ],
+        "wall_s": 0.9495584964752197,
+        "elite_mean_err": [
+          0.717831519979756,
+          0.9005286037053066,
+          0.6930539919883986,
+          0.8689420565323556
+        ],
+        "best_sampled_err": [
+          0.7176559881780441,
+          0.9005286037053066,
+          0.6930539919883986,
+          0.8689420565323556
+        ],
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 32.0,
+        "ground_steps": 1088.0,
+        "t_exec": 3.664,
+        "t_ground": 29.312,
+        "t_piece": 32.976,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 24.0,
+          "n_ground": 192.0,
+          "ground_steps": 6528.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "G": 16,
+        "e_piece": 0.6563970446586609,
+        "e_seg": [
+          0.7470499277114868,
+          1.0379267930984497,
+          0.4932226240634918,
+          0.34738874435424805
+        ],
+        "wall_s": 0.7419033050537109,
+        "elite_mean_err": [
+          0.7470499380442492,
+          1.0379267862987533,
+          0.49322263133468064,
+          0.3473887482613273
+        ],
+        "best_sampled_err": [
+          0.7470499380442492,
+          1.0379267862987533,
+          0.49322263133468064,
+          0.3473887482613273
+        ],
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 64.0,
+        "ground_steps": 2176.0,
+        "t_exec": 3.664,
+        "t_ground": 58.624,
+        "t_piece": 62.288,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 24.0,
+          "n_ground": 384.0,
+          "ground_steps": 13056.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "G": 32,
+        "e_piece": 0.5861911177635193,
+        "e_seg": [
+          0.562172532081604,
+          0.8256615400314331,
+          0.6040489673614502,
+          0.35288137197494507
+        ],
+        "wall_s": 1.162471055984497,
+        "elite_mean_err": [
+          0.5621724977044913,
+          0.8256615174928892,
+          0.6042647377280859,
+          0.3528813578244189
+        ],
+        "best_sampled_err": [
+          0.5621724977044913,
+          0.8256615174928892,
+          0.6040489153546912,
+          0.3528813578244189
+        ],
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 128.0,
+        "ground_steps": 4352.0,
+        "t_exec": 3.664,
+        "t_ground": 117.248,
+        "t_piece": 120.912,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 24.0,
+          "n_ground": 768.0,
+          "ground_steps": 26112.0,
+          "n_perf": 6
+        }
+      }
+    ],
+    "rule": "smallest G within 5% of the ladder's best piece error",
+    "sat_tol": 0.05,
+    "e_best": 0.5861911177635193,
+    "G_star": 32,
+    "chosen": {
+      "G": 32,
+      "e_piece": 0.5861911177635193,
+      "e_seg": [
+        0.562172532081604,
+        0.8256615400314331,
+        0.6040489673614502,
+        0.35288137197494507
+      ],
+      "wall_s": 1.162471055984497,
+      "elite_mean_err": [
+        0.5621724977044913,
+        0.8256615174928892,
+        0.6042647377280859,
+        0.3528813578244189
+      ],
+      "best_sampled_err": [
+        0.5621724977044913,
+        0.8256615174928892,
+        0.6040489153546912,
+        0.3528813578244189
+      ],
+      "steps": 136.0,
+      "n_fb": 4.0,
+      "n_ground": 128.0,
+      "ground_steps": 4352.0,
+      "t_exec": 3.664,
+      "t_ground": 117.248,
+      "t_piece": 120.912,
+      "raw": {
+        "steps": 816.0,
+        "n_fb": 24.0,
+        "n_ground": 768.0,
+        "ground_steps": 26112.0,
+        "n_perf": 6
+      }
+    },
+    "tempo": [
+      {
+        "R": 1,
+        "G": 1,
+        "decisions_per_seg": 34,
+        "e_piece": 1.0560277700424194,
+        "e_seg": [
+          0.9693042039871216,
+          1.1785688400268555,
+          0.9070165157318115,
+          1.1692215204238892
+        ],
+        "wall_s": 1.5913429260253906,
+        "steps": 136.0,
+        "n_fb": 136.0,
+        "n_ground": 136.0,
+        "ground_steps": 4624.0,
+        "t_exec": 16.864,
+        "t_ground": 124.576,
+        "t_piece": 141.44,
+        "raw": {
+          "steps": 544.0,
+          "n_fb": 544.0,
+          "n_ground": 544.0,
+          "ground_steps": 18496.0,
+          "n_perf": 4
+        }
+      },
+      {
+        "R": 34,
+        "G": 32,
+        "decisions_per_seg": 1,
+        "e_piece": 0.47961366176605225,
+        "e_seg": [
+          0.5089970827102661,
+          0.5134243965148926,
+          0.6354236602783203,
+          0.26060956716537476
+        ],
+        "wall_s": 0.7476170063018799,
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 128.0,
+        "ground_steps": 4352.0,
+        "t_exec": 3.664,
+        "t_ground": 117.248,
+        "t_piece": 120.912,
+        "raw": {
+          "steps": 544.0,
+          "n_fb": 16.0,
+          "n_ground": 512.0,
+          "ground_steps": 17408.0,
+          "n_perf": 4
+        }
+      },
+      {
+        "R": 1,
+        "G": 4,
+        "decisions_per_seg": 34,
+        "e_piece": 1.0277371406555176,
+        "e_seg": [
+          0.7344112396240234,
+          1.0668113231658936,
+          1.1469700336456299,
+          1.162756085395813
+        ],
+        "wall_s": 5.909001111984253,
+        "reactive_rung": true,
+        "steps": 136.0,
+        "n_fb": 136.0,
+        "n_ground": 544.0,
+        "ground_steps": 18496.0,
+        "t_exec": 16.864,
+        "t_ground": 498.304,
+        "t_piece": 515.168,
+        "raw": {
+          "steps": 544.0,
+          "n_fb": 544.0,
+          "n_ground": 2176.0,
+          "ground_steps": 73984.0,
+          "n_perf": 4
+        }
+      },
+      {
+        "R": 1,
+        "G": 16,
+        "decisions_per_seg": 34,
+        "e_piece": 0.6273084878921509,
+        "e_seg": [
+          0.6055939793586731,
+          0.6067831516265869,
+          0.626463770866394,
+          0.6703931093215942
+        ],
+        "wall_s": 11.081449031829834,
+        "reactive_rung": true,
+        "steps": 136.0,
+        "n_fb": 136.0,
+        "n_ground": 2176.0,
+        "ground_steps": 73984.0,
+        "t_exec": 16.864,
+        "t_ground": 1993.216,
+        "t_piece": 2010.0800000000002,
+        "raw": {
+          "steps": 544.0,
+          "n_fb": 544.0,
+          "n_ground": 8704.0,
+          "ground_steps": 295936.0,
+          "n_perf": 4
+        }
+      }
+    ],
+    "tempo_note": "first block: matched groundings/traversal to the G* cell; second block: R=1 at absolute per-decision budgets (the reactive rung). n_eval=4; instrument, not read by the budget rule"
+  },
+  "t_A_B": 6.649465084075928,
+  "t_A_B_tempo": 24.948254346847534,
+  "A_I": {
+    "never_band": [
+      0.1,
+      0.11
+    ],
+    "G_star": 32,
+    "e_search_star": 0.5861911177635193,
+    "t_search_star": 120.912,
+    "e_reflex": 0.014954161830246449,
+    "t_reflex": 16.864,
+    "reaches_band": false,
+    "best_incumbent_cell": {
+      "kind": "tempo_R",
+      "R": 34,
+      "G": 32,
+      "decisions_per_seg": 1,
+      "e_piece": 0.47961366176605225,
+      "wall_s": 0.7476170063018799,
+      "steps": 136.0,
+      "n_fb": 4.0,
+      "n_ground": 128.0,
+      "ground_steps": 4352.0,
+      "t_exec": 3.664,
+      "t_ground": 117.248,
+      "t_piece": 120.912
+    },
+    "n_cells_beating_reflex_on_error": 0,
+    "n_cells_dominating_reflex": 0,
+    "beats_reflex_at_any_budget": false,
+    "halt": true,
+    "pass": false
+  },
+  "halted_at": "A-I",
+  "library": {
+    "build": [
+      {
+        "n_pool": 12,
+        "n_cand": 4,
+        "n_score": 4,
+        "chosen_score": 0.05454017919170069,
+        "score_med": 0.06289146772803403,
+        "score_max": 0.15576292131834535,
+        "score_of_best_own": 0.05454017919170069,
+        "kept_scores": [
+          0.05454017919170069,
+          0.06024799444722394,
+          0.06553494100884413
+        ],
+        "seam": 0,
+        "ns": 1,
+        "level": "seg",
+        "n_harvest_cycles": 2,
+        "harvest_ledger": {
+          "steps": 272.0,
+          "n_fb": 272.0,
+          "n_ground": 0.0,
+          "ground_steps": 0.0,
+          "t_exec": 33.728,
+          "t_ground": 0.0,
+          "t_piece": 33.728,
+          "raw": {
+            "steps": 1632.0,
+            "n_fb": 1632.0,
+            "n_ground": 0.0,
+            "ground_steps": 0.0,
+            "n_perf": 6
+          }
+        },
+        "s0_disp": 0.026664407923817635,
+        "s0_spread": 0.038006991147994995,
+        "s0_speed": 0.1146278977394104
+      },
+      {
+        "n_pool": 12,
+        "n_cand": 4,
+        "n_score": 4,
+        "chosen_score": 0.10164170923661711,
+        "score_med": 0.30857443089391456,
+        "score_max": 0.46171200485638975,
+        "score_of_best_own": 0.46171200485638975,
+        "kept_scores": [
+          0.10164170923661711,
+          0.17891641477783216,
+          0.438232447009997
+        ],
+        "seam": 1,
+        "ns": 1,
+        "level": "seg",
+        "n_harvest_cycles": 2,
+        "harvest_ledger": {
+          "steps": 272.0,
+          "n_fb": 206.0,
+          "n_ground": 0.0,
+          "ground_steps": 0.0,
+          "t_exec": 27.128,
+          "t_ground": 0.0,
+          "t_piece": 27.128,
+          "raw": {
+            "steps": 1632.0,
+            "n_fb": 1236.0,
+            "n_ground": 0.0,
+            "ground_steps": 0.0,
+            "n_perf": 6
+          }
+        },
+        "s0_disp": 0.008263095282018185,
+        "s0_spread": 0.03859579935669899,
+        "s0_speed": 0.8163229823112488
+      },
+      {
+        "n_pool": 12,
+        "n_cand": 4,
+        "n_score": 4,
+        "chosen_score": 0.16891926721823802,
+        "score_med": 0.2678327704420892,
+        "score_max": 0.987983512148205,
+        "score_of_best_own": 0.29662952570601325,
+        "kept_scores": [
+          0.16891926721823802,
+          0.2390360151781652,
+          0.29662952570601325
+        ],
+        "seam": 2,
+        "ns": 1,
+        "level": "seg",
+        "n_harvest_cycles": 2,
+        "harvest_ledger": {
+          "steps": 272.0,
+          "n_fb": 140.0,
+          "n_ground": 0.0,
+          "ground_steps": 0.0,
+          "t_exec": 20.528,
+          "t_ground": 0.0,
+          "t_piece": 20.528,
+          "raw": {
+            "steps": 1632.0,
+            "n_fb": 840.0,
+            "n_ground": 0.0,
+            "ground_steps": 0.0,
+            "n_perf": 6
+          }
+        },
+        "s0_disp": 0.021526696160435677,
+        "s0_spread": 0.07435342669487,
+        "s0_speed": 0.7184838056564331
+      },
+      {
+        "n_pool": 12,
+        "n_cand": 4,
+        "n_score": 4,
+        "chosen_score": 0.20134978981098722,
+        "score_med": 0.22681518551504398,
+        "score_max": 0.33687384815480287,
+        "score_of_best_own": 0.33687384815480287,
+        "kept_scores": [
+          0.20134978981098722,
+          0.20420880138314515,
+          0.2494215696469428
+        ],
+        "seam": 3,
+        "ns": 1,
+        "level": "seg",
+        "n_harvest_cycles": 2,
+        "harvest_ledger": {
+          "steps": 272.0,
+          "n_fb": 74.0,
+          "n_ground": 0.0,
+          "ground_steps": 0.0,
+          "t_exec": 13.928,
+          "t_ground": 0.0,
+          "t_piece": 13.928,
+          "raw": {
+            "steps": 1632.0,
+            "n_fb": 444.0,
+            "n_ground": 0.0,
+            "ground_steps": 0.0,
+            "n_perf": 6
+          }
+        },
+        "s0_disp": 0.05986158177256584,
+        "s0_spread": 0.12142117321491241,
+        "s0_speed": 0.7720764875411987
+      }
+    ],
+    "chains": [
+      {
+        "n_pool": 12,
+        "n_cand": 4,
+        "n_score": 4,
+        "chosen_score": 0.1117249668658425,
+        "score_med": 0.19848797315251415,
+        "score_max": 0.3352069545136652,
+        "score_of_best_own": 0.1117249668658425,
+        "kept_scores": [
+          0.1117249668658425,
+          0.1739680373095745,
+          0.2230079089954538
+        ],
+        "seam": 0,
+        "ns": 4,
+        "level": "chain",
+        "source": "segment_slot_spellings",
+        "control_reflex_sourced": {
+          "n_pool": 12,
+          "n_cand": 4,
+          "n_score": 4,
+          "chosen_score": 0.04577965243768592,
+          "score_med": 0.07331761193317526,
+          "score_max": 0.12827975321139962,
+          "score_of_best_own": 0.04577965243768592,
+          "kept_scores": [
+            0.04577965243768592,
+            0.060488558370339014,
+            0.08614666549601152
+          ]
+        }
+      },
+      {
+        "n_pool": 12,
+        "n_cand": 4,
+        "n_score": 4,
+        "chosen_score": 0.2778887353080775,
+        "score_med": 0.29562953853851837,
+        "score_max": 0.6362975269568283,
+        "score_of_best_own": 0.31298841112428705,
+        "kept_scores": [
+          0.2778887353080775,
+          0.2782706659527497,
+          0.31298841112428705
+        ],
+        "seam": 1,
+        "ns": 3,
+        "level": "chain",
+        "source": "segment_slot_spellings",
+        "control_reflex_sourced": {
+          "n_pool": 12,
+          "n_cand": 4,
+          "n_score": 4,
+          "chosen_score": 0.16441294986983682,
+          "score_med": 0.30299724977219317,
+          "score_max": 0.45413448502454906,
+          "score_of_best_own": 0.45413448502454906,
+          "kept_scores": [
+            0.16441294986983682,
+            0.2800253970693893,
+            0.32596910247499705
+          ]
+        }
+      },
+      {
+        "n_pool": 12,
+        "n_cand": 4,
+        "n_score": 4,
+        "chosen_score": 0.17583598340408174,
+        "score_med": 0.27783994996452754,
+        "score_max": 0.5032026042188521,
+        "score_of_best_own": 0.17867136501776015,
+        "kept_scores": [
+          0.17583598340408174,
+          0.17867136501776015,
+          0.37700853491129493
+        ],
+        "seam": 2,
+        "ns": 2,
+        "level": "chain",
+        "source": "segment_slot_spellings",
+        "control_reflex_sourced": {
+          "n_pool": 12,
+          "n_cand": 4,
+          "n_score": 4,
+          "chosen_score": 0.315569291534557,
+          "score_med": 0.5537871858619622,
+          "score_max": 0.981676711193672,
+          "score_of_best_own": 0.315569291534557,
+          "kept_scores": [
+            0.315569291534557,
+            0.33452529893207844,
+            0.7730490727918459
+          ]
+        }
+      }
+    ],
+    "sizes": {
+      "1:0": 3,
+      "1:1": 3,
+      "1:2": 3,
+      "1:3": 3,
+      "2:2": 3,
+      "3:1": 3,
+      "4:0": 3
+    },
+    "build_ledger": {
+      "steps": 0.0,
+      "n_fb": 0.0,
+      "n_ground": 160.0,
+      "ground_steps": 11968.0,
+      "t_exec": 0.0,
+      "t_ground": 303.232,
+      "t_piece": 303.232,
+      "raw": {
+        "steps": 0.0,
+        "n_fb": 0.0,
+        "n_ground": 160.0,
+        "ground_steps": 11968.0,
+        "n_perf": 1
+      }
+    }
+  },
+  "t_library": 15.957077741622925,
+  "A_C": {
+    "exactness_max_abs": 1.4653633487182738e-07,
+    "exact": true,
+    "calibration": [
+      {
+        "seam": 0,
+        "ns": 1,
+        "level": "seg",
+        "chosen": 0.05454017919170069,
+        "realised": 0.07433672466010965,
+        "gap": 1.362971771669965
+      },
+      {
+        "seam": 1,
+        "ns": 1,
+        "level": "seg",
+        "chosen": 0.10164170923661711,
+        "realised": 0.16045861480234522,
+        "gap": 1.5786689933441116
+      },
+      {
+        "seam": 2,
+        "ns": 1,
+        "level": "seg",
+        "chosen": 0.16891926721823802,
+        "realised": 0.20416684382233422,
+        "gap": 1.2086652232427548
+      },
+      {
+        "seam": 3,
+        "ns": 1,
+        "level": "seg",
+        "chosen": 0.20134978981098722,
+        "realised": 0.2945753587123043,
+        "gap": 1.4630030604394002
+      },
+      {
+        "seam": 0,
+        "ns": 4,
+        "level": "chain",
+        "chosen": 0.1117249668658425,
+        "realised": 0.10953881807104487,
+        "gap": 0.9804327639906779
+      },
+      {
+        "seam": 1,
+        "ns": 3,
+        "level": "chain",
+        "chosen": 0.2778887353080775,
+        "realised": 0.2799379201276108,
+        "gap": 1.007374119779492
+      },
+      {
+        "seam": 2,
+        "ns": 2,
+        "level": "chain",
+        "chosen": 0.17583598340408174,
+        "realised": 0.17521551299590157,
+        "gap": 0.9964713115247049
+      }
+    ]
+  },
+  "t_A_C": 2.6087772846221924,
+  "A_R": {
+    "ladder": [
+      {
+        "mode": "key",
+        "k": 0,
+        "levels": [
+          "seg"
+        ],
+        "e_piece": 0.1833285391330719,
+        "topk_order": "library insertion order (= construction-score order); no pi in Phase A, so this is an OPTIMISTIC top-k",
+        "e_seg": [
+          0.04040435701608658,
+          0.13418787717819214,
+          0.23402687907218933,
+          0.32469508051872253
+        ],
+        "wall_s": 0.21567678451538086,
+        "n_aud": 0.0,
+        "frac_prim": 0.0,
+        "frac_chain": 0.0,
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 0.0,
+        "ground_steps": 0.0,
+        "t_exec": 3.664,
+        "t_ground": 0.0,
+        "t_piece": 3.664,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 24.0,
+          "n_ground": 0.0,
+          "ground_steps": 0.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "mode": "audit_k",
+        "k": 1,
+        "levels": [
+          "seg",
+          "chain"
+        ],
+        "e_piece": 0.12863492965698242,
+        "topk_order": "library insertion order (= construction-score order); no pi in Phase A, so this is an OPTIMISTIC top-k",
+        "e_seg": [
+          0.052280690521001816,
+          0.08467210829257965,
+          0.12196983397006989,
+          0.25561705231666565
+        ],
+        "wall_s": 1.110365867614746,
+        "n_aud": 1.0,
+        "frac_prim": 0.0,
+        "frac_chain": 0.0,
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 132.0,
+        "ground_steps": 4488.0,
+        "t_exec": 3.664,
+        "t_ground": 120.912,
+        "t_piece": 124.576,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 24.0,
+          "n_ground": 792.0,
+          "ground_steps": 26928.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "mode": "audit_k",
+        "k": 2,
+        "levels": [
+          "seg",
+          "chain"
+        ],
+        "e_piece": 0.15124018490314484,
+        "topk_order": "library insertion order (= construction-score order); no pi in Phase A, so this is an OPTIMISTIC top-k",
+        "e_seg": [
+          0.04040435701608658,
+          0.0933317318558693,
+          0.18576745688915253,
+          0.28545719385147095
+        ],
+        "wall_s": 1.1501758098602295,
+        "n_aud": 2.0,
+        "frac_prim": 0.0,
+        "frac_chain": 0.0,
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 136.0,
+        "ground_steps": 4624.0,
+        "t_exec": 3.664,
+        "t_ground": 124.576,
+        "t_piece": 128.24,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 24.0,
+          "n_ground": 816.0,
+          "ground_steps": 27744.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "mode": "audit_k",
+        "k": 3,
+        "levels": [
+          "seg",
+          "chain"
+        ],
+        "e_piece": 0.10541945695877075,
+        "topk_order": "library insertion order (= construction-score order); no pi in Phase A, so this is an OPTIMISTIC top-k",
+        "e_seg": [
+          0.04040435701608658,
+          0.1215648353099823,
+          0.13021178543567657,
+          0.12949687242507935
+        ],
+        "wall_s": 1.1974449157714844,
+        "n_aud": 3.0,
+        "frac_prim": 0.0,
+        "frac_chain": 0.0,
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 140.0,
+        "ground_steps": 4760.0,
+        "t_exec": 3.664,
+        "t_ground": 128.24,
+        "t_piece": 131.904,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 24.0,
+          "n_ground": 840.0,
+          "ground_steps": 28560.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "mode": "audit_k",
+        "k": 4,
+        "levels": [
+          "seg",
+          "chain"
+        ],
+        "e_piece": 0.10132856667041779,
+        "topk_order": "library insertion order (= construction-score order); no pi in Phase A, so this is an OPTIMISTIC top-k",
+        "e_seg": [
+          0.04040435701608658,
+          0.1215648353099823,
+          0.14130142331123352,
+          0.10204365849494934
+        ],
+        "wall_s": 1.2144947052001953,
+        "n_aud": 3.75,
+        "frac_prim": 0.0,
+        "frac_chain": 0.08333333333333333,
+        "steps": 136.0,
+        "n_fb": 3.6666666666666665,
+        "n_ground": 131.33333333333334,
+        "ground_steps": 4669.333333333333,
+        "t_exec": 3.630666666666667,
+        "t_ground": 125.19733333333333,
+        "t_piece": 128.82799999999997,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 22.0,
+          "n_ground": 788.0,
+          "ground_steps": 28016.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "mode": "audit_k",
+        "k": 6,
+        "levels": [
+          "seg",
+          "chain"
+        ],
+        "e_piece": 0.09655874967575073,
+        "topk_order": "library insertion order (= construction-score order); no pi in Phase A, so this is an OPTIMISTIC top-k",
+        "e_seg": [
+          0.04040435701608658,
+          0.1215648353099823,
+          0.12222215533256531,
+          0.10204365849494934
+        ],
+        "wall_s": 1.3887536525726318,
+        "n_aud": 5.25,
+        "frac_prim": 0.0,
+        "frac_chain": 0.08333333333333333,
+        "steps": 136.0,
+        "n_fb": 3.6666666666666665,
+        "n_ground": 137.33333333333334,
+        "ground_steps": 5281.333333333333,
+        "t_exec": 3.630666666666667,
+        "t_ground": 140.48533333333333,
+        "t_piece": 144.11599999999999,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 22.0,
+          "n_ground": 824.0,
+          "ground_steps": 31688.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "mode": "audit_all",
+        "k": 0,
+        "levels": [
+          "seg",
+          "chain"
+        ],
+        "e_piece": 0.09655874967575073,
+        "topk_order": "library insertion order (= construction-score order); no pi in Phase A, so this is an OPTIMISTIC top-k",
+        "e_seg": [
+          0.04040435701608658,
+          0.1215648353099823,
+          0.12222215533256531,
+          0.10204365849494934
+        ],
+        "wall_s": 1.3817100524902344,
+        "n_aud": 5.25,
+        "frac_prim": 0.0,
+        "frac_chain": 0.08333333333333333,
+        "steps": 136.0,
+        "n_fb": 3.6666666666666665,
+        "n_ground": 137.33333333333334,
+        "ground_steps": 5281.333333333333,
+        "t_exec": 3.630666666666667,
+        "t_ground": 140.48533333333333,
+        "t_piece": 144.11599999999999,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 22.0,
+          "n_ground": 824.0,
+          "ground_steps": 31688.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "mode": "lib_only",
+        "k": 0,
+        "levels": [
+          "seg"
+        ],
+        "e_piece": 0.10541945695877075,
+        "e_seg": [
+          0.04040435701608658,
+          0.1215648353099823,
+          0.13021178543567657,
+          0.12949687242507935
+        ],
+        "n_aud": 3.0,
+        "frac_prim": 0.0,
+        "frac_chain": 0.0,
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 12.0,
+        "ground_steps": 408.0,
+        "t_exec": 3.664,
+        "t_ground": 10.992,
+        "t_piece": 14.656,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 24.0,
+          "n_ground": 72.0,
+          "ground_steps": 2448.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "mode": "lib_only",
+        "k": 0,
+        "levels": [
+          "seg",
+          "chain"
+        ],
+        "e_piece": 0.09655874967575073,
+        "e_seg": [
+          0.04040435701608658,
+          0.1215648353099823,
+          0.12222215533256531,
+          0.10204365849494934
+        ],
+        "n_aud": 5.25,
+        "frac_prim": 0.0,
+        "frac_chain": 0.08333333333333333,
+        "steps": 136.0,
+        "n_fb": 3.6666666666666665,
+        "n_ground": 20.0,
+        "ground_steps": 1292.0,
+        "t_exec": 3.630666666666667,
+        "t_ground": 33.007999999999996,
+        "t_piece": 36.638666666666666,
+        "raw": {
+          "steps": 816.0,
+          "n_fb": 22.0,
+          "n_ground": 120.0,
+          "ground_steps": 7752.0,
+          "n_perf": 6
+        }
+      },
+      {
+        "mode": "never_reflex",
+        "k": 0,
+        "levels": [],
+        "e_piece": 0.014954161830246449,
+        "e_seg": [
+          0.0042922887951135635,
+          0.029354983940720558,
+          0.009623249061405659,
+          0.016546126455068588
+        ],
+        "n_aud": 0.0,
+        "frac_prim": 0.0,
+        "frac_chain": 0.0,
+        "steps": 136.0,
+        "n_fb": 136.0,
+        "n_ground": 0.0,
+        "ground_steps": 0.0,
+        "t_exec": 16.864,
+        "t_ground": 0.0,
+        "t_piece": 16.864
+      },
+      {
+        "mode": "never_search",
+        "k": 0,
+        "levels": [],
+        "e_piece": 0.5861911177635193,
+        "e_seg": [
+          0.562172532081604,
+          0.8256615400314331,
+          0.6040489673614502,
+          0.35288137197494507
+        ],
+        "n_aud": 0.0,
+        "frac_prim": 1.0,
+        "frac_chain": 0.0,
+        "steps": 136.0,
+        "n_fb": 4.0,
+        "n_ground": 128.0,
+        "ground_steps": 4352.0,
+        "t_exec": 3.664,
+        "t_ground": 117.248,
+        "t_piece": 120.912
+      }
+    ],
+    "G_star": 32
+  },
+  "t_A_R": 17.848860502243042,
+  "A_S": {
+    "seams": [
+      {
+        "seam": 0,
+        "spread": 0.1476285606622696,
+        "repeat_noise": 3.0719530030864917e-08,
+        "ratio": NaN,
+        "pos_spread": 0.03550976142287254,
+        "pos_noise": 2.9802322387695312e-08,
+        "pos_ratio": NaN,
+        "perf_spread": 0.1476285606622696,
+        "perf_pos_spread": 0.03550976142287254,
+        "structurally_undefined": true,
+        "speed": 0.13683314621448517
+      },
+      {
+        "seam": 1,
+        "spread": 0.12549129128456116,
+        "repeat_noise": 0.16103440523147583,
+        "ratio": 0.7792824837908153,
+        "pos_spread": 0.02046806365251541,
+        "pos_noise": 0.02157445065677166,
+        "pos_ratio": 0.9487177207031697,
+        "perf_spread": 0.04406595230102539,
+        "perf_pos_spread": 0.004587776027619839,
+        "structurally_undefined": false,
+        "speed": 0.7868611216545105
+      },
+      {
+        "seam": 2,
+        "spread": 0.23628388345241547,
+        "repeat_noise": 0.18858957290649414,
+        "ratio": 1.252900040075752,
+        "pos_spread": 0.021579405292868614,
+        "pos_noise": 0.03357323259115219,
+        "pos_ratio": 0.6427562563205664,
+        "perf_spread": 0.014225584454834461,
+        "perf_pos_spread": 0.001496633980423212,
+        "structurally_undefined": false,
+        "speed": 0.7003014087677002
+      },
+      {
+        "seam": 3,
+        "spread": 0.14542777836322784,
+        "repeat_noise": 0.21546311676502228,
+        "ratio": 0.6749543984450346,
+        "pos_spread": 0.029244430363178253,
+        "pos_noise": 0.019948666915297508,
+        "pos_ratio": 1.465984192695721,
+        "perf_spread": 0.00220100162550807,
+        "perf_pos_spread": 0.0003887703351210803,
+        "structurally_undefined": false,
+        "speed": 0.8682818412780762
+      }
+    ],
+    "oracle": [
+      {
+        "seam": 0,
+        "best_fixed": 0.06306065623996059,
+        "per_state": 0.04784531416375857,
+        "gain": 1.3180111227637668,
+        "n_slot": 3,
+        "n_distinct_argmin": 3
+      },
+      {
+        "seam": 1,
+        "best_fixed": 0.13248284887969372,
+        "per_state": 0.09937400960185006,
+        "gain": 1.3331740302167225,
+        "n_slot": 3,
+        "n_distinct_argmin": 2
+      },
+      {
+        "seam": 2,
+        "best_fixed": 0.22104456915500867,
+        "per_state": 0.1304336902425404,
+        "gain": 1.694689222883889,
+        "n_slot": 3,
+        "n_distinct_argmin": 2
+      },
+      {
+        "seam": 3,
+        "best_fixed": 0.17871402624212981,
+        "per_state": 0.13808503122458382,
+        "gain": 1.2942317111220136,
+        "n_slot": 3,
+        "n_distinct_argmin": 3
+      }
+    ],
+    "note": "between-start and within-start spreads are BOTH under practice motor noise (matched); performance is deterministic and noise-free, so its spread is reported separately"
+  },
+  "t_A_S": 1.0156912803649902,
+  "A_D": {
+    "wall_by_phase": {
+      "t_A_F": 1.1142475605010986,
+      "t_reflex_cal": 0.6033999919891357,
+      "t_A_B": 6.649465084075928,
+      "t_library": 15.957077741622925,
+      "t_A_C": 2.6087772846221924,
+      "t_A_R": 17.848860502243042,
+      "t_A_S": 1.0156912803649902
+    },
+    "search_traversal_wall_by_G": {
+      "8": 0.9495584964752197,
+      "16": 0.7419033050537109,
+      "32": 1.162471055984497
+    },
+    "rent_traversal_wall": {
+      "key_k0": 0.21567678451538086,
+      "audit_k_k1": 1.110365867614746,
+      "audit_k_k2": 1.1501758098602295,
+      "audit_k_k3": 1.1974449157714844,
+      "audit_k_k4": 1.2144947052001953,
+      "audit_k_k6": 1.3887536525726318,
+      "audit_all_k0": 1.3817100524902344,
+      "lib_only_k0": null,
+      "never_reflex_k0": null,
+      "never_search_k0": null
+    },
+    "n_proc": 8
+  }
+}

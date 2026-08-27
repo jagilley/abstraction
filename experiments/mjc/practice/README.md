@@ -39,7 +39,7 @@ typed maintenance):
 | span | [`span/`](span/README.md) | the composition horizon **as a trajectory**: legato's practice loop with nothing committed, the FM snapshotted every cycle, imagination horizon × executed span of one live phrase plan against a flat `e_react`; plus a re-measurement of the saved models (on/off-corridor accuracy, the exploitation gap, a per-snapshot CAL-P sweep) | **written up** — 1 seed; 17–81-point monotone trends are the claims |
 | offbook | [`offbook/`](offbook/README.md) | **the port back** on this substrate: seam-time audition (enumeration) vs π-routing vs both ports, the address-book battery and poison twin — then three canary rounds (credit currency, exposure placement, reflex-loop delay) on why the chain level is never adopted | **written up; SUSPECT** (2026-08-27, see `accompanist/`) — 1 seed/run, bit-identity twins + cross-tag exact controls |
 | accompanist | [`accompanist/`](accompanist/README.md) | the follow-up to offbook: library construction (`d1`–`d3`: content ladder, legato's nesting, the model adapting) and the delay operator (`d3b`, `presto/`: naive vs efference copy) on offbook's piece and on a fast 120 ms-segment piece | **written up** — the pivot: the incumbent's free forward model, not the piece, is what refuses the deep unit |
-| acappella | `acappella/SPEC.md`[^private] | the re-port with **no forward model anywhere**: a priced real-rollout incumbent under a declared budget on `etude/`'s substrate, plant audition, nested selection, routing π | **spec only** |
+| acappella | [`acappella/`](acappella/README.md) | the re-port with **no forward model anywhere**: a priced real-rollout incumbent under a declared budget on `etude/`'s substrate, then (amendment) the feedback/delay axis — reflex vs keyed/auditioned library under an unbridgeable observation delay | **written up** — the grounding economy halts at its own pre-fixed gate (0/15 search cells beat the reflex); re-sited on feedback, a model-free **segment-span niche opens at 192 ms** |
 
 ## Shared substrate
 
@@ -319,7 +319,28 @@ owns every playable delay on both pieces — every Δ inside the model's horizon
 model. On RHM the incumbent's search was real and priced; on this substrate it has been free
 imagination since `fingering/`, and `etude/` — the one node where chunks won — is the one where the
 model was the bottleneck. Single seed throughout; bit-identity controls across rounds. Full record:
-[`accompanist/README.md`](accompanist/README.md). Next: `acappella/SPEC.md`[^private].
+[`accompanist/README.md`](accompanist/README.md). Next: [`acappella/SPEC.md`](acappella/SPEC.md).
+
+### acappella — the model-free port: the grounding halt, and the feedback niche (2026-08-27, written up)
+
+**Goal**: run the RHM economy on the motor substrate with **no forward model anywhere** — a priced
+real-rollout incumbent (CEM on a resettable plant copy) under a declared grounding budget on
+`etude/`'s piece, a reflex law as the no-search reference, plant audition, legato's nesting.
+
+**Headline**: the grounding economy **halts at its own pre-fixed gate** — the search reaches
+étude's `never` band (0.0612 at G=4096, ladder-limited) but 0 of 15 cells beat the reflex law
+(0.0045 at 16.9 s vs 0.0607 at 15,011 s priced): a motor trial costs performance-currency time,
+and on a piece steerable by feel, search-by-real-trial is dominated by an option RHM structurally
+lacks. Re-sited on the meter's native feedback axis (amendment, same day): under an honest,
+unbridgeable observation delay, a **model-free segment-span niche opens at 192 ms** — stored
+tapes at 4 fb beat a per-Δ re-tuned reflex 2.0× → 5.6× (to 384 ms), degradation ordered exactly
+by feedback consumption (134× / 1.65–3.10× / 1.00×) — offbook finding 7d with the confound
+removed. The chain question is structurally out of this piece's reach (chains decide at seam 0,
+from rest — exactly delay-invariant, pre-flagged), and the audition is the most delay-fragile
+selector in the system (calibration 1.00 → 1.77; the chain-capable arm selects chains least where
+they pay most). B2 (trust at Δ=8) and the presto fast-piece escalation are queued with explicit
+licensing conditions, not run. Single seed; bit-identity gates against `etude/` and across tags.
+Full record: [`acappella/README.md`](acappella/README.md).
 
 ## Reproduce
 
@@ -360,9 +381,8 @@ Modal volume (`mujoco-control-data`): `/data/bridge_assembly/dsw_<cell>_s<seed>/
 [`span/FILES.md`](span/FILES.md) ·
 [`offbook/FILES.md`](offbook/FILES.md) ·
 [`accompanist/FILES.md`](accompanist/FILES.md) ·
+[`acappella/FILES.md`](acappella/FILES.md) ·
 [`estimability/FILES.md`](estimability/FILES.md) ·
 [`priced_plasticity/FILES.md`](priced_plasticity/FILES.md) ·
 [`aleatoric_flip/FILES.md`](aleatoric_flip/FILES.md) ·
 [`../bridge_assembly/difficulty_sweep/FILES.md`](../bridge_assembly/difficulty_sweep/FILES.md)
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

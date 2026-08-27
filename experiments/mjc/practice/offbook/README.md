@@ -50,7 +50,7 @@ together.
 
 **What stands**: the π-level facts — trust tracks exposure (findings 4–5), the poison quarantine
 under forced exposure (8), the frozen key's need for boundary information (9). **What is next**:
-`../acappella/SPEC.md`[^private], the re-port with no forward model anywhere.
+[`../acappella/SPEC.md`](../acappella/SPEC.md), the re-port with no forward model anywhere.
 
 ## The question
 
@@ -260,5 +260,3 @@ trust dynamics ever need the decomposition · the arrival/rehearsal assay (`cens
 instrument) once a substrate exists where adoption can occur · `/update-beliefs` for the unit
 (trust-tracks-exposure; the three-layer refusal; the quarantine under forced exposure; the
 feedback-consumption ordering).
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

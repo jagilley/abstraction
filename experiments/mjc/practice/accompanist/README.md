@@ -6,7 +6,7 @@ design record and results) · **In place**: [`../offbook/FILES.md`](../offbook/F
 (`d1`, `d2`, `d3`, `d3b` — additive flags on offbook's own delay gate, left there so `d0` stays
 byte-reproducible).
 **What this corrects**: [`../offbook/README.md`](../offbook/README.md) (PR #72), now marked
-**suspect**. **What it licenses**: `../acappella/SPEC.md`[^private], the model-free
+**suspect**. **What it licenses**: [`../acappella/SPEC.md`](../acappella/SPEC.md), the model-free
 re-port.
 **Runs**: `d1` (10 arms) · `d2` (7) · `d3` (8) · `d3b` (7 × 2 operators) on offbook's piece; `t0`
 (3 × 3 ladder) · `p0` (8 strategies × 8 Δ × 2 operators) on the new piece. 2026-08-26 → 08-27,
@@ -83,7 +83,7 @@ incumbent is denied the model. Finding 3 is why a delay knob cannot substitute f
 incumbent's search: any delay the model can compose across, it will.
 
 Held loosely: whether "denied the model" should be implemented as priced real rollouts (RHM's
-structure) or as a reflex law with no search — `../acappella/SPEC.md`[^private]
+structure) or as a reflex law with no search — [`../acappella/SPEC.md`](../acappella/SPEC.md)
 proposes the first with the second as reference.
 
 ## What this does to `offbook/`
@@ -112,8 +112,6 @@ Offbook rounds: `../offbook/FILES.md` §Reproduce (Rounds 5–7b) — `delay_gat
 
 ## Next
 
-`../acappella/SPEC.md`[^private]: the port back on `etude/`'s substrate with no
+[`../acappella/SPEC.md`](../acappella/SPEC.md): the port back on `etude/`'s substrate with no
 forward model anywhere — a priced real-rollout incumbent under a declared budget, plant audition,
 nested selection, routing π.
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

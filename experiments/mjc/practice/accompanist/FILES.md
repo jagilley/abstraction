@@ -25,6 +25,4 @@ None at this node — `accompanist/` is the super-writeup for one orchestrated c
 | node | what |
 |---|---|
 | [`../offbook/FILES.md`](../offbook/FILES.md) §Rounds 5–7b | `d1` content ladder · `d2` legato's nesting · `d3` the FM adapting · `d3b` the efference-copy incumbent — on offbook's own piece and gate |
-| `../acappella/SPEC.md`[^private] | the model-free re-port this conversation licensed (spec only) |
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
+| [`../acappella/SPEC.md`](../acappella/SPEC.md) | the model-free re-port this conversation licensed (spec only) |
