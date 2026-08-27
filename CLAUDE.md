@@ -8,7 +8,7 @@ This is a research monorepo consolidating several projects.
     - `experiments/a2a_forward` is our main experiment for training forward self-models for decomposing activations
     - `experiments/rhm` is a controlled setup for generating language-like data with a known data generating process
     - `experiments/mjc` is a place we run MuJoCo experiments for motor learning
-    - `experiments/canvas` is the image substrate of the practice arc: a tile grammar (`tiles.py`) rendered to 256×256 swatches with the code grid aligned to the tile grid, inpainting as the piece, an adjacency-support truth gauge and a typicality taste gauge, and no agent-consumed oracle; a GLSL style library is kept as a taste venue
+    - `experiments/canvas` is the image substrate of the practice arc: a tile grammar (`tiles.py`) rendered to swatches with the code grid aligned to the tile grid, inpainting as the piece, an adjacency-support truth gauge and a typicality taste gauge, and no agent-consumed oracle
 - `reading/` — Papers, notes, and reference material (shared across projects)
 - `ideas/` — Research ideas and hypotheses (shared)
 - `beliefs/` — Crystallized beliefs about how things work (shared)
@@ -16,12 +16,13 @@ This is a research monorepo consolidating several projects.
     - `beliefs/*.md` — Deeper essay-format explorations of specific beliefs
     - Use `/add-belief` to integrate new evidence; `/update-beliefs` to assess existing beliefs against new evidence
 - `conversations/` — Conversations with AI assistants and collaborators (shared)
-- `fer/` — Fractured Entangled Representations project (JAX/Flax, conda env: `fer`)
-- `glp/` — Generative Latent Prior project (PyTorch, conda env: `glp`)
+- `fer/` — Fractured Entangled Representations project
+- `glp/` — Generative Latent Prior project
 - `manim-videos/` — Animated video explainers (Manim CE, conda env: `manim`)
 - `org/` — Org-mode files for research and application tracking
 - `applications/` — Job/fellowship applications
 - `projects/` — Cross-project progress logs
+- `ROADMAP.md` - our working roadmap for the next steps in this line of work. (Don't edit without permission)
 
 Each project subdirectory has its own CLAUDE.md with setup instructions and conventions.
 
