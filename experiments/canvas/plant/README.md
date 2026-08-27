@@ -322,6 +322,8 @@ Gates, per-decision reasons and volume layouts: [`SPEC.md`](SPEC.md), [`FILES.md
 
 ## Next steps (queued, not started)
 
+*Update 2026-08-26: the first item ran — [`../practice/ratchet/`](../practice/ratchet/README.md).*
+
 The first practice-flavoured node on canvas — fork `rhm/practice/ratchet/ratchet.py` +
 `macros.py` verbatim onto **aligned tiles**, with the support test as the grade of record for
 the value target, mining gate and audition, the typicality reader logged as taste from day one,

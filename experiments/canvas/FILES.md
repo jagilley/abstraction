@@ -19,6 +19,7 @@
 | folder | summary |
 |---|---|
 | [`plant/`](plant/README.md) | The substrate description: alphabet, plant, grader, and the five preconditions on the GLSL library and the aligned/misaligned tiles twin; the tail and adjacency-support grader re-analyses. Establishes aligned tiles as the substrate. |
+| [`practice/`](practice/README.md) | The practice arc on canvas. Node 1 (`ratchet/`, 2026-08-26) earns a level-indexed code-tuple vocabulary (T[2] ≈ tiles, T[3] ≈ motifs) over an inpainting depth ladder, priced in forward passes and graded by the adjacency-support test: earned ≈ given, the descent purely vocabulary-carried, `never_base` 0.2–0.35 worse. Files in [`practice/FILES.md`](practice/FILES.md). |
 
 ## Figures
 

@@ -42,12 +42,22 @@ pairwise-local validity, so only the demand gauge exists there. [`taste/clicker.
   a *property* — while a zero-forward **adjacency-support test** does (AUC .96–.99; rejects 96.6 %
   of the plant's oracle-invalid fills at the clean ceiling). Two organs, one per currency: support
   for truth, typicality for taste. Child: `plant/tiles_twin/`[^private].
+- [`practice/`](practice/README.md) — **the practice arc on canvas** (2026-08-26). Node 1,
+  [`ratchet/`](practice/ratchet/README.md): the RHM ratchet forked onto aligned tiles (T[2] ≈ tiles,
+  T[3] ≈ motifs, inpainting depth ladder, G = 8 forwards/solve, support as the grade of record).
+  **Earned ≈ given** — the sensibly-timed practice arms cluster with `given` at eras 2–3
+  (0.85–1.14; `prov`'s 203-entry strict subset of `given`'s 364 ties it), `early` is foreclosed,
+  and `never_base` — search plus a free truth grader, no value head, plant inert — is 0.2–0.35
+  worse, so the descent is purely vocabulary-carried. T[3] nests and forecloses but is
+  coverage-bound; the taste gauge rises .86 → .98 while validity falls to ~.2. Single seed.
 
 ## Where things stand
 
-No practice node has run on canvas. The first — `ratchet` forked verbatim onto aligned tiles,
-support as the grade of record, typicality and `at_support` logged from day one, ranks against
-`never_base` and a `given` arm from the tile catalogue — is queued in
-[`plant/README.md`](plant/README.md)'s next steps with the design choices still to settle.
+The first practice node has run ([`practice/ratchet/`](practice/ratchet/README.md)) and the
+arc's headline reproduces on images with a stronger control. Queued next, in
+[`practice/README.md`](practice/README.md): **`native/`** — consolidate the earned tile table into the
+plant, with the port canvas makes natural (mint a tile token into the plant's own input stream)
+beside RHM's routing head — then **`spiral/`**, re-earning level 3 over the minted plant with
+exemplar count as the variable.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
