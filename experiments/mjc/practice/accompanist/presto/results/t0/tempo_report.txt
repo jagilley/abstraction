@@ -1,0 +1,143 @@
+
+=== presto Phase A (t0) — complete=True wall=54 min ===
+
+[G-F] fork fidelity vs offbook on the DONOR piece+plant: max|delta| = 0.000e+00 over 7 arrays | fb_equal=True t_equal=True -> PASS=True
+[G-F2] `obs_predict` (efference copy) is a strict no-op at Delta = 0: max|delta| = 0.000e+00 -> PASS=True
+
+=== G-T — the tempo ladder (mean piece error, 24 held-out geometries, sigma_perf) ===
+`hold` = zero commands after the approach (the do-nothing floor).  Playability anchors: `ref_stale` = ballistic-per-segment under the PRE-PRACTICE FM undelayed (offbook's, carried unchanged); `half_leg` = half the mean drilled leg (task-anchored, so the anchor cannot collapse below 'the figure is still recognisable').
+Two incumbents per delay: `rct` = offbook's NAIVE delayed observation (act on where you were), `prd` = the same controller with EFFERENCE COPY through the delay (act on where your own forward model says you now are). `prd` is the honest strong baseline; `rct` is the continuity read against offbook Round 4.
+ damp     R   m/s    hold   refst    hleg |      rct/prd d0      rct/prd d2      rct/prd d4      rct/prd d6 |        seg/p d0        seg/p d4 |  chn d0  chn d4 |  v_max
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  0.5  0.09  0.88  0.2075  0.0216  0.0529 |  0.0100/0.0100   0.1778/0.0198   0.2802/0.0316   0.3868/0.0482  |  0.0182/0.0182   0.0899/0.0258  |  0.0532  0.1013 |   2.72
+  0.5  0.13  1.27  0.1940  0.0330  0.0764 |  0.0192/0.0192   0.0964/0.0220   0.2361/0.0246   0.3574/0.0281  |  0.0235/0.0235   0.1338/0.0304  |  0.0583  0.0791 |   2.41
+  0.5  0.17  1.66  0.2156  0.0477  0.0999 |  0.0208/0.0208   0.1206/0.0279   0.2394/0.0346   0.3188/0.0424  |  0.0324/0.0324   0.1854/0.0404  |  0.0922  0.0878 |   3.21
+ 0.15  0.09  0.88  0.2729  0.0365  0.0529 |  0.0113/0.0113   0.1556/0.0169   0.3821/0.0272   0.4468/0.0429  |  0.0261/0.0261   0.1760/0.0554  |  0.0820  0.1915 |   3.04
+ 0.15  0.13  1.27  0.2544  0.0558  0.0764 |  0.0142/0.0142   0.1872/0.0201   0.4166/0.0274   0.5042/0.0375  |  0.0295/0.0295   0.2116/0.0526  |  0.0868  0.1643 |   3.61
+ 0.15  0.17  1.66  0.2752  0.0785  0.0999 |  0.0171/0.0171   0.1823/0.0261   0.4014/0.0422   0.4693/0.0600  |  0.0409/0.0409   0.1989/0.0716  |  0.1377  0.1829 |   4.48
+ 0.05  0.09  0.88  0.3887  0.0863  0.0529 |  0.0163/0.0163   0.3339/0.0249   0.4293/0.0427   0.4418/0.0633  |  0.0375/0.0375   0.2069/0.0862  |  0.2048  0.2844 |   3.48
+ 0.05  0.13  1.27  0.4333  0.1097  0.0764 |  0.0221/0.0221   0.2392/0.0293   0.4644/0.0432   0.4921/0.0592  |  0.0421/0.0421   0.2117/0.0825  |  0.1748  0.3069 |   4.55
+ 0.05  0.17  1.66  0.3796  0.1047  0.0999 |  0.0261/0.0261   0.3463/0.0373   0.5074/0.0617   0.5449/0.0914  |  0.0577/0.0577   0.3299/0.1223  |  0.2072  0.2886 |   4.94
+
+feedback events per traversal (the currency a delay taxes): react=31, live_seg=6, live_chain=2
+
+=== G-H — the composition horizon, re-measured on this plant (FM rolled open-loop along EXECUTED commands; first step median tip divergence crosses) ===
+          cell  h@.05 stale  h@.05 prac  h@.02 stale  h@.02 prac  1step task  1step pool   segment={H_seg}  phrase={H_phrase}
+    d0.5_R0.09           12          23            8          11      0.2051      0.0907   segment=6  phrase=30
+    d0.5_R0.13           23          31           15          24      0.1179      0.1054   segment=6  phrase=30
+    d0.5_R0.17           23          21           15          14      0.2448      0.1361   segment=6  phrase=30
+   d0.15_R0.09           11          22            6          13      0.1229      0.1115   segment=6  phrase=30
+   d0.15_R0.13           12          18            6          11      0.1843      0.1131   segment=6  phrase=30
+   d0.15_R0.17           11          15            6           9      0.3936      0.1582   segment=6  phrase=30
+   d0.05_R0.09            6           8            4           5      0.3043      0.2090   segment=6  phrase=30
+   d0.05_R0.13            6          12            4           7      0.2344      0.1837   segment=6  phrase=30
+   d0.05_R0.17            6          14            4           7      0.4166      0.2358   segment=6  phrase=30
+
+=== G-S — seam information (posture spread / matched repeat-noise; >1 means the seam carries state a key could read) ===
+    d0.5_R0.09  seam0: 0.49x (tip 0.54x, |v|=4.19)  seam1: 0.82x (tip 1.62x, |v|=3.81)  seam2: 0.73x (tip 0.68x, |v|=5.41)  seam3: 0.67x (tip 0.65x, |v|=5.65)  seam4: 0.50x (tip 0.45x, |v|=6.83)
+    d0.5_R0.13  seam0: 0.61x (tip 0.57x, |v|=3.33)  seam1: 0.99x (tip 0.85x, |v|=4.50)  seam2: 0.95x (tip 0.76x, |v|=5.45)  seam3: 0.38x (tip 0.36x, |v|=7.53)  seam4: 0.61x (tip 0.35x, |v|=6.74)
+    d0.5_R0.17  seam0: 0.66x (tip 0.65x, |v|=2.75)  seam1: 0.73x (tip 0.71x, |v|=6.79)  seam2: 1.54x (tip 0.75x, |v|=6.77)  seam3: 0.92x (tip 1.23x, |v|=6.73)  seam4: 0.76x (tip 0.54x, |v|=5.91)
+   d0.15_R0.09  seam0: 0.66x (tip 0.46x, |v|=5.07)  seam1: 0.49x (tip 0.45x, |v|=3.95)  seam2: 0.68x (tip 0.53x, |v|=3.53)  seam3: 0.49x (tip 0.56x, |v|=6.56)  seam4: 0.38x (tip 0.52x, |v|=7.51)
+   d0.15_R0.13  seam0: 0.54x (tip 0.67x, |v|=4.61)  seam1: 0.41x (tip 0.63x, |v|=5.86)  seam2: 0.75x (tip 0.47x, |v|=4.10)  seam3: 0.46x (tip 0.61x, |v|=9.65)  seam4: 0.48x (tip 0.50x, |v|=9.69)
+   d0.15_R0.17  seam0: 0.80x (tip 0.49x, |v|=4.95)  seam1: 0.71x (tip 0.75x, |v|=8.19)  seam2: 0.76x (tip 0.41x, |v|=5.11)  seam3: 0.86x (tip 0.40x, |v|=11.33)  seam4: 0.79x (tip 0.32x, |v|=9.93)
+   d0.05_R0.09  seam0: 0.63x (tip 0.37x, |v|=4.42)  seam1: 0.40x (tip 0.71x, |v|=3.14)  seam2: 0.42x (tip 0.62x, |v|=3.51)  seam3: 0.49x (tip 0.88x, |v|=5.30)  seam4: 0.67x (tip 0.70x, |v|=6.95)
+   d0.05_R0.13  seam0: 0.88x (tip 0.38x, |v|=4.49)  seam1: 0.46x (tip 0.79x, |v|=4.41)  seam2: 0.85x (tip 0.71x, |v|=4.17)  seam3: 0.68x (tip 0.48x, |v|=8.38)  seam4: 0.41x (tip 0.34x, |v|=8.85)
+   d0.05_R0.17  seam0: 0.66x (tip 0.44x, |v|=5.66)  seam1: 0.93x (tip 0.95x, |v|=6.66)  seam2: 0.69x (tip 0.78x, |v|=7.97)  seam3: 0.60x (tip 0.66x, |v|=9.87)  seam4: 0.67x (tip 0.88x, |v|=11.75)
+
+=== G-P — the planner ladder (arm_substrate P3: if error is still falling at the top, the arm is planner-starved and every span comparison is noise) ===
+    d0.5_R0.09  seg  256:0.0191  1024:0.0179  4096:0.0178   | chain 256:0.0553  1024:0.0522  4096:0.0526
+                reactive look=  6  d4:0.2840
+                reactive look= 12  d4:0.2482
+                reactive look= 30  d4:0.1923
+    d0.5_R0.13  seg  256:0.0290  1024:0.0253  4096:0.0252   | chain 256:0.0641  1024:0.0563  4096:0.0570
+                reactive look=  6  d4:0.2181
+                reactive look= 12  d4:0.2353
+                reactive look= 30  d4:0.1713
+    d0.5_R0.17  seg  256:0.0369  1024:0.0316  4096:0.0312   | chain 256:0.0893  1024:0.0927  4096:0.0929
+                reactive look=  6  d4:0.2665
+                reactive look= 12  d4:0.2321
+                reactive look= 30  d4:0.2136
+   d0.15_R0.09  seg  256:0.0276  1024:0.0268  4096:0.0247   | chain 256:0.0843  1024:0.0856  4096:0.0841
+                reactive look=  6  d4:0.5185
+                reactive look= 12  d4:0.3643
+                reactive look= 30  d4:0.2729
+   d0.15_R0.13  seg  256:0.0310  1024:0.0310  4096:0.0273   | chain 256:0.1012  1024:0.0906  4096:0.0846
+                reactive look=  6  d4:0.5647
+                reactive look= 12  d4:0.4028
+                reactive look= 30  d4:0.2943
+   d0.15_R0.17  seg  256:0.0438  1024:0.0411  4096:0.0380   | chain 256:0.1449  1024:0.1380  4096:0.1367
+                reactive look=  6  d4:0.5170
+                reactive look= 12  d4:0.3632
+                reactive look= 30  d4:0.3168
+   d0.05_R0.09  seg  256:0.0422  1024:0.0391  4096:0.0382   | chain 256:0.2293  1024:0.2379  4096:0.2150
+                reactive look=  6  d4:0.3962
+                reactive look= 12  d4:0.3793
+                reactive look= 30  d4:0.3305
+   d0.05_R0.13  seg  256:0.0491  1024:0.0397  4096:0.0409   | chain 256:0.1914  1024:0.1796  4096:0.1689
+                reactive look=  6  d4:0.4308
+                reactive look= 12  d4:0.4491
+                reactive look= 30  d4:0.3148
+   d0.05_R0.17  seg  256:0.0675  1024:0.0608  4096:0.0544   | chain 256:0.2030  1024:0.1774  4096:0.1835
+                reactive look=  6  d4:0.5427
+                reactive look= 12  d4:0.4625
+                reactive look= 30  d4:0.3401
+
+=== G-L — content calibration (legato recipe: tapes harvested at sigma_perf, cross-state PLANT audition on a held-out score set, keyed via select_library / single tape via select_fixed) ===
+
+  d0.5_R0.09  (anchors: ref_stale 0.0216, half_leg 0.0529)
+    delay  0 (  0 ms):  seg_tape=0.1022(fb6)  seg_tapep=0.1022(fb6)  seg_fixed=0.1657(fb6)  chain=0.1181(fb2)  chain_fixed=0.1399(fb2)
+    delay  4 ( 80 ms):  seg_tape=0.1742(fb6)  seg_tapep=0.1027(fb6)  seg_fixed=0.1657(fb6)  chain=0.1694(fb2)  chain_fixed=0.1399(fb2)
+    audition: seg0[best_fixed 0.060 / oracle 0.029 = 2.04x, 8/8 distinct]  seg1[best_fixed 0.091 / oracle 0.054 = 1.68x, 8/8 distinct]  seg2[best_fixed 0.132 / oracle 0.084 = 1.57x, 8/8 distinct]  seg3[best_fixed 0.161 / oracle 0.100 = 1.61x, 8/8 distinct]  seg4[best_fixed 0.131 / oracle 0.063 = 2.08x, 5/8 distinct]  chain[best_fixed 0.177 / oracle 0.033 = 5.31x, 8/8 distinct]
+
+  d0.5_R0.13  (anchors: ref_stale 0.0330, half_leg 0.0764)
+    delay  0 (  0 ms):  seg_tape=0.0914(fb6)  seg_tapep=0.0914(fb6)  seg_fixed=0.1251(fb6)  chain=0.0829(fb2)  chain_fixed=0.1292(fb2)
+    delay  4 ( 80 ms):  seg_tape=0.1407(fb6)  seg_tapep=0.0965(fb6)  seg_fixed=0.1251(fb6)  chain=0.1299(fb2)  chain_fixed=0.1292(fb2)
+    audition: seg0[best_fixed 0.069 / oracle 0.041 = 1.69x, 6/8 distinct]  seg1[best_fixed 0.081 / oracle 0.032 = 2.51x, 8/8 distinct]  seg2[best_fixed 0.110 / oracle 0.089 = 1.23x, 6/8 distinct]  seg3[best_fixed 0.180 / oracle 0.154 = 1.16x, 6/8 distinct]  seg4[best_fixed 0.170 / oracle 0.137 = 1.24x, 5/8 distinct]  chain[best_fixed 0.132 / oracle 0.041 = 3.21x, 7/8 distinct]
+
+  d0.5_R0.17  (anchors: ref_stale 0.0477, half_leg 0.0999)
+    delay  0 (  0 ms):  seg_tape=0.1178(fb6)  seg_tapep=0.1178(fb6)  seg_fixed=0.1430(fb6)  chain=0.0928(fb2)  chain_fixed=0.1254(fb2)
+    delay  4 ( 80 ms):  seg_tape=0.1537(fb6)  seg_tapep=0.1341(fb6)  seg_fixed=0.1430(fb6)  chain=0.1089(fb2)  chain_fixed=0.1254(fb2)
+    audition: seg0[best_fixed 0.060 / oracle 0.026 = 2.32x, 7/8 distinct]  seg1[best_fixed 0.111 / oracle 0.046 = 2.40x, 8/8 distinct]  seg2[best_fixed 0.176 / oracle 0.104 = 1.70x, 6/8 distinct]  seg3[best_fixed 0.225 / oracle 0.157 = 1.43x, 8/8 distinct]  seg4[best_fixed 0.189 / oracle 0.142 = 1.34x, 6/8 distinct]  chain[best_fixed 0.137 / oracle 0.043 = 3.21x, 7/8 distinct]
+
+  d0.15_R0.09  (anchors: ref_stale 0.0365, half_leg 0.0529)
+    delay  0 (  0 ms):  seg_tape=0.1645(fb6)  seg_tapep=0.1645(fb6)  seg_fixed=0.1999(fb6)  chain=0.1625(fb2)  chain_fixed=0.2096(fb2)
+    delay  4 ( 80 ms):  seg_tape=0.1907(fb6)  seg_tapep=0.1687(fb6)  seg_fixed=0.1999(fb6)  chain=0.1647(fb2)  chain_fixed=0.2096(fb2)
+    audition: seg0[best_fixed 0.138 / oracle 0.033 = 4.17x, 7/8 distinct]  seg1[best_fixed 0.152 / oracle 0.068 = 2.24x, 8/8 distinct]  seg2[best_fixed 0.194 / oracle 0.122 = 1.58x, 8/8 distinct]  seg3[best_fixed 0.242 / oracle 0.171 = 1.42x, 5/8 distinct]  seg4[best_fixed 0.241 / oracle 0.180 = 1.34x, 6/8 distinct]  chain[best_fixed 0.233 / oracle 0.074 = 3.15x, 8/8 distinct]
+
+  d0.15_R0.13  (anchors: ref_stale 0.0558, half_leg 0.0764)
+    delay  0 (  0 ms):  seg_tape=0.1754(fb6)  seg_tapep=0.1754(fb6)  seg_fixed=0.2743(fb6)  chain=0.1895(fb2)  chain_fixed=0.2423(fb2)
+    delay  4 ( 80 ms):  seg_tape=0.2020(fb6)  seg_tapep=0.1992(fb6)  seg_fixed=0.2743(fb6)  chain=0.2131(fb2)  chain_fixed=0.2423(fb2)
+    audition: seg0[best_fixed 0.151 / oracle 0.025 = 6.10x, 6/8 distinct]  seg1[best_fixed 0.135 / oracle 0.067 = 2.00x, 7/8 distinct]  seg2[best_fixed 0.198 / oracle 0.135 = 1.47x, 8/8 distinct]  seg3[best_fixed 0.201 / oracle 0.156 = 1.29x, 5/8 distinct]  seg4[best_fixed 0.261 / oracle 0.196 = 1.34x, 6/8 distinct]  chain[best_fixed 0.229 / oracle 0.059 = 3.86x, 8/8 distinct]
+
+  d0.15_R0.17  (anchors: ref_stale 0.0785, half_leg 0.0999)
+    delay  0 (  0 ms):  seg_tape=0.2408(fb6)  seg_tapep=0.2408(fb6)  seg_fixed=0.3715(fb6)  chain=0.1991(fb2)  chain_fixed=0.2778(fb2)
+    delay  4 ( 80 ms):  seg_tape=0.3269(fb6)  seg_tapep=0.2508(fb6)  seg_fixed=0.3715(fb6)  chain=0.1951(fb2)  chain_fixed=0.2778(fb2)
+    audition: seg0[best_fixed 0.169 / oracle 0.038 = 4.43x, 6/8 distinct]  seg1[best_fixed 0.197 / oracle 0.108 = 1.83x, 6/8 distinct]  seg2[best_fixed 0.324 / oracle 0.243 = 1.33x, 5/8 distinct]  seg3[best_fixed 0.333 / oracle 0.252 = 1.32x, 6/8 distinct]  seg4[best_fixed 0.320 / oracle 0.247 = 1.29x, 7/8 distinct]  chain[best_fixed 0.262 / oracle 0.069 = 3.80x, 7/8 distinct]
+
+  d0.05_R0.09  (anchors: ref_stale 0.0863, half_leg 0.0529)
+    delay  0 (  0 ms):  seg_tape=0.2402(fb6)  seg_tapep=0.2402(fb6)  seg_fixed=0.3737(fb6)  chain=0.2202(fb2)  chain_fixed=0.3321(fb2)
+    delay  4 ( 80 ms):  seg_tape=0.3247(fb6)  seg_tapep=0.2614(fb6)  seg_fixed=0.3737(fb6)  chain=0.2939(fb2)  chain_fixed=0.3321(fb2)
+    audition: seg0[best_fixed 0.190 / oracle 0.028 = 6.76x, 8/8 distinct]  seg1[best_fixed 0.215 / oracle 0.088 = 2.46x, 7/8 distinct]  seg2[best_fixed 0.328 / oracle 0.235 = 1.40x, 6/8 distinct]  seg3[best_fixed 0.397 / oracle 0.321 = 1.24x, 5/8 distinct]  seg4[best_fixed 0.404 / oracle 0.324 = 1.25x, 7/8 distinct]  chain[best_fixed 0.353 / oracle 0.093 = 3.78x, 8/8 distinct]
+
+  d0.05_R0.13  (anchors: ref_stale 0.1097, half_leg 0.0764)
+    delay  0 (  0 ms):  seg_tape=0.3037(fb6)  seg_tapep=0.3037(fb6)  seg_fixed=0.5268(fb6)  chain=0.2307(fb2)  chain_fixed=0.3470(fb2)
+    delay  4 ( 80 ms):  seg_tape=0.5080(fb6)  seg_tapep=0.2818(fb6)  seg_fixed=0.5268(fb6)  chain=0.3432(fb2)  chain_fixed=0.3470(fb2)
+    audition: seg0[best_fixed 0.184 / oracle 0.034 = 5.50x, 8/8 distinct]  seg1[best_fixed 0.275 / oracle 0.115 = 2.39x, 7/8 distinct]  seg2[best_fixed 0.353 / oracle 0.260 = 1.36x, 7/8 distinct]  seg3[best_fixed 0.478 / oracle 0.383 = 1.25x, 5/8 distinct]  seg4[best_fixed 0.438 / oracle 0.372 = 1.18x, 7/8 distinct]  chain[best_fixed 0.364 / oracle 0.094 = 3.89x, 8/8 distinct]
+
+  d0.05_R0.17  (anchors: ref_stale 0.1047, half_leg 0.0999)
+    delay  0 (  0 ms):  seg_tape=0.3563(fb6)  seg_tapep=0.3563(fb6)  seg_fixed=0.4520(fb6)  chain=0.2582(fb2)  chain_fixed=0.3619(fb2)
+    delay  4 ( 80 ms):  seg_tape=0.3613(fb6)  seg_tapep=0.3682(fb6)  seg_fixed=0.4520(fb6)  chain=0.2500(fb2)  chain_fixed=0.3619(fb2)
+    audition: seg0[best_fixed 0.194 / oracle 0.040 = 4.84x, 8/8 distinct]  seg1[best_fixed 0.242 / oracle 0.087 = 2.80x, 7/8 distinct]  seg2[best_fixed 0.391 / oracle 0.265 = 1.48x, 6/8 distinct]  seg3[best_fixed 0.507 / oracle 0.384 = 1.32x, 5/8 distinct]  seg4[best_fixed 0.534 / oracle 0.411 = 1.30x, 6/8 distinct]  chain[best_fixed 0.327 / oracle 0.110 = 2.98x, 8/8 distinct]
+
+=== the design question, as a table ===
+A cell is a candidate when measured content clears an anchor at Delta = 0 (the `ballistic/` 4b feasibility precondition) AND the incumbent is already broken at a human-realistic delay. Both columns, no verdict.
+          cell  best stored @d0  anchor(max)  stored playable   rct d0   rct d4   prd d4  naive brk  pred brk
+    d0.5_R0.09           0.1022       0.0529            False   0.0100   0.2802   0.0316       True     False
+    d0.5_R0.13           0.0829       0.0764            False   0.0192   0.2361   0.0246       True     False
+    d0.5_R0.17           0.0928       0.0999             True   0.0208   0.2394   0.0346       True     False
+   d0.15_R0.09           0.1625       0.0529            False   0.0113   0.3821   0.0272       True     False
+   d0.15_R0.13           0.1754       0.0764            False   0.0142   0.4166   0.0274       True     False
+   d0.15_R0.17           0.1991       0.0999            False   0.0171   0.4014   0.0422       True     False
+   d0.05_R0.09           0.2202       0.0863            False   0.0163   0.4293   0.0427       True     False
+   d0.05_R0.13           0.2307       0.1097            False   0.0221   0.4644   0.0432       True     False
+   d0.05_R0.17           0.2582       0.1047            False   0.0261   0.5074   0.0617       True     False

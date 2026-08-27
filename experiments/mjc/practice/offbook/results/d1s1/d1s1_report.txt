@@ -1,0 +1,240 @@
+================================================================================================
+delay gate `d1s1`  seed 0  complete=True  Delta in [0, 4, 16] ([0, 80, 320] ms)
+================================================================================================
+
+## Ceilings (both, as round 4 reported them)
+  ref_stale (ballistic-per-segment, STALE FM, Delta=0)  = 0.1912   <- the pre-fixed playability guard
+  original draft (2x the best of the three at Delta=0)  = 0.1171   (best at Delta=0 = 0.0585)
+  legato on this piece: phrase_frozen 0.1026  seg_frozen 0.1065  seg_plan_launch 0.085  never 0.0107
+
+## Sanity
+  ladder `d0` arm vs the round-4 sweep : max|delta| = 0.000e+00   OK
+  library-independent strategies identical across all 10 arms : max|delta| = 0.000e+00 over 60 values   OK
+  lib `warm` sizes={'1:0': 24, '3:0': 24, '1:1': 24, '2:1': 24, '1:2': 24}
+      harvest   : warm reactive traversals during FM training, post-noise acts at sigma_practice
+      selection : uniform 24/cell
+      distinct tapes drawn per cell: 1:0:24/24, 3:0:24/24, 1:1:24/24, 2:1:24/24, 1:2:24/24
+  lib `fresh` sizes={'1:0': 16, '3:0': 16, '1:1': 16, '2:1': 16, '1:2': 16}
+      harvest   : post-training reactive pool, post-noise acts @ sigma_practice
+      selection : uniform 24/cell
+      distinct tapes drawn per cell: 1:0:16/16, 3:0:16/16, 1:1:16/16, 2:1:16/16, 1:2:16/16
+      build cost (agent): t_priced 0.0 s  steps 0  fb 0  plans 0
+  lib `perf` sizes={'1:0': 16, '3:0': 16, '1:1': 16, '2:1': 16, '1:2': 16}
+      harvest   : post-training reactive pool, post-noise acts @ sigma_perf
+      selection : uniform 24/cell
+      distinct tapes drawn per cell: 1:0:16/16, 3:0:16/16, 1:1:16/16, 2:1:16/16, 1:2:16/16
+      build cost (agent): t_priced 0.0 s  steps 0  fb 0  plans 0
+  lib `raw` sizes={'1:0': 16, '3:0': 16, '1:1': 16, '2:1': 16, '1:2': 16}
+      harvest   : the SAME sigma_perf traversals, PRE-noise commands
+      selection : uniform 24/cell
+      distinct tapes drawn per cell: 1:0:16/16, 3:0:16/16, 1:1:16/16, 2:1:16/16, 1:2:16/16
+      build cost (agent): t_priced 0.0 s  steps 0  fb 0  plans 0
+  lib `f5` sizes={'1:0': 16, '3:0': 16, '1:1': 16, '2:1': 16, '1:2': 16}
+      harvest   : ns=1 from the raw sigma_perf pool; ns>1 from SEGMENT-COMMITTED play (legato F5)
+      selection : uniform 24/cell
+      distinct tapes drawn per cell: 1:0:16/16, 3:0:8/16, 1:1:16/16, 2:1:4/16, 1:2:16/16
+      build cost (agent): t_priced 0.0 s  steps 0  fb 0  plans 0
+  lib `small` sizes={'1:0': 2, '3:0': 2, '1:1': 2, '2:1': 2, '1:2': 2}
+      harvest   : as `f5`
+      selection : uniform 2/cell (size control for `sel`)
+      distinct tapes drawn per cell: 1:0:2/2, 3:0:1/2, 1:1:2/2, 2:1:2/2, 1:2:2/2
+      build cost (agent): t_priced 0.0 s  steps 0  fb 0  plans 0
+  lib `sel` sizes={'1:0': 2, '3:0': 2, '1:1': 2, '2:1': 2, '1:2': 2}
+      harvest   : as `f5`
+      selection : legato PLANT AUDITION: 8 candidates x 12 recorded launch states, 2 committed per cell
+      build cost (agent): t_priced 386.9 s  steps 16584  fb 552  plans 0
+      audition  1:0: n_cand 8 x n_score 12 -> 2/2 distinct  chosen 0.0909  best_fixed 0.0975  per-state oracle 0.0763 (1.28x)
+      audition  1:1: n_cand 8 x n_score 12 -> 1/2 distinct  chosen 0.3800  best_fixed 0.3800  per-state oracle 0.3127 (1.22x)
+      audition  1:2: n_cand 8 x n_score 12 -> 1/2 distinct  chosen 0.5448  best_fixed 0.5448  per-state oracle 0.4926 (1.11x)
+      audition  2:1: n_cand 8 x n_score 12 -> 2/2 distinct  chosen 0.4073  best_fixed 0.4167  per-state oracle 0.3805 (1.10x)
+      audition  3:0: n_cand 8 x n_score 12 -> 2/2 distinct  chosen 0.2195  best_fixed 0.2205  per-state oracle 0.1609 (1.37x)
+  harvest `fresh` cost (agent): t_priced 121.3 s  steps 1184  fb 976  plans 960
+  harvest `perf` cost (agent): t_priced 121.3 s  steps 1184  fb 976  plans 960
+  harvest `route` cost (agent): t_priced 30.1 s  steps 1184  fb 64  plans 0
+  ledger: agent t_priced 841.4 s  steps 21912  fb 4032  | instrument steps 43808
+
+## Strategy x Delta (mean piece error over the shared eval geometries; * = best)
+
+### round-4 sweep (`d0` configuration)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.1902 |    0.2485 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.2684 |    0.2658 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |    0.2565 |   *0.2360 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 1.35x   chain 0.95x
+
+### arm `d0`  (library `warm`, seam `audit`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.1902 |    0.2485 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.2684 |    0.2658 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |    0.2565 |   *0.2360 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 1.35x   chain 0.95x
+
+### arm `fresh`  (library `fresh`, seam `audit`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.2259 |    0.2861 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.2329 |    0.2850 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |    0.3350 |   *0.3139 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 1.48x   chain 1.10x
+
+### arm `perf`  (library `perf`, seam `audit`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.2134 |    0.2208 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.2213 |    0.2470 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |   *0.2795 |    0.2807 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 1.31x   chain 1.27x
+
+### arm `raw`  (library `raw`, seam `audit`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.2073 |    0.2404 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.2704 |    0.2859 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |   *0.2359 |    0.2583 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 1.14x   chain 1.07x
+
+### arm `f5`  (library `f5`, seam `audit`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.2073 |    0.2632 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.2704 |    0.2564 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |   *0.2359 |    0.2461 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 1.14x   chain 0.94x
+
+### arm `small`  (library `small`, seam `audit`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.3827 |    0.4547 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.3405 |    0.4547 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |   *0.3677 |    0.4547 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 0.96x   chain 1.00x
+
+### arm `sel`  (library `sel`, seam `audit`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.3191 |    0.2623 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.3191 |    0.2623 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |   *0.2210 |    0.3101 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 0.69x   chain 1.18x
+
+### arm `all4`  (library `sel`, seam `key`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.2882 |    0.2907 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.2549 |    0.2570 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |    0.5233 |   *0.3200 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 1.82x   chain 1.10x
+
+### arm `f5_key`  (library `f5`, seam `key`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.2837 |    0.3689 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.2358 |    0.3908 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |   *0.2253 |    0.3200 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 0.79x   chain 0.87x
+
+### arm `key_d0`  (library `warm`, seam `key`)
+  D |    ms |  reactive |  live_seg |  seg_tape |     chain |  fb(react/live/seg/chain)
+  0 |     0 |   *0.0585 |    0.1291 |    0.2863 |    0.2722 |  61/4/4/2
+  4 |    80 |    0.2141 |   *0.1661 |    0.3672 |    0.2897 |  61/4/4/2
+ 16 |   320 |    0.5290 |    0.3953 |    0.4439 |   *0.3844 |  61/4/4/2
+  degradation Delta_min -> Delta_max:  reactive 9.04x   live_seg 3.06x   seg_tape 1.55x   chain 1.41x
+
+## The pre-fixed criterion, per arm
+   Delta* = smallest Delta with e_chain <= e_live_seg <= e_reactive, subject to
+   min(the three) <= ref_stale.  Nothing below is re-fitted.
+
+  arm      | Delta* | rows (D: ordered/playable -> verdict)
+  (round4) |   None | 0:.p  4:.p  16:o.
+  d0       |   None | 0:.p  4:.p  16:o.
+  fresh    |   None | 0:.p  4:.p  16:o.
+  perf     |   None | 0:.p  4:.p  16:o.
+  raw      |   None | 0:.p  4:.p  16:o.
+  f5       |   None | 0:.p  4:.p  16:o.
+  small    |   None | 0:.p  4:.p  16:..
+  sel      |   None | 0:.p  4:.p  16:o.
+  all4     |   None | 0:.p  4:.p  16:o.
+  f5_key   |   None | 0:.p  4:.p  16:o.
+  key_d0   |   None | 0:.p  4:.p  16:o.
+
+## Per-segment medians (round 4: the chain's error concentrates on the closing leg)
+  arm      | strat     |  D | seg0 | seg1 | seg2
+  (round4) | reactive  |  0 | 0.0198 | 0.1502 | 0.0046
+  (round4) | reactive  |  4 | 0.1061 | 0.2662 | 0.3197
+  (round4) | reactive  | 16 | 0.5461 | 0.7076 | 0.3453
+  (round4) | live_seg  |  0 | 0.0308 | 0.1615 | 0.1375
+  (round4) | live_seg  |  4 | 0.0416 | 0.1520 | 0.1938
+  (round4) | live_seg  | 16 | 0.1589 | 0.3209 | 0.4881
+  (round4) | seg_tape  |  0 | 0.0297 | 0.1341 | 0.2616
+  (round4) | seg_tape  |  4 | 0.0312 | 0.2074 | 0.4620
+  (round4) | seg_tape  | 16 | 0.1197 | 0.2464 | 0.3101
+  (round4) | chain     |  0 | 0.0711 | 0.3076 | 0.3015
+  (round4) | chain     |  4 | 0.0741 | 0.3462 | 0.3341
+  (round4) | chain     | 16 | 0.0769 | 0.3415 | 0.2644
+  d0       | seg_tape  |  0 | 0.0297 | 0.1341 | 0.2616
+  d0       | seg_tape  |  4 | 0.0312 | 0.2074 | 0.4620
+  d0       | seg_tape  | 16 | 0.1197 | 0.2464 | 0.3101
+  d0       | chain     |  0 | 0.0711 | 0.3076 | 0.3015
+  d0       | chain     |  4 | 0.0741 | 0.3462 | 0.3341
+  d0       | chain     | 16 | 0.0769 | 0.3415 | 0.2644
+  fresh    | seg_tape  |  0 | 0.0409 | 0.2503 | 0.2159
+  fresh    | seg_tape  |  4 | 0.0462 | 0.3135 | 0.2069
+  fresh    | seg_tape  | 16 | 0.1432 | 0.2385 | 0.5420
+  fresh    | chain     |  0 | 0.1392 | 0.3256 | 0.3980
+  fresh    | chain     |  4 | 0.0790 | 0.3680 | 0.2788
+  fresh    | chain     | 16 | 0.1266 | 0.3451 | 0.4788
+  perf     | seg_tape  |  0 | 0.0403 | 0.2821 | 0.1770
+  perf     | seg_tape  |  4 | 0.0412 | 0.2853 | 0.2313
+  perf     | seg_tape  | 16 | 0.1711 | 0.2005 | 0.3969
+  perf     | chain     |  0 | 0.0931 | 0.2397 | 0.2206
+  perf     | chain     |  4 | 0.0746 | 0.3227 | 0.2670
+  perf     | chain     | 16 | 0.1456 | 0.3561 | 0.3383
+  raw      | seg_tape  |  0 | 0.0351 | 0.2439 | 0.1430
+  raw      | seg_tape  |  4 | 0.0505 | 0.3573 | 0.2806
+  raw      | seg_tape  | 16 | 0.1928 | 0.0985 | 0.2962
+  raw      | chain     |  0 | 0.0617 | 0.2956 | 0.2647
+  raw      | chain     |  4 | 0.0732 | 0.3561 | 0.3666
+  raw      | chain     | 16 | 0.1607 | 0.2782 | 0.3365
+  f5       | seg_tape  |  0 | 0.0351 | 0.2439 | 0.1430
+  f5       | seg_tape  |  4 | 0.0505 | 0.3573 | 0.2806
+  f5       | seg_tape  | 16 | 0.1928 | 0.0985 | 0.2962
+  f5       | chain     |  0 | 0.0696 | 0.2968 | 0.4086
+  f5       | chain     |  4 | 0.0696 | 0.2574 | 0.3939
+  f5       | chain     | 16 | 0.1242 | 0.3896 | 0.2670
+  small    | seg_tape  |  0 | 0.0877 | 0.3097 | 0.6663
+  small    | seg_tape  |  4 | 0.0877 | 0.2518 | 0.5932
+  small    | seg_tape  | 16 | 0.0877 | 0.3097 | 0.6663
+  small    | chain     |  0 | 0.1842 | 0.3079 | 0.8578
+  small    | chain     |  4 | 0.1842 | 0.3079 | 0.8578
+  small    | chain     | 16 | 0.1842 | 0.3079 | 0.8578
+  sel      | seg_tape  |  0 | 0.0784 | 0.2852 | 0.2665
+  sel      | seg_tape  |  4 | 0.0784 | 0.2852 | 0.2665
+  sel      | seg_tape  | 16 | 0.0843 | 0.2744 | 0.2457
+  sel      | chain     |  0 | 0.0843 | 0.3713 | 0.3863
+  sel      | chain     |  4 | 0.0843 | 0.3713 | 0.3863
+  sel      | chain     | 16 | 0.1260 | 0.3713 | 0.4337
+  all4     | seg_tape  |  0 | 0.0784 | 0.2842 | 0.2665
+  all4     | seg_tape  |  4 | 0.0843 | 0.2744 | 0.2665
+  all4     | seg_tape  | 16 | 0.1877 | 0.5381 | 0.8103
+  all4     | chain     |  0 | 0.0843 | 0.3614 | 0.3863
+  all4     | chain     |  4 | 0.0843 | 0.3395 | 0.3863
+  all4     | chain     | 16 | 0.1842 | 0.2849 | 0.4103
+  f5_key   | seg_tape  |  0 | 0.0784 | 0.3425 | 0.4063
+  f5_key   | seg_tape  |  4 | 0.1233 | 0.2289 | 0.2749
+  f5_key   | seg_tape  | 16 | 0.1242 | 0.3896 | 0.2161
+  f5_key   | chain     |  0 | 0.1842 | 0.3349 | 0.6798
+  f5_key   | chain     |  4 | 0.1842 | 0.3403 | 0.8199
+  f5_key   | chain     | 16 | 0.1842 | 0.2849 | 0.4103
+  key_d0   | seg_tape  |  0 | 0.0686 | 0.3179 | 0.3623
+  key_d0   | seg_tape  |  4 | 0.0937 | 0.4413 | 0.4910
+  key_d0   | seg_tape  | 16 | 0.0419 | 0.5305 | 0.5941
+  key_d0   | chain     |  0 | 0.0784 | 0.3405 | 0.2945
+  key_d0   | chain     |  4 | 0.1461 | 0.3480 | 0.3518
+  key_d0   | chain     | 16 | 0.0419 | 0.1929 | 0.8828
+
+## The ladder: best STORED error at Delta = 0, against the anchors
+   round-4 baseline (best of seg_tape/chain at Delta=0) = 0.1902;  ref_stale = 0.1912;  legato seg_frozen = 0.1065
+  arm      |  chain |seg_tape| best  | gap closed to ref_stale | best stored, ANY D
+  d0       | 0.2485 | 0.1902 | 0.1902 |                       - | 0.1902
+  fresh    | 0.2861 | 0.2259 | 0.2259 |                       - | 0.2259
+  perf     | 0.2208 | 0.2134 | 0.2134 |                       - | 0.2134
+  raw      | 0.2404 | 0.2073 | 0.2073 |                       - | 0.2073
+  f5       | 0.2632 | 0.2073 | 0.2073 |                       - | 0.2073
+  small    | 0.4547 | 0.3827 | 0.3827 |                       - | 0.3405
+  sel      | 0.2623 | 0.3191 | 0.2623 |                       - | 0.2210
+  all4     | 0.2907 | 0.2882 | 0.2882 |                       - | 0.2549
+  f5_key   | 0.3689 | 0.2837 | 0.2837 |                       - | 0.2253
+  key_d0   | 0.2722 | 0.2863 | 0.2722 |                       - | 0.2722
+   ('gap closed' = fraction of the distance from the round-4 baseline down to the playability anchor; >100% means the arm is under the anchor.)

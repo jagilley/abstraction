@@ -1,4 +1,13 @@
-"""The offbook world -- a VERBATIM FORK of `legato/world.py` (2026-08-25) with the re-internalization
+"""The presto world -- a VERBATIM FORK of `offbook/world.py` (2026-08-26), byte-identical apart
+from two import lines (`.piece` and `.nets` now resolve inside this package) and this paragraph.
+`offbook/` is untouched and every `g0/O1/O2/O3/d0` result stays byte-reproducible. Gate **G-F**
+asserts the fork still reproduces the donor traversal bit-for-bit on the DONOR piece and plant
+rather than trusting that the copy was faithful. Nothing else in this file may change: what presto
+changes is the PIECE and the PLANT, both of which arrive through `cfg`, so the fork stays a fork.
+
+Original offbook header follows.
+--------------------------------------------------------------------------------------------------
+The offbook world -- a VERBATIM FORK of `legato/world.py` (2026-08-25) with the re-internalization
 machinery appended. `legato/` is untouched and every `l0/l1/l2/L1` result stays byte-reproducible.
 
 WHY A FORK AND NOT A SUBCLASS. The traversal changes shape: legato executes a routing decided BEFORE
@@ -113,7 +122,7 @@ from mjc.practice.fingering.world import (  # noqa: F401
 
 # The piece's constants live in `piece.py` (which imports nothing, so a Modal LOCAL entrypoint can
 # read them on a machine with no numpy). Re-exported here for convenience.
-from mjc.practice.offbook.piece import DEF_WPS, DEF_PATCH_SEG    # noqa: F401,E402
+from mjc.practice.accompanist.presto.piece import DEF_WPS, DEF_PATCH_SEG    # noqa: F401,E402
 
 
 class Ledger:
@@ -254,7 +263,7 @@ class World:
         # model's TRAINING TRANSITIONS (the delay is a decision/actuation constraint, not a
         # learning-data treatment). One variable.
         self.obs_delay = int(cfg.get("obs_delay", 0))
-        # ROUND 7b ADDITION (2026-08-27), PORTED VERBATIM FROM `../accompanist/presto/` -- EFFERENCE COPY through the delay, i.e. the honest STRONG
+        # PRESTO ADDITION (2026-08-26) -- EFFERENCE COPY through the delay, i.e. the honest STRONG
         # incumbent. offbook's `obs()` hands a delayed consumer the raw stale state, which is a
         # strawman: a nervous system with a reflex delay does not act on where it WAS, it acts on
         # where its forward model says it now IS, given the motor commands it has already issued.
@@ -266,9 +275,9 @@ class World:
         # of what a reflex delay costs, and it is a much harder incumbent to beat.
         #
         # ADDITIVE AND OFF BY DEFAULT: at `obs_predict = False` every arithmetic path below is
-        # byte-identical to the pre-round-7b code (gate G-F asserts the legato fork and never
-        # sets this flag, so it is unaffected), leaving `d0`/`d1`/`d2`/`d3` reproducible and the
-        # naive operator available as the Round-4 continuity read.
+        # byte-identical to the offbook fork (gate G-F asserts the fork; gate G-F2 asserts this
+        # flag's default), so `d0` and every offbook run stay reproducible and the naive operator
+        # remains available as the continuity read against offbook Round 4.
         self.obs_predict = bool(cfg.get("obs_predict", False))
         self.env = self._make_env(patch=True)
         self.env_clean = self._make_env(patch=False)
@@ -766,7 +775,6 @@ class World:
             s = body.reset(rng, self.qc, 0.0, q0=q0, qd0=qd0)
             trS, trU, trS2 = [], [], []
             hist = [s.copy()]
-
             issued = []            # efference copy: issued[j] took hist[j] -> hist[j+1]
 
             def obs():
@@ -1269,7 +1277,6 @@ class World:
             s = body.reset(rng, self.qc, 0.0, q0=q0, qd0=qd0)
             trS, trU, trS2 = [], [], []
             hist = [s.copy()]
-
             issued = []            # efference copy: issued[j] took hist[j] -> hist[j+1]
 
             def obs():
@@ -1685,7 +1692,7 @@ class RoutePolicy:
 
     # ------------------------------------------------------------------ the decision
     def decide(self, W, fm, S, k, rng, who="agent", explore=False, cycle=0, capture=False):
-        from mjc.practice.offbook import nets as N
+        from mjc.practice.accompanist.presto import nets as N
         n = len(S)
         ids, ent = self.legal(k)
         if not ent:

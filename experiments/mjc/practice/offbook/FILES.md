@@ -113,7 +113,9 @@ materialise it at every seam; does π starve it? (`native/` finding 6.)
 | `nets.py` | The two ports: `SlotLayout`, `isolated_rng`, `build_prop` / `select_slots` / `explore_slots` / `PropTrainer` / `prop_probe` (Port 1 + the trust and can't-decompose readouts), `build_span` / `SpanBuffer` (Port 2). |
 | `gates.py` | **Phase A** — G-F (fork fidelity), G-R (rng discipline), G-P (π fidelity at k=N), G-K (the rent gate), G-B (does a chunk ever pay?), G-S (pool spread), G-C (audition calibration), G-D (cycle cost). |
 | `offbook.py` | **Phase B** — the arm comparison, one Modal container per arm, plus the end-of-run battery. |
+| `delay_gate.py` | **Round 4 (`organist`/`d0`)** — the observation-delay gate: Δ × {reactive, live_seg, seg_tape, chain} under the pre-fixed criterion and the `ref_stale` playability guard. **Round 5 (`d1`)** — the content ladder bolted on behind `--arms`: harvest pools (`fresh`/`perf`/`raw`/F5-routed), `build_uniform` (the donor's draw, refactored into a function), `build_auditioned` (legato's `compile_unit` ported onto this node's `Cell`/`RoutePolicy`), and the per-arm sweep. Every round-5 flag defaults to the round-4 behaviour and the ladder's own `d0` arm asserts bit-identity against the round-4 sweep in-run. |
 | `analyze_gates.py` | The gate report and the calibration record the main run's knobs are read from. |
+| `analyze_delay.py` | Reduces a delay-gate run (`d0`) and its content ladder (`d1`): both ceilings, the sanity block (in-run identity + the library-independence of `reactive`/`live_seg` across arms), strategy × Δ per arm, the pre-fixed verdict per arm, per-segment medians, and the ladder read against `ref_stale` and legato's own frozen-unit numbers. `--figs` draws locally into `results/<tag>/`. |
 | `analyze_offbook.py` | Reduces a main run (headline, routing mix, trust formation, can't-decompose, parity, plant guard, consumption-phase ledger, battery, poison) + `::figs`, a **remote** figure job. |
 | `launch_detached.py` | Session-isolated detached launcher (`--fn gates\|offbook`). |
 
@@ -123,6 +125,7 @@ materialise it at every seam; does π starve it? (`native/` finding 6.)
 /data/practice_offbook/<tag>/gates/results.json     # Phase A
 /data/practice_offbook/<tag>/<arm>/results.json     # Phase B (one dir per arm)
 /data/practice_offbook/<tag>/figs/*.png             # figures, written remotely
+/data/practice_offbook/<tag>/delay_gate/results.json  # rounds 4 & 5 (one file; arms nested inside)
 ```
 
 ## Reproduce
@@ -778,3 +781,757 @@ not create a niche for the 60-step chunk inside the region where the piece can b
 Combined with O3 (chains execute 2.77x worse than the median traversal at 203 plays) the picture is
 consistent: on this plant the chain level is refused on its own merits, and no amount of taxing its
 competitors rescues it while the task remains performable.
+
+
+## Round 5 — the content ladder (`d1`, seed 0, launched 2026-08-26 22:40 UTC)
+
+**What this attacks, and what it does NOT.** Round 4 returned Δ\* = None with every stored strategy
+sitting **above the playability anchor already at Δ = 0** (`seg_tape` 0.268, `chain` 0.270 against
+`ref_stale` 0.146). The round read that as an environment property. But on the *same* piece and the
+*same* plant, [`../legato/`](../legato/README.md)'s plant-auditioned, launch-keyed frozen units run
+**0.1026** (phrase) and **0.1065** (segment) — *under* d0's own playability bar before any delay is
+applied. So d0's stored content is ≈2.5× worse than content this substrate is known to produce, and
+the gate's question was asked of a library that was never built the way legato builds one. This
+round re-runs the **identical gate** — same piece, same plant, same FM, same eval geometries, same
+Δ sweep, same four strategies, same pre-fixed criterion, same `ref_stale` anchor — and varies **only
+how the library is built and read**. It does not re-tune Δ, does not change the criterion, and does
+not touch the round-4 numbers.
+
+**The four setup choices, turned into rungs.** (`delay_gate.py` module docstring carries the same
+list with line references.)
+
+| # | the choice d0 made | what legato does | rung(s) |
+|---|---|---|---|
+| 1 | tapes are the post-noise issued commands (`acts`) of 20 **reactive** warm-up traversals at `sigma_practice = 0.15` (2.5× the performance noise), recorded *while the FM was still training* — replayed open-loop such a tape carries one noise realisation **plus** the closed-loop corrections made for it; and the chain cells come from that same reactive pool, which `world.Library`'s own docstring names as the configuration legato F1 measured at 1.03× and F5 corrected to 1.34× | harvest at performance conditions, and cut the chain pool from **segment-committed** play (F5: the lower level's library funds the upper level's addressable variation) | `fresh` (post-training pool, same σ — the vintage control) · `perf` (σ_perf, **matched noise seed**) · `raw` (**the same traversals'** pre-noise commands) · `f5` (chain cells from keyed segment play) |
+| 2 | `lib_k = 72` tapes/cell drawn **uniformly**, never cross-validated (justified by étude E-3b's winner's curse) | pay for a **plant audition**: `n_cand` candidates replayed open-loop on `n_score` recorded launch states, `select_library` commits one argmin per cell of the launch distribution — not the winner's curse, because it scores on states the tape never saw | `sel` (audition) · `small` (uniform, **size-matched** to `sel`, so the audition is not credited with the effect of merely holding fewer entries) |
+| 3 | seam selection is **FM audition**, which Phase A G-C measured as calibrated at segment span (ρ = 0.924) and blind at chain span (ρ = 0.337) | — | `key_d0`, `f5_key`, `all4` |
+| 4 | launches are **unkeyed** — played from whatever posture the body reached | **key**: nearest launch-state centroid picks the rendition (`RoutePolicy`'s existing `key` mode, unmodified) | as above |
+
+Defects 3 and 4 are carried by the same knob here (the seam selector), and the ladder separates
+*keying uncurated content* (`key_d0`, `f5_key`) from *keying curated content* (`all4`).
+
+**The arms** (10; `--arms "d0,fresh,perf,raw,f5,small,sel,all4,f5_key,key_d0"`):
+
+| arm | library harvest | selection | seam | isolates |
+|---|---|---|---|---|
+| `d0` | round 4's warm pool | uniform 72 | `audit` | **the in-run control** |
+| `fresh` | post-training reactive pool @ σ_practice | uniform 72 | `audit` | pool vintage / FM staleness |
+| `perf` | post-training reactive pool @ σ_perf | uniform 72 | `audit` | + harvest noise level |
+| `raw` | **the same** σ_perf traversals, pre-noise commands | uniform 72 | `audit` | + the baked-in noise realisation |
+| `f5` | ns=1 from `raw`; ns>1 from segment-committed play | uniform 72 | `audit` | + chain addressability (legato F5) |
+| `small` | as `f5` | uniform `n_pick` | `audit` | size control for `sel` |
+| `sel` | as `f5` | **plant audition**, `n_pick`/cell | `audit` | + cross-state selection |
+| `all4` | as `f5` | plant audition | **`key`** | **all four fixed** |
+| `f5_key` | as `f5` | uniform 72 | `key` | the key on uncurated F5 content |
+| `key_d0` | round 4's warm pool | uniform 72 | `key` | the key alone, on d0's own content |
+
+**Knobs**: `n_harvest = 20` (× `batch` 16 = 320 rows/cell, matching d0's pool size exactly),
+`n_cand = 64`, `n_score = 96`, `n_pick = 4` — legato's own `n_cand`/`n_score`/`n_lib`. Score
+geometries are held out (`geom(n_score, seed+5100)`, distinct from the eval set at `seed+5200`).
+
+**Three controls that make the ladder readable.**
+
+1. **`reactive` and `live_seg` are library-independent by construction** — reactive never reads the
+   library, and `live_seg` restricts the action set to the live plan (`pol.levels = set()`), so
+   `Library.populated` returns nothing. Every arm is therefore scored against the *same* two, which
+   is asserted post hoc at 0.000e+00 across all arms × Δ in `analyze_delay.py`'s sanity block. Only
+   the two stored strategies are re-run per arm.
+2. **`perf` vs `raw` is a perfectly matched pair**: the identical traversals, the identical launch
+   states, the identical realised errors, read two ways (`acts` vs `acts_raw`). The only thing that
+   differs is whether the stored commands contain the noise realisation they were recorded under.
+3. **Additive flags, donor defaults, in-run identity gate.** `--arms ""` skips the whole ladder;
+   the `--quick` default path reproduces `results/dsmoke/delay_gate.json`'s sweep at **0.000e+00
+   over 72 values** (verified before launch as `d1s0`, and note this also re-verifies that round
+   4's own late `ref_stale` insertion was RNG-neutral); and the ladder's `d0` arm re-runs the
+   stored strategies through the ladder's code and asserts bit-identity against the round-4 sweep
+   **in-run**, raising if it ever differs (`d1s1` smoke: 0.000e+00).
+
+**Pricing.** The plant audition is charged to the agent exactly as legato charges it
+(`World.audition(..., who="agent")`), and so are the score-set traversals (the body has to play up
+to a seam to find out where it arrives) and every harvest traversal. Per-library `build_cost` and
+per-pool `harvest_cost` deltas are recorded on the ledger and printed by the analyzer.
+
+**One thing that had to be added, and why (found by the smoke, not by inspection).** `Cell._assign`
+hands slot assignment to k-means over *content*, and k-means++ cannot run when the drawn tapes hold
+fewer **distinct** sequences than there are slots — the seeding step samples from an all-zero
+distance distribution and numpy raises `probabilities do not sum to 1`. Round 4's pool is reactive
+play, where every rendition is unique, so the degeneracy was unreachable. Round 5's `f5`/`small`
+pools are cut from **keyed** play, where many performers replay the same stored rendition bit for
+bit, so it *is* reachable there — and the ladder smoke hit it immediately. `degenerate_slots()` in
+`delay_gate.py` returns an explicit assignment in exactly that case (identical tapes share a slot)
+and `None` — the donor's k-means path, untouched — otherwise, so nothing that previously worked
+changes. The distinct-tape count it computes is logged per cell either way, because it *is* legato
+F5's quantity: how much addressable variation the lower level manufactures. The fix lives in
+`delay_gate.py` and not in `world.py`, so gate G-F's bit-for-bit fork fidelity is unaffected.
+
+**Reproduce.**
+
+```bash
+cd experiments/            # MODAL_PROFILE=chromatic
+# smokes (both, always, before the detached launch)
+modal run mjc/practice/offbook/delay_gate.py::delay_gate --quick --tag d1s0
+modal run mjc/practice/offbook/delay_gate.py::delay_gate --quick --tag d1s1 \
+    --arms "d0,fresh,perf,raw,f5,small,sel,all4,f5_key,key_d0"
+# the run (--spawn only; see the launch-path Gotcha above)
+modal run --detach mjc/practice/offbook/delay_gate.py::delay_gate --spawn --tag d1 --seed 0 \
+    --arms "d0,fresh,perf,raw,f5,small,sel,all4,f5_key,key_d0"
+python3 mjc/practice/offbook/analyze_delay.py --tag d1 --fetch --figs
+```
+
+### Round 5 result (`d1`, complete, 10 arms, ~26 min) — Δ\* = None on **every** arm
+
+**Both sanity gates passed.** The ladder's `d0` arm is bit-identical to the round-4 sweep
+(**0.000e+00**, in-run assertion), and `reactive`/`live_seg` are identical across all 10 arms
+(**0.000e+00 over 100 values**) — they are library-independent by construction, so every arm is
+scored against the same two. `raw` and `f5` share their ns=1 cells by construction (all pools hold
+320 rows, so the shared `lrng` stream lands on the same draw) and their `seg_tape` rows agree at
+0.000e+00 across all five Δ, which makes `raw → f5` a clean single-variable contrast **on the
+chain**.
+
+**Ceilings, unchanged and reported per arm.** `ref_stale` = **0.1460**; the original draft ceiling
+(2× the best at Δ=0) = **0.0228**. legato on this piece: `phrase_frozen` 0.1026, `seg_frozen`
+0.1065, `seg_plan_launch` 0.0850, `never` 0.0107.
+
+**Mean piece error at Δ = 0, best stored per arm** (the quantity the round was built to move —
+round-4 baseline 0.2682, target 0.1460):
+
+| arm | chain | seg_tape | best stored | gap closed to `ref_stale` | best stored, any Δ |
+|---|---|---|---|---|---|
+| `d0` | 0.2703 | 0.2682 | 0.2682 | 0.0% | 0.2036 |
+| `fresh` | 0.3521 | **0.1831** | **0.1831** | **69.6%** | **0.1805** |
+| `perf` | 0.2645 | 0.2606 | 0.2606 | 6.2% | 0.2169 |
+| `raw` | 0.3030 | 0.2223 | 0.2223 | 37.5% | 0.2223 |
+| `f5` | 0.2936 | 0.2223 | 0.2223 | 37.5% | 0.2223 |
+| `small` | 0.2610 | 0.2480 | 0.2480 | 16.5% | 0.2452 |
+| `sel` | 0.3557 | 0.2828 | 0.2828 | −11.9% | 0.2119 |
+| `all4` | **0.2360** | 0.2306 | 0.2306 | 30.7% | 0.1998 |
+| `f5_key` | 0.3287 | 0.2979 | 0.2979 | −24.3% | 0.2543 |
+| `key_d0` | 0.2669 | 0.3265 | 0.2669 | 1.1% | 0.2373 |
+
+**Δ\* = None on every one of the ten arms**, under the pre-fixed criterion and either ceiling. The
+playable region is Δ ∈ {0, 2} in every arm (it is set by `reactive`, which is shared), reactive wins
+both in every arm, and no arm's stored content ever reaches `ref_stale` = 0.146 at any Δ — the best
+number anywhere in the round is `fresh`'s `seg_tape` 0.1805 at Δ = 2, still 1.24× above the anchor
+and 1.69× above legato's `seg_frozen`. Ordering rows: `chain ≤ live_seg ≤ reactive` first holds at
+Δ = 16 for six arms and at Δ = 8 for `raw`, `f5`, `all4`, `key_d0` — all outside playability, i.e.
+by universal collapse, which is what the guard exists to refuse.
+
+**The single-variable contrasts at Δ = 0** (each row changes exactly one thing):
+
+| step | what changes | seg_tape | chain |
+|---|---|---|---|
+| `d0` → `fresh` | pool vintage: harvested after FM training instead of during | 0.2682 → **0.1831** | 0.2703 → 0.3521 |
+| `fresh` → `perf` | σ_practice → σ_perf, matched noise seed | 0.1831 → 0.2606 | 0.3521 → 0.2645 |
+| `perf` → `raw` | the SAME traversals, post-noise → pre-noise commands | 0.2606 → 0.2223 | 0.2645 → 0.3030 |
+| `raw` → `f5` | chain pool: reactive → segment-committed play (F5) | 0.2223 → 0.2223 (identical by construction) | 0.3030 → 0.2936 |
+| `f5` → `small` | library size 72 → 4, both uniform | 0.2223 → 0.2480 | 0.2936 → 0.2610 |
+| `small` → `sel` | uniform → **plant audition**, size matched | 0.2480 → 0.2828 | 0.2610 → 0.3557 |
+| `sel` → `all4` | FM-audit read → **keyed** read, same library | 0.2828 → **0.2306** | 0.3557 → **0.2360** |
+| `f5` → `f5_key` | FM-audit → keyed read, same library | 0.2223 → 0.2979 | 0.2936 → 0.3287 |
+| `d0` → `key_d0` | FM-audit → keyed read, same library | 0.2682 → 0.3265 | 0.2703 → 0.2669 |
+
+Two things in that table are worth stating flatly because they were not what the round was set up
+to expect. **(i)** The largest single move on `seg_tape` comes from the *vintage control* — the pool
+harvested after the forward model finished training — not from any of the four named defects, and
+it costs the chain (0.2703 → 0.3521). **(ii)** The two named fixes that were expected to carry the
+effect *individually make things worse in the read they were paired with*: the plant audition at
+matched size (`small` → `sel`) is worse under an FM-audit read on both levels, and keying alone
+(`d0` → `key_d0`, `f5` → `f5_key`) is worse on `seg_tape` in both cases. They only pay **together**:
+`sel` → `all4` (identical library, keyed instead of auditioned at the seam) is the round's largest
+single improvement, 1.23× on `seg_tape` and **1.51× on the chain**.
+
+**The audition is well calibrated when its output is read the way it was selected, and not
+otherwise.** The plant audition's own held-out predictions (noiseless open-loop replay on recorded
+launch states, `n_cand` 64 × `n_score` 96, 4 committed per cell):
+
+| cell | chosen | best_fixed | per-state oracle | distinct picks |
+|---|---|---|---|---|
+| 1:0 | 0.0414 | 0.0465 | 0.0131 (3.54×) | 4/4 |
+| 1:1 | 0.2171 | 0.2234 | 0.1995 (1.12×) | 2/4 |
+| 1:2 | 0.3023 | 0.3408 | 0.2280 (1.49×) | 3/4 |
+| 3:0 (chain) | 0.2199 | 0.2499 | 0.1273 (1.96×) | 2/4 |
+| 2:1 | 0.4625 | 0.4625 | 0.4429 (1.04×) | 1/4 |
+
+Realised against predicted, same library: the **keyed** read (`all4`) runs 1.23× on `seg_tape` and
+**1.07×** on the chain — legato-like calibration; the **FM-audit** read (`sel`) runs 1.51× and
+**1.62×**. This is Phase A G-C (ρ = 0.337 at chain span) showing up at consequence level: reading a
+state-conditioned library with a rollout score breaks the state↔rendition pairing the audition
+validated, and the chain level is where it breaks worst.
+
+**legato F5's mechanism fires but buys nothing here.** Keyed segment play does manufacture
+addressable variation — the chain pool cut from it holds **18 distinct sequences in 72 draws** at
+cell 3:0 and 16/72 at cell 2:1, against 72/72 for round 4's reactive pool — and the resulting
+contrast (`raw` → `f5`) is 0.3030 → 0.2936 on the chain, ~3%, with the closing-leg median unmoved
+(0.6430 → 0.6427).
+
+**Per-segment medians: the closing leg is where everything lives, and content does not move it.**
+Round 4's chain profile at Δ=0 was [0.0451, 0.1252, 0.3130]. Across the ten arms the chain's seg-2
+median at Δ=0 spans 0.2769 (`key_d0`) to 1.0633 (`sel`), while seg-0 never leaves 0.039–0.109. The
+best-behaved closing leg in the round belongs to `all4` (chain [0.0713, 0.2323, 0.3007], and it is
+the only arm whose closing leg stays under 0.37 at every Δ: 0.3007 / 0.3200 / 0.3632 / 0.2808 /
+0.3410). `sel` under the FM-audit read is the worst (1.0633, flat across Δ = 0–8 because the
+audition selects the same chain at every delay and an open-loop chain's trajectory is
+delay-independent once the tape is fixed).
+
+**Ledger — what the fix cost.** Total agent priced time 30,865 s. The plant audition plus its
+score-set traversals cost **22,986 s (74% of the run), 992,832 environment steps and 31,296 feedback
+events** for one library, against 2,426 s for round 4's entire 20-cycle warm-up. The `fresh` and
+`perf` harvests cost 2,426 s each, the keyed route-pool harvest 602 s (planner-free). Uniform
+library builds are free by construction (they only read pools already paid for). So the
+best-scoring content in the round (`fresh`) is also the cheapest to build, and the most expensive
+arm (`sel`, 74% of the ledger) is the second-worst on `seg_tape`.
+
+**Caveats.** Single seed; the eval is 24 shared geometries; the spread across all ten content arms
+at Δ = 0 is 0.183–0.327 (≈1.8×) and there is no in-run replicate to size the uniform-draw sampling
+noise against, so the small steps (≤0.03) in the contrast table should be read as ranks at best.
+Mean and median disagree in sign for some arms (`d0` `seg_tape` 0.2682/0.1912 vs `sel`
+0.2828/0.3421), and the criterion is stated on the mean, as in round 4. The auditioned library is
+committed at `n_pick` = 4 (legato's `n_lib`), so `sel`/`all4` hold 4 entries per cell against 72 for
+the uniform arms — `small` is the size control for that, and it sits between them. `sel`'s ns=1
+cells are audition-selected while the chain pool it draws from was generated by *uniform* ns=1 keyed
+play, which keeps the selection axis a single variable but is one step short of legato's strict
+left-to-right nesting for the chain level.
+
+**Artifacts.** `results/d1/d1_report.txt` (full tables), `results/d1/d1_delay_by_arm.png` (error vs
+Δ, one panel per arm, log scale, with `ref_stale` and legato's `seg_frozen` drawn),
+`results/d1/d1_ladder_delay0.png` (the rung bar chart against all three anchors),
+`results/d1/d1_by_segment.png` (per-segment medians at Δ = 0, all arms).
+Raw: `results/d1/d1/delay_gate/results.json`. Smokes: `results/d1s0` (donor identity),
+`results/d1s1` (ladder path).
+
+
+## Round 6 — legato's nesting on the gate (`d2`, seed 0, launched 2026-08-26 23:22 UTC)
+
+**The diagnosis this implements** (orchestrator's, from `legato/results/l1/l1/*/results.json`'s
+`events`, and now reproduced automatically by `analyze_delay.py`'s content-fidelity block against
+round 5's own record):
+
+| cell | legato `L1` chosen / per-state oracle | `d1` `sel` chosen / oracle | ratio on the oracle |
+|---|---|---|---|
+| 1:0 | 0.0426 / 0.0137 (c25) | 0.0414 / 0.0131 | **0.96×** (match) |
+| 1:1 | 0.1271 / 0.0481 (c32) | 0.2171 / 0.1995 | **4.14×** |
+| 1:2 | 0.1993 / 0.0554 (c39) | 0.3023 / 0.2280 | **4.12×** |
+| 3:0 | 0.1005 / 0.0586 (c55) | 0.2199 / 0.1273 | **2.17×** |
+
+`per_state_oracle` is the best **any** candidate achieves per launch state, so a 4× gap there is a
+property of the **pool**, before selection: round 5's candidate pools contained no tape that works
+from the committed configuration's launch states. legato's own events say why — at its seam-1/2
+commits `n_reactive_traces` = **2 of 6** traces, i.e. 4 of 6 were practice recorded *in the
+already-committed configuration* (commits c25/32/39, `trace_window` 6, `batch` 24 → `n_pool` 144,
+`interleave_period` 3). A candidate for seam k has to start from the frozen predecessor's arrival
+distribution — the same distribution the score set is drawn from. `d1` harvested every segment pool
+from purely reactive traversals, so candidate and score-set launch distributions were mismatched at
+every seam past the first. (Round 5's own `fresh` result — the *vintage* control being the largest
+single move on `seg_tape` — points the same way: a tape is only as good as the configuration it was
+recorded in.)
+
+**`build_nested()`** ports legato's sequential assembly whole:
+
+```
+stage k = 0..NS-1 :  practice `n_nest` cycles in the CURRENT configuration at sigma_practice
+                     (committed seams played by their keyed `lib` unit, uncommitted seams reactive,
+                      one cycle in `nest_interleave` fully reactive — legato's diet-rent interleave),
+                     keeping a `nest_window`-deep trace buffer;
+                     score at seam k from that same configuration, on held-out geometries;
+                     commit cell (1, k) by plant audition + `select_library`.
+stage NS          :  practice `n_nest` more cycles in the FULLY segment-committed configuration and
+                     commit the chain cells from THOSE traces — legato F5 done properly, where
+                     round 5's `f5` only approximated it with uniform keyed play.
+```
+
+Practice and score-set traversals go through `World.traverse` with legato's **own** `lib` unit
+(`World.select_library`'s return value is exactly what `unit_commands`' `"lib"` branch consumes), so
+the configuration the pool is recorded in is legato's machinery bit for bit; the same renditions are
+also written into this node's `Cell`s so the gate can read them through `RoutePolicy` in either
+mode. Knobs are legato `L1`'s own: `n_nest` 7 (its inter-commit gap), `nest_window` 6, `nest_batch`
+24 (6 × 24 = its recorded `n_pool` of 144), `nest_interleave` 3, `n_cand` 64 / `n_cand_phrase` 48 /
+`n_score` 96 / `n_pick` 4.
+
+**Arms** (7; `--arms "d0,sel,all4,nest_u,nest_u_key,nest,nest_key"`):
+
+| arm | library | seam | isolates |
+|---|---|---|---|
+| `d0` | round 4's warm pool, uniform 72 | `audit` | the in-run control |
+| `sel` | round 5's plant audition on **reactive** pools | `audit` | the pool contrast's other end |
+| `all4` | same library as `sel` | `key` | round 5's best configuration |
+| `nest_u` | legato's **nested** per-cell pools, uniform `n_pick` | `audit` | the POOL alone |
+| `nest_u_key` | nested pools, uniform `n_pick` | `key` | pool + keyed read |
+| `nest` | nested pools + plant audition | `audit` | pool + selection |
+| `nest_key` | nested pools + plant audition | `key` | **the legato configuration, end to end** |
+
+`nest_u` reads the *same* per-cell pools `nest` committed from (snapshotted at each of its commits),
+so `nest_u → nest` is selection given legato's pool, and `sel → nest` is legato's pool given
+legato's selection.
+
+**One deliberate deviation, and it is the main caveat.** The forward model stays **frozen** at its
+post-warm state throughout the nesting; legato adapted its FM over 90 cycles. Freezing is what keeps
+`reactive`, `live_seg` and `ref_stale` bit-identical to round 4 — without it the in-run control and
+the whole cross-round comparison dissolve. So `d2` reproduces legato's **launch-distribution**
+nesting but not legato's **model quality**, and any residual gap has to be read against that.
+
+**A statistics correction that changes the target** (found while wiring the fidelity check, and now
+enforced in `analyze_delay.py`). legato's headline table reports `e_perf`, a **median** over its 48
+eval geometries; this gate's criterion is stated on the **mean** over 24. Read from `L1`'s own
+ladder:
+
+| legato arm | median @c75 | **mean @c75** | median @c90 | **mean @c90** | by-seg @c90 (medians) |
+|---|---|---|---|---|---|
+| `seg_frozen` | 0.0940 | **0.1311** | 0.1206 | **0.1495** | [0.0550, 0.1108, 0.1861] |
+| `phrase_frozen` | 0.1011 | **0.1173** | 0.1117 | **0.1213** | [0.0964, 0.1198, 0.1103] |
+| `never` | 0.0098 | 0.0099 | — | — | [0.0102, 0.0187, 0.0013] |
+
+So the mean-for-mean target is **0.117–0.150**, not the 0.1026/0.1065 the round-5 record compared
+against — that comparison was mean-vs-median and overstated the gap by ~25%. `ref_stale` = 0.1460
+is itself a mean, so legato's `phrase_frozen` clears the playability anchor on the mean and its
+`seg_frozen` straddles it. Round 5's best stored number (0.1831) is 1.25× above `ref_stale` and
+1.40× above legato's `seg_frozen` mean, not 1.7×.
+
+**Three identity gates, all passed before launch.**
+
+1. default path (`--arms ""`, `--quick`) vs the recorded donor smoke `results/dsmoke/delay_gate.json`
+   — **0.000e+00 over 72 values** (`d2s0`);
+2. the ladder's `d0` arm vs the in-run round-4 sweep — **0.000e+00** (in-run assertion, raises
+   otherwise);
+3. **cross-round**: `d2`'s `sel` and `all4` arms vs `d1`'s — **0.000e+00 over 72 values** (`d2s1`
+   vs `d1s1`), which is what licenses reading `d1`'s ten-arm ladder and `d2`'s nesting arms on one
+   axis.
+
+**Reproduce.**
+
+```bash
+cd experiments/            # MODAL_PROFILE=chromatic
+modal run mjc/practice/offbook/delay_gate.py::delay_gate --quick --tag d2s0
+modal run mjc/practice/offbook/delay_gate.py::delay_gate --quick --tag d2s1 \
+    --arms "d0,sel,all4,nest_u,nest_u_key,nest,nest_key"
+modal run --detach mjc/practice/offbook/delay_gate.py::delay_gate --spawn --tag d2 --seed 0 \
+    --arms "d0,sel,all4,nest_u,nest_u_key,nest,nest_key"
+python3 mjc/practice/offbook/analyze_delay.py --tag d2 --fetch --figs
+```
+
+### Round 6 result (`d2`, complete, 7 arms, ~33 min) — the content port SUCCEEDS; Δ\* = None on every arm
+
+**All three identity gates held in the real run.** Ladder `d0` arm vs the round-4 sweep
+**0.000e+00**; `reactive`/`live_seg` identical across all 7 arms **0.000e+00 over 70 values**; and
+`d2`'s `sel`/`all4` arms reproduce `d1`'s bit for bit (**0.000e+00 over 72 values**, asserted at
+smoke scale before launch), so rounds 5 and 6 read on one axis.
+
+#### 1. Content fidelity: the nesting reproduces legato, and the pool defect is gone
+
+`build_nested()` reproduces legato's pool **geometry** exactly — `n_pool` 144 from 6 traces at every
+commit, with **6/6 reactive at seam 0** and **2/6 reactive** at seams 1, 2 and the chain, which is
+what `L1`'s own events record — and its **content**:
+
+| cell | legato chosen / per-state oracle | `d1` `sel` (reactive pools) | `d2` `nest` (nested pools) | oracle ratio d1 → d2 |
+|---|---|---|---|---|
+| 1:0 | 0.0426 / 0.0137 | 0.0414 / 0.0131 (0.96×) | 0.0390 / 0.0139 (**1.01×**) | 0.96× → 1.01× |
+| 1:1 | 0.1271 / 0.0481 | 0.2171 / 0.1995 (4.14×) | 0.1253 / 0.0419 (**0.87×**) | **4.14× → 0.87×** |
+| 1:2 | 0.1993 / 0.0554 | 0.3023 / 0.2280 (4.12×) | 0.2302 / 0.0502 (**0.91×**) | **4.12× → 0.91×** |
+| 3:0 | 0.1005 / 0.0586 | 0.2199 / 0.1273 (2.17×) | 0.1239 / 0.0679 (**1.16×**) | 2.17× → 1.16× |
+| 2:1 | (no legato analogue) | 0.4625 / 0.4429 | 0.1914 / 0.1064 | — |
+
+The diagnosis is confirmed and the fix works: the per-state oracle — the best **any** candidate
+achieves per launch state, i.e. the pool before selection — was 4.1× legato's at seams 1–2 with
+reactive pools and is **0.87–0.91×** legato's with nested pools. `chosen_score` lands at
+0.91×/0.99×/1.15×/1.23× of legato's. Cell 2:1 improves 4.2× on the oracle for the same reason.
+
+**Undelayed by-segment medians against legato's plateau** (medians, legato c90):
+
+| source | seg0 | seg1 | seg2 |
+|---|---|---|---|
+| legato `seg_frozen` | 0.0550 | 0.1108 | 0.1861 |
+| legato `phrase_frozen` | 0.0964 | 0.1198 | 0.1103 |
+| `nest` `seg_tape` | 0.0611 | 0.1668 | **0.1464** |
+| `nest_key` `seg_tape` | 0.0574 | 0.1624 | 0.2052 |
+| `nest` `chain` | 0.0460 | 0.1831 | 0.2545 |
+| `nest_key` `chain` | 0.0628 | **0.1146** | 0.2047 |
+| (`d0` `chain`, round 4) | 0.0451 | 0.1252 | 0.3130 |
+
+Piece error, mean-for-mean: `nest_key` **0.1455** (chain) / **0.1491** (`seg_tape`) against legato's
+`phrase_frozen` **0.1173** and `seg_frozen` **0.1311** — **1.24×** and **1.14×**. Medians: `nest_key`
+0.1392 / 0.1488 against legato's 0.1011 / 0.0940. The residual is consistent with the one deliberate
+deviation (frozen FM vs legato's 90 adapted cycles) but is not attributed here, because nothing in
+this round varies the model.
+
+#### 2. The gate: Δ\* = None on all seven arms, and the reason has changed
+
+| arm | chain @Δ0 | seg_tape @Δ0 | best stored | gap closed to `ref_stale` | best stored, any Δ | Δ\* |
+|---|---|---|---|---|---|---|
+| `d0` | 0.2703 | 0.2682 | 0.2682 | 0.0% | 0.2036 | None |
+| `sel` | 0.3557 | 0.2828 | 0.2828 | −11.9% | 0.2119 | None |
+| `all4` | 0.2360 | 0.2306 | 0.2306 | 30.7% | 0.1998 | None |
+| `nest_u` | 0.2010 | 0.2395 | 0.2010 | 55.0% | 0.1874 | None |
+| `nest_u_key` | 0.2199 | 0.2506 | 0.2199 | 39.5% | 0.1727 | None |
+| `nest` | 0.1864 | **0.1613** | 0.1613 | 87.4% | 0.1613 | None |
+| `nest_key` | **0.1455** | 0.1491 | **0.1455** | **100.4%** | **0.1455** | None |
+
+**`nest_key` is the first stored strategy in this node to reach the playability anchor**: its chain
+runs 0.1455 against `ref_stale` = 0.1460 at Δ = 0. Round 4's stored content was 1.84× the anchor.
+
+The verdict rows, and exactly where the criterion breaks:
+
+| Δ | ms | chain | live_seg | reactive | ordered? | min | vs `ref_stale` |
+|---|---|---|---|---|---|---|---|
+| 0 | 0 | 0.1455 | 0.1978 | **0.0114** | no (reactive wins) | 0.0114 | playable |
+| 2 | 40 | 0.1563 | 0.2201 | **0.1110** | no (reactive wins) | 0.1110 | playable |
+| 4 | 80 | **0.1595** | 0.2447 | 0.2231 | **no — the MIDDLE term fails** (`live_seg` > `reactive`) | 0.1595 | miss by 9.3% |
+| 8 | 160 | **0.1513** | 0.3340 | 0.5294 | **yes** | 0.1513 | **miss by 3.6%** |
+| 16 | 320 | **0.1580** | 0.5311 | 0.7190 | **yes** | 0.1580 | miss by 8.3% |
+
+Two facts worth stating precisely because the pre-fixed rule does not ask about them. **(i)** From
+Δ = 4 onward the chain is strictly the **best of the three** (0.1595 < 0.2231 < 0.2447); the full
+ordering fails at Δ = 4 only because `live_seg` overtakes `reactive`, i.e. the middle term, not the
+chain. **(ii)** At Δ = 8 the ordering holds and the round misses the playability guard by
+**0.1513 vs 0.1460 — 3.6%**. Both are reported, neither is acted on: Δ is not extended, the
+criterion is not re-fitted, and the ceiling is not moved. Δ\* = None stands.
+
+**Delay robustness.** `nest_key`'s chain is the flattest strategy measured anywhere in this node:
+**1.09×** across 0 → 320 ms (0.1455 / 0.1563 / 0.1595 / 0.1513 / 0.1580), with a by-segment profile
+that barely moves ([0.063, 0.115, 0.205] at Δ = 0 → [0.068, 0.173, 0.210] at Δ = 16) against
+reactive's 63.1×. `nest` (audit read) 0.97×, `nest_u_key` 0.79×, `nest_u` 0.93×.
+
+#### 3. Attribution: the pool carries it, selection and the key add on top, and they interact
+
+Single-variable contrasts at Δ = 0 (mean piece error):
+
+| step | what changes | seg_tape | chain |
+|---|---|---|---|
+| `sel` → `nest` | POOL: reactive → legato nesting (audition read both) | 0.2828 → 0.1613 (1.75×) | 0.3557 → 0.1864 (**1.91×**) |
+| `all4` → `nest_key` | POOL: reactive → legato nesting (keyed read both) | 0.2306 → 0.1491 (1.55×) | 0.2360 → 0.1455 (**1.62×**) |
+| `nest_u` → `nest` | SELECTION: uniform → plant audition, same nested pool | 0.2395 → 0.1613 (1.48×) | 0.2010 → 0.1864 (1.08×) |
+| `nest_u_key` → `nest_key` | SELECTION, keyed read | 0.2506 → 0.1491 (1.68×) | 0.2199 → 0.1455 (1.51×) |
+| `nest` → `nest_key` | READ: FM audition → legato key, same library | 0.1613 → 0.1491 (1.08×) | 0.1864 → 0.1455 (1.28×) |
+| `nest_u` → `nest_u_key` | READ, **uniform** library | 0.2395 → 0.2506 (0.96×) | 0.2010 → 0.2199 (0.91×) |
+| `d0` → `nest_key` | round 4 → all of legato | 0.2682 → 0.1491 (**1.80×**) | 0.2703 → 0.1455 (**1.86×**) |
+
+The pool is the largest single factor (1.6–1.9× on the chain), which is what round 5 was missing.
+Round 5's interaction reproduces exactly: **the key pays on audition-selected content and costs on
+uniform content** (`nest` → `nest_key` 1.28× on the chain; `nest_u` → `nest_u_key` 0.91×). Selection
+carries most of the `seg_tape` effect (1.48–1.68×) and little of the chain's under an audit read
+(1.08×) but a lot under a keyed read (1.51×).
+
+**Audition calibration** (realised ÷ its own held-out prediction): `nest_key` **1.13× / 1.17×**
+(seg / chain) — legato-like; `nest` (audit read) 1.23× / 1.50×; `d1`'s `sel` was 1.51× / 1.62×.
+Reading a state-conditioned library with a state key rather than a rollout score keeps the pairing
+the audition validated, at both spans.
+
+#### 4. Ledger
+
+Total agent priced time **51,984 s**, 1,957,440 environment steps, 128,352 feedback events. The two
+plant-auditioned builds dominate: `nest` **23,545 s (45%)** — 893,568 steps, 56,736 fb, 26,880 plans
+(the nesting practice is the only priced *planning* here) — and `sel` **22,986 s (44%)**. Harvests:
+`perf` 2,426 s, `route` 602 s. Uniform builds (`nest_u`) are free by construction: they re-read the
+per-cell pools `nest` already paid for.
+
+#### 5. Caveats
+
+Single seed; 24 shared eval geometries; the criterion is on the mean and mean/median disagree in
+places (`nest` chain 0.1864/0.1527, `nest_key` chain 0.1455/0.1392 — both *lower* on the median).
+**The forward model is frozen** at its post-warm state through the nesting while legato adapted its
+over 90 cycles; that is what keeps `reactive`/`live_seg`/`ref_stale` bit-identical to round 4, and
+it is the most likely residual against legato's 1.14–1.24×, but this round varies nothing about the
+model so the attribution is not made here. `nest_u` reads the pools `nest`'s *auditioned* commits
+generated, so the selection contrast is one-variable in the draw but not in the configuration that
+produced the pool. `nest_key` at Δ = 8 misses the pre-fixed guard by 3.6%; no ceiling, sweep or
+criterion was changed in response.
+
+**Artifacts.** `results/d2/d2_report.txt`, `results/d2/d2_delay_by_arm.png`,
+`results/d2/d2_ladder_delay0.png`, `results/d2/d2_by_segment.png`; raw at
+`results/d2/d2/delay_gate/results.json`. Smokes: `results/d2s0` (donor identity),
+`results/d2s1` (nesting path + cross-round identity vs `d1s1`).
+
+
+## Round 7 — the model adapts too (`d3`), and the strong incumbent (`d3b`), seed 0, 2026-08-27
+
+Two runs, launched together, attacking the two things that were still soft after `d2`.
+
+### `d3` — legato's plasticity, not just legato's nesting
+
+`d2` reproduced legato's launch-distribution nesting with the **forward model frozen** at its
+post-warm state; legato's adapted through its practice (39 cycles of online training by its seam-2
+commit, 55 by the phrase commit). That is not cosmetic: a tape harvested off an **uncommitted** seam
+is a reactive rendition whose quality is bounded by the model that produced it, and `live_seg` is a
+model bet outright. `--nest-adapt` turns legato's own `train_online` call on between commits — plain
+uniform-lr steps on a window of practice transitions plus the replay fraction, its own batch stream,
+**training data true-state** per round 4's construction — then freezes the model for the sweep.
+
+**Two consequences, handled rather than papered over.**
+
+1. **The in-run identity of `reactive`/`live_seg` against round 4 dissolves by construction.** They
+   are library-independent but *model*-dependent. `base_pair()` recomputes them **once** under the
+   adapted model (same rng seeds, same geometries, same code path) and every arm is scored against
+   those, so the **cross-arm** identity assertion still holds; the round-4 delta is *reported*
+   instead of asserted. The replacement in-run control is the content ladder re-stated under the one
+   adapted model: the `warm` library (d0's own content) read by `audit` (`d0`) **and** by `key`
+   (`key_d0`), plus `sel`/`all4`, which are cheap because their libraries are built *before* the
+   nesting and are therefore bit-identical to `d2`'s.
+2. **A `key` read never touches the forward model** — `_decide_key` is a nearest-centroid lookup in
+   state space. So `key_d0` and `all4` must stay bit-identical to their round-5/6 twins even with
+   the model moving underneath, and that is the check that the model did not leak where it should
+   not. Verified at smoke scale: `key_d0` vs `d1` **0.000e+00 over 36 values**, `all4` vs `d2`
+   **0.000e+00 over 36 values**, while `sel` (same library, *audit* read) moves by 1.59e-01 — the
+   pure model effect on the read.
+
+**Anchors.** `ref_stale` is *defined* under the stale pre-practice FM at Δ = 0; it does not move and
+the criterion keeps using it untouched. The same ballistic-per-segment anchor is additionally
+reported under the **warm** (pre-nesting) and **adapted** (post-nesting) models as two flagged
+numbers, so the pair brackets what the adapted cycles bought.
+
+**FM competence on the record.** `react_probe()` runs a held-out reactive traversal
+(`who="instrument"`, free) at every nesting stage boundary — `start`, `pre_seg0/1/2`, `pre_chain` —
+recording `e_react` median, mean and by-segment, so the model behind each commit sits next to
+legato's (its `e_react` ran ~0.010 at c25–39).
+
+**Arms** (8): `d0,key_d0,sel,all4,nest_u,nest_u_key,nest,nest_key` with `--nest-adapt`. Cycle
+budget: 20 warm + 7×3 = 41 by the seam-2 commit, 48 by the chain commit, against legato's 39 / 55.
+
+### `d3b` — the honest incumbent: efference copy through the delay
+
+The naive delayed controller in `delay_gate.py` plans from the state Δ steps ago and does not
+correct for it. That is a **strawman**: a nervous system with a reflex delay does not act on where it
+*was*, it acts on where its forward model says it now *is*, given the commands it has already
+issued — the cerebellar forward model is exactly the efference-copy predictor. The sibling `presto`
+node added this (`World.obs_predict`) and measured it removing essentially all of the naive delay
+penalty on their piece, which it should: **bridging a Δ-step delay *is* a Δ-step FM rollout**, and
+Δ = 4–8 sits well inside this plant's ~21-step composition horizon.
+
+**Ported, not re-derived.** `../accompanist/presto/world.py`'s implementation is copied verbatim into
+`offbook/world.py`: an `issued` efference-copy buffer alongside `hist`, and
+
+```
+obs()  ->  s_hat(t) = s(t-D) ; for u in issued[t-D:t]: s_hat += fm_delta(fm, s_hat, u)
+```
+
+in both `traverse` and `traverse_route`, off by default. The offbook copy is now byte-equivalent to
+presto's apart from the header and two package-rename import lines.
+
+**Every strategy is re-swept under it, not just the incumbent** — scoring a predictor-equipped
+`reactive` against predictor-less stored content would be the mirror strawman. `--dual-obs` runs the
+whole ladder twice, storing `sweep`/`verdict` (naive, the round-4 continuity read) and
+`sweep_predict`/`verdict_predict` (efference copy) side by side. `ref_stale` is untouched in both,
+and the analyzer prints Δ\* under both incumbents with the per-Δ **playability margin**
+(min of the three ÷ `ref_stale`).
+
+`d3b` is otherwise **`d2`'s exact configuration** (frozen FM, `d2`'s seven arms), so its naive half
+is a bit-identity control against `d2` and the predictive half is the only new variable. This is the
+run that says whether `d2`'s "the chain is strictly the best of the three from 80 ms on" survives a
+Δ-step FM bet.
+
+### Identity gates, all passed before launch
+
+| gate | result |
+|---|---|
+| default path (`--arms ""`, `--quick`) vs `results/dsmoke/delay_gate.json`, **after** the `world.py` port | **0.000e+00 over 72 values** (`d3bs0`) |
+| Phase-A **G-F fork fidelity** re-run after the `world.py` port | **0.000e+00 over 7 arrays**, pass (`gsmoke2`); G-R and G-P also pass |
+| `--arms …` with `nest_adapt` OFF vs `d2`'s smoke — round 6 reproduced | **0.000e+00 over 252 values** (`d3s1` vs `d2s1`) |
+| `key_d0` vs `d1`'s — `key` reads are model-independent | **0.000e+00 over 36 values** |
+| the same two `key`-read arms under `--nest-adapt` | **0.000e+00** (`key_d0` vs `d1`, `all4` vs `d2`) |
+| `obs_predict` is a **no-op at Δ = 0** (in-run assertion, raises otherwise) | **0.000e+00 over 90 values** (`d3bs1`) |
+| ladder `d0` arm vs the in-run round-4 sweep (frozen-FM runs only; reported not asserted under `--nest-adapt`) | 0.000e+00 |
+
+### Reproduce
+
+```bash
+cd experiments/            # MODAL_PROFILE=chromatic
+modal run mjc/practice/offbook/delay_gate.py::delay_gate --quick --tag d3bs0
+modal run mjc/practice/offbook/gates.py::offbook_gates --quick --tag gsmoke2     # G-F after the port
+modal run mjc/practice/offbook/delay_gate.py::delay_gate --quick --tag d3s1 \
+    --arms "d0,key_d0,sel,all4,nest_u,nest_u_key,nest,nest_key"
+modal run mjc/practice/offbook/delay_gate.py::delay_gate --quick --tag d3s2 --nest-adapt \
+    --arms "d0,key_d0,sel,all4,nest_u,nest_u_key,nest,nest_key"
+modal run mjc/practice/offbook/delay_gate.py::delay_gate --quick --tag d3bs1 --dual-obs \
+    --arms "d0,sel,all4,nest_u,nest_u_key,nest,nest_key"
+# the runs (--spawn only)
+modal run --detach mjc/practice/offbook/delay_gate.py::delay_gate --spawn --tag d3 --seed 0 \
+    --nest-adapt --arms "d0,key_d0,sel,all4,nest_u,nest_u_key,nest,nest_key"
+modal run --detach mjc/practice/offbook/delay_gate.py::delay_gate --spawn --tag d3b --seed 0 \
+    --dual-obs --arms "d0,sel,all4,nest_u,nest_u_key,nest,nest_key"
+python3 mjc/practice/offbook/analyze_delay.py --tag d3  --fetch --figs --vs d2
+python3 mjc/practice/offbook/analyze_delay.py --tag d3b --fetch --figs --vs d2
+```
+
+**Note on ordering.** `d3` was launched *before* the `world.py` `obs_predict` port, so it ran the
+pre-7b code — i.e. the naive operator, which is exactly its intended round-4-continuity read. The
+port is byte-neutral at its default (two independent gates above), so `d3` stays reproducible
+against the current tree.
+
+### Round 7 result (`d3`, complete, 8 arms, ~36 min) — **Δ\* = 8 (160 ms). THE GATE PASSES.**
+
+**Sanity, with the two references that had to change.** Cross-arm identity of the
+library-independent strategies holds at **0.000e+00 over 80 values** against the pair recomputed
+under the adapted model. The `d0` arm vs round 4 is **4.754e-01** — expected nonzero and reported,
+not asserted: the FM moved and `d0` is an `audit` read. The adapted pair vs round 4's differs by
+**1.269e-01**, which *is* the model effect. And the two model-independence checks pass in the real
+run: **`key_d0` vs `d1` = 0.000e+00 over 60 values**, **`all4` vs `d2` = +0.0000 at every Δ** — a
+`key` lookup never touches the forward model, and nothing leaked.
+
+**The forward model through the nesting** (held-out `e_react`, free instrument; legato's ran ~0.010
+at its c25–39 commits):
+
+| stage | nest cycle | e_react med | e_react mean | by-segment medians |
+|---|---|---|---|---|
+| `start` | 0 | **0.0098** | 0.0122 | 0.0088 0.0103 0.0036 |
+| `pre_seg0` | 7 | 0.0102 | 0.0134 | 0.0113 0.0140 0.0030 |
+| `pre_seg1` | 14 | 0.0160 | 0.0189 | 0.0079 0.0385 0.0017 |
+| `pre_seg2` | 21 | 0.0068 | 0.0072 | 0.0066 0.0107 0.0031 |
+| `pre_chain` | 28 | **0.0063** | 0.0070 | 0.0074 0.0084 0.0021 |
+
+The warm-20 model was *already* at legato's competence (0.0098 vs ~0.010) before a single nested
+cycle; adaptation took it to 0.0063 with one dip at `pre_seg1`. Undelayed `reactive` improves
+0.0114 → **0.0065** and `live_seg` 0.1978 → **0.1573**.
+
+**Content fidelity: `nest` now matches or beats legato on every cell.**
+
+| cell | legato chosen / oracle | `d3` `nest` chosen / oracle | ratios |
+|---|---|---|---|
+| 1:0 | 0.0426 / 0.0137 | 0.0403 / 0.0134 | 0.95× / **0.98×** |
+| 1:1 | 0.1271 / 0.0481 | 0.1224 / 0.0342 | 0.96× / **0.71×** |
+| 1:2 | 0.1993 / 0.0554 | 0.1648 / 0.0463 | 0.83× / **0.84×** |
+| 3:0 | 0.1005 / 0.0586 | 0.1148 / 0.0603 | 1.14× / **1.03×** |
+
+Pool geometry stays legato's exactly (144 rows from 6 traces; 6/6 reactive at seam 0, 2/6 after).
+
+**The gate, arm `nest`** (`ref_stale` = 0.1460, untouched):
+
+| Δ | ms | chain | live_seg | reactive | ordered? | min ÷ `ref_stale` | verdict |
+|---|---|---|---|---|---|---|---|
+| 0 | 0 | 0.1255 | 0.1573 | **0.0065** | no | 0.045× | playable |
+| 2 | 40 | 0.1244 | 0.1823 | **0.0781** | no | 0.535× | playable |
+| 4 | 80 | **0.1205** | 0.2121 | 0.1971 | no (middle term: `live_seg` > `reactive`) | 0.825× | playable |
+| 8 | 160 | **0.1416** | 0.2818 | 0.4025 | **yes** | **0.970×** | **PASS** |
+| 16 | 320 | 0.2001 | 0.5045 | 0.7132 | yes | 1.371× | not playable |
+
+**Δ\* = 8 — 160 ms, inside the human range, and the round's pre-fixed criterion is satisfied for
+the first time in this node.** Nothing was re-fitted: same Δ sweep, same ordering, same `ref_stale`
+computed under the stale pre-practice FM. The margin is 3.0% inside the guard.
+
+**Δ\* by arm:** `nest` **8**; every other arm None. `nest_key` is ordered at Δ = 8 but misses
+playability at 1.042× (0.1521 vs 0.1460) — **under the adapted model the `audit` read overtakes the
+`key` read**, reversing rounds 5–6, where keying was worth 1.28× on the chain. The FM audition is
+now accurate enough at chain span to out-pick the launch key.
+
+**The ladder at Δ = 0** (mean; medians in brackets where notable):
+
+| arm | chain | seg_tape | best stored | gap closed to `ref_stale` |
+|---|---|---|---|---|
+| `d0` | 0.2908 | 0.1568 | 0.1568 | 91.1% |
+| `key_d0` | 0.2669 | 0.3265 | 0.2669 | 1.1% |
+| `sel` | 0.2770 | 0.2319 | 0.2319 | 29.7% |
+| `all4` | 0.2360 | 0.2306 | 0.2306 | 30.7% |
+| `nest_u` | 0.1504 | 0.2389 | 0.1504 | 96.4% |
+| `nest_u_key` | 0.2077 | 0.2465 | 0.2077 | 49.5% |
+| `nest` | **0.1255** [0.0960] | **0.1116** [0.0961] | **0.1116** | **128.1%** |
+| `nest_key` | 0.1297 [0.0971] | 0.1355 [0.1178] | 0.1297 | 113.3% |
+
+`nest`'s stored content is now **below legato's own means** (`seg_frozen` 0.1311, `phrase_frozen`
+0.1173) on both spans, and below the playability anchor by 28%.
+
+**`d2` → `d3` per-arm deltas** (the model's own effect, everything else held): `all4` **+0.0000 at
+every Δ** (key read, library built pre-nesting — the control); `d0` `seg_tape` −0.1114 at Δ = 0
+(round 4's *uncurated* library read by a better model is 1.71× better); `nest` −0.0497 / −0.0608
+(seg/chain) at Δ = 0 and −0.0887 / −0.0510 at Δ = 8; `sel` −0.0509 / −0.0787.
+
+**An anchor curiosity, reported and not interpreted.** The same ballistic-per-segment quantity is
+0.1460 under the **stale** FM (the guard), **0.2298** under the warm FM, and **0.1814** under the
+adapted FM — i.e. per-segment ballistic planning is *worse* with a better model here. legato's
+README flags a related asymmetry (stale vs ceiling models degrading for different reasons). The
+criterion uses only the stale-FM number, which is unchanged from round 4, so nothing in the verdict
+depends on this.
+
+**Ledger.** Agent priced time **51,984 s** — identical to `d2`'s, because online FM training costs
+GPU time but no priced environment steps or feedback events. `nest` build 23,545 s (45%, 26,880
+plans — the nesting practice is the only priced planning), `sel` build 22,986 s (44%), harvests
+`perf` 2,426 s / `route` 602 s.
+
+**Caveats.** Single seed; 24 shared eval geometries; the criterion is on the mean and `nest`'s
+medians are lower throughout (chain 0.0960 at Δ = 0, 0.1161 at Δ = 8), so the PASS is not a
+median-vs-mean artifact in the favourable direction. The Δ = 8 pass sits 3.0% inside the guard, and
+the Δ = 4 row fails only on the middle term (`live_seg` > `reactive`), not on the chain. `nest_u`
+reads the pools `nest`'s auditioned commits generated. The **incumbent here is the naive delayed
+controller**; whether the pass survives an efference-copy incumbent is exactly what `d3b` asks.
+
+**Artifacts.** `results/d3/d3_report.txt`, `results/d3/d3_delay_by_arm.png`,
+`results/d3/d3_ladder_delay0.png`, `results/d3/d3_by_segment.png`; raw at
+`results/d3/d3/delay_gate/results.json`.
+
+### Round 7b result (`d3b`, complete, 7 arms × 2 operators, ~40 min) — **Δ\* = None under BOTH incumbents**
+
+**Four controls, all clean.** The ladder `d0` arm vs the round-4 sweep **0.000e+00**; cross-arm
+identity of the library-independent strategies **0.000e+00 over 70 values**; `obs_predict` is a
+**no-op at Δ = 0** — **0.000e+00 over 90 values**, asserted in-run; and the whole naive half is
+bit-identical to `d2` — **+0.0000 across all 7 arms × 5 Δ × 2 strategies (140 values)**. So the
+efference-copy half is the only new variable in the run.
+
+**The strong incumbent is very strong.** Efference copy costs the agent only the part of the last Δ
+steps it could not have predicted (the motor noise) plus the model's own drift, and on this plant
+Δ = 2–8 sits well inside the ~21-step composition horizon:
+
+| Δ | ms | reactive naive → efference | live_seg naive → efference |
+|---|---|---|---|
+| 0 | 0 | 0.0114 → 0.0114 (no-op) | 0.1978 → 0.1978 (no-op) |
+| 2 | 40 | 0.1110 → **0.0191** (5.8×) | 0.2201 → 0.2113 (1.04×) |
+| 4 | 80 | 0.2231 → **0.0210** (10.6×) | 0.2447 → 0.1837 (1.33×) |
+| 8 | 160 | 0.5294 → **0.0828** (6.4×) | 0.3340 → 0.1618 (2.06×) |
+| 16 | 320 | 0.7190 → **0.3559** (2.0×) | 0.5311 → 0.3750 (1.42×) |
+
+Reactive's delay degradation drops from **63.1× to 31.2×**, and at 80 ms a predictor-equipped
+reactive controller is **0.0210** — 1.8× *better* than the undelayed ballistic anchor. Most of
+round 4's headline delay tax was the naive operator, not the delay.
+
+**Δ\* = None on every arm under both operators.** Per-Δ playability margins (min of the three ÷
+`ref_stale`, naive / efference; `<1.00` = inside playability):
+
+| arm | Δ=0 | Δ=2 | Δ=4 | Δ=8 | Δ=16 | naive Δ\* | efference Δ\* |
+|---|---|---|---|---|---|---|---|
+| `d0` | 0.08/0.08 | 0.76/0.13 | 1.53/0.14 | 2.29/0.57 | 3.13/1.97 | None | None |
+| `sel` | 0.08/0.08 | 0.76/0.13 | 1.53/0.14 | 2.29/0.57 | 2.16/2.44 | None | None |
+| `all4` | 0.08/0.08 | 0.76/0.13 | 1.53/0.14 | 1.58/0.57 | 1.79/1.58 | None | None |
+| `nest_u` | 0.08/0.08 | 0.76/0.13 | 1.53/0.14 | 1.66/0.57 | 1.28/1.77 | None | None |
+| `nest_u_key` | 0.08/0.08 | 0.76/0.13 | 1.22/0.14 | 1.35/0.57 | 1.18/1.61 | None | None |
+| `nest` | 0.08/0.08 | 0.76/0.13 | 1.34/0.14 | 1.32/0.57 | 1.24/1.30 | None | None |
+| `nest_key` | 0.08/0.08 | 0.76/0.13 | 1.09/0.14 | 1.04/0.57 | 1.08/**0.98** | None | None |
+
+Under efference copy the whole Δ ∈ {0, 2, 4, 8} region becomes *comfortably* playable (margins
+0.08–0.57) — and reactive owns all of it.
+
+**`d2`'s "the chain is strictly the best of the three from 80 ms on" does NOT survive.** The first
+Δ at which the chain beats both live strategies:
+
+| arm | naive | efference copy |
+|---|---|---|
+| `nest`, `nest_key`, `nest_u_key` | **4** (80 ms) | **16** (320 ms) |
+| `all4`, `nest_u` | 8 | **16** |
+| `d0`, `sel` | 16 | 16 |
+
+Under the honest incumbent the chain is best only at 320 ms, on every arm.
+
+**The one thing that does hold up.** `nest_key`'s chain under efference copy is **flat and under the
+anchor at every delay**: 0.1455 / 0.1425 / 0.1425 / 0.1425 / 0.1425 (0.98–1.00× `ref_stale`;
+degradation **0.98×** — marginally *better* at 320 ms than at 0). At Δ = 16 it is strictly the best
+of the three *and* playable (min ÷ anchor **0.976**), but the pre-fixed criterion still fails on the
+**middle term**: `live_seg` 0.3750 > `reactive` 0.3559. That is the **third** appearance of this
+pattern (`d2` at Δ = 4, `d3` at Δ = 4, `d3b` at Δ = 16) — the ordering the criterion asks for is
+broken by the live *segment* plan overtaking the reactive controller, not by the chain.
+
+**Stored content is mostly slightly WORSE under the predictor** — the efference copy changes which
+tape the seam selector picks, and not always for the better. Best stored error at any Δ, naive →
+efference: `d0` 0.2036 → 0.2365, `sel` 0.2119 → 0.2821, `all4` 0.1998 → 0.2291, `nest_u`
+0.1874 → 0.2010, `nest_u_key` 0.1727 → 0.2110, `nest` 0.1613 → 0.1613, `nest_key`
+0.1455 → **0.1425**. Only the fully-legato arm improves.
+
+**The comparison this round does NOT make.** `d3b` runs `d2`'s configuration (FM frozen) under both
+operators; `d3`'s Δ\* = 8 pass was under the *adapted* FM with the *naive* incumbent. The
+adapted-FM × efference-copy cell was not run, so whether `d3`'s pass survives the strong incumbent
+is **untested**. What is measured: under the frozen FM, efference copy improves reactive 6.4× at
+Δ = 8 (0.5294 → 0.0828), while `d3`'s passing chain scored 0.1416 there.
+
+**Ledger.** Agent priced time **51,984 s** — identical to `d2` and `d3`, since the second sweep is
+experimenter instrumentation (`who="instrument"`); instrument steps rise 163,392 → 314,352.
+
+**Caveats.** Single seed; 24 shared eval geometries; the criterion is on the mean. The predictor
+uses the *same* forward model the agent plans with, so its quality and the planner's are not
+separable here — the natural next question, and the one Jasper is redirecting to.
+
+**Artifacts.** `results/d3b/d3b_report.txt`, `results/d3b/d3b_delay_by_arm.png`,
+`results/d3b/d3b_ladder_delay0.png`, `results/d3b/d3b_by_segment.png`; raw at
+`results/d3b/d3b/delay_gate/results.json`. Smokes: `results/d3bs0` (donor identity after the
+`world.py` port), `results/d3bs1` (dual-operator path), `results/gsmoke2` (G-F re-run).

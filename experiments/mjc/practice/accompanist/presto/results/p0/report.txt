@@ -1,0 +1,191 @@
+
+=== presto Phase B (p0) — complete=True wall=14 min ===
+piece: R=0.17 damping=0.5 h_seg=[6, 6, 6, 6, 6] mean drilled leg 0.1997 m -> nominal tip speed 1.66 m/s
+knobs from Phase A: lookahead_gamma=1.0 vel_pen_mid=0.0 react_look grid=[6, 12, 30] calp={'1': [1024, 8], '5': [1024, 12]}
+anchors: ref_stale 0.0477 | half_leg 0.0999 -> ref_play 0.0999   |   do-nothing floor 0.2156
+
+feedback events per traversal: reactive=31, live_seg=6, live_chain=2, seg_tape=6, seg_fixed=6, chain=2, chain_fixed=2, chain_react=2
+
+=== the Delta sweep, PREDICTING incumbent (efference copy through the delay) — PRIMARY ===
+  D    ms  reactive  live_seg live_chai  seg_tape seg_fixed     chain chain_fix chain_rea
+-----------------------------------------------------------------------------------------
+  0     0    0.0184    0.0310    0.1053    0.0949    0.1194    0.0996    0.1420    0.0960
+  1    20    0.0218    0.0328    0.1080    0.0932    0.1194    0.0973    0.1420    0.0958
+  2    40    0.0257    0.0356    0.1097    0.0875    0.1194    0.0964    0.1420    0.0940
+  3    60    0.0275    0.0383    0.1132    0.0967    0.1194    0.0960    0.1420    0.0954
+  4    80    0.0291    0.0439    0.1121    0.0958    0.1194    0.0934    0.1420    0.0985
+  5   100    0.0321    0.0457    0.1139    0.0883    0.1194    0.0960    0.1420    0.0944
+  6   120    0.0347    0.0469    0.1126    0.0964    0.1194    0.0934    0.1420    0.0944
+  8   160    0.0418    0.0526    0.1130    0.0958    0.1194    0.0960    0.1420    0.0947
+degradation D=0 -> D=8: reactive 2.28x  live_seg 1.70x  live_chain 1.07x  seg_tape 1.01x  seg_fixed 1.00x  chain 0.96x  chain_fixed 1.00x  chain_react 0.99x
+
+=== the Delta sweep, NAIVE incumbent (act on where you were) — offbook d0's operator ===
+  D    ms  reactive  live_seg live_chai  seg_tape seg_fixed     chain chain_fix chain_rea
+-----------------------------------------------------------------------------------------
+  0     0    0.0184    0.0310    0.1053    0.0949    0.1194    0.0996    0.1420    0.0960
+  1    20    0.0511    0.0600    0.1034    0.1405    0.1194    0.1017    0.1420    0.1035
+  2    40    0.1166    0.0827    0.1026    0.1269    0.1194    0.0979    0.1420    0.1068
+  3    60    0.1513    0.1071    0.0971    0.1287    0.1194    0.1008    0.1420    0.1013
+  4    80    0.1894    0.1562    0.0956    0.1287    0.1194    0.1063    0.1420    0.1296
+  5   100    0.2692    0.2273    0.0960    0.1284    0.1194    0.1194    0.1420    0.1205
+  6   120    0.2831    0.2974    0.1063    0.2334    0.1194    0.1201    0.1420    0.1198
+  8   160    0.3506    0.3090    0.1739    0.3153    0.1194    0.1291    0.1420    0.1210
+degradation D=0 -> D=8: reactive 19.10x  live_seg 9.96x  live_chain 1.65x  seg_tape 3.32x  seg_fixed 1.00x  chain 1.30x  chain_fixed 1.00x  chain_react 1.26x
+
+=== the pre-fixed criterion (fixed before the run) ===
+Delta* = smallest Delta with e_chain <= e_live_seg <= e_reactive on mean piece error, subject to min(of the three) <= ref_play = max(ref_stale, 0.5 x mean drilled leg).
+MARGINS, not just verdicts: `ch<live` and `live<rct` are the ordering margins (positive = the ordering holds), `guard mgn` is ref_play minus the best of the three and `chain mgn` is ref_play minus the chain alone (positive = inside playability). The sibling d2 round missed this guard by 3.6% on offbook's piece, which a pass/fail column alone would have reported as an indistinguishable 'no'.
+
+  --- predict ---
+    D    ms    chain  live_seg  reactive  ord  ch<live  live<rct  play  guard mgn     (%)  chain mgn     (%)  passes
+    0     0   0.0996    0.0310    0.0184    F  -0.0686   -0.0127     T    +0.0815   +81.6    +0.0003    +0.3      no
+    1    20   0.0973    0.0328    0.0218    F  -0.0645   -0.0110     T    +0.0781   +78.2    +0.0026    +2.6      no
+    2    40   0.0964    0.0356    0.0257    F  -0.0609   -0.0098     T    +0.0742   +74.3    +0.0034    +3.4      no
+    3    60   0.0960    0.0383    0.0275    F  -0.0576   -0.0108     T    +0.0723   +72.4    +0.0039    +3.9      no
+    4    80   0.0934    0.0439    0.0291    F  -0.0495   -0.0148     T    +0.0708   +70.9    +0.0064    +6.4      no
+    5   100   0.0960    0.0457    0.0321    F  -0.0503   -0.0136     T    +0.0678   +67.8    +0.0039    +3.9      no
+    6   120   0.0934    0.0469    0.0347    F  -0.0465   -0.0122     T    +0.0652   +65.2    +0.0064    +6.4      no
+    8   160   0.0960    0.0526    0.0418    F  -0.0434   -0.0108     T    +0.0581   +58.1    +0.0039    +3.9      no
+
+  --- naive ---
+    D    ms    chain  live_seg  reactive  ord  ch<live  live<rct  play  guard mgn     (%)  chain mgn     (%)  passes
+    0     0   0.0996    0.0310    0.0184    F  -0.0686   -0.0127     T    +0.0815   +81.6    +0.0003    +0.3      no
+    1    20   0.1017    0.0600    0.0511    F  -0.0416   -0.0089     T    +0.0488   +48.8    -0.0018    -1.8      no
+    2    40   0.0979    0.0827    0.1166    F  -0.0152   +0.0339     T    +0.0172   +17.2    +0.0020    +2.0      no
+    3    60   0.1008    0.1071    0.1513    T  +0.0064   +0.0441     F    -0.0009    -0.9    -0.0009    -0.9      no
+    4    80   0.1063    0.1562    0.1894    T  +0.0499   +0.0332     F    -0.0064    -6.4    -0.0064    -6.4      no
+    5   100   0.1194    0.2273    0.2692    T  +0.1079   +0.0419     F    -0.0195   -19.6    -0.0195   -19.6      no
+    6   120   0.1201    0.2974    0.2831    F  +0.1773   -0.0143     F    -0.0202   -20.3    -0.0202   -20.3      no
+    8   160   0.1291    0.3090    0.3506    T  +0.1799   +0.0416     F    -0.0293   -29.3    -0.0293   -29.3      no
+
+  Delta* (PRIMARY, predicting) = None   |   Delta* (naive, offbook's operator) = None
+  -> no delay inverts the ordering under the pre-fixed rule. The round stops at the gate; Delta is not extended and the criterion is not re-fitted (legato F2).
+
+=== crossovers (first delay at which each holds, and whether it is inside playability) ===
+  [predict] chain < reactive: never in the sweep
+  [predict] seg_tape < reactive: never in the sweep
+  [predict] chain < live_seg: never in the sweep
+  [predict] seg_tape < live_seg: never in the sweep
+  [predict] seg_fixed < seg_tape: never in the sweep
+  [predict] chain_fixed < chain: never in the sweep
+  [predict] chain < seg_tape: first at Delta = 3 (60 ms), INSIDE playability (0.0960 vs 0.0967)
+  [naive  ] chain < reactive: first at Delta = 2 (40 ms), INSIDE playability (0.0979 vs 0.1166)
+  [naive  ] seg_tape < reactive: first at Delta = 3 (60 ms), outside playability (0.1287 vs 0.1513)
+  [naive  ] chain < live_seg: first at Delta = 3 (60 ms), outside playability (0.1008 vs 0.1071)
+  [naive  ] seg_tape < live_seg: first at Delta = 4 (80 ms), outside playability (0.1287 vs 0.1562)
+  [naive  ] seg_fixed < seg_tape: first at Delta = 1 (20 ms), INSIDE playability (0.1194 vs 0.1405)
+  [naive  ] chain_fixed < chain: never in the sweep
+  [naive  ] chain < seg_tape: first at Delta = 1 (20 ms), INSIDE playability (0.1017 vs 0.1405)
+
+=== the forward model's own competence at each commit (legato CAL-D's curve) ===
+Content frozen against a model that is still improving is legato's measured failure mode (`L1` committed at c25-c39 against a ballistic clock not plateaued by c72). The model trains through the between-commit practice and is frozen only for the sweep.
+   commit  cycles   e_react  e_ball_seg
+        0      25    0.0157      0.0259
+        1      30    0.0155      0.0252
+        2      35    0.0180      0.0295
+        3      40    0.0138      0.0270
+        4      45    0.0157      0.0306
+    chain      50    0.0167      0.0309
+
+=== the stored content, as auditioned (plant replay, cross-state, NESTED build: candidates AND score set from the configuration that deploys the unit) ===
+  `chosen` is what the committed library actually scores on its own score set; `per-state oracle` is the ceiling a perfect key could reach on the same pool -- if the ORACLE is bad the pool is wrong, which no selection can repair (the sibling d1's seam-1/2 finding).
+      key/seg0:   96 cand x  72 states | chosen 0.0450 | best single tape 0.0566 | per-state oracle 0.0295 (1.92x) | 10/12 distinct
+      key/seg1:   96 cand x  72 states | chosen 0.0355 | best single tape 0.1013 | per-state oracle 0.0161 (6.27x) | 12/12 distinct
+      key/seg2:   96 cand x  72 states | chosen 0.0690 | best single tape 0.1309 | per-state oracle 0.0460 (2.85x) | 9/12 distinct
+      key/seg3:   96 cand x  72 states | chosen 0.1042 | best single tape 0.1605 | per-state oracle 0.0747 (2.15x) | 10/12 distinct
+      key/seg4:   96 cand x  72 states | chosen 0.1149 | best single tape 0.1571 | per-state oracle 0.0670 (2.35x) | 12/12 distinct
+      fix/seg0:   96 cand x  72 states | chosen 0.0519 | best single tape 0.0519 | per-state oracle 0.0267 (1.95x) | 1/1 distinct
+      fix/seg1:   96 cand x  72 states | chosen 0.0532 | best single tape 0.0532 | per-state oracle 0.0192 (2.76x) | 1/1 distinct
+      fix/seg2:   96 cand x  72 states | chosen 0.1078 | best single tape 0.1078 | per-state oracle 0.0565 (1.91x) | 1/1 distinct
+      fix/seg3:   96 cand x  72 states | chosen 0.1632 | best single tape 0.1632 | per-state oracle 0.0668 (2.44x) | 1/1 distinct
+      fix/seg4:   96 cand x  72 states | chosen 0.1533 | best single tape 0.1533 | per-state oracle 0.0723 (2.12x) | 1/1 distinct
+         chain:   96 cand x  72 states | chosen 0.0816 | best single tape 0.1296 | per-state oracle 0.0517 (2.51x) | 10/12 distinct
+   chain_react:   96 cand x  72 states | chosen 0.0785 | best single tape 0.1185 | per-state oracle 0.0377 (3.15x) | 9/12 distinct
+   chain_fixed:   96 cand x  72 states | chosen 0.1296 | best single tape 0.1296 | per-state oracle 0.0517 (2.51x) | 1/1 distinct
+
+=== the incumbent's lookahead, per delay (it is given its best at each) ===
+  [predict] D= 0: 6:0.0378  12:0.0184  30:0.0537   -> chose 12
+  [predict] D= 1: 6:0.0421  12:0.0218  30:0.0551   -> chose 12
+  [predict] D= 2: 6:0.0334  12:0.0257  30:0.0569   -> chose 12
+  [predict] D= 3: 6:0.0389  12:0.0275  30:0.0587   -> chose 12
+  [predict] D= 4: 6:0.0438  12:0.0291  30:0.0608   -> chose 12
+  [predict] D= 5: 6:0.0535  12:0.0321  30:0.0625   -> chose 12
+  [predict] D= 6: 6:0.0636  12:0.0347  30:0.0661   -> chose 12
+  [predict] D= 8: 6:0.0849  12:0.0418  30:0.0719   -> chose 12
+  [naive  ] D= 0: 6:0.0378  12:0.0184  30:0.0537   -> chose 12
+  [naive  ] D= 1: 6:0.1216  12:0.0511  30:0.0759   -> chose 12
+  [naive  ] D= 2: 6:0.1586  12:0.1178  30:0.1166   -> chose 30
+  [naive  ] D= 3: 6:0.2157  12:0.1752  30:0.1513   -> chose 30
+  [naive  ] D= 4: 6:0.2593  12:0.2078  30:0.1894   -> chose 30
+  [naive  ] D= 5: 6:0.2882  12:0.2754  30:0.2692   -> chose 30
+  [naive  ] D= 6: 6:0.2831  12:0.3256  30:0.3026   -> chose 6
+  [naive  ] D= 8: 6:0.4107  12:0.4366  30:0.3506   -> chose 30
+
+=== by-segment medians (where in the figure each strategy loses it) ===
+  [predict] D= 0 (  0 ms)
+          reactive  0.0445  0.0020  0.0429  0.0044  0.0014   | v_mean 1.71 v_max 2.98
+          live_seg  0.0494  0.0129  0.0530  0.0215  0.0119   | v_mean 1.69 v_max 3.04
+        live_chain  0.0909  0.0259  0.1916  0.1314  0.1041   | v_mean 1.56 v_max 3.05
+          seg_tape  0.0407  0.0457  0.0910  0.1414  0.1437   | v_mean 1.81 v_max 4.04
+         seg_fixed  0.0530  0.0480  0.1100  0.1826  0.1850   | v_mean 1.74 v_max 3.24
+             chain  0.0532  0.0575  0.0825  0.1223  0.1277   | v_mean 1.81 v_max 4.05
+       chain_fixed  0.0614  0.0759  0.1217  0.1903  0.2320   | v_mean 1.89 v_max 3.80
+       chain_react  0.0623  0.0542  0.0871  0.1114  0.1156   | v_mean 1.76 v_max 3.34
+  [predict] D= 4 ( 80 ms)
+          reactive  0.0418  0.0077  0.0572  0.0227  0.0111   | v_mean 1.70 v_max 3.23
+          live_seg  0.0463  0.0174  0.0910  0.0370  0.0302   | v_mean 1.63 v_max 3.18
+        live_chain  0.0883  0.0307  0.1969  0.1353  0.1165   | v_mean 1.55 v_max 3.11
+          seg_tape  0.0407  0.0419  0.0906  0.1426  0.1326   | v_mean 1.81 v_max 4.04
+         seg_fixed  0.0530  0.0480  0.1100  0.1826  0.1850   | v_mean 1.74 v_max 3.24
+             chain  0.0532  0.0540  0.0645  0.1322  0.1208   | v_mean 1.81 v_max 4.05
+       chain_fixed  0.0614  0.0759  0.1217  0.1903  0.2320   | v_mean 1.89 v_max 3.80
+       chain_react  0.0625  0.0542  0.0865  0.1116  0.1188   | v_mean 1.77 v_max 3.34
+  [predict] D= 8 (160 ms)
+          reactive  0.0415  0.0145  0.0609  0.0502  0.0216   | v_mean 1.67 v_max 3.38
+          live_seg  0.0434  0.0203  0.0942  0.0406  0.0504   | v_mean 1.63 v_max 2.95
+        live_chain  0.0887  0.0294  0.1951  0.1266  0.1222   | v_mean 1.56 v_max 2.76
+          seg_tape  0.0407  0.0419  0.0906  0.1388  0.1183   | v_mean 1.81 v_max 3.77
+         seg_fixed  0.0530  0.0480  0.1100  0.1826  0.1850   | v_mean 1.74 v_max 3.24
+             chain  0.0547  0.0562  0.0782  0.1322  0.1253   | v_mean 1.80 v_max 4.05
+       chain_fixed  0.0614  0.0759  0.1217  0.1903  0.2320   | v_mean 1.89 v_max 3.80
+       chain_react  0.0610  0.0542  0.0842  0.1078  0.1156   | v_mean 1.77 v_max 3.53
+  [naive  ] D= 0 (  0 ms)
+          reactive  0.0445  0.0020  0.0429  0.0044  0.0014   | v_mean 1.71 v_max 2.98
+          live_seg  0.0494  0.0129  0.0530  0.0215  0.0119   | v_mean 1.69 v_max 3.04
+        live_chain  0.0909  0.0259  0.1916  0.1314  0.1041   | v_mean 1.56 v_max 3.05
+          seg_tape  0.0407  0.0457  0.0910  0.1414  0.1437   | v_mean 1.81 v_max 4.04
+         seg_fixed  0.0530  0.0480  0.1100  0.1826  0.1850   | v_mean 1.74 v_max 3.24
+             chain  0.0532  0.0575  0.0825  0.1223  0.1277   | v_mean 1.81 v_max 4.05
+       chain_fixed  0.0614  0.0759  0.1217  0.1903  0.2320   | v_mean 1.89 v_max 3.80
+       chain_react  0.0623  0.0542  0.0871  0.1114  0.1156   | v_mean 1.76 v_max 3.34
+  [naive  ] D= 4 ( 80 ms)
+          reactive  0.1941  0.2064  0.1721  0.2483  0.1254   | v_mean 3.16 v_max 5.67
+          live_seg  0.0624  0.1093  0.1442  0.2482  0.1679   | v_mean 2.38 v_max 5.12
+        live_chain  0.0994  0.0326  0.1676  0.0919  0.0905   | v_mean 1.58 v_max 3.16
+          seg_tape  0.0563  0.0506  0.0944  0.1571  0.1895   | v_mean 1.85 v_max 4.42
+         seg_fixed  0.0530  0.0480  0.1100  0.1826  0.1850   | v_mean 1.74 v_max 3.24
+             chain  0.0540  0.0586  0.1072  0.1196  0.1251   | v_mean 1.77 v_max 3.80
+       chain_fixed  0.0614  0.0759  0.1217  0.1903  0.2320   | v_mean 1.89 v_max 3.80
+       chain_react  0.0610  0.0542  0.1127  0.1519  0.1617   | v_mean 1.73 v_max 3.40
+  [naive  ] D= 8 (160 ms)
+          reactive  0.2053  0.4127  0.3831  0.3688  0.4537   | v_mean 3.35 v_max 7.32
+          live_seg  0.1047  0.2901  0.3850  0.3320  0.6528   | v_mean 2.92 v_max 7.14
+        live_chain  0.1074  0.0912  0.1768  0.2003  0.2292   | v_mean 1.58 v_max 3.49
+          seg_tape  0.0553  0.1369  0.2307  0.4291  0.4905   | v_mean 2.04 v_max 5.11
+         seg_fixed  0.0530  0.0480  0.1100  0.1826  0.1850   | v_mean 1.74 v_max 3.24
+             chain  0.0743  0.0653  0.1085  0.1416  0.1521   | v_mean 1.91 v_max 3.51
+       chain_fixed  0.0614  0.0759  0.1217  0.1903  0.2320   | v_mean 1.89 v_max 3.80
+       chain_react  0.0740  0.0585  0.1075  0.1349  0.1579   | v_mean 1.76 v_max 3.25
+
+=== the ledger (agent-side is practice + the nested build; every sweep traversal and every audition is instrument-side) ===
+         steps_agent: 35,200
+    steps_instrument: 1,083,600
+            fb_agent: 18,800
+       fb_instrument: 160,104
+         plans_agent: 16,800
+    plans_instrument: 62,184
+         delib_agent: 1,272,053,760
+           aud_agent: 0
+      aud_instrument: 0
+            t_priced: 2,584
+  largest kinds by env steps: practice=14,080, practice_seam0=3,520, practice_seam1=3,520, practice_seam2=3,520, practice_seam3=3,520, practice_seam4=3,520, practice_chain=3,520

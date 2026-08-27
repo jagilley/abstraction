@@ -23,6 +23,35 @@ the claims.** One orchestrated conversation; one implementer agent built all fou
 canary-staged (one treatment arm per round after O1, each launched only after the previous round's
 reduction was read).
 
+## ⚠ Status: SUSPECT (2026-08-27) — read [`../accompanist/README.md`](../accompanist/README.md) first
+
+**Jasper's note**: these findings may be erroneous; read with a grain of salt. We shouldn't have
+run this with an FM; as of running we didn't understand how FM + practice/re-internalization play
+together.
+
+**Why, specifically** (six follow-up rounds, `d1`–`d3b` below and `../accompanist/presto/`):
+
+- **This node's incumbent plans for free in a near-perfect forward model.** On RHM, the search the
+  vocabulary competes with is *real and priced* (every candidate materialised on the plant, under a
+  declared grounding budget) — that is what made depth unaffordable to primitives. Here the
+  reactive incumbent re-plans every 20 ms in imagination at zero price. The RHM economy never ran
+  on this substrate, so "the chain level is never adopted" is not a finding about the units.
+- **The ports were built out of the same model.** Seam-time audition is an FM rollout (blind at
+  chain span, G-C); the rent is denominated in FM rollout-steps (buys nothing, G-K(a)); Port 2 sits
+  on the FM trunk. Findings 1–3 are statements about the FM audition, not about routing on a plant.
+- **`d0`'s "no playable niche" was library construction, and is retracted on its own criterion.**
+  Tapes here were noisy closed-loop renditions, uniformly drawn, harvested from purely reactive
+  traversals. Built the way `legato/` built them (nested in the committed configuration, the model
+  adapting), the chain reaches the anchor and the pre-fixed gate **passes at 160 ms** (`d3`) —
+  against the naive delayed incumbent used in `d0`.
+- **And that pass does not survive an incumbent allowed to predict through the delay** (`d3b`):
+  efference copy is a Δ-step FM rollout, and every Δ inside the model's horizon is bridged by it.
+  The "geometric, not economic" conclusion in the Interpretation below is superseded.
+
+**What stands**: the π-level facts — trust tracks exposure (findings 4–5), the poison quarantine
+under forced exposure (8), the frozen key's need for boundary information (9). **What is next**:
+`../acappella/SPEC.md`[^private], the re-port with no forward model anywhere.
+
 ## The question
 
 Every committed unit on this substrate had been an **external object** — a keyed tape
@@ -211,7 +240,15 @@ Full flag records per round, the decision table, and the launch-path Gotcha: [`F
 Volume `mujoco-control-data`: `/data/practice_offbook/<tag>/…`; fetched copies, reports and figures
 under `results/<tag>/`.
 
-## Next steps (queued, not started)
+## Rounds 5–7b (2026-08-26 → 27): `d1`, `d2`, `d3`, `d3b`
+
+Run after the banner above's diagnosis, on this node's own delay gate with additive flags (defaults
+reproduce `d0` at 0.000e+00): the content ladder (`d1`), legato's nesting (`d2`), the model
+adapting through it (`d3`), the efference-copy incumbent (`d3b`). Records in [`FILES.md`](FILES.md)
+§Rounds 5–7b; reduced results under `results/d1`–`results/d3b`; the writeup and interpretation
+live in [`../accompanist/README.md`](../accompanist/README.md).
+
+## Next steps (superseded — see the banner; kept as the record of what was queued on 2026-08-26)
 
 A piece that can only be played from memory — task difficulty co-designed with the reflex delay so
 closed-loop control fails at realistic Δ while measured content still passes (the regime fast
@@ -223,3 +260,5 @@ trust dynamics ever need the decomposition · the arrival/rehearsal assay (`cens
 instrument) once a substrate exists where adoption can occur · `/update-beliefs` for the unit
 (trust-tracks-exposure; the three-layer refusal; the quarantine under forced exposure; the
 feedback-consumption ordering).
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

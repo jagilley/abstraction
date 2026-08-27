@@ -37,7 +37,9 @@ typed maintenance):
 | fingering | [`fingering/`](fingering/README.md) | the compile-op taxonomy on a boundary that carries information: frozen (fixed/keyed/regressed/averaged) vs **live** content under committed routing, timing × maintenance, priced deliberation | **written up** — 1 seed/run; f1c's `never` bit-reproduces f1b's |
 | legato | [`legato/`](legato/README.md) | committed **span** vs the model's composition horizon: segment vs phrase granularity × live vs measured content, with a fusion control | **written up** — 1 seed (seed pair cancelled, GPU budget); ranks + two-horizon signs + double-sided control |
 | span | [`span/`](span/README.md) | the composition horizon **as a trajectory**: legato's practice loop with nothing committed, the FM snapshotted every cycle, imagination horizon × executed span of one live phrase plan against a flat `e_react`; plus a re-measurement of the saved models (on/off-corridor accuracy, the exploitation gap, a per-snapshot CAL-P sweep) | **written up** — 1 seed; 17–81-point monotone trends are the claims |
-| offbook | [`offbook/`](offbook/README.md) | **the port back** on this substrate: seam-time audition (enumeration) vs π-routing vs both ports, the address-book battery and poison twin — then three canary rounds (credit currency, exposure placement, reflex-loop delay) on why the chain level is never adopted | **written up** — 1 seed/run, bit-identity twins + cross-tag exact controls |
+| offbook | [`offbook/`](offbook/README.md) | **the port back** on this substrate: seam-time audition (enumeration) vs π-routing vs both ports, the address-book battery and poison twin — then three canary rounds (credit currency, exposure placement, reflex-loop delay) on why the chain level is never adopted | **written up; SUSPECT** (2026-08-27, see `accompanist/`) — 1 seed/run, bit-identity twins + cross-tag exact controls |
+| accompanist | [`accompanist/`](accompanist/README.md) | the follow-up to offbook: library construction (`d1`–`d3`: content ladder, legato's nesting, the model adapting) and the delay operator (`d3b`, `presto/`: naive vs efference copy) on offbook's piece and on a fast 120 ms-segment piece | **written up** — the pivot: the incumbent's free forward model, not the piece, is what refuses the deep unit |
+| acappella | `acappella/SPEC.md`[^private] | the re-port with **no forward model anywhere**: a priced real-rollout incumbent under a declared budget on `etude/`'s substrate, plant audition, nested selection, routing π | **spec only** |
 
 ## Shared substrate
 
@@ -295,6 +297,30 @@ niche for them. Depth on this piece is geometric, not economic — an environmen
 memory-only piece named as the fix. Quarantine of a poisoned address holds even under forced
 exposure. Full record: [`offbook/README.md`](offbook/README.md).
 
+**Status (2026-08-27): suspect.** The incumbent plans for free in a near-perfect forward model and
+the ports were built from the same model; the "geometric, not economic" conclusion is retracted by
+`accompanist/` on offbook's own criterion. The π-level findings (trust tracks exposure, quarantine)
+stand.
+
+### accompanist — the forward model is the incumbent's free accompanist (2026-08-26 → 08-27, written up)
+
+**Goal**: find where offbook's setup diverged from the conditions practice work needs, and run the
+two fixes the record suggested — build the library the way `legato/` did, and build a piece
+playable only from memory.
+
+**Headline**: offbook's negative was two things stacked. First, library construction: tapes
+harvested from reactive traversals never launch from the states they are scored and played on;
+with legato's nesting the pool matches legato's cell for cell, and with the model adapting the
+pre-fixed delay gate **passes at 160 ms** on offbook's own piece (`d3`) — and on a fast
+120 ms-segment piece the chain beats reactive from 40 ms inside playability (`presto/`). Second,
+and decisive: those wins are against a delayed incumbent that cannot predict. Give it the forward
+model through the delay (efference copy, a Δ-step rollout) and it recovers 6–11× of the penalty and
+owns every playable delay on both pieces — every Δ inside the model's horizon is bridged by the
+model. On RHM the incumbent's search was real and priced; on this substrate it has been free
+imagination since `fingering/`, and `etude/` — the one node where chunks won — is the one where the
+model was the bottleneck. Single seed throughout; bit-identity controls across rounds. Full record:
+[`accompanist/README.md`](accompanist/README.md). Next: `acappella/SPEC.md`[^private].
+
 ## Reproduce
 
 ```bash
@@ -333,7 +359,10 @@ Modal volume (`mujoco-control-data`): `/data/bridge_assembly/dsw_<cell>_s<seed>/
 [`legato/FILES.md`](legato/FILES.md) ·
 [`span/FILES.md`](span/FILES.md) ·
 [`offbook/FILES.md`](offbook/FILES.md) ·
+[`accompanist/FILES.md`](accompanist/FILES.md) ·
 [`estimability/FILES.md`](estimability/FILES.md) ·
 [`priced_plasticity/FILES.md`](priced_plasticity/FILES.md) ·
 [`aleatoric_flip/FILES.md`](aleatoric_flip/FILES.md) ·
 [`../bridge_assembly/difficulty_sweep/FILES.md`](../bridge_assembly/difficulty_sweep/FILES.md)
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
