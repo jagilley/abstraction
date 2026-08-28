@@ -1,0 +1,493 @@
+
+[merge] ma_s1 -> ma_s0: refs identical = True, stale buffer identical = True
+[merge] arms added: ['outer_yield_j', 'learned_yield_j']
+[merge] the twin tag's own in-job substrate assertion vs ma_s0: refs_identical = True
+=== maestro (A2) — tag ma_s0 ===
+ladder [('L1n25', 48), ('L2n12', 40), ('L3n6', 12), ('L4n3', 9), ('L5n1', 7)] = 116 cycles/arm scheduled; caps [60, 50, 15, 12, 9] = 146; setup 605s; stale buffer 0.1269 -> 0.1541
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+
+==============================================================================
+(0) GATES
+==============================================================================
+  CROSS-TAG REPLAY (the substrate): ma_s0/anchor vs cd_s0/anchor over c1-c116
+    max|delta| = 0.000e+00 over 13 series; commits [(18, 2), (69, 3)] vs [(18, 2), (69, 3)]  -> PASS
+  CROSS-TAG REPLAY (A1's THERMOSTAT, the comparator): ma_s0/outer_yield vs cd_s0/outer_yield over c1-c139
+    max|delta| = 0.000e+00 over 13 series; commits [(49, 2), (92, 3)] vs [(49, 2), (92, 3)]  -> PASS
+  CROSS-TAG REPLAY (the chain back to the donor of A1's donor): ma_s0/anchor vs as_s0/anchor over c1-c116
+    max|delta| = 0.000e+00 over 13 series; commits [(18, 2), (69, 3)] vs [(18, 2), (69, 3)]  -> PASS
+
+  IN-TAG TWIN GATE (each arm vs the anchor, to the first action by EITHER; the anchor's own first commit is c18):
+    outer_yield    c1-c17   (first action c18 (anchor)) max|delta| = 0.000e+00  -> PASS
+    learned_yield  c1-c17   (first action c18 (anchor)) max|delta| = 0.000e+00  -> PASS
+    learned_task   c1-c13   (first action c14 (own)) max|delta| = 0.000e+00  -> PASS
+    yoked_learned  c1-c17   (first action c18 (anchor)) max|delta| = 0.000e+00  -> PASS
+    outer_yield_j  c1-c17   (first action c18 (anchor)) max|delta| = 9.800e+01  -> FAIL
+    learned_yield_j c1-c17   (first action c18 (anchor)) max|delta| = 9.800e+01  -> FAIL
+
+  OBSERVATION PANEL vs the donor's G-Y miner (level 4, every cycle):
+    anchor         agree=True over 116 cycles
+    outer_yield    agree=True over 139 cycles
+    learned_yield  agree=True over 130 cycles
+    learned_task   agree=True over 125 cycles
+    yoked_learned  agree=True over 130 cycles
+    outer_yield_j  agree=True over 137 cycles
+    learned_yield_j agree=True over 106 cycles
+
+  POLICY GATE (offline, no GPU): ALL PASS (21 checks)
+
+  ENDO READ: LABEL-FREE BY CONSTRUCTION: PASS — positions depend only on ['era.level', 'era.node', 's', 'depth']; none of ['truth', 'rules', 'inverse_maps', 'committed', 'canon', 'true_mask', 'grade'] appears in the read's code
+    era 1 cell L1n25 blocks [25, 26] -> parent L2n12 blocks [24, 26]
+    era 2 cell L2n12 blocks [24, 26] -> parent L3n6 blocks [24, 28]
+    era 3 cell L3n6 blocks [24, 28] -> parent L4n3 blocks [24, 32]
+    era 4 cell L4n3 blocks [24, 32] -> parent L5n1 blocks [16, 32]
+    era 5 cell L5n1 blocks [16, 32] -> parent L6n0 blocks [0, 32]  (parent IS the root: the read is the unconditional marginal)
+
+  DEAD ZONES: measured, not defaulted: PASS, matches floors.json = None
+    {'tol_ledger': 0.02944712566990095, 'tol_yield_l3': 0.46127129019246205, 'tol_yield_l4': 0.5166900731510206, 'tol_endo': 0.01091575129919287}
+    provenance: cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)
+
+  ENDO PRICE (measured on the run's own GPU): one read over 256 sequences = 1.3 ms = 268 grounding-equivalents; charged 267g
+
+==============================================================================
+(1) THE ACTION TRACE — what the loop did, and when
+==============================================================================
+  arm               policy    read cycles  commits  advances  chosen  capped  rode cap
+  anchor          schedule    None    116        0         0       0       0     False
+  outer_yield        quiet   yield    139        2         5       4       3      True
+  learned_yield    learnedlearned:yield    130        2         5       4       3      True
+  learned_task     learnedlearned:task    125        1         5       4       2      True
+  yoked_learned       yoke    None    130        2         5       0       0     False
+  outer_yield_j      quiet   yield    137        2         5       6       1     False
+  learned_yield_j   learnedlearned:yield    106        2         5       5       2      True
+
+  PER-ARM ACTIONS (cycle, kind, level, why, and the statistic at that instant)
+
+    anchor  eras: e1 c1-48 (48c), e2 c49-88 (40c), e3 c89-100 (12c), e4 c101-109 (9c), e5 c110-116 (7c)
+      (no loop actions — the schedule arm)
+
+    outer_yield  eras: e1 c1-56 (56c), e2 c57-106 (50c), e3 c107-121 (15c), e4 c122-130 (9c), e5 c131-139 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c56   era1 advance  L-  why=quiet  V=   0.4375 tol=  0.4613 V/tol=    0.95
+      c92   era2 commit   L3  why=quiet  V=   0.3015 tol=  0.5167 V/tol=    0.58
+      c106  era2 advance  L-  why=cap    V=   1.4912 tol=  0.5167 V/tol=    2.89
+      c121  era3 advance  L-  why=cap    V=   0.9353 tol=  0.5167 V/tol=    1.81
+      c130  era4 advance  L-  why=quiet  V=   0.3906 tol=  0.5167 V/tol=    0.76
+      c139  era5 advance  L-  why=cap    V=   0.3125 tol=  0.5167 V/tol=    0.60
+
+    learned_yield  eras: e1 c1-60 (60c), e2 c61-94 (34c), e3 c95-109 (15c), e4 c110-121 (12c), e5 c122-130 (9c)
+      c39   era1 commit   L2  why=quiet  V=   1.0172 tol=  1.2085 V/tol=    0.84
+      c60   era1 advance  L-  why=quiet  V=   0.9174 tol=  1.0980 V/tol=    0.84
+      c85   era2 commit   L3  why=quiet  V=   0.8457 tol=  1.2085 V/tol=    0.70
+      c94   era2 advance  L-  why=quiet  V=   1.0264 tol=  1.0980 V/tol=    0.93
+      c109  era3 advance  L-  why=cap    V=   2.0370 tol=  1.0980 V/tol=    1.86
+      c121  era4 advance  L-  why=cap    V=   1.4468 tol=  1.0980 V/tol=    1.32
+      c130  era5 advance  L-  why=cap    V=   0.6504 tol=  1.0980 V/tol=    0.59
+
+    learned_task  eras: e1 c1-45 (45c), e2 c46-95 (50c), e3 c96-108 (13c), e4 c109-116 (8c), e5 c117-125 (9c)
+      c14   era1 commit   L2  why=quiet  V=   1.1380 tol=  1.4253 V/tol=    0.80
+      c45   era1 advance  L-  why=quiet  V=   0.3200 tol=  0.7083 V/tol=    0.45
+      c95   era2 advance  L-  why=cap    V=   0.5102 tol=  1.4253 V/tol=    0.36
+      c108  era3 advance  L-  why=quiet  V=   0.5704 tol=  0.7083 V/tol=    0.81
+      c116  era4 advance  L-  why=quiet  V=   0.5726 tol=  0.7083 V/tol=    0.81
+      c125  era5 advance  L-  why=cap    V=   0.0552 tol=  0.7083 V/tol=    0.08
+
+    yoked_learned  eras: e1 c1-60 (60c), e2 c61-94 (34c), e3 c95-109 (15c), e4 c110-121 (12c), e5 c122-130 (9c)
+      c39   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c60   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c85   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c94   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c109  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c121  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c130  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    outer_yield_j  eras: e1 c1-59 (59c), e2 c60-109 (50c), e3 c110-122 (13c), e4 c123-129 (7c), e5 c130-137 (8c)
+      c26   era1 commit   L2  why=quiet  V=   0.3741 tol=  0.4613 V/tol=    0.81
+      c59   era1 advance  L-  why=quiet  V=   0.3757 tol=  0.4613 V/tol=    0.81
+      c103  era2 commit   L3  why=quiet  V=   0.2610 tol=  0.5167 V/tol=    0.51
+      c109  era2 advance  L-  why=cap    V=   1.8750 tol=  0.5167 V/tol=    3.63
+      c122  era3 advance  L-  why=quiet  V=   0.4297 tol=  0.5167 V/tol=    0.83
+      c129  era4 advance  L-  why=quiet  V=   0.4375 tol=  0.5167 V/tol=    0.85
+      c137  era5 advance  L-  why=quiet  V=   0.5000 tol=  0.5167 V/tol=    0.97
+
+    learned_yield_j  eras: e1 c1-46 (46c), e2 c47-70 (24c), e3 c71-85 (15c), e4 c86-97 (12c), e5 c98-106 (9c)
+      c26   era1 commit   L2  why=quiet  V=   0.7472 tol=  1.2085 V/tol=    0.62
+      c46   era1 advance  L-  why=quiet  V=   0.9859 tol=  1.0980 V/tol=    0.90
+      c54   era2 commit   L3  why=quiet  V=   1.1966 tol=  1.2085 V/tol=    0.99
+      c70   era2 advance  L-  why=quiet  V=   1.0678 tol=  1.0980 V/tol=    0.97
+      c85   era3 advance  L-  why=cap    V=   1.6510 tol=  1.0980 V/tol=    1.50
+      c97   era4 advance  L-  why=quiet  V=   0.9505 tol=  1.0980 V/tol=    0.87
+      c106  era5 advance  L-  why=cap    V=   0.8714 tol=  1.0980 V/tol=    0.79
+
+  COMMIT CYCLES AND WHAT WAS COMMITTED
+  arm            lvl  cycle  era  prov  entries  recall    prec  cert@    driver
+  anchor           2     18    1 False       11   0.571   0.727     18delta_prov
+  anchor           3     69    2 False       12   0.071   0.333     69delta_prov
+  outer_yield      2     49    1 False       14   0.714   0.714     18      loop
+  outer_yield      3     92    2 False       21   0.125   0.333     74      loop
+  learned_yield    2     39    1 False       13   0.643   0.692     18      loop
+  learned_yield    3     85    2 False       18   0.089   0.278     81      loop
+  learned_task     2     14    1 False       11   0.571   0.727   None      loop
+  yoked_learned    2     39    1 False       13   0.643   0.692     18      loop
+  yoked_learned    3     85    2 False       18   0.089   0.278     81      loop
+  outer_yield_j    2     26    1 False       12   0.571   0.667     19      loop
+  outer_yield_j    3    103    2 False       22   0.125   0.318     80      loop
+  learned_yield_j   2     26    1 False       12   0.571   0.667     19      loop
+  learned_yield_j   3     54    2 False        5   0.036   0.400   None      loop
+
+==============================================================================
+(1b) THE LEARNED POLICY'S OWN RECORD — the mixtures, the fit, the action diff
+==============================================================================
+  THE FITTED MIXTURES (unit-norm weights on each gauge's paired-interval slope,
+  IN FLOOR UNITS; the bucket is `will_commit` = would a firing install a table).
+  A1's thermostat is the point (0, 1, 0) with theta = 1 in this same class.
+    arm/reward        bucket           ledger         yield   endo_excess    theta
+    learned_yield   installs          +0.2106       +0.9440       +0.2540   1.2085
+    learned_yield   advances          +0.0495       +0.8506       +0.5235   1.0980
+    learned_task    installs          -0.7806       +0.2146       +0.5871   1.4253
+    learned_task    advances          -0.4221       +0.1367       +0.8962   0.7083
+
+  OFFLINE FIT DIAGNOSTICS (from fit.json; corpus 257 windows over 4 distinct trajectories, leave-one-ARM-out)
+    reward    bucket     n   lambda  LOAO mse thermostat  ratio  R2 vs 0                  fold cos
+    yield          1   165       30    0.9725     1.1228  0.866   +0.763    1.00, 1.00, 1.00, 1.00
+    yield          0    92       10    1.2601     1.4125  0.892   +0.651    0.99, 0.99, 0.91, 1.00
+    task           1   165        3    0.0965     0.6898  0.140   -0.009    1.00, 0.98, 1.00, 1.00
+    task           0    92      0.3    0.0890     1.0353  0.086   +0.216    0.99, 1.00, 1.00, 1.00
+    'thermostat' is the hand-written rule's own predictor of the same forward
+    rate (that currency's trailing rate, coefficient 1, no free parameters);
+    'ratio' < 1 means the fitted mixture predicts it better OUT OF ARM.
+
+  HOW THE TWO MIXTURES RELATE (cosine)
+    will_commit=1:  yield.task +0.187   yield.thermostat +0.944   task.thermostat +0.215
+    will_commit=0:  yield.task +0.564   yield.thermostat +0.851   task.thermostat +0.137
+
+  THE ACTION DIFF — learned vs the hand-written thermostat, IN THIS TAG
+  (both ran live on their own trajectories, so this is a difference between two
+   runs and not a counterfactual; the pre-GPU replay is in fit.json.)
+    outer_yield      (thermostat) [(49, 'commit', 2, 'quiet'), (56, 'advance', None, 'quiet'), (92, 'commit', 3, 'quiet'), (106, 'advance', None, 'cap'), (121, 'advance', None, 'cap'), (130, 'advance', None, 'quiet'), (139, 'advance', None, 'cap')]
+    learned_yield                 [(39, 'commit', 2, 'quiet'), (60, 'advance', None, 'quiet'), (85, 'commit', 3, 'quiet'), (94, 'advance', None, 'quiet'), (109, 'advance', None, 'cap'), (121, 'advance', None, 'cap'), (130, 'advance', None, 'cap')]
+      commit  : thermostat [49, 92]  learned [39, 85]  delta(cycles, pairwise) [-10, -7]
+      advance : thermostat [56, 106, 121, 130, 139]  learned [60, 94, 109, 121, 130]  delta(cycles, pairwise) [4, -12, -12, -9, -9]
+    learned_task                  [(14, 'commit', 2, 'quiet'), (45, 'advance', None, 'quiet'), (95, 'advance', None, 'cap'), (108, 'advance', None, 'quiet'), (116, 'advance', None, 'quiet'), (125, 'advance', None, 'cap')]
+      commit  : thermostat [49, 92]  learned [14]  delta(cycles, pairwise) [-35]
+      advance : thermostat [56, 106, 121, 130, 139]  learned [45, 95, 108, 116, 125]  delta(cycles, pairwise) [-11, -11, -13, -14, -14]
+
+  WHAT THE LEARNED POLICY READ AT EACH OF ITS OWN ACTIONS
+    learned_yield
+      c39   era1 commit   L2  why=quiet  bucket=   1 Vhat=   1.017 theta=  1.209 Vhat/theta=   0.84   inputs (floor units): ledger=  -0.04  yield=   1.23  endo_excess=  -0.52
+      c60   era1 advance  L-  why=quiet  bucket=   0 Vhat=   0.917 theta=  1.098 Vhat/theta=   0.84   inputs (floor units): ledger=   0.16  yield=   0.79  endo_excess=   0.45
+      c85   era2 commit   L3  why=quiet  bucket=   1 Vhat=   0.846 theta=  1.209 Vhat/theta=   0.70   inputs (floor units): ledger=   0.12  yield=   0.90  endo_excess=  -0.11
+      c94   era2 advance  L-  why=quiet  bucket=   0 Vhat=   1.026 theta=  1.098 Vhat/theta=   0.93   inputs (floor units): ledger=   0.19  yield=   1.54  endo_excess=  -0.56
+      c109  era3 advance  L-  why=cap    bucket=   0 Vhat=   2.037 theta=  1.098 Vhat/theta=   1.86   inputs (floor units): ledger=   0.03  yield=   2.70  endo_excess=  -0.49
+      c121  era4 advance  L-  why=cap    bucket=   0 Vhat=   1.447 theta=  1.098 Vhat/theta=   1.32   inputs (floor units): ledger=   0.63  yield=   1.69  endo_excess=  -0.04
+      c130  era5 advance  L-  why=cap    bucket=   0 Vhat=   0.650 theta=  1.098 Vhat/theta=   0.59   inputs (floor units): ledger=   0.17  yield=   0.85  endo_excess=  -0.15
+    learned_task
+      c14   era1 commit   L2  why=quiet  bucket=   1 Vhat=   1.138 theta=  1.425 Vhat/theta=   0.80   inputs (floor units): ledger=   0.19  yield=   2.45  endo_excess=   1.30
+      c45   era1 advance  L-  why=quiet  bucket=   0 Vhat=   0.320 theta=  0.708 Vhat/theta=   0.45   inputs (floor units): ledger=  -0.30  yield=   0.60  endo_excess=   0.13
+      c95   era2 advance  L-  why=cap    bucket=   1 Vhat=   0.510 theta=  1.425 Vhat/theta=   0.36   inputs (floor units): ledger=  -0.10  yield=   2.11  endo_excess=  -0.04
+      c108  era3 advance  L-  why=quiet  bucket=   0 Vhat=   0.570 theta=  0.708 Vhat/theta=   0.81   inputs (floor units): ledger=   0.25  yield=   2.27  endo_excess=   0.41
+      c116  era4 advance  L-  why=quiet  bucket=   0 Vhat=   0.573 theta=  0.708 Vhat/theta=   0.81   inputs (floor units): ledger=   0.19  yield=   1.03  endo_excess=   0.57
+      c125  era5 advance  L-  why=cap    bucket=   0 Vhat=   0.055 theta=  0.708 Vhat/theta=   0.08   inputs (floor units): ledger=   0.17  yield=   0.79  endo_excess=   0.02
+
+==============================================================================
+(2) GAUGE vs YOKE — the mandatory timing control (census finding 4)
+==============================================================================
+  The yoke replays the gauge arm's realised action cycles by clock and reads
+  nothing. A divergence would mean the reads are not inert; identity means the
+  criterion contributed nothing beyond a cycle number, which is a finding, and the
+  priced-time column is then what the read cost for a trajectory a clock reproduces.
+
+  learned_yield vs yoked_learned  (n=130 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 39), (3, 85)] vs [(2, 39), (3, 85)]   equal = True
+    advances [60, 94, 109, 121, 130] vs [60, 94, 109, 121, 130]   equal = True
+    priced time t_cum 31743132 vs 31708422  (difference +34710 = what the read cost)
+
+==============================================================================
+(3) THE THREE CLOCKS: certificate, coverage, value
+==============================================================================
+  CLOCK 1 — the SHADOW certificate (read-only in every arm, incl. the driven ones)
+  arm             L2 fired  L3 fired  L2 c2cert  L3 c2cert  commit L2  commit L3
+  anchor                18        69         17         19         18         69
+  outer_yield           18        74         17         16         49         92
+  learned_yield         18        81         17         20         39         85
+  learned_task          17        67         16         21         14       None
+  yoked_learned         18        81         17         20         39         85
+  outer_yield_j         19        80         18         20         26        103
+  learned_yield_j        19        79         18         32         26         54
+
+  CLOCK 2 — COVERAGE: end-of-run committed table per level
+  arm            lvl  frozen n   recall    prec  live n  live rec  live prec
+  anchor           2        11    0.571   0.727      18     0.857      0.667
+  anchor           3        12    0.071   0.333      17     0.125      0.412
+  outer_yield      2        14    0.714   0.714      18     0.929      0.722
+  outer_yield      3        21    0.125   0.333      34     0.232      0.382
+  learned_yield    2        13    0.643   0.692      18     0.786      0.611
+  learned_yield    3        18    0.089   0.278      29     0.161      0.310
+  learned_task     2        11    0.571   0.727      19     0.929      0.684
+  learned_task     3         -        -       -      17     0.125      0.412
+  yoked_learned    2        13    0.643   0.692      18     0.786      0.611
+  yoked_learned    3        18    0.089   0.278      29     0.161      0.310
+  outer_yield_j    2        12    0.571   0.667      18     0.929      0.722
+  outer_yield_j    3        22    0.125   0.318      26     0.161      0.346
+  learned_yield_j   2        12    0.571   0.667      20     0.929      0.650
+  learned_yield_j   3         5    0.036   0.400      20     0.107      0.300
+
+  CLOCK 3 — VALUE: recovered fraction per era (e, and (stale-e)/(stale-floor))
+  arm                        era1             era2             era3             era4             era5
+  anchor            0.464 /+0.524    0.549 /+0.619    0.632 /+0.644    0.823 /+0.564    0.950 /+0.202
+  outer_yield       0.474 /+0.512    0.582 /+0.562    0.632 /+0.644    0.804 /+0.630    0.910 /+0.454
+  learned_yield     0.456 /+0.536    0.564 /+0.592    0.644 /+0.617    0.795 /+0.661    0.897 /+0.536
+  learned_task      0.470 /+0.516    0.549 /+0.619    0.707 /+0.476    0.859 /+0.439    0.944 /+0.240
+  yoked_learned     0.456 /+0.536    0.564 /+0.592    0.644 /+0.617    0.795 /+0.661    0.897 /+0.536
+  outer_yield_j     0.454 /+0.538    0.540 /+0.634    0.655 /+0.592    0.832 /+0.533    0.905 /+0.481
+  learned_yield_j    0.480 /+0.504    0.587 /+0.553    0.716 /+0.457    0.790 /+0.679    0.918 /+0.399
+  stale                     0.865            0.906            0.922            0.984            0.982
+  floor                     0.102            0.328            0.471            0.698            0.823
+
+  DELTA TO THE ANCHOR (the scheduled crank), per era, in recovered fraction
+  Read against the MEASURED depth-6 stream floor (census finding 7): 0.087 in the
+  earning family and 0.083/0.148/0.344 in the given family for eras 3/4/5. Ranks
+  and signs in the deep eras are the currency; fractions are not.
+  arm                 era1      era2      era3      era4      era5
+  outer_yield       -0.013    -0.057     0.000     0.067     0.251
+  learned_yield      0.011    -0.027    -0.027     0.097     0.333
+  learned_task      -0.008     0.000    -0.168    -0.124     0.038
+  yoked_learned      0.011    -0.027    -0.027     0.097     0.333
+  outer_yield_j      0.014     0.015    -0.052    -0.030     0.279
+  learned_yield_j    -0.020    -0.066    -0.187     0.115     0.197
+
+==============================================================================
+(4) pi PER-LEVEL MASS, ARGMAX SHARE, AND MACRO EXPANSIONS, per arm per era
+==============================================================================
+
+  L2 proposal mass p_macro_all (last probe of each era)
+  arm                 era1      era2      era3      era4      era5
+  anchor             0.188     0.249     0.258     0.255     0.250
+  outer_yield        0.061     0.305     0.291     0.293     0.280
+  learned_yield      0.185     0.305     0.333     0.322     0.317
+  learned_task       0.204     0.340     0.389     0.436     0.434
+  yoked_learned      0.185     0.305     0.333     0.322     0.317
+  outer_yield_j      0.198     0.361     0.342     0.346     0.299
+  learned_yield_j     0.164     0.232     0.241     0.253     0.246
+
+  L3 proposal mass p_macro_all (last probe of each era)
+  arm                 era1      era2      era3      era4      era5
+  anchor             0.000     0.105     0.166     0.225     0.233
+  outer_yield        0.000     0.065     0.143     0.229     0.234
+  learned_yield      0.000     0.042     0.096     0.162     0.219
+  learned_task       0.000     0.000     0.000     0.000     0.000
+  yoked_learned      0.000     0.042     0.096     0.162     0.219
+  outer_yield_j      0.000     0.053     0.117     0.170     0.231
+  learned_yield_j     0.000     0.047     0.105     0.172     0.200
+
+  L2 argmax share frac_argmax (last probe of each era)
+  arm                 era1      era2      era3      era4      era5
+  anchor             0.000     0.156     0.260     0.229     0.187
+  outer_yield        0.000     0.255     0.302     0.349     0.284
+  learned_yield      0.003     0.224     0.315     0.302     0.302
+  learned_task       0.000     0.271     0.367     0.461     0.393
+  yoked_learned      0.003     0.224     0.315     0.302     0.302
+  outer_yield_j      0.003     0.292     0.318     0.339     0.253
+  learned_yield_j     0.000     0.112     0.156     0.229     0.180
+
+  L3 argmax share frac_argmax (last probe of each era)
+  arm                 era1      era2      era3      era4      era5
+  anchor             0.000     0.047     0.115     0.219     0.234
+  outer_yield        0.000     0.000     0.068     0.201     0.214
+  learned_yield      0.000     0.003     0.026     0.102     0.214
+  learned_task       0.000     0.000     0.000     0.000     0.000
+  yoked_learned      0.000     0.003     0.026     0.102     0.214
+  outer_yield_j      0.000     0.000     0.047     0.117     0.208
+  learned_yield_j     0.000     0.003     0.039     0.182     0.240
+
+  MACRO EXPANSIONS the beam ran (blocks.mat_dp, per-cycle mean by era)
+  arm                   era1        era2        era3        era4        era5
+  anchor               12579       24829       40730       58051       69502
+  outer_yield           9176       22240       44377       64722       72902
+  learned_yield         9714       29224       37455       61366       74830
+  learned_task         13998       21043       43770       57921       65823
+  yoked_learned         9714       29224       37455       61366       74830
+  outer_yield_j        11842       30506       44982       67011       76854
+  learned_yield_j       12413       27379       28848       44605       60274
+
+==============================================================================
+(5) THE LEDGER — what each arm read, and what it cost
+==============================================================================
+  ear's convention: the learner's own experience is free, a counterfactual read is
+  priced, and instruments logged in every arm are free. Only the POLICY's input
+  stream is charged, and the charge lands in `counts['ground']` -> `t_cum`, which
+  nothing in the cycle loop reads.
+  arm                   read  n reads  priced  spend(g)    t_cum end   t_cum+read  read % of
+  anchor                None        0       0         0     28794106     28794106     0.000%
+  outer_yield          yield        0       0         0     34463987     34463987     0.000%
+  learned_yield learned:yield      390     130     34710     31743132     31743132     0.109%
+  learned_task  learned:task      375     125     33375     30725305     30725305     0.109%
+  yoked_learned         None        0       0         0     31708422     31708422     0.000%
+  outer_yield_j        yield        0       0         0     33820723     33820723     0.000%
+  learned_yield_jlearned:yield      318     106     28302     26035784     26035784     0.109%
+
+==============================================================================
+(6) THE MEASURED FLOORS, RE-DERIVED IN-TAG on the schedule arm
+==============================================================================
+  reference arm: anchor (116 cycles, 6 windows dropped at era boundaries / commits); span=1 W=4
+  gauge         n_win      sd(N)    mean(N)  v_tol=sd/2    mean(D)  D/floor   governed by
+  ledger           82    0.05889   +0.00121     0.02945   +0.01059     0.36       0.02945
+  yield            82    0.98299   +0.07927     0.49150   +0.92378     1.88L3 0.4613/L4 0.5167
+  endo             82    0.02156   -0.00334     0.01078   -0.00147    -0.14       0.01092
+  endo_cell        82    0.03327   -0.00502     0.01664   -0.00408    -0.25          None
+  endo_excess      82    0.02183   +0.00168     0.01092   +0.00262     0.24          None
+
+  >>> THE ENDO DEAD ZONE, measured on ma_s0/anchor: v_tol = 0.0107814
+      pass it to the main run as  --tol-endo 0.0107814
+
+==============================================================================
+(7) THE SHADOW PANEL — every gauge replayed through the same rule, in every arm
+==============================================================================
+  Counterfactual: what each gauge WOULD have licensed in each arm, per era, if it
+  had been the driven read. Exact only up to the arm's first action (after that the
+  arm's own trajectory is the one the gauge was measured on), so `first_action` is
+  printed beside it and a shadow decision must never be read as a measured one.
+
+    anchor  (first action cNone)
+      ledger       e1[48c armed@5 quiet@10]  e2[40c armed@75 quiet@76]  e3[12c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[7c armed@None quiet@None]
+      yield        e1[48c armed@5 quiet@29]  e2[40c armed@53 quiet@58]  e3[12c armed@93 quiet@None]  e4[9c armed@105 quiet@None]  e5[7c armed@None quiet@None]
+      endo         e1[48c armed@None quiet@None]  e2[40c armed@None quiet@None]  e3[12c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[7c armed@None quiet@None]
+      endo_cell    e1[48c armed@None quiet@None]  e2[40c armed@None quiet@None]  e3[12c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[7c armed@None quiet@None]
+      endo_excess  e1[48c armed@5 quiet@16]  e2[40c armed@None quiet@None]  e3[12c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[7c armed@None quiet@None]
+
+    outer_yield  (first action c49)
+      ledger       e1[56c armed@5 quiet@10]  e2[50c armed@97 quiet@99]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[56c armed@5 quiet@49]  e2[50c armed@61 quiet@92]  e3[15c armed@111 quiet@None]  e4[9c armed@126 quiet@130]  e5[9c armed@None quiet@None]
+      endo         e1[56c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[56c armed@37 quiet@38]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[56c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    learned_yield  (first action c39)
+      ledger       e1[60c armed@5 quiet@10]  e2[34c armed@90 quiet@92]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[60c armed@5 quiet@41]  e2[34c armed@69 quiet@85]  e3[15c armed@100 quiet@None]  e4[12c armed@115 quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[60c armed@None quiet@None]  e2[34c armed@91 quiet@93]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[60c armed@37 quiet@38]  e2[34c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[60c armed@5 quiet@16]  e2[34c armed@91 quiet@92]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    learned_task  (first action c14)
+      ledger       e1[45c armed@5 quiet@10]  e2[50c armed@None quiet@None]  e3[13c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[45c armed@5 quiet@23]  e2[50c armed@50 quiet@75]  e3[13c armed@100 quiet@None]  e4[8c armed@114 quiet@None]  e5[9c armed@121 quiet@125]
+      endo         e1[45c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[13c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[45c armed@35 quiet@39]  e2[50c armed@None quiet@None]  e3[13c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[45c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[13c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    yoked_learned  (first action c39)
+      ledger       e1[60c armed@5 quiet@10]  e2[34c armed@90 quiet@92]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[60c armed@5 quiet@41]  e2[34c armed@69 quiet@85]  e3[15c armed@100 quiet@None]  e4[12c armed@115 quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[60c armed@None quiet@None]  e2[34c armed@91 quiet@93]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[60c armed@37 quiet@38]  e2[34c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[60c armed@5 quiet@16]  e2[34c armed@91 quiet@92]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    outer_yield_j  (first action c26)
+      ledger       e1[59c armed@5 quiet@10]  e2[50c armed@108 quiet@None]  e3[13c armed@None quiet@None]  e4[7c armed@None quiet@None]  e5[8c armed@None quiet@None]
+      yield        e1[59c armed@5 quiet@26]  e2[50c armed@64 quiet@103]  e3[13c armed@115 quiet@122]  e4[7c armed@127 quiet@129]  e5[8c armed@134 quiet@137]
+      endo         e1[59c armed@None quiet@None]  e2[50c armed@109 quiet@None]  e3[13c armed@None quiet@None]  e4[7c armed@None quiet@None]  e5[8c armed@None quiet@None]
+      endo_cell    e1[59c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[13c armed@None quiet@None]  e4[7c armed@None quiet@None]  e5[8c armed@None quiet@None]
+      endo_excess  e1[59c armed@5 quiet@11]  e2[50c armed@None quiet@None]  e3[13c armed@None quiet@None]  e4[7c armed@None quiet@None]  e5[8c armed@None quiet@None]
+
+    learned_yield_j  (first action c26)
+      ledger       e1[46c armed@5 quiet@10]  e2[24c armed@60 quiet@61]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[46c armed@5 quiet@26]  e2[24c armed@51 quiet@59]  e3[15c armed@75 quiet@None]  e4[12c armed@91 quiet@97]  e5[9c armed@None quiet@None]
+      endo         e1[46c armed@None quiet@None]  e2[24c armed@60 quiet@61]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[46c armed@None quiet@None]  e2[24c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@92 quiet@93]  e5[9c armed@None quiet@None]
+      endo_excess  e1[46c armed@5 quiet@11]  e2[24c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+==============================================================================
+(8) THE ADDRESS-BOOK BATTERY, plant guard, certificates, cost
+==============================================================================
+  END-OF-RUN BATTERY: e per condition (last era), and the next-level currency split
+  arm                cond  e(last era)  g/solve  solved  T3@sup  T3built
+  anchor           a_full        0.951    463.0      19       1        1
+  anchor           b_span        0.987    463.0       5       0        0
+  anchor          c_prims        0.844    463.0      60       5        3
+  outer_yield      a_full        0.917    463.0      32       3        1
+  outer_yield      b_span        0.974    463.0      10       0        0
+  outer_yield     c_prims        0.833    463.0      64       6        4
+  learned_yield    a_full        0.880    463.0      46       4        2
+  learned_yield    b_span        0.987    463.0       5       0        0
+  learned_yield   c_prims        0.818    463.0      70       6        3
+  learned_task     a_full        0.938    463.0      24       0        0
+  learned_task     b_span        0.982    463.0       7       0        0
+  learned_task    c_prims        0.854    463.0      56       7        1
+  yoked_learned    a_full        0.880    463.0      46       4        2
+  yoked_learned    b_span        0.987    463.0       5       0        0
+  yoked_learned   c_prims        0.818    463.0      70       6        3
+  outer_yield_j    a_full        0.911    463.0      34       2        1
+  outer_yield_j    b_span        0.984    463.0       6       0        0
+  outer_yield_j   c_prims        0.826    463.0      67       6        2
+  learned_yield_j   a_full        0.922    463.0      30       3        2
+  learned_yield_j   b_span        0.984    463.0       6       0        0
+  learned_yield_j  c_prims        0.870    463.0      50       4        1
+
+  G-Y / OBSERVATION PANEL: distinct next-level tuples at support, end of each era
+  anchor         L3/L4 at support 3:      41/6    58/41    59/56    60/64    62/68
+  outer_yield    L3/L4 at support 3:     50/11    65/66    65/79    65/83    72/87
+  learned_yield  L3/L4 at support 3:     46/24    58/50    60/64    60/71    68/74
+  learned_task   L3/L4 at support 3:     39/10    54/53    56/67    56/71    62/76
+  yoked_learned  L3/L4 at support 3:     46/24    58/50    60/64    60/71    68/74
+  outer_yield_j  L3/L4 at support 3:     45/23    58/72    59/81    59/86    64/89
+  learned_yield_j L3/L4 at support 3:     39/14    46/29    52/45    53/52    58/56
+
+  PLANT GUARD, CERTIFICATES, COST
+  anchor         parse 0.664-0.693  infill 0.711-0.764  cert L2 c18 L3 c69  recerts  10    10.6 s/cycle
+  outer_yield    parse 0.672-0.694  infill 0.717-0.766  cert L2 c18 L3 c74  recerts  13    10.5 s/cycle
+  learned_yield  parse 0.666-0.693  infill 0.715-0.771  cert L2 c18 L3 c81  recerts   9    10.8 s/cycle
+  learned_task   parse 0.668-0.693  infill 0.689-0.773  cert L2 c17 L3 c67  recerts  10    10.6 s/cycle
+  yoked_learned  parse 0.666-0.693  infill 0.715-0.771  cert L2 c18 L3 c81  recerts   9    10.8 s/cycle
+  outer_yield_j  parse 0.669-0.690  infill 0.725-0.764  cert L2 c19 L3 c80  recerts  12    10.5 s/cycle
+  learned_yield_j parse 0.668-0.690  infill 0.715-0.764  cert L2 c19 L3 c79  recerts   7    11.1 s/cycle
+
+  TOTAL 7478s = 2.08 GPU-h
+
+==============================================================================
+(9) THE STREAM-POSITION FLOOR — displaced twins
+==============================================================================
+
+  outer_yield_j vs outer_yield   burn = 1024 draws (cpu=True, cuda=True) at: after per-arm torch/cuda seeding, before the generator deepcopy
+     era    orig e    twin e     |de|  orig rec  twin rec  |d rec|
+       1    0.4740    0.4540   0.0200    +0.512    +0.538    0.026
+       2    0.5816    0.5399   0.0417    +0.562    +0.634    0.072
+       3    0.6319    0.6554   0.0234    +0.644    +0.592    0.052
+       4    0.8038    0.8316   0.0278    +0.630    +0.533    0.097
+       5    0.9097    0.9054   0.0043    +0.454    +0.481    0.027
+    eras 3-5 |d recovered fraction|: [0.052, 0.097, 0.027]  max 0.097  mean 0.059
+    first differing cycle: c1; per-cycle |de| mean 0.0550 max 0.4141
+    ACTIONS  original : [(49, 'commit', 2, 'quiet'), (56, 'advance', None, 'quiet'), (92, 'commit', 3, 'quiet'), (106, 'advance', None, 'cap'), (121, 'advance', None, 'cap'), (130, 'advance', None, 'quiet'), (139, 'advance', None, 'cap')]
+    ACTIONS  displaced: [(26, 'commit', 2, 'quiet'), (59, 'advance', None, 'quiet'), (103, 'commit', 3, 'quiet'), (109, 'advance', None, 'cap'), (122, 'advance', None, 'quiet'), (129, 'advance', None, 'quiet'), (137, 'advance', None, 'quiet')]
+      commits  [49, 92] -> [26, 103]   delta [-23, 11]
+      advances [56, 106, 121, 130, 139] -> [59, 109, 122, 129, 137]   delta [3, 3, 1, -1, -2]
+      n_cycles 139 -> 137
+
+  learned_yield_j vs learned_yield   burn = 1024 draws (cpu=True, cuda=True) at: after per-arm torch/cuda seeding, before the generator deepcopy
+     era    orig e    twin e     |de|  orig rec  twin rec  |d rec|
+       1    0.4557    0.4800   0.0243    +0.536    +0.504    0.032
+       2    0.5642    0.5868   0.0226    +0.592    +0.553    0.039
+       3    0.6441    0.7161   0.0720    +0.617    +0.457    0.160
+       4    0.7951    0.7899   0.0052    +0.661    +0.679    0.018
+       5    0.8967    0.9184   0.0217    +0.536    +0.399    0.137
+    eras 3-5 |d recovered fraction|: [0.16, 0.018, 0.137]  max 0.160  mean 0.105
+    first differing cycle: c1; per-cycle |de| mean 0.1280 max 0.4141
+    ACTIONS  original : [(39, 'commit', 2, 'quiet'), (60, 'advance', None, 'quiet'), (85, 'commit', 3, 'quiet'), (94, 'advance', None, 'quiet'), (109, 'advance', None, 'cap'), (121, 'advance', None, 'cap'), (130, 'advance', None, 'cap')]
+    ACTIONS  displaced: [(26, 'commit', 2, 'quiet'), (46, 'advance', None, 'quiet'), (54, 'commit', 3, 'quiet'), (70, 'advance', None, 'quiet'), (85, 'advance', None, 'cap'), (97, 'advance', None, 'quiet'), (106, 'advance', None, 'cap')]
+      commits  [39, 85] -> [26, 54]   delta [-13, -31]
+      advances [60, 94, 109, 121, 130] -> [46, 70, 85, 97, 106]   delta [-14, -24, -24, -24, -24]
+      n_cycles 130 -> 106
+
+  THE COMPARISON THIS EXISTS FOR — does the learned-vs-thermostat rank
+  survive displacement? Two independent draws of the same ordering; the
+  per-arm displacement magnitudes are the floor it is read against.
+     era   draw A (undisplaced)   draw B (displaced)  floor: |d| oy   |d| ly  rank holds
+       1                 +0.024               -0.034          0.026    0.032          NO
+       2                 +0.030               -0.081          0.072    0.039          NO
+       3                 -0.027               -0.135          0.052    0.160         YES
+       4                 +0.030               +0.145          0.097    0.018         YES
+       5                 +0.082               -0.082          0.027    0.137          NO
+    (draw A/B = learned_yield - outer_yield in recovered fraction; 'rank holds'
+     means the sign of that difference is the same on both draws.)
+
+[figures] /home/user/research/experiments/rhm/practice/maestro/figures/ma_s0/fig1_competence.png fig2_panel.png fig3_clocks.png

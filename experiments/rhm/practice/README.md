@@ -330,6 +330,52 @@ stream floor itself, demoting fractions, shallow-era orderings, and all L3 cert-
 readings across three rounds. Use is only earnable: content transfers, trust does not. Single
 seed; the stream twins bound stream noise, not seed noise.
 
+### [`conductor/`](conductor/README.md) — A1: the composition; the outer loop drives the crank (2026-08-27→28)
+
+**Goal**: compose the arc's first two pillars in one node (ROADMAP §4.1, shape A1) — the
+`teacher_slot` outer-loop rule, charged for what it reads with dead zones at measured floors,
+sitting over the routing-only depth-6 practice learner and owning commit/hold per level and era
+advance; the certificate demoted to a read-only instrument; arms differing in nothing but what
+the rule reads; a yoked-clock control per gauge arm.
+
+**Finding**: **the one-level-up reader is the one that can drive.** The free at_support gauge
+holds each commit ~20–30 cycles past the certificate and stretches the earning eras, buying
+bigger tables at unchanged precision and the most next-level minability of any arm — matching
+the scheduled anchor inside the earnable range (era-3 Δ exactly 0.000) and beating it where
+demand outruns what was earned (era-5 +0.251 recovered fraction, **2.9× the earning-family
+stream floor**). The within-level reader re-derives the refusal in a sharper form: it commits
+and exits early on its own quieting slope, never arms again, and ends worst on value with the
+fewest next-level observations — a reader that starves the level above it. The raw one-level-up
+NLL never arms at all (an absorbing action has no second condition to cancel plant drift; its
+excess form licenses one commit and saturates), and both yoked clocks are **bit-identical** to
+their gauge arms — census finding 4 generalized to the full action set: the criterion's whole
+contribution is the cycle numbers it writes, which is exactly the part only a gauge can write
+endogenously. Single seed; ranks, signs, floor-multiples are the claims; arms are not
+lifetime-matched (pacing is what the loop owns and pays for).
+
+### [`maestro/`](maestro/README.md) — A2: learn the rule (2026-08-28)
+
+**Goal**: replace A1's hand-written thermostat with a small learned policy over (gauge
+readings, level state) rewarded by next-level yield — fitted offline on the logged corpus of
+prior crank turns, since the actions are absorbing and within-run trial-and-error is
+structurally impossible — against A1's rule in-tag (bit-for-bit replica) and against a
+within-level-rewarded twin of the identical class as the negative control.
+
+**Finding**: **the reward's type makes the judge; learning adds a timing refinement
+gauge-choice already paid for.** From identical inputs, class, and fitting, the two rewards
+produce near-orthogonal policies: the yield-rewarded mixture predicts forward next-level yield
+11–13% better than the raw gauge out-of-arm and paces the crank at least as well as the
+thermostat at ~8% less priced time by committing *earlier with thinner tables* (the
+census/assay arrival mechanism, produced by an endogenous choice — its early L2 commit bought
+2.2× the L4-shaped observations by era-1 exit); the within-level twin commits before its own
+certificate and **never takes L3 while its own input reads the yield gauge at 2+ floor units**
+— the crossing's value is not invisible to a within-level objective but *unvalued* by it.
+Stream-displaced twins then police the node's own cells: each gauge-driven arm's era-5 win
+over the schedule survives displacement above the floor (2.3–3.8×), the era-5
+learned-vs-thermostat ordering flips sign and is demoted, and era 4 is the cell where
+learning's edge holds on both draws. Single seed; the twins bound stream position, not seed;
+6 logged commit events mean the learned object is the value of states, not of acting.
+
 ## Reproduce
 
 ```bash

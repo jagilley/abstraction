@@ -1,0 +1,1023 @@
+{
+  "fits": {
+    "yield": {
+      "reward": "yield",
+      "fit_id": "maestro-fit-yield",
+      "gauges": [
+        "ledger",
+        "yield",
+        "endo_excess"
+      ],
+      "buckets": [
+        "1",
+        "0"
+      ],
+      "mixes": {
+        "1": [
+          0.21060533596693154,
+          0.944006380431357,
+          0.25396327720192946
+        ],
+        "0": [
+          0.04946387529238211,
+          0.8505980361855522,
+          0.5234847713910517
+        ]
+      },
+      "thetas": {
+        "1": 1.208500542604683,
+        "0": 1.0979866716790605
+      },
+      "theta_detail": {
+        "1": {
+          "n_win": 28,
+          "sd_Nhat": 2.417001085209366,
+          "mean_Nhat": 0.1278664793958851,
+          "theta": 1.208500542604683,
+          "n_win_all_buckets": 82,
+          "theta_pooled": 1.1300078361366308
+        },
+        "0": {
+          "n_win": 54,
+          "sd_Nhat": 2.195973343358121,
+          "mean_Nhat": 0.2592354215403558,
+          "theta": 1.0979866716790605,
+          "n_win_all_buckets": 82,
+          "theta_pooled": 1.1585642724657246
+        }
+      },
+      "diagnostics": {
+        "1": {
+          "a": [
+            0.21060533596693154,
+            0.944006380431357,
+            0.25396327720192946
+          ],
+          "c": [
+            0.183381493320055,
+            0.8219796471554918,
+            0.22113478183220148
+          ],
+          "lam": 30.0,
+          "coef_norm": 0.870735266407727,
+          "loao_mse": 0.9725446566066436,
+          "r2_vs_zero": 0.7632953416199875,
+          "r2_vs_mean": 0.02246873738561672,
+          "thermostat_mse": 1.12281557595118,
+          "beats_thermostat": true,
+          "mse_ratio_vs_thermostat": 0.8661659825860216,
+          "fold_cos": [
+            0.9968770584809556,
+            0.9958686631896367,
+            0.9997189587926463,
+            0.9997415961154775
+          ],
+          "n": 165,
+          "target_mean": 1.764592101080869,
+          "target_sd": 0.9974461268300393,
+          "phat_mean": 1.4884531766982285,
+          "phat_sd": 0.7790498621132189,
+          "phat_min": 0.09092159729555879
+        },
+        "0": {
+          "a": [
+            0.04946387529238211,
+            0.8505980361855522,
+            0.5234847713910517
+          ],
+          "c": [
+            0.04688664239905545,
+            0.806279041264544,
+            0.4962094686775098
+          ],
+          "lam": 10.0,
+          "coef_norm": 0.9478966644224178,
+          "loao_mse": 1.2600839767803573,
+          "r2_vs_zero": 0.6508379170184815,
+          "r2_vs_mean": -0.5461047728513171,
+          "thermostat_mse": 1.4125451325767344,
+          "beats_thermostat": true,
+          "mse_ratio_vs_thermostat": 0.8920663472760968,
+          "fold_cos": [
+            0.9925329491281658,
+            0.9941197832507175,
+            0.9140483307837637,
+            0.9997672771461601
+          ],
+          "n": 92,
+          "target_mean": 1.6714886219783767,
+          "target_sd": 0.9027765802771573,
+          "phat_mean": 1.367736320670715,
+          "phat_sd": 0.5277248487242788,
+          "phat_min": 0.3655548237541093
+        }
+      },
+      "geometry": {
+        "span": 1,
+        "W": 4,
+        "burn": 4,
+        "alpha": 0.5,
+        "gap": 1,
+        "horizon": 4,
+        "lam_grid": [
+          0.3,
+          1.0,
+          3.0,
+          10.0,
+          30.0,
+          100.0,
+          300.0,
+          1000.0
+        ]
+      },
+      "floors_used_as_units": {
+        "ledger": 0.02944712566990095,
+        "endo_excess": 0.01091575129919287,
+        "yield_by_level": {
+          "3": 0.46127129019246205,
+          "4": 0.5166900731510206
+        }
+      },
+      "corpus": [
+        "cd_s0/anchor",
+        "cd_s0/outer_yield",
+        "cd_s0/outer_endo",
+        "cd_s0/outer_ledger"
+      ],
+      "reference": "cd_s0/anchor",
+      "replay": {
+        "cd_s0/anchor": {
+          "fires": [
+            {
+              "cycle": 29,
+              "era": 1,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 1.0060925284208073,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.9163066860203986
+            },
+            {
+              "cycle": 57,
+              "era": 2,
+              "kind": "commit",
+              "level": 3,
+              "bucket": "1",
+              "V": 0.9994016927276009,
+              "theta": 1.208500542604683,
+              "v_mult": 0.8269766189542529
+            },
+            {
+              "cycle": 83,
+              "era": 2,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.923623779308773,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.841197623916829
+            }
+          ],
+          "arm_own_actions": [],
+          "first_divergence": 29
+        },
+        "cd_s0/outer_yield": {
+          "fires": [
+            {
+              "cycle": 39,
+              "era": 1,
+              "kind": "commit",
+              "level": 2,
+              "bucket": "1",
+              "V": 1.017170448874345,
+              "theta": 1.208500542604683,
+              "v_mult": 0.8416797618328212
+            },
+            {
+              "cycle": 48,
+              "era": 1,
+              "kind": "commit",
+              "level": 2,
+              "bucket": "1",
+              "V": 1.1664813167757615,
+              "theta": 1.208500542604683,
+              "v_mult": 0.9652302797164183
+            },
+            {
+              "cycle": 56,
+              "era": 1,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.5222386675008821,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.47563297530949583
+            },
+            {
+              "cycle": 92,
+              "era": 2,
+              "kind": "commit",
+              "level": 3,
+              "bucket": "1",
+              "V": 0.7257007403775839,
+              "theta": 1.208500542604683,
+              "v_mult": 0.6004968262682613
+            },
+            {
+              "cycle": 100,
+              "era": 2,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 1.0506937356760877,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.9569275864426918
+            },
+            {
+              "cycle": 127,
+              "era": 4,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 1.0852299561805254,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.9883817209920889
+            }
+          ],
+          "arm_own_actions": [
+            {
+              "cycle": 49,
+              "kind": "commit",
+              "level": 2
+            },
+            {
+              "cycle": 56,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 92,
+              "kind": "commit",
+              "level": 3
+            },
+            {
+              "cycle": 106,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 121,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 130,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 139,
+              "kind": "advance",
+              "level": null
+            }
+          ],
+          "first_divergence": 39
+        },
+        "cd_s0/outer_endo": {
+          "fires": [
+            {
+              "cycle": 31,
+              "era": 1,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 1.0639257714569412,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.9689787671374619
+            },
+            {
+              "cycle": 47,
+              "era": 1,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.747169660143262,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.680490646576499
+            },
+            {
+              "cycle": 57,
+              "era": 1,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.9145521237311889,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.8329355422253347
+            },
+            {
+              "cycle": 76,
+              "era": 2,
+              "kind": "commit",
+              "level": 3,
+              "bucket": "1",
+              "V": 1.1724084992762265,
+              "theta": 1.208500542604683,
+              "v_mult": 0.9701348555039393
+            },
+            {
+              "cycle": 100,
+              "era": 2,
+              "kind": "commit",
+              "level": 3,
+              "bucket": "1",
+              "V": 1.1240831290848456,
+              "theta": 1.208500542604683,
+              "v_mult": 0.9301469792161677
+            },
+            {
+              "cycle": 132,
+              "era": 4,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.8374258624741744,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.7626921929694903
+            }
+          ],
+          "arm_own_actions": [
+            {
+              "cycle": 16,
+              "kind": "commit",
+              "level": 2
+            },
+            {
+              "cycle": 60,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 110,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 125,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 137,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 146,
+              "kind": "advance",
+              "level": null
+            }
+          ],
+          "first_divergence": 31
+        },
+        "cd_s0/outer_ledger": {
+          "fires": [
+            {
+              "cycle": 53,
+              "era": 2,
+              "kind": "commit",
+              "level": 3,
+              "bucket": "1",
+              "V": 1.0781003212719646,
+              "theta": 1.208500542604683,
+              "v_mult": 0.8920975070051134
+            },
+            {
+              "cycle": 95,
+              "era": 4,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.9447939695614292,
+              "theta": 1.0979866716790605,
+              "v_mult": 0.860478541252813
+            }
+          ],
+          "arm_own_actions": [
+            {
+              "cycle": 10,
+              "kind": "commit",
+              "level": 2
+            },
+            {
+              "cycle": 18,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 68,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 83,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 95,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 104,
+              "kind": "advance",
+              "level": null
+            }
+          ],
+          "first_divergence": 53
+        }
+      }
+    },
+    "task": {
+      "reward": "task",
+      "fit_id": "maestro-fit-task",
+      "gauges": [
+        "ledger",
+        "yield",
+        "endo_excess"
+      ],
+      "buckets": [
+        "1",
+        "0"
+      ],
+      "mixes": {
+        "1": [
+          -0.7805776968216638,
+          0.21455449152515405,
+          0.5870816207231914
+        ],
+        "0": [
+          -0.4221446205589885,
+          0.1366584639685819,
+          0.8961687249390349
+        ]
+      },
+      "thetas": {
+        "1": 1.4253060718406116,
+        "0": 0.7083064560849142
+      },
+      "theta_detail": {
+        "1": {
+          "n_win": 28,
+          "sd_Nhat": 2.8506121436812233,
+          "mean_Nhat": 0.055216955970355475,
+          "theta": 1.4253060718406116,
+          "n_win_all_buckets": 82,
+          "theta_pooled": 0.9758491760701024
+        },
+        "0": {
+          "n_win": 54,
+          "sd_Nhat": 1.4166129121698283,
+          "mean_Nhat": 0.17710133713190002,
+          "theta": 0.7083064560849142,
+          "n_win_all_buckets": 82,
+          "theta_pooled": 1.0068193114137165
+        }
+      },
+      "diagnostics": {
+        "1": {
+          "a": [
+            -0.7805776968216638,
+            0.21455449152515405,
+            0.5870816207231914
+          ],
+          "c": [
+            -0.15495662784060643,
+            0.042592352600089214,
+            0.11654469322513548
+          ],
+          "lam": 3.0,
+          "coef_norm": 0.1985153156073442,
+          "loao_mse": 0.0965148462931496,
+          "r2_vs_zero": -0.0088763139003607,
+          "r2_vs_mean": -0.11727541655154061,
+          "thermostat_mse": 0.689761713315641,
+          "beats_thermostat": true,
+          "mse_ratio_vs_thermostat": 0.13992491092207604,
+          "fold_cos": [
+            0.9997898481698645,
+            0.9849111370859036,
+            0.9999500506197201,
+            0.9989998973120144
+          ],
+          "n": 165,
+          "target_mean": 0.09634092697672543,
+          "target_sd": 0.29391174425259514,
+          "phat_mean": 0.059315182236480225,
+          "phat_sd": 0.07510924295452906,
+          "phat_min": -0.10840979969938859
+        },
+        "0": {
+          "a": [
+            -0.4221446205589885,
+            0.1366584639685819,
+            0.8961687249390349
+          ],
+          "c": [
+            -0.16635422001969588,
+            0.05385290034604729,
+            0.35315255005706414
+          ],
+          "lam": 0.3,
+          "coef_norm": 0.39406926422375277,
+          "loao_mse": 0.08901749248630267,
+          "r2_vs_zero": 0.21590703047105708,
+          "r2_vs_mean": 0.17828774239265177,
+          "thermostat_mse": 1.0353183112247135,
+          "beats_thermostat": true,
+          "mse_ratio_vs_thermostat": 0.08598079597471894,
+          "fold_cos": [
+            0.991481418188374,
+            0.9988581483248373,
+            0.9970983019554637,
+            0.9993047832317561
+          ],
+          "n": 92,
+          "target_mean": 0.07209402983231408,
+          "target_sd": 0.32913782548423237,
+          "phat_mean": 0.054091237604643794,
+          "phat_sd": 0.15219887004228727,
+          "phat_min": -0.28836827551765876
+        }
+      },
+      "geometry": {
+        "span": 1,
+        "W": 4,
+        "burn": 4,
+        "alpha": 0.5,
+        "gap": 1,
+        "horizon": 4,
+        "lam_grid": [
+          0.3,
+          1.0,
+          3.0,
+          10.0,
+          30.0,
+          100.0,
+          300.0,
+          1000.0
+        ]
+      },
+      "floors_used_as_units": {
+        "ledger": 0.02944712566990095,
+        "endo_excess": 0.01091575129919287,
+        "yield_by_level": {
+          "3": 0.46127129019246205,
+          "4": 0.5166900731510206
+        }
+      },
+      "corpus": [
+        "cd_s0/anchor",
+        "cd_s0/outer_yield",
+        "cd_s0/outer_endo",
+        "cd_s0/outer_ledger"
+      ],
+      "reference": "cd_s0/anchor",
+      "replay": {
+        "cd_s0/anchor": {
+          "fires": [
+            {
+              "cycle": 14,
+              "era": 1,
+              "kind": "commit",
+              "level": 2,
+              "bucket": "1",
+              "V": 1.1380036665432716,
+              "theta": 1.4253060718406116,
+              "v_mult": 0.7984275721730958
+            },
+            {
+              "cycle": 47,
+              "era": 1,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.36115863887711014,
+              "theta": 0.7083064560849142,
+              "v_mult": 0.509890367050125
+            },
+            {
+              "cycle": 95,
+              "era": 3,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.6581086315831968,
+              "theta": 0.7083064560849142,
+              "v_mult": 0.9291297939324451
+            }
+          ],
+          "arm_own_actions": [],
+          "first_divergence": 14
+        },
+        "cd_s0/outer_yield": {
+          "fires": [
+            {
+              "cycle": 14,
+              "era": 1,
+              "kind": "commit",
+              "level": 2,
+              "bucket": "1",
+              "V": 1.1380036665432716,
+              "theta": 1.4253060718406116,
+              "v_mult": 0.7984275721730958
+            },
+            {
+              "cycle": 106,
+              "era": 2,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.6813181825363531,
+              "theta": 0.7083064560849142,
+              "v_mult": 0.9618974621553843
+            }
+          ],
+          "arm_own_actions": [
+            {
+              "cycle": 49,
+              "kind": "commit",
+              "level": 2
+            },
+            {
+              "cycle": 56,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 92,
+              "kind": "commit",
+              "level": 3
+            },
+            {
+              "cycle": 106,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 121,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 130,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 139,
+              "kind": "advance",
+              "level": null
+            }
+          ],
+          "first_divergence": 14
+        },
+        "cd_s0/outer_endo": {
+          "fires": [
+            {
+              "cycle": 14,
+              "era": 1,
+              "kind": "commit",
+              "level": 2,
+              "bucket": "1",
+              "V": 1.1380036665432716,
+              "theta": 1.4253060718406116,
+              "v_mult": 0.7984275721730958
+            },
+            {
+              "cycle": 47,
+              "era": 1,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.4025627238768674,
+              "theta": 0.7083064560849142,
+              "v_mult": 0.5683454109708226
+            }
+          ],
+          "arm_own_actions": [
+            {
+              "cycle": 16,
+              "kind": "commit",
+              "level": 2
+            },
+            {
+              "cycle": 60,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 110,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 125,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 137,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 146,
+              "kind": "advance",
+              "level": null
+            }
+          ],
+          "first_divergence": 14
+        },
+        "cd_s0/outer_ledger": {
+          "fires": [
+            {
+              "cycle": 16,
+              "era": 1,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": -0.1194529225205676,
+              "theta": 0.7083064560849142,
+              "v_mult": -0.16864581918514546
+            },
+            {
+              "cycle": 91,
+              "era": 4,
+              "kind": "advance",
+              "level": null,
+              "bucket": "0",
+              "V": 0.6598239611453354,
+              "theta": 0.7083064560849142,
+              "v_mult": 0.931551527558339
+            }
+          ],
+          "arm_own_actions": [
+            {
+              "cycle": 10,
+              "kind": "commit",
+              "level": 2
+            },
+            {
+              "cycle": 18,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 68,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 83,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 95,
+              "kind": "advance",
+              "level": null
+            },
+            {
+              "cycle": 104,
+              "kind": "advance",
+              "level": null
+            }
+          ],
+          "first_divergence": 16
+        }
+      }
+    }
+  },
+  "relation": {
+    "1": {
+      "cos_yield_task": 0.18724415324641266,
+      "cos_yield_thermostat": 0.944006380431357,
+      "cos_task_thermostat": 0.21455449152515405
+    },
+    "0": {
+      "cos_yield_task": 0.5644911923156509,
+      "cos_yield_thermostat": 0.8505980361855522,
+      "cos_task_thermostat": 0.1366584639685819
+    }
+  },
+  "gate_f1": {
+    "ledger": {
+      "n_win": 82,
+      "expected_n_win": 82,
+      "sd_N": 0.05889425133980191,
+      "A1_sd_N": 0.05889,
+      "rel_diff": 7.219120057586275e-05,
+      "v_tol": 0.029447125669900955,
+      "A1_v_tol": 0.02945,
+      "pass": true
+    },
+    "yield": {
+      "n_win": 82,
+      "expected_n_win": 82,
+      "sd_N": 0.9829941573503325,
+      "A1_sd_N": 0.98299,
+      "rel_diff": 4.22929056494406e-06,
+      "v_tol": 0.49149707867516623,
+      "A1_v_tol": 0.4915,
+      "pass": true
+    },
+    "endo_excess": {
+      "n_win": 82,
+      "expected_n_win": 82,
+      "sd_N": 0.021831502598385732,
+      "A1_sd_N": 0.02183,
+      "rel_diff": 6.883180878304041e-05,
+      "v_tol": 0.010915751299192866,
+      "A1_v_tol": 0.01092,
+      "pass": true
+    },
+    "ALL": true
+  },
+  "verdict": {
+    "twins_identical_on_every_logged_arm": false,
+    "at_least_one_policy_acts": true,
+    "vacuous": false
+  },
+  "gap_sensitivity": {
+    "0": {
+      "n": 274,
+      "yield_wc1": {
+        "a": [
+          0.09631695608912227,
+          0.946275671495142,
+          0.3086833288438887
+        ],
+        "mse_ratio_vs_thermostat": 0.865791772424172,
+        "r2_vs_zero": 0.7565979485365466
+      },
+      "yield_wc0": {
+        "a": [
+          0.12710113843548618,
+          0.7739913497860461,
+          0.6203085450522005
+        ],
+        "mse_ratio_vs_thermostat": 0.8676677067523267,
+        "r2_vs_zero": 0.6683959629496105
+      },
+      "task_wc1": {
+        "a": [
+          -0.8432668290724789,
+          0.1699475327507379,
+          0.5099204752684321
+        ],
+        "mse_ratio_vs_thermostat": 0.11375805006999376,
+        "r2_vs_zero": 0.125914148856219
+      },
+      "task_wc0": {
+        "a": [
+          -0.5808858219829179,
+          0.17786898719001973,
+          0.7943137196443395
+        ],
+        "mse_ratio_vs_thermostat": 0.10150289664618994,
+        "r2_vs_zero": 0.16232080093212542
+      }
+    },
+    "1": {
+      "n": 257,
+      "yield_wc1": {
+        "a": [
+          0.21060533596693154,
+          0.944006380431357,
+          0.25396327720192946
+        ],
+        "mse_ratio_vs_thermostat": 0.8661659825860216,
+        "r2_vs_zero": 0.7632953416199875
+      },
+      "yield_wc0": {
+        "a": [
+          0.04946387529238211,
+          0.8505980361855522,
+          0.5234847713910517
+        ],
+        "mse_ratio_vs_thermostat": 0.8920663472760968,
+        "r2_vs_zero": 0.6508379170184815
+      },
+      "task_wc1": {
+        "a": [
+          -0.7805776968216638,
+          0.21455449152515405,
+          0.5870816207231914
+        ],
+        "mse_ratio_vs_thermostat": 0.13992491092207604,
+        "r2_vs_zero": -0.0088763139003607
+      },
+      "task_wc0": {
+        "a": [
+          -0.4221446205589885,
+          0.1366584639685819,
+          0.8961687249390349
+        ],
+        "mse_ratio_vs_thermostat": 0.08598079597471894,
+        "r2_vs_zero": 0.21590703047105708
+      }
+    },
+    "2": {
+      "n": 240,
+      "yield_wc1": {
+        "a": [
+          0.33927885258738966,
+          0.9168356984772934,
+          0.21048078816043464
+        ],
+        "mse_ratio_vs_thermostat": 0.8580697684896911,
+        "r2_vs_zero": 0.7727691504077698
+      },
+      "yield_wc0": {
+        "a": [
+          -0.024598772876149155,
+          0.8731050627945987,
+          0.48691113120920493
+        ],
+        "mse_ratio_vs_thermostat": 0.9390001401684687,
+        "r2_vs_zero": 0.6199772658270861
+      },
+      "task_wc1": {
+        "a": [
+          -0.06563774254398837,
+          0.8368384561961163,
+          0.5435007681549584
+        ],
+        "mse_ratio_vs_thermostat": 0.15761978668530846,
+        "r2_vs_zero": -0.04584968868685446
+      },
+      "task_wc0": {
+        "a": [
+          -0.3786050991936954,
+          0.13754852469657944,
+          0.9152806029946917
+        ],
+        "mse_ratio_vs_thermostat": 0.06368801603202484,
+        "r2_vs_zero": 0.34457843030862667
+      }
+    }
+  },
+  "corpus_windows": {
+    "cd_s0/anchor": 50,
+    "cd_s0/outer_yield": 73,
+    "cd_s0/outer_endo": 87,
+    "cd_s0/outer_ledger": 47
+  },
+  "n_windows": 257,
+  "n_by_bucket": {
+    "1": 165,
+    "0": 92
+  },
+  "constants": {
+    "gauges": [
+      "ledger",
+      "yield",
+      "endo_excess"
+    ],
+    "span": 1,
+    "W": 4,
+    "burn": 4,
+    "alpha": 0.5,
+    "gap": 1,
+    "horizon": 4,
+    "lam_grid": [
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0
+    ],
+    "era_caps": [
+      60,
+      50,
+      15,
+      12,
+      9
+    ],
+    "max_macro_level": 3
+  },
+  "floors_used_as_units": {
+    "ledger": 0.02944712566990095,
+    "endo_excess": 0.01091575129919287,
+    "yield_by_level": {
+      "3": 0.46127129019246205,
+      "4": 0.5166900731510206
+    }
+  }
+}

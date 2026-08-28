@@ -1,0 +1,353 @@
+=== conductor (A1) — tag cd_s0 ===
+ladder [('L1n25', 48), ('L2n12', 40), ('L3n6', 12), ('L4n3', 9), ('L5n1', 7)] = 116 cycles/arm scheduled; caps [60, 50, 15, 12, 9] = 146; setup 601s; stale buffer 0.1269 -> 0.1541
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+
+==============================================================================
+(0) GATES
+==============================================================================
+  G-F full scale (cross-tag): cd_s0/anchor vs as_s0/anchor over c1-c116
+    max|delta| = 0.000e+00 over 13 series  -> PASS
+  G-F smoke scale (in-process vs assay.py, shadow panel ON in the fork): max|fork - assay| = 0.000e+00, self-replay control = 0.000e+00, commits equal = True  -> PASS
+
+  IN-TAG TWIN GATE (each arm vs the anchor, to the first action by EITHER; the anchor's own first commit is c18):
+    outer_yield    c1-c17   (first action c18 (anchor)) max|delta| = 0.000e+00  -> PASS
+    yoked_yield    c1-c17   (first action c18 (anchor)) max|delta| = 0.000e+00  -> PASS
+    outer_endo     c1-c15   (first action c16 (own)) max|delta| = 0.000e+00  -> PASS
+    yoked_endo     c1-c15   (first action c16 (own)) max|delta| = 0.000e+00  -> PASS
+    outer_ledger   c1-c9    (first action c10 (own)) max|delta| = 0.000e+00  -> PASS
+
+  OBSERVATION PANEL vs the donor's G-Y miner (level 4, every cycle):
+    anchor         agree=True over 116 cycles
+    outer_yield    agree=True over 139 cycles
+    yoked_yield    agree=True over 139 cycles
+    outer_endo     agree=True over 146 cycles
+    yoked_endo     agree=True over 146 cycles
+    outer_ledger   agree=True over 104 cycles
+
+  POLICY GATE (offline, no GPU): ALL PASS (12 checks)
+
+  ENDO READ: LABEL-FREE BY CONSTRUCTION: PASS — positions depend only on ['era.level', 'era.node', 's', 'depth']; none of ['truth', 'rules', 'inverse_maps', 'committed', 'canon', 'true_mask', 'grade'] appears in the read's code
+    era 1 cell L1n25 blocks [25, 26] -> parent L2n12 blocks [24, 26]
+    era 2 cell L2n12 blocks [24, 26] -> parent L3n6 blocks [24, 28]
+    era 3 cell L3n6 blocks [24, 28] -> parent L4n3 blocks [24, 32]
+    era 4 cell L4n3 blocks [24, 32] -> parent L5n1 blocks [16, 32]
+    era 5 cell L5n1 blocks [16, 32] -> parent L6n0 blocks [0, 32]  (parent IS the root: the read is the unconditional marginal)
+
+  DEAD ZONES: measured, not defaulted: PASS, matches floors.json = None
+    {'tol_ledger': 0.02944712566990095, 'tol_yield_l3': 0.46127129019246205, 'tol_yield_l4': 0.5166900731510206, 'tol_endo': 0.01091575129919287}
+    provenance: cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)
+
+  ENDO PRICE (measured on the run's own GPU): one read over 256 sequences = 1.3 ms = 258 grounding-equivalents; charged 267g
+
+==============================================================================
+(1) THE ACTION TRACE — what the loop did, and when
+==============================================================================
+  arm               policy    read cycles  commits  advances  chosen  capped  rode cap
+  anchor          schedule    None    116        0         0       0       0     False
+  outer_yield        quiet   yield    139        2         5       4       3      True
+  yoked_yield         yoke    None    139        2         5       0       0     False
+  outer_endo         quietendo_excess    146        1         5       1       5      True
+  yoked_endo          yoke    None    146        1         5       0       0     False
+  outer_ledger       quiet  ledger    104        1         5       2       4      True
+
+  PER-ARM ACTIONS (cycle, kind, level, why, and the statistic at that instant)
+
+    anchor  eras: e1 c1-48 (48c), e2 c49-88 (40c), e3 c89-100 (12c), e4 c101-109 (9c), e5 c110-116 (7c)
+      (no loop actions — the schedule arm)
+
+    outer_yield  eras: e1 c1-56 (56c), e2 c57-106 (50c), e3 c107-121 (15c), e4 c122-130 (9c), e5 c131-139 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c56   era1 advance  L-  why=quiet  V=   0.4375 tol=  0.4613 V/tol=    0.95
+      c92   era2 commit   L3  why=quiet  V=   0.3015 tol=  0.5167 V/tol=    0.58
+      c106  era2 advance  L-  why=cap    V=   1.4912 tol=  0.5167 V/tol=    2.89
+      c121  era3 advance  L-  why=cap    V=   0.9353 tol=  0.5167 V/tol=    1.81
+      c130  era4 advance  L-  why=quiet  V=   0.3906 tol=  0.5167 V/tol=    0.76
+      c139  era5 advance  L-  why=cap    V=   0.3125 tol=  0.5167 V/tol=    0.60
+
+    yoked_yield  eras: e1 c1-56 (56c), e2 c57-106 (50c), e3 c107-121 (15c), e4 c122-130 (9c), e5 c131-139 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c56   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c92   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c106  era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c121  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c130  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c139  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    outer_endo  eras: e1 c1-60 (60c), e2 c61-110 (50c), e3 c111-125 (15c), e4 c126-137 (12c), e5 c138-146 (9c)
+      c16   era1 commit   L2  why=quiet  V=  -0.0005 tol=  0.0109 V/tol=   -0.05
+      c60   era1 advance  L-  why=cap    V=  -0.0004 tol=  0.0109 V/tol=   -0.04
+      c110  era2 advance  L-  why=cap    V=  -0.0034 tol=  0.0109 V/tol=   -0.31
+      c125  era3 advance  L-  why=cap    V=   0.0002 tol=  0.0109 V/tol=    0.02
+      c137  era4 advance  L-  why=cap    V=   0.0017 tol=  0.0109 V/tol=    0.16
+      c146  era5 advance  L-  why=cap    V=   0.0002 tol=  0.0109 V/tol=    0.02
+
+    yoked_endo  eras: e1 c1-60 (60c), e2 c61-110 (50c), e3 c111-125 (15c), e4 c126-137 (12c), e5 c138-146 (9c)
+      c16   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c60   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c110  era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c125  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c137  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c146  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    outer_ledger  eras: e1 c1-18 (18c), e2 c19-68 (50c), e3 c69-83 (15c), e4 c84-95 (12c), e5 c96-104 (9c)
+      c10   era1 commit   L2  why=quiet  V=   0.0213 tol=  0.0294 V/tol=    0.72
+      c18   era1 advance  L-  why=quiet  V=   0.0186 tol=  0.0294 V/tol=    0.63
+      c68   era2 advance  L-  why=cap    V=  -0.0084 tol=  0.0294 V/tol=   -0.29
+      c83   era3 advance  L-  why=cap    V=   0.0031 tol=  0.0294 V/tol=    0.11
+      c95   era4 advance  L-  why=cap    V=   0.0075 tol=  0.0294 V/tol=    0.25
+      c104  era5 advance  L-  why=cap    V=  -0.0006 tol=  0.0294 V/tol=   -0.02
+
+  COMMIT CYCLES AND WHAT WAS COMMITTED
+  arm            lvl  cycle  era  prov  entries  recall    prec  cert@    driver
+  anchor           2     18    1 False       11   0.571   0.727     18delta_prov
+  anchor           3     69    2 False       12   0.071   0.333     69delta_prov
+  outer_yield      2     49    1 False       14   0.714   0.714     18      loop
+  outer_yield      3     92    2 False       21   0.125   0.333     74      loop
+  yoked_yield      2     49    1 False       14   0.714   0.714     18      loop
+  yoked_yield      3     92    2 False       21   0.125   0.333     74      loop
+  outer_endo       2     16    1 False       11   0.571   0.727   None      loop
+  yoked_endo       2     16    1 False       11   0.571   0.727   None      loop
+  outer_ledger     2     10    1 False       10   0.571   0.800   None      loop
+
+==============================================================================
+(2) GAUGE vs YOKE — the mandatory timing control (census finding 4)
+==============================================================================
+  The yoke replays the gauge arm's realised action cycles by clock and reads
+  nothing. A divergence would mean the reads are not inert; identity means the
+  criterion contributed nothing beyond a cycle number, which is a finding, and the
+  priced-time column is then what the read cost for a trajectory a clock reproduces.
+
+  outer_yield vs yoked_yield  (n=139 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 92)] vs [(2, 49), (3, 92)]   equal = True
+    advances [56, 106, 121, 130, 139] vs [56, 106, 121, 130, 139]   equal = True
+    priced time t_cum 34463987 vs 34463987  (difference +0 = what the read cost)
+
+  outer_endo vs yoked_endo  (n=146 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 16)] vs [(2, 16)]   equal = True
+    advances [60, 110, 125, 137, 146] vs [60, 110, 125, 137, 146]   equal = True
+    priced time t_cum 35347949 vs 35347949  (difference +0 = what the read cost)
+
+==============================================================================
+(3) THE THREE CLOCKS: certificate, coverage, value
+==============================================================================
+  CLOCK 1 — the SHADOW certificate (read-only in every arm, incl. the driven ones)
+  arm             L2 fired  L3 fired  L2 c2cert  L3 c2cert  commit L2  commit L3
+  anchor                18        69         17         19         18         69
+  outer_yield           18        74         17         16         49         92
+  yoked_yield           18        74         17         16         49         92
+  outer_endo            18        74         17         14         16       None
+  yoked_endo            18        74         17         14         16       None
+  outer_ledger          17        36         16         18         10       None
+
+  CLOCK 2 — COVERAGE: end-of-run committed table per level
+  arm            lvl  frozen n   recall    prec  live n  live rec  live prec
+  anchor           2        11    0.571   0.727      18     0.857      0.667
+  anchor           3        12    0.071   0.333      17     0.125      0.412
+  outer_yield      2        14    0.714   0.714      18     0.929      0.722
+  outer_yield      3        21    0.125   0.333      34     0.232      0.382
+  yoked_yield      2        14    0.714   0.714      18     0.929      0.722
+  yoked_yield      3        21    0.125   0.333      34     0.232      0.382
+  outer_endo       2        11    0.571   0.727      19     0.929      0.684
+  outer_endo       3         -        -       -      20     0.143      0.400
+  yoked_endo       2        11    0.571   0.727      19     0.929      0.684
+  yoked_endo       3         -        -       -      20     0.143      0.400
+  outer_ledger     2        10    0.571   0.800      17     0.857      0.706
+  outer_ledger     3         -        -       -      15     0.143      0.533
+
+  CLOCK 3 — VALUE: recovered fraction per era (e, and (stale-e)/(stale-floor))
+  arm                        era1             era2             era3             era4             era5
+  anchor            0.464 /+0.524    0.549 /+0.619    0.632 /+0.644    0.823 /+0.564    0.950 /+0.202
+  outer_yield       0.474 /+0.512    0.582 /+0.562    0.632 /+0.644    0.804 /+0.630    0.910 /+0.454
+  yoked_yield       0.474 /+0.512    0.582 /+0.562    0.632 /+0.644    0.804 /+0.630    0.910 /+0.454
+  outer_endo        0.418 /+0.585    0.528 /+0.655    0.713 /+0.464    0.852 /+0.461    0.949 /+0.208
+  yoked_endo        0.418 /+0.585    0.528 /+0.655    0.713 /+0.464    0.852 /+0.461    0.949 /+0.208
+  outer_ledger      0.489 /+0.493    0.632 /+0.474    0.753 /+0.376    0.901 /+0.291    0.973 /+0.055
+  stale                     0.865            0.906            0.922            0.984            0.982
+  floor                     0.102            0.328            0.471            0.698            0.823
+
+  DELTA TO THE ANCHOR (the scheduled crank), per era, in recovered fraction
+  Read against the MEASURED depth-6 stream floor (census finding 7): 0.087 in the
+  earning family and 0.083/0.148/0.344 in the given family for eras 3/4/5. Ranks
+  and signs in the deep eras are the currency; fractions are not.
+  arm                 era1      era2      era3      era4      era5
+  outer_yield       -0.013    -0.057     0.000     0.067     0.251
+  yoked_yield       -0.013    -0.057     0.000     0.067     0.251
+  outer_endo         0.060     0.036    -0.179    -0.103     0.005
+  yoked_endo         0.060     0.036    -0.179    -0.103     0.005
+  outer_ledger      -0.032    -0.144    -0.268    -0.273    -0.148
+
+==============================================================================
+(4) pi PER-LEVEL MASS, ARGMAX SHARE, AND MACRO EXPANSIONS, per arm per era
+==============================================================================
+
+  L2 proposal mass p_macro_all (last probe of each era)
+  arm                 era1      era2      era3      era4      era5
+  anchor             0.188     0.249     0.258     0.255     0.250
+  outer_yield        0.061     0.305     0.291     0.293     0.280
+  yoked_yield        0.061     0.305     0.291     0.293     0.280
+  outer_endo         0.220     0.362     0.443     0.492     0.520
+  yoked_endo         0.220     0.362     0.443     0.492     0.520
+  outer_ledger       0.098     0.326     0.376     0.441     0.396
+
+  L3 proposal mass p_macro_all (last probe of each era)
+  arm                 era1      era2      era3      era4      era5
+  anchor             0.000     0.105     0.166     0.225     0.233
+  outer_yield        0.000     0.065     0.143     0.229     0.234
+  yoked_yield        0.000     0.065     0.143     0.229     0.234
+  outer_endo         0.000     0.000     0.000     0.000     0.000
+  yoked_endo         0.000     0.000     0.000     0.000     0.000
+  outer_ledger       0.000     0.000     0.000     0.000     0.000
+
+  L2 argmax share frac_argmax (last probe of each era)
+  arm                 era1      era2      era3      era4      era5
+  anchor             0.000     0.156     0.260     0.229     0.187
+  outer_yield        0.000     0.255     0.302     0.349     0.284
+  yoked_yield        0.000     0.255     0.302     0.349     0.284
+  outer_endo         0.003     0.299     0.422     0.516     0.576
+  yoked_endo         0.003     0.299     0.422     0.516     0.576
+  outer_ledger       0.000     0.260     0.328     0.474     0.383
+
+  L3 argmax share frac_argmax (last probe of each era)
+  arm                 era1      era2      era3      era4      era5
+  anchor             0.000     0.047     0.115     0.219     0.234
+  outer_yield        0.000     0.000     0.068     0.201     0.214
+  yoked_yield        0.000     0.000     0.068     0.201     0.214
+  outer_endo         0.000     0.000     0.000     0.000     0.000
+  yoked_endo         0.000     0.000     0.000     0.000     0.000
+  outer_ledger       0.000     0.000     0.000     0.000     0.000
+
+  MACRO EXPANSIONS the beam ran (blocks.mat_dp, per-cycle mean by era)
+  arm                   era1        era2        era3        era4        era5
+  anchor               12579       24829       40730       58051       69502
+  outer_yield           9176       22240       44377       64722       72902
+  yoked_yield           9176       22240       44377       64722       72902
+  outer_endo           13805       30324       53354       65474       76918
+  yoked_endo           13805       30324       53354       65474       76918
+  outer_ledger         28940       16559       38394       51222       59380
+
+==============================================================================
+(5) THE LEDGER — what each arm read, and what it cost
+==============================================================================
+  ear's convention: the learner's own experience is free, a counterfactual read is
+  priced, and instruments logged in every arm are free. Only the POLICY's input
+  stream is charged, and the charge lands in `counts['ground']` -> `t_cum`, which
+  nothing in the cycle loop reads.
+  arm                   read  n reads  priced  spend(g)    t_cum end   t_cum+read  read % of
+  anchor                None        0       0         0     28794106     28794106     0.000%
+  outer_yield          yield        0       0         0     34463987     34463987     0.000%
+  yoked_yield           None        0       0         0     34463987     34463987     0.000%
+  outer_endo     endo_excess      146       0     38982     35347949     35386931     0.110%   <- reconstructed
+  yoked_endo            None        0       0         0     35347949     35347949     0.000%
+  outer_ledger        ledger        0       0         0     26035910     26035910     0.000%
+
+  RECONSTRUCTED for ['outer_endo']: this tag priced the endo read under the key `endo` while the driven key was `endo_excess`, so `charge` recorded the reads and priced them at 0. Trajectories are unaffected BY CONSTRUCTION — a charge reaches only counts['ground'] -> t_cum, which nothing in the cycle loop reads, and the arm's yoke reproduces it bit-for-bit either way. The spend column above is n_reads x 267 g/read (the pinned `endo_bench` price); `t_cum end` is what the run recorded and `t_cum+read` what it would have been.
+
+==============================================================================
+(6) THE MEASURED FLOORS, RE-DERIVED IN-TAG on the schedule arm
+==============================================================================
+  reference arm: anchor (116 cycles, 6 windows dropped at era boundaries / commits); span=1 W=4
+  gauge         n_win      sd(N)    mean(N)  v_tol=sd/2    mean(D)  D/floor   governed by
+  ledger           82    0.05889   +0.00121     0.02945   +0.01059     0.36       0.02945
+  yield            82    0.98299   +0.07927     0.49150   +0.92378     1.88L3 0.4613/L4 0.5167
+  endo             82    0.02156   -0.00334     0.01078   -0.00147    -0.14       0.01092
+  endo_cell        82    0.03327   -0.00502     0.01664   -0.00408    -0.25          None
+  endo_excess      82    0.02183   +0.00168     0.01092   +0.00262     0.24          None
+
+  >>> THE ENDO DEAD ZONE, measured on cd_s0/anchor: v_tol = 0.0107814
+      pass it to the main run as  --tol-endo 0.0107814
+
+==============================================================================
+(7) THE SHADOW PANEL — every gauge replayed through the same rule, in every arm
+==============================================================================
+  Counterfactual: what each gauge WOULD have licensed in each arm, per era, if it
+  had been the driven read. Exact only up to the arm's first action (after that the
+  arm's own trajectory is the one the gauge was measured on), so `first_action` is
+  printed beside it and a shadow decision must never be read as a measured one.
+
+    anchor  (first action cNone)
+      ledger       e1[48c armed@5 quiet@10]  e2[40c armed@75 quiet@76]  e3[12c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[7c armed@None quiet@None]
+      yield        e1[48c armed@5 quiet@29]  e2[40c armed@53 quiet@58]  e3[12c armed@93 quiet@None]  e4[9c armed@105 quiet@None]  e5[7c armed@None quiet@None]
+      endo         e1[48c armed@None quiet@None]  e2[40c armed@None quiet@None]  e3[12c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[7c armed@None quiet@None]
+      endo_cell    e1[48c armed@None quiet@None]  e2[40c armed@None quiet@None]  e3[12c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[7c armed@None quiet@None]
+      endo_excess  e1[48c armed@5 quiet@16]  e2[40c armed@None quiet@None]  e3[12c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[7c armed@None quiet@None]
+
+    outer_yield  (first action c49)
+      ledger       e1[56c armed@5 quiet@10]  e2[50c armed@97 quiet@99]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[56c armed@5 quiet@49]  e2[50c armed@61 quiet@92]  e3[15c armed@111 quiet@None]  e4[9c armed@126 quiet@130]  e5[9c armed@None quiet@None]
+      endo         e1[56c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[56c armed@37 quiet@38]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[56c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    yoked_yield  (first action c49)
+      ledger       e1[56c armed@5 quiet@10]  e2[50c armed@97 quiet@99]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[56c armed@5 quiet@49]  e2[50c armed@61 quiet@92]  e3[15c armed@111 quiet@None]  e4[9c armed@126 quiet@130]  e5[9c armed@None quiet@None]
+      endo         e1[56c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[56c armed@37 quiet@38]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[56c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[9c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    outer_endo  (first action c16)
+      ledger       e1[60c armed@5 quiet@10]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[60c armed@5 quiet@32]  e2[50c armed@68 quiet@82]  e3[15c armed@115 quiet@None]  e4[12c armed@130 quiet@132]  e5[9c armed@None quiet@None]
+      endo         e1[60c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[60c armed@37 quiet@41]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[60c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    yoked_endo  (first action c16)
+      ledger       e1[60c armed@5 quiet@10]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[60c armed@5 quiet@32]  e2[50c armed@68 quiet@82]  e3[15c armed@115 quiet@None]  e4[12c armed@130 quiet@132]  e5[9c armed@None quiet@None]
+      endo         e1[60c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[60c armed@37 quiet@41]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[60c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    outer_ledger  (first action c10)
+      ledger       e1[18c armed@5 quiet@10]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[18c armed@5 quiet@None]  e2[50c armed@25 quiet@27]  e3[15c armed@73 quiet@None]  e4[12c armed@91 quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[18c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@95 quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[18c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@93 quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[18c armed@5 quiet@11]  e2[50c armed@None quiet@None]  e3[15c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+==============================================================================
+(8) THE ADDRESS-BOOK BATTERY, plant guard, certificates, cost
+==============================================================================
+  END-OF-RUN BATTERY: e per condition (last era), and the next-level currency split
+  arm                cond  e(last era)  g/solve  solved  T3@sup  T3built
+  anchor           a_full        0.951    463.0      19       1        1
+  anchor           b_span        0.987    463.0       5       0        0
+  anchor          c_prims        0.844    463.0      60       5        3
+  outer_yield      a_full        0.917    463.0      32       3        1
+  outer_yield      b_span        0.974    463.0      10       0        0
+  outer_yield     c_prims        0.833    463.0      64       6        4
+  yoked_yield      a_full        0.917    463.0      32       3        1
+  yoked_yield      b_span        0.974    463.0      10       0        0
+  yoked_yield     c_prims        0.833    463.0      64       6        4
+  outer_endo       a_full        0.943    463.0      22       2        0
+  outer_endo       b_span        0.977    463.0       9       1        0
+  outer_endo      c_prims        0.930    463.0      27       2        0
+  yoked_endo       a_full        0.943    463.0      22       2        0
+  yoked_endo       b_span        0.977    463.0       9       1        0
+  yoked_endo      c_prims        0.930    463.0      27       2        0
+  outer_ledger     a_full        0.974    463.0      10       0        0
+  outer_ledger     b_span        0.982    463.0       7       0        0
+  outer_ledger    c_prims        0.943    463.0      22       1        0
+
+  G-Y / OBSERVATION PANEL: distinct next-level tuples at support, end of each era
+  anchor         L3/L4 at support 3:      41/6    58/41    59/56    60/64    62/68
+  outer_yield    L3/L4 at support 3:     50/11    65/66    65/79    65/83    72/87
+  yoked_yield    L3/L4 at support 3:     50/11    65/66    65/79    65/83    72/87
+  outer_endo     L3/L4 at support 3:     42/23    58/59    62/74    63/83    70/84
+  yoked_endo     L3/L4 at support 3:     42/23    58/59    62/74    63/83    70/84
+  outer_ledger   L3/L4 at support 3:      15/1    41/26    44/41    44/48    48/49
+
+  PLANT GUARD, CERTIFICATES, COST
+  anchor         parse 0.664-0.693  infill 0.711-0.764  cert L2 c18 L3 c69  recerts  10    10.5 s/cycle
+  outer_yield    parse 0.672-0.694  infill 0.717-0.766  cert L2 c18 L3 c74  recerts  13    10.4 s/cycle
+  yoked_yield    parse 0.672-0.694  infill 0.717-0.766  cert L2 c18 L3 c74  recerts  13    10.4 s/cycle
+  outer_endo     parse 0.665-0.693  infill 0.703-0.766  cert L2 c18 L3 c74  recerts  10    10.3 s/cycle
+  yoked_endo     parse 0.665-0.693  infill 0.703-0.766  cert L2 c18 L3 c74  recerts  10    10.3 s/cycle
+  outer_ledger   parse 0.662-0.693  infill 0.715-0.766  cert L2 c17 L3 c36  recerts  10    10.9 s/cycle
+
+  TOTAL 8932s = 2.48 GPU-h
+
+[figures] /home/user/research/experiments/rhm/practice/conductor/figures/cd_s0/fig1_competence.png fig2_panel.png fig3_clocks.png
