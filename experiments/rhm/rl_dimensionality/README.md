@@ -124,6 +124,27 @@ Sampled-policy parse validity (the distribution, not just the argmax) and root-l
 
 Interpretation is deliberately scoped: this is one substrate, one model size, single-seed (effects are large, monotone in m, and internally replicated across three mechanisms and two verifiers, which triangulates seed sensitivity about as well as one seed can), and EI's validity curves were still climbing at round 6 — though its deep-level excess trend across rounds is flat-to-worsening, which is the falsifiable part. Where capability creation *would* show up in this framework is the filtered-imitation channel scaled further: SFT on verifier-selected samples is pretraining on self-generated grammar data, and nothing here rules out that channel teaching missing rules with far more data — the observation is that at the RL-matched budget it demonstrably did not, while task reward doubled anyway.
 
+## Children
+
+### [`idiolect/`](idiolect/README.md) — what the surviving verifier does to the coordinate it can't see (2026-08-28)
+
+The parse verifier is *exactly invariant* to which of the `m` synonymous rules
+realizes a feature, so under it surface form is a free coordinate; pretraining's
+own objective is the only thing that ever pinned it to the corpus. Re-analyzing
+these checkpoints (inference only — invertible rules make the rule used at every
+node exactly recoverable), synonym-choice divergence from the DGP **rises** with
+`m` under the parse verifier (EI: 0.017 → 0.078 bits, `m` = 2→6) and **falls**
+under the exact verifier (0.055 → 0.024), the same verifier × dimensionality
+reversal as bound B1, on an independent measurement. At `m=6` six EI rounds
+raise root validity, raise grammaticality *above* the pretrained model's, and
+raise drift 13× above pretrained — monotonically, in both seeds. A second EI run
+from the identical checkpoint drifts comparably far but **45–79° away** in
+direction (4–6.6× the same-seed noise floor), so the amount is reproducible
+while the direction is largely arbitrary — the shape of an idiolect rather than
+a correction. The `kl_coef=0.1` anchor nearly eliminates it. Scope: RHM synonyms
+are interchangeable by construction, so this shows the mechanism exists and
+scales as predicted, not that it explains term-invention in frontier models.
+
 ## Reproduction
 
 ```bash

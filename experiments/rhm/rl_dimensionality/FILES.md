@@ -10,6 +10,12 @@
 | `aggregate_ei.py` | Three-way EI (ei01) vs KL (kl01) vs base comparison |
 | `rl_dimensionality_colab.ipynb` | Self-contained Colab walkthrough: the setup explained, a scaled-down live replica (pretrain-to-plateau → REINFORCE → +KL → EI at one m, ~15 min on a T4), and the full-scale results embedded with the README's interpretation inline. No Modal/repo dependency — upload and run |
 
+## Children
+
+| Folder | Summary |
+|---|---|
+| [`idiolect/`](idiolect/README.md) | Synonym-choice drift under the synonymy-invariant verifier: reproducible in magnitude, largely arbitrary in direction, and co-occurring with rising validity and grammaticality. Inference-only re-analysis of this folder's checkpoints, plus a seed-43 privacy arm. File index in [`idiolect/FILES.md`](idiolect/FILES.md) |
+
 ## Auxiliary docs
 
 | File | Summary |
