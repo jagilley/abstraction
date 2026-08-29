@@ -23,6 +23,7 @@ This is a research monorepo consolidating several projects.
 - `applications/` — Job/fellowship applications
 - `projects/` — Cross-project progress logs
 - `ROADMAP.md` - our working roadmap for the next steps in this line of work. (Don't edit without permission)
+- `ROADMAP_PROGRESS.md` and `QUEUE.md` - place where we put one-liners describing the progress we have made or will make towards the roadmap. Please edit these as appropriate unless instructed otherwise
 
 Each project subdirectory has its own CLAUDE.md with setup instructions and conventions.
 
