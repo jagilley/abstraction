@@ -376,6 +376,26 @@ learned-vs-thermostat ordering flips sign and is demoted, and era 4 is the cell 
 learning's edge holds on both draws. Single seed; the twins bound stream position, not seed;
 6 logged commit events mean the learned object is the value of states, not of acting.
 
+### [`crescendo/`](crescendo/README.md) — A3: the signature (2026-08-28→29)
+
+**Goal**: the roadmap's one distinctive prediction (§1.4) — the earnable range extends with
+the turn of the crank — tested by opening L4 to the loop-paced learner on the same depth-6
+world, against a ceiling control that is a clock yoke of the treatment carrying exactly one
+extra bit (`commit_max_level=3`): lifetime-identical, bit-identical to the forbidden commit,
+on both stream draws.
+
+**Finding**: **the value clock holds past the range the previous turn certified, on both
+draws.** The thermostat crank commits L4 on its own signals (c129 certified / c121 on the
+displaced draw — both inside Phase 0's offline-predicted window and book size), and against
+the one-bit ceiling the value clock reads **+0.388/+0.427 at era 4** (clearing every floor,
+12.9× the node's own measured displacement floor) and +0.519/+0.929 at era 5 (sign-stable,
+1.27× its in-node floor) — a 4–5-entry sliver of an 816-tuple level buying a third of the
+deep-era gap, with π's L4 mass rising monotonically post-commit on both draws while every
+L4-forbidden arm sits at exactly 0.000. The r² wall above is real and arithmetic (frozen
+recall² predicted buildable L4 to ±2) and extension is the measured lever, putting Track F3's
+index ops on the critical path of any further climb. One rung, single seed, exogenous demand
+ladder — §1.3's "semi-autonomous" stands.
+
 ## Reproduce
 
 ```bash

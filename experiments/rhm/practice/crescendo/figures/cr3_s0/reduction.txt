@@ -1,0 +1,697 @@
+✓ Finished downloading files to local!
+✓ Finished downloading files to local!
+✓ Finished downloading files to local!
+
+[merge] cr3_s1 -> cr3_s0: refs identical = True, stale buffer identical = True
+[merge] arms added: ['outer_yield_m4_j', 'ceiling_m3_j']
+[merge] the twin tag's own in-job substrate assertion vs cr3_s0: refs_identical = True
+=== crescendo (A3) — tag cr3_s0 ===
+ladder [('L1n25', 60), ('L2n12', 50), ('L3n6', 70), ('L4n3', 12), ('L5n1', 9)] = 201 cycles/arm scheduled; caps [60, 50, 70, 12, 9] = 201; setup 611s; stale buffer 0.1269 -> 0.1541
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+
+==============================================================================
+(0) GATES
+==============================================================================
+  CROSS-TAG REPLAY (A1's THERMOSTAT through the earning eras — the round's strongest gate): cr3_s0/outer_yield_m4 vs ma_s0/outer_yield over c1-c106 (through era 2)
+    max|delta| = 0.000e+00 over 13 series; commits [(49, 2), (92, 3)] vs [(49, 2), (92, 3)]  -> PASS
+  CROSS-TAG REPLAY (the substrate): cr3_s0/anchor_long vs ma_s0/anchor over c1-c48 (through era 1)
+    max|delta| = 0.000e+00 over 13 series; commits [(18, 2)] vs [(18, 2)]  -> PASS
+  CROSS-TAG REPLAY (the chain back to A1): cr3_s0/anchor_long vs cd_s0/anchor over c1-c48 (through era 1)
+    max|delta| = 0.000e+00 over 13 series; commits [(18, 2)] vs [(18, 2)]  -> PASS
+  G-F smoke scale (in-process vs maestro.py, panel ON, maxl=3): max|fork - donor| = 0.000e+00, self-replay control = 0.000e+00, commits equal = True  -> PASS
+
+  IN-TAG TWIN GATE (each arm vs anchor_long, to the first action by EITHER; anchor_long's own first commit is c18):
+    outer_yield_m4 c1-c17   (first action c18 (schedule)) max|delta| = 0.000e+00  -> PASS
+    ceiling_m3     c1-c17   (first action c18 (schedule)) max|delta| = 0.000e+00  -> PASS
+    outer_yield_m4x c1-c17   (first action c18 (schedule)) max|delta| = 0.000e+00  -> PASS
+    outer_yield_m3 c1-c17   (first action c18 (schedule)) max|delta| = 0.000e+00  -> PASS
+    outer_yield_m4_j c1-c17   (first action c18 (schedule)) max|delta| = 9.800e+01  -> FAIL
+    ceiling_m3_j   c1-c17   (first action c18 (schedule)) max|delta| = 9.800e+01  -> FAIL
+
+  OBSERVATION PANEL vs the donor's G-Y miner (level 4, every cycle):
+    anchor_long      agree=True over 201 cycles
+    outer_yield_m4   agree=True over 162 cycles
+    ceiling_m3       agree=True over 162 cycles
+    outer_yield_m4x  agree=True over 166 cycles
+    outer_yield_m3   agree=True over 150 cycles
+    outer_yield_m4_j agree=True over 151 cycles
+    ceiling_m3_j     agree=True over 151 cycles
+
+  POLICY GATE (offline, no GPU): ALL PASS (21 checks)
+
+  ENDO READ: LABEL-FREE BY CONSTRUCTION: PASS — positions depend only on ['era.level', 'era.node', 's', 'depth']; none of ['truth', 'rules', 'inverse_maps', 'committed', 'canon', 'true_mask', 'grade'] appears in the read's code
+    era 1 cell L1n25 blocks [25, 26] -> parent L2n12 blocks [24, 26]
+    era 2 cell L2n12 blocks [24, 26] -> parent L3n6 blocks [24, 28]
+    era 3 cell L3n6 blocks [24, 28] -> parent L4n3 blocks [24, 32]
+    era 4 cell L4n3 blocks [24, 32] -> parent L5n1 blocks [16, 32]
+    era 5 cell L5n1 blocks [16, 32] -> parent L6n0 blocks [0, 32]  (parent IS the root: the read is the unconditional marginal)
+
+  DEAD ZONES: measured, not defaulted: PASS, matches floors.json = None
+    {'tol_ledger': 0.02944712566990095, 'tol_yield_l3': 0.46127129019246205, 'tol_yield_l4': 0.5166900731510206, 'tol_endo': 0.01091575129919287}
+    provenance: cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)
+
+  ENDO PRICE (measured on the run's own GPU): one read over 256 sequences = 1.3 ms = 258 grounding-equivalents; charged 267g
+
+==============================================================================
+(1) THE ACTION TRACE — what the loop did, and when
+==============================================================================
+  arm                 policy    read cycles  commits  advances  chosen  capped  rode cap
+  anchor_long       schedule    None    201        0         0       0       0     False
+  outer_yield_m4       quiet   yield    162        3         5       5       3      True
+  ceiling_m3            yoke    None    162        2         5       0       0     False
+  outer_yield_m4x      quiet   yield    166        3         5       5       3      True
+  outer_yield_m3       quiet   yield    150        2         5       4       3      True
+  outer_yield_m4_j     quiet   yield    151        3         5       5       3      True
+  ceiling_m3_j          yoke    None    151        2         5       0       0     False
+
+  PER-ARM ACTIONS (cycle, kind, level, why, and the statistic at that instant)
+
+    anchor_long  eras: e1 c1-60 (60c), e2 c61-110 (50c), e3 c111-180 (70c), e4 c181-192 (12c), e5 c193-201 (9c)
+      (no loop actions — the schedule arm)
+
+    outer_yield_m4  eras: e1 c1-56 (56c), e2 c57-106 (50c), e3 c107-141 (35c), e4 c142-153 (12c), e5 c154-162 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c56   era1 advance  L-  why=quiet  V=   0.4375 tol=  0.4613 V/tol=    0.95
+      c92   era2 commit   L3  why=quiet  V=   0.3015 tol=  0.5167 V/tol=    0.58
+      c106  era2 advance  L-  why=cap    V=   1.4912 tol=  0.5167 V/tol=    2.89
+      c129  era3 commit   L4  why=quiet  V=   0.4709 tol=  0.5167 V/tol=    0.91
+      c141  era3 advance  L-  why=quiet  V=   0.4199 tol=  0.5167 V/tol=    0.81
+      c153  era4 advance  L-  why=cap    V=   0.2930 tol=  0.5167 V/tol=    0.57
+      c162  era5 advance  L-  why=cap    V=   0.0000 tol=  0.5167 V/tol=    0.00
+
+    ceiling_m3  eras: e1 c1-56 (56c), e2 c57-106 (50c), e3 c107-141 (35c), e4 c142-153 (12c), e5 c154-162 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c56   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c92   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c106  era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c141  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c153  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c162  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    outer_yield_m4x  eras: e1 c1-56 (56c), e2 c57-106 (50c), e3 c107-145 (39c), e4 c146-157 (12c), e5 c158-166 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c56   era1 advance  L-  why=quiet  V=   0.4375 tol=  0.4613 V/tol=    0.95
+      c79   era2 commit   L3  why=quiet  V=   0.4453 tol=  0.5167 V/tol=    0.86
+      c106  era2 advance  L-  why=cap    V=   0.8700 tol=  0.5167 V/tol=    1.68
+      c119  era3 commit   L4  why=quiet  V=   0.4326 tol=  0.5167 V/tol=    0.84
+      c145  era3 advance  L-  why=quiet  V=   0.4803 tol=  0.5167 V/tol=    0.93
+      c157  era4 advance  L-  why=cap    V=   0.3672 tol=  0.5167 V/tol=    0.71
+      c166  era5 advance  L-  why=cap    V=   0.1250 tol=  0.5167 V/tol=    0.24
+
+    outer_yield_m3  eras: e1 c1-56 (56c), e2 c57-106 (50c), e3 c107-129 (23c), e4 c130-141 (12c), e5 c142-150 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c56   era1 advance  L-  why=quiet  V=   0.4375 tol=  0.4613 V/tol=    0.95
+      c92   era2 commit   L3  why=quiet  V=   0.3015 tol=  0.5167 V/tol=    0.58
+      c106  era2 advance  L-  why=cap    V=   1.4912 tol=  0.5167 V/tol=    2.89
+      c129  era3 advance  L-  why=quiet  V=   0.4709 tol=  0.5167 V/tol=    0.91
+      c141  era4 advance  L-  why=cap    V=   0.3398 tol=  0.5167 V/tol=    0.66
+      c150  era5 advance  L-  why=cap    V=   0.0156 tol=  0.5167 V/tol=    0.03
+
+    outer_yield_m4_j  eras: e1 c1-59 (59c), e2 c60-109 (50c), e3 c110-130 (21c), e4 c131-142 (12c), e5 c143-151 (9c)
+      c26   era1 commit   L2  why=quiet  V=   0.3741 tol=  0.4613 V/tol=    0.81
+      c59   era1 advance  L-  why=quiet  V=   0.3757 tol=  0.4613 V/tol=    0.81
+      c103  era2 commit   L3  why=quiet  V=   0.2610 tol=  0.5167 V/tol=    0.51
+      c109  era2 advance  L-  why=cap    V=   1.8750 tol=  0.5167 V/tol=    3.63
+      c121  era3 commit   L4  why=quiet  V=   0.4375 tol=  0.5167 V/tol=    0.85
+      c130  era3 advance  L-  why=quiet  V=   0.4375 tol=  0.5167 V/tol=    0.85
+      c142  era4 advance  L-  why=cap    V=   0.0879 tol=  0.5167 V/tol=    0.17
+      c151  era5 advance  L-  why=cap    V=   0.0000 tol=  0.5167 V/tol=    0.00
+
+    ceiling_m3_j  eras: e1 c1-59 (59c), e2 c60-109 (50c), e3 c110-130 (21c), e4 c131-142 (12c), e5 c143-151 (9c)
+      c26   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c59   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c103  era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c109  era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c130  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c142  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c151  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+  COMMIT CYCLES AND WHAT WAS COMMITTED
+  arm              lvl  cycle  era  prov  entries  recall    prec  cert@    driver
+  anchor_long        2     18    1 False       11   0.571   0.727     18delta_prov
+  anchor_long        3     75    2 False        8   0.054   0.375     75delta_prov
+  anchor_long        4    180    3  True        5   0.001   0.200   Nonedelta_prov
+  outer_yield_m4     2     49    1 False       14   0.714   0.714     18      loop
+  outer_yield_m4     3     92    2 False       21   0.125   0.333     74      loop
+  outer_yield_m4     4    129    3 False        5   0.002   0.400    127      loop
+  ceiling_m3         2     49    1 False       14   0.714   0.714     18      loop
+  ceiling_m3         3     92    2 False       21   0.125   0.333     74      loop
+  outer_yield_m4x    2     49    1 False       14   0.714   0.714     18      loop
+  outer_yield_m4x    3     79    2 False       15   0.089   0.333     75      loop
+  outer_yield_m4x    4    119    3 False        5   0.002   0.400   None      loop
+  outer_yield_m3     2     49    1 False       14   0.714   0.714     18      loop
+  outer_yield_m3     3     92    2 False       21   0.125   0.333     74      loop
+  outer_yield_m4_j   2     26    1 False       12   0.571   0.667     19      loop
+  outer_yield_m4_j   3    103    2 False       22   0.125   0.318     80      loop
+  outer_yield_m4_j   4    121    3 False        4   0.001   0.250   None      loop
+  ceiling_m3_j       2     26    1 False       12   0.571   0.667     19      loop
+  ceiling_m3_j       3    103    2 False       22   0.125   0.318     80      loop
+
+==============================================================================
+(1b) THE LEARNED POLICY'S OWN RECORD — the mixtures, the fit, the action diff
+==============================================================================
+  THE FITTED MIXTURES (unit-norm weights on each gauge's paired-interval slope,
+  IN FLOOR UNITS; the bucket is `will_commit` = would a firing install a table).
+  A1's thermostat is the point (0, 1, 0) with theta = 1 in this same class.
+    arm/reward        bucket           ledger         yield   endo_excess    theta
+    learned_yield   installs          +0.2106       +0.9440       +0.2540   1.2085
+    learned_yield   advances          +0.0495       +0.8506       +0.5235   1.0980
+    learned_task    installs          -0.7806       +0.2146       +0.5871   1.4253
+    learned_task    advances          -0.4221       +0.1367       +0.8962   0.7083
+
+  THE ACTION DIFF — learned vs the hand-written thermostat, IN THIS TAG
+  (both ran live on their own trajectories, so this is a difference between two
+   runs and not a counterfactual; the pre-GPU replay is in fit.json.)
+
+  WHAT THE LEARNED POLICY READ AT EACH OF ITS OWN ACTIONS
+
+==============================================================================
+(2) GAUGE vs YOKE — the mandatory timing control (census finding 4)
+==============================================================================
+  The yoke replays the gauge arm's realised action cycles by clock and reads
+  nothing. A divergence would mean the reads are not inert; identity means the
+  criterion contributed nothing beyond a cycle number, which is a finding, and the
+  priced-time column is then what the read cost for a trajectory a clock reproduces.
+
+  outer_yield_m4 vs ceiling_m3  (n=162 cycles)
+    max|delta| over 12 trajectory series = 1.890e+02; first divergence cycle = 129
+    per-series: e=1.35e-01, succ=1.35e-01, dres=6.93e-01, n_moves=4.00e+00, width=1.00e+01, g_per_solve=2.00e+00, e_practice=1.88e-01, vloss=3.58e-01, gloss=1.88e-01, n_solved=1.89e+02, n_mined=2.00e+00, m_per_solve=1.20e+01
+    commits [(2, 49), (3, 92), (4, 129)] vs [(2, 49), (3, 92)]   equal = False
+    advances [56, 106, 141, 153, 162] vs [56, 106, 141, 153, 162]   equal = True
+    priced time t_cum 40748768 vs 40316422  (difference +432346 = what the read cost)
+
+  outer_yield_m4_j vs ceiling_m3_j  (n=151 cycles)
+    max|delta| over 12 trajectory series = 2.140e+02; first divergence cycle = 121
+    per-series: e=1.95e-01, succ=1.95e-01, dres=9.77e-01, n_moves=4.00e+00, width=1.00e+01, g_per_solve=2.00e+00, e_practice=1.88e-01, vloss=2.37e-01, gloss=1.52e-01, n_solved=2.14e+02, n_mined=3.00e+00, m_per_solve=1.20e+01
+    commits [(2, 26), (3, 103), (4, 121)] vs [(2, 26), (3, 103)]   equal = False
+    advances [59, 109, 130, 142, 151] vs [59, 109, 130, 142, 151]   equal = True
+    priced time t_cum 37734362 vs 37302208  (difference +432154 = what the read cost)
+
+==============================================================================
+(3) THE THREE CLOCKS: certificate, coverage, value
+==============================================================================
+  CLOCK 1 — the SHADOW certificate (read-only in every arm, incl. the driven ones)
+  arm               L2 fired  L3 fired  L2 c2cert  L3 c2cert  commit L2  commit L3
+  anchor_long             18        75         17         15         18         75
+  outer_yield_m4          18        74         17         16         49         92
+  ceiling_m3              18        74         17         16         49         92
+  outer_yield_m4x         18        75         17         17         49         79
+  outer_yield_m3          18        74         17         16         49         92
+  outer_yield_m4_j        19        80         18         20         26        103
+  ceiling_m3_j            19        80         18         20         26        103
+
+  CLOCK 2 — COVERAGE: end-of-run committed table per level
+  arm              lvl  frozen n   recall    prec  live n  live rec  live prec
+  anchor_long        2        11    0.571   0.727      19     0.929      0.684
+  anchor_long        3         8    0.054   0.375      21     0.143      0.381
+  anchor_long        4         5    0.001   0.200       5     0.001      0.200
+  outer_yield_m4     2        14    0.714   0.714      19     0.857      0.632
+  outer_yield_m4     3        21    0.125   0.333      33     0.196      0.333
+  outer_yield_m4     4         5    0.002   0.400       7     0.002      0.286
+  ceiling_m3         2        14    0.714   0.714      20     0.929      0.650
+  ceiling_m3         3        21    0.125   0.333      36     0.250      0.389
+  ceiling_m3         4         -        -       -      10     0.004      0.300
+  outer_yield_m4x    2        18    0.857   0.667      18     0.857      0.667
+  outer_yield_m4x    3        34    0.161   0.265      38     0.196      0.289
+  outer_yield_m4x    4         9    0.004   0.333       9     0.004      0.333
+  outer_yield_m3     2        14    0.714   0.714      18     0.857      0.667
+  outer_yield_m3     3        21    0.125   0.333      35     0.232      0.371
+  outer_yield_m3     4         -        -       -       7     0.002      0.286
+  outer_yield_m4_j   2        12    0.571   0.667      17     0.857      0.706
+  outer_yield_m4_j   3        22    0.125   0.318      26     0.161      0.346
+  outer_yield_m4_j   4         4    0.001   0.250       6     0.002      0.333
+  ceiling_m3_j       2        12    0.571   0.667      20     0.929      0.650
+  ceiling_m3_j       3        22    0.125   0.318      28     0.161      0.321
+  ceiling_m3_j       4         -        -       -       8     0.002      0.250
+
+  CLOCK 3 — VALUE: recovered fraction per era (e, and (stale-e)/(stale-floor))
+  arm                          era1             era2             era3             era4             era5
+  anchor_long         0.471 /+0.515    0.523 /+0.664    0.510 /+0.915    0.646 /+1.182    0.793 /+1.186
+  outer_yield_m4      0.474 /+0.512    0.582 /+0.562    0.519 /+0.894    0.620 /+1.273    0.803 /+1.126
+  ceiling_m3          0.474 /+0.512    0.582 /+0.562    0.514 /+0.906    0.731 /+0.885    0.885 /+0.607
+  outer_yield_m4x     0.470 /+0.518    0.559 /+0.601    0.440 /+1.069    0.582 /+1.403    0.726 /+1.612
+  outer_yield_m3      0.474 /+0.512    0.582 /+0.562    0.550 /+0.825    0.760 /+0.782    0.916 /+0.415
+  outer_yield_m4_j    0.454 /+0.538    0.540 /+0.634    0.576 /+0.769    0.611 /+1.303    0.738 /+1.536
+  ceiling_m3_j        0.454 /+0.538    0.540 /+0.634    0.595 /+0.724    0.734 /+0.876    0.885 /+0.607
+  stale                     0.865            0.906            0.922            0.984            0.982
+  floor                     0.102            0.328            0.471            0.698            0.823
+
+  DELTA TO ANCHOR_LONG (the scheduled crank AND the lifetime ceiling), per era, in recovered fraction
+  Read against the MEASURED depth-6 stream floor (census finding 7): 0.087 in the
+  earning family and 0.083/0.148/0.344 in the given family for eras 3/4/5. Ranks
+  and signs in the deep eras are the currency; fractions are not.
+  arm                   era1      era2      era3      era4      era5
+  outer_yield_m4      -0.003    -0.102    -0.021     0.091    -0.060
+  ceiling_m3          -0.003    -0.102    -0.010    -0.297    -0.579
+  outer_yield_m4x      0.002    -0.063     0.154     0.221     0.426
+  outer_yield_m3      -0.003    -0.102    -0.091    -0.400    -0.770
+  outer_yield_m4_j     0.023    -0.030    -0.146     0.121     0.350
+  ceiling_m3_j         0.023    -0.030    -0.191    -0.306    -0.579
+
+==============================================================================
+(4) pi PER-LEVEL MASS, ARGMAX SHARE, AND MACRO EXPANSIONS, per arm per era
+==============================================================================
+
+  L2 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  anchor_long          0.195     0.268     0.195     0.190     0.203
+  outer_yield_m4       0.061     0.305     0.285     0.204     0.207
+  ceiling_m3           0.061     0.305     0.284     0.251     0.258
+  outer_yield_m4x      0.058     0.243     0.220     0.165     0.184
+  outer_yield_m3       0.061     0.305     0.307     0.240     0.265
+  outer_yield_m4_j     0.198     0.361     0.292     0.221     0.205
+  ceiling_m3_j         0.198     0.361     0.328     0.301     0.289
+
+  L3 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  anchor_long          0.000     0.131     0.351     0.447     0.383
+  outer_yield_m4       0.000     0.065     0.222     0.310     0.290
+  ceiling_m3           0.000     0.065     0.226     0.365     0.335
+  outer_yield_m4x      0.000     0.113     0.233     0.252     0.236
+  outer_yield_m3       0.000     0.065     0.176     0.287     0.255
+  outer_yield_m4_j     0.000     0.053     0.173     0.221     0.235
+  ceiling_m3_j         0.000     0.053     0.156     0.319     0.364
+
+  L4 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  anchor_long          0.000     0.000     0.096     0.082     0.118
+  outer_yield_m4       0.000     0.000     0.034     0.104     0.152
+  ceiling_m3           0.000     0.000     0.000     0.000     0.000
+  outer_yield_m4x      0.000     0.000     0.100     0.251     0.258
+  outer_yield_m3       0.000     0.000     0.000     0.000     0.000
+  outer_yield_m4_j     0.000     0.000     0.041     0.165     0.219
+  ceiling_m3_j         0.000     0.000     0.000     0.000     0.000
+
+  L2 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  anchor_long          0.003     0.234     0.109     0.096     0.117
+  outer_yield_m4       0.000     0.255     0.302     0.161     0.135
+  ceiling_m3           0.000     0.255     0.268     0.185     0.221
+  outer_yield_m4x      0.000     0.190     0.169     0.083     0.060
+  outer_yield_m3       0.000     0.255     0.357     0.214     0.219
+  outer_yield_m4_j     0.003     0.292     0.255     0.143     0.117
+  ceiling_m3_j         0.003     0.292     0.318     0.305     0.242
+
+  L3 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  anchor_long          0.000     0.065     0.516     0.630     0.508
+  outer_yield_m4       0.000     0.000     0.250     0.398     0.388
+  ceiling_m3           0.000     0.000     0.260     0.542     0.432
+  outer_yield_m4x      0.000     0.010     0.289     0.266     0.266
+  outer_yield_m3       0.000     0.000     0.128     0.333     0.294
+  outer_yield_m4_j     0.000     0.000     0.122     0.216     0.232
+  ceiling_m3_j         0.000     0.000     0.086     0.404     0.453
+
+  L4 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  anchor_long          0.000     0.000     0.000     0.091     0.156
+  outer_yield_m4       0.000     0.000     0.005     0.130     0.201
+  ceiling_m3           0.000     0.000     0.000     0.000     0.000
+  outer_yield_m4x      0.000     0.000     0.091     0.365     0.406
+  outer_yield_m3       0.000     0.000     0.000     0.000     0.000
+  outer_yield_m4_j     0.000     0.000     0.003     0.221     0.326
+  ceiling_m3_j         0.000     0.000     0.000     0.000     0.000
+
+  MACRO EXPANSIONS the beam ran (blocks.mat_dp, per-cycle mean by era)
+  arm                     era1        era2        era3        era4        era5
+  anchor_long            11778       29094       61595      101732       99579
+  outer_yield_m4          9176       22240       54888       75996       89881
+  ceiling_m3              9176       22240       48816       76725       85162
+  outer_yield_m4x         9176       23464       55333       73395       91651
+  outer_yield_m3          9176       22240       46404       67913       76661
+  outer_yield_m4_j       11842       30506       56891       75842       94384
+  ceiling_m3_j           11842       30506       46799       72757       86876
+
+==============================================================================
+(5) THE LEDGER — what each arm read, and what it cost
+==============================================================================
+  ear's convention: the learner's own experience is free, a counterfactual read is
+  priced, and instruments logged in every arm are free. Only the POLICY's input
+  stream is charged, and the charge lands in `counts['ground']` -> `t_cum`, which
+  nothing in the cycle loop reads.
+  arm                     read  n reads  priced  spend(g)    t_cum end   t_cum+read  read % of
+  anchor_long             None        0       0         0     50688282     50688282     0.000%
+  outer_yield_m4         yield        0       0         0     40748768     40748768     0.000%
+  ceiling_m3              None        0       0         0     40316422     40316422     0.000%
+  outer_yield_m4x        yield        0       0         0     41631290     41631290     0.000%
+  outer_yield_m3         yield        0       0         0     37094125     37094125     0.000%
+  outer_yield_m4_j       yield        0       0         0     37734362     37734362     0.000%
+  ceiling_m3_j            None        0       0         0     37302208     37302208     0.000%
+
+==============================================================================
+(6) THE MEASURED FLOORS, RE-DERIVED IN-TAG on the schedule arm
+==============================================================================
+  reference arm: anchor_long (201 cycles, 7 windows dropped at era boundaries / commits); span=1 W=4
+  gauge         n_win      sd(N)    mean(N)  v_tol=sd/2    mean(D)  D/floor   governed by
+  ledger          166    0.04489   -0.00023     0.02244   +0.00634     0.28       0.02945
+  yield           166    0.79150   +0.03916     0.39575   +0.74247     1.88L3 0.4613/L4 0.5167
+  endo            166    0.01864   +0.00019     0.00932   -0.00032    -0.03       0.01092
+  endo_cell       166    0.02777   +0.00021     0.01389   -0.00158    -0.11          None
+  endo_excess     166    0.01963   -0.00002     0.00981   +0.00126     0.13          None
+
+  >>> THE ENDO DEAD ZONE, measured on cr3_s0/anchor_long: v_tol = 0.00931931
+      pass it to the main run as  --tol-endo 0.00931931
+
+==============================================================================
+(7) THE SHADOW PANEL — every gauge replayed through the same rule, in every arm
+==============================================================================
+  Counterfactual: what each gauge WOULD have licensed in each arm, per era, if it
+  had been the driven read. Exact only up to the arm's first action (after that the
+  arm's own trajectory is the one the gauge was measured on), so `first_action` is
+  printed beside it and a shadow decision must never be read as a measured one.
+
+    anchor_long  (first action cNone)
+      ledger       e1[60c armed@5 quiet@10]  e2[50c armed@81 quiet@83]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[60c armed@5 quiet@29]  e2[50c armed@65 quiet@93]  e3[70c armed@116 quiet@128]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[60c armed@None quiet@None]  e2[50c armed@65 quiet@66]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[60c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[60c armed@5 quiet@16]  e2[50c armed@65 quiet@67]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    outer_yield_m4  (first action c49)
+      ledger       e1[56c armed@5 quiet@10]  e2[50c armed@97 quiet@99]  e3[35c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[56c armed@5 quiet@49]  e2[50c armed@61 quiet@92]  e3[35c armed@111 quiet@129]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[56c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[35c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[56c armed@37 quiet@38]  e2[50c armed@None quiet@None]  e3[35c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[56c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[35c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    ceiling_m3  (first action c49)
+      ledger       e1[56c armed@5 quiet@10]  e2[50c armed@97 quiet@99]  e3[35c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[56c armed@5 quiet@49]  e2[50c armed@61 quiet@92]  e3[35c armed@111 quiet@129]  e4[12c armed@146 quiet@149]  e5[9c armed@None quiet@None]
+      endo         e1[56c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[35c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[56c armed@37 quiet@38]  e2[50c armed@None quiet@None]  e3[35c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[56c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[35c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    outer_yield_m4x  (first action c49)
+      ledger       e1[56c armed@5 quiet@10]  e2[50c armed@85 quiet@86]  e3[39c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[56c armed@5 quiet@49]  e2[50c armed@62 quiet@79]  e3[39c armed@114 quiet@119]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[56c armed@None quiet@None]  e2[50c armed@85 quiet@86]  e3[39c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[56c armed@37 quiet@38]  e2[50c armed@None quiet@None]  e3[39c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[56c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[39c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    outer_yield_m3  (first action c49)
+      ledger       e1[56c armed@5 quiet@10]  e2[50c armed@97 quiet@99]  e3[23c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[56c armed@5 quiet@49]  e2[50c armed@61 quiet@92]  e3[23c armed@111 quiet@129]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[56c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[23c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[56c armed@37 quiet@38]  e2[50c armed@None quiet@None]  e3[23c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[56c armed@5 quiet@16]  e2[50c armed@None quiet@None]  e3[23c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    outer_yield_m4_j  (first action c26)
+      ledger       e1[59c armed@5 quiet@10]  e2[50c armed@108 quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[59c armed@5 quiet@26]  e2[50c armed@64 quiet@103]  e3[21c armed@114 quiet@121]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[59c armed@None quiet@None]  e2[50c armed@109 quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[59c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[59c armed@5 quiet@11]  e2[50c armed@None quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    ceiling_m3_j  (first action c26)
+      ledger       e1[59c armed@5 quiet@10]  e2[50c armed@108 quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[59c armed@5 quiet@26]  e2[50c armed@64 quiet@103]  e3[21c armed@114 quiet@121]  e4[12c armed@138 quiet@None]  e5[9c armed@149 quiet@151]
+      endo         e1[59c armed@None quiet@None]  e2[50c armed@109 quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[59c armed@None quiet@None]  e2[50c armed@None quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[59c armed@5 quiet@11]  e2[50c armed@None quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+==============================================================================
+(8) THE ADDRESS-BOOK BATTERY, plant guard, certificates, cost
+==============================================================================
+  END-OF-RUN BATTERY: e per condition (last era), and the next-level currency split
+  arm                  cond  e(last era)  g/solve  solved  T3@sup  T3built  T4@sup  T4built
+  anchor_long        a_full        0.789    463.0      81       5        1       1        1
+  anchor_long        b_span        0.987    463.0       5       0        0       0        0
+  anchor_long       c_prims        0.688    463.0     120       7        1       2        1
+  outer_yield_m4     a_full        0.779    463.0      85       4        1       1        1
+  outer_yield_m4     b_span        0.982    463.0       7       0        0       0        0
+  outer_yield_m4    c_prims        0.708    463.0     112       9        3       1        1
+  ceiling_m3         a_full        0.891    463.0      42       3        1       0        0
+  ceiling_m3         b_span        0.979    463.0       8       0        0       0        0
+  ceiling_m3        c_prims        0.857    463.0      55       8        5       2        1
+  outer_yield_m4x    a_full        0.719    463.0     108       6        6       1        1
+  outer_yield_m4x    b_span        0.987    463.0       5       0        0       0        0
+  outer_yield_m4x   c_prims        0.659    463.0     131      10        7       1        1
+  outer_yield_m3     a_full        0.924    463.0      29       2        1       0        0
+  outer_yield_m3     b_span        0.982    463.0       7       0        0       0        0
+  outer_yield_m3    c_prims        0.857    463.0      55       7        3       2        1
+  outer_yield_m4_j   a_full        0.708    463.0     112       9        3       1        1
+  outer_yield_m4_j   b_span        0.984    463.0       6       0        0       0        0
+  outer_yield_m4_j  c_prims        0.674    463.0     125       9        2       2        1
+  ceiling_m3_j       a_full        0.880    463.0      46       4        1       1        1
+  ceiling_m3_j       b_span        0.982    463.0       7       0        0       0        0
+  ceiling_m3_j      c_prims        0.818    463.0      70       8        3       2        2
+
+  G-Y / OBSERVATION PANEL: distinct next-level tuples at support, end of each era
+  anchor_long      L3/L4 at support 3:     50/15    60/62   64/105   64/109   71/113
+  outer_yield_m4   L3/L4 at support 3:     50/11    65/66    67/95    68/98    73/99
+  ceiling_m3       L3/L4 at support 3:     50/11    65/66    69/95    70/99   75/102
+  outer_yield_m4x  L3/L4 at support 3:     50/11    61/64    64/85    64/90    68/91
+  outer_yield_m3   L3/L4 at support 3:     50/11    65/66    67/89    67/92    71/93
+  outer_yield_m4_j L3/L4 at support 3:     45/23    58/72    60/83    60/86    63/86
+  ceiling_m3_j     L3/L4 at support 3:     45/23    58/72    60/83    60/92    69/95
+
+  PLANT GUARD, CERTIFICATES, COST
+  anchor_long      parse 0.666-0.693  infill 0.721-0.764  cert L2 c18 L3 c75  recerts  26    10.6 s/cycle
+  outer_yield_m4   parse 0.665-0.694  infill 0.715-0.766  cert L2 c18 L3 c74  recerts  19    10.7 s/cycle
+  ceiling_m3       parse 0.672-0.694  infill 0.717-0.766  cert L2 c18 L3 c74  recerts  17    10.5 s/cycle
+  outer_yield_m4x  parse 0.660-0.693  infill 0.715-0.762  cert L2 c18 L3 c75  recerts  19    10.6 s/cycle
+  outer_yield_m3   parse 0.672-0.694  infill 0.717-0.766  cert L2 c18 L3 c74  recerts  14    10.5 s/cycle
+  outer_yield_m4_j parse 0.669-0.690  infill 0.723-0.764  cert L2 c19 L3 c80  recerts  16    10.8 s/cycle
+  ceiling_m3_j     parse 0.669-0.690  infill 0.715-0.764  cert L2 c19 L3 c80  recerts  14    10.8 s/cycle
+
+  TOTAL 9571s = 2.66 GPU-h
+
+==============================================================================
+(9) THE STREAM-POSITION FLOOR — displaced twins
+==============================================================================
+
+  outer_yield_m4_j vs outer_yield_m4   burn = 1024 draws (cpu=True, cuda=True) at: after per-arm torch/cuda seeding, before the generator deepcopy
+     era    orig e    twin e     |de|  orig rec  twin rec  |d rec|
+       1    0.4740    0.4540   0.0200    +0.512    +0.538    0.026
+       2    0.5816    0.5399   0.0417    +0.562    +0.634    0.072
+       3    0.5191    0.5755   0.0564    +0.894    +0.769    0.125
+       4    0.6198    0.6111   0.0087    +1.273    +1.303    0.030
+       5    0.8030    0.7378   0.0651    +1.126    +1.536    0.410
+    eras 3-5 |d recovered fraction|: [0.125, 0.03, 0.41]  max 0.410  mean 0.188
+    first differing cycle: c1; per-cycle |de| mean 0.0631 max 0.4141
+    ACTIONS  original : [(49, 'commit', 2, 'quiet'), (56, 'advance', None, 'quiet'), (92, 'commit', 3, 'quiet'), (106, 'advance', None, 'cap'), (129, 'commit', 4, 'quiet'), (141, 'advance', None, 'quiet'), (153, 'advance', None, 'cap'), (162, 'advance', None, 'cap')]
+    ACTIONS  displaced: [(26, 'commit', 2, 'quiet'), (59, 'advance', None, 'quiet'), (103, 'commit', 3, 'quiet'), (109, 'advance', None, 'cap'), (121, 'commit', 4, 'quiet'), (130, 'advance', None, 'quiet'), (142, 'advance', None, 'cap'), (151, 'advance', None, 'cap')]
+      commits  [49, 92, 129] -> [26, 103, 121]   delta [-23, 11, -8]
+      advances [56, 106, 141, 153, 162] -> [59, 109, 130, 142, 151]   delta [3, 3, -11, -11, -11]
+      n_cycles 162 -> 151
+
+  ceiling_m3_j vs ceiling_m3   burn = 1024 draws (cpu=True, cuda=True) at: after per-arm torch/cuda seeding, before the generator deepcopy
+     era    orig e    twin e     |de|  orig rec  twin rec  |d rec|
+       1    0.4740    0.4540   0.0200    +0.512    +0.538    0.026
+       2    0.5816    0.5399   0.0417    +0.562    +0.634    0.072
+       3    0.5139    0.5955   0.0816    +0.906    +0.724    0.181
+       4    0.7309    0.7335   0.0026    +0.885    +0.876    0.009
+       5    0.8854    0.8854   0.0000    +0.607    +0.607    0.000
+    eras 3-5 |d recovered fraction|: [0.181, 0.009, 0.0]  max 0.181  mean 0.063
+    first differing cycle: c1; per-cycle |de| mean 0.0743 max 0.4141
+    ACTIONS  original : [(49, 'commit', 2, 'clock'), (56, 'advance', None, 'clock'), (92, 'commit', 3, 'clock'), (106, 'advance', None, 'clock'), (141, 'advance', None, 'clock'), (153, 'advance', None, 'clock'), (162, 'advance', None, 'clock')]
+    ACTIONS  displaced: [(26, 'commit', 2, 'clock'), (59, 'advance', None, 'clock'), (103, 'commit', 3, 'clock'), (109, 'advance', None, 'clock'), (130, 'advance', None, 'clock'), (142, 'advance', None, 'clock'), (151, 'advance', None, 'clock')]
+      commits  [49, 92] -> [26, 103]   delta [-23, 11]
+      advances [56, 106, 141, 153, 162] -> [59, 109, 130, 142, 151]   delta [3, 3, -11, -11, -11]
+      n_cycles 162 -> 151
+
+==============================================================================
+(F) THE SIGNATURE ON TWO DRAWS
+==============================================================================
+
+  RECOVERED FRACTION per era, per draw
+            draw  arm                   era1      era2      era3      era4      era5   cycles
+      A (cr3_s0)  outer_yield_m4       0.512     0.562     0.894     1.273     1.126      162
+      A (cr3_s0)  ceiling_m3           0.512     0.562     0.906     0.885     0.607      162
+   B (displaced)  outer_yield_m4_j     0.538     0.634     0.769     1.303     1.536      151
+   B (displaced)  ceiling_m3_j         0.538     0.634     0.724     0.876     0.607      151
+
+  THE SIGNATURE CELL (treatment - ceiling control), per draw
+            draw        era1      era2      era3      era4      era5
+      A (cr3_s0)       0.000     0.000    -0.012     0.388     0.519
+   B (displaced)       0.000     0.000     0.044     0.427     0.929
+
+  SIGN AGREEMENT and magnitude, eras 3-5
+   era    draw A    draw B  same sign  min |d|  x0.087  x given
+     3    -0.012     0.044      False    0.012    0.13     0.14
+     4     0.388     0.427       True    0.388    4.46     2.62
+     5     0.519     0.929       True    0.519    5.97     1.51
+
+  The conservative reading of a two-draw cell is the SMALLER magnitude, which is
+  what `min |d|` is; the floors are census finding 7's pooled values (earning-family
+  0.087; given-family 0.083/0.148/0.344 at eras 3/4/5), and each arm's OWN measured
+  displacement magnitude is in section (9) beside them — where they disagree the
+  in-node number is the narrower claim.
+
+  DID THE L4 COMMIT RECUR ON THE DISPLACED DRAW?
+  arm               L4 cycle  c_in_era3  entries   recall    prec  cycles
+  outer_yield_m4         129         23        5   0.0025   0.400     162
+  outer_yield_m4_j       121         12        4   0.0012   0.250     151
+
+==============================================================================
+(A) THE CROSSING: the L4 commit, and the r**2 ceiling it was drawn from
+==============================================================================
+  The DGP's levels, as DISTINCT flat tuples (the recall denominator): L2 14, L3 56, L4 816.
+  `T4 subset T3xT3`: an L4 entry exists only if BOTH of its 4-tuple halves are rows
+  of the operative L3 table, so a frozen L3 of recall r caps L4 near r**2.
+
+  arm               L4 commit c_in_era  entries   recall    prec  buildable  of which true  share taken
+  anchor_long             180       70        5   0.0012   0.200          5              1        1.000
+  outer_yield_m4          129       23        5   0.0025   0.400         14              3        0.357
+  ceiling_m3             None     None        -        -       -         17              3            -
+  outer_yield_m4x         119       13        5   0.0025   0.400         12              2        0.417
+  outer_yield_m3         None     None        -        -       -         15              3            -
+  outer_yield_m4_j        121       12        4   0.0012   0.250         17              4        0.235
+  ceiling_m3_j           None     None        -        -       -         23              5            -
+
+  `buildable` = distinct L4 tuples at support 3 in the arm's own observation
+  panel whose two halves are both rows of its FROZEN L3, at the cycle named. It is
+  the honest ceiling for that arm's L4 commit; `share taken` is what it took of it.
+  A cancelled commit (the empty-table guard) appears in the action trace, not here.
+
+==============================================================================
+(B) THE SIGNATURE: does the value clock hold past the certified range?
+==============================================================================
+  The pair the signature is read on is TREATMENT vs CEILING CONTROL. They share the
+  substrate, the stream, the head, the miners, the panel, the auditions, every era
+  boundary and every L2/L3 commit cycle. They differ in ONE bit: whether the L4
+  commit installed a table. Lifetime is identical by construction, so no era-4/5
+  difference here can be a difference in practice time.
+
+  RECOVERED FRACTION per era (higher is better)
+  arm                   era1      era2      era3      era4      era5   cycles
+  outer_yield_m4       0.512     0.562     0.894     1.273     1.126      162
+  ceiling_m3           0.512     0.562     0.906     0.885     0.607      162
+  anchor_long          0.515     0.664     0.915     1.182     1.186      201
+  outer_yield_m4x      0.518     0.601     1.069     1.403     1.612      166
+
+  THE SIGNATURE CELL: outer_yield_m4 - ceiling_m3, per era
+                        era1      era2      era3      era4      era5
+  delta                0.000     0.000    -0.012     0.388     0.519
+  Against the measured depth-6 stream floor (census finding 7): 0.087 earning-
+  family; 0.083 / 0.148 / 0.344 given-family at eras 3 / 4 / 5.
+  x floor(e4)          2.621   x floor(e5)          1.509
+  NOTE: eras 4 and 5 are the eras beyond the range A1/A2 could earn. Era 3 is
+  the earning era for L4 itself, so a delta there is the cost or benefit of the
+  commit DURING earning, not the signature.
+
+==============================================================================
+(C) THE GAUGE AT THE FRONTIER: what paced the L4 commit, and the L5 alternative
+==============================================================================
+  Driven read: `yield` = -(distinct level-`read_level` tuples at support).
+  `read_level` = min(active+1, gy_level=4), so at era 3 (active=4) it is the level
+  BEING EARNED, not one above it. Floors that governed the run: L3 0.46127129019246205, L4 0.5166900731510206.
+
+  read_level actually used, per era (logged per cycle)
+  arm                  era1     era2     era3     era4     era5
+  anchor_long             3        4        4        4        4
+  outer_yield_m4          3        4        4        4        4
+  ceiling_m3              3        4        4        4        4
+  outer_yield_m4x         3        4        4        4        4
+  outer_yield_m3          3        4        4        4        4
+  outer_yield_m4_j        3        4        4        4        4
+  ceiling_m3_j            3        4        4        4        4
+
+  THE OBSERVATION PANEL, end of run: distinct tuples at support, per level.
+  Levels 5 and 6 are logged UNCHARGED in every arm and were never driven — Phase 0
+  measured them degenerate (max 1-2 over an entire run, first non-zero at c89-124),
+  which is the reason the L4 commit is paced on the L4 stream's own quieting.
+  arm                   L3      L4      L5      L6  L5 first>0
+  anchor_long           71     113       7       0         127
+  outer_yield_m4        73      99       1       1         125
+  ceiling_m3            75     102       2       0         125
+  outer_yield_m4x       68      91       7       1         107
+  outer_yield_m3        71      93       4       0         125
+  outer_yield_m4_j      63      86       2       1         111
+  ceiling_m3_j          69      95       2       0         111
+
+  THE L4 AT-SUPPORT SERIES over era 3 (the series the commit was read on):
+  per-era first -> last, and the mean per-cycle increment against the L4 floor.
+  arm               era     n   first    last   d/cycle  x floor
+  anchor_long         1    60       0      15     0.254    0.492
+  anchor_long         2    50      16      62     0.939    1.817
+  anchor_long         3    70      62     105     0.623    1.206
+  anchor_long         4    12     105     109     0.364    0.704
+  anchor_long         5     9     110     113     0.375    0.726
+  outer_yield_m4      1    56       0      11     0.200    0.387
+  outer_yield_m4      2    50      13      66     1.082    2.093
+  outer_yield_m4      3    35      67      95     0.824    1.594
+  outer_yield_m4      4    12      96      98     0.182    0.352
+  outer_yield_m4      5     9      99      99     0.000    0.000
+  ceiling_m3          1    56       0      11     0.200    0.387
+  ceiling_m3          2    50      13      66     1.082    2.093
+  ceiling_m3          3    35      67      95     0.824    1.594
+  ceiling_m3          4    12      96      99     0.273    0.528
+  ceiling_m3          5     9      99     102     0.375    0.726
+  outer_yield_m4x     1    56       0      11     0.200    0.387
+  outer_yield_m4x     2    50      12      64     1.061    2.054
+  outer_yield_m4x     3    39      64      85     0.553    1.070
+  outer_yield_m4x     4    12      86      90     0.364    0.704
+  outer_yield_m4x     5     9      90      91     0.125    0.242
+  outer_yield_m3      1    56       0      11     0.200    0.387
+  outer_yield_m3      2    50      13      66     1.082    2.093
+  outer_yield_m3      3    23      67      89     1.000    1.935
+  outer_yield_m3      4    12      89      92     0.273    0.528
+  outer_yield_m3      5     9      92      93     0.125    0.242
+  outer_yield_m4_j    1    59       0      23     0.397    0.767
+  outer_yield_m4_j    2    50      25      72     0.959    1.856
+  outer_yield_m4_j    3    21      73      83     0.500    0.968
+  outer_yield_m4_j    4    12      84      86     0.182    0.352
+  outer_yield_m4_j    5     9      86      86     0.000    0.000
+  ceiling_m3_j        1    59       0      23     0.397    0.767
+  ceiling_m3_j        2    50      25      72     0.959    1.856
+  ceiling_m3_j        3    21      73      83     0.500    0.968
+  ceiling_m3_j        4    12      85      92     0.636    1.232
+  ceiling_m3_j        5     9      92      95     0.375    0.726
+
+==============================================================================
+(D) TREATMENT vs CEILING CONTROL: bit-identity up to the L4 commit
+==============================================================================
+
+  --- outer_yield_m4  vs  ceiling_m3 ---
+  the treatment's L4 commit: c129. Pre-commit window c1-c128.
+  max|delta| over 12 trajectory series in the window = 0.000e+00  -> PASS
+  first divergence anywhere: c129 (== the commit cycle)
+  era advances replayed exactly: True  [(1, 56), (2, 106), (3, 141), (4, 153), (5, 162)]
+  L2/L3 commits replayed exactly: True  [(2, 49), (3, 92)]
+  lifetimes: treatment 162 cycles, ceiling 162 — matched = True
+
+  --- outer_yield_m4_j  vs  ceiling_m3_j ---
+  the treatment's L4 commit: c121. Pre-commit window c1-c120.
+  max|delta| over 12 trajectory series in the window = 0.000e+00  -> PASS
+  first divergence anywhere: c121 (== the commit cycle)
+  era advances replayed exactly: True  [(1, 59), (2, 109), (3, 130), (4, 142), (5, 151)]
+  L2/L3 commits replayed exactly: True  [(2, 26), (3, 103)]
+  lifetimes: treatment 151 cycles, ceiling 151 — matched = True
+
+==============================================================================
+(E) EXTENSION: the r**2-wall bypass
+==============================================================================
+  Phase 0 measured the wall binds and that extension is the lever: buildable L4 over
+  the FROZEN L3 vs over the LIVE L3 was 15 vs 25 (cd_s0/outer_yield), 13 vs 26
+  (ma_s0/learned_yield), 8 vs 13 (anchor) — i.e. extension roughly doubles the
+  ceiling an L4 commit is drawn from.
+
+  arm               lvl  events   cands  admitted  final n  final recall  final prec
+  anchor_long         2       0       0         0       11        0.5714       0.727
+  anchor_long         3       0       0         0        8        0.0536       0.375
+  anchor_long         4       0       0         0        5        0.0012       0.200
+  outer_yield_m4      2       0       0         0       14        0.7143       0.714
+  outer_yield_m4      3       0       0         0       21        0.1250       0.333
+  outer_yield_m4      4       0       0         0        5        0.0025       0.400
+  ceiling_m3          2       0       0         0       14        0.7143       0.714
+  ceiling_m3          3       0       0         0       21        0.1250       0.333
+  outer_yield_m4x     2      22       4         4       18        0.8571       0.667
+  outer_yield_m4x     3      16      28        19       34        0.1607       0.265
+  outer_yield_m4x     4       8       4         4        9        0.0037       0.333
+  outer_yield_m3      2       0       0         0       14        0.7143       0.714
+  outer_yield_m3      3       0       0         0       21        0.1250       0.333
+  outer_yield_m4_j    2       0       0         0       12        0.5714       0.667
+  outer_yield_m4_j    3       0       0         0       22        0.1250       0.318
+  outer_yield_m4_j    4       0       0         0        4        0.0012       0.250
+  ceiling_m3_j        2       0       0         0       12        0.5714       0.667
+  ceiling_m3_j        3       0       0         0       22        0.1250       0.318
+
+  and what the treatment vs the extension arm actually held at L4:
+  arm               frozen L3  buildable L4  L4 entries  L4 true
+  outer_yield_m4           21            14           5        3
+  outer_yield_m4x          15            12           5        2
+  ceiling_m3               21            17           -        3
+  anchor_long               8             5           5        1
+
+[figures] /home/user/research/experiments/rhm/practice/crescendo/figures/cr3_s0/fig1_competence.png fig2_panel.png fig3_clocks.png

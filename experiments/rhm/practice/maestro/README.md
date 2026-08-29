@@ -160,9 +160,8 @@ Full command set in [`FILES.md`](FILES.md) §Reproduce: the offline phase first
 
 ## Next steps (queued, not started)
 
-**A3 — the signature** (does the earnable range extend with each turn): A2's verdict for its
-planning is that the crank can run on the thermostat with the learned rule as one arm — nothing
-yet says A3 depends on learned judgment · the `/update-beliefs` sweep (roadmap §4.6 wanted it
+**A3 — the signature**: run as this node's sibling [`../crescendo/`](../crescendo/README.md),
+on the thermostat per this node's verdict — the range extends on both stream draws · the `/update-beliefs` sweep (roadmap §4.6 wanted it
 before A2's interpretation hardens; it should carry finding 1's visibility→valuation
 sharpening) · the action-value gap (a judge that learns from its own acting — possibly via
 parallel candidate tracks within a run, the hippocampus-shaped speculation) · Track F's F1
