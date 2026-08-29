@@ -1,0 +1,70 @@
+AUDIATION E1 PHASE 2 - the arity-2 self-model on practice  [--ladder: SECTION 7 ONLY; the decode matrix is in reduction.txt]
+  tag=au_s0 arm=anchor seed=0
+  cycles 5..116 (112); choice-state rows 733568; slots 56
+
+==============================================================================
+(0) THE DATUM
+==============================================================================
+  the agent's own move at a choice state = the argmax-scored child. Its provenance:
+    proposed       514870  70.19%
+    forced          17821   2.43%
+    explore        200877  27.38%
+  argmax child survived the topk        : 44.32%
+  kept children per choice state (mean) : 1.147
+  entered the VALUE buffer (n_desc>0)   : 18.44%  (135279 rows; mean multiplicity 6.8)
+  has a SOLVED descendant               :  4.79%
+  the move pi was then trained toward at this state IS the agent's argmax:
+    all rows  3.64% | value-buffer rows 19.75%
+  grade ybar on buffer rows: mean 0.2258; sigmoid(v_c) mean 0.3322
+
+  FM split (by cycle):   84 train / 28 held-out cycles; FM fit on 300000 rows
+  decode set = the held-out cycles' rows: 183488 (137616 probe-train / 45872 probe-test, split by instance)
+  eras present in test cycles: [1, 2, 3, 4, 5]
+
+  headroom after residualisation (frac of Var(target) left on probe-test rows):
+    verr       raw var   0.26601 -> cycle x step residualised  0.894   [224 strata, 614 probe-train rows each]
+    dprop      raw var   0.04301 -> cycle x step residualised  0.996   [224 strata, 614 probe-train rows each]
+    dv         raw var   0.00717 -> cycle x step residualised  0.587   [224 strata, 614 probe-train rows each]
+    dprop_max  raw var   0.02405 -> cycle x step residualised  0.954   [224 strata, 614 probe-train rows each]
+
+==============================================================================
+(7) THE CONDITIONING-COMPLETION LADDER
+==============================================================================
+  Is the update's per-cycle common mode a function of public, prospective BATCH
+  CONTENT, or is it optimizer/composition noise? Same FM2 class, same cycle-held-out
+  split, same target scaling, same training recipe; only the conditioning set moves.
+
+  BUFFER RECONSTRUCTION, checked against the arm's own independently logged series:
+    max |reconstructed pi pushes  - log['prop']['n_pairs']| = 0
+    max |reconstructed pi buffer  - log['prop']['n']|       = 0
+    (the second is >0 only where the cap truncates a cycle mid-push; see `buffer_state`)
+  The REPLAY POOL is bound once in `_spiral_shared` and never rebound in `run_arm`, so
+  its CONTENT is constant across cycles and cannot carry a per-cycle signature; what it
+  contributes that does vary is a gradient through `value_c`, i.e. head state, which is
+  rung 5's block. Stated, not closed.
+  The EXACT SAMPLING INDICES come from the arm's private RNG and are NOT recoverable:
+  rungs 3-4 summarise the POOL the update sampled from, never the sampled batches.
+  BINDING LIMIT: rungs 3-4 are constant within a cycle, so their effective sample size
+  is the number of TRAINING CYCLES (84), not the number of rows.
+
+  rung                d_in     FM  |r|/|d|     cos  in-cos     verr_cs   dprop_cs       verr      dprop
+  (s, a)  [reused fr   161    h64    1.069  +0.003  +0.134       0.004      0.015      0.052      0.031
+  + own-datum superv   167    h64    1.069  -0.000  +0.134       0.008      0.011      0.057      0.024
+  + cycle batch summ   293    h64    1.975  -0.011  +0.770       0.007      0.019      0.055      0.022
+  + richer batch con   525    h64    1.612  -0.039  +0.782       0.003      0.018      0.037      0.022
+  + own pre-update r   582    h64    1.621  -0.045  +0.800       0.010      0.007      0.060      0.019
+  (s, a)  [reused fr   161   h256    1.118  -0.000  +0.266         nan        nan        nan        nan
+  + own-datum superv   167   h256    1.115  -0.000  +0.260         nan        nan        nan        nan
+  + cycle batch summ   293   h256    2.147  -0.031  +0.933         nan        nan        nan        nan
+  + richer batch con   525   h256    1.734  -0.039  +0.940         nan        nan        nan        nan
+  + own pre-update r   582   h256    1.678  -0.040  +0.951         nan        nan        nan        nan
+
+  REFERENCE POINTS (both already measured, neither a rung):
+    calendar one-hot          |r_cyc|/|d| = 0.731 -- not generalisable across held-out
+                                                     cycles by construction
+    within-cycle FM (ceiling) |r|/|d|     = 1.057 at cos +0.141
+  and the crux row `delta` decodes, at the same probe settings (from fit.json):
+    delta                            0.005      0.016      0.052      0.029
+  figure: ladder.png
+
+END (ladder) - 492s total

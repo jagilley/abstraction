@@ -1,0 +1,226 @@
+AUDIATION E1 PHASE 2 - the arity-2 self-model on practice
+  tag=au_s0 arm=anchor seed=0
+  cycles 5..116 (112); choice-state rows 733568; slots 56
+
+==============================================================================
+(0) THE DATUM
+==============================================================================
+  the agent's own move at a choice state = the argmax-scored child. Its provenance:
+    proposed       514870  70.19%
+    forced          17821   2.43%
+    explore        200877  27.38%
+  argmax child survived the topk        : 44.32%
+  kept children per choice state (mean) : 1.147
+  entered the VALUE buffer (n_desc>0)   : 18.44%  (135279 rows; mean multiplicity 6.8)
+  has a SOLVED descendant               :  4.79%
+  the move pi was then trained toward at this state IS the agent's argmax:
+    all rows  3.64% | value-buffer rows 19.75%
+  grade ybar on buffer rows: mean 0.2258; sigmoid(v_c) mean 0.3322
+
+  FM split (by cycle):   84 train / 28 held-out cycles; FM fit on 300000 rows
+  decode set = the held-out cycles' rows: 183488 (137616 probe-train / 45872 probe-test, split by instance)
+  eras present in test cycles: [1, 2, 3, 4, 5]
+
+  headroom after residualisation (frac of Var(target) left on probe-test rows):
+    verr       raw var   0.26601 -> cycle x step residualised  0.894   [224 strata, 614 probe-train rows each]
+    dprop      raw var   0.04301 -> cycle x step residualised  0.996   [224 strata, 614 probe-train rows each]
+    dv         raw var   0.00717 -> cycle x step residualised  0.587   [224 strata, 614 probe-train rows each]
+    dprop_max  raw var   0.02405 -> cycle x step residualised  0.954   [224 strata, 614 probe-train rows each]
+
+==============================================================================
+(1) THE MATCHED PAIR  (FM2 gets the slot of the agent's own move; FM1 a MASK id)
+==============================================================================
+  FM h64      14.1K params (  8.2% of the two heads' 172K)  held-out cos(p2,delta)=+0.003 |r|/|delta|=1.069 | in-sample cos=+0.134 |r|/|delta|=0.985 | |g|/|delta|=0.303  ens_cos=0.956  [115s]
+  FM h256     56.1K params ( 32.5% of the two heads' 172K)  held-out cos(p2,delta)=-0.000 |r|/|delta|=1.118 | in-sample cos=+0.266 |r|/|delta|=0.950 | |g|/|delta|=0.356  ens_cos=nan  [98s]
+  FM h1024   224.3K params (130.1% of the two heads' 172K)  held-out cos(p2,delta)=+0.008 |r|/|delta|=1.193 | in-sample cos=+0.441 |r|/|delta|=0.869 | |g|/|delta|=0.418  ens_cos=nan  [351s]
+  WITHIN-CYCLE upper bound (an FM that HAS seen the cycle's own update, on other instances):
+    cos(p2,delta)=+0.141  |r|/|delta|=1.057  |g|/|delta|=0.324   -- not a forecast, the ceiling to read the honest split against
+
+==============================================================================
+(2) THE DECODE MATRIX   R^2 out of sample, probe-test rows of held-out cycles
+==============================================================================
+  content sources at the full readout ladder; scalar norms, the calendar and the
+  shuffled null at the reduced one. `_cs` = residualised on cycle x step.
+
+  WHAT A FORECAST OF THE UPDATE COULD KNOW. The update is ONE batched step per cycle,
+  so the first question is how much of Delta(s) is `which cycle is this` rather than
+  `which state is this`, and the self-model is structurally denied the former.
+    eta^2(Delta ~ cycle) on the decode rows        = 0.438
+    |Delta - E[Delta|cycle]| / |Delta|             = 0.731   (a calendar-only forecaster)
+    |r| / |Delta|, the learned arity-2 forecaster  = 1.069
+    [r           d=57  ] verr_cs= 0.004  dprop_cs= 0.015  verr= 0.052  dprop= 0.031   [126s]
+    [delta       d=57  ] verr_cs= 0.005  dprop_cs= 0.016  verr= 0.052  dprop= 0.029   [132s]
+    [gap         d=57  ] verr_cs= 0.005  dprop_cs= 0.001  verr= 0.014  dprop= 0.002   [130s]
+    [r1          d=57  ] verr_cs= 0.005  dprop_cs= 0.015  verr= 0.049  dprop= 0.031   [127s]
+    [p2          d=57  ] verr_cs= 0.006  dprop_cs= 0.001  verr= 0.031  dprop= 0.007   [121s]
+    [z_state     d=96  ] verr_cs= 0.041  dprop_cs= 0.002  verr= 0.063  dprop= 0.002   [142s]
+    [readout0    d=57  ] verr_cs= 0.163  dprop_cs= 0.001  verr= 0.293  dprop= 0.007   [129s]
+    [delta_u     d=114 ] verr_cs= 0.009  dprop_cs= 0.930  verr= 0.070  dprop= 0.938   [140s]
+    [u_only      d=57  ] verr_cs= 0.004  dprop_cs= 0.025  verr= 0.017  dprop= 0.027   [25s]
+    [r_cyc       d=57  ] verr_cs= 0.019  dprop_cs= 0.018  verr= 0.016  dprop= 0.016   [127s]
+    [delib       d=12  ] verr_cs= 0.057  dprop_cs= 0.000  verr= 0.133  dprop= 0.003   [101s]
+    [calendar    d=23  ] verr_cs=-0.000  dprop_cs=-0.001  verr= 0.072  dprop= 0.004   [21s]
+    [|r|         d=1   ] verr_cs= 0.005  dprop_cs=-0.000  verr= 0.000  dprop= 0.004   [20s]
+    [|delta|     d=1   ] verr_cs= 0.016  dprop_cs=-0.001  verr= 0.012  dprop= 0.000   [20s]
+    [g           d=1   ] verr_cs= 0.003  dprop_cs=-0.000  verr= 0.010  dprop= 0.000   [19s]
+    [r_shuffled  d=57  ] verr_cs=-0.000  dprop_cs=-0.001  verr= 0.035  dprop= 0.002   [30s]
+  diagnostics (wiring cells; `dv` is a coordinate of `delta` by construction):
+    [r          ] dv_cs= 0.919  dprop_max_cs= 0.387  dprop_vb_cs= 0.015
+    [delta      ] dv_cs= 0.982  dprop_max_cs= 0.430  dprop_vb_cs= 0.021
+    [delta_u    ] dv_cs= 0.977  dprop_max_cs= 0.403  dprop_vb_cs= 0.845
+    [gap        ] dv_cs=-0.011  dprop_max_cs=-0.001  dprop_vb_cs= 0.000
+    [delib      ] dv_cs=-0.011  dprop_max_cs= 0.001  dprop_vb_cs= 0.003
+    [z_state    ] dv_cs=-0.002  dprop_max_cs=-0.010  dprop_vb_cs=-0.001
+
+  the ladder in full (rows = source, cols = capacity), per target:
+    --- verr_cs ---
+      r            h0= 0.004  h16=-0.056  h64=-0.072  h256=-0.188
+      delta        h0= 0.005  h16=-0.037  h64=-0.058  h256=-0.187
+      gap          h0= 0.005  h16=-0.028  h64=-0.031  h256=-0.052
+      r1           h0= 0.005  h16=-0.074  h64=-0.115  h256=-0.260
+      p2           h0= 0.006  h16=-0.048  h64=-0.012  h256=-0.034
+      z_state      h0=-0.003  h16= 0.041  h64=-0.005  h256= 0.009
+      readout0     h0= 0.155  h16= 0.163  h64= 0.162  h256= 0.135
+      delta_u      h0= 0.009  h16=-0.002  h64=-0.053  h256=-0.129
+      u_only       h0= 0.004  h64=-0.002
+      r_cyc        h0= 0.019  h16=-0.037  h64=-0.110  h256=-0.253
+      delib        h0= 0.050  h16= 0.057  h64= 0.048  h256= 0.055
+      calendar     h0=-0.000  h64=-0.004
+      |r|          h0= 0.005  h64= 0.001
+      |delta|      h0= 0.015  h64= 0.016
+      g            h0= 0.001  h64= 0.003
+      r_shuffled   h0=-0.000  h64=-0.010
+    --- dprop_cs ---
+      r            h0= 0.015  h16= 0.013  h64= 0.000  h256= 0.010
+      delta        h0= 0.015  h16= 0.016  h64= 0.016  h256=-0.012
+      gap          h0= 0.001  h16=-0.016  h64=-0.027  h256=-0.027
+      r1           h0= 0.015  h16=-0.003  h64=-0.004  h256=-0.003
+      p2           h0= 0.001  h16=-0.029  h64=-0.021  h256=-0.038
+      z_state      h0= 0.002  h16=-0.002  h64=-0.017  h256=-0.031
+      readout0     h0= 0.001  h16=-0.011  h64=-0.005  h256=-0.054
+      delta_u      h0= 0.046  h16= 0.658  h64= 0.876  h256= 0.930
+      u_only       h0= 0.025  h64= 0.020
+      r_cyc        h0= 0.018  h16= 0.001  h64=-0.003  h256=-0.014
+      delib        h0= 0.000  h16=-0.001  h64=-0.002  h256=-0.007
+      calendar     h0=-0.001  h64=-0.003
+      |r|          h0=-0.000  h64=-0.004
+      |delta|      h0=-0.001  h64=-0.007
+      g            h0=-0.001  h64=-0.000
+      r_shuffled   h0=-0.001  h64=-0.005
+    --- verr ---
+      r            h0= 0.052  h16= 0.007  h64=-0.022  h256=-0.118
+      delta        h0= 0.052  h16= 0.021  h64=-0.009  h256=-0.116
+      gap          h0= 0.014  h16=-0.007  h64= 0.012  h256=-0.003
+      r1           h0= 0.049  h16=-0.004  h64=-0.058  h256=-0.171
+      p2           h0= 0.031  h16=-0.027  h64= 0.023  h256= 0.007
+      z_state      h0= 0.036  h16= 0.050  h64=-0.023  h256= 0.063
+      readout0     h0= 0.272  h16= 0.293  h64= 0.292  h256= 0.259
+      delta_u      h0= 0.070  h16= 0.062  h64= 0.015  h256=-0.047
+      u_only       h0= 0.017  h64= 0.010
+      r_cyc        h0= 0.016  h16= 0.001  h64=-0.073  h256=-0.199
+      delib        h0= 0.123  h16= 0.133  h64= 0.126  h256= 0.122
+      calendar     h0= 0.072  h64= 0.071
+      |r|          h0=-0.002  h64= 0.000
+      |delta|      h0= 0.006  h64= 0.012
+      g            h0= 0.010  h64= 0.007
+      r_shuffled   h0= 0.035  h64= 0.029
+    --- dprop ---
+      r            h0= 0.031  h16= 0.020  h64= 0.009  h256= 0.017
+      delta        h0= 0.029  h16= 0.023  h64= 0.023  h256=-0.009
+      gap          h0= 0.002  h16=-0.017  h64=-0.023  h256=-0.026
+      r1           h0= 0.031  h16=-0.003  h64= 0.005  h256= 0.003
+      p2           h0= 0.007  h16=-0.030  h64=-0.019  h256=-0.037
+      z_state      h0= 0.002  h16=-0.001  h64=-0.015  h256=-0.035
+      readout0     h0= 0.007  h16=-0.004  h64= 0.000  h256=-0.052
+      delta_u      h0= 0.058  h16= 0.657  h64= 0.888  h256= 0.938
+      u_only       h0= 0.027  h64= 0.022
+      r_cyc        h0= 0.016  h16= 0.003  h64= 0.002  h256=-0.013
+      delib        h0= 0.002  h16= 0.003  h64= 0.001  h256=-0.002
+      calendar     h0= 0.004  h64= 0.002
+      |r|          h0= 0.002  h64= 0.004
+      |delta|      h0= 0.000  h64=-0.007
+      g            h0= 0.000  h64= 0.000
+      r_shuffled   h0= 0.002  h64=-0.002
+
+==============================================================================
+(3) AGENCY  -- the arity gap and the decode, by the provenance of the chosen move
+==============================================================================
+    class               n      |g|  |g|/|d|      |r|     |r1|      |d|  E[dprop]   E[verr]
+    proposed       127638    1.700    0.291    6.357    6.494    6.059   -0.0063   -0.1008
+    forced           5551    3.254    0.481    8.371    7.412    6.955   +0.0559   -0.6499
+    explore         50299    2.073    0.352    6.713    6.546    6.095   -0.0071   -0.1005
+  |r1| - |r| is what the efference copy buys the forecast; g is the same thing as a
+  forecast displacement rather than an error reduction.
+
+  decode conditioned on the provenance of the chosen move (matched n, h0 and h64):
+    [proposed  r      n=50299] verr_cs= 0.011/-0.166  dprop_cs= 0.026/ 0.018  verr= 0.027/-0.136  dprop= 0.037/ 0.029
+    [proposed  delta  n=50299] verr_cs= 0.011/-0.144  dprop_cs= 0.033/ 0.029  verr= 0.027/-0.111  dprop= 0.044/ 0.038
+    [proposed  delta_u n=50299] verr_cs= 0.012/-0.209  dprop_cs= 0.049/ 0.854  verr= 0.055/-0.131  dprop= 0.063/ 0.870
+    [proposed  gap    n=50299] verr_cs= 0.001/-0.075  dprop_cs= 0.002/-0.034  verr= 0.004/-0.052  dprop= 0.002/-0.035
+    [explore   r      n=50299] verr_cs= 0.007/-0.066  dprop_cs= 0.098/ 0.110  verr= 0.020/-0.038  dprop= 0.098/ 0.105
+    [explore   delta  n=50299] verr_cs= 0.007/-0.060  dprop_cs= 0.120/ 0.103  verr= 0.024/-0.035  dprop= 0.120/ 0.100
+    [explore   delta_u n=50299] verr_cs= 0.009/-0.065  dprop_cs= 0.160/ 0.868  verr= 0.026/-0.037  dprop= 0.160/ 0.874
+    [explore   gap    n=50299] verr_cs=-0.005/-0.032  dprop_cs= 0.002/-0.034  verr= 0.010/-0.018  dprop= 0.002/-0.029
+
+==============================================================================
+(4) THE OBSERVER LADDER  -- public information only, same targets, same strata,
+    same readout stack. Any 'introspection helps X' claim must beat its twin.
+==============================================================================
+  ONE ASYMMETRY, STATED. The self side reads `z`, the FROZEN CONTROLLER's encoding of
+  the same `x` the observer gets raw, and the observer has to rebuild an encoder with
+  the same one-hidden-layer stack the probes use. That is paper 2's reconstruction
+  cost, but part of it is an architecture gap and not a privacy fact; the capacity
+  sweep and the half-data control are what separate `cannot` from `not yet`.
+    [O_x          d=520 ] verr_cs=-0.038  dprop_cs=-0.019  verr=-0.002  dprop=-0.020   [181s]
+    [O_x+a        d=576 ] verr_cs=-0.034  dprop_cs= 0.006  verr= 0.009  dprop= 0.008   [189s]
+    [O_x+a+grade  d=579 ] verr_cs= 0.642  dprop_cs= 0.007  verr= 0.684  dprop= 0.009   [190s]
+    [O_x+a+grade_half budget control] verr_cs= 0.613  dprop_cs=-0.231  verr= 0.619  dprop=-0.222
+
+  self vs observer (best over capacities):
+    target            best self       src      O_x    O_x+a  O_x+a+g  advantage
+    verr_cs               0.057     delib   -0.038   -0.034    0.642     -0.585
+    dprop_cs              0.930   delta_u   -0.019    0.006    0.007      0.922
+    verr                  0.133     delib   -0.002    0.009    0.684     -0.551
+    dprop                 0.938   delta_u   -0.020    0.008    0.009      0.930
+
+==============================================================================
+(5) GUARDS
+==============================================================================
+  gradcheck (analytic vs central differences, both rungs)            PASS
+  ens_cos over 3 independent-seed FM2 residuals: 0.956
+    (high => the residual is input-determined and any FM misses it identically;
+     low  => it is the particular FM's own idiosyncratic noise)
+  junk-residual eta^2 -- how much of each source is a calendar:
+    source          cycle     step      era
+    r               0.383    0.000    0.061
+    delta           0.438    0.000    0.067
+    delta_u         0.427    0.000    0.065
+    r_cyc           0.005    0.000    0.001
+    gap             0.036    0.001    0.003
+    r1              0.380    0.000    0.060
+    p2              0.047    0.001    0.004
+    delib           0.026    0.084    0.004
+    z_state         0.016    0.001    0.002
+    readout0        0.305    0.018    0.125
+  capacity invariance of the crux decode across FM instrument capacity:
+          FM    params  %heads       verr_cs      dprop_cs          verr         dprop
+         h64     14073    8.2%         0.004         0.015         0.052         0.031   (source r)
+        h256     56121   32.5%         0.003         0.013         0.046         0.026   (source r)
+       h1024    224313  130.1%         0.004         0.010         0.043         0.019   (source r)
+  scalar-norm negative controls and the shuffled null are rows of the matrix above.
+
+==============================================================================
+(6) THE STRICT-TIMING SPLIT  -- FM trained on the first 3/4 of the run, scored on the
+    last 1/4. Same targets, same strata, same readout ladder; crux sources only.
+==============================================================================
+  cycles >= 89 held out (28 cycles, 182784 rows; 137088 probe-train / 45696 probe-test)
+    [r       ] verr_cs= 0.001/-0.080  dprop_cs= 0.008/-0.007  verr= 0.004/-0.074  dprop= 0.022/ 0.004
+    [delta   ] verr_cs= 0.009/-0.070  dprop_cs= 0.013/-0.007  verr= 0.007/-0.069  dprop= 0.028/ 0.004
+    [delta_u ] verr_cs= 0.014/-0.085  dprop_cs= 0.012/ 0.818  verr= 0.030/-0.074  dprop= 0.027/ 0.823
+    [gap     ] verr_cs= 0.003/-0.012  dprop_cs=-0.002/-0.028  verr= 0.009/-0.005  dprop=-0.003/-0.029
+    [r1      ] verr_cs= 0.001/-0.070  dprop_cs= 0.010/-0.012  verr= 0.005/-0.067  dprop= 0.024/-0.001
+  |r|/|delta| under the strict split: 1.114   |g|/|delta|: 0.391
+
+  figures: decode_matrix.png, capacity_ladder.png, agency.png, observer_ladder.png, guards.png
+
+END - 3508s total

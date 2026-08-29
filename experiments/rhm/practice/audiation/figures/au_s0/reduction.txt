@@ -1,0 +1,95 @@
+AUDIATION (E1 phase 1) — data report for au_s0/anchor
+  complete=True  cycles=116  seed=0  eras=['L1n25', 'L2n12', 'L3n6', 'L4n3', 'L5n1']
+
+==============================================================================
+(0) GATES
+==============================================================================
+  CROSS-TAG REPLAY vs cd_s0/anchor  (conductor, the direct donor)
+    c1-c116 (116 ref / 116 here), 13 series: max|delta| = 0.000e+00  -> PASS
+  CROSS-TAG REPLAY vs as_s0/anchor  (assay, the donor's own carrier)
+    c1-c116 (116 ref / 116 here), 13 series: max|delta| = 0.000e+00  -> PASS
+  IN-RUN REPLAY GATE (asserted every checkpoint against rhm_practice_conductor/cd_s0): c1-c116, max|delta| = 0.000e+00, cycle counts equal = True  -> PASS
+  BEAM GATE (this file's beams vs conductor.py's, recorder off AND on): enum_rec_off=0.0e+00, enum_rec_on=0.0e+00, prop_rec_off=0.0e+00, prop_rec_on=0.0e+00  -> PASS
+    recorded: 312/312 tip-steps (enum/prop), 216 pi rows, src {'1': 864, '4': 216}
+  SNAPSHOT RECOMPUTE (in-run, 117 cycles x 64 probe states; 7 of them through the written .npz): max|dv| = 0.000e+00, max|dpi| = 0.000e+00  -> PASS
+
+==============================================================================
+(1) THE DATASET
+==============================================================================
+  cycles logged      116  (arm ran 116)
+  decision shards    24 files, 111.5 MB
+  tip-step rows      881280
+  candidate rows     4937600
+  head snapshots     117 (final at c117), plant snapshots 15, 95.2 MB
+  bytes per tip-step 127 (compressed, tips + candidates + pi)
+  action set |ms|    32 -> 56; grows at cycles [19, 70]
+  routed beam from   c5 (cycles 1..4 enumerate: prop_warmup)
+  k_eff              [4, 12, 20, 32]
+  n_slots            56, offsets {'1': 0, '2': 32, '3': 48}
+  solved tips/cycle  min 49 med 238 max 477
+  s/cycle            11.36 here vs 10.53 in cd_s0 (same arm, no instrument) -> +7.8% wall for the logging
+  wall               2000s (0.56 GPU-h, L4)
+
+==============================================================================
+(2) JOIN INTEGRITY
+==============================================================================
+  rows read          881280 tip-steps / 4937600 candidates over 116 cycles
+  manifest agrees    tips True, cand True
+  terminal join      complete and positional on every cycle: True
+  lineage closes     True
+  kept == beam       True
+  ranges / finite    True
+  per-cycle tips     min 7552 med 7552 max 8256
+  per-cycle cands    min 32640 med 32640 max 231424
+  solved terminals   27394 of 118784 graded tips (23.1%)
+  heads_c AND heads_c+1 present for every logged cycle: True
+  VERDICT            PASS — no violation found
+
+==============================================================================
+(3) DESCRIPTIVE
+==============================================================================
+  candidate provenance (every scored child of the practice beam):
+    enumerated      925696  18.75%
+    proposed       2934272  59.43%
+    forced          344064   6.97%
+    explore         733568  14.86%
+  OFFLINE RECOMPUTE (numpy heads on heads_c0061.npz, 512 logged beam states):
+    pi: max|numpy - logged| = 1.841e-03 against a logit scale of 4.70  -> consistent with fp16 z
+    v : recomputed at the same states, range [-15.154, 0.256]
+
+  per-cycle revision on the fixed probe (fp32, live readouts; the probe states are
+  the era's own metering set, so only WITHIN-era differences are meaningful):
+     era  pairs   |dv| med   |dv| p95  |dpi| med  |dpi| p95  frac dpi==0
+       1     47     0.0691     0.2285     0.1264     0.4790        0.00%
+       2     39     0.0501     0.1466     0.1166     0.4055        0.00%
+       3     11     0.0522     0.1403     0.1199     0.3836        0.00%
+       4      8     0.0597     0.1669     0.1274     0.3973        0.00%
+       5      7     0.0456     0.1441     0.1192     0.3774        0.00%
+
+  PER-CYCLE REVISION AT THE LOGGED BEAM STATES (offline, from the fetched bytes:
+  |f(heads_{c+1}, s) - f(heads_c, s)| over decision rows of cycle c, live slots only)
+     cycle  era  states  slots  |dv| med  |dv| p95  |dpi| med  |dpi| p95  |dpi| max   frac==0
+         5    1    4096     32    0.1897    0.2807     0.2187     0.6304     1.0057     0.00%
+        16    1    4096     32    0.1353    0.2159     0.1169     0.3712     0.6865     0.00%
+        27    1    4096     48    0.0525    0.1729     0.1359     0.4728     1.8365     0.00%
+        38    1    4096     48    0.0519    0.1141     0.1183     0.4220     0.9884     0.00%
+        49    2    4096     48    0.0562    0.1144     0.1084     0.3563     0.7705     0.00%
+        60    2    4096     48    0.0251    0.0787     0.1223     0.4060     0.9935     0.00%
+        71    2    4096     56    0.0364    0.1152     0.1283     1.2459     3.2853     0.00%
+        82    2    4096     56    0.0424    0.1494     0.1234     0.4135     0.9590     0.00%
+        93    3    4096     56    0.0493    0.1133     0.1162     0.3450     0.8604     0.00%
+       104    4    4096     56    0.0721    0.1720     0.1251     0.4052     1.2350     0.00%
+    pooled over 10 cycles: |dpi| med 0.1257 p95 0.4667 max 3.2853, frac==0 0.00%; |dv| med 0.0583 p95 0.2064
+
+  FP16-z CONTROL: perturbing the logged z by half a fp16 ulp per element moves pi by max 5.468e-04;
+    the offline-vs-logged residual above was 1.841e-03 — same scale, so the residual is z's storage precision, not a recompute error.
+
+  EXACT-ZERO INVARIANT (cumulative, per cycle): on every cycle, the slots the action set
+  had not yet contained must have a logit of exactly 0.0 (zero-init out-layer, masked softmax,
+  multiplicative decay). Checked on 69/117 cycles that still had an unseen slot:
+    max|logit| over those = 0.000e+00  -> PASS (exactly 0)
+    slots first available at: {1: 32, 19: 16, 70: 8}  (cycle -> how many slots arrived then)
+    and pi moves at EVERY cycle boundary: min over boundaries of max|dpi| = 4.850e-01 (116/116 boundaries nonzero)
+
+==============================================================================
+END — no integrity violation found

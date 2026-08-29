@@ -1,0 +1,155 @@
+AUDIATION E1b REFIT - per-datum credit, au_s1/perdatum
+  tag=au_s1 arm=perdatum seed=0
+  14848 update events over 116 cycles; own states 9, actions 8, slots 56
+  pi stepped on 3066 events (20.6%); e_did_pi == e_succ exactly (asserted)
+
+  THE DATUM is one (event, own state t) row. The (s,a) ladder uses t in [0,budget)
+  because `e_own_a` has `budget` entries against `budget+1` states; Q2's value block
+  uses all of them. Splits: FM by CYCLE, probes by EVENT inside the held-out cycles.
+  Strata: cycle x update-order bucket (the head drifts within a pass).
+  provenance join: 14848/14848 events resolved; n_explore mean 3.08
+  FM split: 87 train / 29 held-out cycles; FM fit on 100224 state rows
+  decode set 33408 state rows (25056 probe-train / 8352 probe-test, split by event); 232 strata
+
+==============================================================================
+(Q1) THE CONDITIONING LADDER  -- forecastability of the per-datum revision
+==============================================================================
+  Same FM2 class, same recipe and same cycle-held-out discipline as phase 2, so the
+  `(s,a)` rung is directly comparable to au_s0's. Three target blocks, because
+  `e_did_pi == e_succ`: on the joint target the `+grade` rung is handed the fact that
+  dpi is identically zero on 79% of rows, which is WIRING, not forecasting skill.
+
+  target own57  (phase 2's target shape; dpi==0 on 79% of rows)   [89088 fit rows, 29696 held-out rows]
+    rung                d_in     FM   |r|/|d|      cos   in-cos
+    1_state_action       161    h64     1.338   +0.055   +0.156
+    2_plus_grade         163    h64     1.161   +0.181   +0.281
+    3_plus_lineage      1493    h64     1.150   +0.237   +0.369
+    4_plus_readout      1550    h64     1.127   +0.239   +0.386
+    1_state_action       161   h256     1.512   +0.026   +0.163
+    2_plus_grade         163   h256     1.267   +0.163   +0.304
+    3_plus_lineage      1493   h256     1.186   +0.199   +0.445
+    4_plus_readout      1550   h256     1.154   +0.247   +0.513
+
+  target dv1    (the value component alone; never zero)   [89088 fit rows, 29696 held-out rows]
+    rung                d_in     FM   |r|/|d|      cos   in-cos
+    1_state_action       161    h64     1.079   +0.146   +0.465
+    2_plus_grade         163    h64     0.726   +0.447   +0.613
+    3_plus_lineage      1493    h64     0.907   +0.335   +0.844
+    4_plus_readout      1550    h64     0.881   +0.353   +0.860
+    1_state_action       161   h256     1.104   +0.142   +0.573
+    2_plus_grade         163   h256     0.732   +0.436   +0.655
+    3_plus_lineage      1493   h256     0.837   +0.378   +0.897
+    4_plus_readout      1550   h256     0.811   +0.382   +0.906
+
+  target own57@pi (rows whose event stepped pi)   [18048 fit rows, 6480 held-out rows]
+    rung                d_in     FM   |r|/|d|      cos   in-cos
+    1_state_action       161    h64     1.136   +0.042   +0.512
+    2_plus_grade         163    h64     1.139   +0.041   +0.517
+    3_plus_lineage      1493    h64     1.191   +0.321   +0.886
+    4_plus_readout      1550    h64     1.188   +0.317   +0.900
+    1_state_action       161   h256     1.204   +0.055   +0.695
+    2_plus_grade         163   h256     1.198   +0.054   +0.695
+    3_plus_lineage      1493   h256     1.211   +0.279   +0.984
+    4_plus_readout      1550   h256     1.188   +0.284   +0.986
+
+
+  READ Q1's `dv1 / +grade` ROW TOGETHER WITH Q2, NOT BESIDE IT. The grade enters the
+  forecaster only through delta = sigmoid(v0)-y, and Q2 measures how much of dv_t that
+  scalar already explains on its own. The two are the SAME fact seen twice, and adding
+  them would be double-counting.
+  au_s0 (POOLED) at the same rung and capacity, for the contrast:
+    1_state_action     161    h64     1.069   +0.003   +0.134
+    1_state_action     161   h256     1.118   -0.000   +0.266
+    (au_s0's within-cycle ceiling, an FM that had seen the cycle: 1.057 at cos +0.141)
+  arity gap |g|/|Delta| at the (s,a) rung: 0.449 (au_s0: 0.303 at h64)
+  ens_cos over 3 independent-seed FM2 residuals: 0.635
+
+==============================================================================
+(Q2) THE VALUE STEP: HOW MUCH OF IT IS THE ANALYTIC delta?
+==============================================================================
+  BCE's logit gradient is delta_t = sigmoid(v0_t) - y, so if `Delta v` at the datum's
+  OWN states were simply -eta*delta_t, then `a forecaster without the grade leaves a
+  residual that IS the vector delta` would be an IDENTITY about the loss, not a finding
+  about self-models. WHAT THIS CELL CAN MEAN: a high R^2 from delta alone means the
+  value component is wiring and nothing built on it is evidence about forecasting.
+  WHAT IT CANNOT MEAN: it says nothing about the pi component or about spillover, which
+  are where the generalization geometry lives. Adam normalises per-parameter, and one
+  step is shared by all 9 states, so the identity is not guaranteed a priori.
+    source                          R^2(dv_t)
+    delta_t = sigmoid(v0)-y  [1]        0.588
+    (v0, y)                  [2]        0.612
+    all 9 deltas of the event [9]       0.596
+    + z                       [.]       0.530
+    raw corr(dv_t, -delta_t) = +0.696; sign agreement 94.8%
+    |dv| by |delta| decile is NOT monotone (Adam normalises): 1.55e-03 2.10e-03 2.02e-03 1.69e-03
+
+==============================================================================
+(Q3) INCREMENTAL DECODE OVER THE SCALAR delta THAT IS ALREADY FREE ON THE WIRE
+==============================================================================
+  Every cell below is R^2 with a COVARIATE BASELINE already in it: the per-state
+  analytic delta = sigmoid(v0)-y, its mean, the grade, and log|Delta_i| -- i.e. every
+  SCALAR that is already free on the wire, INCLUDING the update's own magnitude. The
+  first row IS that baseline; every later row is the same fit with a VECTOR source
+  added, so the gap between them is what the vector form buys.
+  WHAT THESE CELLS CAN MEAN: an increment over the baseline row means the VECTOR update
+  carries spillover content the free SCALARS do not. WHAT THEY CANNOT MEAN: nothing here
+  licenses a claim about privacy (that is Q4's ladder), and the RAW columns are not the
+  evidence -- only the [cs] columns are, because a gain that vanishes under cycle x
+  update-order residualisation was the calendar and not the datum.
+  The earlier `ref rms / own rms` ratio target was DROPPED: `own_rms` sat in both the
+  target and every update-derived source, so those cells scored by tautology. It is now
+  a covariate instead, which is what makes the remaining increments mean anything.
+
+    source                         spill_ref_rms  spill_ref_rms  spill_dir_ref  spill_dir_ref  spill_dir_prb  spill_dir_prb
+    baseline (free scalars)                0.247          0.139          0.112          0.064          0.307          0.138
+    + Delta_i (raw update, vec)            0.244          0.138          0.119          0.057          0.316          0.149
+    + r        (residual, s,a)             0.214          0.101          0.148          0.042          0.259          0.113
+    + g        (arity gap)                 0.185          0.069          0.214          0.034          0.418          0.075
+    + own dpi  (the pi step)               0.247          0.147          0.108          0.056          0.311          0.136
+  Columns are raw then [cs] (residualised on cycle x update-order). `spill_*_rms` is an
+  RMS over 32 states -- size-invariant, comparable across cycles. The DIRECTION targets
+  are leave-one-out cosines against the cycle's (reference) or era's (probe) own mean
+  spillover, which is how a direction is made comparable when the state set is redrawn.
+
+==============================================================================
+(Q4) AGENCY, THE OBSERVER TWIN, AND THE NULLS
+==============================================================================
+  arity gap and residual by the datum's explore count (the agency axis):
+     n_explore   events   |g|/|d|   |r|/|d|     dv rms    spill   solved
+             0      643     0.664     1.491  2.101e-03    0.475    13.8%
+             1      440     0.328     1.273  1.962e-03    0.458    19.3%
+             2     3127     0.355     1.253  1.798e-03    0.455    24.4%
+             3     5408     0.437     1.325  1.637e-03    0.491    22.1%
+             4     3696     0.563     1.451  1.545e-03    0.516    18.6%
+             5     1239     0.572     1.455  1.506e-03    0.528    16.2%
+             6      268     0.308     1.211  1.438e-03    0.549    15.3%
+
+  spillover DIRECTION (leave-one-out cos vs the cycle's own mean spillover),
+  residualised on cycle x order -- self vs the observer twin:
+    O_x            (public)    d=512   R^2=  0.289
+    O_x+a          (public)    d=968   R^2=  0.098
+    O_x+a+grade    (public)    d=969   R^2=  0.085
+    SELF: free scalars only    d=12    R^2=  0.062
+    SELF: z0+a+grade           d=553   R^2=  0.036
+    SELF: + Delta_i (vector)   d=21    R^2=  0.061
+    SELF: + r (residual)       d=525   R^2=  0.042
+    n_explore only  (public)   d=1     R^2= -0.001
+    O_x+a+grade half-data            R^2= -0.144   (budget control)
+
+  NULLS on the same target (all should sit at ~0):
+    Delta_i shuffled within cycle x order        R^2=  0.000
+    own dpi rms shuffled likewise                R^2= -0.000
+
+==============================================================================
+(C) COMPARABILITY -- the SAME phase-2 FM class on au_s1/perdatum's WHOLE-CYCLE Delta
+==============================================================================
+  Same code path as phase 2 (`build_table` + `train_pair`), pointed at this arm's own
+  boundary snapshots, so the pooled-vs-per-datum contrast is also stated at the CYCLE
+  granularity on the same trajectories. This target INCLUDES the maintenance pass.
+        FM   |r|/|d|      cos   in-cos   |g|/|d|
+       h64     1.059   -0.017   +0.227     0.190
+      h256     1.106   -0.015   +0.342     0.243
+    au_s0/anchor, the pooled arm, same class:  h64 1.069 +0.003 +0.134 0.303
+                                               h256 1.118 -0.000 +0.266 0.356
+
+END (E1b) - 1625s total
