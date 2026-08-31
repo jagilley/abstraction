@@ -1,0 +1,876 @@
+=== intonation (E′ round 2, delta_perf) — tag in_s0 ===
+ladder [('L1n25', 60), ('L2n12', 50), ('L3n6', 70), ('L4n3', 12), ('L5n1', 9)] = 201 cycles/arm scheduled; caps [60, 50, 70, 12, 9] = 201; setup 610s; stale buffer 0.1269 -> 0.1541
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+
+==============================================================================
+(0) GATES
+==============================================================================
+  CROSS-TAG REPLAY (A3's TREATMENT, WHOLE LIFE — this round's baseline IS that arm): cr3_s0/outer_yield_m4 not fetched locally — skipped
+  CROSS-TAG REPLAY (A1's thermostat through the earning eras — the chain back to A2): ma_s0/outer_yield not fetched locally — skipped
+  G-F smoke scale (in-process vs maestro.py, panel ON, maxl=3): max|fork - donor| = 0.000e+00, self-replay control = 0.000e+00, commits equal = True  -> PASS
+
+  IN-TAG TWIN GATE (each arm vs perf_log, to the first action by EITHER; perf_log's own first commit is c49).
+  [tacet] NOTE: every arm here is treated from c1, so a non-zero delta below is the
+  round's variable — read it as WHEN THE GATE FIRST BOUND, not as a failure.
+    perf_gain      c1-c48   (first action c49 (own)) max|delta| = 0.000e+00  -> identical
+    perf_gate      c1-c48   (first action c49 (own)) max|delta| = 2.240e+02  -> differs
+    outcome_gate   c1-c48   (first action c49 (own)) max|delta| = 2.070e+02  -> differs
+    perf_raw       c1-c48   (first action c49 (own)) max|delta| = 0.000e+00  -> identical
+
+  OBSERVATION PANEL vs the donor's G-Y miner (level 4, every cycle):
+    perf_log         agree=True over 131 cycles
+    perf_gain        agree=True over 131 cycles
+    perf_gate        agree=True over 131 cycles
+    outcome_gate     agree=True over 131 cycles
+    perf_raw         agree=True over 131 cycles
+
+  POLICY GATE (offline, no GPU): ALL PASS (21 checks)
+
+  ENDO READ: LABEL-FREE BY CONSTRUCTION: PASS — positions depend only on ['era.level', 'era.node', 's', 'depth']; none of ['truth', 'rules', 'inverse_maps', 'committed', 'canon', 'true_mask', 'grade'] appears in the read's code
+    era 1 cell L1n25 blocks [25, 26] -> parent L2n12 blocks [24, 26]
+    era 2 cell L2n12 blocks [24, 26] -> parent L3n6 blocks [24, 28]
+    era 3 cell L3n6 blocks [24, 28] -> parent L4n3 blocks [24, 32]
+    era 4 cell L4n3 blocks [24, 32] -> parent L5n1 blocks [16, 32]
+    era 5 cell L5n1 blocks [16, 32] -> parent L6n0 blocks [0, 32]  (parent IS the root: the read is the unconditional marginal)
+
+  DEAD ZONES: measured, not defaulted: PASS, matches floors.json = None
+    {'tol_ledger': 0.02944712566990095, 'tol_yield_l3': 0.46127129019246205, 'tol_yield_l4': 0.5166900731510206, 'tol_endo': 0.01091575129919287}
+    provenance: cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)
+
+  ENDO PRICE (measured on the run's own GPU): one read over 256 sequences = 1.3 ms = 260 grounding-equivalents; charged 267g
+
+==============================================================================
+(1) THE ACTION TRACE — what the loop did, and when
+==============================================================================
+  arm                 policy    read cycles  commits  advances  chosen  capped  rode cap
+  perf_log             quiet   yield    131        3         5       7       1      True
+  perf_gain             yoke    None    131        3         5       0       0     False
+  perf_gate             yoke    None    131        3         5       0       0     False
+  outcome_gate          yoke    None    131        3         5       0       0     False
+  perf_raw              yoke    None    131        3         5       0       0     False
+
+  PER-ARM ACTIONS (cycle, kind, level, why, and the statistic at that instant)
+
+    perf_log  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c58   era1 advance  L-  why=quiet  V=   0.2344 tol=  0.4613 V/tol=    0.51
+      c72   era2 commit   L3  why=quiet  V=   0.4019 tol=  0.5167 V/tol=    0.78
+      c88   era2 advance  L-  why=quiet  V=   0.3928 tol=  0.5167 V/tol=    0.76
+      c104  era3 commit   L4  why=quiet  V=   0.2767 tol=  0.5167 V/tol=    0.54
+      c114  era3 advance  L-  why=quiet  V=   0.4297 tol=  0.5167 V/tol=    0.83
+      c122  era4 advance  L-  why=quiet  V=   0.4062 tol=  0.5167 V/tol=    0.79
+      c131  era5 advance  L-  why=cap    V=   0.0625 tol=  0.5167 V/tol=    0.12
+
+    perf_gain  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c58   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c72   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c88   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c104  era3 commit   L4  why=clock  V=        - tol=       - V/tol=       -
+      c114  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c122  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c131  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    perf_gate  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c58   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c72   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c88   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c104  era3 commit   L4  why=clock  V=        - tol=       - V/tol=       -
+      c114  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c122  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c131  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    outcome_gate  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c58   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c72   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c88   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c104  era3 commit   L4  why=clock  V=        - tol=       - V/tol=       -
+      c114  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c122  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c131  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    perf_raw  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c58   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c72   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c88   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c104  era3 commit   L4  why=clock  V=        - tol=       - V/tol=       -
+      c114  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c122  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c131  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+  COMMIT CYCLES AND WHAT WAS COMMITTED
+  arm              lvl  cycle  era  prov  entries  recall    prec  cert@    driver
+  perf_log           2     49    1 False       14   0.714   0.714     18      loop
+  perf_log           3     72    2 False       10   0.071   0.400   None      loop
+  perf_log           4    104    3 False        1   0.001   1.000   None      loop
+  perf_gain          2     49    1 False       14   0.714   0.714     18      loop
+  perf_gain          3     72    2 False        9   0.054   0.333   None      loop
+  perf_gain          4    104    3 False        2   0.001   0.500   None      loop
+  perf_gate          2     49    1 False       16   0.786   0.688     19      loop
+  perf_gate          3     72    2 False       11   0.071   0.364   None      loop
+  perf_gate          4    104    3 False        2   0.001   0.500   None      loop
+  outcome_gate       2     49    1 False       16   0.786   0.688     18      loop
+  outcome_gate       3     72    2 False        9   0.071   0.444     72      loop
+  outcome_gate       4    104    3 False        2   0.001   0.500   None      loop
+  perf_raw           2     49    1 False       14   0.714   0.714     18      loop
+  perf_raw           3     72    2 False       14   0.071   0.286     68      loop
+  perf_raw           4    104    3 False        1   0.001   1.000   None      loop
+
+==============================================================================
+(1b) THE LEARNED POLICY'S OWN RECORD — the mixtures, the fit, the action diff
+==============================================================================
+  THE FITTED MIXTURES (unit-norm weights on each gauge's paired-interval slope,
+  IN FLOOR UNITS; the bucket is `will_commit` = would a firing install a table).
+  A1's thermostat is the point (0, 1, 0) with theta = 1 in this same class.
+    arm/reward        bucket           ledger         yield   endo_excess    theta
+    learned_yield   installs          +0.2106       +0.9440       +0.2540   1.2085
+    learned_yield   advances          +0.0495       +0.8506       +0.5235   1.0980
+    learned_task    installs          -0.7806       +0.2146       +0.5871   1.4253
+    learned_task    advances          -0.4221       +0.1367       +0.8962   0.7083
+
+  THE ACTION DIFF — learned vs the hand-written thermostat, IN THIS TAG
+  (both ran live on their own trajectories, so this is a difference between two
+   runs and not a counterfactual; the pre-GPU replay is in fit.json.)
+
+  WHAT THE LEARNED POLICY READ AT EACH OF ITS OWN ACTIONS
+
+==============================================================================
+(2) GAUGE vs YOKE — the mandatory timing control (census finding 4)
+==============================================================================
+  The yoke replays the gauge arm's realised action cycles by clock and reads
+  nothing. A divergence would mean the reads are not inert; identity means the
+  criterion contributed nothing beyond a cycle number, which is a finding, and the
+  priced-time column is then what the read cost for a trajectory a clock reproduces.
+  [tacet] In this tag the yokes ARE the treatments (each carries one gate knob), so
+  a non-zero delta below is the round's variable and `first divergence` reads as
+  WHEN THE GATE FIRST BOUND. What must still hold is commits/advances EQUAL — that
+  is what makes the arms lifetime- and pacing-identical.
+
+  perf_gain vs perf_gain  (n=131 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 72), (4, 104)] vs [(2, 49), (3, 72), (4, 104)]   equal = True
+    advances [58, 88, 114, 122, 131] vs [58, 88, 114, 122, 131]   equal = True
+    priced time t_cum 32553946 vs 32553946  (difference +0 = what the read cost)
+
+  perf_gate vs perf_gate  (n=131 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 72), (4, 104)] vs [(2, 49), (3, 72), (4, 104)]   equal = True
+    advances [58, 88, 114, 122, 131] vs [58, 88, 114, 122, 131]   equal = True
+    priced time t_cum 32553677 vs 32553677  (difference +0 = what the read cost)
+
+  outcome_gate vs outcome_gate  (n=131 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 72), (4, 104)] vs [(2, 49), (3, 72), (4, 104)]   equal = True
+    advances [58, 88, 114, 122, 131] vs [58, 88, 114, 122, 131]   equal = True
+    priced time t_cum 32554214 vs 32554214  (difference +0 = what the read cost)
+
+  perf_raw vs perf_raw  (n=131 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 72), (4, 104)] vs [(2, 49), (3, 72), (4, 104)]   equal = True
+    advances [58, 88, 114, 122, 131] vs [58, 88, 114, 122, 131]   equal = True
+    priced time t_cum 32554752 vs 32554752  (difference +0 = what the read cost)
+
+==============================================================================
+(3) THE THREE CLOCKS: certificate, coverage, value
+==============================================================================
+  CLOCK 1 — the SHADOW certificate (read-only in every arm, incl. the driven ones)
+  arm               L2 fired  L3 fired  L2 c2cert  L3 c2cert  commit L2  commit L3
+  perf_log                18        76         17         17         49         72
+  perf_gain               18        80         17         21         49         72
+  perf_gate               19        75         18         16         49         72
+  outcome_gate            18        72         17         12         49         72
+  perf_raw                18        68         17         10         49         72
+
+  CLOCK 2 — COVERAGE: end-of-run committed table per level
+  arm              lvl  frozen n   recall    prec  live n  live rec  live prec
+  perf_log           2        14    0.714   0.714      18     0.929      0.722
+  perf_log           3        10    0.071   0.400      27     0.143      0.296
+  perf_log           4         1    0.001   1.000       2     0.001      0.500
+  perf_gain          2        14    0.714   0.714      18     0.929      0.722
+  perf_gain          3         9    0.054   0.333      24     0.143      0.333
+  perf_gain          4         2    0.001   0.500       4     0.001      0.250
+  perf_gate          2        16    0.786   0.688      17     0.857      0.706
+  perf_gate          3        11    0.071   0.364      32     0.196      0.344
+  perf_gate          4         2    0.001   0.500       5     0.001      0.200
+  outcome_gate       2        16    0.786   0.688      21     0.929      0.619
+  outcome_gate       3         9    0.071   0.444      23     0.161      0.391
+  outcome_gate       4         2    0.001   0.500       3     0.001      0.333
+  perf_raw           2        14    0.714   0.714      17     0.857      0.706
+  perf_raw           3        14    0.071   0.286      22     0.089      0.227
+  perf_raw           4         1    0.001   1.000       4     0.001      0.250
+
+  CLOCK 3 — VALUE: recovered fraction per era (e, and (stale-e)/(stale-floor))
+  arm                          era1             era2             era3             era4             era5
+  perf_log            0.496 /+0.484    0.619 /+0.497    0.614 /+0.684    0.685 /+1.045    0.772 /+1.322
+  perf_gain           0.528 /+0.441    0.617 /+0.500    0.615 /+0.682    0.669 /+1.100    0.802 /+1.131
+  perf_gate           0.525 /+0.445    0.588 /+0.551    0.696 /+0.501    0.766 /+0.764    0.887 /+0.596
+  outcome_gate        0.534 /+0.433    0.670 /+0.408    0.714 /+0.461    0.772 /+0.742    0.879 /+0.645
+  perf_raw            0.516 /+0.457    0.588 /+0.551    0.621 /+0.669    0.701 /+0.988    0.794 /+1.180
+  stale                     0.865            0.906            0.922            0.984            0.982
+  floor                     0.102            0.328            0.471            0.698            0.823
+
+  DELTA TO PERF_LOG, per era, in recovered fraction
+  Read against the MEASURED depth-6 stream floor (census finding 7): 0.087 in the
+  earning family and 0.083/0.148/0.344 in the given family for eras 3/4/5. Ranks
+  and signs in the deep eras are the currency; fractions are not.
+  arm                   era1      era2      era3      era4      era5
+  perf_gain           -0.042     0.003    -0.002     0.055    -0.191
+  perf_gate           -0.039     0.054    -0.183    -0.282    -0.727
+  outcome_gate        -0.050    -0.089    -0.224    -0.303    -0.678
+  perf_raw            -0.026     0.054    -0.015    -0.058    -0.142
+
+==============================================================================
+(4) pi PER-LEVEL MASS, ARGMAX SHARE, AND MACRO EXPANSIONS, per arm per era
+==============================================================================
+
+  L2 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  perf_log             0.065     0.182     0.162     0.143     0.145
+  perf_gain            0.063     0.206     0.191     0.180     0.161
+  perf_gate            0.039     0.113     0.171     0.196     0.223
+  outcome_gate         0.034     0.095     0.129     0.164     0.153
+  perf_raw             0.054     0.178     0.175     0.146     0.146
+
+  L3 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  perf_log             0.000     0.061     0.213     0.243     0.217
+  perf_gain            0.000     0.044     0.176     0.206     0.185
+  perf_gate            0.000     0.019     0.098     0.109     0.132
+  outcome_gate         0.000     0.023     0.092     0.133     0.155
+  perf_raw             0.000     0.063     0.200     0.224     0.218
+
+  L4 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  perf_log             0.000     0.000     0.038     0.131     0.168
+  perf_gain            0.000     0.000     0.036     0.130     0.190
+  perf_gate            0.000     0.000     0.017     0.054     0.072
+  outcome_gate         0.000     0.000     0.022     0.052     0.087
+  perf_raw             0.000     0.000     0.037     0.106     0.159
+
+  L2 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  perf_log             0.000     0.029     0.049     0.036     0.052
+  perf_gain            0.000     0.078     0.120     0.081     0.039
+  perf_gate            0.000     0.016     0.076     0.125     0.182
+  outcome_gate         0.000     0.005     0.018     0.078     0.070
+  perf_raw             0.000     0.026     0.057     0.029     0.052
+
+  L3 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  perf_log             0.000     0.010     0.250     0.331     0.271
+  perf_gain            0.000     0.010     0.167     0.253     0.188
+  perf_gate            0.000     0.000     0.065     0.068     0.099
+  outcome_gate         0.000     0.000     0.052     0.133     0.151
+  perf_raw             0.000     0.034     0.219     0.299     0.260
+
+  L4 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  perf_log             0.000     0.000     0.010     0.094     0.185
+  perf_gain            0.000     0.000     0.008     0.148     0.281
+  perf_gate            0.000     0.000     0.000     0.031     0.070
+  outcome_gate         0.000     0.000     0.000     0.031     0.109
+  perf_raw             0.000     0.000     0.003     0.081     0.198
+
+  MACRO EXPANSIONS the beam ran (blocks.mat_dp, per-cycle mean by era)
+  arm                     era1        era2        era3        era4        era5
+  perf_log                8843        3972        5455           0           0
+  perf_gain               8843        2581        5455           0           0
+  perf_gate               8831        2348        1122           0           0
+  outcome_gate            8837        1877        7149           0           0
+  perf_raw                8828        1893        2237         134        2145
+
+==============================================================================
+(5) THE LEDGER — what each arm read, and what it cost
+==============================================================================
+  ear's convention: the learner's own experience is free, a counterfactual read is
+  priced, and instruments logged in every arm are free. Only the POLICY's input
+  stream is charged, and the charge lands in `counts['ground']` -> `t_cum`, which
+  nothing in the cycle loop reads.
+  arm                     read  n reads  priced  spend(g)    t_cum end   t_cum+read  read % of
+  perf_log               yield        0       0         0     32554752     32554752     0.000%
+  perf_gain               None        0       0         0     32553946     32553946     0.000%
+  perf_gate               None        0       0         0     32553677     32553677     0.000%
+  outcome_gate            None        0       0         0     32554214     32554214     0.000%
+  perf_raw                None        0       0         0     32554752     32554752     0.000%
+
+==============================================================================
+(6) THE MEASURED FLOORS, RE-DERIVED IN-TAG on the schedule arm
+==============================================================================
+  reference arm: perf_log (131 cycles, 7 windows dropped at era boundaries / commits); span=1 W=4
+  gauge         n_win      sd(N)    mean(N)  v_tol=sd/2    mean(D)  D/floor   governed by
+  ledger           92    0.05487   -0.00309     0.02744   +0.00903     0.33       0.02945
+  yield            92    0.91322   -0.01630     0.45661   +0.91033     1.99L3 0.4613/L4 0.5167
+  endo             92    0.02792   +0.00608     0.01396   -0.00167    -0.12       0.01092
+  endo_cell        92    0.03353   +0.00760     0.01677   -0.00492    -0.29          None
+  endo_excess      92    0.02406   -0.00152     0.01203   +0.00325     0.27          None
+
+  >>> THE ENDO DEAD ZONE, measured on in_s0/perf_log: v_tol = 0.0139617
+      pass it to the main run as  --tol-endo 0.0139617
+
+==============================================================================
+(7) THE SHADOW PANEL — every gauge replayed through the same rule, in every arm
+==============================================================================
+  Counterfactual: what each gauge WOULD have licensed in each arm, per era, if it
+  had been the driven read. Exact only up to the arm's first action (after that the
+  arm's own trajectory is the one the gauge was measured on), so `first_action` is
+  printed beside it and a shadow decision must never be read as a measured one.
+
+    perf_log  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@65 quiet@72]  e3[26c armed@94 quiet@104]  e4[8c armed@120 quiet@122]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@78 quiet@79]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@82 quiet@83]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@65 quiet@66]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    perf_gain  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@65 quiet@77]  e3[26c armed@93 quiet@107]  e4[8c armed@119 quiet@122]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@67 quiet@68]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@78 quiet@81]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@84 quiet@86]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    perf_gate  (first action c49)
+      ledger       e1[58c armed@5 quiet@11]  e2[30c armed@78 quiet@79]  e3[26c armed@106 quiet@107]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@23]  e2[30c armed@64 quiet@82]  e3[26c armed@93 quiet@100]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@None quiet@None]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@None quiet@None]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@70 quiet@74]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    outcome_gate  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@106 quiet@107]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@7 quiet@25]  e2[30c armed@67 quiet@72]  e3[26c armed@96 quiet@106]  e4[8c armed@None quiet@None]  e5[9c armed@127 quiet@130]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@39 quiet@41]  e2[30c armed@74 quiet@78]  e3[26c armed@103 quiet@104]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@66 quiet@72]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    perf_raw  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@63 quiet@66]  e3[26c armed@97 quiet@113]  e4[8c armed@119 quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@None quiet@None]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@78 quiet@81]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@127 quiet@128]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@None quiet@None]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+==============================================================================
+(8) THE ADDRESS-BOOK BATTERY, plant guard, certificates, cost
+==============================================================================
+  END-OF-RUN BATTERY: e per condition (last era), and the next-level currency split
+  arm                  cond  e(last era)  g/solve  solved  T3@sup  T3built  T4@sup  T4built
+  perf_log           a_full        0.773    463.0      87       4        1       1        1
+  perf_log          b_table        0.773    463.0      87       4        1       1        1
+  perf_log           b_span        0.990    463.0       4       0        0       0        0
+  perf_log          c_prims        0.669    463.0     127       8        3       2        1
+  perf_gain          a_full        0.789    463.0      81       4        3       1        1
+  perf_gain         b_table        0.789    463.0      81       4        3       1        1
+  perf_gain          b_span        0.990    463.0       4       0        0       0        0
+  perf_gain         c_prims        0.698    463.0     116       7        5       4        4
+  perf_gate          a_full        0.870    463.0      50       2        2       1        1
+  perf_gate         b_table        0.870    463.0      50       2        2       1        1
+  perf_gate          b_span        0.987    463.0       5       0        0       0        0
+  perf_gate         c_prims        0.815    463.0      71       6        5       1        1
+  outcome_gate       a_full        0.865    463.0      52       3        2       1        1
+  outcome_gate      b_table        0.865    463.0      52       3        2       1        1
+  outcome_gate       b_span        0.990    463.0       4       0        0       0        0
+  outcome_gate      c_prims        0.703    463.0     114       5        4       1        1
+  perf_raw           a_full        0.781    463.0      84       4        1       1        1
+  perf_raw          b_table        0.781    463.0      84       4        1       1        1
+  perf_raw           b_span        0.987    463.0       5       0        0       0        0
+  perf_raw          c_prims        0.680    463.0     123       9        4       3        1
+
+  G-Y / OBSERVATION PANEL: distinct next-level tuples at support, end of each era
+  perf_log         L3/L4 at support 3:     51/16    59/41    61/56    61/59    69/60
+  perf_gain        L3/L4 at support 3:     51/17    58/42    58/64    60/67    64/70
+  perf_gate        L3/L4 at support 3:     55/13    61/34    65/55    66/56    69/58
+  outcome_gate     L3/L4 at support 3:     51/14    64/34    66/51    69/52    77/56
+  perf_raw         L3/L4 at support 3:     48/15    56/43    60/63    60/71    64/72
+
+  PLANT GUARD, CERTIFICATES, COST
+  perf_log         parse 0.649-0.693  infill 0.705-0.762  cert L2 c18 L3 c76  recerts  12    15.3 s/cycle
+  perf_gain        parse 0.655-0.693  infill 0.717-0.762  cert L2 c18 L3 c80  recerts  12    15.5 s/cycle
+  perf_gate        parse 0.641-0.693  infill 0.711-0.760  cert L2 c19 L3 c75  recerts  12    15.4 s/cycle
+  outcome_gate     parse 0.648-0.692  infill 0.715-0.760  cert L2 c18 L3 c72  recerts  12    15.5 s/cycle
+  perf_raw         parse 0.648-0.693  infill 0.686-0.762  cert L2 c18 L3 c68  recerts  12    15.8 s/cycle
+
+  TOTAL 10829s = 3.01 GPU-h
+
+==============================================================================
+(A) THE CROSSING: the L4 commit, and the r**2 ceiling it was drawn from
+==============================================================================
+  The DGP's levels, as DISTINCT flat tuples (the recall denominator): L2 14, L3 56, L4 816.
+  `T4 subset T3xT3`: an L4 entry exists only if BOTH of its 4-tuple halves are rows
+  of the operative L3 table, so a frozen L3 of recall r caps L4 near r**2.
+
+  arm               L4 commit c_in_era  entries   recall    prec  buildable  of which true  share taken
+  perf_log                104       16        1   0.0012   1.000          8              1        0.125
+  perf_gain               104       16        2   0.0012   0.500          7              1        0.286
+  perf_gate               104       16        2   0.0012   0.500         10              1        0.200
+  outcome_gate            104       16        2   0.0012   0.500          5              1        0.400
+  perf_raw                104       16        1   0.0012   1.000          9              1        0.111
+
+  `buildable` = distinct L4 tuples at support 3 in the arm's own observation
+  panel whose two halves are both rows of its FROZEN L3, at the cycle named. It is
+  the honest ceiling for that arm's L4 commit; `share taken` is what it took of it.
+  A cancelled commit (the empty-table guard) appears in the action trace, not here.
+
+==============================================================================
+(C) THE GAUGE AT THE FRONTIER: what paced the L4 commit, and the L5 alternative
+==============================================================================
+  Driven read: `yield` = -(distinct level-`read_level` tuples at support).
+  `read_level` = min(active+1, gy_level=4), so at era 3 (active=4) it is the level
+  BEING EARNED, not one above it. Floors that governed the run: L3 0.46127129019246205, L4 0.5166900731510206.
+
+  read_level actually used, per era (logged per cycle)
+  arm                  era1     era2     era3     era4     era5
+  perf_log                3        4        4        4        4
+  perf_gain               3        4        4        4        4
+  perf_gate               3        4        4        4        4
+  outcome_gate            3        4        4        4        4
+  perf_raw                3        4        4        4        4
+
+  THE OBSERVATION PANEL, end of run: distinct tuples at support, per level.
+  Levels 5 and 6 are logged UNCHARGED in every arm and were never driven — Phase 0
+  measured them degenerate (max 1-2 over an entire run, first non-zero at c89-124),
+  which is the reason the L4 commit is paced on the L4 stream's own quieting.
+  arm                   L3      L4      L5      L6  L5 first>0
+  perf_log              69      60       1       0         105
+  perf_gain             64      70       4       0         105
+  perf_gate             69      58       3       0          87
+  outcome_gate          77      56       4       1          74
+  perf_raw              64      72       1       0         107
+
+  THE L4 AT-SUPPORT SERIES over era 3 (the series the commit was read on):
+  per-era first -> last, and the mean per-cycle increment against the L4 floor.
+  arm               era     n   first    last   d/cycle  x floor
+  perf_log            1    58       0      16     0.281    0.543
+  perf_log            2    30      18      41     0.793    1.535
+  perf_log            3    26      41      56     0.600    1.161
+  perf_log            4     8      56      59     0.429    0.829
+  perf_log            5     9      59      60     0.125    0.242
+  perf_gain           1    58       0      17     0.298    0.577
+  perf_gain           2    30      18      42     0.828    1.602
+  perf_gain           3    26      43      64     0.840    1.626
+  perf_gain           4     8      64      67     0.429    0.829
+  perf_gain           5     9      67      70     0.375    0.726
+  perf_gate           1    58       0      13     0.228    0.441
+  perf_gate           2    30      13      34     0.724    1.401
+  perf_gate           3    26      34      55     0.840    1.626
+  perf_gate           4     8      55      56     0.143    0.276
+  perf_gate           5     9      57      58     0.125    0.242
+  outcome_gate        1    58       0      14     0.246    0.475
+  outcome_gate        2    30      14      34     0.690    1.335
+  outcome_gate        3    26      34      51     0.680    1.316
+  outcome_gate        4     8      51      52     0.143    0.276
+  outcome_gate        5     9      53      56     0.375    0.726
+  perf_raw            1    58       0      15     0.263    0.509
+  perf_raw            2    30      19      43     0.828    1.602
+  perf_raw            3    26      43      63     0.800    1.548
+  perf_raw            4     8      64      71     1.000    1.935
+  perf_raw            5     9      71      72     0.125    0.242
+
+==============================================================================
+(E) EXTENSION: the r**2-wall bypass
+==============================================================================
+  Phase 0 measured the wall binds and that extension is the lever: buildable L4 over
+  the FROZEN L3 vs over the LIVE L3 was 15 vs 25 (cd_s0/outer_yield), 13 vs 26
+  (ma_s0/learned_yield), 8 vs 13 (anchor) — i.e. extension roughly doubles the
+  ceiling an L4 commit is drawn from.
+
+  arm               lvl  events   cands  admitted  final n  final recall  final prec
+  perf_log            2       0       0         0       14        0.7143       0.714
+  perf_log            3       0       0         0       10        0.0714       0.400
+  perf_log            4       0       0         0        1        0.0012       1.000
+  perf_gain           2       0       0         0       14        0.7143       0.714
+  perf_gain           3       0       0         0        9        0.0536       0.333
+  perf_gain           4       0       0         0        2        0.0012       0.500
+  perf_gate           2       0       0         0       16        0.7857       0.688
+  perf_gate           3       0       0         0       11        0.0714       0.364
+  perf_gate           4       0       0         0        2        0.0012       0.500
+  outcome_gate        2       0       0         0       16        0.7857       0.688
+  outcome_gate        3       0       0         0        9        0.0714       0.444
+  outcome_gate        4       0       0         0        2        0.0012       0.500
+  perf_raw            2       0       0         0       14        0.7143       0.714
+  perf_raw            3       0       0         0       14        0.0714       0.286
+  perf_raw            4       0       0         0        1        0.0012       1.000
+
+  and what the treatment vs the extension arm actually held at L4:
+  arm               frozen L3  buildable L4  L4 entries  L4 true
+  perf_log                 10             8           1        1
+
+==============================================================================
+(G) THE GATE: what each arm refused, and what the refusal was made of
+==============================================================================
+  gate_frac = 0.5 of SOLVED TIPS kept on the pi channel; the
+  mining cap (8) is untouched, so mining volume is matched and
+  only its content moves. The value buffer is UNGATED in every arm (delta is the
+  residual of the value head's own forecast).
+
+  PER-ARM TOTALS over the whole run
+  arm                   mode  sol tips    kept  kept %   pi rows   mined  pbuf end fallbacks
+  perf_log              None     33776       0    0.0%    270208    1036     60000         0
+  perf_gain             None     33821       0    0.0%    270568    1029     60000         0
+  perf_gate          perf_hi     30131   15067   50.0%    120536    1002     60000         0
+  outcome_gate      delta_hi     30945   15466   50.0%    123728    1006     60000         0
+  perf_raw              None     32876       0    0.0%    263008    1028     60000         0
+  `kept` is 0 in an arm with no gate: the gate log records the FEATURES in every arm
+  and the SELECTION only where a mode is set — an ungated arm keeps everything the
+  grade admitted, i.e. `sol tips`.
+
+  pi ROWS ENTERING THE REPLAY BUFFER, per era (the diet's volume)
+  arm                   era1      era2      era3      era4      era5
+  perf_log            142704     47384     48400     15480     16240
+  perf_gain           142584     48744     46664     16240     16336
+  perf_gate            66320     21840     19336      6720      6320
+  outcome_gate         67664     21480     20016      7504      7064
+  perf_raw            139200     47544     45216     16896     14152
+
+  WHAT THE GATE KEPT vs WHAT IT DROPPED (mean over the run, gated arms only)
+  arm               delta kept  delta dropped      gap  margin kept  margin all
+  perf_gate             0.5309         0.5164   0.0144       0.0549      0.0593
+  outcome_gate          0.7523         0.3163   0.4361       0.0589      0.0600
+
+  THE FEATURES THEMSELVES, in every arm (per-instance, whole run)
+  delta_ans = grade - sigmoid(v) at the answer the beam gave; margin = the
+  deliberation state (top1 - top2 over the instance's tip value scores).
+  `margin` is the GATED form (chosen minus the mean of the unchosen); `m2` is the
+  textbook top1-top2 margin, logged but not gated on — `m2=0 frac` is how often it
+  is exactly zero (a duplicate runner-up), which is why the gate reads the mean form.
+  arm              solve rate  d|solved  d|failed    sd d   margin  sd marg  m2=0 frac  corr(d,-m)
+  perf_log             0.2333    0.4644   -0.5247  0.5153   0.0586   0.0766     0.4169      0.1299
+  perf_gain            0.2302    0.4625   -0.5231  0.5135   0.0585   0.0771     0.4148      0.1435
+  perf_gate            0.2055    0.4864   -0.5089  0.5021   0.0593   0.0769     0.4058      0.1671
+  outcome_gate         0.2123    0.4850   -0.5086  0.5058   0.0600   0.0783     0.4161      0.1522
+  perf_raw             0.2242    0.4787   -0.5259  0.5157   0.0597   0.0794     0.4182      0.1555
+
+  THE COUNTERFACTUAL GATES, per arm, on that arm's OWN logged features
+  Of the solved instances each cycle, take the top half by each rule and report the
+  mean pairwise JACCARD overlap between the rules' selections. This is what a gate
+  arm's mining reorder could at most have moved, computed in every arm including
+  the ungated baseline — a gate whose selection is the same set as another's cannot
+  produce a different table.
+  arm                  dhi/dlo     dhi/dlb     dhi/rnd     dlo/dlb     dlo/rnd     dlb/rnd
+  perf_log               0.000       0.338       0.362       0.330       0.296       0.322
+  perf_gain              0.000       0.345       0.352       0.327       0.318       0.321
+  perf_gate              0.000       0.374       0.336       0.321       0.342       0.322
+  outcome_gate           0.000       0.377       0.294       0.311       0.374       0.348
+  perf_raw               0.000       0.344       0.328       0.337       0.336       0.336
+
+==============================================================================
+(G2) TABLE CONTENT: reconstruction, truth, and overlap between arms
+==============================================================================
+  Each arm's committed table replayed entry-for-entry from its own logged key
+  stream (Phase 0's gate B-1 machinery). `recon == n` is the reconstruction check.
+
+  L2  (the DGP has 14 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  perf_log                49    14     14    10      0.714   0.7143
+  perf_gain               49    14     14    10      0.714   0.7143
+  perf_gate               49    16     16    11      0.688   0.7857
+  outcome_gate            49    16     16    11      0.688   0.7857
+  perf_raw                49    14     14    10      0.714   0.7143
+
+    pairwise JACCARD of the committed L2 entry sets
+                           perf_log      perf_gain      perf_gate   outcome_gate       perf_raw
+    perf_log                  1.000          1.000          0.875          0.875          1.000
+    perf_gain                 1.000          1.000          0.875          0.875          1.000
+    perf_gate                 0.875          0.875          1.000          0.882          0.875
+    outcome_gate              0.875          0.875          0.882          1.000          0.875
+    perf_raw                  1.000          1.000          0.875          0.875          1.000
+
+  L3  (the DGP has 56 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  perf_log                72    10     10     4      0.400   0.0714
+  perf_gain               72     9      9     3      0.333   0.0536
+  perf_gate               72    11     11     4      0.364   0.0714
+  outcome_gate            72     9      9     4      0.444   0.0714
+  perf_raw                72    14     14     4      0.286   0.0714
+
+    pairwise JACCARD of the committed L3 entry sets
+                           perf_log      perf_gain      perf_gate   outcome_gate       perf_raw
+    perf_log                  1.000          0.727          0.500          0.462          0.412
+    perf_gain                 0.727          1.000          0.429          0.636          0.353
+    perf_gate                 0.500          0.429          1.000          0.538          0.786
+    outcome_gate              0.462          0.636          0.538          1.000          0.438
+    perf_raw                  0.412          0.353          0.786          0.438          1.000
+
+  L4  (the DGP has 816 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  perf_log               104     1      1     1      1.000   0.0012
+  perf_gain              104     2      2     1      0.500   0.0012
+  perf_gate              104     2      2     1      0.500   0.0012
+  outcome_gate           104     2      2     1      0.500   0.0012
+  perf_raw               104     1      1     1      1.000   0.0012
+
+    pairwise JACCARD of the committed L4 entry sets
+                           perf_log      perf_gain      perf_gate   outcome_gate       perf_raw
+    perf_log                  1.000          0.500          0.500          0.500          1.000
+    perf_gain                 0.500          1.000          0.333          0.333          0.500
+    perf_gate                 0.500          0.333          1.000          0.333          0.500
+    outcome_gate              0.500          0.333          0.333          1.000          0.500
+    perf_raw                  1.000          0.500          0.500          0.500          1.000
+
+  A gate that changes what the learner learns from can only change the table
+  through the entries it mined; identical sets here mean the gate moved trust
+  (section 4) and pacing (section H) but not the address book.
+
+==============================================================================
+(H) THE PACING COUNTERFACTUAL: when each arm's own gauge would have fired
+==============================================================================
+  A1's thermostat, unchanged (span 1, W 4, burn 4, alpha 0.5), floors L3 0.461271 / L4 0.516690, replayed from era-3 start on each arm's own
+  logged panel. The BASELINE's realised L4 commit cycle is what every yoked arm
+  actually did, so the column to read is `would fire` against it.
+
+  arm               era3 c0    n  would fire (c)  c_in_era3  vs baseline   all firings (c_in_era3)
+  perf_log               89   43             104         16            0              [16, 26, 34]
+  perf_gain              89   43             107         19            3                  [19, 29]
+  perf_gate              89   43             100         12           -4                  [12, 30]
+  outcome_gate           89   43             106         18            2              [18, 29, 42]
+  perf_raw               89   43             113         25            9                  [25, 37]
+
+  the baseline's REALISED L4 commit: c104. Every gate arm replayed it by clock,
+  which is what makes section (3)'s era table a content comparison.
+
+==============================================================================
+(P1) THE METER — a live, fallible executor, and delta_perf's own components
+==============================================================================
+  `tau_fire` is the FIRING threshold; `span_tau` (0.95) still governs the parity
+  RECORD, so `opened_below_tau` counts slot-openings the donor's gate would have
+  refused. `misfire` is a row whose emitted span did not exactly match what
+  `apply_any` would have written on the same observation.
+
+  arm             tau_f     fired  misfire    rate  slots  open@f  open@.95      g0   theta  calib@c  degen med g act
+  perf_log         0.50   2220079   126981  0.0572     28      28        16  0.0000  0.0010       57   True    0.0000
+  perf_gain        0.50   2407167   135550  0.0563     28      28        21  0.0000  0.0010       57   True    0.0000
+  perf_gate        0.50   1918938   147405  0.0768     28      28        18  0.0000  0.0010       56   True    0.0000
+  outcome_gate     0.50   1545753   104033  0.0673     28      28        20  0.0000  0.0010       57   True    0.0000
+  perf_raw         0.50   2390514   210959  0.0882     28      28        12  0.0000  0.0010       57   True    0.0000
+
+  PER MACRO SLOT (the syllable), summed over the run:
+  arm perf_gain (the metered arm with the most executions).
+     slot     rows    fired   mean e   exact   mean g   mean d      b-e    b(s)  parity
+      2:0    11986    11986   0.0657   0.904   0.2010  -0.0123   0.0101  0.0307   0.931
+      2:1    13071    13071   0.0465   0.940   0.2628  -0.0017   0.0153  0.0115   0.963
+      2:2    15002    15002   0.0750   0.894   0.1767  -0.0004   0.0267  0.0206   0.970
+      2:3    24615    24615   0.0455   0.935   0.1646  -0.0079   0.0104  0.0169   0.973
+      2:4    30346    30346   0.0354   0.954   0.1430  -0.0074   0.0071  0.0169   0.985
+      2:5    41712    41712   0.0223   0.968   0.1207  -0.0039   0.0063  0.0073   0.954
+      2:6    11732    11732   0.0502   0.931   0.1141  -0.0120   0.0061  0.0320   0.966
+      2:7    52332    52332   0.0262   0.964   0.1334  -0.0067   0.0051  0.0150   0.992
+      2:8    16146    16146   0.0558   0.926   0.1636  -0.0205  -0.0047  0.0103   0.959
+      2:9    27587    27587   0.0655   0.914   0.1770  -0.0128   0.0084  0.0471   0.979
+     2:10    31885    31885   0.0610   0.913   0.1730  -0.0104   0.0116  0.0507   0.949
+     2:11    49568    49568   0.0287   0.962   0.2184   0.0062   0.0195  0.0160   0.972
+     2:12   397533   397533   0.0587   0.925   0.1726  -0.0111   0.0125  0.0514   0.856
+     2:13   250676   250676   0.0259   0.964   0.1117  -0.0039   0.0091  0.0384   0.958
+     2:14    22991    22991   0.0580   0.923   0.1648  -0.0169   0.0036  0.0392   0.937
+     2:15    31490    31490   0.0457   0.937   0.1409  -0.0046   0.0138  0.0070   0.955
+      3:0    61564    61564   0.0180   0.970   0.1618   0.0002   0.0069  0.0293   0.963
+      3:1    47050    47050   0.0638   0.891   0.1761  -0.0015   0.0218  0.0639   0.894
+      3:2    56014    56014   0.0477   0.881   0.1082  -0.0083   0.0131  0.0173   0.985
+      3:3   103203   103203   0.0537   0.897   0.1645  -0.0067   0.0118  0.0188   0.993
+      3:4    58425    58425   0.0340   0.960   0.1995  -0.0000   0.0088  0.0236   0.899
+      3:5    95658    95658   0.0769   0.864   0.2680  -0.0063   0.0062  0.0276   0.974
+      3:6   450650   450650   0.0373   0.935   0.1568  -0.0088   0.0016  0.0270   0.939
+      3:7   139963   139963   0.0247   0.964   0.1032  -0.0004   0.0130  0.0130   0.990
+      4:0    37431    37431   0.0000   1.000   0.0195   0.0000   0.0000  0.0000   1.000
+      4:1    65208    65208   0.0000   1.000   0.0005   0.0000   0.0000  0.0000   1.000
+      4:2    39921    39921   0.0000   1.000   0.0921  -0.0000  -0.0000  0.0000   1.000
+      4:3   223408   223408   0.0000   1.000   0.0051   0.0000   0.0000  0.0000   1.000
+
+  ACT vs PLAYBACK (Gadagkar's control, on this substrate).
+  ACT     rows the head REALIZED: e measured against what `apply_any` would have
+          written, agency g > 0 (the slot command explains part of the span).
+  PLAYBK  the SAME head, the SAME contexts, but the DP realized the move: the parity
+          read computes the head's would-be error on every held-out row of every
+          slot each cycle. No efference copy for the head's output, so g == 0 by
+          construction and the CENTERED gate closes. `b - e` is the ungated signal;
+          if it fires in both columns and delta only in ACT, the gate is carrying
+          the discrimination (S13(a)'s dissection).
+
+  arm               e ACT  e PLAYBK   b-e ACT  b-e PLAY  delta ACT delta PLAY   g ACT
+  perf_log         0.0340    0.0565    0.0082   -0.0024    -0.0052    -0.0012  0.1167
+  perf_gain        0.0366    0.0560    0.0075    0.0012    -0.0057     0.0006  0.1363
+  perf_gate        0.0461    0.0647    0.0078    0.0031    -0.0080     0.0015  0.1416
+  outcome_gate     0.0395    0.0543    0.0123    0.0049    -0.0023     0.0025  0.1435
+  perf_raw         0.0478    0.0658    0.0089    0.0007    -0.0076     0.0004  0.1329
+
+  (PLAYBK's delta column is the ungated `b - e_shadow` multiplied by the gate's
+   value AT g = 0, which is what the mechanism would assign those rows. Playback
+   rows are never scored IN-RUN: the head did not execute them, so no credit is
+   assigned at all — the exclusion is structural, not a threshold.)
+
+  THE AGENCY VARIABLE'S OWN DISTRIBUTION, from the raw per-row sample (ACT rows):
+  arm              n rows   g == 0    g > 0  mean g|g>0   e|g==0    e|g>0
+  perf_log          14620   0.6185   0.3815      0.4964   0.0009   0.1740
+  perf_gain         14620   0.5947   0.4053      0.4901   0.0012   0.1768
+  perf_gate         14695   0.6001   0.3999      0.4917   0.0022   0.2081
+  outcome_gate      14649   0.5965   0.4035      0.4875   0.0009   0.1749
+  perf_raw          14680   0.5907   0.4093      0.4975   0.0008   0.2078
+
+==============================================================================
+(P2) THE 2x2: EXECUTED-AS-INTENDED x SOLVED
+==============================================================================
+  Per surviving trajectory. `int` = every head execution on it exactly matched its
+  intention; `bad` = at least one did not; `none` = the head executed nothing on it
+  (no performance to grade — kept apart, never folded into `int`).
+  `bad+solved` is THE LUCKY SUCCESS: an ill-executed trajectory the grade rewards.
+  `int+failed` is THE HONEST FAILURE: well executed, task not solved — the cell the
+  grade-only rule discards entirely.
+
+  --- perf_log ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         355        1235         119         695       17364       39624       5579     1092  0.2232 -0.4209
+     2        4448       16958         923        5793         552        2046     454061    57955  0.1102 -0.5998
+     3        5182       16233         655        3637         213         704     771308    35359  0.0718 -0.6389
+     4        1712        5310         209         806          14         141     395799    15304  0.0502 -0.6500
+     5        1861        5861         169        1256           0          69     593332    17271  0.0537 -0.5936
+   ALL       13558       45597        2075       12187       18143       42584
+       P(solve | as intended) = 0.2292   P(solve | NOT as intended) = 0.1455   lucky-success share of solves = 0.1327
+  --- perf_gain ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         345        1094         123         790       17355       39685       5819     1143  0.3291 -0.3429
+     2        4678       16784         894        5949         521        1894     514138    52964  0.1130 -0.6326
+     3        4792       15846         844        4252         197         693     861243    44836  0.0871 -0.6979
+     4        1870        5065         148        1002          12          95     429897    19677  0.0709 -0.6470
+     5        1817        6056         225        1088           0          30     596070    16930  0.0618 -0.7296
+   ALL       13502       44845        2234       13081       18085       42397
+       P(solve | as intended) = 0.2314   P(solve | NOT as intended) = 0.1459   lucky-success share of solves = 0.1420
+  --- perf_gate ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         227        1361         127         890       16229       40558       7345     1801  0.2974 -0.2944
+     2        3738       16361        1109        6630         617        2265     405199    62587  0.1273 -0.5563
+     3        3799       15454         801        5452         226         892     674777    37966  0.0951 -0.5752
+     4        1415        4860         223        1528          40         126     313912    22490  0.0874 -0.6273
+     5        1312        6075         268        1438           0         123     517705    22561  0.0705 -0.6335
+   ALL       10491       44111        2528       15938       17112       43964
+       P(solve | as intended) = 0.1921   P(solve | NOT as intended) = 0.1369   lucky-success share of solves = 0.1942
+  --- outcome_gate ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         298        1233         133         974       16492       40262       5787     1532  0.3036 -0.4038
+     2        4096       17280         813        5941         458        2132     401493    58867  0.1249 -0.5943
+     3        4111       16811         569        3802         331        1000     443657    20904  0.0660 -0.6754
+     4        1665        5220         197        1020          12          78     285883    10255  0.0512 -0.6885
+     5        1559        6132         211        1202           0         112     408933    12475  0.0430 -0.7194
+   ALL       11729       46676        1923       12939       17293       43584
+       P(solve | as intended) = 0.2008   P(solve | NOT as intended) = 0.1294   lucky-success share of solves = 0.1409
+  --- perf_raw ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         221        1545         132         808       17047       39639       6577     1507  0.3538 -0.3790
+     2        4047       16102        1299        6785         597        1890     524738    78148  0.1328 -0.5544
+     3        4233       14822        1241        5497         178         653     873604    64010  0.0982 -0.5514
+     4        1819        4444         292        1547           1          89     411749    33453  0.0782 -0.5805
+     5        1403        5744         362        1635           4          68     573846    33841  0.0790 -0.6242
+   ALL       11723       42657        3326       16272       17827       42339
+       P(solve | as intended) = 0.2156   P(solve | NOT as intended) = 0.1697   lucky-success share of solves = 0.2210
+
+  WHAT GOT MINED, BY CELL (at the beam's own answer — the mined unit), per arm:
+  arm               mined  as intended  NOT as int  no exec   mean d   ans-2x2 (int_s/int_f/bad_s/bad_f/non_s/non_f)
+  perf_log           1036          468         105      463  -0.0223   767/2910/155/868/1034/2650
+  perf_gain          1029          485          88      456  -0.0103   755/2849/146/938/1029/2667
+  perf_gate          1002          488          57      457   0.0255   590/2782/153/1148/980/2731
+  outcome_gate       1006          457          86      463  -0.0042   692/2934/117/936/971/2734
+  perf_raw           1028          432         139      457  -0.0183   673/2643/204/1184/1003/2677
+
+==============================================================================
+(P3) THE PLASTICITY GAIN: delta_perf vs UNIFORM vs RAW-e
+==============================================================================
+  `perf_log` is the UNGATED control (uniform weights, the donor's own span loss).
+  `perf_gain` weights each stored row by exp(-delta/tau_w); `perf_raw` by e alone
+  (no benchmark, no agency gate) — S13(b)'s hygiene comparison. Both are
+  budget-matched by running-mean normalisation, which `mean w` checks.
+
+  arm               mode   mean w  cred frac     fired  misfire    rate  end parity L2      L3      L4
+  perf_log          None        -          -   2220079   126981  0.0572          0.941   0.938   1.000
+  perf_gain        delta   0.9997     0.5387   2407167   135550  0.0563          0.956   0.955   1.000
+  perf_raw           raw   0.4015     0.5301   2390514   210959  0.0882          0.937   0.837   1.000
+
+  ERA TABLE (raw e, last 3 cycles of each era; recovered fraction in brackets)
+  arm                         era1              era2              era3              era4              era5
+  perf_log          0.4957 [ 0.48]    0.6189 [ 0.50]    0.6137 [ 0.68]    0.6849 [ 1.05]    0.7717 [ 1.32]
+  perf_gain         0.5278 [ 0.44]    0.6172 [ 0.50]    0.6146 [ 0.68]    0.6693 [ 1.10]    0.8021 [ 1.13]
+  perf_raw          0.5156 [ 0.46]    0.5877 [ 0.55]    0.6207 [ 0.67]    0.7014 [ 0.99]    0.7943 [ 1.18]
+  stale                     0.8646            0.9062            0.9219            0.9844            0.9818
+  floor                     0.1016            0.3281            0.4714            0.6979            0.8229
+
+  THE PLANT GUARD (the span loss reaches the shared trunk, so it has to be read;
+   `handle/`'s measured interference was -0.094 / -0.044 on parse at 3-9x floor):
+  arm             parse min  parse max  parse last  infill min  infill max
+  perf_log           0.6494     0.6925      0.6650      0.7051      0.7617
+  perf_gain          0.6548     0.6925      0.6556      0.7168      0.7617
+  perf_gate          0.6412     0.6927      0.6728      0.7109      0.7598
+  outcome_gate       0.6483     0.6919      0.6667      0.7148      0.7598
+  perf_raw           0.6476     0.6928      0.6744      0.6855      0.7617
+
+==============================================================================
+(P4) THE GATE ARMS: delta_perf vs outcome-delta vs ungated, at matched volume
+==============================================================================
+  `perf_gate` ranks solved trajectories by their summed delta_perf; `outcome_gate`
+  by delta = grade - v(s) (`tacet`'s `gate_delta_hi`, re-run here on the live-
+  executor substrate so the comparison is in-tag). Both keep the same COUNT on
+  every cycle, so the only thing that differs is which trajectories.
+
+  arm                 mode  kept tips  of solved kept as-int    ties  mined int  mined bad
+  perf_log            None          0      33776           0       0        468        105
+  perf_gate        perf_hi      15067      30131        6944   17176        488         57
+  outcome_gate    delta_hi      15466      30945        5795   17454        457         86
+
+  ERA TABLE (raw e; recovered fraction in brackets), and the delta to the
+  ungated baseline `perf_log` in recovered fraction:
+  arm                         era1              era2              era3              era4              era5
+  perf_log          0.4957 [ 0.48]    0.6189 [ 0.50]    0.6137 [ 0.68]    0.6849 [ 1.05]    0.7717 [ 1.32]
+  perf_gate         0.5252 [ 0.44]    0.5877 [ 0.55]    0.6962 [ 0.50]    0.7656 [ 0.76]    0.8872 [ 0.60]
+  outcome_gate      0.5339 [ 0.43]    0.6701 [ 0.41]    0.7144 [ 0.46]    0.7717 [ 0.74]    0.8793 [ 0.64]
+
+  arm                 era1      era2      era3      era4      era5
+  perf_gate         -0.039     0.054    -0.183    -0.282    -0.727
+  outcome_gate      -0.050    -0.089    -0.224    -0.303    -0.678
+  Read against census finding 7's pooled depth-6 stream floor: 0.087 in the
+  earning family; 0.083 / 0.148 / 0.344 in the given family at eras 3/4/5.
+
+  WHAT EACH ARM'S TABLES AND pi ENDED UP HOLDING (per level, end of run):
+  arm            lvl  entries   recall    prec  L4 pi mass
+  perf_log         2        -   0.7143   0.714            
+                   3        -   0.0714   0.400            
+                   4        -   0.0012   1.000      0.1678
+  perf_gate        2        -   0.7857   0.688            
+                   3        -   0.0714   0.364            
+                   4        -   0.0012   0.500      0.0719
+  outcome_gate     2        -   0.7857   0.688            
+                   3        -   0.0714   0.444            
+                   4        -   0.0012   0.500      0.0870
+
+==============================================================================
+(P5) THE BENCHMARK TIMESCALE — delta recomputed offline across alpha
+==============================================================================
+  arm perf_gain; per-cycle per-slot means, 131 cycles.
+     alpha  eff. window  frac b>e  mean b-e   sd(b-e)  slots
+     0.005        200.0    0.8132   0.06300   0.07096     28
+     0.020         50.0    0.8053   0.04247   0.05729     28
+     0.050         20.0    0.7573   0.02361   0.05001     28
+     0.100         10.0    0.6813   0.01287   0.04691     28
+     0.300          3.3    0.5968   0.00455   0.04570     28
+     1.000          1.0    0.4894   0.00146   0.05670     28
+  (`eff. window` is 1/alpha in units of the update — here one CYCLE per slot, so
+   the in-run benchmark, which updates per macro CALL, is faster than any row here;
+   the in-run alpha is printed in each arm's config as `perf_alpha`.)
+
+==============================================================================
+(P6) THE TWO UNPRICED COLUMNS, PRICED — never folded into `t`
+==============================================================================
+  arm             n_misfire  t_misfire       t_cum   % of t     blk_ref   blk_head     blk_dp
+  perf_log           126981       6349    32554752   0.0195     8517818    2220079    2637042
+  perf_gain          135550       6777    32553946   0.0208     9035196    2407167    2470156
+  perf_gate          147405       7370    32553677   0.0226     7024872    1918938    1531086
+  outcome_gate       104033       5202    32554214   0.0160     5624224    1545753    2737306
+  perf_raw           210959      10548    32554752   0.0324     9451044    2390514    1869284
+  Pricing misfires would move the ledger by 0.016-0.032% — below every floor in the
+  tag, so the choice is behaviourally inert and is recorded as a convention, not a
+  result. `blk_ref` exceeds `blk_head` by the span factor: the meter consumes the
+  DP's block evidence that the head's own execution does not.
+
+[figures] /home/user/research/experiments/rhm/practice/intonation/figures/in_s0/fig1_competence.png fig2_panel.png fig3_clocks.png
+
+[fig] wrote gate_diet.png, gate_eras.png, gate_pi_mass.png to /home/user/research/experiments/rhm/practice/intonation/figures/in_s0
+
+[fig] wrote perf_meter.png to /home/user/research/experiments/rhm/practice/intonation/figures/in_s0

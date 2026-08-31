@@ -849,6 +849,10 @@ def main():
                          "under figures/<tag>/fit/; the phase-2 and ladder paths are untouched")
     ap.add_argument("--e1b-no-cycle-row", action="store_true",
                     help="skip the whole-cycle comparability row (it rebuilds a phase-2 table)")
+    ap.add_argument("--e1b-reencode", action="store_true",
+                    help="run ONLY the symmetric re-encode check on finding 8(i) (section 9) "
+                         "and write reencode.txt/json under figures/<tag>/fit/; the phase-2, "
+                         "ladder and --e1b paths are untouched")
     ap.add_argument("--proj-k", type=int, default=4,
                     help="width of the fixed z-projection used by the rung-4 batch encoding")
     ap.add_argument("--smoke", action="store_true")
@@ -884,6 +888,18 @@ def main():
         with open(os.path.join(outdir, "e1b.json"), "w") as f:
             json.dump(res, f, indent=1, default=float)
         print(f"\nwrote {outdir}/reduction.txt and e1b.json", flush=True)
+        return
+
+    # -------- the symmetric re-encode check: a fourth disjoint mode, section 9 --------
+    if args.e1b_reencode:
+        res = e1b_reencode(args, root, outdir, out)
+        out("")
+        out(f"END (re-encode) - {time.time() - t_start:.0f}s total")
+        with open(os.path.join(outdir, "reencode.txt"), "w") as f:
+            f.write("\n".join(lines) + "\n")
+        with open(os.path.join(outdir, "reencode.json"), "w") as f:
+            json.dump(res, f, indent=1, default=float)
+        print(f"\nwrote {outdir}/reencode.txt and reencode.json", flush=True)
         return
 
     # ---------------- the table ----------------
@@ -2607,6 +2623,371 @@ def _e1b_part3(args, root, outdir, out, res, L, e_dec, e_ptr, e_pte, e_str, cov,
         del a1, a2, q1_, q2_
     out("    au_s0/anchor, the pooled arm, same class:  h64 1.069 +0.003 +0.134 0.303")
     out("                                               h256 1.118 -0.000 +0.266 0.356")
+    return res
+
+
+# ======================================================================
+# (9) THE SYMMETRIC RE-ENCODE CHECK  --  `--e1b-reencode`, a fourth disjoint mode
+# ======================================================================
+#
+# WHAT IT IS FOR. Finding 8(i) of the node's README records one unsettled cell: on the
+# spillover-DIRECTION target, `O_x` -- an observer holding the raw public configuration as a
+# 64x8 one-hot -- reaches R^2 = 0.289 while every self source sits <= 0.062, including
+# `SELF: z0+a+grade` at 0.036, a twin holding (nominally) the same configuration in the
+# learner's own frozen 96-dim fp16 encoding. The node flagged rather than claimed the cell for
+# two stated reasons: the rungs are unstable (adding the action LOWERS the observer, 0.289 ->
+# 0.098; the half-data control goes negative), and a one-hot-`x` vs fp16-`z` ENCODING ASYMMETRY
+# is unexcluded -- the two sides differ not only in whose information they hold but in the input
+# FORMAT they hold it in.
+#
+# WHAT "SYMMETRIC" HAS TO MEAN. The incumbent pair confounds four axes at once:
+#   (1) CONTENT      x0  vs  z0 = enc(x0)
+#   (2) BASIS        a sparse indicator code (64 of 512 columns hot, every "token j at
+#                    position t" a free LINEAR feature) vs a dense real code (96 coordinates,
+#                    every such indicator a function the probe must first learn)
+#   (3) WIDTH        512 free features vs 96
+#   (4) CONDITIONING `O_x` is state-ONLY; the self twin also carries the 456-dim action block
+#                    and the grade -- exactly the two additions that demonstrably LOWER the
+#                    observer when it gets them.
+# and, in the background, (5) PRECISION: one-hot values are exact in fp16, `z` is stored in it.
+#
+# So this mode crosses CONTENT x BASIS explicitly, holding conditioning fixed, and then runs the
+# conditioning axis as its own contrast on the four principal cells. Both directions of
+# re-encoding are built, because only running both can distinguish "the encoder discarded it"
+# from "a dense code of any origin is unreadable here":
+#
+#            |  sparse indicator basis        |  dense 96-d fp16 code
+#   ---------+--------------------------------+--------------------------------
+#     x      |  one-hot 64x8 = 512  [INCUMBENT]|  x_oh @ G  (random, 96) AND
+#            |                                |  x_oh -> PCA-96      <- NEW
+#   ---------+--------------------------------+--------------------------------
+#     z      |  96 dims x 8 quantile bins     |  z0 as logged, 96    <- NEW
+#            |  = 768, 96 hot        <- NEW   |  (never run WITHOUT a+grade before)
+#
+# The two dense-x cells bracket the compression: the random projection is the format-only
+# control (no information selection at all), PCA-96 is the GENEROUS one (the best linear 96-dim
+# summary of x, fitted on probe-train rows only). If even PCA-96 collapses, no 96-dim dense code
+# of x carries this target readably and `z`'s 0.036 is a fact about format. If PCA-96 holds at
+# ~0.29 while `z` stays at ~0.04, the learner's encoder specifically is where it goes.
+# Two further z cells separate BASIS from WIDTH, which the grid above still bundles:
+#   * `z -> random LINEAR lift to 512`: a width-only change. Ridge is exactly invariant to an
+#     injective linear map and an MLP nearly so, so this cell is a NULL -- it must reproduce
+#     `z`'s own number, and if it does, width is not the axis and anything the binned cell moves
+#     is about the BASIS.
+#   * `z -> 512 random ReLU features`: the observer's width AND a fixed nonlinear basis, without
+#     discretisation.
+# Precision is handled by construction rather than by a cell: {0,1} is exact in fp16, so the
+# precision axis cannot favour the incumbent observer, while every dense-x code here is put
+# through an fp16 round trip so the x side PAYS `z`'s storage cost.
+#
+# A CONFOUND THE GRID SURFACED, recorded here because it is prior to the format question.
+# `e_own_x[:, 0]` is the datum's ROOT state -- the corrupted problem its trajectory started
+# from -- and on this arm `(cycle, e_inst)` <-> `(cycle, x0)` is a BIJECTION over all 14,848
+# events. So `O_x` holds instance identity and nothing else about the datum. The `--e1b` probe
+# split is by EVENT (`_group_split(..., groups=e_dec)`, i.e. every event its own group), and
+# 86.6% of events share their `(cycle, x0)` with at least one other event, so for most test rows
+# an EXACT input duplicate sits in the probe-train set. That is bug #1 of the phase-2 log
+# (`_group_split`'s docstring) one level up, and it is FORMAT-GATED: a 512-column indicator code
+# can express an instance lookup as a linear combination, a 96-dim dense code cannot. Every cell
+# is therefore run twice -- under the incumbent EVENT split (which reproduces the published
+# numbers) and under an INSTANCE-grouped split on `(cycle, e_inst)` -- and a group-mean
+# instance-identity predictor rides along as the leak's own ceiling.
+#
+# DISCIPLINE, unchanged from the file's: one train-only standardisation per source inside
+# `decode`, the same capacity sweep on every cell (ridge + MLP, `--obs-caps`), a shuffled null
+# within cycle x update-order, and the half-data budget control -- here on the PRINCIPAL cells
+# rather than only on the top rung, because running it only where R^2 is already 0.085 is what
+# made the incumbent control uninformative.
+#
+# Writes `figures/<tag>/fit/reencode.{txt,json}`. `reduction.txt` is not touched.
+# ======================================================================
+
+
+def _loo_dir_cos_ev(M, key):
+    """`_e1b_part2`'s spillover-direction target, verbatim, as a module-level function so this
+    mode forms exactly the same object rather than an equivalent-looking one."""
+    M = np.asarray(M, np.float64)
+    kk = np.asarray(key)
+    outv = np.zeros(M.shape[0])
+    for u in np.unique(kk):
+        i_ = np.nonzero(kk == u)[0]
+        if i_.size < 3:
+            continue
+        S = M[i_].sum(0, keepdims=True)
+        loo = (S - M[i_]) / max(i_.size - 1, 1)
+        num = (M[i_] * loo).sum(1)
+        den = np.linalg.norm(M[i_], axis=1) * np.linalg.norm(loo, axis=1)
+        outv[i_] = num / np.maximum(den, 1e-12)
+    return outv
+
+
+def _fp16(X):
+    """The storage round trip `z` already paid, applied to a re-encoding of `x`."""
+    return X.astype(np.float16).astype(np.float32)
+
+
+def _onehot(idx, k):
+    n, T = idx.shape
+    O = np.zeros((n, T * k), np.float32)
+    O[np.arange(n)[:, None], np.arange(T)[None, :] * k + idx] = 1.0
+    return O
+
+
+def _group_mean_predict(y, groups, tr, te):
+    """R^2 of the best possible GROUP-IDENTITY predictor: each test row gets its group's mean
+    target over train rows, and the train global mean when its group is unseen. Under the event
+    split this is the ceiling on what instance memorisation alone can buy; under the instance
+    split every test group is unseen by construction, so it must fall to ~0."""
+    y = np.asarray(y, float)
+    gtr = np.asarray(groups)[tr]
+    gm = float(y[tr].mean())
+    tot, cnt = {}, {}
+    for gg, yy in zip(gtr.tolist(), y[tr].tolist()):
+        tot[gg] = tot.get(gg, 0.0) + yy
+        cnt[gg] = cnt.get(gg, 0) + 1
+    seen = 0
+    yhat = np.empty(te.size)
+    for i, gg in enumerate(np.asarray(groups)[te].tolist()):
+        if gg in cnt:
+            yhat[i] = tot[gg] / cnt[gg]
+            seen += 1
+        else:
+            yhat[i] = gm
+    return _r2_np(y[te], yhat), seen / max(te.size, 1)
+
+
+def _eta2_group(y, groups):
+    """Fraction of the variance of `y` that lies BETWEEN groups. Descriptive: how much of the
+    target is an instance-level property at all."""
+    y = np.asarray(y, float)
+    gg = np.asarray(groups)
+    ss_b = 0.0
+    mu = y.mean()
+    for u in np.unique(gg):
+        i_ = gg == u
+        ss_b += i_.sum() * (y[i_].mean() - mu) ** 2
+    ss_t = ((y - mu) ** 2).sum()
+    return float(ss_b / ss_t) if ss_t > 0 else float("nan")
+
+
+def e1b_reencode(args, root, outdir, out):
+    """The symmetric re-encode check on finding 8(i). Reads the revision tables only."""
+    rev = load_revisions(root)
+    audi = json.load(open(os.path.join(root, "audiation.json")))
+    n_slots = int(audi["n_slots"])
+    mask_slot = n_slots
+    ne = rev["e_cycle"].size
+    bud = int(rev["e_own_a"].shape[1])
+
+    out("AUDIATION -- THE SYMMETRIC RE-ENCODE CHECK on finding 8(i)")
+    out(f"  tag={args.tag} arm={args.arm} seed={args.seed}")
+    out("  A fourth disjoint mode. It re-forms `--e1b`'s Q4 frame exactly (same target, same")
+    out("  cycle hold-out, same strata, same `decode` stack) and crosses CONTENT x BASIS on the")
+    out("  observer/self pair, so that input FORMAT is excluded as the driver of the")
+    out("  0.289-vs-0.036 gap. `reduction.txt` is not touched.")
+    out("")
+
+    # ---------------- the frame, re-formed exactly as `_e1b_part2` does ----------------
+    cycles = np.unique(rev["e_cycle"])
+    test_cyc = cycles[3::4]
+    e_dec = np.nonzero(np.isin(rev["e_cycle"], test_cyc))[0]
+    e_str = (np.searchsorted(cycles, rev["e_cycle"][e_dec]) * 8
+             + np.minimum(rev["e_order"][e_dec] // 16, 7)).astype(np.int64)
+    y_all = _loo_dir_cos_ev(rev["e_ref_dv"], rev["e_cycle"])
+    N = e_dec.size
+
+    # the two grouping keys. `(cycle, e_inst)` is the instance; `e_dec` (every event its own
+    # group) is what `--e1b` used and is reproduced here so the published cells come back.
+    inst_key = (rev["e_cycle"].astype(np.int64) * 100000
+                + rev["e_inst"].astype(np.int64))[e_dec]
+
+    # ---------------- what x0 actually is ----------------
+    x_all = rev["e_own_x"][:, 0, :].astype(np.int64)
+    vx = int(rev["e_own_x"].max()) + 1
+    T = x_all.shape[1]
+    xb = [x_all[i].tobytes() for i in range(ne)]
+    ck = rev["e_cycle"].astype(np.int64).tolist()
+    pair_x, pair_i = {}, {}
+    for c_, b_, i_ in zip(ck, xb, rev["e_inst"].astype(np.int64).tolist()):
+        pair_x.setdefault((c_, b_), set()).add(i_)
+        pair_i.setdefault((c_, i_), set()).add(b_)
+    bij = (max(len(v) for v in pair_x.values()) == 1
+           and max(len(v) for v in pair_i.values()) == 1)
+    cnt_x = {}
+    for c_, b_ in zip(ck, xb):
+        cnt_x[(c_, b_)] = cnt_x.get((c_, b_), 0) + 1
+    shared = float(np.mean([cnt_x[(c_, b_)] > 1 for c_, b_ in zip(ck, xb)]))
+    out("  WHAT `x0` IS (prior to the format question):")
+    out(f"    `e_own_x[:,0]` is the datum's ROOT configuration. Over all {ne} events,")
+    out(f"    (cycle, e_inst) <-> (cycle, x0) is {'a BIJECTION' if bij else 'NOT a bijection'}")
+    out(f"    ({len(pair_x)} distinct pairs), so `O_x` holds INSTANCE IDENTITY and nothing")
+    out(f"    else about the datum. {shared:.1%} of events share their (cycle, x0) with at")
+    out("    least one other event, and `--e1b`'s probe split is by EVENT -- so for most test")
+    out("    rows an exact input duplicate sits in the probe-train set. Hence split B below.")
+    out("")
+
+    splits = {}
+    for sname, gkey in (("A_event  (the --e1b split)", e_dec.copy()),
+                        ("B_instance (cycle,e_inst)", inst_key)):
+        ptr, pte = _group_split(np.arange(N), gkey, 0.25, args.seed + 11)
+        y_cs = _stratum_residualise(y_all[e_dec], e_str, ptr)
+        splits[sname] = {"g": gkey, "ptr": ptr, "pte": pte,
+                         "tgt": {"spill_dir_ref [cs]": (y_cs, np.ones(N, bool))}}
+        out(f"  split {sname}: {np.unique(gkey).size} groups -> "
+            f"{ptr.size} probe-train / {pte.size} probe-test events "
+            f"({np.unique(e_str).size} strata)")
+    out(f"  decode rows are EVENTS ({N} in the {test_cyc.size} held-out cycles), as in Q4.")
+    out("")
+
+    # ---------------- the two contents ----------------
+    x0 = x_all[e_dec]
+    Xoh = _onehot(x0, vx)                                        # 512, the incumbent O_x
+    z0 = rev["e_own_z"][e_dec, 0].astype(np.float32)             # 96, fp16 as logged
+    Aoh = np.zeros((N, bud * (mask_slot + 1)), np.float32)
+    for t in range(bud):
+        Aoh[np.arange(N), t * (mask_slot + 1) + rev["e_own_a"][e_dec, t].astype(np.int64)] = 1.0
+    grade_o = rev["e_succ"][e_dec][:, None].astype(np.float32)
+    # Q4's two self sources that are NOT a state code, rebuilt exactly (d=12 and d=21 as
+    # published). They are per-DATUM rather than per-instance, so they are the one place the
+    # instance-grouped split could leave something standing, and the grid is not complete
+    # against `reduction.txt`'s list without them.
+    own_rms = np.sqrt((rev["e_own_dv"].astype(np.float64) ** 2).mean(1))
+    dlt_ev = (_sig(rev["e_own_v0"].astype(np.float64))
+              - rev["e_succ"].astype(np.float64)[:, None])
+    cov = np.concatenate([dlt_ev[e_dec], dlt_ev[e_dec].mean(1, keepdims=True),
+                          rev["e_succ"][e_dec][:, None],
+                          np.log(own_rms[e_dec] + 1e-12)[:, None]], 1).astype(np.float32)
+    cov_dv = np.concatenate([cov, rev["e_own_dv"][e_dec].astype(np.float32)], 1)
+
+    def _std_fit(M, tr):
+        mu, sd = M[tr].mean(0, keepdims=True), np.maximum(M[tr].std(0, keepdims=True), 1e-6)
+        return ((M - mu) / sd).astype(np.float32)
+
+    def _format_maps(tr):
+        """Every re-encoding, fitted on THIS split's probe-train rows only. All of them are
+        unsupervised (a projection, a set of quantile edges, a fixed random matrix), so nothing
+        about the target enters; refitting per split is only about not letting a held-out
+        instance contribute to the map that encodes it."""
+        rs = np.random.default_rng(args.seed + 8100)
+        G = (rs.standard_normal((Xoh.shape[1], 96)) / np.sqrt(Xoh.shape[1])).astype(np.float32)
+        Xd_rand = _fp16(_std_fit(Xoh @ G, tr))
+        Xc = Xoh - Xoh[tr].mean(0, keepdims=True)
+        w_, V_ = np.linalg.eigh(((Xc[tr].T @ Xc[tr]) / max(tr.size - 1, 1)).astype(np.float64))
+        ordr = np.argsort(-w_)
+        Xd_pca = _fp16(_std_fit(Xc @ V_[:, ordr[:96]].astype(np.float32), tr))
+        evr = float(w_[ordr[:96]].sum() / max(w_.sum(), 1e-12))
+
+        zs = _std_fit(z0, tr)
+        binn = lambda M: _onehot(np.stack(
+            [np.searchsorted(np.quantile(M[tr, j], np.arange(1, 8) / 8.0), M[:, j])
+             for j in range(M.shape[1])], 1).astype(np.int64), 8)
+        Zsparse = binn(zs)                                       # 768, 96 hot
+        wz, Vz = np.linalg.eigh(np.cov(zs[tr].T).astype(np.float64))
+        Zpca64 = _std_fit((zs @ Vz[:, np.argsort(-wz)[:64]].astype(np.float32)), tr)
+        Zsp512 = binn(Zpca64)                                    # 512, 64 hot -- MATCHED to O_x
+        Wl = (rs.standard_normal((zs.shape[1], 512)) / np.sqrt(zs.shape[1])).astype(np.float32)
+        Wr = (rs.standard_normal((zs.shape[1], 512)) / np.sqrt(zs.shape[1])).astype(np.float32)
+        br = rs.standard_normal(512).astype(np.float32)
+        return {"Xd_rand": Xd_rand, "Xd_pca": Xd_pca, "evr": evr, "Zsparse": Zsparse,
+                "Zsp512": Zsp512, "Zlift": (zs @ Wl).astype(np.float32),
+                "Zrelu": np.maximum(zs @ Wr + br, 0.0).astype(np.float32)}
+
+    caps = [int(q) for q in args.obs_caps.split(",")]
+    inc = [c for c in caps if c in (0, 64)]
+    res = {"n_events": int(ne), "n_decode": int(N), "bijection_inst_x0": bool(bij),
+           "frac_events_sharing_x0": shared, "caps": caps, "cells": {}}
+    out(f"  the one-hot block of `x` has rank <= {T * (vx - 1)}; every dense re-encoding of it")
+    out("  below is put through the same fp16 round trip `z` already pays in storage.")
+    out("")
+    for sname, S in splits.items():
+        M = _format_maps(S["ptr"])
+        ag = lambda Q: np.concatenate([Q, Aoh, grade_o], 1)
+        grid = [
+            ("x", "sparse 64x8 one-hot   [INCUMBENT O_x]", Xoh),
+            ("x", "dense96 random proj, fp16", M["Xd_rand"]),
+            ("x", "dense96 PCA, fp16", M["Xd_pca"]),
+            ("z", "dense96 as logged, fp16  [NEW: no a+grade]", z0),
+            ("z", "sparse 64x8 bins of PCA-64  [MATCHED to O_x]", M["Zsp512"]),
+            ("z", "sparse 96x8 quantile bins (all of z)", M["Zsparse"]),
+            ("z", "dense512 random LINEAR lift (width null)", M["Zlift"]),
+            ("z", "sparse512 random ReLU features", M["Zrelu"]),
+            ("x", "sparse one-hot + a + grade  [INCUMBENT]", ag(Xoh)),
+            ("x", "dense96 PCA + a + grade", ag(M["Xd_pca"])),
+            ("z", "dense96 as logged + a + grade [INCUMBENT]", ag(z0)),
+            ("z", "sparse 64x8 bins of PCA-64 + a + grade", ag(M["Zsp512"])),
+            ("self", "free scalars only          [INCUMBENT]", cov),
+            ("self", "free scalars + Delta_i     [INCUMBENT]", cov_dv),
+        ]
+        Zsparse = M["Zsp512"]
+        out("  " + "-" * 74)
+        out(f"  SPLIT {sname} -- R^2 on `spill_dir_ref [cs]` (cycle x order residualised)")
+        out(f"  (PCA-96 of the one-hot keeps {M['evr']:.1%} of this split's train variance)")
+        out("  " + "-" * 74)
+        out(f"    {'content':>8s}  {'format':44s} {'d':>5s} "
+            + " ".join(f"{('h%d' % c):>7s}" for c in caps)
+            + f" {'best[0,64]':>11s}")
+        for content, fname, X in grid:
+            d_ = decode(np.ascontiguousarray(X), S["tgt"], S["ptr"], S["pte"], caps=caps,
+                        seed=args.seed + 200, steps=args.obs_steps, batch=512, lr=1e-3,
+                        groups=S["g"])
+            per = {f"h{c}": d_[f"h{c}"]["spill_dir_ref [cs]"]["r2"] for c in caps}
+            best = max(per[f"h{c}"] for c in inc) if inc else float("nan")
+            out(f"    {content:>8s}  {fname:44s} {X.shape[1]:>5d} "
+                + " ".join(_fmt(per[f'h{c}'], 7, 3) for c in caps)
+                + f" {_fmt(best, 11, 3)}")
+            res["cells"].setdefault(sname, {})[f"{content}|{fname}"] = {
+                "d": int(X.shape[1]), "per_cap": per, "best_0_64": best}
+        # ---- the controls, the same ones the file already uses ----
+        out("")
+        out("    controls on the same split:")
+        # the leak's own ceiling: memorise the INSTANCE, always, under whichever split is live.
+        r2g, cov_ = _group_mean_predict(S["tgt"]["spill_dir_ref [cs]"][0], inst_key,
+                                        S["ptr"], S["pte"])
+        out(f"      {'instance-identity group mean (the leak ceiling)':52s} "
+            f"R^2={_fmt(r2g, 7, 3)}  ({cov_:.0%} of test rows in a seen instance)")
+        res["cells"][sname]["_group_mean_r2"] = r2g
+        res["cells"][sname]["_group_mean_cov"] = cov_
+        for nm, X in (("O_x one-hot", Xoh), ("z sparse 64x8 (matched)", Zsparse),
+                      ("z dense96 as logged", z0)):
+            half, _ = _group_split(S["ptr"], S["g"], 0.5, args.seed + 303)
+            Xh = standardise_(np.array(X, np.float32, copy=True), S["ptr"])
+            d_ = decode(Xh, S["tgt"], half, S["pte"], caps=[64], seed=args.seed + 201,
+                        steps=args.obs_steps, batch=512, lr=1e-3, groups=S["g"],
+                        standardise=False)
+            v = d_["h64"]["spill_dir_ref [cs]"]["r2"]
+            out(f"      {('half-data budget, ' + nm):52s} R^2={_fmt(v, 7, 3)}")
+            res["cells"][sname][f"_half_{nm}"] = v
+        perm = np.arange(N)
+        rp = np.random.default_rng(args.seed + 99)
+        for s_ in np.unique(e_str):
+            i_ = np.nonzero(e_str == s_)[0]
+            perm[i_] = i_[rp.permutation(i_.size)]
+        for nm, X in (("O_x one-hot", Xoh), ("z sparse 64x8 (matched)", Zsparse)):
+            d_ = decode(np.ascontiguousarray(X[perm]), S["tgt"], S["ptr"], S["pte"],
+                        caps=inc or [64], seed=args.seed, steps=args.obs_steps, batch=512,
+                        lr=1e-3, groups=S["g"])
+            v = max(d_[f"h{c}"]["spill_dir_ref [cs]"]["r2"] for c in (inc or [64]))
+            out(f"      {('shuffled null within cycle x order, ' + nm):52s} "
+                f"R^2={_fmt(v, 7, 3)}")
+            res["cells"][sname][f"_null_{nm}"] = v
+        out("")
+
+    eta = _eta2_group(splits["A_event  (the --e1b split)"]["tgt"]["spill_dir_ref [cs]"][0],
+                      inst_key)
+    res["eta2_target_by_instance"] = eta
+    out(f"  eta^2(residualised target ~ (cycle, e_inst)) = {eta:.3f} over {N} events in "
+        f"{np.unique(inst_key).size} instances")
+    out("  (descriptive: how much of the target is an instance-level property at all. With")
+    out("   ~2.3 events per instance a chance value is ~n_groups/n = "
+        f"{np.unique(inst_key).size / N:.3f}.)")
+    out("")
+    out("  THE INCUMBENT CELLS, quoted from figures/au_s1/fit/reduction.txt for the contrast:")
+    out("    O_x            (public)    d=512   R^2=  0.289")
+    out("    O_x+a          (public)    d=968   R^2=  0.098")
+    out("    O_x+a+grade    (public)    d=969   R^2=  0.085")
+    out("    SELF: free scalars only    d=12    R^2=  0.062")
+    out("    SELF: z0+a+grade           d=553   R^2=  0.036")
+    out("    O_x+a+grade half-data              R^2= -0.144")
     return res
 
 

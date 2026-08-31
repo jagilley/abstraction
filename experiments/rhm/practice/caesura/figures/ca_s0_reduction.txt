@@ -1,0 +1,737 @@
+=== caesura (E′ round 3, delta-silence as the commit decision) — tag ca_s0 ===
+ladder [('L1n25', 60), ('L2n12', 50), ('L3n6', 70), ('L4n3', 12), ('L5n1', 9)] = 201 cycles/arm scheduled; caps [60, 50, 70, 12, 9] = 201; setup 617s; stale buffer 0.1269 -> 0.1541
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+
+==============================================================================
+(0) GATES
+==============================================================================
+  CROSS-TAG REPLAY (A3's TREATMENT, WHOLE LIFE — this round's baseline IS that arm): cr3_s0/outer_yield_m4 not fetched locally — skipped
+  CROSS-TAG REPLAY (A1's thermostat through the earning eras — the chain back to A2): ma_s0/outer_yield not fetched locally — skipped
+  G-F smoke scale (in-process vs maestro.py, panel ON, maxl=3): max|fork - donor| = 0.000e+00, self-replay control = 0.000e+00, commits equal = True  -> PASS
+
+  IN-TAG TWIN GATE (each arm vs dsil_sched, to the first action by EITHER; dsil_sched's own first commit is c18).
+  [tacet] NOTE: every arm here is treated from c1, so a non-zero delta below is the
+  round's variable — read it as WHEN THE GATE FIRST BOUND, not as a failure.
+    dsil_yield     c1-c17   (first action c18 (schedule)) max|delta| = 0.000e+00  -> identical
+    dsil_read      c1-c17   (first action c18 (own)) max|delta| = 0.000e+00  -> identical
+    dsil_and       c1-c17   (first action c18 (schedule)) max|delta| = 0.000e+00  -> identical
+
+  OBSERVATION PANEL vs the donor's G-Y miner (level 4, every cycle):
+    dsil_sched       agree=True over 201 cycles
+    dsil_yield       agree=True over 131 cycles
+    dsil_read        agree=True over 176 cycles
+    dsil_and         agree=True over 114 cycles
+
+  POLICY GATE (offline, no GPU): ALL PASS (21 checks)
+
+  ENDO READ: LABEL-FREE BY CONSTRUCTION: PASS — positions depend only on ['era.level', 'era.node', 's', 'depth']; none of ['truth', 'rules', 'inverse_maps', 'committed', 'canon', 'true_mask', 'grade'] appears in the read's code
+    era 1 cell L1n25 blocks [25, 26] -> parent L2n12 blocks [24, 26]
+    era 2 cell L2n12 blocks [24, 26] -> parent L3n6 blocks [24, 28]
+    era 3 cell L3n6 blocks [24, 28] -> parent L4n3 blocks [24, 32]
+    era 4 cell L4n3 blocks [24, 32] -> parent L5n1 blocks [16, 32]
+    era 5 cell L5n1 blocks [16, 32] -> parent L6n0 blocks [0, 32]  (parent IS the root: the read is the unconditional marginal)
+
+  DEAD ZONES: measured, not defaulted: PASS, matches floors.json = None
+    {'tol_ledger': 0.02944712566990095, 'tol_yield_l3': 0.46127129019246205, 'tol_yield_l4': 0.5166900731510206, 'tol_endo': 0.01091575129919287}
+    provenance: cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)
+
+  ENDO PRICE (measured on the run's own GPU): one read over 256 sequences = 1.3 ms = 258 grounding-equivalents; charged 267g
+
+==============================================================================
+(1) THE ACTION TRACE — what the loop did, and when
+==============================================================================
+  arm                 policy    read cycles  commits  advances  chosen  capped  rode cap
+  dsil_sched        schedule    None    201        0         0       0       0     False
+  dsil_yield           quiet   yield    131        3         5       7       1      True
+  dsil_read            quiet    dsil    176        3         5       5       3      True
+  dsil_and             quiet   yield    114        2         5       6       1      True
+
+  PER-ARM ACTIONS (cycle, kind, level, why, and the statistic at that instant)
+
+    dsil_sched  eras: e1 c1-60 (60c), e2 c61-110 (50c), e3 c111-180 (70c), e4 c181-192 (12c), e5 c193-201 (9c)
+      (no loop actions — the schedule arm)
+
+    dsil_yield  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c58   era1 advance  L-  why=quiet  V=   0.2344 tol=  0.4613 V/tol=    0.51
+      c72   era2 commit   L3  why=quiet  V=   0.4019 tol=  0.5167 V/tol=    0.78
+      c88   era2 advance  L-  why=quiet  V=   0.3928 tol=  0.5167 V/tol=    0.76
+      c104  era3 commit   L4  why=quiet  V=   0.2767 tol=  0.5167 V/tol=    0.54
+      c114  era3 advance  L-  why=quiet  V=   0.4297 tol=  0.5167 V/tol=    0.83
+      c122  era4 advance  L-  why=quiet  V=   0.4062 tol=  0.5167 V/tol=    0.79
+      c131  era5 advance  L-  why=cap    V=   0.0625 tol=  0.5167 V/tol=    0.12
+
+    dsil_read  eras: e1 c1-46 (46c), e2 c47-85 (39c), e3 c86-155 (70c), e4 c156-167 (12c), e5 c168-176 (9c)
+      c18   era1 commit   L2  why=quiet  V=        - tol=       - V/tol=       -
+      c46   era1 advance  L-  why=quiet  V=   0.0027 tol=  0.0032 V/tol=    0.84
+      c71   era2 commit   L3  why=quiet  V=   0.0029 tol=  0.0032 V/tol=    0.89
+      c85   era2 advance  L-  why=quiet  V=   0.0027 tol=  0.0032 V/tol=    0.85
+      c97   era3 commit   L4  why=quiet  V=   0.0020 tol=  0.0032 V/tol=    0.64
+      c155  era3 advance  L-  why=cap    V=  -0.0002 tol=  0.0032 V/tol=   -0.05
+      c167  era4 advance  L-  why=cap    V=  -0.0001 tol=  0.0032 V/tol=   -0.03
+      c176  era5 advance  L-  why=cap    V=   0.0004 tol=  0.0032 V/tol=    0.12
+
+    dsil_and  eras: e1 c1-58 (58c), e2 c59-72 (14c), e3 c73-93 (21c), e4 c94-105 (12c), e5 c106-114 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c58   era1 advance  L-  why=quiet  V=   0.2344 tol=  0.4613 V/tol=    0.51
+      c72   era2 advance  L-  why=quiet  V=   0.4019 tol=  0.5167 V/tol=    0.78
+      c81   era3 commit   L4  why=quiet  V=   0.5156 tol=  0.5167 V/tol=    1.00
+      c93   era3 advance  L-  why=quiet  V=   0.2773 tol=  0.5167 V/tol=    0.54
+      c105  era4 advance  L-  why=quiet  V=   0.3945 tol=  0.5167 V/tol=    0.76
+      c114  era5 advance  L-  why=cap    V=   0.1250 tol=  0.5167 V/tol=    0.24
+
+  COMMIT CYCLES AND WHAT WAS COMMITTED
+  arm              lvl  cycle  era  prov  entries  recall    prec  cert@    driver
+  dsil_sched         2     18    1 False       11   0.571   0.727     18delta_prov
+  dsil_sched         3     77    2 False        9   0.089   0.556     77delta_prov
+  dsil_sched         4    180    3  True        3   0.001   0.333   Nonedelta_prov
+  dsil_yield         2     49    1 False       14   0.714   0.714     18      loop
+  dsil_yield         3     72    2 False       10   0.071   0.400   None      loop
+  dsil_yield         4    104    3 False        1   0.001   1.000   None      loop
+  dsil_read          2     18    1 False       11   0.571   0.727     18      loop
+  dsil_read          3     71    2 False       14   0.125   0.500     63      loop
+  dsil_read          4     97    3 False        3   0.001   0.333   None      loop
+  dsil_and           2     49    1 False       14   0.714   0.714     18      loop
+  dsil_and           4     81    3 False        1   0.001   1.000   None      loop
+
+==============================================================================
+(1b) THE LEARNED POLICY'S OWN RECORD — the mixtures, the fit, the action diff
+==============================================================================
+  THE FITTED MIXTURES (unit-norm weights on each gauge's paired-interval slope,
+  IN FLOOR UNITS; the bucket is `will_commit` = would a firing install a table).
+  A1's thermostat is the point (0, 1, 0) with theta = 1 in this same class.
+    arm/reward        bucket           ledger         yield   endo_excess    theta
+    learned_yield   installs          +0.2106       +0.9440       +0.2540   1.2085
+    learned_yield   advances          +0.0495       +0.8506       +0.5235   1.0980
+    learned_task    installs          -0.7806       +0.2146       +0.5871   1.4253
+    learned_task    advances          -0.4221       +0.1367       +0.8962   0.7083
+
+  THE ACTION DIFF — learned vs the hand-written thermostat, IN THIS TAG
+  (both ran live on their own trajectories, so this is a difference between two
+   runs and not a counterfactual; the pre-GPU replay is in fit.json.)
+
+  WHAT THE LEARNED POLICY READ AT EACH OF ITS OWN ACTIONS
+
+==============================================================================
+(2) GAUGE vs YOKE — the mandatory timing control (census finding 4)
+==============================================================================
+  The yoke replays the gauge arm's realised action cycles by clock and reads
+  nothing. A divergence would mean the reads are not inert; identity means the
+  criterion contributed nothing beyond a cycle number, which is a finding, and the
+  priced-time column is then what the read cost for a trajectory a clock reproduces.
+  [tacet] In this tag the yokes ARE the treatments (each carries one gate knob), so
+  a non-zero delta below is the round's variable and `first divergence` reads as
+  WHEN THE GATE FIRST BOUND. What must still hold is commits/advances EQUAL — that
+  is what makes the arms lifetime- and pacing-identical.
+  (no yoked arms in this tag)
+
+==============================================================================
+(3) THE THREE CLOCKS: certificate, coverage, value
+==============================================================================
+  CLOCK 1 — the SHADOW certificate (read-only in every arm, incl. the driven ones)
+  arm               L2 fired  L3 fired  L2 c2cert  L3 c2cert  commit L2  commit L3
+  dsil_sched              18        77         17         16         18         77
+  dsil_yield              18        76         17         17         49         72
+  dsil_read               18        63         17         16         18         71
+  dsil_and                18        83         17         24         49       None
+
+  CLOCK 2 — COVERAGE: end-of-run committed table per level
+  arm              lvl  frozen n   recall    prec  live n  live rec  live prec
+  dsil_sched         2        11    0.571   0.727      20     0.929      0.650
+  dsil_sched         3         9    0.089   0.556      18     0.143      0.444
+  dsil_sched         4         3    0.001   0.333       4     0.002      0.500
+  dsil_yield         2        14    0.714   0.714      18     0.929      0.722
+  dsil_yield         3        10    0.071   0.400      27     0.143      0.296
+  dsil_yield         4         1    0.001   1.000       2     0.001      0.500
+  dsil_read          2        11    0.571   0.727      19     0.857      0.632
+  dsil_read          3        14    0.125   0.500      18     0.161      0.500
+  dsil_read          4         3    0.001   0.333       5     0.001      0.200
+  dsil_and           2        14    0.714   0.714      17     0.786      0.647
+  dsil_and           3         -        -       -      18     0.107      0.333
+  dsil_and           4         1    0.001   1.000       2     0.001      0.500
+
+  CLOCK 3 — VALUE: recovered fraction per era (e, and (stale-e)/(stale-floor))
+  arm                          era1             era2             era3             era4             era5
+  dsil_sched          0.484 /+0.498    0.555 /+0.608    0.554 /+0.817    0.628 /+1.242    0.744 /+1.497
+  dsil_yield          0.496 /+0.484    0.619 /+0.497    0.614 /+0.684    0.685 /+1.045    0.772 /+1.322
+  dsil_read           0.498 /+0.480    0.552 /+0.613    0.477 /+0.988    0.574 /+1.433    0.706 /+1.738
+  dsil_and            0.496 /+0.484    0.651 /+0.441    0.707 /+0.478    0.595 /+1.358    0.832 /+0.940
+  stale                     0.865            0.906            0.922            0.984            0.982
+  floor                     0.102            0.328            0.471            0.698            0.823
+
+  DELTA TO DSIL_SCHED, per era, in recovered fraction
+  Read against the MEASURED depth-6 stream floor (census finding 7): 0.087 in the
+  earning family and 0.083/0.148/0.344 in the given family for eras 3/4/5. Ranks
+  and signs in the deep eras are the currency; fractions are not.
+  arm                   era1      era2      era3      era4      era5
+  dsil_yield          -0.015    -0.111    -0.133    -0.197    -0.175
+  dsil_read           -0.018     0.005     0.171     0.191     0.240
+  dsil_and            -0.015    -0.167    -0.339     0.115    -0.557
+
+==============================================================================
+(4) pi PER-LEVEL MASS, ARGMAX SHARE, AND MACRO EXPANSIONS, per arm per era
+==============================================================================
+
+  L2 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  dsil_sched           0.189     0.209     0.166     0.176     0.150
+  dsil_yield           0.065     0.182     0.162     0.143     0.145
+  dsil_read            0.150     0.210     0.149     0.163     0.153
+  dsil_and             0.065     0.125     0.184     0.182     0.159
+
+  L3 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  dsil_sched           0.000     0.168     0.394     0.422     0.446
+  dsil_yield           0.000     0.061     0.213     0.243     0.217
+  dsil_read            0.000     0.079     0.259     0.237     0.231
+  dsil_and             0.000     0.000     0.000     0.000     0.000
+
+  L4 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  dsil_sched           0.000     0.000     0.101     0.103     0.132
+  dsil_yield           0.000     0.000     0.038     0.131     0.168
+  dsil_read            0.000     0.000     0.218     0.338     0.367
+  dsil_and             0.000     0.000     0.077     0.251     0.296
+
+  L2 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  dsil_sched           0.000     0.133     0.052     0.070     0.042
+  dsil_yield           0.000     0.029     0.049     0.036     0.052
+  dsil_read            0.000     0.091     0.031     0.065     0.057
+  dsil_and             0.000     0.008     0.034     0.036     0.044
+
+  L3 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  dsil_sched           0.000     0.099     0.620     0.630     0.667
+  dsil_yield           0.000     0.010     0.250     0.331     0.271
+  dsil_read            0.000     0.047     0.328     0.247     0.258
+  dsil_and             0.000     0.000     0.000     0.000     0.000
+
+  L4 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  dsil_sched           0.000     0.000     0.000     0.112     0.135
+  dsil_yield           0.000     0.000     0.010     0.094     0.185
+  dsil_read            0.000     0.000     0.302     0.479     0.544
+  dsil_and             0.000     0.000     0.049     0.365     0.453
+
+  MACRO EXPANSIONS the beam ran (blocks.mat_dp, per-cycle mean by era)
+  arm                     era1        era2        era3        era4        era5
+  dsil_sched              8552        6800           0        9429           0
+  dsil_yield              8843        3972        5455           0           0
+  dsil_read              11155        5727        3362           0           0
+  dsil_and                8843           0       11315           0           0
+
+==============================================================================
+(5) THE LEDGER — what each arm read, and what it cost
+==============================================================================
+  ear's convention: the learner's own experience is free, a counterfactual read is
+  priced, and instruments logged in every arm are free. Only the POLICY's input
+  stream is charged, and the charge lands in `counts['ground']` -> `t_cum`, which
+  nothing in the cycle loop reads.
+  arm                     read  n reads  priced  spend(g)    t_cum end   t_cum+read  read % of
+  dsil_sched              None        0       0         0     50697843     50697843     0.000%
+  dsil_yield             yield        0       0         0     32554752     32554752     0.000%
+  dsil_read               dsil        0       0         0     44572704     44572704     0.000%
+  dsil_and               yield        0       0         0     27198330     27198330     0.000%
+
+==============================================================================
+(6) THE MEASURED FLOORS, RE-DERIVED IN-TAG on the schedule arm
+==============================================================================
+  reference arm: dsil_sched (201 cycles, 7 windows dropped at era boundaries / commits); span=1 W=4
+  gauge         n_win      sd(N)    mean(N)  v_tol=sd/2    mean(D)  D/floor   governed by
+  ledger          166    0.04441   -0.00002     0.02221   +0.00601     0.27       0.02945
+  yield           166    0.81568   +0.01807     0.40784   +0.72590     1.78L3 0.4613/L4 0.5167
+  endo            166    0.02353   -0.00126     0.01177   -0.00134    -0.11       0.01092
+  endo_cell       166    0.03592   -0.00141     0.01796   -0.00280    -0.16          None
+  endo_excess     166    0.02338   +0.00015     0.01169   +0.00146     0.12          None
+  dsil            147    0.00983   +0.00021     0.00492   +0.00116     0.24       0.00321   (from c25: the gauge does not exist before a slot opens)
+
+  >>> THE ENDO DEAD ZONE, measured on ca_s0/dsil_sched: v_tol = 0.0117672
+      pass it to the main run as  --tol-endo 0.0117672
+
+==============================================================================
+(7) THE SHADOW PANEL — every gauge replayed through the same rule, in every arm
+==============================================================================
+  Counterfactual: what each gauge WOULD have licensed in each arm, per era, if it
+  had been the driven read. Exact only up to the arm's first action (after that the
+  arm's own trajectory is the one the gauge was measured on), so `first_action` is
+  printed beside it and a shadow decision must never be read as a measured one.
+
+    dsil_sched  (first action cNone)
+      ledger       e1[60c armed@5 quiet@10]  e2[50c armed@83 quiet@84]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[60c armed@5 quiet@46]  e2[50c armed@69 quiet@109]  e3[70c armed@115 quiet@120]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[60c armed@None quiet@None]  e2[50c armed@83 quiet@84]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[60c armed@25 quiet@27]  e2[50c armed@None quiet@None]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[60c armed@5 quiet@16]  e2[50c armed@82 quiet@84]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    dsil_yield  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@65 quiet@72]  e3[26c armed@94 quiet@104]  e4[8c armed@120 quiet@122]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@78 quiet@79]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@82 quiet@83]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@65 quiet@66]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    dsil_read  (first action c18)
+      ledger       e1[46c armed@5 quiet@10]  e2[39c armed@77 quiet@78]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[46c armed@5 quiet@46]  e2[39c armed@59 quiet@None]  e3[70c armed@90 quiet@108]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[46c armed@None quiet@None]  e2[39c armed@52 quiet@55]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[46c armed@25 quiet@27]  e2[39c armed@73 quiet@79]  e3[70c armed@103 quiet@104]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[46c armed@5 quiet@16]  e2[39c armed@51 quiet@54]  e3[70c armed@90 quiet@94]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    dsil_and  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[14c armed@None quiet@None]  e3[21c armed@82 quiet@85]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[14c armed@65 quiet@72]  e3[21c armed@78 quiet@81]  e4[12c armed@103 quiet@105]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[14c armed@None quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[14c armed@None quiet@None]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[14c armed@65 quiet@66]  e3[21c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+==============================================================================
+(8) THE ADDRESS-BOOK BATTERY, plant guard, certificates, cost
+==============================================================================
+  END-OF-RUN BATTERY: e per condition (last era), and the next-level currency split
+  arm                  cond  e(last era)  g/solve  solved  T3@sup  T3built  T4@sup  T4built
+  dsil_sched         a_full        0.729    463.0     104       9        2       3        2
+  dsil_sched        b_table        0.729    463.0     104       9        2       3        2
+  dsil_sched         b_span        0.992    463.0       3       0        0       0        0
+  dsil_sched        c_prims        0.654    463.0     133       8        2       6        2
+  dsil_yield         a_full        0.773    463.0      87       4        1       1        1
+  dsil_yield        b_table        0.773    463.0      87       4        1       1        1
+  dsil_yield         b_span        0.990    463.0       4       0        0       0        0
+  dsil_yield        c_prims        0.669    463.0     127       8        3       2        1
+  dsil_read          a_full        0.674    463.0     125      10        3       2        1
+  dsil_read         b_table        0.674    463.0     125      10        3       2        1
+  dsil_read          b_span        0.984    463.0       6       0        0       0        0
+  dsil_read         c_prims        0.669    463.0     127       9        4       2        2
+  dsil_and           a_full        0.831    463.0      65       1        1       1        1
+  dsil_and          b_table        0.831    463.0      65       1        1       1        1
+  dsil_and           b_span        0.990    463.0       4       0        0       0        0
+  dsil_and          c_prims        0.732    463.0     103       2        1       1        1
+
+  G-Y / OBSERVATION PANEL: distinct next-level tuples at support, end of each era
+  dsil_sched       L3/L4 at support 3:     44/17    61/62   67/108   67/110   71/113
+  dsil_yield       L3/L4 at support 3:     51/16    59/41    61/56    61/59    69/60
+  dsil_read        L3/L4 at support 3:      37/9    55/40    59/78    59/81    63/82
+  dsil_and         L3/L4 at support 3:     51/16    54/26    58/37    58/40    67/41
+
+  PLANT GUARD, CERTIFICATES, COST
+  dsil_sched       parse 0.662-0.693  infill 0.721-0.762  cert L2 c18 L3 c77  recerts  26    15.6 s/cycle
+  dsil_yield       parse 0.649-0.693  infill 0.705-0.762  cert L2 c18 L3 c76  recerts  12    14.8 s/cycle
+  dsil_read        parse 0.659-0.693  infill 0.719-0.756  cert L2 c18 L3 c63  recerts  23    15.9 s/cycle
+  dsil_and         parse 0.652-0.693  infill 0.701-0.762  cert L2 c18 L3 c83  recerts   4    13.8 s/cycle
+
+  TOTAL 10147s = 2.82 GPU-h
+
+==============================================================================
+(A) THE CROSSING: the L4 commit, and the r**2 ceiling it was drawn from
+==============================================================================
+  The DGP's levels, as DISTINCT flat tuples (the recall denominator): L2 14, L3 56, L4 816.
+  `T4 subset T3xT3`: an L4 entry exists only if BOTH of its 4-tuple halves are rows
+  of the operative L3 table, so a frozen L3 of recall r caps L4 near r**2.
+
+  arm               L4 commit c_in_era  entries   recall    prec  buildable  of which true  share taken
+  dsil_sched              180       70        3   0.0012   0.333          4              1        0.750
+  dsil_yield              104       16        1   0.0012   1.000          8              1        0.125
+  dsil_read                97       12        3   0.0012   0.333          9              3        0.333
+  dsil_and                 81        9        1   0.0012   1.000          0              0            -
+
+  `buildable` = distinct L4 tuples at support 3 in the arm's own observation
+  panel whose two halves are both rows of its FROZEN L3, at the cycle named. It is
+  the honest ceiling for that arm's L4 commit; `share taken` is what it took of it.
+  A cancelled commit (the empty-table guard) appears in the action trace, not here.
+
+==============================================================================
+(C) THE GAUGE AT THE FRONTIER: what paced the L4 commit, and the L5 alternative
+==============================================================================
+  Driven read: `yield` = -(distinct level-`read_level` tuples at support).
+  `read_level` = min(active+1, gy_level=4), so at era 3 (active=4) it is the level
+  BEING EARNED, not one above it. Floors that governed the run: L3 0.46127129019246205, L4 0.5166900731510206.
+
+  read_level actually used, per era (logged per cycle)
+  arm                  era1     era2     era3     era4     era5
+  dsil_sched              3        4        4        4        4
+  dsil_yield              3        4        4        4        4
+  dsil_read               3        4        4        4        4
+  dsil_and                3        4        4        4        4
+
+  THE OBSERVATION PANEL, end of run: distinct tuples at support, per level.
+  Levels 5 and 6 are logged UNCHARGED in every arm and were never driven — Phase 0
+  measured them degenerate (max 1-2 over an entire run, first non-zero at c89-124),
+  which is the reason the L4 commit is paced on the L4 stream's own quieting.
+  arm                   L3      L4      L5      L6  L5 first>0
+  dsil_sched            71     113       8       1         129
+  dsil_yield            69      60       1       0         105
+  dsil_read             63      82      11       4          89
+  dsil_and              67      41       1       0          83
+
+  THE L4 AT-SUPPORT SERIES over era 3 (the series the commit was read on):
+  per-era first -> last, and the mean per-cycle increment against the L4 floor.
+  arm               era     n   first    last   d/cycle  x floor
+  dsil_sched          1    60       0      17     0.288    0.558
+  dsil_sched          2    50      19      62     0.878    1.698
+  dsil_sched          3    70      62     108     0.667    1.290
+  dsil_sched          4    12     108     110     0.182    0.352
+  dsil_sched          5     9     110     113     0.375    0.726
+  dsil_yield          1    58       0      16     0.281    0.543
+  dsil_yield          2    30      18      41     0.793    1.535
+  dsil_yield          3    26      41      56     0.600    1.161
+  dsil_yield          4     8      56      59     0.429    0.829
+  dsil_yield          5     9      59      60     0.125    0.242
+  dsil_read           1    46       0       9     0.200    0.387
+  dsil_read           2    39       9      40     0.816    1.579
+  dsil_read           3    70      42      78     0.522    1.010
+  dsil_read           4    12      78      81     0.273    0.528
+  dsil_read           5     9      81      82     0.125    0.242
+  dsil_and            1    58       0      16     0.281    0.543
+  dsil_and            2    14      18      26     0.615    1.191
+  dsil_and            3    21      26      37     0.550    1.064
+  dsil_and            4    12      37      40     0.273    0.528
+  dsil_and            5     9      40      41     0.125    0.242
+
+==============================================================================
+(E) EXTENSION: the r**2-wall bypass
+==============================================================================
+  Phase 0 measured the wall binds and that extension is the lever: buildable L4 over
+  the FROZEN L3 vs over the LIVE L3 was 15 vs 25 (cd_s0/outer_yield), 13 vs 26
+  (ma_s0/learned_yield), 8 vs 13 (anchor) — i.e. extension roughly doubles the
+  ceiling an L4 commit is drawn from.
+
+  arm               lvl  events   cands  admitted  final n  final recall  final prec
+  dsil_sched          2       0       0         0       11        0.5714       0.727
+  dsil_sched          3       0       0         0        9        0.0893       0.556
+  dsil_sched          4       0       0         0        3        0.0012       0.333
+  dsil_yield          2       0       0         0       14        0.7143       0.714
+  dsil_yield          3       0       0         0       10        0.0714       0.400
+  dsil_yield          4       0       0         0        1        0.0012       1.000
+  dsil_read           2       0       0         0       11        0.5714       0.727
+  dsil_read           3       0       0         0       14        0.1250       0.500
+  dsil_read           4       0       0         0        3        0.0012       0.333
+  dsil_and            2       0       0         0       14        0.7143       0.714
+  dsil_and            4       0       0         0        1        0.0012       1.000
+
+  and what the treatment vs the extension arm actually held at L4:
+  arm               frozen L3  buildable L4  L4 entries  L4 true
+  dsil_yield               10             8           1        1
+  dsil_sched                9             4           3        1
+
+==============================================================================
+(G) THE GATE: what each arm refused, and what the refusal was made of
+==============================================================================
+  gate_frac = 0.5 of SOLVED TIPS kept on the pi channel; the
+  mining cap (8) is untouched, so mining volume is matched and
+  only its content moves. The value buffer is UNGATED in every arm (delta is the
+  residual of the value head's own forecast).
+
+  PER-ARM TOTALS over the whole run
+  arm                   mode  sol tips    kept  kept %   pi rows   mined  pbuf end fallbacks
+  dsil_sched            None     47615       0    0.0%    380920    1580     60000         0
+  dsil_yield            None     33776       0    0.0%    270208    1036     60000         0
+  dsil_read             None     46583       0    0.0%    372664    1383     60000         0
+  dsil_and              None     29729       0    0.0%    237832     889     60000         0
+  `kept` is 0 in an arm with no gate: the gate log records the FEATURES in every arm
+  and the SELECTION only where a mode is set — an ungated arm keeps everything the
+  grade admitted, i.e. `sol tips`.
+
+  pi ROWS ENTERING THE REPLAY BUFFER, per era (the diet's volume)
+  arm                   era1      era2      era3      era4      era5
+  dsil_sched          111944     87008    137512     25952     18504
+  dsil_yield          142704     47384     48400     15480     16240
+  dsil_read            87368     61656    178280     29400     15960
+  dsil_and            142704     22280     30424     27816     14608
+
+  WHAT THE GATE KEPT vs WHAT IT DROPPED (mean over the run, gated arms only)
+  arm               delta kept  delta dropped      gap  margin kept  margin all
+
+  THE FEATURES THEMSELVES, in every arm (per-instance, whole run)
+  delta_ans = grade - sigmoid(v) at the answer the beam gave; margin = the
+  deliberation state (top1 - top2 over the instance's tip value scores).
+  `margin` is the GATED form (chosen minus the mean of the unchosen); `m2` is the
+  textbook top1-top2 margin, logged but not gated on — `m2=0 frac` is how often it
+  is exactly zero (a duplicate runner-up), which is why the gate reads the mean form.
+  arm              solve rate  d|solved  d|failed    sd d   margin  sd marg  m2=0 frac  corr(d,-m)
+  dsil_sched           0.2104    0.4512   -0.5264  0.4946   0.0652   0.0802     0.4056      0.1417
+  dsil_yield           0.2333    0.4644   -0.5247  0.5153   0.0586   0.0766     0.4169      0.1299
+  dsil_read            0.2384    0.4101   -0.5477  0.5037   0.0626   0.0786     0.4337      0.1333
+  dsil_and             0.2353    0.4750   -0.5074  0.5179   0.0544   0.0755     0.4327      0.1462
+
+  THE COUNTERFACTUAL GATES, per arm, on that arm's OWN logged features
+  Of the solved instances each cycle, take the top half by each rule and report the
+  mean pairwise JACCARD overlap between the rules' selections. This is what a gate
+  arm's mining reorder could at most have moved, computed in every arm including
+  the ungated baseline — a gate whose selection is the same set as another's cannot
+  produce a different table.
+  arm                  dhi/dlo     dhi/dlb     dhi/rnd     dlo/dlb     dlo/rnd     dlb/rnd
+  dsil_sched             0.000       0.361       0.334       0.309       0.333       0.347
+  dsil_yield             0.000       0.338       0.319       0.330       0.334       0.336
+  dsil_read              0.000       0.336       0.343       0.329       0.324       0.315
+  dsil_and               0.000       0.332       0.314       0.344       0.344       0.336
+
+==============================================================================
+(G2) TABLE CONTENT: reconstruction, truth, and overlap between arms
+==============================================================================
+  Each arm's committed table replayed entry-for-entry from its own logged key
+  stream (Phase 0's gate B-1 machinery). `recon == n` is the reconstruction check.
+
+  L2  (the DGP has 14 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  dsil_sched              18    11     11     8      0.727   0.5714
+  dsil_yield              49    14     14    10      0.714   0.7143
+  dsil_read               18    11     11     8      0.727   0.5714
+  dsil_and                49    14     14    10      0.714   0.7143
+
+    pairwise JACCARD of the committed L2 entry sets
+                         dsil_sched     dsil_yield      dsil_read       dsil_and
+    dsil_sched                1.000          0.786          1.000          0.786
+    dsil_yield                0.786          1.000          0.786          1.000
+    dsil_read                 1.000          0.786          1.000          0.786
+    dsil_and                  0.786          1.000          0.786          1.000
+
+  L3  (the DGP has 56 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  dsil_sched              77     9      9     5      0.556   0.0893
+  dsil_yield              72    10     10     4      0.400   0.0714
+  dsil_read               71    14     14     7      0.500   0.1250
+
+    pairwise JACCARD of the committed L3 entry sets
+                         dsil_sched     dsil_yield      dsil_read
+    dsil_sched                1.000          0.462          0.643
+    dsil_yield                0.462          1.000          0.500
+    dsil_read                 0.643          0.500          1.000
+
+  L4  (the DGP has 816 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  dsil_sched             180     3      3     1      0.333   0.0012
+  dsil_yield             104     1      1     1      1.000   0.0012
+  dsil_read               97     3      3     1      0.333   0.0012
+  dsil_and                81     1      0     0        nan   0.0000
+
+    pairwise JACCARD of the committed L4 entry sets
+                         dsil_sched     dsil_yield      dsil_read       dsil_and
+    dsil_sched                1.000          0.333          0.200          0.000
+    dsil_yield                0.333          1.000          0.333          0.000
+    dsil_read                 0.200          0.333          1.000          0.000
+    dsil_and                  0.000          0.000          0.000          0.000
+
+  A gate that changes what the learner learns from can only change the table
+  through the entries it mined; identical sets here mean the gate moved trust
+  (section 4) and pacing (section H) but not the address book.
+
+==============================================================================
+(H) THE PACING COUNTERFACTUAL: when each arm's own gauge would have fired
+==============================================================================
+  A1's thermostat, unchanged (span 1, W 4, burn 4, alpha 0.5), floors L3 0.461271 / L4 0.516690, replayed from era-3 start on each arm's own
+  logged panel. The BASELINE's realised L4 commit cycle is what every yoked arm
+  actually did, so the column to read is `would fire` against it.
+
+  arm               era3 c0    n  would fire (c)  c_in_era3  vs baseline   all firings (c_in_era3)
+  dsil_sched            111   91             120         10           16              [10, 53, 70]
+  dsil_yield             89   43             104         16            0              [16, 26, 34]
+  dsil_read              86   91             108         23            4              [23, 45, 69]
+  dsil_and               73   42              81          9          -23               [9, 21, 33]
+
+  the baseline's REALISED L4 commit: c104. Every gate arm replayed it by clock,
+  which is what makes section (3)'s era table a content comparison.
+
+==============================================================================
+(P1) THE METER — a live, fallible executor, and delta_perf's own components
+==============================================================================
+  `tau_fire` is the FIRING threshold; `span_tau` (0.95) still governs the parity
+  RECORD, so `opened_below_tau` counts slot-openings the donor's gate would have
+  refused. `misfire` is a row whose emitted span did not exactly match what
+  `apply_any` would have written on the same observation.
+
+  arm             tau_f     fired  misfire    rate  slots  open@f  open@.95      g0   theta  calib@c  degen med g act
+  dsil_sched       0.50   7186292   202747  0.0282     28      28        25  0.0000  0.0010       26   True    0.0000
+  dsil_yield       0.50   2220079   126981  0.0572     28      28        16  0.0000  0.0010       57   True    0.0000
+  dsil_read        0.50   6102128   225603  0.0370     28      28        20  0.0000  0.0010       26   True    0.0000
+  dsil_and         0.50   1313100    42066  0.0320     20      20        12  0.0000  0.0010       57   True    0.0000
+
+  PER MACRO SLOT (the syllable), summed over the run:
+  arm dsil_sched (the metered arm with the most executions).
+     slot     rows    fired   mean e   exact   mean g   mean d      b-e    b(s)  parity
+      2:0    61198    61198   0.0237   0.968   0.2037  -0.0048   0.0032  0.0263   0.959
+      2:1   156660   156660   0.0177   0.979   0.2395   0.0012   0.0073  0.0346   0.982
+      2:2    55301    55301   0.0378   0.948   0.1853  -0.0116   0.0002  0.0150   0.958
+      2:3   132626   132626   0.0233   0.973   0.2151  -0.0044   0.0029  0.0228   0.968
+      2:4    43341    43341   0.0316   0.958   0.1550  -0.0004   0.0118  0.0139   0.964
+      2:5   278472   278472   0.0118   0.985   0.1556  -0.0026   0.0024  0.0020   0.980
+      2:6    73984    73984   0.0188   0.973   0.1329  -0.0036   0.0052  0.0324   0.991
+      2:7    73534    73534   0.0227   0.972   0.2330  -0.0055   0.0013  0.0199   0.988
+      2:8    39847    39847   0.0206   0.971   0.1777  -0.0047   0.0024  0.0083   0.984
+      2:9   148494   148494   0.0169   0.980   0.1535  -0.0020   0.0060  0.0136   0.993
+     2:10   225226   225226   0.0247   0.969   0.2144  -0.0011   0.0086  0.0190   0.957
+     2:11    59856    59856   0.0278   0.966   0.2399  -0.0047   0.0036  0.0179   0.942
+     2:12   741317   741317   0.0293   0.962   0.1638  -0.0059   0.0063  0.0130   0.949
+     2:13   159365   159365   0.0158   0.981   0.1725  -0.0010   0.0058  0.0188   0.907
+     2:14    68010    68010   0.0215   0.970   0.1184  -0.0067   0.0017  0.0068   0.985
+     2:15   657092   657092   0.0164   0.980   0.1924  -0.0011   0.0060  0.0110   0.967
+      3:0   124407   124407   0.0119   0.983   0.0890  -0.0017   0.0041  0.0057   0.999
+      3:1   142471   142471   0.0284   0.957   0.1446  -0.0037   0.0061  0.0552   0.965
+      3:2   322697   322697   0.0107   0.979   0.0586  -0.0020   0.0036  0.0087   0.977
+      3:3   489943   489943   0.0055   0.994   0.0745   0.0003   0.0040  0.0047   0.992
+      3:4   139786   139786   0.0406   0.944   0.1828  -0.0054   0.0054  0.0231   0.984
+      3:5   377714   377714   0.0296   0.944   0.1995  -0.0027   0.0024  0.0113   0.978
+      3:6  1790364  1790364   0.0174   0.967   0.0841  -0.0045   0.0025  0.0109   0.965
+      3:7   551863   551863   0.0120   0.985   0.0942  -0.0003   0.0061  0.0049   0.990
+      4:0    31571    31571   0.0000   1.000   0.0356   0.0000   0.0000  0.0000   1.000
+      4:1    40840    40840   0.0000   1.000   0.0161   0.0000   0.0000  0.0000   1.000
+      4:2    47752    47752   0.0000   1.000   0.0833   0.0000   0.0000  0.0000   1.000
+      4:3   152561   152561   0.0098   0.950   0.0277   0.0055   0.0142  0.0000   1.000
+
+  ACT vs PLAYBACK (Gadagkar's control, on this substrate).
+  ACT     rows the head REALIZED: e measured against what `apply_any` would have
+          written, agency g > 0 (the slot command explains part of the span).
+  PLAYBK  the SAME head, the SAME contexts, but the DP realized the move: the parity
+          read computes the head's would-be error on every held-out row of every
+          slot each cycle. No efference copy for the head's output, so g == 0 by
+          construction and the CENTERED gate closes. `b - e` is the ungated signal;
+          if it fires in both columns and delta only in ACT, the gate is carrying
+          the discrimination (S13(a)'s dissection).
+
+  arm               e ACT  e PLAYBK   b-e ACT  b-e PLAY  delta ACT delta PLAY   g ACT
+  dsil_sched       0.0184    0.0329    0.0045   -0.0015    -0.0028    -0.0008  0.1311
+  dsil_yield       0.0340    0.0565    0.0082   -0.0024    -0.0052    -0.0012  0.1167
+  dsil_read        0.0211    0.0370    0.0041   -0.0000    -0.0034    -0.0000  0.1108
+  dsil_and         0.0240    0.0567    0.0040   -0.0025    -0.0053    -0.0013  0.0840
+
+  (PLAYBK's delta column is the ungated `b - e_shadow` multiplied by the gate's
+   value AT g = 0, which is what the mechanism would assign those rows. Playback
+   rows are never scored IN-RUN: the head did not execute them, so no credit is
+   assigned at all — the exclusion is structural, not a threshold.)
+
+  THE AGENCY VARIABLE'S OWN DISTRIBUTION, from the raw per-row sample (ACT rows):
+  arm              n rows   g == 0    g > 0  mean g|g>0   e|g==0    e|g>0
+  dsil_sched        33984   0.5759   0.4241      0.5066   0.0003   0.1056
+  dsil_yield        14620   0.6185   0.3815      0.4964   0.0009   0.1740
+  dsil_read         29184   0.5595   0.4405      0.4972   0.0004   0.1168
+  dsil_and          11356   0.6382   0.3618      0.5138   0.0008   0.1966
+
+==============================================================================
+(P2) THE 2x2: EXECUTED-AS-INTENDED x SOLVED
+==============================================================================
+  Per surviving trajectory. `int` = every head execution on it exactly matched its
+  intention; `bad` = at least one did not; `none` = the head executed nothing on it
+  (no performance to grade — kept apart, never folded into `int`).
+  `bad+solved` is THE LUCKY SUCCESS: an ill-executed trajectory the grade rewards.
+  `int+failed` is THE HONEST FAILURE: well executed, task not solved — the cell the
+  grade-only rule discards entirely.
+
+  --- dsil_sched ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1        5933       21115         720        4259        7340       22073     171837    10291  0.1030 -0.7080
+     2        9035       31553        1142        5512         699        3259     945818    35575  0.0524 -0.7329
+     3       15211       45660        1697        7666         281        1165    4026993   105176  0.0495 -0.7089
+     4        2919        7578         306        1369          19          97    1099886    33753  0.0532 -0.7113
+     5        2199        5809         114        1066           0          28     941758    17952  0.0480 -0.6861
+   ALL       35297      111715        3979       19872        8339       26622
+       P(solve | as intended) = 0.2401   P(solve | NOT as intended) = 0.1668   lucky-success share of solves = 0.1013
+  --- dsil_yield ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         355        1235         119         695       17364       39624       5579     1092  0.2232 -0.4209
+     2        4448       16958         923        5793         552        2046     454061    57955  0.1102 -0.5998
+     3        5182       16233         655        3637         213         704     771308    35359  0.0718 -0.6389
+     4        1712        5310         209         806          14         141     395799    15304  0.0502 -0.6500
+     5        1861        5861         169        1256           0          69     593332    17271  0.0537 -0.5936
+   ALL       13558       45597        2075       12187       18143       42584
+       P(solve | as intended) = 0.2292   P(solve | NOT as intended) = 0.1455   lucky-success share of solves = 0.1327
+  --- dsil_read ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1        3493       12441         534        2986        6894       20756      65268     5908  0.1326 -0.6736
+     2        6020       24162        1023        5014         664        3053     618011    39556  0.0669 -0.6871
+     3       19127       39115        2843        8995         315        1285    3514226   124359  0.0558 -0.5842
+     4        3320        7037         346        1522           9          54    1019073    31249  0.0522 -0.6099
+     5        1675        5833         320        1284           0         104     885550    24531  0.0565 -0.6212
+   ALL       33635       88588        5066       19801        7882       25252
+       P(solve | as intended) = 0.2752   P(solve | NOT as intended) = 0.2037   lucky-success share of solves = 0.1309
+  --- dsil_and ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         355        1235         119         695       17364       39624       5579     1092  0.2232 -0.4209
+     2        2016        8098         442        2310         327        1143      55793     5747  0.1152 -0.6441
+     3        3158       13575         398        2354         247        1772     322682    19790  0.0589 -0.7404
+     4        3271        7269         202        1110           4         432     452502     7824  0.0358 -0.7533
+     5        1748        6047          78        1033           0         310     476544     7613  0.0378 -0.7522
+   ALL       10548       36224        1239        7502       17942       43281
+       P(solve | as intended) = 0.2255   P(solve | NOT as intended) = 0.1417   lucky-success share of solves = 0.1051
+
+  WHAT GOT MINED, BY CELL (at the beam's own answer — the mined unit), per arm:
+  arm               mined  as intended  NOT as int  no exec   mean d   ans-2x2 (int_s/int_f/bad_s/bad_f/non_s/non_f)
+  dsil_sched         1580         1206         148      226  -0.0159   2020/7218/256/1420/430/1520
+  dsil_yield         1036          468         105      463  -0.0223   767/2910/155/868/1034/2650
+  dsil_read          1383          984         174      225  -0.0286   1927/5698/342/1426/416/1455
+  dsil_and            889          374          59      456  -0.0216   601/2340/92/543/1024/2696
+
+==============================================================================
+(P5) THE BENCHMARK TIMESCALE — delta recomputed offline across alpha
+==============================================================================
+  arm dsil_sched; per-cycle per-slot means, 201 cycles.
+     alpha  eff. window  frac b>e  mean b-e   sd(b-e)  slots
+     0.005        200.0    0.8981   0.07719   0.06068     28
+     0.020         50.0    0.8525   0.03481   0.04505     28
+     0.050         20.0    0.7521   0.01489   0.03712     28
+     0.100         10.0    0.6947   0.00751   0.03278     28
+     0.300          3.3    0.6347   0.00253   0.03065     28
+     1.000          1.0    0.4995   0.00076   0.03754     28
+  (`eff. window` is 1/alpha in units of the update — here one CYCLE per slot, so
+   the in-run benchmark, which updates per macro CALL, is faster than any row here;
+   the in-run alpha is printed in each arm's config as `perf_alpha`.)
+
+==============================================================================
+(P6) THE TWO UNPRICED COLUMNS, PRICED — never folded into `t`
+==============================================================================
+  arm             n_misfire  t_misfire       t_cum   % of t     blk_ref   blk_head     blk_dp
+  dsil_sched         202747      10137    50697843   0.0200    23887418    7186292    3291508
+  dsil_yield         126981       6349    32554752   0.0195     8517818    2220079    2637042
+  dsil_read          225603      11280    44572704   0.0253    27706866    6102128    3802644
+  dsil_and            42066       2103    27198330   0.0077     6386808    1313100    2926826
+  Pricing misfires would move the ledger by 0.016-0.032% — below every floor in the
+  tag, so the choice is behaviourally inert and is recorded as a convention, not a
+  result. `blk_ref` exceeds `blk_head` by the span factor: the meter consumes the
+  DP's block evidence that the head's own execution does not.
+
+==============================================================================
+(D) delta-SILENCE: the gauge, the commits it paced, and what it deferred
+==============================================================================
+  `dsil` = mean b(s) over the OPEN slots — the per-macro-slot benchmark the meter
+  already maintains, in the panel's error convention. It is None until a slot opens,
+  so it CANNOT pace the L2 commit: at the cycle level l is committed the level-l
+  slots do not exist, and the gauge only ever speaks about levels <= l-1.
+
+  arm             read 1st dsil c  dsil min  dsil last  max open           commits (lvl@c)                  advances
+  dsil_sched      None         25   0.01033    0.01429        28[(2, 18), (3, 77), (4, 180)]                        []
+  dsil_yield     yield         55   0.02416    0.02416        28[(2, 49), (3, 72), (4, 104)]   [58, 88, 114, 122, 131]
+  dsil_read       dsil         25   0.01578    0.02210        28[(2, 18), (3, 71), (4, 97)]   [46, 85, 155, 167, 176]
+  dsil_and       yield         55   0.02075    0.03027        20        [(2, 49), (4, 81)]    [58, 72, 93, 105, 114]
+
+  COMMIT CYCLES against the comparator (A1's yield thermostat) and the schedule:
+  arm                    L2          L3          L4     dL2     dL3     dL4   cycles
+  dsil_sched             18          77         180     -31      +5     +76      201
+  dsil_yield             49          72         104      +0      +0      +0      131
+  dsil_read              18          71          97     -31      -1      -7      176
+  dsil_and               49           0          81      +0       -     -23      114
+  (a 0 in an L column means that arm never committed that level.)
+
+  THE VETO'S LEDGER (`dsil_and` only): every cycle the yield thermostat licensed
+  a commit and delta-silence was consulted.
+  dsil_read: 1 consultations — 0 DEFER, 0 pass, 0 absent (gauge not yet alive)
+    c18   era1 L2 bootstrap dsil=        - open=0 V=        -
+  dsil_and: 3 consultations — 1 DEFER, 1 pass, 1 absent (gauge not yet alive)
+    c49   era1 L2  absent dsil=        - open=0 V=        -
+    c72   era2 L3   defer dsil=  0.05608 open=16 V=  0.00706
+    c81   era3 L4    pass dsil=  0.04919 open=16 V=  0.00144
+    total cycles of delay bought by the veto: 1 (each deferral costs one cycle and does NOT spend the rule's firing — the commit re-fires as soon as the executor quiets)
+
+  THE ERA TABLE, against the measured floors (this tag is NOT yoked — the
+  question IS the pacing — so lifetimes differ and the deep-era deltas conflate
+  pacing with practice time; `dsil_sched` is the lifetime ceiling by construction.
+  arm                        era1              era2              era3              era4              era5   cycles
+  dsil_sched       0.4844 [ 0.50]    0.5547 [ 0.61]    0.5538 [ 0.82]    0.6285 [ 1.24]    0.7439 [ 1.50]      201
+  dsil_yield       0.4957 [ 0.48]    0.6189 [ 0.50]    0.6137 [ 0.68]    0.6849 [ 1.05]    0.7717 [ 1.32]      131
+  dsil_read        0.4983 [ 0.48]    0.5521 [ 0.61]    0.4766 [ 0.99]    0.5738 [ 1.43]    0.7057 [ 1.74]      176
+  dsil_and         0.4957 [ 0.48]    0.6510 [ 0.44]    0.7066 [ 0.48]    0.5955 [ 1.36]    0.8325 [ 0.94]      114
+
+  DELTA TO dsil_yield (A1's thermostat), in recovered fraction
+  arm                era1      era2      era3      era4      era5
+  dsil_sched        0.015     0.111     0.133     0.197     0.175
+  dsil_read        -0.003     0.116     0.304     0.388     0.415
+  dsil_and          0.000    -0.056    -0.206     0.312    -0.383
+  Floors: census finding 7's pooled depth-6 stream floor 0.087 (earning family);
+  0.083 / 0.148 / 0.344 (given family) at eras 3/4/5.

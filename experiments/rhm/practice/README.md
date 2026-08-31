@@ -396,6 +396,34 @@ recall² predicted buildable L4 to ±2) and extension is the measured lever, put
 index ops on the critical path of any further climb. One rung, single seed, exogenous demand
 ladder — §1.3's "semi-autonomous" stands.
 
+### [`two_deltas/`](two_deltas/README.md) — Track E′ round 2: performance error vs outcome surprise (2026-08-29→31)
+
+**Goal**: run Track E′'s δ-gate program (`tacet`), its E2 shape (`continuo`), and `audiation`'s
+queued re-encode control — then, after the mid-round diagnosis that the arc had **two δs under
+one name** (the bridge line's execution-vs-intention δ_perf vs the outcome surprise
+`grade − v(s)`, with δ_perf ≡ 0 on the routing-only stack because the DP executor is exact),
+give RHM a live fallible executor by un-gating `native/span`'s head below parity
+(`intonation`), and test δ_perf as executor-plasticity gain, as mining/π gate, as the commit
+decision (`caesura`), and under strongly-metered data (`ma_s0`). Joint writeup for five
+member nodes; the nodes carry `FILES.md` records only.
+
+**Finding**: **the metering signal has two seats with floor-clearing evidence, and the diet
+gate is not one of them.** As commit pacer, δ-silence — structurally unable to license the
+*first* crossing (slots are minted by commits; bootstrapped, gated) — beats the one-level-up
+yield thermostat +0.304/+0.388/+0.415 at eras 3–5 (3.7×/2.6×/1.2× floors) and the 201-cycle
+schedule ceiling on 25 fewer cycles, from one rung behind the frontier. As executor
+plasticity the form is regime-dependent: benchmarked δ wins under abundance, raw `e` under
+scarcity (the only above-floor value cells, 1.25×/1.70×), consistent-with-but-not-testing
+§13(c)'s estimability condition. As a gate, both δs lose in both regimes — under abundance by
+the `two_clocks` channel law, under scarcity for lack of leverage (the cost collapses to
+~0.1× floor; content selection works — 1.84× fewer lucky successes mined at matched volume —
+but never pays). The 2×2 the arc could never produce is populated everywhere (honest failures
+3.4× as-intended successes; 13–22% of solves ill-executed), `audiation` 8(i)'s observer
+inversion dissolves under the symmetric grid (the per-datum self scalars are the only
+surviving source), and `continuo`'s residual bit is a novelty tag except under per-datum
+credit (p = 0.011 vs 0.125, matched ridge rung). Single seed throughout; full record and the
+within-level-currency question it raises: [two_deltas/README.md](two_deltas/README.md).
+
 ## Reproduce
 
 ```bash

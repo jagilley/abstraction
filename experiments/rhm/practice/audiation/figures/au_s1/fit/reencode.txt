@@ -1,0 +1,91 @@
+AUDIATION -- THE SYMMETRIC RE-ENCODE CHECK on finding 8(i)
+  tag=au_s1 arm=perdatum seed=0
+  A fourth disjoint mode. It re-forms `--e1b`'s Q4 frame exactly (same target, same
+  cycle hold-out, same strata, same `decode` stack) and crosses CONTENT x BASIS on the
+  observer/self pair, so that input FORMAT is excluded as the driver of the
+  0.289-vs-0.036 gap. `reduction.txt` is not touched.
+
+  WHAT `x0` IS (prior to the format question):
+    `e_own_x[:,0]` is the datum's ROOT configuration. Over all 14848 events,
+    (cycle, e_inst) <-> (cycle, x0) is a BIJECTION
+    (6559 distinct pairs), so `O_x` holds INSTANCE IDENTITY and nothing
+    else about the datum. 86.6% of events share their (cycle, x0) with at
+    least one other event, and `--e1b`'s probe split is by EVENT -- so for most test
+    rows an exact input duplicate sits in the probe-train set. Hence split B below.
+
+  split A_event  (the --e1b split): 3712 groups -> 2784 probe-train / 928 probe-test events (232 strata)
+  split B_instance (cycle,e_inst): 1637 groups -> 2791 probe-train / 921 probe-test events (232 strata)
+  decode rows are EVENTS (3712 in the 29 held-out cycles), as in Q4.
+
+  the one-hot block of `x` has rank <= 448; every dense re-encoding of it
+  below is put through the same fp16 round trip `z` already pays in storage.
+
+  --------------------------------------------------------------------------
+  SPLIT A_event  (the --e1b split) -- R^2 on `spill_dir_ref [cs]` (cycle x order residualised)
+  (PCA-96 of the one-hot keeps 72.7% of this split's train variance)
+  --------------------------------------------------------------------------
+     content  format                                           d      h0     h64    h256  best[0,64]
+           x  sparse 64x8 one-hot   [INCUMBENT O_x]          512   0.033   0.289   0.306       0.289
+           x  dense96 random proj, fp16                       96   0.018   0.206   0.238       0.206
+           x  dense96 PCA, fp16                               96   0.012   0.214   0.288       0.214
+           z  dense96 as logged, fp16  [NEW: no a+grade]      96  -0.006   0.121   0.195       0.121
+           z  sparse 64x8 bins of PCA-64  [MATCHED to O_x]   512   0.072   0.304   0.329       0.304
+           z  sparse 96x8 quantile bins (all of z)           768   0.118   0.308   0.312       0.308
+           z  dense512 random LINEAR lift (width null)       512  -0.005   0.140   0.197       0.140
+           z  sparse512 random ReLU features                 512   0.055   0.194   0.272       0.194
+           x  sparse one-hot + a + grade  [INCUMBENT]        969   0.072   0.085   0.167       0.085
+           x  dense96 PCA + a + grade                        553   0.051   0.041   0.073       0.051
+           z  dense96 as logged + a + grade [INCUMBENT]      553   0.036  -0.019   0.023       0.036
+           z  sparse 64x8 bins of PCA-64 + a + grade         969   0.096   0.130   0.187       0.130
+        self  free scalars only          [INCUMBENT]          12   0.030   0.062   0.055       0.062
+        self  free scalars + Delta_i     [INCUMBENT]          21   0.052   0.061   0.043       0.061
+
+    controls on the same split:
+      instance-identity group mean (the leak ceiling)      R^2=  0.399  (77% of test rows in a seen instance)
+      half-data budget, O_x one-hot                        R^2=  0.031
+      half-data budget, z sparse 64x8 (matched)            R^2=  0.098
+      half-data budget, z dense96 as logged                R^2= -0.027
+      shuffled null within cycle x order, O_x one-hot      R^2= -0.037
+      shuffled null within cycle x order, z sparse 64x8 (matched) R^2= -0.038
+
+  --------------------------------------------------------------------------
+  SPLIT B_instance (cycle,e_inst) -- R^2 on `spill_dir_ref [cs]` (cycle x order residualised)
+  (PCA-96 of the one-hot keeps 73.5% of this split's train variance)
+  --------------------------------------------------------------------------
+     content  format                                           d      h0     h64    h256  best[0,64]
+           x  sparse 64x8 one-hot   [INCUMBENT O_x]          512  -0.054  -0.229  -0.214      -0.054
+           x  dense96 random proj, fp16                       96  -0.001  -0.224  -0.392      -0.001
+           x  dense96 PCA, fp16                               96  -0.014  -0.196  -0.267      -0.014
+           z  dense96 as logged, fp16  [NEW: no a+grade]      96  -0.002  -0.121  -0.114      -0.002
+           z  sparse 64x8 bins of PCA-64  [MATCHED to O_x]   512  -0.011  -0.246  -0.173      -0.011
+           z  sparse 96x8 quantile bins (all of z)           768  -0.060  -0.167  -0.164      -0.060
+           z  dense512 random LINEAR lift (width null)       512  -0.007  -0.263  -0.382      -0.007
+           z  sparse512 random ReLU features                 512  -0.010  -0.328  -0.349      -0.010
+           x  sparse one-hot + a + grade  [INCUMBENT]        969  -0.069  -0.341  -0.352      -0.069
+           x  dense96 PCA + a + grade                        553  -0.035  -0.442  -0.311      -0.035
+           z  dense96 as logged + a + grade [INCUMBENT]      553  -0.019  -0.347  -0.314      -0.019
+           z  sparse 64x8 bins of PCA-64 + a + grade         969  -0.021  -0.332  -0.272      -0.021
+        self  free scalars only          [INCUMBENT]          12   0.030   0.060   0.057       0.060
+        self  free scalars + Delta_i     [INCUMBENT]          21   0.050   0.044   0.037       0.050
+
+    controls on the same split:
+      instance-identity group mean (the leak ceiling)      R^2= -0.001  (0% of test rows in a seen instance)
+      half-data budget, O_x one-hot                        R^2= -0.236
+      half-data budget, z sparse 64x8 (matched)            R^2= -0.202
+      half-data budget, z dense96 as logged                R^2= -0.201
+      shuffled null within cycle x order, O_x one-hot      R^2= -0.039
+      shuffled null within cycle x order, z sparse 64x8 (matched) R^2= -0.038
+
+  eta^2(residualised target ~ (cycle, e_inst)) = 0.815 over 3712 events in 1637 instances
+  (descriptive: how much of the target is an instance-level property at all. With
+   ~2.3 events per instance a chance value is ~n_groups/n = 0.441.)
+
+  THE INCUMBENT CELLS, quoted from figures/au_s1/fit/reduction.txt for the contrast:
+    O_x            (public)    d=512   R^2=  0.289
+    O_x+a          (public)    d=968   R^2=  0.098
+    O_x+a+grade    (public)    d=969   R^2=  0.085
+    SELF: free scalars only    d=12    R^2=  0.062
+    SELF: z0+a+grade           d=553   R^2=  0.036
+    O_x+a+grade half-data              R^2= -0.144
+
+END (re-encode) - 3863s total

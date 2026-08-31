@@ -1,0 +1,213 @@
+==============================================================================
+continuo — E2: consolidation state off the residual   tag=au_s0 arm=anchor
+==============================================================================
+argv: --tag au_s0 --arm anchor --seed 1 --h-sweep 16 --n-seeds 2 --out rhm/practice/continuo/figures/au_s0_seed1
+
+(0) GATES
+  gradcheck (central differences, float64): PASS, worst rel err 5.03e-08
+  donor: 116 cycles, 117 head snapshots, n_slots=56, span_mode=False, prop_k=4
+  events derived from the run's own record: commit_L2=c18, ms_grow_L2=c19, era2=c49, commit_L3=c69, ms_grow_L3=c70, era3=c89, era4=c101, era5=c110
+    (regression check against the hardcoded au_s0/anchor table: PASS)
+  replay gate (donor's own): max_abs_delta=0.000e+00 over True/116 cycles
+  shards fetched: 6 -> 227072 tip rows, cycles 6..115
+  probe: 6240 fixed practice-beam states over 30 cycles, 4368 FM-train / 1872 held-out rows, split by (cycle, instance)
+  head-recompute gate at c71: max|numpy pi - logged t_pi| = 2.731e-03 on a logit scale of 7.43  (PASS; audiation measured 1.2e-3 at fp16-z storage)
+
+(1) PRIMARY PASS — FM hidden H=16, draw/split/projection seed 1, FM init seed 1, 113 checkpoints
+  c 20 live 48 degen  0 te_mse 0.1243 |r|/|t| 0.338 cmass 0.104 (share 0.333)
+  c 40 live 48 degen  0 te_mse 0.1931 |r|/|t| 0.422 cmass 0.254 (share 0.333)
+  c 60 live 48 degen  0 te_mse 0.2751 |r|/|t| 0.479 cmass 0.337 (share 0.333)
+  c 80 live 56 degen  0 te_mse 0.2871 |r|/|t| 0.505 cmass 0.429 (share 0.429)
+  c100 live 56 degen  0 te_mse 0.3612 |r|/|t| 0.583 cmass 0.509 (share 0.429)
+  c117 live 56 degen  0 te_mse 0.4059 |r|/|t| 0.616 cmass 0.511 (share 0.429)
+  [1066s]
+
+(2) AXIS 1 — RESIDUAL-CLASS OCCUPANCY
+  codebook: spherical k-means K=8 on 5989 pooled residual directions (era-balanced, all checkpoints), mean cos-to-centroid 0.436
+  class command-mass (fraction of the centroid's energy on macro slots):
+    k0=0.340  k1=0.277  k2=0.170  k3=0.071  k4=0.097  k5=0.543  k6=0.106  k7=0.157
+
+  occupancy drift TV(o_c, o_c-1): median 0.0569, p90 0.0939, max 0.1378 over 112 checkpoints
+  where the named consolidation events sit in that distribution (rank 1 = largest):
+    commit_L2    c 18  drift 0.1319  rank   4/112  (top 3%)
+    commit_L3    c 69  drift 0.0593  rank  52/112  (top 46%)
+    ms_grow_L2   c 19  drift 0.1084  rank   5/112  (top 4%)
+    ms_grow_L3   c 70  drift 0.0940  rank  12/112  (top 10%)
+    era2         c 49  drift 0.0524  rank  63/112  (top 55%)
+    era3         c 89  drift 0.0406  rank  93/112  (top 82%)
+    era4         c101  drift 0.0262  rank 109/112  (top 96%)
+    era5         c110  drift 0.0748  rank  28/112  (top 24%)
+
+  command-energy share of the residual, against the share of live slots that are commands:
+    cycle  n_live  macro_share  cmass_R  excess_R  cmass_LOGIT  cmass_FM  occ_cmd
+    c  10    32   0.000      0.000   +0.000      0.000       0.000    0.163
+    c  18    32   0.000      0.000   +0.000      0.000       0.000    0.186
+    c  19    48   0.333      0.000   -0.333      0.000       0.000    0.179
+    c  20    48   0.333      0.104   -0.229      0.109       0.103    0.186
+    c  30    48   0.333      0.222   -0.111      0.313       0.328    0.187
+    c  40    48   0.333      0.254   -0.080      0.259       0.260    0.219
+    c  49    48   0.333      0.287   -0.047      0.218       0.200    0.212
+    c  50    48   0.333      0.289   -0.044      0.212       0.195    0.220
+    c  60    48   0.333      0.337   +0.004      0.216       0.191    0.222
+    c  69    48   0.333      0.313   -0.020      0.236       0.214    0.229
+    c  70    56   0.429      0.319   -0.110      0.239       0.217    0.225
+    c  80    56   0.429      0.429   +0.000      0.390       0.380    0.240
+    c  89    56   0.429      0.456   +0.028      0.390       0.364    0.243
+    c  90    56   0.429      0.464   +0.036      0.397       0.378    0.246
+    c 100    56   0.429      0.509   +0.080      0.402       0.362    0.251
+    c 101    56   0.429      0.504   +0.075      0.397       0.359    0.256
+    c 110    56   0.429      0.504   +0.075      0.399       0.357    0.261
+
+(3) AXIS 2 — THE INSTRUCTION/DATA DECODE, SELF vs THE OBSERVER TWIN
+  balanced accuracy, leave-one-slot-out, median over the lambda grid; chance = 0.500
+
+  checkpoint sets: all-with-both-classes n=98; warm (no degenerate live slot) n=97; warm & >=10 cycles past the L3 commit n=38
+
+  --- all (mean over 98 checkpoints) ---
+    cell      d=16    d=64    d=256 
+    R         0.589   0.638   0.647 
+    FM        0.535   0.547   0.552 
+    LOGIT     0.541   0.562   0.579 
+    IO        0.544   0.560   0.568 
+    BEH       0.509   0.512   0.512 
+    SHUF      0.496   0.494   0.493 
+    NORM      0.534   0.534   0.534 
+    slot-label permutation null on R@d64: mean 0.491, mean p = 0.185 over 7 checkpoints
+
+  --- warm (mean over 97 checkpoints) ---
+    cell      d=16    d=64    d=256 
+    R         0.590   0.639   0.648 
+    FM        0.535   0.548   0.552 
+    LOGIT     0.542   0.563   0.580 
+    IO        0.544   0.561   0.569 
+    BEH       0.509   0.512   0.512 
+    SHUF      0.496   0.494   0.493 
+    NORM      0.534   0.534   0.534 
+    slot-label permutation null on R@d64: mean 0.491, mean p = 0.110 over 6 checkpoints
+
+  --- warm_postL3 (mean over 38 checkpoints) ---
+    cell      d=16    d=64    d=256 
+    R         0.547   0.586   0.595 
+    FM        0.518   0.532   0.538 
+    LOGIT     0.528   0.562   0.591 
+    IO        0.517   0.546   0.549 
+    BEH       0.520   0.524   0.528 
+    SHUF      0.506   0.491   0.488 
+    NORM      0.507   0.507   0.507 
+    slot-label permutation null on R@d64: mean 0.490, mean p = 0.007 over 2 checkpoints
+
+  AGE DISAMBIGUATOR (L2-macro vs L3-macro, macro slots only, d=64): R 0.605  LOGIT 0.516  over 47 checkpoints
+    (a decoder reading token AGE separates these; one reading command-ness does not)
+
+  the decode across time (d=64), against the consolidation events:
+     cycle  n_keep   self R      FM   LOGIT      IO     BEH    SHUF     adv
+    c   20      48    1.000   0.656   0.656   0.984   0.500   0.516  +0.016
+    c   30      48    0.883   0.617   0.633   0.664   0.500   0.508  +0.219
+    c   40      48    0.578   0.609   0.586   0.547   0.500   0.438  -0.008
+    c   49      48    0.617   0.570   0.578   0.531   0.531   0.484  +0.039
+    c   50      48    0.547   0.555   0.539   0.531   0.531   0.531  +0.008
+    c   60      48    0.523   0.508   0.500   0.461   0.500   0.492  +0.023
+    c   69      48    0.500   0.508   0.500   0.500   0.516   0.500  -0.016
+    c   70      48    0.492   0.500   0.500   0.500   0.500   0.492  -0.008
+    c   80      56    0.510   0.526   0.560   0.518   0.464   0.411  -0.049
+    c   89      56    0.599   0.500   0.500   0.495   0.500   0.393  +0.099
+    c   90      56    0.573   0.516   0.513   0.581   0.505   0.466  -0.008
+    c  100      56    0.596   0.536   0.581   0.534   0.500   0.526  +0.016
+    c  101      56    0.617   0.602   0.628   0.542   0.599   0.495  -0.010
+    c  110      56    0.549   0.503   0.594   0.607   0.500   0.469  -0.057
+
+  FOLLOW-UP (a) — the decode under a minimum TOKEN-AGE floor (d=64).
+  A command token is also a young token: pass 1's advantage sat in the cycles just
+  after a commit. This removes slots younger than A cycles and asks what survives.
+       A  n_ckpt  slots  cmd   self R  best I/O      adv    NORM    SHUF
+       0      98   51.8 19.8    0.638     0.582   +0.056   0.534   0.494
+       3      96   51.8 19.8    0.627     0.573   +0.054   0.523   0.494
+       5      94   51.7 19.7    0.618     0.571   +0.047   0.515   0.495
+      10      89   51.4 19.4    0.594     0.562   +0.032   0.505   0.495
+      20      79   50.8 18.8    0.552     0.546   +0.006   0.503   0.494
+      30      69   50.1 18.1    0.532     0.526   +0.006   0.504   0.496
+      50      49   48.0 16.0    0.507     0.500   +0.007   0.500   0.492
+
+  paper 2 criterion 2 / section 6, at d=64:
+    set              self R  best I/O  advantage    frac
+    all               0.638     0.562     +0.075   0.454
+    warm              0.639     0.563     +0.076   0.454
+    warm_postL3       0.586     0.562     +0.025   0.715
+
+(4) GUARDS
+  capacity x seed sweep on 10 checkpoints, 2 seeds per cell
+        H   FM par  % head  ens_cos  |r|/|t|   te_mse   R@d64  LOGIT@d64  cmass_R
+       16     5192    5.4%    0.734    0.424   0.2124   0.626      0.546    0.310
+  (paper 2's reference band for ens_cos: 0.78-0.91 real, 0.65 = the junk artifact.
+   H=384 is exactly the head's own architecture — the saturation rung, on purpose.)
+
+  hierarchy-eta2: the residual's structure, conditioned on the grammar's own latent
+  (the ROOT TARGET — this substrate's deep-hierarchy variable, paper 2's eta2 ~ 0.32)
+  against the junk conditioners. Every cell is reported as observed / matched-random,
+  because eta2 is inflated by group count and small groups and is unreadable alone.
+      ckpt         |R| ~ root         |R| ~ step    |R| ~ src cycle       class ~ root |R| ~ root | cycle
+    c    6    0.183/0.004       0.007/0.004       0.285/0.015       0.094/0.004       0.114/0.004   
+    c   18    0.069/0.004       0.009/0.004       0.340/0.015       0.049/0.004       0.044/0.005   
+    c   19    0.107/0.004       0.007/0.004       0.351/0.016       0.030/0.004       0.083/0.004   
+    c   28    0.130/0.004       0.005/0.005       0.366/0.015       0.050/0.003       0.093/0.004   
+    c   50    0.068/0.004       0.004/0.004       0.341/0.016       0.075/0.004       0.041/0.004   
+    c   69    0.082/0.004       0.006/0.004       0.333/0.014       0.111/0.004       0.053/0.004   
+    c   70    0.100/0.004       0.006/0.004       0.314/0.016       0.080/0.003       0.056/0.005   
+    c   72    0.063/0.003       0.010/0.005       0.353/0.016       0.062/0.004       0.028/0.003   
+    c   94    0.185/0.004       0.011/0.004       0.398/0.014       0.112/0.004       0.106/0.004   
+    c  116    0.185/0.004       0.012/0.004       0.390/0.016       0.095/0.004       0.115/0.003   
+    mean excess over matched-random: root +0.113  step +0.003  src-cycle +0.332  class~root +0.072  root|cycle +0.069
+
+  VALUE-HEAD CONTROL TARGET (same FM class, scalar output, no token index):
+    |r|/|t| mean 0.984 (sd 0.031); ||R|| across checkpoints cv 0.046
+    (a value-head residual that moves at the commits as much as pi's would say the reorganisation is the state distribution or the calendar, not the command port)
+
+(5) DOES IT TRACK at_support YIELD?
+  gauge = panel['at_support'][level], the free one-level-up read A1/A2 drive on.
+  series         level  rho_raw        p  rho_partial     n
+  cmass_R            3   +0.990    0.000       +0.270   112
+  cmass_excess       3   +0.696    0.000       +0.247   112
+  occ_drift          3   -0.595    0.000       +0.171   111
+  occ_cmd            3   +0.979    0.000       +0.189   112
+  decode_R           3   -0.377    0.000       +0.083    97
+  decode_adv         3   -0.446    0.000       +0.053    97
+  r_over_t           3   +0.990    0.000       -0.081   112
+  cmass_R            4   +0.990    0.000       +0.407   112
+  cmass_excess       4   +0.700    0.000       +0.074   112
+  occ_drift          4   -0.597    0.000       +0.014   111
+  occ_cmd            4   +0.975    0.000       +0.042   112
+  decode_R           4   -0.372    0.000       +0.178    97
+  decode_adv         4   -0.445    0.000       +0.098    97
+  r_over_t           4   +0.991    0.000       -0.038   112
+
+  the consolidation BEHAVIOUR series, recomputed offline at the same probe states
+  (`native`'s can't-decompose readout: pi's mass on the argmax macro's own spelling):
+     cycle  macro_mass  own_macro  own_spell  spell_ratio
+    c   10      0.0000        nan        nan          nan
+    c   18      0.0000        nan        nan          nan
+    c   19      0.3471     0.0217     0.0714       0.7669
+    c   20      0.0187     0.0016     0.0401       0.9623
+    c   30      0.0797     0.0145     0.0753       0.8382
+    c   40      0.1562     0.0266     0.0510       0.6572
+    c   49      0.2055     0.0354     0.0375       0.5141
+    c   50      0.2059     0.0365     0.0603       0.6229
+    c   60      0.2245     0.0438     0.0602       0.5788
+    c   69      0.2312     0.0576     0.1155       0.6673
+    c   70      0.3676     0.0502     0.1037       0.6739
+    c   80      0.3012     0.0799     0.1058       0.5697
+    c   89      0.3459     0.1011     0.1380       0.5770
+    c   90      0.3618     0.1095     0.1152       0.5128
+    c  100      0.3944     0.1312     0.1548       0.5412
+    c  101      0.3902     0.1328     0.1689       0.5599
+    c  110      0.3936     0.1302     0.1500       0.5355
+
+  residual series against the consolidation behaviour series (rho_raw / rho_partial):
+    macro_mass    cmass_R=+0.96/-0.08  cmass_excess=+0.67/-0.17  occ_drift=-0.58/+0.05  occ_cmd=+0.94/-0.06  decode_R=-0.40/-0.15  decode_adv=-0.49/-0.21  r_over_t=+0.96/+0.06
+    own_spell     cmass_R=+0.79/-0.08  cmass_excess=+0.74/-0.22  occ_drift=-0.26/+0.28  occ_cmd=+0.77/-0.11  decode_R=-0.04/+0.43  decode_adv=-0.16/+0.37  r_over_t=+0.80/+0.04
+    spell_ratio   cmass_R=-0.74/-0.19  cmass_excess=-0.76/-0.31  occ_drift=+0.48/+0.22  occ_cmd=-0.71/-0.07  decode_R=+0.40/+0.29  decode_adv=+0.50/+0.31  r_over_t=-0.72/+0.08
+  rho_partial residualises BOTH series on cycle and era (audiation finding 1 measured
+  eta2(update~cycle) = 0.438 on this very run — the calendar confound is real here).
+
+  figures: occupancy.png, decode_guards.png
+
+TOTAL 1359s
