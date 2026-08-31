@@ -1,0 +1,537 @@
++ cd /home/user/research/experiments
++ export MODAL_PROFILE=chromatic
++ MODAL_PROFILE=chromatic
++ modal run --detach -m rhm.practice.tuning.gate2_lm::gate2 --workers self_fm --tag g2c --drift-cells 20 --probe-ckpts 250,1000,2000,4000,6500,13500,19500,20000 --full-ckpts 999999 --no-full-at-end --ckpt-arms self_fm
+✓ Initialized. View run at 
+https://modal.com/apps/chromatic/main/ap-Vop5u46M1ZpTKbtJHCg7Fg
+✓ Created objects.
+├── 🔨 Created mount PythonPackage:a2a_forward
+├── 🔨 Created mount PythonPackage:rhm
+├── 🔨 Created mount PythonPackage:rhm
+├── 🔨 Created function gate.
+├── 🔨 Created function run_worker.
+├── 🔨 Created function gate2.
+└── 🔨 Created function calib2.
+==============================================================================
+tuning/Gate 1 WAVE 2  tag=g2c  v16_s2_L6_m4  8L/8H/256D  T=64
+  workers=['self_fm']  max_steps=20000  shadow=True fm=True
+  bursts at 5000,11000,17000 x 250, rho(s)=0.0242,0.0410,0.0377; ladder 0.002,0.005,0.01,0.02,0.05,0.10
+  drift at 6000,13000,19000, level 3, 20 cells/event; ladder 1,2,4,8,16,32
+  dead zones  d_key 0.076  d_self 0.071  d_out 0.028  (rot_requires_out=False)
+==============================================================================
+[refs] loaded verbatim from rhm_practice_fourwall_lm/fwlm1/setup.json
+[refs] epoch 1: recomputing exact BP for the drifted grammar (cell survival vs base 0.6875)
+[refs] exact per-position Bayes surprisal, both conditions, 51s
+[refs] epoch 2: recomputing exact BP for the drifted grammar (cell survival vs base 0.5000)
+[refs] exact per-position Bayes surprisal, both conditions, 52s
+[refs] epoch 3: recomputing exact BP for the drifted grammar (cell survival vs base 0.2812)
+[refs] exact per-position Bayes surprisal, both conditions, 54s
+GPT: 6.35M parameters
+TransformerForwardModel: 264.3K parameters (d_model=256, d_head=16, n_head=8, n_layer=1, mlp_hidden=256, mlp=GELU)
+===== worker self_fm  readers ['self_fm']  bursts [(5000, 5250), (11000, 11250), (17000, 17250)] rho=[0.0242, 0.041, 0.0377] ladder=[0.002, 0.005, 0.01, 0.02, 0.05, 0.1]  shadow=True fm=True =====
+[self_fm    s     0 e0q 0   ] nll idx 3.5992 out 3.6088 | bind -0.0078 mislead -0.0128 Ds 0.0233->0.0241/0.0233
+  self_fm      0 ntp 3.6217
+[self_fm    s   125 e0q 0   ] nll idx 1.9546 out 1.9605 | bind +0.0035 mislead +0.0042 | dk +0.000 ds +0.000 do +0.000 -> none/continue Ds 0.0034->0.0034/0.0034
+[self_fm    s   250 e0q 0   ] nll idx 1.8875 out 1.9227 | bind +0.0058 mislead +0.0065 | dk -0.068 ds -0.068 do -0.043 -> none/continue Ds 0.0045->0.0044/0.0045  d4 t/r 1.000/0.161
+[self_fm    s   375 e0q 0   ] nll idx 1.8174 out 1.8470 | bind +0.0090 mislead +0.0086 | dk -0.140 ds -0.131 do -0.124 -> none/continue Ds 0.0081->0.0079/0.0082
+[self_fm    s   500 e0q 0   ] nll idx 1.7439 out 1.7616 | bind +0.0115 mislead +0.0112 | dk -0.193 ds -0.185 do -0.189 -> none/continue Ds 0.0084->0.0082/0.0084
+[self_fm    s   625 e0q 0   ] nll idx 1.7084 out 1.7169 | bind +0.0145 mislead +0.0143 | dk -0.192 ds -0.188 do -0.209 -> none/continue Ds 0.0098->0.0092/0.0100
+[self_fm    s   750 e0q 0   ] nll idx 1.6914 out 1.6995 | bind +0.0168 mislead +0.0181 | dk -0.184 ds -0.176 do -0.191 -> none/continue Ds 0.0097->0.0094/0.0100
+[self_fm    s   875 e0q 0   ] nll idx 1.6721 out 1.6850 | bind +0.0209 mislead +0.0224 | dk -0.173 ds -0.163 do -0.171 -> none/continue Ds 0.0124->0.0113/0.0130
+[self_fm    s  1000 e0q 0   ] nll idx 1.6679 out 1.6831 | bind +0.0274 mislead +0.0296 | dk -0.144 ds -0.131 do -0.151 -> none/continue Ds 0.0156->0.0134/0.0165  d4 t/r 1.000/0.161
+[self_fm    s  1125 e0q 0   ] nll idx 1.6549 out 1.6764 | bind +0.0332 mislead +0.0342 | dk -0.140 ds -0.127 do -0.126 -> none/continue Ds 0.0198->0.0171/0.0208
+[self_fm    s  1250 e0q 0   ] nll idx 1.6515 out 1.6744 | bind +0.0384 mislead +0.0385 | dk -0.118 ds -0.101 do -0.113 -> none/continue Ds 0.0206->0.0176/0.0218
+[self_fm    s  1375 e0q 0   ] nll idx 1.6460 out 1.6703 | bind +0.0464 mislead +0.0475 | dk -0.114 ds -0.094 do -0.100 -> none/continue Ds 0.0268->0.0225/0.0284
+[self_fm    s  1500 e0q 0   ] nll idx 1.6365 out 1.6628 | bind +0.0489 mislead +0.0491 | dk -0.115 ds -0.095 do -0.091 -> none/continue Ds 0.0271->0.0229/0.0290
+[self_fm    s  1625 e0q 0   ] nll idx 1.6305 out 1.6621 | bind +0.0592 mislead +0.0574 | dk -0.099 ds -0.072 do -0.080 -> none/continue Ds 0.0287->0.0258/0.0312
+[self_fm    s  1750 e0q 0   ] nll idx 1.6195 out 1.6520 | bind +0.0654 mislead +0.0636 | dk -0.092 ds -0.066 do -0.081 -> none/continue Ds 0.0353->0.0273/0.0380
+[self_fm    s  1875 e0q 0   ] nll idx 1.6061 out 1.6434 | bind +0.0709 mislead +0.0703 | dk -0.094 ds -0.073 do -0.076 -> none/continue Ds 0.0373->0.0309/0.0400
+[self_fm    s  2000 e0q 0   ] nll idx 1.6021 out 1.6375 | bind +0.0824 mislead +0.0849 | dk -0.094 ds -0.055 do -0.074 -> none/continue Ds 0.0474->0.0399/0.0501  d4 t/r 1.000/0.147
+  self_fm   2000 ntp 1.6265
+[self_fm    s  2125 e0q 0   ] nll idx 1.5894 out 1.6279 | bind +0.0871 mislead +0.0865 | dk -0.089 ds -0.059 do -0.071 -> none/continue Ds 0.0446->0.0380/0.0478
+[self_fm    s  2250 e0q 0   ] nll idx 1.5778 out 1.6225 | bind +0.1006 mislead +0.0983 | dk -0.085 ds -0.059 do -0.065 -> none/continue Ds 0.0511->0.0443/0.0555
+[self_fm    s  2375 e0q 0   ] nll idx 1.5681 out 1.6178 | bind +0.1175 mislead +0.1137 | dk -0.086 ds -0.046 do -0.063 -> none/continue Ds 0.0621->0.0515/0.0654
+[self_fm    s  2500 e0q 0   ] nll idx 1.5590 out 1.6113 | bind +0.1190 mislead +0.1192 | dk -0.077 ds -0.041 do -0.056 -> none/continue Ds 0.0650->0.0563/0.0703
+[self_fm    s  2625 e0q 0   ] nll idx 1.5511 out 1.6061 | bind +0.1361 mislead +0.1319 | dk -0.077 ds -0.045 do -0.055 -> none/continue Ds 0.0698->0.0607/0.0752
+[self_fm    s  2750 e0q 0   ] nll idx 1.5381 out 1.5958 | bind +0.1499 mislead +0.1380 | dk -0.073 ds -0.047 do -0.054 -> none/continue Ds 0.0758->0.0715/0.0848
+[self_fm    s  2875 e0q 0   ] nll idx 1.5329 out 1.5905 | bind +0.1561 mislead +0.1486 | dk -0.070 ds -0.036 do -0.052 -> none/continue Ds 0.0778->0.0743/0.0836
+[self_fm    s  3000 e0q 0   ] nll idx 1.5246 out 1.5823 | bind +0.1735 mislead +0.1607 | dk -0.076 ds -0.041 do -0.060 -> none/continue Ds 0.0903->0.0862/0.0962
+[self_fm    s  3125 e0q 0   ] nll idx 1.5144 out 1.5729 | bind +0.1648 mislead +0.1518 | dk -0.067 ds -0.044 do -0.055 -> none/continue Ds 0.0814->0.0722/0.0882
+[self_fm    s  3250 e0q 0   ] nll idx 1.5107 out 1.5711 | bind +0.1918 mislead +0.1856 | dk -0.069 ds -0.045 do -0.050 -> none/continue Ds 0.0960->0.0871/0.1046
+[self_fm    s  3375 e0q 0   ] nll idx 1.4971 out 1.5605 | bind +0.1757 mislead +0.1609 | dk -0.067 ds -0.043 do -0.049 -> none/continue Ds 0.0828->0.0756/0.0878
+[self_fm    s  3500 e0q 0   ] nll idx 1.4888 out 1.5580 | bind +0.2214 mislead +0.2002 | dk -0.069 ds -0.032 do -0.050 -> none/continue Ds 0.1072->0.1029/0.1151
+[self_fm    s  3625 e0q 0   ] nll idx 1.4807 out 1.5517 | bind +0.2321 mislead +0.2142 | dk -0.057 ds -0.024 do -0.041 -> none/continue Ds 0.1085->0.1114/0.1167
+[self_fm    s  3750 e0q 0   ] nll idx 1.4738 out 1.5475 | bind +0.2301 mislead +0.2167 | dk -0.057 ds -0.028 do -0.038 -> none/continue Ds 0.1121->0.1077/0.1210
+[self_fm    s  3875 e0q 0   ] nll idx 1.4659 out 1.5447 | bind +0.2303 mislead +0.2088 | dk -0.060 ds -0.038 do -0.038 -> none/continue Ds 0.1054->0.1014/0.1129
+[self_fm    s  4000 e0q 0   ] nll idx 1.4628 out 1.5437 | bind +0.2565 mislead +0.2438 | dk -0.051 ds -0.017 do -0.032 -> none/continue Ds 0.1187->0.1241/0.1300  d4 t/r 1.000/0.165
+  self_fm   4000 ntp 1.5261
+[self_fm    s  4125 e0q 0   ] nll idx 1.4531 out 1.5378 | bind +0.2624 mislead +0.2492 | dk -0.045 ds -0.025 do -0.024 -> none/continue Ds 0.1248->0.1246/0.1384
+[self_fm    s  4250 e0q 0   ] nll idx 1.4494 out 1.5377 | bind +0.2977 mislead +0.2770 | dk -0.059 ds -0.015 do -0.025 -> none/continue Ds 0.1474->0.1453/0.1591
+[self_fm    s  4375 e0q 0   ] nll idx 1.4462 out 1.5363 | bind +0.2957 mislead +0.2753 | dk -0.050 ds -0.019 do -0.024 -> none/continue Ds 0.1384->0.1372/0.1495
+[self_fm    s  4500 e0q 0   ] nll idx 1.4432 out 1.5372 | bind +0.3096 mislead +0.2855 | dk -0.046 ds -0.007 do -0.022 -> none/continue Ds 0.1413->0.1460/0.1563
+[self_fm    s  4625 e0q 0   ] nll idx 1.4366 out 1.5331 | bind +0.3113 mislead +0.2953 | dk -0.029 ds -0.008 do -0.013 -> none/continue Ds 0.1377->0.1422/0.1496
+[self_fm    s  4750 e0q 0   ] nll idx 1.4323 out 1.5304 | bind +0.3368 mislead +0.3181 | dk -0.038 ds -0.001 do -0.016 -> none/continue Ds 0.1502->0.1541/0.1670
+[self_fm    s  4875 e0q 0   ] nll idx 1.4262 out 1.5330 | bind +0.3577 mislead +0.3298 | dk -0.033 ds +0.008 do -0.017 -> none/continue Ds 0.1620->0.1636/0.1823
+[self_fm    s  5000 e0q 0B  ] nll idx 1.4228 out 1.5290 | bind +0.3476 mislead +0.3233 | dk -0.040 ds -0.020 do -0.017 -> none/continue Ds 0.1478->0.1600/0.1666
+[self_fm    s  5025 e0q 0B  ] nll idx 1.4587 out 1.5341 | bind +0.2209 mislead +0.2142 | dk +0.181 ds +0.161 do -0.001 -> burst/skip Ds 0.1045->0.1080/0.1111
+[self_fm    s  5050 e0q 0B S] nll idx 1.4587 out 1.5341 | bind +0.2209 mislead +0.2142 | dk +0.237 ds +0.186 do +0.022 -> burst+fm/continue Ds 0.1045->0.1080/0.1111
+[self_fm    s  5075 e0q 0B  ] nll idx 1.4585 out 1.5333 | bind +0.2447 mislead +0.2311 | dk +0.116 ds +0.113 do -0.005 -> burst+fm/continue Ds 0.1181->0.1180/0.1233
+[self_fm    s  5125 e0q 0B  ] nll idx 1.4712 out 1.5304 | bind +0.2387 mislead +0.2232 | dk +0.111 ds +0.113 do -0.010 -> burst+fm/continue Ds 0.1181->0.1137/0.1224
+[self_fm    s  5250 e0q 0   ] nll idx 1.4509 out 1.5280 | bind +0.2615 mislead +0.2495 | dk +0.069 ds +0.086 do -0.011 -> none+fm/continue Ds 0.1225->0.1194/0.1265
+[self_fm    s  5275 e0q 0   ] nll idx 1.4189 out 1.5269 | bind +0.3263 mislead +0.3017 | dk -0.132 ds -0.104 do -0.013 -> none/continue Ds 0.1451->0.1448/0.1569
+[self_fm    s  5300 e0q 0   ] nll idx 1.4140 out 1.5257 | bind +0.3551 mislead +0.3323 | dk -0.123 ds -0.094 do -0.015 -> none/continue Ds 0.1590->0.1633/0.1757
+[self_fm    s  5325 e0q 0   ] nll idx 1.4236 out 1.5318 | bind +0.3589 mislead +0.3252 | dk -0.095 ds -0.071 do -0.002 -> none/continue Ds 0.1576->0.1547/0.1713
+[self_fm    s  5375 e0q 0   ] nll idx 1.4162 out 1.5260 | bind +0.3716 mislead +0.3480 | dk -0.088 ds -0.054 do -0.010 -> none/continue Ds 0.1667->0.1633/0.1778
+[self_fm    s  5500 e0q 0   ] nll idx 1.4157 out 1.5270 | bind +0.3621 mislead +0.3364 | dk -0.074 ds -0.054 do -0.011 -> none/continue Ds 0.1684->0.1678/0.1803
+[self_fm    s  5625 e0q 0   ] nll idx 1.4084 out 1.5224 | bind +0.3689 mislead +0.3471 | dk -0.060 ds -0.049 do -0.008 -> none/continue Ds 0.1595->0.1645/0.1764
+[self_fm    s  5750 e0q 0   ] nll idx 1.4099 out 1.5228 | bind +0.4180 mislead +0.3965 | dk -0.061 ds -0.030 do -0.012 -> none/continue Ds 0.1849->0.1943/0.2005
+[self_fm    s  5875 e0q 0   ] nll idx 1.4071 out 1.5214 | bind +0.4161 mislead +0.3971 | dk -0.060 ds -0.002 do -0.012 -> none/continue Ds 0.1910->0.1858/0.2038
+  [world] step 6000: DRIFT -> epoch 1 (cell survival vs base 0.6875)
+[self_fm    s  6000 e1q 0   ] nll idx 1.7957 out 1.7432 | bind +0.2706 mislead +0.2492 | dk -0.059 ds -0.022 do -0.020 -> none/continue Ds 0.2039->0.2040/0.2178
+  self_fm   6000 ntp 1.7609
+  [op] self_fm s6025: typed rotation -> MERGE (latched)
+[self_fm    s  6025 e1q 0 M ] nll idx 1.5170 out 1.5666 | bind +0.1181 mislead +0.1147 | dk +0.089 ds -0.024 do +0.047 -> rotation/merge Ds 0.0619->0.0531/0.0667
+[self_fm    s  6050 e1q 0 M ] nll idx 1.5555 out 1.5512 | bind +0.0975 mislead +0.0900 | dk +0.121 ds -0.055 do +0.029 -> rotation/merge Ds 0.0485->0.0447/0.0553
+[self_fm    s  6075 e1q 0 M ] nll idx 1.5449 out 1.5431 | bind +0.0878 mislead +0.0825 | dk +0.099 ds -0.049 do +0.010 -> rotation/merge Ds 0.0437->0.0393/0.0497
+[self_fm    s  6125 e1q 0 M ] nll idx 1.5374 out 1.5364 | bind +0.0747 mislead +0.0692 | dk +0.080 ds -0.045 do +0.003 -> rotation/merge Ds 0.0362->0.0325/0.0403
+[self_fm    s  6250 e1q 0 M ] nll idx 1.5295 out 1.5282 | bind +0.0682 mislead +0.0630 | dk +0.056 ds -0.049 do -0.006 -> none/continue Ds 0.0342->0.0288/0.0387
+[self_fm    s  6375 e1q 0 M ] nll idx 1.5257 out 1.5265 | bind +0.0608 mislead +0.0568 | dk +0.034 ds -0.054 do -0.012 -> none/continue Ds 0.0306->0.0271/0.0350
+[self_fm    s  6500 e1q 0 M ] nll idx 1.5250 out 1.5219 | bind +0.0556 mislead +0.0519 | dk +0.028 ds -0.046 do -0.014 -> none/continue Ds 0.0285->0.0264/0.0321  d4 t/r 1.000/0.237
+[self_fm    s  6625 e1q 0 M ] nll idx 1.5207 out 1.5209 | bind +0.0476 mislead +0.0459 | dk +0.027 ds -0.035 do -0.006 -> none/continue Ds 0.0246->0.0205/0.0300
+[self_fm    s  6750 e1q 0 M ] nll idx 1.5175 out 1.5153 | bind +0.0417 mislead +0.0408 | dk +0.017 ds -0.036 do -0.016 -> none/continue Ds 0.0172->0.0164/0.0220
+[self_fm    s  6875 e1q 0 M ] nll idx 1.5131 out 1.5147 | bind +0.0409 mislead +0.0396 | dk +0.003 ds -0.041 do -0.020 -> none/continue Ds 0.0190->0.0176/0.0240
+[self_fm    s  7000 e1q 0 M ] nll idx 1.5138 out 1.5106 | bind +0.0364 mislead +0.0366 | dk +0.003 ds -0.034 do -0.018 -> none/continue Ds 0.0171->0.0162/0.0216
+[self_fm    s  7125 e1q 0 M ] nll idx 1.5059 out 1.5068 | bind +0.0287 mislead +0.0280 | dk +0.003 ds -0.028 do -0.013 -> none/continue Ds 0.0137->0.0125/0.0178
+[self_fm    s  7250 e1q 0 M ] nll idx 1.5036 out 1.5043 | bind +0.0279 mislead +0.0283 | dk -0.003 ds -0.029 do -0.015 -> none/continue Ds 0.0137->0.0117/0.0174
+[self_fm    s  7375 e1q 0 M ] nll idx 1.5058 out 1.5031 | bind +0.0279 mislead +0.0274 | dk -0.007 ds -0.029 do -0.019 -> none/continue Ds 0.0139->0.0148/0.0163
+[self_fm    s  7500 e1q 0 M ] nll idx 1.5009 out 1.5010 | bind +0.0224 mislead +0.0227 | dk -0.011 ds -0.030 do -0.019 -> none/continue Ds 0.0129->0.0123/0.0159
+[self_fm    s  7625 e1q 0 M ] nll idx 1.4994 out 1.4989 | bind +0.0212 mislead +0.0224 | dk -0.001 ds -0.016 do -0.013 -> none/continue Ds 0.0135->0.0127/0.0172
+[self_fm    s  7750 e1q 0 M ] nll idx 1.4960 out 1.4983 | bind +0.0215 mislead +0.0215 | dk -0.015 ds -0.028 do -0.016 -> none/continue Ds 0.0114->0.0118/0.0146
+[self_fm    s  7875 e1q 0 M ] nll idx 1.4915 out 1.4952 | bind +0.0198 mislead +0.0198 | dk -0.014 ds -0.025 do -0.015 -> none/continue Ds 0.0114->0.0089/0.0137
+[self_fm    s  8000 e1q 4 M ] nll idx 1.4923 out 1.4934 | bind -0.0002 mislead +0.0033 | dk -0.011 ds -0.020 do -0.016 -> none/continue Ds 0.0096->0.0102/0.0127
+  self_fm   8000 ntp 1.4923
+[self_fm    s  8050 e1q 4 M ] nll idx 1.4923 out 1.4932 | bind +0.0004 mislead +0.0023 | dk -0.001 ds -0.009 do -0.007 -> none/continue Ds 0.0085->0.0098/0.0106
+[self_fm    s  8100 e1q 4 M ] nll idx 1.4910 out 1.4927 | bind +0.0010 mislead +0.0033 | dk -0.003 ds -0.009 do -0.008 -> none/continue Ds 0.0093->0.0103/0.0100
+[self_fm    s  8125 e1q 4 M ] nll idx 1.4900 out 1.4922 | bind +0.0001 mislead +0.0021 | dk -0.005 ds -0.011 do -0.009 -> none/continue Ds 0.0078->0.0089/0.0095
+[self_fm    s  8250 e1q 4 M ] nll idx 1.4902 out 1.4929 | bind -0.0000 mislead +0.0017 | dk -0.009 ds -0.013 do -0.013 -> none/continue Ds 0.0078->0.0102/0.0094
+[self_fm    s  8375 e1q 4 M ] nll idx 1.4878 out 1.4899 | bind +0.0002 mislead +0.0028 | dk -0.003 ds -0.007 do -0.013 -> none/continue Ds 0.0091->0.0119/0.0110
+[self_fm    s  8500 e1q 4 M ] nll idx 1.4878 out 1.4901 | bind +0.0005 mislead +0.0027 | dk -0.014 ds -0.017 do -0.013 -> none/continue Ds 0.0083->0.0108/0.0105
+[self_fm    s  8625 e1q 4 M ] nll idx 1.4833 out 1.4857 | bind +0.0004 mislead +0.0026 | dk -0.000 ds -0.003 do -0.003 -> none/continue Ds 0.0079->0.0089/0.0095
+[self_fm    s  8750 e1q 4 M ] nll idx 1.4837 out 1.4859 | bind -0.0007 mislead +0.0016 | dk -0.008 ds -0.011 do -0.009 -> none/continue Ds 0.0084->0.0094/0.0107
+[self_fm    s  8875 e1q 4 M ] nll idx 1.4840 out 1.4862 | bind +0.0001 mislead +0.0026 | dk -0.010 ds -0.012 do -0.011 -> none/continue Ds 0.0065->0.0080/0.0082
+[self_fm    s  9000 e1q 4 M ] nll idx 1.4851 out 1.4862 | bind +0.0004 mislead +0.0015 | dk -0.005 ds -0.007 do -0.007 -> none/continue Ds 0.0065->0.0082/0.0077
+[self_fm    s  9125 e1q 4 M ] nll idx 1.4808 out 1.4822 | bind -0.0007 mislead +0.0014 | dk +0.001 ds -0.000 do -0.003 -> none/continue Ds 0.0065->0.0074/0.0083
+[self_fm    s  9250 e1q 4 M ] nll idx 1.4819 out 1.4838 | bind -0.0005 mislead +0.0017 | dk -0.006 ds -0.007 do -0.001 -> none/continue Ds 0.0058->0.0077/0.0073
+[self_fm    s  9375 e1q 4 M ] nll idx 1.4830 out 1.4843 | bind -0.0010 mislead +0.0014 | dk -0.003 ds -0.004 do -0.006 -> none/continue Ds 0.0057->0.0078/0.0069
+[self_fm    s  9500 e1q 4 M ] nll idx 1.4836 out 1.4844 | bind -0.0012 mislead +0.0017 | dk -0.005 ds -0.006 do -0.011 -> none/continue Ds 0.0063->0.0085/0.0080
+[self_fm    s  9625 e1q 4 M ] nll idx 1.4799 out 1.4810 | bind -0.0002 mislead +0.0015 | dk -0.001 ds -0.001 do -0.001 -> none/continue Ds 0.0053->0.0060/0.0064
+[self_fm    s  9750 e1q 4 M ] nll idx 1.4790 out 1.4818 | bind +0.0000 mislead +0.0012 | dk -0.006 ds -0.007 do -0.005 -> none/continue Ds 0.0055->0.0070/0.0069
+[self_fm    s  9875 e1q 4 M ] nll idx 1.4805 out 1.4815 | bind -0.0004 mislead +0.0016 | dk -0.007 ds -0.007 do -0.006 -> none/continue Ds 0.0066->0.0067/0.0092
+[self_fm    s 10000 e1q 8 M ] nll idx 1.4785 out 1.4802 | bind -0.0017 mislead -0.0016 | dk -0.002 ds -0.003 do -0.005 -> none/continue Ds 0.0061->0.0062/0.0090
+  self_fm  10000 ntp 1.4787
+[self_fm    s 10050 e1q 8 M ] nll idx 1.4804 out 1.4800 | bind -0.0012 mislead -0.0017 | dk -0.002 ds -0.002 do +0.001 -> none/continue Ds 0.0058->0.0051/0.0085
+[self_fm    s 10100 e1q 8 M ] nll idx 1.4785 out 1.4802 | bind -0.0010 mislead -0.0015 | dk +0.001 ds +0.000 do +0.001 -> none/continue Ds 0.0067->0.0058/0.0079
+[self_fm    s 10125 e1q 8 M ] nll idx 1.4791 out 1.4785 | bind -0.0010 mislead -0.0014 | dk +0.002 ds +0.001 do +0.002 -> none/continue Ds 0.0059->0.0059/0.0082
+[self_fm    s 10250 e1q 8 M ] nll idx 1.4781 out 1.4787 | bind -0.0017 mislead -0.0019 | dk -0.001 ds -0.001 do -0.003 -> none/continue Ds 0.0072->0.0069/0.0107
+[self_fm    s 10375 e1q 8 M ] nll idx 1.4768 out 1.4794 | bind -0.0014 mislead -0.0016 | dk -0.004 ds -0.004 do -0.005 -> none/continue Ds 0.0064->0.0056/0.0087
+Container terminated due to preemption. Your Function will be restarted with the same input. For more details, see https://modal.com/docs/guide/preemption
+==============================================================================
+tuning/Gate 1 WAVE 2  tag=g2c  v16_s2_L6_m4  8L/8H/256D  T=64
+  workers=['self_fm']  max_steps=20000  shadow=True fm=True
+  bursts at 5000,11000,17000 x 250, rho(s)=0.0242,0.0410,0.0377; ladder 0.002,0.005,0.01,0.02,0.05,0.10
+  drift at 6000,13000,19000, level 3, 20 cells/event; ladder 1,2,4,8,16,32
+  dead zones  d_key 0.076  d_self 0.071  d_out 0.028  (rot_requires_out=False)
+==============================================================================
+[refs] loaded verbatim from rhm_practice_fourwall_lm/fwlm1/setup.json
+[refs] epoch 1: recomputing exact BP for the drifted grammar (cell survival vs base 0.6875)
+[self_fm    s 10500 e1q 8 M ] nll idx 1.4785 out 1.4798 | bind -0.0006 mislead -0.0012 | dk -0.014 ds -0.014 do -0.009 -> none/continue Ds 0.0059->0.0052/0.0075
+[self_fm    s 10625 e1q 8 M ] nll idx 1.4759 out 1.4775 | bind -0.0008 mislead -0.0009 | dk +0.006 ds +0.005 do +0.005 -> none/continue Ds 0.0052->0.0052/0.0071
+[self_fm    s 10750 e1q 8 M ] nll idx 1.4755 out 1.4766 | bind -0.0007 mislead -0.0012 | dk -0.005 ds -0.005 do -0.003 -> none/continue Ds 0.0051->0.0057/0.0070
+[refs] exact per-position Bayes surprisal, both conditions, 53s
+[refs] epoch 2: recomputing exact BP for the drifted grammar (cell survival vs base 0.5000)
+[self_fm    s 10875 e1q 8 M ] nll idx 1.4751 out 1.4779 | bind -0.0006 mislead -0.0013 | dk -0.001 ds -0.001 do -0.001 -> none/continue Ds 0.0052->0.0051/0.0071
+[self_fm    s 11000 e1q 8BM ] nll idx 1.4784 out 1.4781 | bind -0.0006 mislead -0.0011 | dk +0.001 ds +0.001 do -0.005 -> none/continue Ds 0.0056->0.0075/0.0072
+[refs] exact per-position Bayes surprisal, both conditions, 55s
+[refs] epoch 3: recomputing exact BP for the drifted grammar (cell survival vs base 0.2812)
+[self_fm    s 11025 e1q 8BM ] nll idx 1.5262 out 1.4867 | bind +0.0000 mislead -0.0004 | dk +0.292 ds +0.292 do +0.011 -> burst/skip Ds 0.0062->0.0064/0.0066
+[self_fm    s 11050 e1q 8BMS] nll idx 1.5262 out 1.4867 | bind +0.0000 mislead -0.0004 | dk +0.281 ds +0.281 do +0.032 -> drift/continue Ds 0.0062->0.0064/0.0066
+[self_fm    s 11075 e1q 8BM ] nll idx 1.5422 out 1.4831 | bind -0.0002 mislead -0.0007 | dk +0.197 ds +0.197 do +0.003 -> burst/skip Ds 0.0085->0.0080/0.0090
+[self_fm    s 11125 e1q 8BMS] nll idx 1.5422 out 1.4831 | bind -0.0002 mislead -0.0007 | dk +0.228 ds +0.228 do +0.024 -> burst+fm/continue Ds 0.0085->0.0080/0.0090
+[refs] exact per-position Bayes surprisal, both conditions, 53s
+[self_fm    s 11250 e1q 8 M ] nll idx 1.5172 out 1.4781 | bind +0.0002 mislead -0.0005 | dk +0.096 ds +0.096 do -0.008 -> burst+fm/continue Ds 0.0063->0.0060/0.0067
+GPT: 6.35M parameters
+TransformerForwardModel: 264.3K parameters (d_model=256, d_head=16, n_head=8, n_layer=1, mlp_hidden=256, mlp=GELU)
+===== worker self_fm  readers ['self_fm']  bursts [(5000, 5250), (11000, 11250), (17000, 17250)] rho=[0.0242, 0.041, 0.0377] ladder=[0.002, 0.005, 0.01, 0.02, 0.05, 0.1]  shadow=True fm=True =====
+[self_fm    s 11275 e1q 8 M ] nll idx 1.4763 out 1.4779 | bind -0.0008 mislead -0.0012 | dk -0.171 ds -0.171 do -0.009 -> none+fm/continue Ds 0.0028->0.0029/0.0037
+[self_fm    s     0 e0q 0   ] nll idx 3.5992 out 3.6088 | bind -0.0078 mislead -0.0128 Ds 0.0233->0.0241/0.0233
+  self_fm      0 ntp 3.6217
+[self_fm    s 11300 e1q 8 M ] nll idx 1.4755 out 1.4776 | bind -0.0009 mislead -0.0013 | dk -0.140 ds -0.140 do -0.005 -> none/continue Ds 0.0026->0.0027/0.0036
+[self_fm    s   125 e0q 0   ] nll idx 1.9546 out 1.9605 | bind +0.0035 mislead +0.0042 | dk +0.000 ds +0.000 do +0.000 -> none/continue Ds 0.0034->0.0034/0.0034
+[self_fm    s 11325 e1q 8 M ] nll idx 1.4768 out 1.4771 | bind -0.0009 mislead -0.0013 | dk -0.116 ds -0.116 do -0.007 -> none/continue Ds 0.0026->0.0028/0.0037
+[self_fm    s 11375 e1q 8 M ] nll idx 1.4734 out 1.4762 | bind -0.0009 mislead -0.0012 | dk -0.106 ds -0.106 do -0.007 -> none/continue Ds 0.0027->0.0030/0.0037
+[self_fm    s 11500 e1q 8 M ] nll idx 1.4751 out 1.4765 | bind -0.0008 mislead -0.0008 | dk -0.092 ds -0.092 do -0.010 -> none/continue Ds 0.0034->0.0037/0.0050
+[self_fm    s 11625 e1q 8 M ] nll idx 1.4735 out 1.4748 | bind -0.0008 mislead -0.0012 | dk -0.075 ds -0.075 do -0.000 -> none/continue Ds 0.0042->0.0039/0.0056
+[self_fm    s 11750 e1q 8 M ] nll idx 1.4744 out 1.4737 | bind -0.0012 mislead -0.0013 | dk -0.063 ds -0.063 do -0.006 -> none/continue Ds 0.0033->0.0043/0.0051
+[self_fm    s   250 e0q 0   ] nll idx 1.8875 out 1.9227 | bind +0.0058 mislead +0.0065 | dk -0.068 ds -0.068 do -0.043 -> none/continue Ds 0.0045->0.0044/0.0045  d4 t/r 1.000/0.161
+[self_fm    s   375 e0q 0   ] nll idx 1.8174 out 1.8470 | bind +0.0090 mislead +0.0086 | dk -0.140 ds -0.131 do -0.124 -> none/continue Ds 0.0081->0.0079/0.0082
+[self_fm    s 11875 e1q 8 M ] nll idx 1.4737 out 1.4758 | bind -0.0013 mislead -0.0013 | dk -0.055 ds -0.055 do -0.007 -> none/continue Ds 0.0036->0.0038/0.0048
+[self_fm    s   500 e0q 0   ] nll idx 1.7439 out 1.7616 | bind +0.0115 mislead +0.0112 | dk -0.193 ds -0.185 do -0.189 -> none/continue Ds 0.0084->0.0082/0.0084
+[self_fm    s 12000 e1q12 M ] nll idx 1.4767 out 1.4754 | bind -0.0003 mislead -0.0042 | dk -0.049 ds -0.049 do -0.006 -> none/continue Ds 0.0044->0.0044/0.0058
+  self_fm  12000 ntp 1.4652
+[self_fm    s   625 e0q 0   ] nll idx 1.7084 out 1.7169 | bind +0.0145 mislead +0.0143 | dk -0.192 ds -0.188 do -0.209 -> none/continue Ds 0.0098->0.0092/0.0100
+[self_fm    s 12050 e1q12 M ] nll idx 1.4753 out 1.4741 | bind -0.0002 mislead -0.0044 | dk -0.035 ds -0.035 do -0.000 -> none/continue Ds 0.0046->0.0038/0.0055
+[self_fm    s   750 e0q 0   ] nll idx 1.6914 out 1.6995 | bind +0.0168 mislead +0.0181 | dk -0.184 ds -0.176 do -0.191 -> none/continue Ds 0.0097->0.0094/0.0100
+[self_fm    s 12100 e1q12 M ] nll idx 1.4735 out 1.4737 | bind -0.0002 mislead -0.0039 | dk -0.030 ds -0.030 do -0.001 -> none/continue Ds 0.0042->0.0037/0.0057
+[self_fm    s   875 e0q 0   ] nll idx 1.6721 out 1.6850 | bind +0.0209 mislead +0.0224 | dk -0.173 ds -0.163 do -0.171 -> none/continue Ds 0.0124->0.0113/0.0130
+[self_fm    s 12125 e1q12 M ] nll idx 1.4723 out 1.4738 | bind -0.0003 mislead -0.0044 | dk -0.025 ds -0.025 do -0.000 -> none/continue Ds 0.0041->0.0038/0.0054
+[self_fm    s 12250 e1q12 M ] nll idx 1.4726 out 1.4730 | bind +0.0001 mislead -0.0036 | dk -0.018 ds -0.018 do -0.001 -> none/continue Ds 0.0027->0.0028/0.0045
+[self_fm    s 12375 e1q12 M ] nll idx 1.4746 out 1.4732 | bind -0.0003 mislead -0.0041 | dk -0.021 ds -0.021 do -0.007 -> none/continue Ds 0.0039->0.0033/0.0055
+[self_fm    s 12500 e1q12 M ] nll idx 1.4735 out 1.4736 | bind +0.0000 mislead -0.0037 | dk -0.019 ds -0.019 do -0.005 -> none/continue Ds 0.0037->0.0032/0.0052
+[self_fm    s 12625 e1q12 M ] nll idx 1.4739 out 1.4729 | bind +0.0002 mislead -0.0033 | dk -0.012 ds -0.012 do +0.002 -> none/continue Ds 0.0042->0.0034/0.0055
+[self_fm    s 12750 e1q12 M ] nll idx 1.4702 out 1.4729 | bind +0.0002 mislead -0.0029 | dk -0.008 ds -0.008 do -0.005 -> none/continue Ds 0.0029->0.0030/0.0039
+[self_fm    s  1000 e0q 0   ] nll idx 1.6679 out 1.6831 | bind +0.0274 mislead +0.0296 | dk -0.144 ds -0.131 do -0.151 -> none/continue Ds 0.0156->0.0134/0.0165  d4 t/r 1.000/0.161
+[self_fm    s 12875 e1q12 M ] nll idx 1.4729 out 1.4737 | bind -0.0001 mislead -0.0033 | dk -0.012 ds -0.012 do -0.005 -> none/continue Ds 0.0034->0.0033/0.0047
+[self_fm    s  1125 e0q 0   ] nll idx 1.6549 out 1.6764 | bind +0.0332 mislead +0.0342 | dk -0.140 ds -0.127 do -0.126 -> none/continue Ds 0.0198->0.0171/0.0208
+  [world] step 13000: DRIFT -> epoch 2 (cell survival vs base 0.5000)
+[self_fm    s  1250 e0q 0   ] nll idx 1.6515 out 1.6744 | bind +0.0384 mislead +0.0385 | dk -0.118 ds -0.101 do -0.113 -> none/continue Ds 0.0206->0.0176/0.0218
+[self_fm    s 13000 e2q12 M ] nll idx 1.8327 out 1.8475 | bind -0.0006 mislead -0.0023 | dk -0.012 ds -0.012 do -0.006 -> none/continue Ds 0.0042->0.0039/0.0055
+[self_fm    s  1375 e0q 0   ] nll idx 1.6460 out 1.6703 | bind +0.0464 mislead +0.0475 | dk -0.114 ds -0.094 do -0.100 -> none/continue Ds 0.0268->0.0225/0.0284
+[self_fm    s 13025 e2q12 M ] nll idx 1.5581 out 1.5594 | bind -0.0010 mislead -0.0028 | dk +0.080 ds +0.080 do +0.091 -> drift/continue Ds 0.0022->0.0019/0.0028
+[self_fm    s  1500 e0q 0   ] nll idx 1.6365 out 1.6628 | bind +0.0489 mislead +0.0491 | dk -0.115 ds -0.095 do -0.091 -> none/continue Ds 0.0271->0.0229/0.0290
+[self_fm    s 13050 e2q12 M ] nll idx 1.5314 out 1.5321 | bind +0.0001 mislead -0.0021 | dk +0.039 ds +0.039 do +0.050 -> none+fm/skip Ds 0.0020->0.0017/0.0030
+[self_fm    s  1625 e0q 0   ] nll idx 1.6305 out 1.6621 | bind +0.0592 mislead +0.0574 | dk -0.099 ds -0.072 do -0.080 -> none/continue Ds 0.0287->0.0258/0.0312
+[self_fm    s 13075 e2q12 MS] nll idx 1.5314 out 1.5321 | bind +0.0001 mislead -0.0021 | dk +0.053 ds +0.053 do +0.062 -> none/continue Ds 0.0020->0.0017/0.0030
+[self_fm    s  1750 e0q 0   ] nll idx 1.6195 out 1.6520 | bind +0.0654 mislead +0.0636 | dk -0.092 ds -0.066 do -0.081 -> none/continue Ds 0.0353->0.0273/0.0380
+[self_fm    s 13125 e2q12 M ] nll idx 1.5127 out 1.5138 | bind -0.0005 mislead -0.0029 | dk +0.007 ds +0.007 do +0.008 -> none/continue Ds 0.0023->0.0018/0.0032
+[self_fm    s  1875 e0q 0   ] nll idx 1.6061 out 1.6434 | bind +0.0709 mislead +0.0703 | dk -0.094 ds -0.073 do -0.076 -> none/continue Ds 0.0373->0.0309/0.0400
+[self_fm    s 13250 e2q12 M ] nll idx 1.4974 out 1.4994 | bind -0.0003 mislead -0.0024 | dk -0.014 ds -0.014 do -0.010 -> none/continue Ds 0.0025->0.0021/0.0031
+[self_fm    s 13375 e2q12 M ] nll idx 1.4899 out 1.4913 | bind +0.0002 mislead -0.0018 | dk -0.019 ds -0.019 do -0.016 -> none/continue Ds 0.0030->0.0025/0.0041
+[self_fm    s  2000 e0q 0   ] nll idx 1.6021 out 1.6375 | bind +0.0824 mislead +0.0849 | dk -0.094 ds -0.055 do -0.074 -> none/continue Ds 0.0474->0.0399/0.0501  d4 t/r 1.000/0.147
+  self_fm   2000 ntp 1.6265
+[self_fm    s  2125 e0q 0   ] nll idx 1.5894 out 1.6279 | bind +0.0871 mislead +0.0865 | dk -0.089 ds -0.059 do -0.071 -> none/continue Ds 0.0446->0.0380/0.0478
+[self_fm    s  2250 e0q 0   ] nll idx 1.5778 out 1.6225 | bind +0.1006 mislead +0.0983 | dk -0.085 ds -0.059 do -0.065 -> none/continue Ds 0.0511->0.0443/0.0555
+[self_fm    s  2375 e0q 0   ] nll idx 1.5681 out 1.6178 | bind +0.1175 mislead +0.1137 | dk -0.086 ds -0.046 do -0.063 -> none/continue Ds 0.0621->0.0515/0.0654
+[self_fm    s  2500 e0q 0   ] nll idx 1.5590 out 1.6113 | bind +0.1190 mislead +0.1192 | dk -0.077 ds -0.041 do -0.056 -> none/continue Ds 0.0650->0.0563/0.0703
+[self_fm    s 13500 e2q12 M ] nll idx 1.4888 out 1.4888 | bind -0.0006 mislead -0.0030 | dk -0.025 ds -0.025 do -0.019 -> none/continue Ds 0.0028->0.0024/0.0042  d4 t/r 0.999/0.448
+[self_fm    s  2625 e0q 0   ] nll idx 1.5511 out 1.6061 | bind +0.1361 mislead +0.1319 | dk -0.077 ds -0.045 do -0.055 -> none/continue Ds 0.0698->0.0607/0.0752
+[self_fm    s 13625 e2q12 M ] nll idx 1.4833 out 1.4835 | bind +0.0004 mislead -0.0018 | dk -0.016 ds -0.016 do -0.015 -> none/continue Ds 0.0029->0.0027/0.0039
+[self_fm    s  2750 e0q 0   ] nll idx 1.5381 out 1.5958 | bind +0.1499 mislead +0.1380 | dk -0.073 ds -0.047 do -0.054 -> none/continue Ds 0.0758->0.0715/0.0848
+[self_fm    s 13750 e2q12 M ] nll idx 1.4837 out 1.4833 | bind -0.0001 mislead -0.0020 | dk -0.014 ds -0.014 do -0.018 -> none/continue Ds 0.0032->0.0027/0.0047
+[self_fm    s  2875 e0q 0   ] nll idx 1.5329 out 1.5905 | bind +0.1561 mislead +0.1486 | dk -0.070 ds -0.036 do -0.052 -> none/continue Ds 0.0778->0.0743/0.0836
+[self_fm    s 13875 e2q12 M ] nll idx 1.4835 out 1.4824 | bind -0.0001 mislead -0.0022 | dk -0.020 ds -0.020 do -0.018 -> none/continue Ds 0.0039->0.0033/0.0047
+[self_fm    s  3000 e0q 0   ] nll idx 1.5246 out 1.5823 | bind +0.1735 mislead +0.1607 | dk -0.076 ds -0.041 do -0.060 -> none/continue Ds 0.0903->0.0862/0.0962
+[self_fm    s  3125 e0q 0   ] nll idx 1.5144 out 1.5729 | bind +0.1648 mislead +0.1518 | dk -0.067 ds -0.044 do -0.055 -> none/continue Ds 0.0814->0.0722/0.0882
+[self_fm    s 14000 e2q 0 M ] nll idx 1.4810 out 1.4805 | bind +0.0019 mislead +0.0022 | dk -0.016 ds -0.016 do -0.016 -> none/continue Ds 0.0032->0.0031/0.0041
+  self_fm  14000 ntp 1.4826
+[self_fm    s  3250 e0q 0   ] nll idx 1.5107 out 1.5711 | bind +0.1918 mislead +0.1856 | dk -0.069 ds -0.045 do -0.050 -> none/continue Ds 0.0960->0.0871/0.1046
+[self_fm    s 14050 e2q 0 M ] nll idx 1.4791 out 1.4791 | bind +0.0019 mislead +0.0020 | dk -0.005 ds -0.005 do -0.003 -> none/continue Ds 0.0024->0.0026/0.0035
+[self_fm    s  3375 e0q 0   ] nll idx 1.4971 out 1.5605 | bind +0.1757 mislead +0.1609 | dk -0.067 ds -0.043 do -0.049 -> none/continue Ds 0.0828->0.0756/0.0878
+[self_fm    s 14100 e2q 0 M ] nll idx 1.4801 out 1.4787 | bind +0.0020 mislead +0.0021 | dk -0.004 ds -0.004 do -0.008 -> none/continue Ds 0.0028->0.0027/0.0037
+[self_fm    s 14125 e2q 0 M ] nll idx 1.4793 out 1.4787 | bind +0.0019 mislead +0.0022 | dk -0.005 ds -0.005 do -0.004 -> none/continue Ds 0.0026->0.0033/0.0038
+[self_fm    s  3500 e0q 0   ] nll idx 1.4888 out 1.5580 | bind +0.2214 mislead +0.2002 | dk -0.069 ds -0.032 do -0.050 -> none/continue Ds 0.1072->0.1029/0.1151
+[self_fm    s 14250 e2q 0 M ] nll idx 1.4784 out 1.4789 | bind +0.0019 mislead +0.0021 | dk -0.008 ds -0.008 do -0.010 -> none/continue Ds 0.0031->0.0025/0.0040
+[self_fm    s  3625 e0q 0   ] nll idx 1.4807 out 1.5517 | bind +0.2321 mislead +0.2142 | dk -0.057 ds -0.024 do -0.041 -> none/continue Ds 0.1085->0.1114/0.1167
+[self_fm    s  3750 e0q 0   ] nll idx 1.4738 out 1.5475 | bind +0.2301 mislead +0.2167 | dk -0.057 ds -0.028 do -0.038 -> none/continue Ds 0.1121->0.1077/0.1210
+[self_fm    s 14375 e2q 0 M ] nll idx 1.4780 out 1.4785 | bind +0.0019 mislead +0.0019 | dk -0.012 ds -0.012 do -0.008 -> none/continue Ds 0.0031->0.0030/0.0037
+[self_fm    s  3875 e0q 0   ] nll idx 1.4659 out 1.5447 | bind +0.2303 mislead +0.2088 | dk -0.060 ds -0.038 do -0.038 -> none/continue Ds 0.1054->0.1014/0.1129
+[self_fm    s 14500 e2q 0 M ] nll idx 1.4802 out 1.4801 | bind +0.0016 mislead +0.0016 | dk -0.008 ds -0.008 do -0.011 -> none/continue Ds 0.0030->0.0027/0.0042
+[self_fm    s 14625 e2q 0 M ] nll idx 1.4766 out 1.4763 | bind +0.0017 mislead +0.0017 | dk -0.005 ds -0.005 do -0.003 -> none/continue Ds 0.0029->0.0028/0.0035
+[self_fm    s 14750 e2q 0 M ] nll idx 1.4778 out 1.4767 | bind +0.0012 mislead +0.0012 | dk -0.003 ds -0.003 do -0.003 -> none/continue Ds 0.0026->0.0023/0.0034
+[self_fm    s 14875 e2q 0 M ] nll idx 1.4762 out 1.4758 | bind +0.0014 mislead +0.0015 | dk -0.003 ds -0.003 do -0.008 -> none/continue Ds 0.0029->0.0033/0.0048
+[self_fm    s  4000 e0q 0   ] nll idx 1.4628 out 1.5437 | bind +0.2565 mislead +0.2438 | dk -0.051 ds -0.017 do -0.032 -> none/continue Ds 0.1187->0.1241/0.1300  d4 t/r 1.000/0.165
+  self_fm   4000 ntp 1.5261
+[self_fm    s 15000 e2q 0 M ] nll idx 1.4765 out 1.4762 | bind +0.0015 mislead +0.0015 | dk -0.003 ds -0.003 do -0.007 -> none/continue Ds 0.0030->0.0027/0.0049
+[self_fm    s  4125 e0q 0   ] nll idx 1.4531 out 1.5378 | bind +0.2624 mislead +0.2492 | dk -0.045 ds -0.025 do -0.024 -> none/continue Ds 0.1248->0.1246/0.1384
+[self_fm    s  4250 e0q 0   ] nll idx 1.4494 out 1.5377 | bind +0.2977 mislead +0.2770 | dk -0.059 ds -0.015 do -0.025 -> none/continue Ds 0.1474->0.1453/0.1591
+[self_fm    s 15125 e2q 0 M ] nll idx 1.4742 out 1.4743 | bind +0.0016 mislead +0.0012 | dk +0.001 ds +0.001 do +0.003 -> none/continue Ds 0.0025->0.0025/0.0039
+[self_fm    s  4375 e0q 0   ] nll idx 1.4462 out 1.5363 | bind +0.2957 mislead +0.2753 | dk -0.050 ds -0.019 do -0.024 -> none/continue Ds 0.1384->0.1372/0.1495
+[self_fm    s 15250 e2q 0 M ] nll idx 1.4744 out 1.4740 | bind +0.0016 mislead +0.0012 | dk -0.004 ds -0.004 do -0.004 -> none/continue Ds 0.0029->0.0032/0.0042
+[self_fm    s 15375 e2q 0 M ] nll idx 1.4766 out 1.4745 | bind +0.0013 mislead +0.0011 | dk -0.006 ds -0.006 do -0.008 -> none/continue Ds 0.0031->0.0034/0.0039
+[self_fm    s  4500 e0q 0   ] nll idx 1.4432 out 1.5372 | bind +0.3096 mislead +0.2855 | dk -0.046 ds -0.007 do -0.022 -> none/continue Ds 0.1413->0.1460/0.1563
+[self_fm    s  4625 e0q 0   ] nll idx 1.4366 out 1.5331 | bind +0.3113 mislead +0.2953 | dk -0.029 ds -0.008 do -0.013 -> none/continue Ds 0.1377->0.1422/0.1496
+[self_fm    s  4750 e0q 0   ] nll idx 1.4323 out 1.5304 | bind +0.3368 mislead +0.3181 | dk -0.038 ds -0.001 do -0.016 -> none/continue Ds 0.1502->0.1541/0.1670
+[self_fm    s 15500 e2q 0 M ] nll idx 1.4764 out 1.4743 | bind +0.0011 mislead +0.0011 | dk -0.006 ds -0.006 do -0.008 -> none/continue Ds 0.0029->0.0027/0.0040
+[self_fm    s  4875 e0q 0   ] nll idx 1.4262 out 1.5330 | bind +0.3577 mislead +0.3298 | dk -0.033 ds +0.008 do -0.017 -> none/continue Ds 0.1620->0.1636/0.1823
+[self_fm    s 15625 e2q 0 M ] nll idx 1.4740 out 1.4724 | bind +0.0013 mislead +0.0013 | dk -0.000 ds -0.000 do -0.002 -> none/continue Ds 0.0033->0.0027/0.0045
+[self_fm    s 15750 e2q 0 M ] nll idx 1.4750 out 1.4721 | bind +0.0012 mislead +0.0012 | dk -0.003 ds -0.003 do -0.001 -> none/continue Ds 0.0028->0.0024/0.0041
+[self_fm    s  5000 e0q 0B  ] nll idx 1.4228 out 1.5290 | bind +0.3476 mislead +0.3233 | dk -0.040 ds -0.020 do -0.017 -> none/continue Ds 0.1478->0.1600/0.1666
+[self_fm    s  5025 e0q 0B  ] nll idx 1.4587 out 1.5341 | bind +0.2209 mislead +0.2142 | dk +0.181 ds +0.161 do -0.001 -> burst/skip Ds 0.1045->0.1080/0.1111
+[self_fm    s 15875 e2q 0 M ] nll idx 1.4749 out 1.4722 | bind +0.0011 mislead +0.0013 | dk -0.001 ds -0.001 do -0.004 -> none/continue Ds 0.0025->0.0026/0.0034
+[self_fm    s  5050 e0q 0B S] nll idx 1.4587 out 1.5341 | bind +0.2209 mislead +0.2142 | dk +0.237 ds +0.186 do +0.022 -> burst+fm/continue Ds 0.1045->0.1080/0.1111
+[self_fm    s  5075 e0q 0B  ] nll idx 1.4585 out 1.5333 | bind +0.2447 mislead +0.2311 | dk +0.116 ds +0.113 do -0.005 -> burst+fm/continue Ds 0.1181->0.1180/0.1233
+[self_fm    s  5125 e0q 0B  ] nll idx 1.4712 out 1.5304 | bind +0.2387 mislead +0.2232 | dk +0.111 ds +0.113 do -0.010 -> burst+fm/continue Ds 0.1181->0.1137/0.1224
+[self_fm    s 16000 e2q 4 M ] nll idx 1.4768 out 1.4726 | bind +0.0000 mislead +0.0006 | dk -0.000 ds -0.000 do -0.003 -> none/continue Ds 0.0024->0.0024/0.0029
+  self_fm  16000 ntp 1.4708
+[self_fm    s  5250 e0q 0   ] nll idx 1.4509 out 1.5280 | bind +0.2615 mislead +0.2495 | dk +0.069 ds +0.086 do -0.011 -> none+fm/continue Ds 0.1225->0.1194/0.1265
+[self_fm    s 16050 e2q 4 M ] nll idx 1.4738 out 1.4704 | bind -0.0001 mislead +0.0002 | dk +0.006 ds +0.006 do +0.003 -> none/continue Ds 0.0018->0.0019/0.0027
+[self_fm    s  5275 e0q 0   ] nll idx 1.4189 out 1.5269 | bind +0.3263 mislead +0.3017 | dk -0.132 ds -0.104 do -0.013 -> none/continue Ds 0.1451->0.1448/0.1569
+Container terminated due to preemption. Your Function will be restarted with the same input. For more details, see https://modal.com/docs/guide/preemption
+==============================================================================
+tuning/Gate 1 WAVE 2  tag=g2c  v16_s2_L6_m4  8L/8H/256D  T=64
+  workers=['self_fm']  max_steps=20000  shadow=True fm=True
+  bursts at 5000,11000,17000 x 250, rho(s)=0.0242,0.0410,0.0377; ladder 0.002,0.005,0.01,0.02,0.05,0.10
+  drift at 6000,13000,19000, level 3, 20 cells/event; ladder 1,2,4,8,16,32
+  dead zones  d_key 0.076  d_self 0.071  d_out 0.028  (rot_requires_out=False)
+==============================================================================
+[refs] loaded verbatim from rhm_practice_fourwall_lm/fwlm1/setup.json
+[refs] epoch 1: recomputing exact BP for the drifted grammar (cell survival vs base 0.6875)
+[self_fm    s  5300 e0q 0   ] nll idx 1.4140 out 1.5257 | bind +0.3551 mislead +0.3323 | dk -0.123 ds -0.094 do -0.015 -> none/continue Ds 0.1590->0.1633/0.1757
+[self_fm    s 16100 e2q 4 M ] nll idx 1.4735 out 1.4705 | bind -0.0000 mislead +0.0002 | dk +0.005 ds +0.005 do -0.002 -> none/continue Ds 0.0019->0.0022/0.0025
+[self_fm    s  5325 e0q 0   ] nll idx 1.4236 out 1.5318 | bind +0.3589 mislead +0.3252 | dk -0.095 ds -0.071 do -0.002 -> none/continue Ds 0.1576->0.1547/0.1713
+[self_fm    s 16125 e2q 4 M ] nll idx 1.4738 out 1.4711 | bind -0.0003 mislead -0.0001 | dk -0.002 ds -0.002 do +0.002 -> none/continue Ds 0.0028->0.0026/0.0033
+[self_fm    s  5375 e0q 0   ] nll idx 1.4162 out 1.5260 | bind +0.3716 mislead +0.3480 | dk -0.088 ds -0.054 do -0.010 -> none/continue Ds 0.1667->0.1633/0.1778
+[self_fm    s 16250 e2q 4 M ] nll idx 1.4746 out 1.4721 | bind +0.0000 mislead +0.0003 | dk -0.002 ds -0.002 do -0.002 -> none/continue Ds 0.0029->0.0026/0.0035
+[refs] exact per-position Bayes surprisal, both conditions, 54s
+[self_fm    s  5500 e0q 0   ] nll idx 1.4157 out 1.5270 | bind +0.3621 mislead +0.3364 | dk -0.074 ds -0.054 do -0.011 -> none/continue Ds 0.1684->0.1678/0.1803
+[self_fm    s 16375 e2q 4 M ] nll idx 1.4763 out 1.4709 | bind +0.0001 mislead +0.0006 | dk -0.002 ds -0.002 do -0.006 -> none/continue Ds 0.0022->0.0029/0.0031[refs] epoch 2: recomputing exact BP for the drifted grammar (cell survival vs base 0.5000)
+
+[self_fm    s  5625 e0q 0   ] nll idx 1.4084 out 1.5224 | bind +0.3689 mislead +0.3471 | dk -0.060 ds -0.049 do -0.008 -> none/continue Ds 0.1595->0.1645/0.1764
+[self_fm    s  5750 e0q 0   ] nll idx 1.4099 out 1.5228 | bind +0.4180 mislead +0.3965 | dk -0.061 ds -0.030 do -0.012 -> none/continue Ds 0.1849->0.1943/0.2005
+[self_fm    s 16500 e2q 4 M ] nll idx 1.4767 out 1.4724 | bind +0.0004 mislead +0.0008 | dk -0.004 ds -0.004 do -0.004 -> none/continue Ds 0.0037->0.0040/0.0048
+[self_fm    s  5875 e0q 0   ] nll idx 1.4071 out 1.5214 | bind +0.4161 mislead +0.3971 | dk -0.060 ds -0.002 do -0.012 -> none/continue Ds 0.1910->0.1858/0.2038
+  [world] step 6000: DRIFT -> epoch 1 (cell survival vs base 0.6875)
+[self_fm    s 16625 e2q 4 M ] nll idx 1.4728 out 1.4693 | bind +0.0000 mislead +0.0004 | dk -0.000 ds -0.000 do -0.001 -> none/continue Ds 0.0023->0.0023/0.0031
+[refs] exact per-position Bayes surprisal, both conditions, 52s
+[refs] epoch 3: recomputing exact BP for the drifted grammar (cell survival vs base 0.2812)
+[self_fm    s 16750 e2q 4 M ] nll idx 1.4738 out 1.4704 | bind +0.0002 mislead +0.0006 | dk -0.001 ds -0.001 do -0.001 -> none/continue Ds 0.0028->0.0026/0.0037
+[self_fm    s  6000 e1q 0   ] nll idx 1.7957 out 1.7432 | bind +0.2706 mislead +0.2492 | dk -0.059 ds -0.022 do -0.020 -> none/continue Ds 0.2039->0.2040/0.2178
+  self_fm   6000 ntp 1.7609
+  [op] self_fm s6025: typed rotation -> MERGE (latched)
+[self_fm    s  6025 e1q 0 M ] nll idx 1.5170 out 1.5666 | bind +0.1181 mislead +0.1147 | dk +0.089 ds -0.024 do +0.047 -> rotation/merge Ds 0.0619->0.0531/0.0667
+[self_fm    s 16875 e2q 4 M ] nll idx 1.4737 out 1.4701 | bind +0.0000 mislead +0.0002 | dk -0.003 ds -0.003 do -0.004 -> none/continue Ds 0.0031->0.0024/0.0036
+[self_fm    s  6050 e1q 0 M ] nll idx 1.5555 out 1.5512 | bind +0.0975 mislead +0.0900 | dk +0.121 ds -0.055 do +0.029 -> rotation/merge Ds 0.0485->0.0447/0.0553
+[self_fm    s  6075 e1q 0 M ] nll idx 1.5449 out 1.5431 | bind +0.0878 mislead +0.0825 | dk +0.099 ds -0.049 do +0.010 -> rotation/merge Ds 0.0437->0.0393/0.0497
+[refs] exact per-position Bayes surprisal, both conditions, 51s
+[self_fm    s  6125 e1q 0 M ] nll idx 1.5374 out 1.5364 | bind +0.0747 mislead +0.0692 | dk +0.080 ds -0.045 do +0.003 -> rotation/merge Ds 0.0362->0.0325/0.0403
+[self_fm    s 17000 e2q 4BM ] nll idx 1.4737 out 1.4707 | bind -0.0001 mislead +0.0001 | dk -0.001 ds -0.001 do -0.011 -> none/continue Ds 0.0021->0.0023/0.0027
+GPT: 6.35M parameters
+[self_fm    s 17025 e2q 4BM ] nll idx 1.5290 out 1.4809 | bind -0.0001 mislead -0.0001 | dk +0.291 ds +0.291 do +0.013 -> burst/skip Ds 0.0029->0.0032/0.0033
+[self_fm    s  6250 e1q 0 M ] nll idx 1.5295 out 1.5282 | bind +0.0682 mislead +0.0630 | dk +0.056 ds -0.049 do -0.006 -> none/continue Ds 0.0342->0.0288/0.0387
+TransformerForwardModel: 264.3K parameters (d_model=256, d_head=16, n_head=8, n_layer=1, mlp_hidden=256, mlp=GELU)
+===== worker self_fm  readers ['self_fm']  bursts [(5000, 5250), (11000, 11250), (17000, 17250)] rho=[0.0242, 0.041, 0.0377] ladder=[0.002, 0.005, 0.01, 0.02, 0.05, 0.1]  shadow=True fm=True =====
+[self_fm    s 17050 e2q 4BMS] nll idx 1.5290 out 1.4809 | bind -0.0001 mislead -0.0001 | dk +0.358 ds +0.358 do +0.033 -> drift/continue Ds 0.0029->0.0032/0.0033
+[self_fm    s  6375 e1q 0 M ] nll idx 1.5257 out 1.5265 | bind +0.0608 mislead +0.0568 | dk +0.034 ds -0.054 do -0.012 -> none/continue Ds 0.0306->0.0271/0.0350
+Container terminated due to preemption. Your Function will be restarted with the same input. For more details, see https://modal.com/docs/guide/preemption
+==============================================================================
+tuning/Gate 1 WAVE 2  tag=g2c  v16_s2_L6_m4  8L/8H/256D  T=64
+  workers=['self_fm']  max_steps=20000  shadow=True fm=True
+  bursts at 5000,11000,17000 x 250, rho(s)=0.0242,0.0410,0.0377; ladder 0.002,0.005,0.01,0.02,0.05,0.10
+  drift at 6000,13000,19000, level 3, 20 cells/event; ladder 1,2,4,8,16,32
+  dead zones  d_key 0.076  d_self 0.071  d_out 0.028  (rot_requires_out=False)
+==============================================================================
+[refs] loaded verbatim from rhm_practice_fourwall_lm/fwlm1/setup.json
+[refs] epoch 1: recomputing exact BP for the drifted grammar (cell survival vs base 0.6875)
+[self_fm    s     0 e0q 0   ] nll idx 3.5992 out 3.6088 | bind -0.0078 mislead -0.0128 Ds 0.0233->0.0241/0.0233
+  self_fm      0 ntp 3.6217
+[self_fm    s 17075 e2q 4BM ] nll idx 1.5209 out 1.4764 | bind -0.0001 mislead +0.0000 | dk +0.165 ds +0.165 do +0.002 -> burst/skip Ds 0.0020->0.0021/0.0022
+[self_fm    s   125 e0q 0   ] nll idx 1.9546 out 1.9605 | bind +0.0035 mislead +0.0042 | dk +0.000 ds +0.000 do +0.000 -> none/continue Ds 0.0034->0.0034/0.0034
+[self_fm    s 17125 e2q 4BMS] nll idx 1.5209 out 1.4764 | bind -0.0001 mislead +0.0000 | dk +0.184 ds +0.184 do +0.023 -> burst+fm/continue Ds 0.0020->0.0021/0.0022
+[refs] exact per-position Bayes surprisal, both conditions, 37s
+[refs] epoch 2: recomputing exact BP for the drifted grammar (cell survival vs base 0.5000)
+[self_fm    s 17250 e2q 4 M ] nll idx 1.5048 out 1.4707 | bind -0.0003 mislead -0.0007 | dk +0.073 ds +0.073 do -0.011 -> none+fm/continue Ds 0.0019->0.0021/0.0020
+[self_fm    s 17275 e2q 4 M ] nll idx 1.4757 out 1.4707 | bind -0.0001 mislead +0.0003 | dk -0.166 ds -0.166 do -0.010 -> none/continue Ds 0.0014->0.0014/0.0018
+[self_fm    s 17300 e2q 4 M ] nll idx 1.4736 out 1.4690 | bind -0.0001 mislead +0.0001 | dk -0.137 ds -0.137 do -0.011 -> none/continue Ds 0.0012->0.0013/0.0016
+[refs] exact per-position Bayes surprisal, both conditions, 36s
+[refs] epoch 3: recomputing exact BP for the drifted grammar (cell survival vs base 0.2812)
+[self_fm    s 17325 e2q 4 M ] nll idx 1.4735 out 1.4684 | bind -0.0001 mislead -0.0000 | dk -0.120 ds -0.120 do -0.004 -> none/continue Ds 0.0013->0.0012/0.0017
+[self_fm    s 17375 e2q 4 M ] nll idx 1.4727 out 1.4680 | bind -0.0001 mislead +0.0001 | dk -0.100 ds -0.100 do -0.009 -> none/continue Ds 0.0011->0.0014/0.0015
+[self_fm    s  6500 e1q 0 M ] nll idx 1.5250 out 1.5219 | bind +0.0556 mislead +0.0519 | dk +0.028 ds -0.046 do -0.014 -> none/continue Ds 0.0285->0.0264/0.0321  d4 t/r 1.000/0.237
+[refs] exact per-position Bayes surprisal, both conditions, 35s
+Container terminated due to preemption. Your Function will be restarted with the same input. For more details, see https://modal.com/docs/guide/preemption
+GPT: 6.35M parameters
+TransformerForwardModel: 264.3K parameters (d_model=256, d_head=16, n_head=8, n_layer=1, mlp_hidden=256, mlp=GELU)
+===== worker self_fm  readers ['self_fm']  bursts [(5000, 5250), (11000, 11250), (17000, 17250)] rho=[0.0242, 0.041, 0.0377] ladder=[0.002, 0.005, 0.01, 0.02, 0.05, 0.1]  shadow=True fm=True =====
+[self_fm    s 17500 e2q 4 M ] nll idx 1.4716 out 1.4691 | bind +0.0001 mislead +0.0002 | dk -0.086 ds -0.086 do -0.012 -> none/continue Ds 0.0014->0.0016/0.0019
+[self_fm    s     0 e0q 0   ] nll idx 3.5992 out 3.6088 | bind -0.0078 mislead -0.0128 Ds 0.0233->0.0241/0.0233
+GPT: 6.35M parameters
+[self_fm    s 17625 e2q 4 M ] nll idx 1.4713 out 1.4670 | bind +0.0000 mislead +0.0004 | dk -0.070 ds -0.070 do -0.005 -> none/continue Ds 0.0017->0.0018/0.0022
+  self_fm      0 ntp 3.6217
+TransformerForwardModel: 264.3K parameters (d_model=256, d_head=16, n_head=8, n_layer=1, mlp_hidden=256, mlp=GELU)
+===== worker self_fm  readers ['self_fm']  bursts [(5000, 5250), (11000, 11250), (17000, 17250)] rho=[0.0242, 0.041, 0.0377] ladder=[0.002, 0.005, 0.01, 0.02, 0.05, 0.1]  shadow=True fm=True =====
+[self_fm    s   125 e0q 0   ] nll idx 1.9546 out 1.9605 | bind +0.0035 mislead +0.0042 | dk +0.000 ds +0.000 do +0.000 -> none/continue Ds 0.0034->0.0034/0.0034
+[self_fm    s 17750 e2q 4 M ] nll idx 1.4712 out 1.4664 | bind +0.0000 mislead +0.0002 | dk -0.063 ds -0.063 do -0.005 -> none/continue Ds 0.0013->0.0014/0.0021
+[self_fm    s   250 e0q 0   ] nll idx 1.8875 out 1.9227 | bind +0.0058 mislead +0.0065 | dk -0.068 ds -0.068 do -0.043 -> none/continue Ds 0.0045->0.0044/0.0045  d4 t/r 1.000/0.161
+[self_fm    s     0 e0q 0   ] nll idx 3.5992 out 3.6088 | bind -0.0078 mislead -0.0128 Ds 0.0233->0.0241/0.0233
+[self_fm    s   375 e0q 0   ] nll idx 1.8174 out 1.8470 | bind +0.0090 mislead +0.0086 | dk -0.140 ds -0.131 do -0.124 -> none/continue Ds 0.0081->0.0079/0.0082
+  self_fm      0 ntp 3.6217
+[self_fm    s 17875 e2q 4 M ] nll idx 1.4718 out 1.4667 | bind +0.0000 mislead +0.0002 | dk -0.055 ds -0.055 do -0.008 -> none/continue Ds 0.0015->0.0019/0.0023
+[self_fm    s   125 e0q 0   ] nll idx 1.9546 out 1.9605 | bind +0.0035 mislead +0.0042 | dk +0.000 ds +0.000 do +0.000 -> none/continue Ds 0.0034->0.0034/0.0034
+[self_fm    s   500 e0q 0   ] nll idx 1.7439 out 1.7616 | bind +0.0115 mislead +0.0112 | dk -0.193 ds -0.185 do -0.189 -> none/continue Ds 0.0084->0.0082/0.0084
+[self_fm    s 18000 e2q 8 M ] nll idx 1.4735 out 1.4690 | bind -0.0003 mislead +0.0002 | dk -0.048 ds -0.048 do -0.012 -> none/continue Ds 0.0020->0.0023/0.0027
+  self_fm  18000 ntp 1.4682
+[self_fm    s   625 e0q 0   ] nll idx 1.7084 out 1.7169 | bind +0.0145 mislead +0.0143 | dk -0.192 ds -0.188 do -0.209 -> none/continue Ds 0.0098->0.0092/0.0100
+[self_fm    s 18050 e2q 8 M ] nll idx 1.4721 out 1.4651 | bind -0.0002 mislead +0.0002 | dk -0.029 ds -0.029 do +0.001 -> none/continue Ds 0.0019->0.0022/0.0024
+[self_fm    s   750 e0q 0   ] nll idx 1.6914 out 1.6995 | bind +0.0168 mislead +0.0181 | dk -0.184 ds -0.176 do -0.191 -> none/continue Ds 0.0097->0.0094/0.0100
+[self_fm    s 18100 e2q 8 M ] nll idx 1.4710 out 1.4643 | bind -0.0002 mislead +0.0002 | dk -0.031 ds -0.031 do +0.001 -> none/continue Ds 0.0023->0.0020/0.0031
+[self_fm    s   875 e0q 0   ] nll idx 1.6721 out 1.6850 | bind +0.0209 mislead +0.0224 | dk -0.173 ds -0.163 do -0.171 -> none/continue Ds 0.0124->0.0113/0.0130
+[self_fm    s 18125 e2q 8 M ] nll idx 1.4719 out 1.4658 | bind -0.0001 mislead +0.0003 | dk -0.025 ds -0.025 do -0.001 -> none/continue Ds 0.0019->0.0021/0.0030
+[self_fm    s 18250 e2q 8 M ] nll idx 1.4715 out 1.4648 | bind -0.0003 mislead -0.0001 | dk -0.020 ds -0.020 do -0.001 -> none/continue Ds 0.0021->0.0025/0.0030
+[self_fm    s 18375 e2q 8 M ] nll idx 1.4718 out 1.4650 | bind -0.0003 mislead -0.0001 | dk -0.019 ds -0.019 do -0.003 -> none/continue Ds 0.0022->0.0027/0.0030
+[self_fm    s   250 e0q 0   ] nll idx 1.8875 out 1.9227 | bind +0.0058 mislead +0.0065 | dk -0.068 ds -0.068 do -0.043 -> none/continue Ds 0.0045->0.0044/0.0045  d4 t/r 1.000/0.161
+[self_fm    s 18500 e2q 8 M ] nll idx 1.4739 out 1.4674 | bind -0.0003 mislead +0.0000 | dk -0.021 ds -0.021 do -0.015 -> none/continue Ds 0.0020->0.0028/0.0031
+[self_fm    s   375 e0q 0   ] nll idx 1.8174 out 1.8470 | bind +0.0090 mislead +0.0086 | dk -0.140 ds -0.131 do -0.124 -> none/continue Ds 0.0081->0.0079/0.0082
+[self_fm    s 18625 e2q 8 M ] nll idx 1.4709 out 1.4630 | bind -0.0006 mislead -0.0001 | dk -0.010 ds -0.010 do +0.005 -> none/continue Ds 0.0019->0.0022/0.0026
+[self_fm    s   500 e0q 0   ] nll idx 1.7439 out 1.7616 | bind +0.0115 mislead +0.0112 | dk -0.193 ds -0.185 do -0.189 -> none/continue Ds 0.0084->0.0082/0.0084
+[self_fm    s 18750 e2q 8 M ] nll idx 1.4704 out 1.4624 | bind -0.0002 mislead +0.0001 | dk -0.013 ds -0.013 do -0.002 -> none/continue Ds 0.0022->0.0024/0.0029
+[self_fm    s   625 e0q 0   ] nll idx 1.7084 out 1.7169 | bind +0.0145 mislead +0.0143 | dk -0.192 ds -0.188 do -0.209 -> none/continue Ds 0.0098->0.0092/0.0100
+[self_fm    s   250 e0q 0   ] nll idx 1.8875 out 1.9227 | bind +0.0058 mislead +0.0065 | dk -0.068 ds -0.068 do -0.043 -> none/continue Ds 0.0045->0.0044/0.0045  d4 t/r 1.000/0.161
+[self_fm    s 18875 e2q 8 M ] nll idx 1.4706 out 1.4635 | bind -0.0002 mislead +0.0002 | dk -0.009 ds -0.009 do -0.006 -> none/continue Ds 0.0020->0.0025/0.0028
+[self_fm    s   750 e0q 0   ] nll idx 1.6914 out 1.6995 | bind +0.0168 mislead +0.0181 | dk -0.184 ds -0.176 do -0.191 -> none/continue Ds 0.0097->0.0094/0.0100
+  [world] step 19000: DRIFT -> epoch 3 (cell survival vs base 0.2812)
+[self_fm    s   375 e0q 0   ] nll idx 1.8174 out 1.8470 | bind +0.0090 mislead +0.0086 | dk -0.140 ds -0.131 do -0.124 -> none/continue Ds 0.0081->0.0079/0.0082
+[self_fm    s   875 e0q 0   ] nll idx 1.6721 out 1.6850 | bind +0.0209 mislead +0.0224 | dk -0.173 ds -0.163 do -0.171 -> none/continue Ds 0.0124->0.0113/0.0130
+[self_fm    s 19000 e3q 8 M ] nll idx 1.8931 out 1.8718 | bind +0.0006 mislead +0.0013 | dk -0.012 ds -0.012 do -0.012 -> none/continue Ds 0.0020->0.0024/0.0024
+[self_fm    s  1000 e0q 0   ] nll idx 1.6679 out 1.6831 | bind +0.0274 mislead +0.0296 | dk -0.144 ds -0.131 do -0.151 -> none/continue Ds 0.0156->0.0134/0.0165  d4 t/r 1.000/0.161
+[self_fm    s 19025 e3q 8 M ] nll idx 1.5408 out 1.5400 | bind -0.0002 mislead -0.0002 | dk +0.063 ds +0.063 do +0.077 -> none/continue Ds 0.0010->0.0011/0.0014
+[self_fm    s   500 e0q 0   ] nll idx 1.7439 out 1.7616 | bind +0.0115 mislead +0.0112 | dk -0.193 ds -0.185 do -0.189 -> none/continue Ds 0.0084->0.0082/0.0084
+[self_fm    s  1125 e0q 0   ] nll idx 1.6549 out 1.6764 | bind +0.0332 mislead +0.0342 | dk -0.140 ds -0.127 do -0.126 -> none/continue Ds 0.0198->0.0171/0.0208
+[self_fm    s 19050 e3q 8 M ] nll idx 1.5149 out 1.5124 | bind -0.0001 mislead -0.0001 | dk +0.024 ds +0.024 do +0.043 -> none/continue Ds 0.0012->0.0013/0.0017
+[self_fm    s   625 e0q 0   ] nll idx 1.7084 out 1.7169 | bind +0.0145 mislead +0.0143 | dk -0.192 ds -0.188 do -0.209 -> none/continue Ds 0.0098->0.0092/0.0100
+[self_fm    s  1250 e0q 0   ] nll idx 1.6515 out 1.6744 | bind +0.0384 mislead +0.0385 | dk -0.118 ds -0.101 do -0.113 -> none/continue Ds 0.0206->0.0176/0.0218
+[self_fm    s 19075 e3q 8 M ] nll idx 1.5049 out 1.5031 | bind -0.0003 mislead -0.0003 | dk +0.011 ds +0.011 do +0.024 -> none/continue Ds 0.0013->0.0012/0.0017
+[self_fm    s  1375 e0q 0   ] nll idx 1.6460 out 1.6703 | bind +0.0464 mislead +0.0475 | dk -0.114 ds -0.094 do -0.100 -> none/continue Ds 0.0268->0.0225/0.0284
+[self_fm    s   750 e0q 0   ] nll idx 1.6914 out 1.6995 | bind +0.0168 mislead +0.0181 | dk -0.184 ds -0.176 do -0.191 -> none/continue Ds 0.0097->0.0094/0.0100
+[self_fm    s 19125 e3q 8 M ] nll idx 1.4940 out 1.4923 | bind -0.0004 mislead -0.0004 | dk -0.004 ds -0.004 do +0.008 -> none/continue Ds 0.0013->0.0014/0.0024
+[self_fm    s   875 e0q 0   ] nll idx 1.6721 out 1.6850 | bind +0.0209 mislead +0.0224 | dk -0.173 ds -0.163 do -0.171 -> none/continue Ds 0.0124->0.0113/0.0130
+[self_fm    s 19250 e3q 8 M ] nll idx 1.4838 out 1.4803 | bind -0.0003 mislead -0.0002 | dk -0.015 ds -0.015 do -0.008 -> none/continue Ds 0.0021->0.0022/0.0029
+[self_fm    s  1500 e0q 0   ] nll idx 1.6365 out 1.6628 | bind +0.0489 mislead +0.0491 | dk -0.115 ds -0.095 do -0.091 -> none/continue Ds 0.0271->0.0229/0.0290
+[self_fm    s  1625 e0q 0   ] nll idx 1.6305 out 1.6621 | bind +0.0592 mislead +0.0574 | dk -0.099 ds -0.072 do -0.080 -> none/continue Ds 0.0287->0.0258/0.0312
+[self_fm    s 19375 e3q 8 M ] nll idx 1.4799 out 1.4775 | bind -0.0004 mislead -0.0002 | dk -0.017 ds -0.017 do -0.014 -> none/continue Ds 0.0019->0.0017/0.0030
+[self_fm    s  1750 e0q 0   ] nll idx 1.6195 out 1.6520 | bind +0.0654 mislead +0.0636 | dk -0.092 ds -0.066 do -0.081 -> none/continue Ds 0.0353->0.0273/0.0380
+[self_fm    s  1875 e0q 0   ] nll idx 1.6061 out 1.6434 | bind +0.0709 mislead +0.0703 | dk -0.094 ds -0.073 do -0.076 -> none/continue Ds 0.0373->0.0309/0.0400
+[self_fm    s  1000 e0q 0   ] nll idx 1.6679 out 1.6831 | bind +0.0274 mislead +0.0296 | dk -0.144 ds -0.131 do -0.151 -> none/continue Ds 0.0156->0.0134/0.0165  d4 t/r 1.000/0.161
+[self_fm    s  1125 e0q 0   ] nll idx 1.6549 out 1.6764 | bind +0.0332 mislead +0.0342 | dk -0.140 ds -0.127 do -0.126 -> none/continue Ds 0.0198->0.0171/0.0208
+[self_fm    s  1250 e0q 0   ] nll idx 1.6515 out 1.6744 | bind +0.0384 mislead +0.0385 | dk -0.118 ds -0.101 do -0.113 -> none/continue Ds 0.0206->0.0176/0.0218
+[self_fm    s  1375 e0q 0   ] nll idx 1.6460 out 1.6703 | bind +0.0464 mislead +0.0475 | dk -0.114 ds -0.094 do -0.100 -> none/continue Ds 0.0268->0.0225/0.0284
+[self_fm    s  1500 e0q 0   ] nll idx 1.6365 out 1.6628 | bind +0.0489 mislead +0.0491 | dk -0.115 ds -0.095 do -0.091 -> none/continue Ds 0.0271->0.0229/0.0290
+[self_fm    s  1625 e0q 0   ] nll idx 1.6305 out 1.6621 | bind +0.0592 mislead +0.0574 | dk -0.099 ds -0.072 do -0.080 -> none/continue Ds 0.0287->0.0258/0.0312
+[self_fm    s  1750 e0q 0   ] nll idx 1.6195 out 1.6520 | bind +0.0654 mislead +0.0636 | dk -0.092 ds -0.066 do -0.081 -> none/continue Ds 0.0353->0.0273/0.0380
+[self_fm    s  1875 e0q 0   ] nll idx 1.6061 out 1.6434 | bind +0.0709 mislead +0.0703 | dk -0.094 ds -0.073 do -0.076 -> none/continue Ds 0.0373->0.0309/0.0400
+[self_fm    s 19500 e3q 8 M ] nll idx 1.4802 out 1.4768 | bind -0.0003 mislead -0.0001 | dk -0.013 ds -0.013 do -0.018 -> none/continue Ds 0.0022->0.0023/0.0029  d4 t/r 0.998/0.637
+[self_fm    s  1000 e0q 0   ] nll idx 1.6679 out 1.6831 | bind +0.0274 mislead +0.0296 | dk -0.144 ds -0.131 do -0.151 -> none/continue Ds 0.0156->0.0134/0.0165  d4 t/r 1.000/0.161
+[self_fm    s 19625 e3q 8 M ] nll idx 1.4767 out 1.4702 | bind -0.0005 mislead -0.0003 | dk -0.006 ds -0.006 do -0.010 -> none/continue Ds 0.0019->0.0020/0.0026
+[self_fm    s  2000 e0q 0   ] nll idx 1.6021 out 1.6375 | bind +0.0824 mislead +0.0849 | dk -0.094 ds -0.055 do -0.074 -> none/continue Ds 0.0474->0.0399/0.0501  d4 t/r 1.000/0.147
+  self_fm   2000 ntp 1.6265
+[self_fm    s  1125 e0q 0   ] nll idx 1.6549 out 1.6764 | bind +0.0332 mislead +0.0342 | dk -0.140 ds -0.127 do -0.126 -> none/continue Ds 0.0198->0.0171/0.0208
+[self_fm    s  2125 e0q 0   ] nll idx 1.5894 out 1.6279 | bind +0.0871 mislead +0.0865 | dk -0.089 ds -0.059 do -0.071 -> none/continue Ds 0.0446->0.0380/0.0478
+[self_fm    s 19750 e3q 8 M ] nll idx 1.4758 out 1.4689 | bind -0.0005 mislead -0.0001 | dk -0.014 ds -0.014 do -0.012 -> none/continue Ds 0.0019->0.0020/0.0027
+[self_fm    s  1250 e0q 0   ] nll idx 1.6515 out 1.6744 | bind +0.0384 mislead +0.0385 | dk -0.118 ds -0.101 do -0.113 -> none/continue Ds 0.0206->0.0176/0.0218
+[self_fm    s  2250 e0q 0   ] nll idx 1.5778 out 1.6225 | bind +0.1006 mislead +0.0983 | dk -0.085 ds -0.059 do -0.065 -> none/continue Ds 0.0511->0.0443/0.0555
+[self_fm    s 19875 e3q 8 M ] nll idx 1.4741 out 1.4697 | bind -0.0004 mislead +0.0001 | dk -0.011 ds -0.011 do -0.012 -> none/continue Ds 0.0021->0.0023/0.0029
+[self_fm    s  1375 e0q 0   ] nll idx 1.6460 out 1.6703 | bind +0.0464 mislead +0.0475 | dk -0.114 ds -0.094 do -0.100 -> none/continue Ds 0.0268->0.0225/0.0284
+[self_fm    s  2375 e0q 0   ] nll idx 1.5681 out 1.6178 | bind +0.1175 mislead +0.1137 | dk -0.086 ds -0.046 do -0.063 -> none/continue Ds 0.0621->0.0515/0.0654
+[self_fm    s  1500 e0q 0   ] nll idx 1.6365 out 1.6628 | bind +0.0489 mislead +0.0491 | dk -0.115 ds -0.095 do -0.091 -> none/continue Ds 0.0271->0.0229/0.0290
+[self_fm    s  2500 e0q 0   ] nll idx 1.5590 out 1.6113 | bind +0.1190 mislead +0.1192 | dk -0.077 ds -0.041 do -0.056 -> none/continue Ds 0.0650->0.0563/0.0703
+[self_fm    s  1625 e0q 0   ] nll idx 1.6305 out 1.6621 | bind +0.0592 mislead +0.0574 | dk -0.099 ds -0.072 do -0.080 -> none/continue Ds 0.0287->0.0258/0.0312
+[self_fm    s  2625 e0q 0   ] nll idx 1.5511 out 1.6061 | bind +0.1361 mislead +0.1319 | dk -0.077 ds -0.045 do -0.055 -> none/continue Ds 0.0698->0.0607/0.0752
+[self_fm    s  2750 e0q 0   ] nll idx 1.5381 out 1.5958 | bind +0.1499 mislead +0.1380 | dk -0.073 ds -0.047 do -0.054 -> none/continue Ds 0.0758->0.0715/0.0848
+[self_fm    s  1750 e0q 0   ] nll idx 1.6195 out 1.6520 | bind +0.0654 mislead +0.0636 | dk -0.092 ds -0.066 do -0.081 -> none/continue Ds 0.0353->0.0273/0.0380
+[self_fm    s  2000 e0q 0   ] nll idx 1.6021 out 1.6375 | bind +0.0824 mislead +0.0849 | dk -0.094 ds -0.055 do -0.074 -> none/continue Ds 0.0474->0.0399/0.0501  d4 t/r 1.000/0.147
+[self_fm    s  2875 e0q 0   ] nll idx 1.5329 out 1.5905 | bind +0.1561 mislead +0.1486 | dk -0.070 ds -0.036 do -0.052 -> none/continue Ds 0.0778->0.0743/0.0836
+  self_fm   2000 ntp 1.6265
+[self_fm    s  1875 e0q 0   ] nll idx 1.6061 out 1.6434 | bind +0.0709 mislead +0.0703 | dk -0.094 ds -0.073 do -0.076 -> none/continue Ds 0.0373->0.0309/0.0400
+[self_fm    s  2125 e0q 0   ] nll idx 1.5894 out 1.6279 | bind +0.0871 mislead +0.0865 | dk -0.089 ds -0.059 do -0.071 -> none/continue Ds 0.0446->0.0380/0.0478
+[self_fm    s  2250 e0q 0   ] nll idx 1.5778 out 1.6225 | bind +0.1006 mislead +0.0983 | dk -0.085 ds -0.059 do -0.065 -> none/continue Ds 0.0511->0.0443/0.0555
+[self_fm    s  3000 e0q 0   ] nll idx 1.5246 out 1.5823 | bind +0.1735 mislead +0.1607 | dk -0.076 ds -0.041 do -0.060 -> none/continue Ds 0.0903->0.0862/0.0962
+[self_fm    s  2375 e0q 0   ] nll idx 1.5681 out 1.6178 | bind +0.1175 mislead +0.1137 | dk -0.086 ds -0.046 do -0.063 -> none/continue Ds 0.0621->0.0515/0.0654
+[self_fm    s  3125 e0q 0   ] nll idx 1.5144 out 1.5729 | bind +0.1648 mislead +0.1518 | dk -0.067 ds -0.044 do -0.055 -> none/continue Ds 0.0814->0.0722/0.0882
+[self_fm    s  3250 e0q 0   ] nll idx 1.5107 out 1.5711 | bind +0.1918 mislead +0.1856 | dk -0.069 ds -0.045 do -0.050 -> none/continue Ds 0.0960->0.0871/0.1046
+[self_fm    s  2500 e0q 0   ] nll idx 1.5590 out 1.6113 | bind +0.1190 mislead +0.1192 | dk -0.077 ds -0.041 do -0.056 -> none/continue Ds 0.0650->0.0563/0.0703
+[self_fm    s  3375 e0q 0   ] nll idx 1.4971 out 1.5605 | bind +0.1757 mislead +0.1609 | dk -0.067 ds -0.043 do -0.049 -> none/continue Ds 0.0828->0.0756/0.0878
+[self_fm    s  2625 e0q 0   ] nll idx 1.5511 out 1.6061 | bind +0.1361 mislead +0.1319 | dk -0.077 ds -0.045 do -0.055 -> none/continue Ds 0.0698->0.0607/0.0752
+[self_fm    s  2750 e0q 0   ] nll idx 1.5381 out 1.5958 | bind +0.1499 mislead +0.1380 | dk -0.073 ds -0.047 do -0.054 -> none/continue Ds 0.0758->0.0715/0.0848
+[self_fm    s 20000 e3q12 M ] nll idx 1.4751 out 1.4687 | bind -0.0003 mislead -0.0007 | dk -0.017 ds -0.017 do -0.016 -> none/continue Ds 0.0025->0.0032/0.0035  d4 t/r 0.997/0.679
+[self_fm    s  3500 e0q 0   ] nll idx 1.4888 out 1.5580 | bind +0.2214 mislead +0.2002 | dk -0.069 ds -0.032 do -0.050 -> none/continue Ds 0.1072->0.1029/0.1151
+[self_fm] DONE in 5068s
+[self_fm    s  2875 e0q 0   ] nll idx 1.5329 out 1.5905 | bind +0.1561 mislead +0.1486 | dk -0.070 ds -0.036 do -0.052 -> none/continue Ds 0.0778->0.0743/0.0836
+[self_fm    s  3625 e0q 0   ] nll idx 1.4807 out 1.5517 | bind +0.2321 mislead +0.2142 | dk -0.057 ds -0.024 do -0.041 -> none/continue Ds 0.1085->0.1114/0.1167
+[self_fm    s  3750 e0q 0   ] nll idx 1.4738 out 1.5475 | bind +0.2301 mislead +0.2167 | dk -0.057 ds -0.028 do -0.038 -> none/continue Ds 0.1121->0.1077/0.1210
+[self_fm    s  3000 e0q 0   ] nll idx 1.5246 out 1.5823 | bind +0.1735 mislead +0.1607 | dk -0.076 ds -0.041 do -0.060 -> none/continue Ds 0.0903->0.0862/0.0962
+[self_fm    s  3875 e0q 0   ] nll idx 1.4659 out 1.5447 | bind +0.2303 mislead +0.2088 | dk -0.060 ds -0.038 do -0.038 -> none/continue Ds 0.1054->0.1014/0.1129
+[self_fm    s  3125 e0q 0   ] nll idx 1.5144 out 1.5729 | bind +0.1648 mislead +0.1518 | dk -0.067 ds -0.044 do -0.055 -> none/continue Ds 0.0814->0.0722/0.0882
+[self_fm    s  3250 e0q 0   ] nll idx 1.5107 out 1.5711 | bind +0.1918 mislead +0.1856 | dk -0.069 ds -0.045 do -0.050 -> none/continue Ds 0.0960->0.0871/0.1046
+[self_fm    s  3375 e0q 0   ] nll idx 1.4971 out 1.5605 | bind +0.1757 mislead +0.1609 | dk -0.067 ds -0.043 do -0.049 -> none/continue Ds 0.0828->0.0756/0.0878
+[self_fm    s  2000 e0q 0   ] nll idx 1.6021 out 1.6375 | bind +0.0824 mislead +0.0849 | dk -0.094 ds -0.055 do -0.074 -> none/continue Ds 0.0474->0.0399/0.0501  d4 t/r 1.000/0.147
+  self_fm   2000 ntp 1.6265
+[self_fm    s  3500 e0q 0   ] nll idx 1.4888 out 1.5580 | bind +0.2214 mislead +0.2002 | dk -0.069 ds -0.032 do -0.050 -> none/continue Ds 0.1072->0.1029/0.1151
+[self_fm    s  2125 e0q 0   ] nll idx 1.5894 out 1.6279 | bind +0.0871 mislead +0.0865 | dk -0.089 ds -0.059 do -0.071 -> none/continue Ds 0.0446->0.0380/0.0478
+[self_fm    s  3625 e0q 0   ] nll idx 1.4807 out 1.5517 | bind +0.2321 mislead +0.2142 | dk -0.057 ds -0.024 do -0.041 -> none/continue Ds 0.1085->0.1114/0.1167
+[self_fm    s  3750 e0q 0   ] nll idx 1.4738 out 1.5475 | bind +0.2301 mislead +0.2167 | dk -0.057 ds -0.028 do -0.038 -> none/continue Ds 0.1121->0.1077/0.1210
+[self_fm    s  2250 e0q 0   ] nll idx 1.5778 out 1.6225 | bind +0.1006 mislead +0.0983 | dk -0.085 ds -0.059 do -0.065 -> none/continue Ds 0.0511->0.0443/0.0555
+[self_fm    s  3875 e0q 0   ] nll idx 1.4659 out 1.5447 | bind +0.2303 mislead +0.2088 | dk -0.060 ds -0.038 do -0.038 -> none/continue Ds 0.1054->0.1014/0.1129
+[self_fm    s  2375 e0q 0   ] nll idx 1.5681 out 1.6178 | bind +0.1175 mislead +0.1137 | dk -0.086 ds -0.046 do -0.063 -> none/continue Ds 0.0621->0.0515/0.0654
+[self_fm    s  2500 e0q 0   ] nll idx 1.5590 out 1.6113 | bind +0.1190 mislead +0.1192 | dk -0.077 ds -0.041 do -0.056 -> none/continue Ds 0.0650->0.0563/0.0703
+[self_fm    s  2625 e0q 0   ] nll idx 1.5511 out 1.6061 | bind +0.1361 mislead +0.1319 | dk -0.077 ds -0.045 do -0.055 -> none/continue Ds 0.0698->0.0607/0.0752
+[self_fm    s  4000 e0q 0   ] nll idx 1.4628 out 1.5437 | bind +0.2565 mislead +0.2438 | dk -0.051 ds -0.017 do -0.032 -> none/continue Ds 0.1187->0.1241/0.1300  d4 t/r 1.000/0.165
+  self_fm   4000 ntp 1.5261
+[self_fm    s  2750 e0q 0   ] nll idx 1.5381 out 1.5958 | bind +0.1499 mislead +0.1380 | dk -0.073 ds -0.047 do -0.054 -> none/continue Ds 0.0758->0.0715/0.0848
+[self_fm    s  4125 e0q 0   ] nll idx 1.4531 out 1.5378 | bind +0.2624 mislead +0.2492 | dk -0.045 ds -0.025 do -0.024 -> none/continue Ds 0.1248->0.1246/0.1384
+[self_fm    s  2875 e0q 0   ] nll idx 1.5329 out 1.5905 | bind +0.1561 mislead +0.1486 | dk -0.070 ds -0.036 do -0.052 -> none/continue Ds 0.0778->0.0743/0.0836
+[self_fm    s  4250 e0q 0   ] nll idx 1.4494 out 1.5377 | bind +0.2977 mislead +0.2770 | dk -0.059 ds -0.015 do -0.025 -> none/continue Ds 0.1474->0.1453/0.1591
+[self_fm    s  4375 e0q 0   ] nll idx 1.4462 out 1.5363 | bind +0.2957 mislead +0.2753 | dk -0.050 ds -0.019 do -0.024 -> none/continue Ds 0.1384->0.1372/0.1495
+[self_fm    s  3000 e0q 0   ] nll idx 1.5246 out 1.5823 | bind +0.1735 mislead +0.1607 | dk -0.076 ds -0.041 do -0.060 -> none/continue Ds 0.0903->0.0862/0.0962
+[self_fm    s  4500 e0q 0   ] nll idx 1.4432 out 1.5372 | bind +0.3096 mislead +0.2855 | dk -0.046 ds -0.007 do -0.022 -> none/continue Ds 0.1413->0.1460/0.1563
+[self_fm    s  3125 e0q 0   ] nll idx 1.5144 out 1.5729 | bind +0.1648 mislead +0.1518 | dk -0.067 ds -0.044 do -0.055 -> none/continue Ds 0.0814->0.0722/0.0882
+[self_fm    s  4625 e0q 0   ] nll idx 1.4366 out 1.5331 | bind +0.3113 mislead +0.2953 | dk -0.029 ds -0.008 do -0.013 -> none/continue Ds 0.1377->0.1422/0.1496
+[self_fm    s  4000 e0q 0   ] nll idx 1.4628 out 1.5437 | bind +0.2565 mislead +0.2438 | dk -0.051 ds -0.017 do -0.032 -> none/continue Ds 0.1187->0.1241/0.1300  d4 t/r 1.000/0.165
+[self_fm    s  3250 e0q 0   ] nll idx 1.5107 out 1.5711 | bind +0.1918 mislead +0.1856 | dk -0.069 ds -0.045 do -0.050 -> none/continue Ds 0.0960->0.0871/0.1046
+  self_fm   4000 ntp 1.5261
+[self_fm    s  4750 e0q 0   ] nll idx 1.4323 out 1.5304 | bind +0.3368 mislead +0.3181 | dk -0.038 ds -0.001 do -0.016 -> none/continue Ds 0.1502->0.1541/0.1670
+[self_fm    s  4125 e0q 0   ] nll idx 1.4531 out 1.5378 | bind +0.2624 mislead +0.2492 | dk -0.045 ds -0.025 do -0.024 -> none/continue Ds 0.1248->0.1246/0.1384
+[self_fm    s  3375 e0q 0   ] nll idx 1.4971 out 1.5605 | bind +0.1757 mislead +0.1609 | dk -0.067 ds -0.043 do -0.049 -> none/continue Ds 0.0828->0.0756/0.0878
+[self_fm    s  4875 e0q 0   ] nll idx 1.4262 out 1.5330 | bind +0.3577 mislead +0.3298 | dk -0.033 ds +0.008 do -0.017 -> none/continue Ds 0.1620->0.1636/0.1823
+[self_fm    s  4250 e0q 0   ] nll idx 1.4494 out 1.5377 | bind +0.2977 mislead +0.2770 | dk -0.059 ds -0.015 do -0.025 -> none/continue Ds 0.1474->0.1453/0.1591
+[self_fm    s  4375 e0q 0   ] nll idx 1.4462 out 1.5363 | bind +0.2957 mislead +0.2753 | dk -0.050 ds -0.019 do -0.024 -> none/continue Ds 0.1384->0.1372/0.1495
+[self_fm    s  3500 e0q 0   ] nll idx 1.4888 out 1.5580 | bind +0.2214 mislead +0.2002 | dk -0.069 ds -0.032 do -0.050 -> none/continue Ds 0.1072->0.1029/0.1151
+[self_fm    s  5000 e0q 0B  ] nll idx 1.4228 out 1.5290 | bind +0.3476 mislead +0.3233 | dk -0.040 ds -0.020 do -0.017 -> none/continue Ds 0.1478->0.1600/0.1666
+[self_fm    s  5025 e0q 0B  ] nll idx 1.4587 out 1.5341 | bind +0.2209 mislead +0.2142 | dk +0.181 ds +0.161 do -0.001 -> burst/skip Ds 0.1045->0.1080/0.1111[self_fm    s  3625 e0q 0   ] nll idx 1.4807 out 1.5517 | bind +0.2321 mislead +0.2142 | dk -0.057 ds -0.024 do -0.041 -> none/continue Ds 0.1085->0.1114/0.1167
+
+[self_fm    s  4500 e0q 0   ] nll idx 1.4432 out 1.5372 | bind +0.3096 mislead +0.2855 | dk -0.046 ds -0.007 do -0.022 -> none/continue Ds 0.1413->0.1460/0.1563
+[self_fm    s  5050 e0q 0B S] nll idx 1.4587 out 1.5341 | bind +0.2209 mislead +0.2142 | dk +0.237 ds +0.186 do +0.022 -> burst+fm/continue Ds 0.1045->0.1080/0.1111
+[self_fm    s  3750 e0q 0   ] nll idx 1.4738 out 1.5475 | bind +0.2301 mislead +0.2167 | dk -0.057 ds -0.028 do -0.038 -> none/continue Ds 0.1121->0.1077/0.1210
+[self_fm    s  4625 e0q 0   ] nll idx 1.4366 out 1.5331 | bind +0.3113 mislead +0.2953 | dk -0.029 ds -0.008 do -0.013 -> none/continue Ds 0.1377->0.1422/0.1496
+[self_fm    s  5075 e0q 0B  ] nll idx 1.4585 out 1.5333 | bind +0.2447 mislead +0.2311 | dk +0.116 ds +0.113 do -0.005 -> burst+fm/continue Ds 0.1181->0.1180/0.1233
+[self_fm    s  4750 e0q 0   ] nll idx 1.4323 out 1.5304 | bind +0.3368 mislead +0.3181 | dk -0.038 ds -0.001 do -0.016 -> none/continue Ds 0.1502->0.1541/0.1670
+[self_fm    s  3875 e0q 0   ] nll idx 1.4659 out 1.5447 | bind +0.2303 mislead +0.2088 | dk -0.060 ds -0.038 do -0.038 -> none/continue Ds 0.1054->0.1014/0.1129
+[self_fm    s  5125 e0q 0B  ] nll idx 1.4712 out 1.5304 | bind +0.2387 mislead +0.2232 | dk +0.111 ds +0.113 do -0.010 -> burst+fm/continue Ds 0.1181->0.1137/0.1224
+[self_fm    s  4875 e0q 0   ] nll idx 1.4262 out 1.5330 | bind +0.3577 mislead +0.3298 | dk -0.033 ds +0.008 do -0.017 -> none/continue Ds 0.1620->0.1636/0.1823
+[self_fm    s  5250 e0q 0   ] nll idx 1.4509 out 1.5280 | bind +0.2615 mislead +0.2495 | dk +0.069 ds +0.086 do -0.011 -> none+fm/continue Ds 0.1225->0.1194/0.1265
+[self_fm    s  5275 e0q 0   ] nll idx 1.4189 out 1.5269 | bind +0.3263 mislead +0.3017 | dk -0.132 ds -0.104 do -0.013 -> none/continue Ds 0.1451->0.1448/0.1569
+[self_fm    s  5000 e0q 0B  ] nll idx 1.4228 out 1.5290 | bind +0.3476 mislead +0.3233 | dk -0.040 ds -0.020 do -0.017 -> none/continue Ds 0.1478->0.1600/0.1666
+[self_fm    s  5300 e0q 0   ] nll idx 1.4140 out 1.5257 | bind +0.3551 mislead +0.3323 | dk -0.123 ds -0.094 do -0.015 -> none/continue Ds 0.1590->0.1633/0.1757
+[self_fm    s  5025 e0q 0B  ] nll idx 1.4587 out 1.5341 | bind +0.2209 mislead +0.2142 | dk +0.181 ds +0.161 do -0.001 -> burst/skip Ds 0.1045->0.1080/0.1111
+[self_fm    s  5325 e0q 0   ] nll idx 1.4236 out 1.5318 | bind +0.3589 mislead +0.3252 | dk -0.095 ds -0.071 do -0.002 -> none/continue Ds 0.1576->0.1547/0.1713
+[self_fm    s  5050 e0q 0B S] nll idx 1.4587 out 1.5341 | bind +0.2209 mislead +0.2142 | dk +0.237 ds +0.186 do +0.022 -> burst+fm/continue Ds 0.1045->0.1080/0.1111
+[self_fm    s  5075 e0q 0B  ] nll idx 1.4585 out 1.5333 | bind +0.2447 mislead +0.2311 | dk +0.116 ds +0.113 do -0.005 -> burst+fm/continue Ds 0.1181->0.1180/0.1233
+[self_fm    s  5375 e0q 0   ] nll idx 1.4162 out 1.5260 | bind +0.3716 mislead +0.3480 | dk -0.088 ds -0.054 do -0.010 -> none/continue Ds 0.1667->0.1633/0.1778
+[self_fm    s  5125 e0q 0B  ] nll idx 1.4712 out 1.5304 | bind +0.2387 mislead +0.2232 | dk +0.111 ds +0.113 do -0.010 -> burst+fm/continue Ds 0.1181->0.1137/0.1224
+[self_fm    s  5250 e0q 0   ] nll idx 1.4509 out 1.5280 | bind +0.2615 mislead +0.2495 | dk +0.069 ds +0.086 do -0.011 -> none+fm/continue Ds 0.1225->0.1194/0.1265
+[self_fm    s  5500 e0q 0   ] nll idx 1.4157 out 1.5270 | bind +0.3621 mislead +0.3364 | dk -0.074 ds -0.054 do -0.011 -> none/continue Ds 0.1684->0.1678/0.1803
+[self_fm    s  5275 e0q 0   ] nll idx 1.4189 out 1.5269 | bind +0.3263 mislead +0.3017 | dk -0.132 ds -0.104 do -0.013 -> none/continue Ds 0.1451->0.1448/0.1569
+[self_fm    s  5300 e0q 0   ] nll idx 1.4140 out 1.5257 | bind +0.3551 mislead +0.3323 | dk -0.123 ds -0.094 do -0.015 -> none/continue Ds 0.1590->0.1633/0.1757
+[self_fm    s  5625 e0q 0   ] nll idx 1.4084 out 1.5224 | bind +0.3689 mislead +0.3471 | dk -0.060 ds -0.049 do -0.008 -> none/continue Ds 0.1595->0.1645/0.1764
+[self_fm    s  5325 e0q 0   ] nll idx 1.4236 out 1.5318 | bind +0.3589 mislead +0.3252 | dk -0.095 ds -0.071 do -0.002 -> none/continue Ds 0.1576->0.1547/0.1713
+[self_fm    s  5375 e0q 0   ] nll idx 1.4162 out 1.5260 | bind +0.3716 mislead +0.3480 | dk -0.088 ds -0.054 do -0.010 -> none/continue Ds 0.1667->0.1633/0.1778
+[self_fm    s  5750 e0q 0   ] nll idx 1.4099 out 1.5228 | bind +0.4180 mislead +0.3965 | dk -0.061 ds -0.030 do -0.012 -> none/continue Ds 0.1849->0.1943/0.2005
+[self_fm    s  5875 e0q 0   ] nll idx 1.4071 out 1.5214 | bind +0.4161 mislead +0.3971 | dk -0.060 ds -0.002 do -0.012 -> none/continue Ds 0.1910->0.1858/0.2038
+  [world] step 6000: DRIFT -> epoch 1 (cell survival vs base 0.6875)
+[self_fm    s  5500 e0q 0   ] nll idx 1.4157 out 1.5270 | bind +0.3621 mislead +0.3364 | dk -0.074 ds -0.054 do -0.011 -> none/continue Ds 0.1684->0.1678/0.1803
+[self_fm    s  5625 e0q 0   ] nll idx 1.4084 out 1.5224 | bind +0.3689 mislead +0.3471 | dk -0.060 ds -0.049 do -0.008 -> none/continue Ds 0.1595->0.1645/0.1764
+[self_fm    s  6000 e1q 0   ] nll idx 1.7957 out 1.7432 | bind +0.2706 mislead +0.2492 | dk -0.059 ds -0.022 do -0.020 -> none/continue Ds 0.2039->0.2040/0.2178
+[self_fm    s  5750 e0q 0   ] nll idx 1.4099 out 1.5228 | bind +0.4180 mislead +0.3965 | dk -0.061 ds -0.030 do -0.012 -> none/continue Ds 0.1849->0.1943/0.2005
+  self_fm   6000 ntp 1.7609
+  [op] self_fm s6025: typed rotation -> MERGE (latched)
+[self_fm    s  6025 e1q 0 M ] nll idx 1.5170 out 1.5666 | bind +0.1181 mislead +0.1147 | dk +0.089 ds -0.024 do +0.047 -> rotation/merge Ds 0.0619->0.0531/0.0667
+[self_fm    s  4000 e0q 0   ] nll idx 1.4628 out 1.5437 | bind +0.2565 mislead +0.2438 | dk -0.051 ds -0.017 do -0.032 -> none/continue Ds 0.1187->0.1241/0.1300  d4 t/r 1.000/0.165
+[self_fm    s  5875 e0q 0   ] nll idx 1.4071 out 1.5214 | bind +0.4161 mislead +0.3971 | dk -0.060 ds -0.002 do -0.012 -> none/continue Ds 0.1910->0.1858/0.2038
+  self_fm   4000 ntp 1.5261
+  [world] step 6000: DRIFT -> epoch 1 (cell survival vs base 0.6875)
+[self_fm    s  6050 e1q 0 M ] nll idx 1.5555 out 1.5512 | bind +0.0975 mislead +0.0900 | dk +0.121 ds -0.055 do +0.029 -> rotation/merge Ds 0.0485->0.0447/0.0553
+[self_fm    s  4125 e0q 0   ] nll idx 1.4531 out 1.5378 | bind +0.2624 mislead +0.2492 | dk -0.045 ds -0.025 do -0.024 -> none/continue Ds 0.1248->0.1246/0.1384
+[self_fm    s  6000 e1q 0   ] nll idx 1.7957 out 1.7432 | bind +0.2706 mislead +0.2492 | dk -0.059 ds -0.022 do -0.020 -> none/continue Ds 0.2039->0.2040/0.2178
+[self_fm    s  6075 e1q 0 M ] nll idx 1.5449 out 1.5431 | bind +0.0878 mislead +0.0825 | dk +0.099 ds -0.049 do +0.010 -> rotation/merge Ds 0.0437->0.0393/0.0497
+  self_fm   6000 ntp 1.7609
+  [op] self_fm s6025: typed rotation -> MERGE (latched)
+[self_fm    s  6025 e1q 0 M ] nll idx 1.5170 out 1.5666 | bind +0.1181 mislead +0.1147 | dk +0.089 ds -0.024 do +0.047 -> rotation/merge Ds 0.0619->0.0531/0.0667
+[self_fm    s  4250 e0q 0   ] nll idx 1.4494 out 1.5377 | bind +0.2977 mislead +0.2770 | dk -0.059 ds -0.015 do -0.025 -> none/continue Ds 0.1474->0.1453/0.1591
+[self_fm    s  6125 e1q 0 M ] nll idx 1.5374 out 1.5364 | bind +0.0747 mislead +0.0692 | dk +0.080 ds -0.045 do +0.003 -> rotation/merge Ds 0.0362->0.0325/0.0403

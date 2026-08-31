@@ -396,6 +396,37 @@ recall² predicted buildable L4 to ±2) and extension is the measured lever, put
 index ops on the critical path of any further climb. One rung, single seed, exogenous demand
 ladder — §1.3's "semi-autonomous" stands.
 
+### [`tuning/`](tuning/README.md) — typing the news, and the absorption wall (2026-08-29→31)
+
+**Goal**: three kinds of OOD news raise indexed-span surprisal identically — a key rotation
+(merge), an irreducible burst (skip), a grammar drift (track) — so can a two-basis gauge type
+the event, does the type pick the op, and does a forward self-model grade the op? Bursts
+magnitude-matched to a rotation's spike by construction; 14 policies × 3 event types across two
+waves plus offline checkpoint analytics, every transparency/fidelity gate at max|Δ| = 0.0.
+
+**Finding**: **typing is solved offline from one model, and the learner's own learning erases
+the online evidence.** The KL contraction the spec proposed fails (thin `D_pair`, anti-separating
+`D_self`); re-contracted as per-view *movement*, T\* = (Δkey, Δself, Δout) puts the three events
+in three corners, 100% sign-consistent, with the hollow key-free basis registering drift and the
+second reader an exact null (`pair` ≡ `self`, 0.0 over 191 ckpts). Online, the reader absorbs
+86% of a rotation shock in 50 steps — accelerating because rotations reduce to purer re-indexing
+over a stabilizing embedding table (0.599 → 0.874; no map-keyed organ exists), so the most
+learnable events self-erase (drift invisible at zero lag; loud for seven checkpoints on an
+accidentally-frozen reader) and a priced re-key op, correctly typed and fired, declines its own
+shift twice — supplied ops lose to native track on timing, not correctness. The learner carves a
+reusable ln_f reflex for the one thing it cannot learn (burst×burst cos 0.957 — a native
+soft-skip), the three events write three disjoint weight subspaces, and merge zeroes the typing
+triple itself. At matched merge timing, typing buys the ledger nothing — its measured value is
+the **veto** (the surprisal twin merges on a burst at +12.5× floor); the FM grades only ops that
+let the reader move (a reader-movement statistic cannot confirm a skip — located as design, the
+coding fix moved the outcome 0.05× floor), and the trial meter matches T\*'s verdict 450 steps
+later at 1091 charged step-equivalents. The dissociation holds across all 14 policies
+(corr +0.754). Crystallized as
+[`absorption_blinds_the_evaluator`](../../../ideas/absorption_blinds_the_evaluator.md): stream
+evidence decays at the adapter's learning rate; the surviving ledgers are the adaptation itself
+and standing counterfactual state — Gate 3 (endogenise) deliberately re-specced rather than run.
+Single seed; ranks, signs, floor-multiples are the claims.
+
 ### [`two_deltas/`](two_deltas/README.md) — Track E′ round 2: performance error vs outcome surprise (2026-08-29→31)
 
 **Goal**: run Track E′'s δ-gate program (`tacet`), its E2 shape (`continuo`), and `audiation`'s
