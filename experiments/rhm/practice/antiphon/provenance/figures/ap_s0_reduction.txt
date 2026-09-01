@@ -1,0 +1,210 @@
+====================================================================================================
+[antiphon P'] ap_s0 — GATES
+====================================================================================================
+
+  (a) CROSS-TAG REPLAY vs wd_s1, full length, join recorder ON
+      exact_reh    max|delta| over 13 series x 116 cycles = 0.000e+00   cycles equal = True   -> PASS
+      exact_exp    max|delta| over 13 series x 116 cycles = 0.000e+00   cycles equal = True   -> PASS
+      exact        max|delta| over 13 series x 116 cycles = 0.000e+00   cycles equal = True   -> PASS
+      given_c1     max|delta| over 13 series x 116 cycles = 0.000e+00   cycles equal = True   -> PASS
+
+  (b) SUBSTRATE IDENTITY vs wd_s1's setup.json
+      setup['eras']                       identical = True   -> PASS
+      setup['refs']                       identical = True   -> PASS
+      setup['plant']                       identical = True   -> PASS
+      setup['true_tables']                       identical = True   -> PASS
+      setup['junk_pool']                       identical = True   -> PASS
+      setup['stale_random_blocks']                       identical = True   -> PASS
+      setup['stale_task_matched']                       identical = True   -> PASS
+      setup['read_acc']                       identical = True   -> PASS
+      config keys differing (excluding ['ap_rec']): none   -> PASS
+
+  (c) JOIN SUBSET OF ENTRY — element-wise, every (cycle, phase, level)
+      exact_reh    cells   376   mismatches   0   -> PASS  
+      exact_exp    cells   376   mismatches   0   -> PASS  
+      exact        cells   376   mismatches   0   -> PASS  
+      given_c1     cells   464   mismatches   0   -> PASS  
+
+  (d) `unknown` CONFINED TO THE FILTER-OFF WINDOW (beam phase)
+      exact_reh    filter-off cycles   4  filter-on 112  violations   0   -> PASS  []
+      exact_exp    filter-off cycles   4  filter-on 112  violations   0   -> PASS  []
+      exact        filter-off cycles   4  filter-on 112  violations   0   -> PASS  []
+      given_c1     filter-off cycles   4  filter-on 112  violations   0   -> PASS  []
+
+  (e) LOGGED KEYS == prov_tag's OFFLINE RECONSTRUCTION, entry for entry
+      exact_reh    cells  146   mismatches   0   -> PASS  
+      exact_exp    cells  146   mismatches   0   -> PASS  
+      exact        cells  146   mismatches   0   -> PASS  
+      given_c1     cells  232   mismatches   0   -> PASS  
+
+====================================================================================================
+  GATE VERDICT: ALL PASS
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+(1) WHO PUT THE MOVE ON THE BEAM — the source split of macro executions (beam phase)
+----------------------------------------------------------------------------------------------------
+
+  prop     pi's own top-k proposal          — efferent: pi asked this question
+  forced   the forced-expansion window      — exogenous: the schedule asked it
+  explore  the exploration draw             — nobody asked; the beam looked anyway
+  unknown  the enumerated beam (filter off during prop_warmup)
+  shares are execution-weighted over the whole run; @end is the last cycle
+
+arm           l    exec_tot     prop   forced  explore  unknown |  prop@end  expl@end
+exact_reh     2     2281084   0.6487   0.2200   0.1313   0.0000 |    0.8611    0.1389
+exact_reh     3     1904741   0.7221   0.2344   0.0435   0.0000 |    0.9759    0.0241
+exact_exp     2     2295704   0.6512   0.2186   0.1302   0.0000 |    0.8671    0.1329
+exact_exp     3     1436487   0.6300   0.3108   0.0592   0.0000 |    0.9594    0.0406
+exact         2     2269436   0.6873   0.2211   0.0916   0.0000 |    0.9483    0.0517
+exact         3     1095906   0.6565   0.3046   0.0389   0.0000 |    0.9756    0.0244
+given_c1      2     8254543   0.8951   0.0000   0.0250   0.0799 |    0.9687    0.0313
+given_c1      3     9174369   0.9542   0.0000   0.0099   0.0359 |    0.9930    0.0070
+
+----------------------------------------------------------------------------------------------------
+(2) THE 2x2 — did pi ask for it, and had the agent re-derived the answer?
+----------------------------------------------------------------------------------------------------
+
+  exaff_prop  share of pi-PROPOSED executions served by an entry the agent has NOT
+              itself re-derived — EXAFFERENCE AT THE PROPOSAL GRAIN: pi asked a
+              question and someone else's answer came back
+  exaff_all   the same over all executions (the offline pass's `1 - self_use`)
+  run-mean columns are execution-weighted; @end is the last cycle
+
+arm           l  exaff_prop  exaff_all  exaffP@end  exaffA@end |  n_ent_prop  n_ent_expl
+exact_reh     2      0.0844     0.1233      0.0000      0.0001 |          13          14
+exact_reh     3      0.1544     0.1385      0.0295      0.0301 |          17          20
+exact_exp     2      0.1151     0.1458      0.0691      0.0691 |          13          14
+exact_exp     3      0.1116     0.1068      0.0375      0.0427 |          12          26
+exact         2      0.0703     0.1113      0.0002      0.0002 |          14          13
+exact         3      0.0794     0.0851      0.0737      0.0766 |          12          13
+given_c1      2      0.1355     0.1691      0.0417      0.0423 |          14          13
+given_c1      3      0.4625     0.4821      0.1388      0.1384 |          18          15
+
+----------------------------------------------------------------------------------------------------
+(3) THE ONE-BIT CONTRAST AT THE PROPOSAL GRAIN, against its handles
+----------------------------------------------------------------------------------------------------
+
+  L3 is the rehearsed level; L2 is the same three arms where rehearsal never fired
+  and is the only in-tag handle this round has. Trust columns come from
+  woodshed/reduce_trust.py (imported), unchanged.
+
+  L2 (handle: rehearsal never fired)
+  arm                      amax     prop_share     exaff_prop exaff_prop_end  explore_share     n_ent_prop
+  exact_reh              0.0781         0.6487         0.0844         0.0000         0.1313        13.0000
+  exact_exp              0.1198         0.6512         0.1151         0.0691         0.1302        13.0000
+  exact                  0.1250         0.6873         0.0703         0.0002         0.0916        14.0000
+  given_c1               0.1120         0.8951         0.1355         0.0417         0.0250        14.0000
+
+  L3 (rehearsed)
+  arm                      amax     prop_share     exaff_prop exaff_prop_end  explore_share     n_ent_prop
+  exact_reh              0.5547         0.7221         0.1544         0.0295         0.0435        17.0000
+  exact_exp              0.3750         0.6300         0.1116         0.0375         0.0592        12.0000
+  exact                  0.2396         0.6565         0.0794         0.0737         0.0389        12.0000
+  given_c1               0.8307         0.9542         0.4625         0.1388         0.0099        18.0000
+
+  wd_s1-arms L3 spread (the effect)                    0.3151         0.0921         0.0750         0.0441         0.0202         5.0000
+  unrehearsed-L2 handle (n=3)                          0.0469         0.0386         0.0448         0.0691         0.0397         1.0000
+  effect / handle                                        6.72           2.38           1.68           0.64           0.51           5.00
+
+  ordering check (credit > exposure > none, as trust orders them)
+      amax               reh     0.5547  exp     0.3750  none     0.2396   -> ok 
+      prop_share         reh     0.7221  exp     0.6300  none     0.6565   -> mixed
+      exaff_prop         reh     0.1544  exp     0.1116  none     0.0794   -> ok 
+      exaff_prop_end     reh     0.0295  exp     0.0375  none     0.0737   -> inverted
+      explore_share      reh     0.0435  exp     0.0592  none     0.0389   -> mixed
+      n_ent_prop         reh    17.0000  exp    12.0000  none    12.0000   -> mixed
+
+----------------------------------------------------------------------------------------------------
+(4) CIRCULARITY CHECK — content or composition?
+----------------------------------------------------------------------------------------------------
+
+  The concern: `exaff_prop` conditions on pi-PROPOSED executions and trust is pi's
+  mass, so both move with pi's behaviour. Three ways the conditioning could
+  manufacture the ordering, and each has its own cut below:
+    (i)  ASK-CONDITIONING — the statistic only looks where pi asked.  -> (4a)
+    (ii) VOLUME — credit makes pi propose L3 ~1.9x more than `exact`. -> (4b)
+    (iii) RAMP — the per-cycle rate DECAYS after arrival, and the arms' proposal
+          volume ramps at different speeds (tau to prop_share>=0.90: reh 14, none
+          18, exp 22), so an execution-weighted run mean puts different weight on
+          the high early part of the same curve.                     -> (4b)/(4c)
+
+  Every column below is L3 (rehearsed); `handle` is the identical statistic on L2,
+  where rehearsal never fired (n = 3). `mult` = L3 spread / L2 handle.
+
+  (4a) ASK-INDEPENDENT READS — drop the conditioning on pi's own asks
+
+  statistic                             exact_reh    exact_exp        exact    L3 spread       handle         mult   order
+  exaff_prop  (beam, as reported)          0.1544       0.1116       0.0794       0.0750       0.0448         1.68   ok
+  exaff_all   (beam, ALL sources)          0.1385       0.1068       0.0851       0.0533       0.0345         1.55   ok
+  exaff_forced (beam, EXOGENOUS)         0.091795     0.092054     0.092483     0.000688   degenerate            -   see below
+
+       `exaff_forced` is the purest ask-independent cell the round contains: the
+       forced-expansion window puts those moves on the beam by SCHEDULE, not by pi,
+       so the statistic never conditions on pi's asks at all. Its L2 handle is
+       DEGENERATE — all three arms read 0.225715 exactly, because L2's forced
+       window fires at c18-20, before rehearsal (c71) has made the arms differ — so
+       no multiple is defined for it. The informative comparison is within L3:
+         pi-ASKED executions   spread across the trio = 0.075027
+         SCHEDULE-FORCED execs spread across the trio = 0.000688   (109x smaller)
+       Same table, same self/other tag, same cycles, same three agents: the
+       exafference difference is confined to the executions pi chose.
+
+       THE PROBE PHASE IS NOT USABLE FOR THIS, AND THE REASON IS MACHINERY:
+       the entry accumulator is keyed (phase, level) and reallocates on table size,
+       and the per-cycle AUDITION — which grades the live CANDIDATE table — runs
+       under the `probe` tag. So a probe row is the candidate's, not the committed
+       table's, whenever an audition ran. Measured on this tag:
+         exact_reh    probe size-mismatched cycles L2  75 / L3  31   beam   0 /   0
+         exact_exp    probe size-mismatched cycles L2  78 / L3  31   beam   0 /   0
+         exact        probe size-mismatched cycles L2  69 / L3  32   beam   0 /   0
+       The beam phase is clean (0 everywhere). Size-matching does not PROVE a probe
+       row is the committed table's — it only fails to detect the mixing — so the
+       surviving probe cycles are ambiguous rather than clean, and no probe number
+       is reported. This is a property of the DONOR's `entry.hist` too (gate (c)
+       shows the join reproduces it element-wise), so it demotes the `probe@end` /
+       `probearr` columns of `figures/reduction.txt` section (2). Nothing in
+       sections (3)-(4) of that file used the probe phase.
+
+  (4b) VOLUME-MATCHED AND RAMP-FREE READS
+
+       Uniform subsampling to a matched execution count leaves a cycle's exafference
+       RATE unbiased, so the matched-count statistic is exactly a re-weighting of the
+       per-cycle rates with weights COMMON to all arms. Two such weightings:
+         equal-cycle   every post-arrival cycle counts once
+         matched-count cycle c weighted by min over the trio of that cycle's count
+       Neither can be moved by an arm proposing more than another.
+
+  statistic                             exact_reh    exact_exp        exact    L3 spread       handle         mult   order
+  exaff_prop  equal-cycle weight           0.1693       0.1118       0.0724       0.0969       0.0272         3.56   ok
+  exaff_prop  matched-count weight         0.1545       0.1123       0.0794       0.0751       0.0401         1.87   ok
+  exaff_all   equal-cycle weight           0.1573       0.1120       0.0841       0.0732       0.0267         2.75   ok
+  ent_other_prop (VOLUME-FREE)             0.6168       0.5353       0.4894       0.1274       0.0385         3.31   ok
+
+       `ent_other_prop` carries no execution weights at all: of the DISTINCT entries
+       pi proposed in a cycle, the share that were other-provenance.
+
+       explicit matched-count subsample (hypergeometric, 400 draws, seed 0).
+       The +/- is the SUBSAMPLE's own Monte-Carlo error, NOT an experimental floor.
+       L2: exact_reh=0.0835+/-0.0000   exact_exp=0.1153+/-0.0001   exact=0.0752+/-0.0000
+       L3: exact_reh=0.1545+/-0.0003   exact_exp=0.1123+/-0.0002   exact=0.0794+/-0.0000
+
+  (4c) DECOMPOSITION of each pairwise run-mean gap into RATE and WEIGHT
+
+       run-mean = sum_c w_c r_c, with w_c the arm's own share of proposed L3
+       executions in cycle c and r_c that cycle's exafference rate. For arms X, Y:
+         gap = sum_c wbar_c (rX_c - rY_c)   [RATE: same weights, different content]
+             + sum_c (wX_c - wY_c) rbar_c   [WEIGHT: same content, different ramp]
+       wbar = (wX+wY)/2, rbar = (rX+rY)/2. A gap that is mostly WEIGHT is the
+       composition artifact the concern names.
+
+       pair                              gap   rate part  weight part   rate %
+       L3 exact_reh-exact         0.0750      0.0760      -0.0010    101.3%
+       L3 exact_reh-exact_exp     0.0428      0.0434      -0.0006    101.3%
+       L3 exact_exp-exact         0.0322      0.0334      -0.0012    103.8%
+       L2 exact_reh-exact         0.0140      0.0083       0.0058     58.8%
+       L2 exact_reh-exact_exp    -0.0308     -0.0314       0.0006    102.1%
+       L2 exact_exp-exact         0.0448      0.0416       0.0032     92.8%
+
+       (RATE + WEIGHT = gap exactly; the split is the standard two-term
+        decomposition, symmetric in X and Y.)

@@ -484,6 +484,32 @@ moves precision exactly as the √-law says while the value curve is a **valley,
 likely decomposes into the old budget confound plus a stable value-vs-trust dissociation.
 Full record and the question-port close: [quartet/README.md](quartet/README.md).
 
+### [`antiphon/`](antiphon/README.md) — the question port (2026-09-01)
+
+**Goal**: occupy the demand seat endogenously — question-choice as an outer-loop action on the
+`crescendo` crank, with an oracle-bisection ceiling, the exogenous ladder, Δ`at_support`-per-
+priced-sample as the learner's own question-judge, both failure poles in-tag, and shape P (the
+provenance primitive: efference copies of one's own asks, self/other by match, provenance-gated
+credit) on the `woodshed` harness. A question is a posed repair instance selected from a menu of
+the era's damage cell — the cell is one half of every mined key, so the lever is exact; arms
+hold difficulty, volume, and priced budget and move only selection.
+
+**Finding**: **selection moves the mining exactly as ordered (L4 true-at-support 50 oracle vs
+22 exogenous, endogenous judge 35), but deep-era value lives almost entirely in the
+composition with the pacer** — pacer-alone +0.091/−0.060 at eras 4/5, selection-alone
+−0.085/+0.322, composed **+0.285/+0.536**, an interaction of +0.279/+0.273 over additive, with
+the pacer-only arm certified in-tag at 0.000e+00 and the sign (not the magnitude) lifetime-
+clean. The comfort pole is the measured hazard on this grammar (difficulty collapse; the
+native parse-ambiguity trap punishes novelty barely at all). Shape P lands a non-circular
+provenance instrument — `exaff_prop` orders credit > exposure > none at 1.68× its handle,
+surviving ask-independent and volume/ramp-matched re-reads, with the gift arm at exafference
+1.0000 for 44 straight cycles — while both per-step authorship gates dose-collapse (strict:
+4.9% of solves pass; macro work inside solving rehearsal trajectories is 61.7%
+exploration-drawn vs 31.5% π-proposed). The adopted reading: **the ask directs the search and
+does not author the answer** — per-step provenance gates discard the found-but-not-authored
+work the ask licensed, and the trajectory-grain provenance experiment is `woodshed` itself,
+already run and already positive. Full record: [antiphon/README.md](antiphon/README.md).
+
 ## Reproduce
 
 ```bash

@@ -1,0 +1,109 @@
+====================================================================================================
+[antiphon P"] pp_s1 — the level-restricted provenance pair: GATES
+====================================================================================================
+
+  (a) TWIN GATE vs ap_s0/exact, corrected first-CONSUMED-cycle form
+      exact_rehL_s   fires c71  first CONSUMED c81   c1-c80 max|delta| = 0.000e+00   first divergence c81   -> PASS
+      exact_rehL_m   fires c71  first CONSUMED c81   c1-c80 max|delta| = 0.000e+00   first divergence c81   -> PASS
+
+  (b) FIRST-CONSUMED-CYCLE PAIR-COUNT MATCH  (c) IN-TAG ONE-BIT (same agent there)
+      first consumed cycle equal across the pair = True   -> PASS
+      pair count             8 vs 8   -> PASS
+      prov.n_solved          111 vs 111   -> PASS
+      prov.n_eligible        77 vs 77   -> PASS
+      prov.n_traj_used       1 vs 1   -> PASS
+
+  (d) SUBSTRATE IDENTITY vs ap_s0
+      setup['eras']  identical = True   -> PASS
+      setup['refs']  identical = True   -> PASS
+      setup['plant']  identical = True   -> PASS
+      setup['true_tables']  identical = True   -> PASS
+      setup['junk_pool']  identical = True   -> PASS
+      config drift (excluding ['ap_rec', 'reh_gate']): none   -> PASS
+
+====================================================================================================
+  GATE VERDICT: ALL PASS
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+(1) THE DELIVERED DOSE — realized vs projected, as an apparatus record
+----------------------------------------------------------------------------------------------------
+
+arm             cycles   solved  eligible   no_L3  passes    pairs    dose  zero-cyc
+exact_rehL_s        46     7124      5353    1771     607     4856  0.0852        17
+exact_rehL_m        46     7409      5723    1686     897     7176  0.1211        16
+
+  `dose` is pairs delivered / the pairs plain `credit` would have delivered
+  (= n_solved x budget). References: pp_s0 strict gate 0.0491 (2,872 pairs);
+  wd_s0's recorded near-null 1,728 pairs; wd_s1's full credit 56,840.
+
+  REALIZED 0.0852 vs PROJECTED 0.125 — the projection
+  came from a Poisson(1.528) x independent-prop(0.2976) model fitted to pp_s0's
+  aggregates, which reproduced pp_s0's own logged level-gate rate to 3%. It
+  over-predicts here because the conjunction it assumes is not independent:
+    measured eligible share (>=1 L3 macro)  0.7514   (Poisson predicted 0.7830)
+    measured pass | eligible                0.1134   (independence predicted 0.1595)
+  So the eligible share is close to prediction and the CONDITIONAL pass rate is
+  the term that misses: within a trajectory, the sources of its L3 applications
+  are POSITIVELY CORRELATED — a trajectory that explores into one L3 macro tends
+  to explore into the others — so 'every L3 application was pi's own ask' is
+  rarer than an independent model predicts. Recorded as an apparatus fact; it is
+  the same class of error as the `wd_s0` sizing miss, caught this time before the
+  round rather than after.
+
+----------------------------------------------------------------------------------------------------
+(2) TRUST — pi's per-level proposal mass and argmax share, against the handles
+----------------------------------------------------------------------------------------------------
+
+tag     arm              L2 mass   L2 amax   L3 mass   L3 amax
+pp_s1   exact_rehL_s      0.2479    0.1589    0.2383    0.2891
+pp_s1   exact_rehL_m      0.2277    0.0729    0.2818    0.3828
+ap_s0   exact_reh         0.1975    0.0781    0.3922    0.5547
+ap_s0   exact_exp         0.2041    0.1198    0.2961    0.3750
+ap_s0   exact             0.2242    0.1250    0.2469    0.2396
+ap_s0   given_c1          0.2477    0.1120    0.5796    0.8307
+pp_s0   exact_reh_s       0.1866    0.0703    0.3211    0.4427
+
+  THE ONE-BIT CONTRAST AND ITS HANDLES (L3 = rehearsed, L2 = never rehearsed)
+
+                                                  L3 mass    L3 amax    L2 mass    L2 amax
+  pp_s1 pair effect |selfL - matchL|               0.0434     0.0938     0.0202     0.0859
+  unrehearsed-L2 handle (n=3, incl ap_s0/exact)          -          -     0.0237     0.0859
+    -> L3 effect / L2 handle                         1.83       1.09
+
+  For reference, the same statistic on ap_s0's credit-vs-exposure pair:
+  ap_s0 |exact_reh - exact_exp| @L3                0.0960     0.1797
+
+----------------------------------------------------------------------------------------------------
+(3) VALUE — recovered fraction per era, and the anchor->gift bracket
+----------------------------------------------------------------------------------------------------
+
+  `anchor` imported from as_s0 (unchanged replay); era references identical = True
+
+  arm                       era1      era2      era3      era4      era5
+  exact_rehL_s             0.496     0.592     0.688     0.658     0.393
+  exact_rehL_m             0.496     0.589     0.759     0.636     0.557
+  ap_s0/exact_reh          0.496     0.614     0.680     0.976     0.705
+  ap_s0/exact_exp          0.496     0.620     0.630     0.733     0.448
+  ap_s0/exact              0.496     0.617     0.649     0.670     0.410
+  ap_s0/given_c1           0.438     0.659     0.788     1.152     0.934
+  pp_s0/exact_reh_s        0.496     0.610     0.736     0.745     0.464
+  as_s0/anchor             0.524     0.619     0.644     0.564     0.202
+
+  ERAS 4-5 BRACKET: as_s0/anchor -> ap_s0/given_c1, closure fraction
+  arm                       era4      era5
+  exact_rehL_s             0.160     0.261
+  exact_rehL_m             0.124     0.485
+  ap_s0/exact_reh          0.701     0.687
+  ap_s0/exact_exp          0.289     0.336
+  ap_s0/exact              0.180     0.284
+  ap_s0/given_c1           1.000     1.000
+  pp_s0/exact_reh_s        0.309     0.358
+  as_s0/anchor             0.000     0.000
+
+  pp_s1 pair difference (selfL - matchL), eras 4/5:  +0.036  -0.224
+  ap_s0 credit-vs-exposure (reh - exp), eras 4/5:    +0.412  +0.351
+
+  The measured depth-6 stream floor (as_s1, census/assay finding 7) moves
+  eras-3-5 recovered fractions by up to 0.087 (exact family) — so a recovered-
+  fraction difference below ~0.09 is not separable from stream position alone.

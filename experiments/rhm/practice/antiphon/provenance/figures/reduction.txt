@@ -1,0 +1,428 @@
+====================================================================================================
+[antiphon shape P] PROVENANCE, OFFLINE — efference copies vs the banked practice logs
+====================================================================================================
+
+efference copy  E_l(c) = level-l flat keys the agent's OWN solved rollouts emitted
+                        at support >= mine_support, by cycle c (log['miner'][c][l]['keys_at_support'])
+match rule      entry i of the committed table is SELF at c iff key_i in E_l(c);
+                otherwise OTHER (exafference: an arriving datum matching no
+                outgoing question).  `arr` freezes the tag at the arrival cycle;
+                `live` re-evaluates it every cycle (re-derivation converts).
+
+----------------------------------------------------------------------------------------------------
+(0) GATES — the match rule verified against independent artifacts
+----------------------------------------------------------------------------------------------------
+
+G0  keys_at_support monotone in cycle (the efference log only ever grows)
+G1/G2/G3  the index->key map reproduces the logged per-cycle true_mask and vocab size
+
+node/tag/arm                           lvl source            checked   bad  first_bad
+antiphon/provenance/ap_s0/exact                2 surgery:exact          99     0  
+antiphon/provenance/ap_s0/exact                3 surgery:exact          47     0  
+antiphon/provenance/ap_s0/exact_exp            2 surgery:exact          99     0  
+antiphon/provenance/ap_s0/exact_exp            3 surgery:exact          47     0  
+antiphon/provenance/ap_s0/exact_reh            2 surgery:exact          99     0  
+antiphon/provenance/ap_s0/exact_reh            3 surgery:exact          47     0  
+antiphon/provenance/ap_s0/given_c1             2 gift@c1               116     0  
+antiphon/provenance/ap_s0/given_c1             3 gift@c1               116     0  
+assay/as_s0/anchor               2 earned                 99     0  
+assay/as_s0/anchor               3 earned                 48     0  
+assay/as_s0/complete             2 surgery:complete       99     0  
+assay/as_s0/complete             3 surgery:complete       45     0  
+assay/as_s0/exact                2 surgery:exact          99     0  
+assay/as_s0/exact                3 surgery:exact          47     0  
+assay/as_s0/given_c1             2 gift@c1               116     0  
+assay/as_s0/given_c1             3 gift@c1               116     0  
+assay/as_s0/junk_dose            2 surgery:junk_dose       99     0  
+assay/as_s0/junk_dose            3 surgery:junk_dose       50     0  
+assay/as_s0/strip                2 surgery:strip          99     0  
+assay/as_s0/strip                3 surgery:strip          50     0  
+woodshed/wd_s0/anchor               2 earned                 99     0  
+woodshed/wd_s0/anchor               3 earned                 48     0  
+woodshed/wd_s0/exact                2 surgery:exact          99     0  
+woodshed/wd_s0/exact                3 surgery:exact          47     0  
+woodshed/wd_s0/exact_exp            2 surgery:exact          99     0  
+woodshed/wd_s0/exact_exp            3 surgery:exact          47     0  
+woodshed/wd_s0/exact_reh            2 surgery:exact          99     0  
+woodshed/wd_s0/exact_reh            3 surgery:exact          47     0  
+woodshed/wd_s0/given_c1             2 gift@c1               116     0  
+woodshed/wd_s0/given_c1             3 gift@c1               116     0  
+woodshed/wd_s1/exact                2 surgery:exact          99     0  
+woodshed/wd_s1/exact                3 surgery:exact          47     0  
+woodshed/wd_s1/exact_exp            2 surgery:exact          99     0  
+woodshed/wd_s1/exact_exp            3 surgery:exact          47     0  
+woodshed/wd_s1/exact_reh            2 surgery:exact          99     0  
+woodshed/wd_s1/exact_reh            3 surgery:exact          47     0  
+woodshed/wd_s1/given_c1             2 gift@c1               116     0  
+woodshed/wd_s1/given_c1             3 gift@c1               116     0  
+conductor/cd_s0/anchor               2 earned                 99     0  
+conductor/cd_s0/anchor               3 earned                 48     0  
+maestro/ma_s0/anchor               2 earned                 99     0  
+maestro/ma_s0/anchor               3 earned                 48     0  
+audiation/au_s1/anchor               2 earned                 99     0  
+audiation/au_s1/anchor               3 earned                 48     0  
+
+G0 violations: 0   |   key-map cells PASS 133 / FAIL 0
+
+----------------------------------------------------------------------------------------------------
+(1) PROVENANCE OF THE COMMITTED VOCABULARY — holding-weighted
+----------------------------------------------------------------------------------------------------
+
+  arrival     the cycle the table first exists (commit, or 1 for a gift)
+  n_ent       entries at arrival / at end
+  self@arr    fraction of the arriving table already in the efference log
+  self@end    fraction in the efference log at the last cycle (live tag)
+  conv        of the entries EXAFFERENT at arrival, the fraction the agent has
+              since re-derived itself  (reafference conversion)
+  |E|@end     size of the efference log at the last cycle
+
+tag      arm             l arrival  n_ent0  n_entN  self@arr  self@end    conv  |E|@end   |E∩T|
+ap_s0    exact           2      18      16      16    0.6250    0.9375  0.8333       20      13
+ap_s0    exact           3      70      64      64    0.1562    0.2344  0.0833       35      12
+ap_s0    exact_exp       2      18      16      16    0.6250    0.8750  0.6667       18      12
+ap_s0    exact_exp       3      70      64      64    0.1562    0.1875  0.0417       35      10
+ap_s0    exact_reh       2      18      16      16    0.6250    0.9375  0.8333       20      13
+ap_s0    exact_reh       3      70      64      64    0.1562    0.3125  0.1250       36      14
+ap_s0    given_c1        2       1      16      16    0.0000    0.8750  0.8571       17      12
+ap_s0    given_c1        3       1      64      64    0.0000    0.1562  0.1429       22       8
+as_s0    anchor          2      18      11      11    1.0000    1.0000       -       18      12
+as_s0    anchor          3      69      12      12    1.0000    1.0000       -       34      14
+as_s0    complete        2      18      17      17    0.6471    0.8824  0.6667       17      12
+as_s0    complete        3      72      63      63    0.2381    0.3333  0.1250       35      14
+as_s0    exact           2      18      16      16    0.6250    0.9375  0.8333       20      13
+as_s0    exact           3      70      64      64    0.1562    0.2344  0.0833       35      12
+as_s0    given_c1        2       1      16      16    0.0000    0.8750  0.8571       17      12
+as_s0    given_c1        3       1      64      64    0.0000    0.1562  0.1429       22       8
+as_s0    junk_dose       2      18      16      16    0.6875    0.8750  0.6000       18      12
+as_s0    junk_dose       3      67      32      32    0.3750    0.7188  0.5500       37      10
+as_s0    strip           2      18       8       8    1.0000    1.0000       -       17      12
+as_s0    strip           3      67       5       5    1.0000    1.0000       -       32      13
+as_s1    exact_j         2      19      16      16    0.5625    0.9375  0.8571       18      13
+as_s1    exact_j         3      56      64      64    0.0625    0.2656  0.1887       33      13
+as_s1    given_c1_j      2       1      16      16    0.0000    0.8750  0.8571       18      12
+as_s1    given_c1_j      3       1      64      64    0.0000    0.2344  0.2143       22      12
+wd_s0    anchor          2      18      11      11    1.0000    1.0000       -       18      12
+wd_s0    anchor          3      69      12      12    1.0000    1.0000       -       34      14
+wd_s0    exact           2      18      16      16    0.6250    0.9375  0.8333       20      13
+wd_s0    exact           3      70      64      64    0.1562    0.2344  0.0833       35      12
+wd_s0    exact_exp       2      18      16      16    0.6250    0.8125  0.5000       18      11
+wd_s0    exact_exp       3      70      64      64    0.1562    0.2500  0.0833       36      12
+wd_s0    exact_reh       2      18      16      16    0.6250    0.8125  0.5000       18      11
+wd_s0    exact_reh       3      70      64      64    0.1562    0.2500  0.0833       36      12
+wd_s0    given_c1        2       1      16      16    0.0000    0.8750  0.8571       17      12
+wd_s0    given_c1        3       1      64      64    0.0000    0.1562  0.1429       22       8
+wd_s1    exact           2      18      16      16    0.6250    0.9375  0.8333       20      13
+wd_s1    exact           3      70      64      64    0.1562    0.2344  0.0833       35      12
+wd_s1    exact_exp       2      18      16      16    0.6250    0.8750  0.6667       18      12
+wd_s1    exact_exp       3      70      64      64    0.1562    0.1875  0.0417       35      10
+wd_s1    exact_reh       2      18      16      16    0.6250    0.9375  0.8333       20      13
+wd_s1    exact_reh       3      70      64      64    0.1562    0.3125  0.1250       36      14
+wd_s1    given_c1        2       1      16      16    0.0000    0.8750  0.8571       17      12
+wd_s1    given_c1        3       1      64      64    0.0000    0.1562  0.1429       22       8
+
+
+--- earned-only tags (no gift anywhere): the construction check ---
+tag      arm             l arrival  n_ent0  n_entN  self@arr  self@end    conv  |E|@end   |E∩T|
+cd_s0    anchor          2      18      11      11    1.0000    1.0000       -       18      12
+cd_s0    anchor          3      69      12      12    1.0000    1.0000       -       34      14
+cd_s0    outer_endo      2      16      11      11    1.0000    1.0000       -       19      13
+cd_s0    outer_ledger    2      10      10      10    1.0000    1.0000       -       17      12
+cd_s0    outer_yield     2      49      14      14    1.0000    1.0000       -       18      13
+cd_s0    outer_yield     3      92      21      21    1.0000    1.0000       -       47      17
+cd_s0    yoked_endo      2      16      11      11    1.0000    1.0000       -       19      13
+cd_s0    yoked_yield     2      49      14      14    1.0000    1.0000       -       18      13
+cd_s0    yoked_yield     3      92      21      21    1.0000    1.0000       -       47      17
+ma_s0    anchor          2      18      11      11    1.0000    1.0000       -       18      12
+ma_s0    anchor          3      69      12      12    1.0000    1.0000       -       34      14
+ma_s0    learned_task    2      14      11      11    1.0000    1.0000       -       19      13
+ma_s0    learned_yield   2      39      13      13    1.0000    1.0000       -       18      11
+ma_s0    learned_yield   3      85      18      18    1.0000    1.0000       -       38      14
+ma_s0    outer_yield     2      49      14      14    1.0000    1.0000       -       18      13
+ma_s0    outer_yield     3      92      21      21    1.0000    1.0000       -       47      17
+ma_s0    yoked_learned   2      39      13      13    1.0000    1.0000       -       18      11
+ma_s0    yoked_learned   3      85      18      18    1.0000    1.0000       -       38      14
+ma_s1    learned_yield_j  2      26      12      12    1.0000    1.0000       -       20      13
+ma_s1    learned_yield_j  3      54       5       5    1.0000    1.0000       -       33      10
+ma_s1    outer_yield_j   2      26      12      12    1.0000    1.0000       -       18      13
+ma_s1    outer_yield_j   3     103      22      22    1.0000    1.0000       -       44      16
+cr3_s0   anchor_long     2      18      11      11    1.0000    1.0000       -       19      13
+cr3_s0   anchor_long     3      75       8       8    1.0000    1.0000       -       51      19
+cr3_s0   ceiling_m3      2      49      14      14    1.0000    1.0000       -       20      13
+cr3_s0   ceiling_m3      3      92      21      21    1.0000    1.0000       -       49      17
+cr3_s0   outer_yield_m3  2      49      14      14    1.0000    1.0000       -       18      12
+cr3_s0   outer_yield_m3  3      92      21      21    1.0000    1.0000       -       48      17
+cr3_s0   outer_yield_m4  2      49      14      14    1.0000    1.0000       -       19      12
+cr3_s0   outer_yield_m4  3      92      21      21    1.0000    1.0000       -       47      15
+cr3_s0   outer_yield_m4x  2      49      14      18    1.0000    1.0000       -       18      12
+cr3_s0   outer_yield_m4x  3      79      15      34    1.0000    1.0000       -       44      13
+cr3_s1   ceiling_m3_j    2      26      12      12    1.0000    1.0000       -       20      13
+cr3_s1   ceiling_m3_j    3     103      22      22    1.0000    1.0000       -       49      16
+cr3_s1   outer_yield_m4_j  2      26      12      12    1.0000    1.0000       -       17      12
+cr3_s1   outer_yield_m4_j  3     103      22      22    1.0000    1.0000       -       45      14
+au_s1    anchor          2      18      11      11    1.0000    1.0000       -       18      12
+au_s1    anchor          3      69      12      12    1.0000    1.0000       -       34      14
+au_s1    perdatum        2      19      12      12    1.0000    1.0000       -       18      12
+au_s1    perdatum        3      62       8       8    1.0000    1.0000       -       24       9
+in_s0    outcome_gate    2      49      16      16    1.0000    1.0000       -       21      13
+in_s0    outcome_gate    3      72       9       9    1.0000    1.0000       -       31      10
+in_s0    perf_gain       2      49      14      14    1.0000    1.0000       -       18      13
+in_s0    perf_gain       3      72       9       9    1.0000    1.0000       -       30      10
+in_s0    perf_gate       2      49      16      16    1.0000    1.0000       -       17      12
+in_s0    perf_gate       3      72      11      11    1.0000    1.0000       -       38      12
+in_s0    perf_log        2      49      14      14    1.0000    1.0000       -       18      13
+in_s0    perf_log        3      72      10      10    1.0000    1.0000       -       35      10
+in_s0    perf_raw        2      49      14      14    1.0000    1.0000       -       17      12
+in_s0    perf_raw        3      72      14      14    1.0000    1.0000       -       30       7
+ma_s0    mout_gate       2      43      13      13    1.0000    1.0000       -       17      12
+ma_s0    mout_gate       3      83      10      10    1.0000    1.0000       -       25       9
+ma_s0    mperf_gain      2      43      13      13    1.0000    1.0000       -       15      10
+ma_s0    mperf_gain      3      83      12      12    1.0000    1.0000       -       30      11
+ma_s0    mperf_gate      2      43      15      15    1.0000    1.0000       -       17      12
+ma_s0    mperf_gate      3      83      14      14    1.0000    1.0000       -       21       7
+ma_s0    mperf_log       2      43      13      13    1.0000    1.0000       -       16      11
+ma_s0    mperf_log       3      83      10      10    1.0000    1.0000       -       21       7
+ma_s0    mperf_rawx      2      43      13      13    1.0000    1.0000       -       15      10
+ma_s0    mperf_rawx      3      83       8       8    1.0000    1.0000       -       19       7
+ca_s0    dsil_and        2      49      14      14    1.0000    1.0000       -       17      11
+ca_s0    dsil_read       2      18      11      11    1.0000    1.0000       -       19      12
+ca_s0    dsil_read       3      71      14      14    1.0000    1.0000       -       41      15
+ca_s0    dsil_sched      2      18      11      11    1.0000    1.0000       -       20      13
+ca_s0    dsil_sched      3      77       9       9    1.0000    1.0000       -       43      17
+ca_s0    dsil_yield      2      49      14      14    1.0000    1.0000       -       18      13
+ca_s0    dsil_yield      3      72      10      10    1.0000    1.0000       -       35      10
+tc_s0    gate_all        2      49      17      17    1.0000    1.0000       -       21      13
+tc_s0    gate_all        3      92      31      31    1.0000    1.0000       -       60      19
+tc_s0    gate_delib      2      49      16      16    1.0000    1.0000       -       19      13
+tc_s0    gate_delib      3      92      23      23    1.0000    1.0000       -       44      15
+tc_s0    gate_delta_hi   2      49      16      16    1.0000    1.0000       -       20      13
+tc_s0    gate_delta_hi   3      92      22      22    1.0000    1.0000       -       52      19
+tc_s0    gate_delta_lo   2      49      15      15    1.0000    1.0000       -       18      13
+tc_s0    gate_delta_lo   3      92      21      21    1.0000    1.0000       -       38      13
+tc_s0    gate_random     2      49      16      16    1.0000    1.0000       -       20      13
+tc_s0    gate_random     3      92      18      18    1.0000    1.0000       -       45      14
+tc_s0    outer_yield_m4  2      49      14      14    1.0000    1.0000       -       19      12
+tc_s0    outer_yield_m4  3      92      21      21    1.0000    1.0000       -       47      15
+os_s0    os_log          2      49      14      14    1.0000    1.0000       -       18      13
+os_s0    os_log          3      72      10      10    1.0000    1.0000       -       35      10
+os_s0    os_r001         2      49      14      14    1.0000    1.0000       -       18      12
+os_s0    os_r001         3      72      14      14    1.0000    1.0000       -       31      13
+os_s0    os_r004         2      49      14      14    1.0000    1.0000       -       16      11
+os_s0    os_r004         3      72       9       9    1.0000    1.0000       -       31      13
+os_s0    os_r020         2      49      14      14    1.0000    1.0000       -       17      12
+os_s0    os_r020         3      72      11      11    1.0000    1.0000       -       35      14
+os_s0    os_r100         2      49      14      14    1.0000    1.0000       -       18      13
+os_s0    os_r100         3      72       9       9    1.0000    1.0000       -       30      10
+os_s0    os_rawx         2      49      14      14    1.0000    1.0000       -       18      12
+os_s0    os_rawx         3      72      12      12    1.0000    1.0000       -       33      14
+
+----------------------------------------------------------------------------------------------------
+(2) PROVENANCE OF USE — execution-weighted (assay's entry-identity instrument)
+----------------------------------------------------------------------------------------------------
+
+  self_use    share of macro EXECUTIONS at this level served by a self-tagged entry
+  *_arr       the same with the tag frozen at arrival (origin, not re-derivation)
+  beam = the practice rollouts; probe = the metering rollouts
+
+  n_used / n_ent  distinct entries ever served, out of the table's size
+  ess_use         exp(entropy) of the cumulative per-entry use distribution — the
+                  EFFECTIVE number of entries the agent actually leans on
+
+tag      arm             l  beam@end   beamarr  probe@end  probearr   beam_tot  mean_beam  n_used  n_ent  ess_use
+ap_s0    exact           2    0.9998    0.8708     0.9997    0.8655    2269436     0.8887      14     16     6.57
+ap_s0    exact           3    0.9234    0.9133     0.9350    0.9215    1095906     0.9149      36     64     2.57
+ap_s0    exact_exp       2    0.9309    0.7879     0.9383    0.8342    2295704     0.8542      14     16     7.00
+ap_s0    exact_exp       3    0.9573    0.9167     0.9569    0.9257    1436487     0.8932      42     64     3.00
+ap_s0    exact_reh       2    0.9999    0.8397     1.0000    0.8361    2281084     0.8767      14     16     6.79
+ap_s0    exact_reh       3    0.9699    0.8724     0.9690    0.8635    1904741     0.8615      37     64     2.96
+ap_s0    given_c1        2    0.9577    0.0000     0.9522    0.0000    8254543     0.8309      14     16     6.43
+ap_s0    given_c1        3    0.8616    0.0000     0.8582    0.0000    9174369     0.5179      43     64     3.42
+as_s0    anchor          2    1.0000    1.0000     1.0000    1.0000    1995426     1.0000      11     11     5.37
+as_s0    anchor          3    1.0000    1.0000     1.0000    1.0000    1099238     1.0000      12     12     3.14
+as_s0    complete        2    0.9955    0.9655     0.9968    0.9574    2373084     0.9695      17     17     6.94
+as_s0    complete        3    0.9085    0.8892     0.8889    0.8685    1106886     0.9045      39     63     3.38
+as_s0    exact           2    0.9998    0.8708     0.9997    0.8655    2269436     0.8887      14     16     6.57
+as_s0    exact           3    0.9234    0.9133     0.9350    0.9215    1095906     0.9149      36     64     2.57
+as_s0    given_c1        2    0.9577    0.0000     0.9522    0.0000    8254543     0.8309      14     16     6.43
+as_s0    given_c1        3    0.8616    0.0000     0.8582    0.0000    9174369     0.5179      43     64     3.42
+as_s0    junk_dose       2    0.9847    0.8928     0.9843    0.8909    1996050     0.9625      16     16     5.70
+as_s0    junk_dose       3    0.9839    0.9306     0.9684    0.9247     879553     0.9412      26     32     3.09
+as_s0    strip           2    1.0000    1.0000     1.0000    1.0000    1900111     1.0000       8      8     4.13
+as_s0    strip           3    1.0000    1.0000     1.0000    1.0000    1175077     1.0000       5      5     1.94
+as_s1    exact_j         2    1.0000    0.9048     0.9993    0.8756    1811785     0.9066      14     16     6.36
+as_s1    exact_j         3    0.9308    0.7075     0.9332    0.7369    1469417     0.8733      43     64     3.29
+as_s1    given_c1_j      2    0.9543    0.0000     0.9536    0.0000    9102770     0.8488      14     16     6.43
+as_s1    given_c1_j      3    0.9082    0.0000     0.9106    0.0000    7698229     0.5487      40     64     3.01
+wd_s0    anchor          2    1.0000    1.0000     1.0000    1.0000    1995426     1.0000      11     11     5.37
+wd_s0    anchor          3    1.0000    1.0000     1.0000    1.0000    1099238     1.0000      12     12     3.14
+wd_s0    exact           2    0.9998    0.8708     0.9997    0.8655    2269436     0.8887      14     16     6.57
+wd_s0    exact           3    0.9234    0.9133     0.9350    0.9215    1095906     0.9149      36     64     2.57
+wd_s0    exact_exp       2    0.9843    0.9221     0.9872    0.9429    2509828     0.8572      14     16     6.79
+wd_s0    exact_exp       3    0.9197    0.9192     0.9222    0.9221    1356149     0.9049      41     64     3.00
+wd_s0    exact_reh       2    0.9635    0.8843     0.9613    0.8677    2449194     0.8623      14     16     6.78
+wd_s0    exact_reh       3    0.8694    0.8374     0.8890    0.8637    1507753     0.8934      42     64     3.13
+wd_s0    given_c1        2    0.9577    0.0000     0.9522    0.0000    8254543     0.8309      14     16     6.43
+wd_s0    given_c1        3    0.8616    0.0000     0.8582    0.0000    9174369     0.5179      43     64     3.42
+wd_s1    exact           2    0.9998    0.8708     0.9997    0.8655    2269436     0.8887      14     16     6.57
+wd_s1    exact           3    0.9234    0.9133     0.9350    0.9215    1095906     0.9149      36     64     2.57
+wd_s1    exact_exp       2    0.9309    0.7879     0.9383    0.8342    2295704     0.8542      14     16     7.00
+wd_s1    exact_exp       3    0.9573    0.9167     0.9569    0.9257    1436487     0.8932      42     64     3.00
+wd_s1    exact_reh       2    0.9999    0.8397     1.0000    0.8361    2281084     0.8767      14     16     6.79
+wd_s1    exact_reh       3    0.9699    0.8724     0.9690    0.8635    1904741     0.8615      37     64     2.96
+wd_s1    given_c1        2    0.9577    0.0000     0.9522    0.0000    8254543     0.8309      14     16     6.43
+wd_s1    given_c1        3    0.8616    0.0000     0.8582    0.0000    9174369     0.5179      43     64     3.42
+
+----------------------------------------------------------------------------------------------------
+(3) THE TWO CLOCKS — how fast exafference decays vs how fast trust forms
+----------------------------------------------------------------------------------------------------
+
+  The provenance clock runs on the CYCLE grid (entry.hist is per-cycle); the trust
+  clock runs on the PROBE grid (probe_every = 8), so any provenance time constant
+  below ~8 cycles is not resolvable by the trust instrument it is being compared to.
+
+  su@0/8/16   use-weighted self share at tau = 0 / 8 / 16 cycles after arrival
+  t_su.5/.9   first tau at which the use-weighted self share reaches 0.50 / 0.90
+  cross1      woodshed: first tau at/after the lift trough where pi reaches chance
+  t_half      woodshed: cycles to half the arm's own final pi mass
+
+tag      arm             l    su@0    su@8   su@16  t_su.5  t_su.9 |  cross1  t_half  liftmin  mass@N  amax@N
+ap_s0    exact           2       -  0.7751  0.8657     1.0    22.9 |       -    15.4   0.1623  0.2242  0.1250
+ap_s0    exact           3       -  0.9054  0.9286     1.0     1.2 |    25.6    22.2   0.1530  0.2469  0.2396
+ap_s0    exact_exp       2       -  0.7751  0.8657     1.0    22.9 |       -    14.0   0.1623  0.2041  0.1198
+ap_s0    exact_exp       3       -  0.9308  0.8630     1.0     1.0 |    18.0    21.0   0.4506  0.2961  0.3750
+ap_s0    exact_reh       2       -  0.7751  0.8657     1.0    22.9 |       -    13.5   0.1623  0.1975  0.0781
+ap_s0    exact_reh       3       -  0.8271  0.8957     1.0     1.0 |    16.1    26.4   0.3647  0.3922  0.5547
+ap_s0    given_c1        2  0.0000  0.5827  0.7066     0.9    48.6 |       -     0.0   0.8671  0.2477  0.1120
+ap_s0    given_c1        3  0.0000  0.0000  0.0000    47.7       - |     0.0     8.6   1.0034  0.5796  0.8307
+as_s0    anchor          2       -  1.0000  1.0000     1.0     1.0 |    70.9    18.7   0.1580  0.2502  0.1875
+as_s0    anchor          3       -  1.0000  1.0000     1.0     1.0 |    27.7    23.3   0.1556  0.2335  0.2344
+as_s0    complete        2       -  0.9289  0.9201     1.0     1.0 |    68.1    16.2   0.1723  0.2384  0.1589
+as_s0    complete        3       -  0.9084  0.8617     1.0     1.0 |    26.1     0.0   0.3164  0.2757  0.2891
+as_s0    exact           2       -  0.7751  0.8657     1.0    22.9 |       -    15.4   0.1623  0.2242  0.1250
+as_s0    exact           3       -  0.9054  0.9286     1.0     1.2 |    25.6    22.2   0.1530  0.2469  0.2396
+as_s0    given_c1        2  0.0000  0.5827  0.7066     0.9    48.6 |       -     0.0   0.8671  0.2477  0.1120
+as_s0    given_c1        3  0.0000  0.0000  0.0000    47.7       - |     0.0     8.6   1.0034  0.5796  0.8307
+as_s0    junk_dose       2       -  0.8535  0.9482     1.0     8.4 |    82.4    21.9   0.1388  0.2692  0.2943
+as_s0    junk_dose       3       -  0.8661  0.9030     1.0     1.0 |    34.7    25.1   0.1525  0.1819  0.1068
+as_s0    strip           2       -  1.0000  1.0000     1.0     1.0 |    70.9    22.7   0.1246  0.2258  0.1406
+as_s0    strip           3       -  1.0000  1.0000     1.0     1.0 |    29.8    28.3   0.1963  0.2665  0.3307
+as_s1    exact_j         2       -  0.8311  0.7785     1.0    29.3 |       -    12.5   0.1576  0.2059  0.1432
+as_s1    exact_j         3       -  0.6519  0.7951     1.0    33.9 |    23.4     0.0   0.3759  0.2871  0.2969
+as_s1    given_c1_j      2  0.0000  0.6828  0.8744     1.7    30.0 |     0.0     0.0   1.1324  0.3328  0.2760
+as_s1    given_c1_j      3  0.0000  0.0000  0.0000    47.7    49.0 |     0.0     5.6   1.0034  0.4485  0.6250
+wd_s0    anchor          2       -  1.0000  1.0000     1.0     1.0 |    70.9    18.7   0.1580  0.2502  0.1875
+wd_s0    anchor          3       -  1.0000  1.0000     1.0     1.0 |    27.7    23.3   0.1556  0.2335  0.2344
+wd_s0    exact           2       -  0.7751  0.8657     1.0    22.9 |       -    15.4   0.1623  0.2242  0.1250
+wd_s0    exact           3       -  0.9054  0.9286     1.0     1.2 |    25.6    22.2   0.1530  0.2469  0.2396
+wd_s0    exact_exp       2       -  0.7751  0.8657     1.0    22.9 |       -    13.7   0.1623  0.2005  0.0859
+wd_s0    exact_exp       3       -  0.9118  0.8869     1.0     1.0 |    22.8    22.5   0.1931  0.2814  0.3203
+wd_s0    exact_reh       2       -  0.7751  0.8657     1.0    22.9 |       -    15.1   0.1623  0.2209  0.1484
+wd_s0    exact_reh       3       -  0.9081  0.8507     1.0     1.0 |    22.0    23.6   0.2050  0.3199  0.3854
+wd_s0    given_c1        2  0.0000  0.5827  0.7066     0.9    48.6 |       -     0.0   0.8671  0.2477  0.1120
+wd_s0    given_c1        3  0.0000  0.0000  0.0000    47.7       - |     0.0     8.6   1.0034  0.5796  0.8307
+wd_s1    exact           2       -  0.7751  0.8657     1.0    22.9 |       -    15.4   0.1623  0.2242  0.1250
+wd_s1    exact           3       -  0.9054  0.9286     1.0     1.2 |    25.6    22.2   0.1530  0.2469  0.2396
+wd_s1    exact_exp       2       -  0.7751  0.8657     1.0    22.9 |       -    14.0   0.1623  0.2041  0.1198
+wd_s1    exact_exp       3       -  0.9308  0.8630     1.0     1.0 |    18.0    21.0   0.4506  0.2961  0.3750
+wd_s1    exact_reh       2       -  0.7751  0.8657     1.0    22.9 |       -    13.5   0.1623  0.1975  0.0781
+wd_s1    exact_reh       3       -  0.8271  0.8957     1.0     1.0 |    16.1    26.4   0.3647  0.3922  0.5547
+wd_s1    given_c1        2  0.0000  0.5827  0.7066     0.9    48.6 |       -     0.0   0.8671  0.2477  0.1120
+wd_s1    given_c1        3  0.0000  0.0000  0.0000    47.7       - |     0.0     8.6   1.0034  0.5796  0.8307
+
+----------------------------------------------------------------------------------------------------
+(4) DOES COMPUTED PROVENANCE REPRODUCE WHAT THE ARM LABELS ESTABLISHED?
+----------------------------------------------------------------------------------------------------
+
+  amax/mass      = pi's L3 argmax share and proposal mass at the last probe (TRUST)
+  self_frac_end  = share of the committed table the agent has re-derived (HOLDING)
+  n_self_end     = the same as a count of entries
+  self_use_end   = share of L3 executions served by a re-derived entry (USE, last cycle)
+  self_use_mean  = the same, execution-weighted over the whole run
+  conv           = of the entries exafferent AT ARRIVAL, the share since re-derived
+
+  (a) assay finding 6, ARRIVAL DOMINATES (as_s0): gift@c1 vs commit-time gift
+  arm                       amax          mass self_frac_end    n_self_end  self_use_end self_use_mean          conv
+  given_c1@L3             0.8307        0.5796        0.1562       10.0000        0.8616        0.5179        0.1429
+  exact@L3                0.2396        0.2469        0.2344       15.0000        0.9234        0.9149        0.0833
+  complete@L3             0.2891        0.2757        0.3333       21.0000        0.9085        0.9045        0.1250
+  junk_dose@L3            0.1068        0.1819        0.7188       23.0000        0.9839        0.9412        0.5500
+  anchor@L3               0.2344        0.2335        1.0000       12.0000        1.0000        1.0000             -
+  strip@L3                0.3307        0.2665        1.0000        5.0000        1.0000        1.0000             -
+
+  (b) woodshed wd_s1, CREDIT > EXPOSURE > NONE (all three are `exact` tables at L3)
+  arm                       amax          mass self_frac_end    n_self_end  self_use_end self_use_mean          conv
+  exact_reh@L3            0.5547        0.3922        0.3125       20.0000        0.9699        0.8615        0.1250
+  exact_exp@L3            0.3750        0.2961        0.1875       12.0000        0.9573        0.8932        0.0417
+  exact@L3                0.2396        0.2469        0.2344       15.0000        0.9234        0.9149        0.0833
+
+  (c) the same three arms at L2, where rehearsal never fired — the in-tag handle
+  arm                       amax          mass self_frac_end    n_self_end  self_use_end self_use_mean          conv
+  exact_reh@L2            0.0781        0.1975        0.9375       15.0000        0.9999        0.8767        0.8333
+  exact_exp@L2            0.1198        0.2041        0.8750       14.0000        0.9309        0.8542        0.6667
+  exact@L2                0.1250        0.2242        0.9375       15.0000        0.9998        0.8887        0.8333
+
+  (d) wd_s0, the near-null dose (rehearsal solve rate 0.003)
+  arm                       amax          mass self_frac_end    n_self_end  self_use_end self_use_mean          conv
+  exact_reh@L3            0.3854        0.3199        0.2500       16.0000        0.8694        0.8934        0.0833
+  exact_exp@L3            0.3203        0.2814        0.2500       16.0000        0.9197        0.9049        0.0833
+  exact@L3                0.2396        0.2469        0.2344       15.0000        0.9234        0.9149        0.0833
+
+  (e) as_s1 stream-displaced twins — the only floor available for these statistics
+  arm                       amax          mass self_frac_end    n_self_end  self_use_end self_use_mean          conv
+  given_c1_j@L3           0.6250        0.4485        0.2344       15.0000        0.9082        0.5487        0.2143
+  given_c1@L3             0.8307        0.5796        0.1562       10.0000        0.8616        0.5179        0.1429
+  exact_j@L3              0.2969        0.2871        0.2656       17.0000        0.9308        0.8733        0.1887
+  exact@L3                0.2396        0.2469        0.2344       15.0000        0.9234        0.9149        0.0833
+
+  (a') rank agreement with pi's argmax share over the six as_s0 arms at L3
+       (Kendall tau_b; +1 = the provenance statistic orders the arms exactly as
+        trust does, -1 = exactly inverted)
+  kendall tau_b vs amax          1.00             -         -0.29         -0.47         -0.43         -0.43          0.00
+
+  FLOORS AND HANDLES (spreads, on each statistic)
+  handle                                                amax          mass self_frac_end    n_self_end  self_use_end self_use_mean          conv
+  stream-twin floor, given family @L3 (n=1 pair)        0.2057        0.1311        0.0781        5.0000        0.0467        0.0308        0.0714
+  stream-twin floor, exact family @L3 (n=1 pair)        0.0573        0.0402        0.0312        2.0000        0.0073        0.0416        0.1053
+  in-tag handle, wd_s1 unrehearsed L2 (n=3)           0.0469        0.0267        0.0625        1.0000        0.0691        0.0345        0.1667
+  NULL-DOSE handle, wd_s0 L3 (n=3, dose 0.003)        0.1458        0.0729        0.0156        1.0000        0.0540        0.0214        0.0000
+  wd_s1 REHEARSED L3 spread (the effect)              0.3151        0.1453        0.1250        8.0000        0.0465        0.0533        0.0833
+
+  the effect in floor-multiples  (>1 = the effect is larger than the handle)
+  ratio                                                 amax          mass self_frac_end    n_self_end  self_use_end self_use_mean          conv
+  L3 effect / exact-family stream floor                 5.50          3.61          4.00          4.00          6.34          1.28          0.79
+  L3 effect / in-tag unrehearsed-L2 handle              6.72          5.45          2.00          8.00          0.67          1.55          0.50
+  L3 effect / wd_s0 NULL-DOSE L3 handle                 2.16          1.99          8.00          8.00          0.86          2.49             -
+
+----------------------------------------------------------------------------------------------------
+(5) CAVEATS
+----------------------------------------------------------------------------------------------------
+
+  * The efference log is DOWNSTREAM of use: an entry enters E_l only by being
+    served often enough that the agent's own solved rollouts spell it out at
+    support >= 3. Self-tagging is therefore a near-deterministic consequence of
+    an entry being used, not an independent variable — section (2)'s concentration
+    column is mechanism, not effect.
+  * No floor for pi mass exists anywhere in the arc (woodshed FILES.md), and no
+    floor for ANY provenance statistic exists either. The only handles are the
+    as_s1 stream twins (n=1 pair per family) and wd_s1's unrehearsed L2 (n=3).
+  * Single seed everywhere; rehearsal is not compute-matched (~2x practice compute).
+  * mine_support = 3 is a free parameter of the match rule (a key must be emitted
+    three times before it counts as posed) and it is NOT sweepable offline: the
+    banked logs carry `keys_at_support` only at that one threshold. `n_at_support`
+    below shows how much the log SIZE would move; the membership does not exist on
+    disk at any other threshold. A machinery limit, not a measured invariance.
+
+    tag/arm                   l    sup>=1    sup>=2    sup>=3    sup>=5   sup>=10
+    as_s0/anchor              2        21        19        18        15        13
+    as_s0/anchor              3        75        49        34        19        10
+    as_s0/complete            2        21        18        17        13        12
+    as_s0/complete            3        73        47        35        20        10
+    as_s0/exact               2        23        22        20        16        11
+    as_s0/exact               3        81        52        35        21        10
+    as_s0/given_c1            2        21        18        17        12         7
+    as_s0/given_c1            3        56        31        22        12         6
+    as_s0/junk_dose           2        22        22        18        16        12
+    as_s0/junk_dose           3        80        49        37        21        12
+    as_s0/strip               2        20        20        17        16        12
+    as_s0/strip               3        76        45        32        17        10
+  * `beam` counts practice-rollout executions and `probe` metering executions; the
+    two agree to <0.01 everywhere, so only `beam` is carried into (3)-(4).
