@@ -1,0 +1,234 @@
+==============================================================================
+corridor_fit — E2 pass 2 (executor side)   tag=co_s0 arm=mperf_gain seed=1
+==============================================================================
+
+§0 GATES AND SCALE
+  gradcheck worst relative error      9.92e-10   (hard assert < 2e-5)
+  checkpoints                         110  c44..c153  (stride 1)
+  slots ever live                     28   head slot table 28
+  probe states                        96  (48 train / 48 held out), split by state, fixed across every checkpoint
+  SpanHead parameters (predicted span) 133,736   dim=96 v=8 max_span=8 hidden_mult=4
+  FM input dimension                  316 = 3x96 state reads + 28 slot one-hot
+    H=0    FM params    2,536     1.90% of the head
+    H=8    FM params    3,240     2.42% of the head
+    H=16   FM params    5,840     4.37% of the head   <-- PRIMARY
+    H=384  FM params  125,440    93.80% of the head   <-- SATURATION RUNG, excluded from every headline
+
+§1 THE LABEL (the parity gate), read off the run's own record
+  gate events                         34  (opens 31, closes 3)
+  commits                             [(2, 43), (3, 83), (4, 115)]
+  slot                mint  first_open  first_open@tau  level  span
+    2:0               44          63              66      2     2
+    2:1               44          67              68      2     2
+    2:2               44          57              67      2     2
+    2:3               44          72              72      2     2
+    2:4               44          55              73      2     2
+    2:5               44          60              67      2     2
+    2:6               44          58              76      2     2
+    2:7               44          66              74      2     2
+    2:8               44          61              65      2     2
+    2:9               44          67              77      2     2
+    2:10              44          60             113      2     2
+    2:11              44          61              89      2     2
+    2:12              44          54              60      2     2
+    2:13              44          60              86      2     2
+    2:14              44          55              57      2     2
+    2:15              44          49              61      2     2
+    3:0               84          91              96      3     4
+    3:1               84          95              96      3     4
+    3:2               84          96              96      3     4
+    3:3               84          96              96      3     4
+    3:4               84         105             132      3     4
+    3:5               84         108             111      3     4
+    3:6               84          95              96      3     4
+    3:7               84          95             118      3     4
+    4:0              116         133             133      4     8
+    4:1              116         134             134      4     8
+    4:2              116         129             129      4     8
+    4:3              116         121             121      4     8
+
+  cycle  n_live  n_open  n_open@tau   by level (live/open)
+     44      16       0           0   L2:16/0
+     48      16       0           0   L2:16/0
+     52      16       1           0   L2:16/1
+     56      16       4           0   L2:16/4
+     60      16       9           2   L2:16/9
+     64      16      12           1   L2:16/12
+     68      16      15           4   L2:16/15
+     72      16      16           4   L2:16/16
+     76      16      16           5   L2:16/16
+     80      16      16           6   L2:16/16
+     84      24      16           4   L2:16/16  L3:8/0
+     88      24      16           6   L2:16/16  L3:8/0
+     92      24      17           4   L2:16/16  L3:8/1
+     96      24      22          15   L2:16/16  L3:8/6
+    100      24      22           4   L2:16/16  L3:8/6
+    104      24      22          10   L2:16/16  L3:8/6
+    108      24      24          13   L2:16/16  L3:8/8
+    112      24      24          14   L2:16/16  L3:8/8
+    116      28      24          17   L2:16/16  L3:8/8  L4:4/0
+    120      28      24          11   L2:16/16  L3:8/8  L4:4/0
+    124      28      25          17   L2:16/16  L3:8/8  L4:4/1
+    128      28      25          15   L2:16/16  L3:8/8  L4:4/1
+    132      28      26          19   L2:16/16  L3:8/8  L4:4/2
+    136      28      28          21   L2:16/16  L3:8/8  L4:4/4
+    140      28      28          17   L2:16/16  L3:8/8  L4:4/4
+    144      28      28          18   L2:16/16  L3:8/8  L4:4/4
+    148      28      28          18   L2:16/16  L3:8/8  L4:4/4
+    152      28      28          15   L2:16/16  L3:8/8  L4:4/4
+
+§2 THE FIT, PER CHECKPOINT (primary capacity), AND THE INSTRUMENT GUARDS
+   H   FM%     mse_tr   mse_te    |r|/|t|   ens_cos   n_ckpt  (means over checkpoints)
+    0   1.90%    0.0215   0.0482    0.2114    1.000    110
+    8   2.42%    0.0484   0.0694    0.2556        -    110
+   16   4.37%    0.0267   0.0522    0.2230    0.670    110
+  384  93.80%    0.0003   0.0431    0.2030        -     13   [SATURATION RUNG]
+
+§3 DECODE B — pooled over (slot, checkpoint), leave-one-SLOT-out folds
+   headline = median balanced accuracy over the lambda grid; chance 0.500
+   'adv' = self R minus the best I/O-only observer (LOGIT / IO / BEH)
+
+  --- capacity H=0 (1.90% of the head, ens_cos 1.000)   [the deterministic ridge rung] ---
+  label=open     clock=mint  floor=0   d=8   n=2472  pos=2046  slots=28  | R 0.498  FM 0.500  LOGIT 0.500  IO 0.500  BEH 0.500  SHUF 0.500  NORM 0.726 | adv -0.002  perm_p 1.000
+  label=open     clock=mint  floor=0   d=16  n=2472  pos=2046  slots=28  | R 0.569  FM 0.500  LOGIT 0.506  IO 0.509  BEH 0.500  SHUF 0.500  NORM 0.726 | adv +0.060  perm_p 0.800
+  label=open     clock=mint  floor=0   d=32  n=2472  pos=2046  slots=28  | R 0.593  FM 0.543  LOGIT 0.549  IO 0.520  BEH 0.490  SHUF 0.500  NORM 0.726 | adv +0.044  perm_p 1.000
+  label=open     clock=mint  floor=20  d=8   n=1912  pos=1888  slots=28  | R 0.500  FM 0.500  LOGIT 0.500  IO 0.500  BEH 0.500  SHUF 0.500  NORM 0.500 | adv +0.000  perm_p 1.000
+  label=open     clock=mint  floor=20  d=16  n=1912  pos=1888  slots=28  | R 0.500  FM 0.500  LOGIT 0.500  IO 0.500  BEH 0.500  SHUF 0.500  NORM 0.500 | adv +0.000  perm_p 1.000
+  label=open     clock=mint  floor=20  d=32  n=1912  pos=1888  slots=28  | R 0.500  FM 0.500  LOGIT 0.500  IO 0.500  BEH 0.500  SHUF 0.500  NORM 0.500 | adv +0.000  perm_p 1.000
+  label=open     clock=mint  floor=50   — skipped (a class has < 4 rows)
+
+  label=open_tau clock=mint  floor=0   d=8   n=2472  pos=1052  slots=28  | R 0.554  FM 0.526  LOGIT 0.487  IO 0.535  BEH 0.524  SHUF 0.495  NORM 0.562 | adv +0.019  perm_p 0.000
+  label=open_tau clock=mint  floor=0   d=16  n=2472  pos=1052  slots=28  | R 0.531  FM 0.507  LOGIT 0.496  IO 0.538  BEH 0.505  SHUF 0.505  NORM 0.562 | adv -0.006  perm_p 0.950
+  label=open_tau clock=mint  floor=0   d=32  n=2472  pos=1052  slots=28  | R 0.603  FM 0.543  LOGIT 0.517  IO 0.533  BEH 0.513  SHUF 0.497  NORM 0.562 | adv +0.071  perm_p 0.000
+  label=open_tau clock=mint  floor=20  d=8   n=1912  pos=999   slots=28  | R 0.541  FM 0.590  LOGIT 0.583  IO 0.532  BEH 0.533  SHUF 0.461  NORM 0.442 | adv -0.042  perm_p 0.250
+  label=open_tau clock=mint  floor=20  d=16  n=1912  pos=999   slots=28  | R 0.489  FM 0.505  LOGIT 0.542  IO 0.537  BEH 0.523  SHUF 0.482  NORM 0.442 | adv -0.053  perm_p 1.000
+  label=open_tau clock=mint  floor=20  d=32  n=1912  pos=999   slots=28  | R 0.567  FM 0.535  LOGIT 0.473  IO 0.591  BEH 0.578  SHUF 0.491  NORM 0.442 | adv -0.024  perm_p 0.300
+  label=open_tau clock=mint  floor=50  d=8   n=1120  pos=655   slots=24  | R 0.497  FM 0.551  LOGIT 0.544  IO 0.486  BEH 0.492  SHUF 0.495  NORM 0.500 | adv -0.046  perm_p 0.600
+  label=open_tau clock=mint  floor=50  d=16  n=1120  pos=655   slots=24  | R 0.513  FM 0.532  LOGIT 0.541  IO 0.504  BEH 0.501  SHUF 0.481  NORM 0.500 | adv -0.028  perm_p 0.100
+  label=open_tau clock=mint  floor=50  d=32  n=1120  pos=655   slots=24  | R 0.493  FM 0.529  LOGIT 0.460  IO 0.522  BEH 0.550  SHUF 0.469  NORM 0.500 | adv -0.057  perm_p 0.900
+
+  label=open_tau clock=open  floor=0   d=8   n=2049  pos=1052  slots=28  | R 0.536  FM 0.593  LOGIT 0.583  IO 0.537  BEH 0.542  SHUF 0.462  NORM 0.424 | adv -0.047  perm_p 0.450
+  label=open_tau clock=open  floor=0   d=16  n=2049  pos=1052  slots=28  | R 0.502  FM 0.502  LOGIT 0.541  IO 0.546  BEH 0.540  SHUF 0.497  NORM 0.424 | adv -0.044  perm_p 1.000
+  label=open_tau clock=open  floor=0   d=32  n=2049  pos=1052  slots=28  | R 0.565  FM 0.532  LOGIT 0.494  IO 0.593  BEH 0.596  SHUF 0.486  NORM 0.424 | adv -0.031  perm_p 0.650
+  label=open_tau clock=open  floor=20  d=8   n=1489  pos=853   slots=27  | R 0.466  FM 0.552  LOGIT 0.551  IO 0.455  BEH 0.470  SHUF 0.500  NORM 0.494 | adv -0.085  perm_p 1.000
+  label=open_tau clock=open  floor=20  d=16  n=1489  pos=853   slots=27  | R 0.483  FM 0.519  LOGIT 0.521  IO 0.525  BEH 0.523  SHUF 0.481  NORM 0.494 | adv -0.042  perm_p 0.950
+  label=open_tau clock=open  floor=20  d=32  n=1489  pos=853   slots=27  | R 0.494  FM 0.527  LOGIT 0.452  IO 0.564  BEH 0.542  SHUF 0.483  NORM 0.494 | adv -0.069  perm_p 0.950
+  label=open_tau clock=open  floor=50  d=8   n=755   pos=471   slots=22  | R 0.485  FM 0.527  LOGIT 0.526  IO 0.511  BEH 0.494  SHUF 0.501  NORM 0.500 | adv -0.041  perm_p 1.000
+  label=open_tau clock=open  floor=50  d=16  n=755   pos=471   slots=22  | R 0.432  FM 0.617  LOGIT 0.597  IO 0.511  BEH 0.534  SHUF 0.489  NORM 0.500 | adv -0.165  perm_p 1.000
+  label=open_tau clock=open  floor=50  d=32  n=755   pos=471   slots=22  | R 0.462  FM 0.502  LOGIT 0.519  IO 0.472  BEH 0.470  SHUF 0.475  NORM 0.500 | adv -0.056  perm_p 1.000
+
+  --- capacity H=16 (4.37% of the head, ens_cos 0.670) ---
+  label=open     clock=mint  floor=0   d=8   n=2472  pos=2046  slots=28  | R 0.500  FM 0.500  LOGIT 0.500  IO 0.500  BEH 0.500  SHUF 0.500  NORM 0.590 | adv +0.000  perm_p 1.000
+  label=open     clock=mint  floor=0   d=16  n=2472  pos=2046  slots=28  | R 0.500  FM 0.503  LOGIT 0.506  IO 0.509  BEH 0.500  SHUF 0.500  NORM 0.590 | adv -0.009  perm_p 1.000
+  label=open     clock=mint  floor=0   d=32  n=2472  pos=2046  slots=28  | R 0.505  FM 0.528  LOGIT 0.549  IO 0.520  BEH 0.490  SHUF 0.500  NORM 0.590 | adv -0.043  perm_p 0.600
+  label=open     clock=mint  floor=20  d=8   n=1912  pos=1888  slots=28  | R 0.500  FM 0.500  LOGIT 0.500  IO 0.500  BEH 0.500  SHUF 0.500  NORM 0.500 | adv +0.000  perm_p 1.000
+  label=open     clock=mint  floor=20  d=16  n=1912  pos=1888  slots=28  | R 0.500  FM 0.500  LOGIT 0.500  IO 0.500  BEH 0.500  SHUF 0.500  NORM 0.500 | adv +0.000  perm_p 1.000
+  label=open     clock=mint  floor=20  d=32  n=1912  pos=1888  slots=28  | R 0.500  FM 0.500  LOGIT 0.500  IO 0.500  BEH 0.500  SHUF 0.500  NORM 0.500 | adv +0.000  perm_p 1.000
+  label=open     clock=mint  floor=50   — skipped (a class has < 4 rows)
+
+  label=open_tau clock=mint  floor=0   d=8   n=2472  pos=1052  slots=28  | R 0.512  FM 0.538  LOGIT 0.487  IO 0.535  BEH 0.524  SHUF 0.496  NORM 0.567 | adv -0.023  perm_p 0.400
+  label=open_tau clock=mint  floor=0   d=16  n=2472  pos=1052  slots=28  | R 0.466  FM 0.491  LOGIT 0.496  IO 0.538  BEH 0.505  SHUF 0.488  NORM 0.567 | adv -0.072  perm_p 1.000
+  label=open_tau clock=mint  floor=0   d=32  n=2472  pos=1052  slots=28  | R 0.481  FM 0.537  LOGIT 0.517  IO 0.533  BEH 0.513  SHUF 0.490  NORM 0.567 | adv -0.052  perm_p 0.950
+  label=open_tau clock=mint  floor=20  d=8   n=1912  pos=999   slots=28  | R 0.487  FM 0.613  LOGIT 0.583  IO 0.532  BEH 0.533  SHUF 0.459  NORM 0.465 | adv -0.096  perm_p 0.900
+  label=open_tau clock=mint  floor=20  d=16  n=1912  pos=999   slots=28  | R 0.533  FM 0.521  LOGIT 0.542  IO 0.537  BEH 0.523  SHUF 0.497  NORM 0.465 | adv -0.009  perm_p 0.100
+  label=open_tau clock=mint  floor=20  d=32  n=1912  pos=999   slots=28  | R 0.548  FM 0.541  LOGIT 0.473  IO 0.591  BEH 0.578  SHUF 0.464  NORM 0.465 | adv -0.044  perm_p 0.000
+  label=open_tau clock=mint  floor=50  d=8   n=1120  pos=655   slots=24  | R 0.513  FM 0.543  LOGIT 0.544  IO 0.486  BEH 0.492  SHUF 0.487  NORM 0.500 | adv -0.031  perm_p 0.000
+  label=open_tau clock=mint  floor=50  d=16  n=1120  pos=655   slots=24  | R 0.517  FM 0.551  LOGIT 0.541  IO 0.504  BEH 0.501  SHUF 0.479  NORM 0.500 | adv -0.023  perm_p 0.100
+  label=open_tau clock=mint  floor=50  d=32  n=1120  pos=655   slots=24  | R 0.447  FM 0.506  LOGIT 0.460  IO 0.522  BEH 0.550  SHUF 0.484  NORM 0.500 | adv -0.103  perm_p 1.000
+
+  label=open_tau clock=open  floor=0   d=8   n=2049  pos=1052  slots=28  | R 0.470  FM 0.609  LOGIT 0.583  IO 0.537  BEH 0.542  SHUF 0.465  NORM 0.403 | adv -0.112  perm_p 1.000
+  label=open_tau clock=open  floor=0   d=16  n=2049  pos=1052  slots=28  | R 0.536  FM 0.538  LOGIT 0.541  IO 0.546  BEH 0.540  SHUF 0.495  NORM 0.403 | adv -0.010  perm_p 0.050
+  label=open_tau clock=open  floor=0   d=32  n=2049  pos=1052  slots=28  | R 0.543  FM 0.539  LOGIT 0.494  IO 0.593  BEH 0.596  SHUF 0.466  NORM 0.403 | adv -0.053  perm_p 0.000
+  label=open_tau clock=open  floor=20  d=8   n=1489  pos=853   slots=27  | R 0.494  FM 0.542  LOGIT 0.551  IO 0.455  BEH 0.470  SHUF 0.489  NORM 0.500 | adv -0.056  perm_p 0.750
+  label=open_tau clock=open  floor=20  d=16  n=1489  pos=853   slots=27  | R 0.541  FM 0.542  LOGIT 0.521  IO 0.525  BEH 0.523  SHUF 0.485  NORM 0.500 | adv +0.016  perm_p 0.000
+  label=open_tau clock=open  floor=20  d=32  n=1489  pos=853   slots=27  | R 0.491  FM 0.525  LOGIT 0.452  IO 0.564  BEH 0.542  SHUF 0.480  NORM 0.500 | adv -0.072  perm_p 0.750
+  label=open_tau clock=open  floor=50  d=8   n=755   pos=471   slots=22  | R 0.570  FM 0.517  LOGIT 0.526  IO 0.511  BEH 0.494  SHUF 0.488  NORM 0.500 | adv +0.044  perm_p 0.000
+  label=open_tau clock=open  floor=50  d=16  n=755   pos=471   slots=22  | R 0.498  FM 0.584  LOGIT 0.597  IO 0.511  BEH 0.534  SHUF 0.490  NORM 0.500 | adv -0.098  perm_p 0.650
+  label=open_tau clock=open  floor=50  d=32  n=755   pos=471   slots=22  | R 0.451  FM 0.526  LOGIT 0.519  IO 0.472  BEH 0.470  SHUF 0.504  NORM 0.500 | adv -0.068  perm_p 1.000
+
+§3b CAPACITY INVARIANCE of the headline cell (label=open, clock=mint, floor=20)
+  H=0    ( 1.90% of head, ens_cos 1.000)  R 0.500  best-obs 0.500  adv +0.000  NORM 0.500
+  H=8    ( 2.42% of head, ens_cos 1.000)  R 0.500  best-obs 0.500  adv +0.000  NORM 0.500
+  H=16   ( 4.37% of head, ens_cos 0.670)  R 0.500  best-obs 0.500  adv +0.000  NORM 0.500
+  H=384  (93.80% of head, ens_cos 1.000)  R 0.500  best-obs 0.500  adv +0.000  NORM 0.500
+
+§3c THE THREE-WAY / WITHIN-LEVEL READ (pass 1 design call 5ii's age disambiguator)
+  level L2 floor=0   n=1760  pos=1496  slots=16  | R 0.489  best-obs 0.520  adv -0.030  NORM 0.778
+  level L2 floor=20  n=1440  pos=1421  slots=16  | R 0.500  best-obs 0.500  adv +0.000  NORM 0.500
+  level L3 floor=0   n=560   pos=451   slots=8   | R 0.528  best-obs 0.566  adv -0.038  NORM 0.502
+  level L3 floor=20  n=400   pos=395   slots=8   | R 0.500  best-obs 0.500  adv +0.000  NORM 0.500
+  level L4 floor=0   n=152   pos=99    slots=4   | R 0.598  best-obs 0.678  adv -0.079  NORM 0.602
+  level L4 floor=20  — skipped (a class has < 4 rows)
+
+§4 DECODE A — per checkpoint, rows = slots (pass 1's exact shape)
+  28 checkpoints have both classes at >= 4
+    R      median 0.500   IQR [0.482, 0.543]
+    FM     median 0.685   IQR [0.479, 0.805]
+    LOGIT  median 0.721   IQR [0.495, 0.822]
+    IO     median 0.500   IQR [0.500, 0.520]
+    BEH    median 0.500   IQR [0.500, 0.516]
+    SHUF   median 0.479   IQR [0.444, 0.500]
+    NORM   median 0.557   IQR [0.500, 0.840]
+    advantage (R - best observer): median -0.173  IQR [-0.318, -0.036]
+
+§5 OCCUPANCY — one codebook over residual directions, applied unchanged everywhere
+  codebook K=8 over 492 directions; TV drift median 0.0000, p90 0.1250
+  named event            cycle   TV drift   percentile among all checkpoint steps
+    gate_2:15_open_c49           49   0.1250    88.1%
+    gate_2:12_open_c54           54   0.1250    88.1%
+    gate_2:4_open_c55            55   0.0625    80.7%
+    gate_2:14_open_c55           55   0.0625    80.7%
+    gate_2:2_open_c57            57   0.0625    80.7%
+    gate_2:6_open_c58            58   0.0000     0.0%
+    gate_2:5_open_c60            60   0.0000     0.0%
+    gate_2:10_open_c60           60   0.0000     0.0%
+    gate_2:13_open_c60           60   0.0000     0.0%
+    gate_2:8_open_c61            61   0.0000     0.0%
+    gate_2:11_open_c61           61   0.0000     0.0%
+    gate_2:0_open_c63            63   0.0000     0.0%
+    gate_2:7_open_c66            66   0.0000     0.0%
+    gate_2:1_open_c67            67   0.0000     0.0%
+    gate_2:9_open_c67            67   0.0000     0.0%
+    gate_2:3_open_c72            72   0.0000     0.0%
+    commit_L3                    83   0.0000     0.0%
+    gate_3:0_open_c91            91   0.0417    71.6%
+    gate_3:1_open_c95            95   0.0000     0.0%
+    gate_3:6_open_c95            95   0.0000     0.0%
+    gate_3:7_open_c95            95   0.0000     0.0%
+    gate_3:2_open_c96            96   0.0000     0.0%
+    gate_3:3_open_c96            96   0.0000     0.0%
+    gate_3:4_open_c105          105   0.0000     0.0%
+    gate_3:5_open_c108          108   0.0000     0.0%
+    gate_2:8_close_c113         113   0.0417    74.3%
+    gate_2:8_open_c114          114   0.0000     0.0%
+    commit_L4                   115   0.0417    74.3%
+    gate_4:3_open_c121          121   0.0357    60.6%
+    gate_4:2_open_c129          129   0.0000     0.0%
+    gate_4:0_open_c133          133   0.0000     0.0%
+    gate_4:1_open_c134          134   0.0000     0.0%
+    gate_2:8_close_c146         146   0.0357    60.6%
+    gate_2:8_open_c147          147   0.0357    60.6%
+    gate_2:6_close_c149         149   0.0000     0.0%
+    gate_2:6_open_c150          150   0.0000     0.0%
+
+§6 GUARDS
+  hierarchy-eta2 on the residual norm, POOLED over (slot, checkpoint) rows, each
+  conditioner beside a matched-random grouping of the same sizes. The GRAMMAR
+  conditioner is `dp_content` — the level-1 spelling the DP would write for that span,
+  i.e. the deep-hierarchy content this substrate has. `cycle` and `era` are the junk
+  conditioners: a residual that keys only to the calendar is junk (paper 2 section 8).
+    dp_content     n_groups    7   eta2 0.033   random-matched 0.003   excess +0.030
+    slot_id        n_groups   28   eta2 0.408   random-matched 0.011   excess +0.397
+    level          n_groups    3   eta2 0.263   random-matched 0.001   excess +0.263
+    cycle [junk]   n_groups  110   eta2 0.269   random-matched 0.046   excess +0.223
+    era [junk]     n_groups    5   eta2 0.202   random-matched 0.002   excess +0.201
+  the TRUNK control target (no slot conditioning anywhere in its computation):
+    floor=0   label=open  n=2472   R 0.500  best-obs 0.509  adv -0.009
+    floor=20  label=open  n=1912   R 0.500  best-obs 0.500  adv +0.000
+    floor=50  — skipped (a class has < 4 rows)
+
+§7 THE OUTER LOOP'S OWN GAUGE — command-energy share vs at_support
+  cmass_R ~ at_support@L3   spearman raw +0.622 (p=0.000)   residualised on cycle+era -0.242   (n=105)
+  cmass_R ~ at_support@L4   spearman raw +0.662 (p=0.000)   residualised on cycle+era +0.110   (n=105)
+
+[done in 1116s]  -> rhm/practice/continuo/figures/co_s0_mperf_gain_s1

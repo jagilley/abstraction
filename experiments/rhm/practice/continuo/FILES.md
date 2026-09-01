@@ -118,9 +118,143 @@ Later additions to `continuo.py`, all additive: `derive_events` / `derive_sweep`
 
 ## Children
 
-None. No substrate, no GPU run in pass 1. The follow-up that would need one — a `crescendo`
-fork with additive per-cycle head snapshots (`# [continuo]`-tagged, G-F bit-identical with the
-additions off), buying the live L4 frontier and optionally a `span=True` arm for the
-executor-side half — is not built.
+None. No substrate, no GPU run in pass 1.
+
+---
+
+# PASS 2 — the corridor / span-side consolidation object
+
+Pass 1 re-scoped the executor half out (design call 1c: `au_s0` runs `span_mode=False`, so its
+donor has no corridor head at all). Pass 2 is that half. **Asked in**
+`../../../../QUEUE.md`[^private] § "Track E′ → E2 pass 2". Still no `README.md`
+and still no interpretation here.
+
+**Donor (untouched, NOT edited — another agent is concurrently forking this lineage)**:
+[`../intonation/`](../intonation/FILES.md). `ma_s0`'s regime is the configuration reproduced,
+and `native/span`'s `SpanHead` is the predicted span.
+
+## The object, and why the executor half is the better-conditioned ask
+
+Pass 1's label was `ms_level[j] >= 2` — a slot is a command iff it is a macro — which is very
+nearly "this token is young", and the headline decayed to zero under a 20-cycle token-age floor
+with the scalar-norm negative in lockstep (`two_deltas` finding 3). On the executor side the
+instruction/data bit is not the slot's LEVEL, it is its **parity gate**:
+
+* gate **open** → the span is materialised by `SpanHead.emit` in one pass, no DP, no table
+  consulted at execution time. A **command**: routed, can't-decompose.
+* gate **closed** → `macros.apply_any` masks the span, reads per-block infill evidence and runs
+  the max-sum DP over `T[ℓ] → … → T[1]`. **Data**: enumerated.
+
+Checked against `ma_s0/mperf_log`'s own record before any of this was built, that bit **varies
+within a level** (c60: 10 of 16 L2 slots open, 6 not), **varies within a slot over time** (44
+gate events over 153 cycles, re-closures included) and **is not the slot's mint age** (slots
+minted together at the L2 commit open anywhere from c49 to c77). So "command" and "new" are
+separable in this donor by construction, and the age floors are applied from the first cell
+rather than discovered afterwards. `open_tau` (parity ≥ `span_tau` = 0.95, the donor's own
+criterion) rides free as a stricter grade of the same state, and is the balanced one late in the
+run where `open` saturates.
+
+## Code files (pass 2)
+
+| file | purpose |
+|---|---|
+| `corridor.py` | The **snapshot-enabled fork** of the `intonation` stack. Adds no arm, no trajectory-changing knob, and **no line inside `intonation.py`**. The whole fork is (i) a monkeypatch of `span_net.parity` — the one function `run_arm` calls exactly once per cycle with generator, head, executor and slots all in hand — which calls the real parity, writes a per-cycle snapshot, and returns the real answer unchanged; (ii) `IN.REMOTE` retargeted to `rhm_practice_corridor`, so no `intonation` tag is written to; (iii) two entrypoints, `corridor_gf` (gate X) and `corridor_run` (the paid run). The `run_arm` frame is read (never written) for `cyc`/`arm`/`shared`/`cfg`. |
+| `corridor_fit.py` | The offline instrument and its reduction. No GPU, no Modal, no torch. Reads the snapshots, fits the sub-saturation FM per checkpoint, and writes `figures/<tag>_<arm>/{reduction.txt, corridor.json}`. Imports `continuo.py`'s `_gelu`/`_dgelu`/`_proj`/`_loo_ridge_bal`/`spherical_kmeans`/`unit_rows`/`eta2_vs_random`/`partial_spearman`/`at_support_series` rather than copying them, so pass 1 and pass 2 share one set of guards. |
+| `launch_detached.py` | `intonation/launch_detached.py`'s, retargeted at `corridor.py`. |
+
+## Design calls (pass 2; the two module docstrings are authoritative)
+
+| # | call | why, in one line |
+|---|---|---|
+| 1 | the FM predicts the **span head's block-0 logits** from the head's own read of the state plus the slot identity | the span head is the trainable readable surface on this stack, and block 0 is the one emission every slot has whatever its span (2 / 4 / 8 blocks at L2 / L3 / L4), so every slot's column has the same dimension without padding |
+| 1b | the **trunk's per-block feature logits** (`feature_head(pooled)`) are the control target | they carry no slot conditioning anywhere in their computation — pass 1 design call 1b's value-head control, ported. Anything that reorganises at a gate event on both is the state distribution or the calendar |
+| 2 | probe = a fixed set of sequences from **`shared["replay"]["x"]`**, with each slot's own span masked per slot | the head's input is a masked observation, and `SpanExecutor.apply` builds it exactly this way. NOT `ex.hold` — that is the parity gate's own metering set, i.e. an eval, and pass 1 design call 2 forbids an audition-shaped gauge. The probe SEQUENCES are shared across slots (only the mask moves), which is what makes one slot's column comparable with another's: the decode's rows are slots, so per-slot probe sets would leak slot identity into the classifier |
+| 3 | the FM sees **three reads** — `pooled.mean(all blocks)`, the span's mean, the span's first block — plus a slot one-hot | `span_state` is `ctx(pooled.mean(1)) + slot(sid) + Σ_j in_proj[j](pooled[blk0+j])`, so this is the head's global read exactly and its span read up to the per-offset weighting. **Stated as a cost**: part of the residual is then input the FM never saw rather than structure it failed to theorise. It buys a fixed 3×96 input at every level — the alternative (the full padded 8×96 per-offset read) puts a dimensional signature of the slot's LEVEL into the FM's input, which is the confound this pass exists to control |
+| 3b | the slot enters as a **one-hot**, not a learned embedding | a (28, 288) embedding is 8,064 parameters — 6% of the predicted head on its own — so the FM could not be sub-saturation and conditioned at the same time; and `SpanHead`'s slot embedding is part of the span being predicted |
+| 3c | the **ridge rung (H=0) carries the full grid**, beside the swept MLP | pass 1's instrument-regime confound (an FM in the `ens_cos` junk band at matched `H` on one arm and not the other) was fixed exactly by reading the arms at the deterministic ridge. Pass 2 has two arms to compare, so the fix is built in rather than applied afterwards |
+| 4 | sub-saturation is **computed, not asserted** | `head_params()` derives `SpanHead`'s count from the snapshot's own shapes: 133,736 at `state_dim` 96 / v 8 / `max_span` 8 / 28 slots / `hidden_mult` 4. The rungs are H=0 → 1.90%, H=8 → 2.42%, H=16 → 4.37% (primary), H=32 → 8.3% (over budget, flagged), H=384 → 94% (the saturation demonstration, fitted on a strided checkpoint subset and excluded from every headline) |
+| 5 | **two decodes**, because the label has two axes | **A** per checkpoint with rows = slots (pass 1's exact shape, giving a trajectory) and **B** pooled over (slot, checkpoint) rows with **leave-one-SLOT-out** folds, which is where the age floors bite and where the within-slot temporal variation — the thing the routing-side bit did not have — is used |
+| 5b | the permutation null permutes labels **within each checkpoint** | rows are (slot, checkpoint); a free row-permutation would destroy the per-checkpoint base rate as well as the slot↔label pairing and would be trivially easy to beat. Permuting within a cycle preserves *how many* slots are open at c and destroys only *which* |
+| 6 | **two clocks** for the age floor | cycles since MINT (pass 1's control) and cycles since the slot first OPENED. The floors are 0 / 20 / 50 on both |
+
+## Gates (pass 2) — gate **X**, the instrument is inert
+
+| gate | what it asserts | where |
+|---|---|---|
+| **X-1** | in-hook, **every cycle**: the torch CPU RNG state and every CUDA RNG state are byte-identical across the snapshot, and the executor's `buf`/`hold` sizes and every slot's `open` flag are unchanged. Always on, so the paid run certifies its own instrument | `corridor.py::_install`'s wrapper |
+| **X-2** | the same arm run with the hook OFF and ON, **one process, one shared dict**, log series compared against a **donor self-replay control** (the same arm twice with the hook off) — without which GPU nondeterminism and a real bug look identical | `corridor_gf` |
+| **X-3** | the hook actually **fired**, on an arm where it can: `perf_given` holds the true tables and mints every slot at c1, because at smoke sizes a loop arm never commits, no slot is ever minted, and a gate over a hook that never fired would certify nothing (`intonation`'s own reason for carrying the `perf_given` family into preflight) | `corridor_gf` |
+| gradcheck | `SpanFM`'s analytic gradients against central differences in float64, a hard assert at the top of the reduction (there is no autograd in `corridor_fit.py`) | `corridor_fit._gradcheck` |
+
+## Runs (pass 2)
+
+| tag | command | outcome |
+|---|---|---|
+| `co_gf` | `corridor_gf --tag co_gf --cycles 5 --n-probe 32` | **X-2 PASS — 0.000e+00 fork against a 0.000e+00 self-replay control** on all 13 log series; `gate_events` (40), `slot_events`, `events` and `perf_cells` all bit-identical off-vs-on. **X-3 PASS** — 15 snapshots, one per cycle, 28 slots × 32 probe states, every read finite and non-degenerate, both label classes populated. 0.538 MB/cycle at `n_probe=32`. One bug on the way, fixed: the gate's own comparison step read `gate_events` off `run_arm`'s **return** dict, which does not carry it (it goes only into the `results.json` that `write_results` writes) — the three runs had already completed, so X-2/X-3 were computed offline from the written bytes and the reporting line now reads them back. |
+| `co_s0` | `launch_detached.py --fn corridor_run --tag co_s0 --arms "mperf_log,mperf_gain" --n-probe 96 --n-pr 24 --pr-width 8 --endo-price 267 --seed 0` | the paid run. `ma_s0`'s configuration exactly — every other flag is already `intonation_run`'s own default, so nothing is restated that could drift. Two arms: the metered baseline and the δ_perf **gain** arm (per-execution, per-attributable-cause credit by construction — the executor-side analogue of pass 1's surviving `perdatum` cell). **Clean, 4696 s = 1.30 GPU-h**; both arms 153 cycles, commits c43/c83/c115, 44 gate events (`mperf_log`); **110 per-cycle snapshots per arm** (c44…c153, 186 MB each), gate X-1 asserted on every one. |
+| `co_s0` reductions | `corridor_fit.py --tag co_s0 --arm {mperf_log,mperf_gain} --seed {0,1}` | four reductions, ~1100 s each on 4 CPU cores. Outputs `figures/co_s0_<arm>_s<seed>/{reduction.txt, corridor.json}`. **Numbers are in the reductions; not summarised or interpreted here.** |
+
+Three facts from `co_s0` that belong in the machinery record rather than in a results
+discussion, because they are properties of the **instrument and its label**, not of the object:
+
+- **The raw `open` label goes CLASS-DEGENERATE under the age floor**, and does so by losing its
+  negative class rather than by losing an effect. Slots take a median of 17 (`mperf_log`) / 15
+  (`mperf_gain`) cycles from mint to first opening, range 5–28, and **all 28 of 28 slots
+  eventually open in both arms**. So at a 20-cycle mint floor the pooled rows are 1879/1912
+  open (98.3%) and 1888/1912 (98.7%), and every cell — self, observer, shuffled and
+  scalar-norm alike — returns exactly 0.500 because the classifier predicts one class. The
+  50-cycle floor has no admissible cell at all. This is *why* `open_tau` was carried as the
+  second grade: it stays balanced at every floor (43.2 / 54.2 / 65.4% positive on `mperf_log`;
+  42.6 / 52.2 / 58.5% on `mperf_gain`). Any future pass asking this question on this substrate
+  should treat `open` as an era-1-only label and read `open_tau`, or lower `span_tau_fire`
+  further to keep slots closed longer.
+- **The H=16 MLP rung lands in the `ens_cos` JUNK BAND on all four reductions** — 0.630 / 0.676
+  (`mperf_log` seeds 0/1) and 0.625 / 0.670 (`mperf_gain`) against paper 2's 0.65 floor. This is
+  pass 1's instrument-regime trap reproducing on the executor side at the same capacity, and it
+  is the reason the whole decode grid is run at the deterministic **ridge** rung as well: the
+  ridge's residual is a unique minimiser, its `ens_cos` is 1.000 by construction, and it is the
+  only rung on which the two arms are compared with the same instrument. The ridge is also the
+  *better* FM here (mean held-out MSE 0.0455–0.0482 against the MLP's 0.0472–0.0522), so it is
+  the conservative choice as well as the matched one.
+- **Occupancy TV drift is near-degenerate at this K and probe size**: the codebook trajectory
+  has median TV drift 0.0000 in three of the four reductions (p90 0.0625–0.1875), so a large
+  fraction of checkpoint steps are tied at zero and the "percentile among all steps" statistic
+  is dominated by ties — a named event landing at "0.0%" means *no drift*, not *the smallest
+  drift*. A future pass wanting this axis to resolve needs a larger K, a larger probe, or drift
+  measured on the soft assignment rather than the hard histogram.
+
+## Volume layout (pass 2)
+
+`rhm-scaling-data:/data/rhm_practice_corridor/<tag>/{setup.json,summary.json,manifest.json,<arm>/{results.json,snapshots/span_cXXXX.npz}}`.
+Fetched copies under `data/<tag>/<arm>/` (gitignored); reductions under `figures/<tag>_<arm>/`.
+
+Each `span_cXXXX.npz` holds, per live slot × probe state: `feat` (the three pooled reads),
+`lg0`/`lgm` (the head's block-0 and span-mean logits), `bl0`/`blm` (the trunk's, the control
+target), `emit` (what the executor wrote), `dp` (what the DP would have written — the head's own
+parity target, so the per-row execution error `e` and its exact-match bit are free on a fixed
+distribution every cycle), `err`, `exact`, and the per-slot record `level`/`node`/`blk0`/`span`/
+`open_pre`/`open_post`/`open_tau`/`parity`/`parity_n`.
+
+## Reproduce (pass 2)
+
+```bash
+cd experiments/            # MODAL_PROFILE=chromatic
+
+modal run rhm/practice/continuo/corridor.py::corridor_gf --tag co_gf --cycles 5 --n-probe 32
+
+python3 rhm/practice/continuo/launch_detached.py --fn corridor_run --tag co_s0 \
+    --arms "mperf_log,mperf_gain" --n-probe 96 \
+    --n-pr 24 --pr-width 8 --endo-price 267 --seed 0
+
+mkdir -p rhm/practice/continuo/data/co_s0
+modal volume get --force rhm-scaling-data rhm_practice_corridor/co_s0 \
+    rhm/practice/continuo/data/
+
+# the reduction, per arm, at two independent draws (pass 1's draw variance exceeded its headline)
+for a in mperf_log mperf_gain; do for sd in 0 1; do
+  python3 rhm/practice/continuo/corridor_fit.py --tag co_s0 --arm $a --seed $sd \
+      --out rhm/practice/continuo/figures/co_s0_${a}_s${sd}
+done; done
+```
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

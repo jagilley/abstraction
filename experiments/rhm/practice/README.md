@@ -455,6 +455,35 @@ surviving source), and `continuo`'s residual bit is a novelty tag except under p
 credit (p = 0.011 vs 0.125, matched ridge rung). Single seed throughout; full record and the
 within-level-currency question it raises: [two_deltas/README.md](two_deltas/README.md).
 
+### [`quartet/`](quartet/README.md) — four instruments for the unification node (2026-08-31)
+
+**Goal**: measure the four unmeasured inputs to the queued two-currency unification node, in one
+parallel round — is the weight ledger readable online where the stream ledger drains (the
+absorption doc's predicted typer); does the executor-side instruction/data bit decode once the
+age confound is designed out (E2 pass 2, on `intonation`'s live executor); at what rate does
+trust form after arrival, and can credited rehearsal of a *received* vocabulary compress the
+clock gift could not skip (F1); and is δ_perf's benchmark regime-dependence really estimability
+(`two_deltas` finding 6's mechanism, ρ-thinning the benchmark's evidence with everything else
+held). Joint writeup for four member lanes; the members carry `FILES.md` records only.
+
+**Finding**: **the durable evaluator signals are the ones learning creates or preserves, and
+selection-by-success is the active ingredient — measured from four directions at once.** The
+per-layer-group Δθ typer types rotation/burst/drift 12/12 at online lag and *does not drain*
+(rotation ×0.79 across six events where the stream read decayed to zero), with clean
+event-matched nulls and Δθ ≡ 0 on skipped windows; the executor-side consolidation bit still
+does not decode with the parity gate replacing token age (observer wins, calendar-not-content
+guards, `ens_cos` trap reproduced) — the lone sign-stable survivor is `cmass_R ~ at_support@L4`
+again; trust's rate law has a shape (earned arrivals dip below chance then cross back, faster
+with depth: 70/30/13 cycles at L2/L3/L4; gift never dips) and **credited rehearsal re-opens the
+arrival bracket** — credit > exposure > none on every trust statistic and on deep-era value
+(closing 0.70/0.69 of the anchor→gift bracket vs 0.29/0.34 exposure-matched), the one-bit split
+between imitating one's *solved* rehearsals vs an equal random sample; and the benchmark ladder
+moves precision exactly as the √-law says while the value curve is a **valley, not a crossover**
+(negative vs budget-matched raw at every rung including full evidence, worst in the interior at
+5–7× floors) — with the benchmarked form still buying the most trust, so `two_deltas` finding 6
+likely decomposes into the old budget confound plus a stable value-vs-trust dissociation.
+Full record and the question-port close: [quartet/README.md](quartet/README.md).
+
 ## Reproduce
 
 ```bash

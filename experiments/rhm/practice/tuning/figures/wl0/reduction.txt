@@ -1,0 +1,376 @@
+WEIGHT-LEDGER TYPER CHECK — reduction
+===============================================================================
+read   c_emb  = log2(wte  / gmean(h0..h7))          [rotation's subspace, Gate 1G]
+       c_gain = log2(ln_f / gmean(h0..h7))          [burst's subspace]
+       c_comp = log2(gmean(h1,h2)/gmean(h3..h7))    [drift's subspace]
+z = (contrast - the arm's own quiet baseline at that window length) / sigma_quiet.
+quiet set = gate1g's admission rule, minus intervals starting before step 5000 (pre-maturity warm-up); scored leave-one-out.
+A rotation is NOT an event for an arm whose wall never rotates or that merged the
+wall away before the onset; those onsets score specificity (should stay silent),
+not detection. A window over which the arm fired a `skip` has dtheta exactly 0.
+
+HEADLINE (g1a:track — consumes all three event types, never merges, never acts)
+  [n125   ] argmax 12/12, min margin +0.65 sigma;  gated at the arm's own quiet max|z|: 11/12 fire, 11 correct; silent on drift@19000
+  [fastest] argmax 12/12, min margin +0.65 sigma;  gated at the arm's own quiet max|z|: 11/12 fire, 11 correct; silent on drift@19000
+  cross-type rank consistency 90/90 (100%)
+  rotation  first->last  +6.45 -> +5.11 sigma (x0.79)
+  burst     first->last  +7.39 -> +7.27 sigma (x0.98)
+  drift     first->last  +3.79 -> +2.46 sigma (x0.65)
+
+ALL EIGHT BANKED ARMS at the 125-step unit (detection on real events | specificity on non-events)
+  arm               role                       argmax    gated   ok  skip  non-ev  falsefire
+  g1a:pair_key      merged at 10050               8/8      7/8    7     0       4          0
+  g1a:pair_parse    rotation-blind control        6/6      6/6    6     0       6          0
+  g1a:self          merged at 10050               8/8      7/8    7     0       4          0
+  g1a:track         absorber                    12/12    11/12   11     0       0          0
+  g2a:rekey_dead    rotation-blind control        5/6      6/6    5     0       6          3
+  g2a:self_rekey    absorber                    11/11    11/11   11     1       0          0
+  g2a:self_v2       merged at 8050                7/7      7/7    7     0       5          1
+  g2c:self_fm       merged at 6025                3/6      6/6    3     0       6          6
+  TOTAL                                         60/64    61/64   57     1      31         10
+
+--- instrument calibration, g1a:track ---
+  c_emb   baseline slope +0.098/ln n   sigma 0.379 log2 (= x1.30)   n_quiet 16
+          quiet floor: max|z| 2.14 (at 8125_9000), p90|z| 2.00
+  c_gain  baseline slope +0.221/ln n   sigma 0.268 log2 (= x1.20)   n_quiet 16
+          quiet floor: max|z| 2.62 (at 18125_18250), p90|z| 1.95
+  c_comp  baseline slope +0.081/ln n   sigma 0.158 log2 (= x1.12)   n_quiet 16
+          quiet floor: max|z| 2.83 (at 6125_7250), p90|z| 1.51
+  per-group quiet scaling exponent alpha (coherence audit; 0.5 = random walk, 1.0 = coherent):
+    wte 0.56   h1 0.52   h2 0.56   h4 0.51   ln_f 0.65   lm_head 0.96
+
+--- g1a:track   [absorber] ---
+  typer[n125]  argmax 12/12  min margin +0.65 sigma  |  gated: fires 11/12, correct 11, silent on drift@19000  |  profile-template 9/9
+  typer[fastest]  argmax 12/12  min margin +0.65 sigma  |  gated: fires 11/12, correct 11, silent on drift@19000  |  profile-template 10/10
+  event                n    c_emb   c_gain   c_comp   own  margin  xfloor  flags
+  burst@5000          25     2.78     7.46     2.18  gain    4.67    4.00  fires
+  burst@5000         125     1.69     7.39     0.65  gain    5.70    3.94  fires
+  burst@5000         325     1.01     5.63     0.82  gain    4.61    2.85  fires
+  drift@6000         125     1.50     0.74     3.79  comp    2.29    1.52  fires
+  rotation@8000      125     6.45     1.31     1.54   emb    4.92    5.46  fires
+  rotation@10000     125     5.72     1.26     1.14   emb    4.46    4.50  fires
+  burst@11000         25     1.16     8.40    -0.77  gain    7.24    4.76  fires
+  burst@11000        125    -0.01     7.30    -2.04  gain    7.30    3.88  fires
+  rotation@12000     125     5.61     1.01     1.37   emb    4.24    4.38  fires
+  drift@13000        125    -0.22     1.55     2.91  comp    1.35    1.38  fires
+  rotation@14000     125     5.14     0.94     0.79   emb    4.20    3.87  fires
+  rotation@16000     125     5.24     1.35     1.02   emb    3.89    3.97  fires
+  burst@17000         25     0.68     8.79    -0.96  gain    8.11    5.11  fires
+  burst@17000         50     0.15     8.40    -1.97  gain    8.25    4.76  fires
+  burst@17000        125    -0.31     7.27    -2.17  gain    7.58    3.86  fires
+  rotation@18000     125     5.11     1.10     1.14   emb    3.97    3.84  fires
+  rotation@18000     250     4.32     1.01     0.19   emb    3.31    3.11  fires
+  drift@19000        125    -0.51     1.80     2.46  comp    0.65    1.31  silent
+
+--- g1a:pair_key   [merged at 10050] ---
+  typer[n125]  argmax 8/8  min margin +0.99 sigma  |  gated: fires 7/8, correct 7, silent on drift@19000  |  profile-template 3/5
+                specificity: 4 non-events (rotations this arm cannot see), 0 false fires
+  typer[fastest]  argmax 8/8  min margin +0.99 sigma  |  gated: fires 7/8, correct 7, silent on drift@19000  |  profile-template 3/6
+                specificity: 4 non-events (rotations this arm cannot see), 0 false fires
+  event                n    c_emb   c_gain   c_comp   own  margin  xfloor  flags
+  burst@5000          25     3.06     6.29     2.14  gain    3.23    3.74  fires
+  burst@5000         125     2.51     5.81     1.04  gain    3.30    3.38  fires
+  burst@5000         325     1.88     4.79     0.69  gain    2.91    2.73  fires
+  drift@6000         125     2.18     0.51     3.64  comp    1.46    1.51  fires
+  rotation@8000      125     5.43     0.96     1.51   emb    3.93    7.68  fires
+  rotation@10000     125     4.52     1.48     1.04   emb    3.04    5.46  fires
+  burst@11000         25     1.46     7.24    -0.96  gain    5.78    4.56  fires
+  burst@11000        125     0.47     6.45    -2.16  gain    5.98    3.86  fires
+  rotation@12000     125     0.19     0.50    -0.03   emb   -0.31    1.08  NOT-AN-EVENT silent
+  drift@13000        125     0.36     0.88     2.96  comp    2.07    1.40  fires
+  rotation@14000     125     0.26     0.49    -0.08   emb   -0.23    1.10  NOT-AN-EVENT silent
+  rotation@16000     125     0.21     0.33     0.10   emb   -0.11    1.08  NOT-AN-EVENT silent
+  burst@17000         25     1.58     6.77    -0.17  gain    5.19    4.14  fires
+  burst@17000         50     1.05     6.69    -1.18  gain    5.65    4.07  fires
+  burst@17000        125     0.49     5.97    -1.41  gain    5.48    3.50  fires
+  rotation@18000     125     0.37     0.94     0.22   emb   -0.56    1.15  NOT-AN-EVENT silent
+  rotation@18000     250    -0.12     0.38    -0.21   emb   -0.50    0.95  NOT-AN-EVENT silent
+  drift@19000        125     0.17     1.62     2.61  comp    0.99    1.34  silent
+
+--- g1a:pair_parse   [rotation-blind control] ---
+  typer[n125]  argmax 6/6  min margin +0.05 sigma  |  gated: fires 6/6, correct 6  |  profile-template 4/4
+                specificity: 6 non-events (rotations this arm cannot see), 0 false fires
+  typer[fastest]  argmax 6/6  min margin +0.05 sigma  |  gated: fires 6/6, correct 6  |  profile-template 5/5
+                specificity: 6 non-events (rotations this arm cannot see), 0 false fires
+  event                n    c_emb   c_gain   c_comp   own  margin  xfloor  flags
+  burst@5000          25     4.61     7.73     2.15  gain    3.12    3.93  fires
+  burst@5000         125     2.75     7.34     0.78  gain    4.59    3.66  fires
+  burst@5000         325     2.16     5.46     0.67  gain    3.30    2.63  fires
+  drift@6000         125     1.95     0.20     3.87  comp    1.92    1.46  fires
+  rotation@8000      125     1.34     0.54     0.71   emb    0.63    1.25  NOT-AN-EVENT silent
+  rotation@10000     125     1.24     1.10     0.07   emb    0.15    1.23  NOT-AN-EVENT silent
+  burst@11000         25     2.34     8.76    -0.46  gain    6.43    4.71  fires
+  burst@11000        125     1.41     7.19    -1.47  gain    5.78    3.57  fires
+  rotation@12000     125     0.88     0.93     0.45   emb   -0.05    1.16  NOT-AN-EVENT silent
+  drift@13000        125     1.18     2.26     3.44  comp    1.18    1.40  fires
+  rotation@14000     125     0.40     1.01     0.22   emb   -0.62    1.07  NOT-AN-EVENT silent
+  rotation@16000     125     0.59     0.94     0.17   emb   -0.35    1.10  NOT-AN-EVENT silent
+  burst@17000         25     3.05     8.22    -1.01  gain    5.17    4.28  fires
+  burst@17000         50     2.10     7.83    -1.35  gain    5.73    4.00  fires
+  burst@17000        125     1.25     6.68    -1.47  gain    5.43    3.26  fires
+  rotation@18000     125     0.09     1.65    -0.04   emb   -1.56    1.01  NOT-AN-EVENT silent
+  rotation@18000     250    -0.61     0.72    -0.48   emb   -1.33    0.90  NOT-AN-EVENT silent
+  drift@19000        125     0.58     2.69     2.74  comp    0.05    1.31  fires
+
+--- g1a:self   [merged at 10050] ---
+  typer[n125]  argmax 8/8  min margin +0.99 sigma  |  gated: fires 7/8, correct 7, silent on drift@19000  |  profile-template 3/5
+                specificity: 4 non-events (rotations this arm cannot see), 0 false fires
+  typer[fastest]  argmax 8/8  min margin +0.99 sigma  |  gated: fires 7/8, correct 7, silent on drift@19000  |  profile-template 3/6
+                specificity: 4 non-events (rotations this arm cannot see), 0 false fires
+  event                n    c_emb   c_gain   c_comp   own  margin  xfloor  flags
+  burst@5000          25     3.06     6.29     2.14  gain    3.23    3.74  fires
+  burst@5000         125     2.51     5.81     1.04  gain    3.30    3.38  fires
+  burst@5000         325     1.88     4.79     0.69  gain    2.91    2.73  fires
+  drift@6000         125     2.18     0.51     3.64  comp    1.46    1.51  fires
+  rotation@8000      125     5.43     0.96     1.51   emb    3.93    7.68  fires
+  rotation@10000     125     4.52     1.48     1.04   emb    3.04    5.46  fires
+  burst@11000         25     1.46     7.24    -0.96  gain    5.78    4.56  fires
+  burst@11000        125     0.47     6.45    -2.16  gain    5.98    3.86  fires
+  rotation@12000     125     0.19     0.50    -0.03   emb   -0.31    1.08  NOT-AN-EVENT silent
+  drift@13000        125     0.36     0.88     2.96  comp    2.07    1.40  fires
+  rotation@14000     125     0.26     0.49    -0.08   emb   -0.23    1.10  NOT-AN-EVENT silent
+  rotation@16000     125     0.21     0.33     0.10   emb   -0.11    1.08  NOT-AN-EVENT silent
+  burst@17000         25     1.58     6.77    -0.17  gain    5.19    4.14  fires
+  burst@17000         50     1.05     6.69    -1.18  gain    5.65    4.07  fires
+  burst@17000        125     0.49     5.97    -1.41  gain    5.48    3.50  fires
+  rotation@18000     125     0.37     0.94     0.22   emb   -0.56    1.15  NOT-AN-EVENT silent
+  rotation@18000     250    -0.12     0.38    -0.21   emb   -0.50    0.95  NOT-AN-EVENT silent
+  drift@19000        125     0.17     1.62     2.61  comp    0.99    1.34  silent
+
+--- g2a:rekey_dead   [rotation-blind control] ---
+  typer[n125]  argmax 5/6  min margin -0.86 sigma  |  gated: fires 6/6, correct 5  |  profile-template 4/4
+                specificity: 6 non-events (rotations this arm cannot see), 3 false fires: rotation@10000->gain, rotation@16000->gain, rotation@18000->gain
+  typer[fastest]  argmax 3/6  min margin -5.13 sigma  |  gated: fires 6/6, correct 3  |  profile-template 5/6
+                specificity: 6 non-events (rotations this arm cannot see), 3 false fires: rotation@10000->gain, rotation@16000->gain, rotation@18000->gain
+  event                n    c_emb   c_gain   c_comp   own  margin  xfloor  flags
+  burst@5000          25     4.12    10.86     3.02  gain    6.74    5.42  fires
+  burst@5000         125     3.49     9.39     1.12  gain    5.90    4.31  fires
+  burst@5000         325     2.75     6.87     0.50  gain    4.12    2.91  fires
+  drift@6000          25     1.78     7.05     6.02  comp   -1.03    1.91  fires
+  drift@6000         125     1.46     1.25     4.48  comp    3.02    1.62  fires
+  rotation@8000      125     1.53     1.63     1.56   emb   -0.11    1.32  NOT-AN-EVENT silent
+  rotation@10000     125     0.95     2.32     0.61   emb   -1.38    1.19  NOT-AN-EVENT fires
+  rotation@10000     375     0.48     0.75    -0.08   emb   -0.27    1.09  NOT-AN-EVENT silent
+  burst@11000         25     1.77    11.50     0.69  gain    9.73    5.98  fires
+  burst@11000        125     1.44     8.97    -0.67  gain    7.53    4.04  fires
+  rotation@12000     125    -0.05     2.05     0.57   emb   -2.10    0.99  NOT-AN-EVENT silent
+  drift@13000         25     0.16     8.59     4.04  comp   -4.55    1.54  fires
+  drift@13000         75    -0.12     5.39     4.07  comp   -1.32    1.55  fires
+  drift@13000        125    -0.28     3.83     3.98  comp    0.16    1.53  fires
+  rotation@14000     125    -0.06     1.95     0.26   emb   -2.01    0.99  NOT-AN-EVENT silent
+  rotation@16000     125    -0.17     2.62     0.01   emb   -2.79    0.97  NOT-AN-EVENT fires
+  burst@17000         25     1.13    11.89     0.28  gain   10.76    6.36  fires
+  burst@17000        125     0.65     9.15    -0.87  gain    8.49    4.15  fires
+  rotation@18000     125    -1.20     3.17     0.30   emb   -4.37    0.81  NOT-AN-EVENT fires
+  drift@19000         25    -1.26     8.78     3.65  comp   -5.13    1.48  fires
+  drift@19000        125    -1.08     4.29     3.43  comp   -0.86    1.45  fires
+
+--- g2a:self_rekey   [absorber] ---
+  typer[n125]  argmax 11/11  min margin +0.02 sigma  |  gated: fires 11/11, correct 11  |  1 SKIPPED  |  profile-template 6/8
+  typer[fastest]  argmax 9/11  min margin -5.29 sigma  |  gated: fires 11/11, correct 9  |  1 SKIPPED  |  profile-template 7/10
+  event                n    c_emb   c_gain   c_comp   own  margin  xfloor  flags
+  burst@5000          25     0.56    10.48     2.23  gain    8.26    5.84  fires
+  burst@5000         125     1.16     7.92     1.35  gain    6.56    3.79  fires
+  burst@5000         325     1.33     4.71     1.34  gain    3.37    2.21  fires
+  drift@6000          25    -0.00     7.23     4.04  comp   -3.19    1.62  fires
+  drift@6000         125     0.52     2.42     3.65  comp    1.24    1.54  fires
+  rotation@8000      125     5.11     2.74     1.63   emb    2.37    3.84  fires
+  rotation@10000     125     4.48     2.19     1.12   emb    2.29    3.26  fires
+  rotation@10000     375     4.13     0.94     0.19   emb    3.19    2.97  fires
+  burst@11000         25    -1.08    12.08    -0.02  gain   12.10    7.64  fires
+  burst@11000        125    -0.98    10.11    -1.52  gain   11.09    5.49  fires
+  rotation@12000     125     4.21     2.20     1.25   emb    2.01    3.03  fires
+  drift@13000         25    -0.99     7.32     2.04  comp   -5.29    1.27  fires
+  drift@13000         75    -1.24     4.23     2.48  comp   -1.76    1.34  fires
+  drift@13000        125    -1.23     2.60     2.61  comp    0.02    1.36  fires
+  rotation@14000     125     4.09     2.49     0.75   emb    1.60    2.94  fires
+  rotation@16000     125     3.88     2.63     0.96   emb    1.25    2.78  fires
+  burst@17000         25    -1.51    12.32    -0.43  gain   12.75    7.95  fires
+  burst@17000        125    -1.27    10.32    -1.89  gain   11.60    5.69  fires
+  rotation@18000     125     3.76     2.53     1.20   emb    1.23    2.70  fires
+  drift@19000         25        SKIPPED (dtheta exactly 0)
+  drift@19000        125        SKIPPED (dtheta exactly 0)
+
+--- g2a:self_v2   [merged at 8050] ---
+  typer[n125]  argmax 7/7  min margin +0.13 sigma  |  gated: fires 7/7, correct 7  |  profile-template 2/4
+                specificity: 5 non-events (rotations this arm cannot see), 1 false fires: rotation@18000->gain
+  typer[fastest]  argmax 4/7  min margin -3.18 sigma  |  gated: fires 7/7, correct 4  |  profile-template 3/6
+                specificity: 5 non-events (rotations this arm cannot see), 1 false fires: rotation@18000->gain
+  event                n    c_emb   c_gain   c_comp   own  margin  xfloor  flags
+  burst@5000          25     3.68     9.54     3.00  gain    5.86    5.92  fires
+  burst@5000         125     3.53     7.10     1.77  gain    3.57    3.75  fires
+  burst@5000         325     3.26     4.13     1.56  gain    0.86    2.16  fires
+  drift@6000          25     3.16     6.61     4.89  comp   -1.72    1.75  fires
+  drift@6000         125     2.94     2.13     4.16  comp    1.22    1.61  fires
+  rotation@8000      125     6.62     2.64     1.82   emb    3.97    6.61  fires
+  rotation@10000     125     0.58     2.07     0.59   emb   -1.49    1.18  NOT-AN-EVENT silent
+  rotation@10000     375    -0.05     0.83    -0.38   emb   -0.88    0.99  NOT-AN-EVENT silent
+  burst@11000         25     1.56    10.58     0.57  gain    9.03    7.19  fires
+  burst@11000        125     1.01     8.42    -1.19  gain    7.41    4.80  fires
+  rotation@12000     125     0.46     2.06     0.65   emb   -1.59    1.14  NOT-AN-EVENT silent
+  drift@13000         25     1.90     6.12     3.99  comp   -2.13    1.58  fires
+  drift@13000         75     0.98     3.59     3.66  comp    0.07    1.52  fires
+  drift@13000        125     0.48     2.26     3.44  comp    1.18    1.48  fires
+  rotation@14000     125     0.27     2.08     0.34   emb   -1.81    1.08  NOT-AN-EVENT silent
+  rotation@16000     125     0.48     1.97     0.40   emb   -1.49    1.15  NOT-AN-EVENT silent
+  burst@17000         25     1.97    10.07     1.01  gain    8.10    6.53  fires
+  burst@17000        125     1.23     8.17    -1.01  gain    6.94    4.58  fires
+  rotation@18000     125     0.25     2.46     0.46   emb   -2.21    1.07  NOT-AN-EVENT fires
+  drift@19000         25     1.47     6.47     3.29  comp   -3.18    1.46  fires
+  drift@19000        125     0.23     2.84     2.98  comp    0.13    1.41  fires
+
+--- g2c:self_fm   [merged at 6025] ---
+  typer[n125]  argmax 3/6  min margin -1.13 sigma  |  gated: fires 6/6, correct 3  |  profile-template 3/4
+                specificity: 6 non-events (rotations this arm cannot see), 6 false fires: rotation@8000->gain, rotation@10000->gain, rotation@12000->gain, rotation@14000->gain, rotation@16000->gain, rotation@18000->gain
+  typer[fastest]  argmax 3/6  min margin -5.54 sigma  |  gated: fires 6/6, correct 3  |  profile-template 5/6
+                specificity: 6 non-events (rotations this arm cannot see), 6 false fires: rotation@8000->gain, rotation@10000->gain, rotation@12000->gain, rotation@14000->gain, rotation@16000->gain, rotation@18000->gain
+  event                n    c_emb   c_gain   c_comp   own  margin  xfloor  flags
+  burst@5000          25     4.44    11.31     2.38  gain    6.86    6.05  fires
+  burst@5000         125     3.83     9.91     0.93  gain    6.08    4.84  fires
+  burst@5000         325     3.46     7.16     0.93  gain    3.70    3.13  fires
+  drift@6000          25     3.70     7.59     4.18  comp   -3.41    1.57  fires
+  drift@6000         125     4.52     2.97     3.65  comp   -0.86    1.49  fires
+  rotation@8000      125     0.46     2.08     0.78   emb   -1.61    1.10  NOT-AN-EVENT fires
+  rotation@10000     125     0.66     2.42     0.16   emb   -1.76    1.14  NOT-AN-EVENT fires
+  rotation@10000     375     0.28     1.19    -0.26   emb   -0.91    1.06  NOT-AN-EVENT silent
+  burst@11000         25     1.66    11.78    -0.16  gain   10.12    6.52  fires
+  burst@11000        125     1.51     9.21    -1.21  gain    7.70    4.33  fires
+  rotation@12000     125     0.40     2.43     0.46   emb   -2.03    1.08  NOT-AN-EVENT fires
+  drift@13000         25     1.72     7.91     3.50  comp   -4.41    1.46  fires
+  drift@13000         75     1.24     5.36     3.26  comp   -2.09    1.42  fires
+  drift@13000        125     0.69     3.65     3.26  comp   -0.39    1.42  fires
+  rotation@14000     125     0.40     2.16     0.17   emb   -1.77    1.08  NOT-AN-EVENT fires
+  rotation@16000     125     0.23     2.22    -0.11   emb   -1.99    1.05  NOT-AN-EVENT fires
+  burst@17000         25     1.54    11.80     0.29  gain   10.27    6.55  fires
+  burst@17000        125     1.18     9.29    -1.13  gain    8.10    4.39  fires
+  rotation@18000     125     0.16     3.05     0.11   emb   -2.89    1.03  NOT-AN-EVENT fires
+  drift@19000         25     0.77     8.18     2.64  comp   -5.54    1.33  fires
+  drift@19000        125    -0.10     3.80     2.67  comp   -1.13    1.34  fires
+
+--- sign/rank consistency at the 125-step unit (the finding-1 discipline) ---
+  g1a:track: 90/90 (100%) cross-type comparisons in the right direction
+     c_emb: min(own type) +5.11   max(other types) +1.69
+     c_gain: min(own type) +7.27   max(other types) +1.80
+     c_comp: min(own type) +2.46   max(other types) +1.54
+  g2a:self_rekey: 72/72 (100%) cross-type comparisons in the right direction
+     c_emb: min(own type) +3.76   max(other types) +1.16
+     c_gain: min(own type) +7.92   max(other types) +2.74
+     c_comp: min(own type) +2.61   max(other types) +1.63
+  g1a:pair_parse: 18/18 (100%) cross-type comparisons in the right direction  [rotation is NOT an event for this arm]
+     c_emb: not scored (this arm has no events of that type)
+     c_gain: min(own type) +6.68   max(other types) +2.69
+     c_comp: min(own type) +2.74   max(other types) +0.78
+  g2a:rekey_dead: 18/18 (100%) cross-type comparisons in the right direction  [rotation is NOT an event for this arm]
+     c_emb: not scored (this arm has no events of that type)
+     c_gain: min(own type) +8.97   max(other types) +4.29
+     c_comp: min(own type) +3.43   max(other types) +1.12
+
+--- longitudinal: does the weight ledger drain across the run? ---
+  g1a:pair_parse
+    rotation  8000:+1.34  10000:+1.24  12000:+0.88  14000:+0.40  16000:+0.59  18000:+0.09
+      first +1.34 -> last +0.09  (x0.07)
+    burst     5000:+7.34  11000:+7.19  17000:+6.68
+      first +7.34 -> last +6.68  (x0.91)
+    drift     6000:+3.87  13000:+3.44  19000:+2.74
+      first +3.87 -> last +2.74  (x0.71)
+  g1a:track
+    rotation  8000:+6.45  10000:+5.72  12000:+5.61  14000:+5.14  16000:+5.24  18000:+5.11
+      first +6.45 -> last +5.11  (x0.79)
+    burst     5000:+7.39  11000:+7.30  17000:+7.27
+      first +7.39 -> last +7.27  (x0.98)
+    drift     6000:+3.79  13000:+2.91  19000:+2.46
+      first +3.79 -> last +2.46  (x0.65)
+  g2a:rekey_dead
+    rotation  8000:+1.53  10000:+0.95  12000:-0.05  14000:-0.06  16000:-0.17  18000:-1.20
+      first +1.53 -> last -1.20  (x-0.79)
+    burst     5000:+9.39  11000:+8.97  17000:+9.15
+      first +9.39 -> last +9.15  (x0.97)
+    drift     6000:+4.48  13000:+3.98  19000:+3.43
+      first +4.48 -> last +3.43  (x0.77)
+  g2a:self_rekey
+    rotation  8000:+5.11  10000:+4.48  12000:+4.21  14000:+4.09  16000:+3.88  18000:+3.76
+      first +5.11 -> last +3.76  (x0.74)
+    burst     5000:+7.92  11000:+10.11  17000:+10.32
+      first +7.92 -> last +10.32  (x1.30)
+    drift     6000:+3.65  13000:+2.61  19000:skip
+      first +3.65 -> last +2.61  (x0.72)
+
+--- event-matched control (rotation-blind arms) ---
+  g1a:pair_parse: kind="none", rot_period=0
+  g2a:rekey_dead: kind="dead", rot_period=0
+  event               axis       g1a:track   g1a:pair_parse   g2a:rekey_dead
+  rotation@8000        emb            6.45             1.34             1.53
+  rotation@10000       emb            5.72             1.24             0.95
+  rotation@12000       emb            5.61             0.88            -0.05
+  rotation@14000       emb            5.14             0.40            -0.06
+  rotation@16000       emb            5.24             0.59            -0.17
+  rotation@18000       emb            5.11             0.09            -1.20
+  burst@5000          gain            7.39             7.34             9.39
+  burst@11000         gain            7.30             7.19             8.97
+  burst@17000         gain            7.27             6.68             9.15
+  drift@6000          comp            3.79             3.87             4.48
+  drift@13000         comp            2.91             3.44             3.98
+  drift@19000         comp            2.46             2.74             3.43
+
+--- directional column (cos of raw dtheta to the first event of that type) ---
+  g1a:track
+    rotation  group wte     d=8448    same-type mean +0.042 (min -0.191, n=5)
+              cross-type max|cos| 0.049   quiet |cos| mean/p90/max 0.087/0.176/0.356   random p99 0.032
+              margin of the worst same-type read over the worst quiet read: -0.548
+    burst     group ln_f    d=512     same-type mean +0.955 (min +0.954, n=2)
+              cross-type max|cos| 0.790   quiet |cos| mean/p90/max 0.653/0.810/0.828   random p99 0.101
+              margin of the worst same-type read over the worst quiet read: +0.125
+    drift     group h1      d=793856  same-type mean -0.002 (min -0.004, n=2)
+              cross-type max|cos| 0.027   quiet |cos| mean/p90/max 0.018/0.029/0.121   random p99 0.003
+              margin of the worst same-type read over the worst quiet read: -0.125
+  g2a:self_rekey
+    rotation  group wte     d=8448    same-type mean +0.048 (min -0.162, n=5)
+              cross-type max|cos| 0.063   quiet |cos| mean/p90/max 0.085/0.185/0.349   random p99 0.032
+              margin of the worst same-type read over the worst quiet read: -0.510
+    burst     group ln_f    d=512     same-type mean +0.885 (min +0.880, n=2)
+              cross-type max|cos| 0.748   quiet |cos| mean/p90/max 0.534/0.698/0.750   random p99 0.101
+              margin of the worst same-type read over the worst quiet read: +0.131
+    drift     group h1      d=793856  same-type mean -0.007 (min -0.007, n=1)
+              cross-type max|cos| 0.026   quiet |cos| mean/p90/max 0.019/0.030/0.141   random p99 0.003
+              margin of the worst same-type read over the worst quiet read: -0.148
+
+--- lag response: z on the event's own axis for a window [onset+lag, +lag+n] ---
+    (this is what an evaluator reading a TRAILING window sees; the op map decides
+     at +50...+125, where the trailing 125-step window still contains the onset)
+  g1a:track
+    rotation@8000     lag0+n125: +6.45  lag125+n875: +2.14*
+    rotation@10000    lag0+n125: +5.72  lag125+n625: +2.07*
+    rotation@12000    lag0+n125: +5.61  lag125+n875: +0.97*
+    rotation@14000    lag0+n125: +5.14  lag125+n1375: +0.33*
+    rotation@16000    lag0+n125: +5.24  lag125+n875: +0.23*
+    rotation@18000    lag0+n125: +5.11  lag0+n250: +4.32  lag125+n125: +1.34*
+    burst@5000        lag0+n25: +7.46  lag0+n125: +7.39  lag0+n325: +5.63  lag25+n100: +6.20  lag125+n200: -0.08
+    burst@11000       lag0+n25: +8.40  lag0+n125: +7.30  lag25+n100: +5.16  lag125+n875: -0.02
+    burst@17000       lag0+n25: +8.79  lag0+n50: +8.40  lag0+n125: +7.27  lag25+n25: +6.48  lag50+n75: +2.72  lag125+n875: -0.17
+    drift@6000        lag0+n125: +3.79  lag125+n1125: +2.83*
+    drift@13000       lag0+n125: +2.91  lag125+n625: +1.02*
+    drift@19000       lag0+n125: +2.46  lag125+n875: +0.20*
+  g2a:self_rekey
+    rotation@8000     lag0+n125: +5.11  lag125+n500: +2.08*
+    rotation@10000    lag0+n125: +4.48  lag0+n375: +4.13  lag125+n250: +1.77*
+    rotation@12000    lag0+n125: +4.21  lag125+n875: +1.23*
+    rotation@14000    lag0+n125: +4.09  lag125+n625: +0.81*
+    rotation@16000    lag0+n125: +3.88  lag125+n375: +0.06*
+    rotation@18000    lag0+n125: +3.76  lag125+n875: +0.20*
+    burst@5000        lag0+n25: +10.48  lag0+n125: +7.92  lag0+n325: +4.71  lag125+n200: +1.53
+    burst@11000       lag0+n25: +12.08  lag0+n125: +10.11  lag25+n100: +8.29  lag125+n500: -0.99
+    burst@17000       lag0+n25: +12.32  lag0+n125: +10.32  lag25+n100: +8.49  lag125+n625: -1.61
+    drift@6000        lag0+n25: +4.04  lag0+n125: +3.65  lag25+n100: +3.21  lag125+n750: +2.60*
+    drift@13000       lag0+n25: +2.04  lag0+n75: +2.48  lag0+n125: +2.61  lag25+n50: +2.46  lag75+n50: +1.99  lag125+n875: +0.55*
+    (* = a window gate1g's rule admits as QUIET, scored leave-one-out: it sits in
+       the null, which is exactly why the null is an upper bound on the floor)
+
+--- arms that acted: the meter's own blind spot ---
+  g2a:self_rekey: 5 intervals with dtheta EXACTLY 0 (fired skips)
+  g2a:self_v2: 1 intervals with dtheta EXACTLY 0 (fired skips)
+
+--- merged arms (rotation stops being news once the wall is merged away) ---
+  g1a:pair_key (merge at 10050): rotation c_emb z  8000:+5.43  10000:+4.52  12000:+0.19  14000:+0.26  16000:+0.21  18000:+0.37
+  g1a:self (merge at 10050): rotation c_emb z  8000:+5.43  10000:+4.52  12000:+0.19  14000:+0.26  16000:+0.21  18000:+0.37
+  g2a:self_v2 (merge at 8050): rotation c_emb z  8000:+6.62  10000:+0.58  12000:+0.46  14000:+0.27  16000:+0.48  18000:+0.25
+  g2c:self_fm (merge at 6025): rotation c_emb z  8000:+0.46  10000:+0.66  12000:+0.40  14000:+0.40  16000:+0.23  18000:+0.16

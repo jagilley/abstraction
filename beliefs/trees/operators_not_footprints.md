@@ -1,7 +1,7 @@
 # Operators, Not Footprints
 
 *Domain: representation learning, data, self-modeling, philosophy of language*
-*Last updated: 2026-08-25*
+*Last updated: 2026-08-31*
 
 
 ## The meaningful primitive in data is the operator (the transformation between states), not the surface trace it leaves; modeling the surface distribution captures a distribution-bound footprint, while modeling the operator captures a distribution-invariant object
@@ -12,6 +12,7 @@
 - The principle has three instances at different altitudes — a model modeling itself, a model modeling language, and a model modeling a whole mind's output stream (see children) — that turn out to be the same claim; this cross-level unification is the main reason to treat it as a root rather than a self-modeling detail
 - **Mechanism for why the footprint→operator inversion is hard, and why it gets harder as the generator improves**: recovering a generating process from its outputs is an *inverse problem*, ill-posed exactly to the degree the forward process destroyed information, and the failure is **silent** — regressing a single-valued map onto a multivalued relation returns a smooth, confident, mode-averaged answer that is wrong on the collisions. Measured: as a grokking MLP compresses onto the task variable, its inverse self-model collapses R² 0.88 → 0.15 while the forward self-model stays pinned at 1.0 — and the collapse *keeps deepening after test accuracy has already hit 100%*, so no performance metric can see it — [inverse dynamics](../../experiments/inverse_dynamics/README.md)
 - Corollary with teeth: **the better a generating system's compression, the less of it survives in its outputs.** Expert human abstraction is excellent compression, which is why one can read every paper in a field and not acquire the taste.
+- The footprint/operator line is set by the **conditioning set**, and now has a measured boundary case: a forecaster of a learner's own weight update that omits the update's exogenous driver (the grade) reads the calendar, not the operator (pooled credit: calendar η² 0.44, no prospective conditioning set contains the cause); completing the conditioning set turns the forecast into the operator — but the operator of the self-update *is the learning rule*, known analytically (per-datum forecastable part exactly σ(v₀) − y, R² 0.59), so no organ is owed that job. The constructive arity-2 definition of an operator is in [operators_are_arity_two](../../ideas/operators_are_arity_two.md); the measurement is [audiation](../../experiments/rhm/practice/audiation/README.md)
 
 
 ### Self-modeling instance: a network's activations are the footprint of its computation; modeling P(activations) captures the manifold (distribution-bound), while a forward self-model captures the transformation g (distribution-invariant)

@@ -15,6 +15,8 @@ the 2026-08-30 Gate-1 reshaping addendum). This is the complete listing.
 | `gate1g.py` | Gate 1G Modal entrypoints over the banked checkpoints: per-layer ‖Δθ‖ + event×event alignment cosines (CPU), and the representation reads (RSA, PC/Procrustes angles, the address-matched sharp test and map-swap bracket control) on the panel's own eval batches, per epoch grammar. |
 | `analyze_tuning.py` | Reduction for `tn0`/`g1a`/`g2a`/`g2c`: matched-surprisal Factor-T sections (bracketing discipline, pooled groups, sign counts), section 2b (counterfactual-vs-realized cross-check), 2c (mirror control), 2d (the movement decomposition, added retroactively), Factor-M rows, ledgers, per-event costs in floor multiples, figures. |
 | `analyze_g1g.py` | Gate 1G reduction: the weight null (‖Δθ‖ ~ n^α fit + the direct n=125 datum), the two alignment floors (random-vector + post-merge empirical), the rep null, verdicts (reorient/gain/rebuild), re-index recovery, figures. Null designs documented in its module docstring. |
+| `wledger.py` | Weight-ledger typer check, compute side (Modal CPU, no training): per-layer-group relative ‖Δθ‖ over every adjacent and event-anchored interval on all eight banked arms (`g1a`, `g2a`, `g2c`), each labelled with its event kind and its lag from onset, plus the interval×interval Δθ cosines that feed the directional column. Retains gate1g's `quiet_pairs` rule and `layer_of` grouping verbatim so the two reductions are comparable. |
+| `analyze_wledger.py` | Weight-ledger typer reduction: the three between-group log-ratio contrasts (`c_emb` wte, `c_gain` ln_f, `c_comp` h1-h2) standardised against a per-arm quiet baseline in log n (warm-up excluded, leave-one-out scored); argmax and floor-gated typing; the detection/specificity split (a rotation is not an event for a rotation-blind or already-merged arm); longitudinal drain check; lag response; the directional template column; 4 figures + `reduction.txt`. Instrument caveats in its module docstring. |
 | `transparency.py` | Gate 0 gates: `--shadow`-vs-`--no-shadow` and FM-vs-no-FM trajectory identity; `--fidelity` = the five-instrument max\|Δ\| comparison against fwlm0/fwlm1/tsdB/ey0 over shared prefixes. |
 | `transparency_g1.py` | Wave-1 fidelity + the per-arm first-op report (prints first-op steps rather than asserting, so a pre-event fire reads as a result, not a gate crash). |
 | `transparency_g2.py` | Wave-2 cross-wave prefix licenses (each arm vs wave-1 `track`; `self_v2` vs wave-1 `self`; `g2c` vs `self_v2` divergence point) + donor twins. |
@@ -33,12 +35,15 @@ the 2026-08-30 Gate-1 reshaping addendum). This is the complete listing.
 | `g2a` | Wave 2: `self_v2`, `self_fm`, `sur_fm`, `self_abba`, `self_rekey`+`rekey_dead` | `rhm_practice_tuning_g2/g2a/` |
 | `g2c` | The fix round: `self_fm` with the FM learning through skips | `rhm_practice_tuning_g2/g2c/` |
 | `g1g` | Offline checkpoint analytics (weights + representations), ~0.03 GPU-h | `rhm_practice_tuning_g1g/g1g/` |
+| `wl0` | Weight-ledger typer check: per-layer-group Δθ ratios over all banked intervals, 8 arms across `g1a`/`g2a`/`g2c` (CPU only, no training) | `rhm_practice_tuning_wl/wl0/` |
 
 Fetched copies + figures under `figures/<tag>/`; every tag's exact config in its `setup.json`.
 Figures: `tn0/fig1–fig6` (competence / Factor T / ladder / Factor M / FM-lr / movement),
 `g1a/fig1_typing_and_floors`+`fig2_ledger`, `g2a/fig1_wave2`+`fig2_two_wave_ledger`+
 `fig3_gate1_complete`, `g2c/fig1_gate1_complete`, `g1g/fig1_absorption_locus`+
-`fig2_remap_alignment`+`fig3_representation`+`fig4_sharp_reindex`.
+`fig2_remap_alignment`+`fig3_representation`+`fig4_sharp_reindex`,
+`wl0/fig1_three_corners`+`fig2_per_event_z`+`fig3_longitudinal_lag`+`fig4_directional`
+(+ `wl0/reduction.txt`, the weight-ledger typer's own reduction).
 
 ## Gate records
 

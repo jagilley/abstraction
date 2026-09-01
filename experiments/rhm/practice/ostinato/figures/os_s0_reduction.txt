@@ -1,0 +1,1019 @@
+✓ Finished downloading files to local!
+✓ Finished downloading files to local!
+=== intonation (E′ round 2, delta_perf) — tag os_s0 ===
+ladder [('L1n25', 60), ('L2n12', 50), ('L3n6', 70), ('L4n3', 12), ('L5n1', 9)] = 201 cycles/arm scheduled; caps [60, 50, 70, 12, 9] = 201; setup 611s; stale buffer 0.1269 -> 0.1541
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+
+==============================================================================
+(0) GATES
+==============================================================================
+  CROSS-TAG REPLAY (A3's TREATMENT, WHOLE LIFE — this round's baseline IS that arm): cr3_s0/outer_yield_m4 not fetched locally — skipped
+  CROSS-TAG REPLAY (A1's thermostat through the earning eras — the chain back to A2): ma_s0/outer_yield not fetched locally — skipped
+  G-F smoke scale (in-process vs maestro.py, panel ON, maxl=3): max|fork - donor| = 0.000e+00, self-replay control = 0.000e+00, commits equal = True  -> PASS
+
+  IN-TAG TWIN GATE (each arm vs os_log, to the first action by EITHER; os_log's own first commit is c49).
+  [tacet] NOTE: every arm here is treated from c1, so a non-zero delta below is the
+  round's variable — read it as WHEN THE GATE FIRST BOUND, not as a failure.
+    os_rawx        c1-c48   (first action c49 (own)) max|delta| = 0.000e+00  -> identical
+    os_r100        c1-c48   (first action c49 (own)) max|delta| = 0.000e+00  -> identical
+    os_r020        c1-c48   (first action c49 (own)) max|delta| = 0.000e+00  -> identical
+    os_r004        c1-c48   (first action c49 (own)) max|delta| = 0.000e+00  -> identical
+    os_r001        c1-c48   (first action c49 (own)) max|delta| = 0.000e+00  -> identical
+
+  OBSERVATION PANEL vs the donor's G-Y miner (level 4, every cycle):
+    os_log           agree=True over 131 cycles
+    os_rawx          agree=True over 131 cycles
+    os_r100          agree=True over 131 cycles
+    os_r020          agree=True over 131 cycles
+    os_r004          agree=True over 131 cycles
+    os_r001          agree=True over 131 cycles
+
+  POLICY GATE (offline, no GPU): ALL PASS (21 checks)
+
+  ENDO READ: LABEL-FREE BY CONSTRUCTION: PASS — positions depend only on ['era.level', 'era.node', 's', 'depth']; none of ['truth', 'rules', 'inverse_maps', 'committed', 'canon', 'true_mask', 'grade'] appears in the read's code
+    era 1 cell L1n25 blocks [25, 26] -> parent L2n12 blocks [24, 26]
+    era 2 cell L2n12 blocks [24, 26] -> parent L3n6 blocks [24, 28]
+    era 3 cell L3n6 blocks [24, 28] -> parent L4n3 blocks [24, 32]
+    era 4 cell L4n3 blocks [24, 32] -> parent L5n1 blocks [16, 32]
+    era 5 cell L5n1 blocks [16, 32] -> parent L6n0 blocks [0, 32]  (parent IS the root: the read is the unconditional marginal)
+
+  DEAD ZONES: measured, not defaulted: PASS, matches floors.json = None
+    {'tol_ledger': 0.02944712566990095, 'tol_yield_l3': 0.46127129019246205, 'tol_yield_l4': 0.5166900731510206, 'tol_endo': 0.01091575129919287}
+    provenance: cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)
+
+  ENDO PRICE (measured on the run's own GPU): one read over 256 sequences = 1.3 ms = 269 grounding-equivalents; charged 267g
+
+==============================================================================
+(1) THE ACTION TRACE — what the loop did, and when
+==============================================================================
+  arm                 policy    read cycles  commits  advances  chosen  capped  rode cap
+  os_log               quiet   yield    131        3         5       7       1      True
+  os_rawx               yoke    None    131        3         5       0       0     False
+  os_r100               yoke    None    131        3         5       0       0     False
+  os_r020               yoke    None    131        3         5       0       0     False
+  os_r004               yoke    None    131        3         5       0       0     False
+  os_r001               yoke    None    131        3         5       0       0     False
+
+  PER-ARM ACTIONS (cycle, kind, level, why, and the statistic at that instant)
+
+    os_log  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c58   era1 advance  L-  why=quiet  V=   0.2344 tol=  0.4613 V/tol=    0.51
+      c72   era2 commit   L3  why=quiet  V=   0.4019 tol=  0.5167 V/tol=    0.78
+      c88   era2 advance  L-  why=quiet  V=   0.3928 tol=  0.5167 V/tol=    0.76
+      c104  era3 commit   L4  why=quiet  V=   0.2767 tol=  0.5167 V/tol=    0.54
+      c114  era3 advance  L-  why=quiet  V=   0.4297 tol=  0.5167 V/tol=    0.83
+      c122  era4 advance  L-  why=quiet  V=   0.4062 tol=  0.5167 V/tol=    0.79
+      c131  era5 advance  L-  why=cap    V=   0.0625 tol=  0.5167 V/tol=    0.12
+
+    os_rawx  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c58   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c72   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c88   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c104  era3 commit   L4  why=clock  V=        - tol=       - V/tol=       -
+      c114  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c122  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c131  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    os_r100  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c58   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c72   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c88   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c104  era3 commit   L4  why=clock  V=        - tol=       - V/tol=       -
+      c114  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c122  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c131  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    os_r020  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c58   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c72   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c88   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c104  era3 commit   L4  why=clock  V=        - tol=       - V/tol=       -
+      c114  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c122  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c131  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    os_r004  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c58   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c72   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c88   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c104  era3 commit   L4  why=clock  V=        - tol=       - V/tol=       -
+      c114  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c122  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c131  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    os_r001  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c58   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c72   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c88   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c104  era3 commit   L4  why=clock  V=        - tol=       - V/tol=       -
+      c114  era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c122  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c131  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+  COMMIT CYCLES AND WHAT WAS COMMITTED
+  arm              lvl  cycle  era  prov  entries  recall    prec  cert@    driver
+  os_log             2     49    1 False       14   0.714   0.714     18      loop
+  os_log             3     72    2 False       10   0.071   0.400   None      loop
+  os_log             4    104    3 False        1   0.001   1.000   None      loop
+  os_rawx            2     49    1 False       14   0.714   0.714     18      loop
+  os_rawx            3     72    2 False       12   0.107   0.500   None      loop
+  os_rawx            4    104    3 False        2   0.001   0.500   None      loop
+  os_r100            2     49    1 False       14   0.714   0.714     18      loop
+  os_r100            3     72    2 False        9   0.054   0.333   None      loop
+  os_r100            4    104    3 False        2   0.001   0.500   None      loop
+  os_r020            2     49    1 False       14   0.714   0.714     18      loop
+  os_r020            3     72    2 False       11   0.054   0.273   None      loop
+  os_r020            4    104    3 False        2   0.001   0.500   None      loop
+  os_r004            2     49    1 False       14   0.714   0.714     18      loop
+  os_r004            3     72    2 False        9   0.036   0.222   None      loop
+  os_r004            4    104    3 False        2   0.000   0.000   None      loop
+  os_r001            2     49    1 False       14   0.714   0.714     18      loop
+  os_r001            3     72    2 False       14   0.089   0.357   None      loop
+  os_r001            4    104    3 False        2   0.001   0.500   None      loop
+
+==============================================================================
+(1b) THE LEARNED POLICY'S OWN RECORD — the mixtures, the fit, the action diff
+==============================================================================
+  THE FITTED MIXTURES (unit-norm weights on each gauge's paired-interval slope,
+  IN FLOOR UNITS; the bucket is `will_commit` = would a firing install a table).
+  A1's thermostat is the point (0, 1, 0) with theta = 1 in this same class.
+    arm/reward        bucket           ledger         yield   endo_excess    theta
+    learned_yield   installs          +0.2106       +0.9440       +0.2540   1.2085
+    learned_yield   advances          +0.0495       +0.8506       +0.5235   1.0980
+    learned_task    installs          -0.7806       +0.2146       +0.5871   1.4253
+    learned_task    advances          -0.4221       +0.1367       +0.8962   0.7083
+
+  THE ACTION DIFF — learned vs the hand-written thermostat, IN THIS TAG
+  (both ran live on their own trajectories, so this is a difference between two
+   runs and not a counterfactual; the pre-GPU replay is in fit.json.)
+
+  WHAT THE LEARNED POLICY READ AT EACH OF ITS OWN ACTIONS
+
+==============================================================================
+(2) GAUGE vs YOKE — the mandatory timing control (census finding 4)
+==============================================================================
+  The yoke replays the gauge arm's realised action cycles by clock and reads
+  nothing. A divergence would mean the reads are not inert; identity means the
+  criterion contributed nothing beyond a cycle number, which is a finding, and the
+  priced-time column is then what the read cost for a trajectory a clock reproduces.
+  [tacet] In this tag the yokes ARE the treatments (each carries one gate knob), so
+  a non-zero delta below is the round's variable and `first divergence` reads as
+  WHEN THE GATE FIRST BOUND. What must still hold is commits/advances EQUAL — that
+  is what makes the arms lifetime- and pacing-identical.
+
+  os_rawx vs os_rawx  (n=131 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 72), (4, 104)] vs [(2, 49), (3, 72), (4, 104)]   equal = True
+    advances [58, 88, 114, 122, 131] vs [58, 88, 114, 122, 131]   equal = True
+    priced time t_cum 32554214 vs 32554214  (difference +0 = what the read cost)
+
+  os_r100 vs os_r100  (n=131 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 72), (4, 104)] vs [(2, 49), (3, 72), (4, 104)]   equal = True
+    advances [58, 88, 114, 122, 131] vs [58, 88, 114, 122, 131]   equal = True
+    priced time t_cum 32553946 vs 32553946  (difference +0 = what the read cost)
+
+  os_r020 vs os_r020  (n=131 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 72), (4, 104)] vs [(2, 49), (3, 72), (4, 104)]   equal = True
+    advances [58, 88, 114, 122, 131] vs [58, 88, 114, 122, 131]   equal = True
+    priced time t_cum 32554752 vs 32554752  (difference +0 = what the read cost)
+
+  os_r004 vs os_r004  (n=131 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 72), (4, 104)] vs [(2, 49), (3, 72), (4, 104)]   equal = True
+    advances [58, 88, 114, 122, 131] vs [58, 88, 114, 122, 131]   equal = True
+    priced time t_cum 32553677 vs 32553677  (difference +0 = what the read cost)
+
+  os_r001 vs os_r001  (n=131 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 49), (3, 72), (4, 104)] vs [(2, 49), (3, 72), (4, 104)]   equal = True
+    advances [58, 88, 114, 122, 131] vs [58, 88, 114, 122, 131]   equal = True
+    priced time t_cum 32554752 vs 32554752  (difference +0 = what the read cost)
+
+==============================================================================
+(3) THE THREE CLOCKS: certificate, coverage, value
+==============================================================================
+  CLOCK 1 — the SHADOW certificate (read-only in every arm, incl. the driven ones)
+  arm               L2 fired  L3 fired  L2 c2cert  L3 c2cert  commit L2  commit L3
+  os_log                  18        76         17         17         49         72
+  os_rawx                 18        74         17         15         49         72
+  os_r100                 18        80         17         21         49         72
+  os_r020                 18        75         17         16         49         72
+  os_r004                 18        75         17         16         49         72
+  os_r001                 18        75         17         16         49         72
+
+  CLOCK 2 — COVERAGE: end-of-run committed table per level
+  arm              lvl  frozen n   recall    prec  live n  live rec  live prec
+  os_log             2        14    0.714   0.714      18     0.929      0.722
+  os_log             3        10    0.071   0.400      27     0.143      0.296
+  os_log             4         1    0.001   1.000       2     0.001      0.500
+  os_rawx            2        14    0.714   0.714      18     0.857      0.667
+  os_rawx            3        12    0.107   0.500      27     0.214      0.444
+  os_rawx            4         2    0.001   0.500       2     0.001      0.500
+  os_r100            2        14    0.714   0.714      18     0.929      0.722
+  os_r100            3         9    0.054   0.333      24     0.143      0.333
+  os_r100            4         2    0.001   0.500       4     0.001      0.250
+  os_r020            2        14    0.714   0.714      17     0.857      0.706
+  os_r020            3        11    0.054   0.273      26     0.179      0.385
+  os_r020            4         2    0.001   0.500       4     0.001      0.250
+  os_r004            2        14    0.714   0.714      16     0.786      0.688
+  os_r004            3         9    0.036   0.222      22     0.143      0.364
+  os_r004            4         2    0.000   0.000       4     0.001      0.250
+  os_r001            2        14    0.714   0.714      18     0.857      0.667
+  os_r001            3        14    0.089   0.357      23     0.179      0.435
+  os_r001            4         2    0.001   0.500       5     0.001      0.200
+
+  CLOCK 3 — VALUE: recovered fraction per era (e, and (stale-e)/(stale-floor))
+  arm                          era1             era2             era3             era4             era5
+  os_log              0.496 /+0.484    0.619 /+0.497    0.614 /+0.684    0.685 /+1.045    0.772 /+1.322
+  os_rawx             0.584 /+0.367    0.586 /+0.554    0.609 /+0.694    0.643 /+1.191    0.785 /+1.240
+  os_r100             0.528 /+0.441    0.617 /+0.500    0.615 /+0.682    0.669 /+1.100    0.802 /+1.131
+  os_r020             0.528 /+0.441    0.621 /+0.494    0.609 /+0.696    0.696 /+1.006    0.814 /+1.055
+  os_r004             0.516 /+0.457    0.582 /+0.562    0.682 /+0.532    0.766 /+0.761    0.882 /+0.628
+  os_r001             0.516 /+0.456    0.624 /+0.488    0.609 /+0.694    0.669 /+1.100    0.792 /+1.197
+  stale                     0.865            0.906            0.922            0.984            0.982
+  floor                     0.102            0.328            0.471            0.698            0.823
+
+  DELTA TO OS_LOG, per era, in recovered fraction
+  Read against the MEASURED depth-6 stream floor (census finding 7): 0.087 in the
+  earning family and 0.083/0.148/0.344 in the given family for eras 3/4/5. Ranks
+  and signs in the deep eras are the currency; fractions are not.
+  arm                   era1      era2      era3      era4      era5
+  os_rawx             -0.116     0.057     0.010     0.145    -0.082
+  os_r100             -0.042     0.003    -0.002     0.055    -0.191
+  os_r020             -0.042    -0.003     0.012    -0.039    -0.268
+  os_r004             -0.026     0.065    -0.152    -0.285    -0.694
+  os_r001             -0.027    -0.009     0.010     0.055    -0.126
+
+==============================================================================
+(4) pi PER-LEVEL MASS, ARGMAX SHARE, AND MACRO EXPANSIONS, per arm per era
+==============================================================================
+
+  L2 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  os_log               0.065     0.182     0.162     0.143     0.145
+  os_rawx              0.058     0.181     0.208     0.206     0.176
+  os_r100              0.063     0.206     0.191     0.180     0.161
+  os_r020              0.066     0.189     0.179     0.170     0.170
+  os_r004              0.066     0.214     0.220     0.210     0.160
+  os_r001              0.066     0.193     0.192     0.210     0.199
+
+  L3 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  os_log               0.000     0.061     0.213     0.243     0.217
+  os_rawx              0.000     0.060     0.172     0.216     0.187
+  os_r100              0.000     0.044     0.176     0.206     0.185
+  os_r020              0.000     0.052     0.167     0.169     0.182
+  os_r004              0.000     0.048     0.138     0.147     0.185
+  os_r001              0.000     0.046     0.173     0.201     0.211
+
+  L4 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  os_log               0.000     0.000     0.038     0.131     0.168
+  os_rawx              0.000     0.000     0.039     0.100     0.179
+  os_r100              0.000     0.000     0.036     0.130     0.190
+  os_r020              0.000     0.000     0.039     0.102     0.158
+  os_r004              0.000     0.000     0.037     0.089     0.110
+  os_r001              0.000     0.000     0.038     0.088     0.140
+
+  L2 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  os_log               0.000     0.029     0.049     0.036     0.052
+  os_rawx              0.000     0.057     0.154     0.143     0.096
+  os_r100              0.000     0.078     0.120     0.081     0.039
+  os_r020              0.000     0.039     0.081     0.122     0.078
+  os_r004              0.000     0.117     0.177     0.177     0.062
+  os_r001              0.000     0.060     0.086     0.130     0.099
+
+  L3 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  os_log               0.000     0.010     0.250     0.331     0.271
+  os_rawx              0.000     0.005     0.169     0.268     0.193
+  os_r100              0.000     0.010     0.167     0.253     0.188
+  os_r020              0.000     0.005     0.161     0.159     0.182
+  os_r004              0.000     0.000     0.112     0.120     0.169
+  os_r001              0.000     0.008     0.159     0.258     0.242
+
+  L4 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  os_log               0.000     0.000     0.010     0.094     0.185
+  os_rawx              0.000     0.000     0.010     0.094     0.258
+  os_r100              0.000     0.000     0.008     0.148     0.281
+  os_r020              0.000     0.000     0.005     0.096     0.214
+  os_r004              0.000     0.000     0.005     0.104     0.143
+  os_r001              0.000     0.000     0.016     0.070     0.167
+
+  MACRO EXPANSIONS the beam ran (blocks.mat_dp, per-cycle mean by era)
+  arm                     era1        era2        era3        era4        era5
+  os_log                  8843        3972        5455           0           0
+  os_rawx                 8846        2596        1044           0           0
+  os_r100                 8843        2581        5455           0           0
+  os_r020                 8843        2582        5455           0           0
+  os_r004                 8843        1889        2161           0           0
+  os_r001                 8843        3280        5455           0           0
+
+==============================================================================
+(5) THE LEDGER — what each arm read, and what it cost
+==============================================================================
+  ear's convention: the learner's own experience is free, a counterfactual read is
+  priced, and instruments logged in every arm are free. Only the POLICY's input
+  stream is charged, and the charge lands in `counts['ground']` -> `t_cum`, which
+  nothing in the cycle loop reads.
+  arm                     read  n reads  priced  spend(g)    t_cum end   t_cum+read  read % of
+  os_log                 yield        0       0         0     32554752     32554752     0.000%
+  os_rawx                 None        0       0         0     32554214     32554214     0.000%
+  os_r100                 None        0       0         0     32553946     32553946     0.000%
+  os_r020                 None        0       0         0     32554752     32554752     0.000%
+  os_r004                 None        0       0         0     32553677     32553677     0.000%
+  os_r001                 None        0       0         0     32554752     32554752     0.000%
+
+==============================================================================
+(6) THE MEASURED FLOORS, RE-DERIVED IN-TAG on the schedule arm
+==============================================================================
+  reference arm: os_log (131 cycles, 7 windows dropped at era boundaries / commits); span=1 W=4
+  gauge         n_win      sd(N)    mean(N)  v_tol=sd/2    mean(D)  D/floor   governed by
+  ledger           92    0.05487   -0.00309     0.02744   +0.00903     0.33       0.02945
+  yield            92    0.91322   -0.01630     0.45661   +0.91033     1.99L3 0.4613/L4 0.5167
+  endo             92    0.02792   +0.00608     0.01396   -0.00167    -0.12       0.01092
+  endo_cell        92    0.03353   +0.00760     0.01677   -0.00492    -0.29          None
+  endo_excess      92    0.02406   -0.00152     0.01203   +0.00325     0.27          None
+
+  >>> THE ENDO DEAD ZONE, measured on os_s0/os_log: v_tol = 0.0139617
+      pass it to the main run as  --tol-endo 0.0139617
+
+==============================================================================
+(7) THE SHADOW PANEL — every gauge replayed through the same rule, in every arm
+==============================================================================
+  Counterfactual: what each gauge WOULD have licensed in each arm, per era, if it
+  had been the driven read. Exact only up to the arm's first action (after that the
+  arm's own trajectory is the one the gauge was measured on), so `first_action` is
+  printed beside it and a shadow decision must never be read as a measured one.
+
+    os_log  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@65 quiet@72]  e3[26c armed@94 quiet@104]  e4[8c armed@120 quiet@122]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@78 quiet@79]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@82 quiet@83]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@65 quiet@66]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    os_rawx  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@66 quiet@74]  e3[26c armed@93 quiet@105]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@78 quiet@84]  e3[26c armed@114 quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@63 quiet@66]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@78 quiet@87]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    os_r100  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@65 quiet@77]  e3[26c armed@93 quiet@107]  e4[8c armed@119 quiet@122]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@67 quiet@68]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@78 quiet@81]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@84 quiet@86]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    os_r020  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@77 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@63 quiet@65]  e3[26c armed@99 quiet@None]  e4[8c armed@119 quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@None quiet@None]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@79 quiet@81]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@70 quiet@71]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    os_r004  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@65 quiet@70]  e3[26c armed@99 quiet@111]  e4[8c armed@119 quiet@122]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@78 quiet@82]  e3[26c armed@112 quiet@113]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@None quiet@None]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    os_r001  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@77 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@66 quiet@78]  e3[26c armed@93 quiet@99]  e4[8c armed@119 quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@None quiet@None]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@None quiet@None]  e3[26c armed@103 quiet@104]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@86 quiet@None]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+==============================================================================
+(8) THE ADDRESS-BOOK BATTERY, plant guard, certificates, cost
+==============================================================================
+  END-OF-RUN BATTERY: e per condition (last era), and the next-level currency split
+  arm                  cond  e(last era)  g/solve  solved  T3@sup  T3built  T4@sup  T4built
+  os_log             a_full        0.773    463.0      87       4        1       1        1
+  os_log            b_table        0.773    463.0      87       4        1       1        1
+  os_log             b_span        0.990    463.0       4       0        0       0        0
+  os_log            c_prims        0.669    463.0     127       8        3       2        1
+  os_rawx            a_full        0.781    463.0      84       4        2       1        1
+  os_rawx           b_table        0.781    463.0      84       4        2       1        1
+  os_rawx            b_span        0.984    463.0       6       0        0       0        0
+  os_rawx           c_prims        0.698    463.0     116       9        3       1        1
+  os_r100            a_full        0.789    463.0      81       4        3       1        1
+  os_r100           b_table        0.789    463.0      81       4        3       1        1
+  os_r100            b_span        0.990    463.0       4       0        0       0        0
+  os_r100           c_prims        0.698    463.0     116       7        5       4        4
+  os_r020            a_full        0.794    463.0      79       2        1       1        1
+  os_r020           b_table        0.794    463.0      79       2        1       1        1
+  os_r020            b_span        0.984    463.0       6       0        0       0        0
+  os_r020           c_prims        0.688    463.0     120       9        5       3        1
+  os_r004            a_full        0.857    463.0      55       3        1       1        1
+  os_r004           b_table        0.857    463.0      55       3        1       1        1
+  os_r004            b_span        0.984    463.0       6       0        0       0        0
+  os_r004           c_prims        0.792    463.0      80       6        3       2        2
+  os_r001            a_full        0.771    463.0      88       5        2       1        1
+  os_r001           b_table        0.771    463.0      88       5        2       1        1
+  os_r001            b_span        0.990    463.0       4       0        0       0        0
+  os_r001           c_prims        0.693    463.0     118      12        7       2        2
+
+  G-Y / OBSERVATION PANEL: distinct next-level tuples at support, end of each era
+  os_log           L3/L4 at support 3:     51/16    59/41    61/56    61/59    69/60
+  os_rawx          L3/L4 at support 3:     50/14    57/35    59/65    59/66    65/67
+  os_r100          L3/L4 at support 3:     51/17    58/42    58/64    60/67    64/70
+  os_r020          L3/L4 at support 3:     51/15    57/40    62/61    62/65    69/67
+  os_r004          L3/L4 at support 3:     52/16    59/36    62/50    62/54    69/58
+  os_r001          L3/L4 at support 3:     52/16    58/43    62/60    62/66    68/69
+
+  PLANT GUARD, CERTIFICATES, COST
+  os_log           parse 0.649-0.693  infill 0.705-0.762  cert L2 c18 L3 c76  recerts  12    13.9 s/cycle
+  os_rawx          parse 0.653-0.693  infill 0.713-0.762  cert L2 c18 L3 c74  recerts  12    14.6 s/cycle
+  os_r100          parse 0.655-0.693  infill 0.717-0.762  cert L2 c18 L3 c80  recerts  12    14.5 s/cycle
+  os_r020          parse 0.652-0.693  infill 0.707-0.762  cert L2 c18 L3 c75  recerts  12    14.9 s/cycle
+  os_r004          parse 0.664-0.693  infill 0.703-0.762  cert L2 c18 L3 c75  recerts  12    14.4 s/cycle
+  os_r001          parse 0.662-0.693  infill 0.707-0.762  cert L2 c18 L3 c75  recerts  12    14.3 s/cycle
+
+  TOTAL 12020s = 3.34 GPU-h
+
+==============================================================================
+(A) THE CROSSING: the L4 commit, and the r**2 ceiling it was drawn from
+==============================================================================
+  The DGP's levels, as DISTINCT flat tuples (the recall denominator): L2 14, L3 56, L4 816.
+  `T4 subset T3xT3`: an L4 entry exists only if BOTH of its 4-tuple halves are rows
+  of the operative L3 table, so a frozen L3 of recall r caps L4 near r**2.
+
+  arm               L4 commit c_in_era  entries   recall    prec  buildable  of which true  share taken
+  os_log                  104       16        1   0.0012   1.000          8              1        0.125
+  os_rawx                 104       16        2   0.0012   0.500          8              1        0.250
+  os_r100                 104       16        2   0.0012   0.500          7              1        0.286
+  os_r020                 104       16        2   0.0012   0.500          8              1        0.250
+  os_r004                 104       16        2   0.0000   0.000          8              1        0.250
+  os_r001                 104       16        2   0.0012   0.500         14              1        0.143
+
+  `buildable` = distinct L4 tuples at support 3 in the arm's own observation
+  panel whose two halves are both rows of its FROZEN L3, at the cycle named. It is
+  the honest ceiling for that arm's L4 commit; `share taken` is what it took of it.
+  A cancelled commit (the empty-table guard) appears in the action trace, not here.
+
+==============================================================================
+(C) THE GAUGE AT THE FRONTIER: what paced the L4 commit, and the L5 alternative
+==============================================================================
+  Driven read: `yield` = -(distinct level-`read_level` tuples at support).
+  `read_level` = min(active+1, gy_level=4), so at era 3 (active=4) it is the level
+  BEING EARNED, not one above it. Floors that governed the run: L3 0.46127129019246205, L4 0.5166900731510206.
+
+  read_level actually used, per era (logged per cycle)
+  arm                  era1     era2     era3     era4     era5
+  os_log                  3        4        4        4        4
+  os_rawx                 3        4        4        4        4
+  os_r100                 3        4        4        4        4
+  os_r020                 3        4        4        4        4
+  os_r004                 3        4        4        4        4
+  os_r001                 3        4        4        4        4
+
+  THE OBSERVATION PANEL, end of run: distinct tuples at support, per level.
+  Levels 5 and 6 are logged UNCHARGED in every arm and were never driven — Phase 0
+  measured them degenerate (max 1-2 over an entire run, first non-zero at c89-124),
+  which is the reason the L4 commit is paced on the L4 stream's own quieting.
+  arm                   L3      L4      L5      L6  L5 first>0
+  os_log                69      60       1       0         105
+  os_rawx               65      67       2       1          74
+  os_r100               64      70       4       0         105
+  os_r020               69      67       4       0          75
+  os_r004               69      58       1       0         116
+  os_r001               68      69       2       0         106
+
+  THE L4 AT-SUPPORT SERIES over era 3 (the series the commit was read on):
+  per-era first -> last, and the mean per-cycle increment against the L4 floor.
+  arm               era     n   first    last   d/cycle  x floor
+  os_log              1    58       0      16     0.281    0.543
+  os_log              2    30      18      41     0.793    1.535
+  os_log              3    26      41      56     0.600    1.161
+  os_log              4     8      56      59     0.429    0.829
+  os_log              5     9      59      60     0.125    0.242
+  os_rawx             1    58       0      14     0.246    0.475
+  os_rawx             2    30      16      35     0.655    1.268
+  os_rawx             3    26      35      65     1.200    2.322
+  os_rawx             4     8      65      66     0.143    0.276
+  os_rawx             5     9      66      67     0.125    0.242
+  os_r100             1    58       0      17     0.298    0.577
+  os_r100             2    30      18      42     0.828    1.602
+  os_r100             3    26      43      64     0.840    1.626
+  os_r100             4     8      64      67     0.429    0.829
+  os_r100             5     9      67      70     0.375    0.726
+  os_r020             1    58       0      15     0.263    0.509
+  os_r020             2    30      15      40     0.862    1.668
+  os_r020             3    26      42      61     0.760    1.471
+  os_r020             4     8      61      65     0.571    1.106
+  os_r020             5     9      65      67     0.250    0.484
+  os_r004             1    58       0      16     0.281    0.543
+  os_r004             2    30      19      36     0.586    1.135
+  os_r004             3    26      36      50     0.560    1.084
+  os_r004             4     8      50      54     0.571    1.106
+  os_r004             5     9      56      58     0.250    0.484
+  os_r001             1    58       0      16     0.281    0.543
+  os_r001             2    30      18      43     0.862    1.668
+  os_r001             3    26      44      60     0.640    1.239
+  os_r001             4     8      60      66     0.857    1.659
+  os_r001             5     9      66      69     0.375    0.726
+
+==============================================================================
+(E) EXTENSION: the r**2-wall bypass
+==============================================================================
+  Phase 0 measured the wall binds and that extension is the lever: buildable L4 over
+  the FROZEN L3 vs over the LIVE L3 was 15 vs 25 (cd_s0/outer_yield), 13 vs 26
+  (ma_s0/learned_yield), 8 vs 13 (anchor) — i.e. extension roughly doubles the
+  ceiling an L4 commit is drawn from.
+
+  arm               lvl  events   cands  admitted  final n  final recall  final prec
+  os_log              2       0       0         0       14        0.7143       0.714
+  os_log              3       0       0         0       10        0.0714       0.400
+  os_log              4       0       0         0        1        0.0012       1.000
+  os_rawx             2       0       0         0       14        0.7143       0.714
+  os_rawx             3       0       0         0       12        0.1071       0.500
+  os_rawx             4       0       0         0        2        0.0012       0.500
+  os_r100             2       0       0         0       14        0.7143       0.714
+  os_r100             3       0       0         0        9        0.0536       0.333
+  os_r100             4       0       0         0        2        0.0012       0.500
+  os_r020             2       0       0         0       14        0.7143       0.714
+  os_r020             3       0       0         0       11        0.0536       0.273
+  os_r020             4       0       0         0        2        0.0012       0.500
+  os_r004             2       0       0         0       14        0.7143       0.714
+  os_r004             3       0       0         0        9        0.0357       0.222
+  os_r004             4       0       0         0        2        0.0000       0.000
+  os_r001             2       0       0         0       14        0.7143       0.714
+  os_r001             3       0       0         0       14        0.0893       0.357
+  os_r001             4       0       0         0        2        0.0012       0.500
+
+  and what the treatment vs the extension arm actually held at L4:
+  arm               frozen L3  buildable L4  L4 entries  L4 true
+  os_log                   10             8           1        1
+
+==============================================================================
+(G) THE GATE: what each arm refused, and what the refusal was made of
+==============================================================================
+  gate_frac = 0.5 of SOLVED TIPS kept on the pi channel; the
+  mining cap (8) is untouched, so mining volume is matched and
+  only its content moves. The value buffer is UNGATED in every arm (delta is the
+  residual of the value head's own forecast).
+
+  PER-ARM TOTALS over the whole run
+  arm                   mode  sol tips    kept  kept %   pi rows   mined  pbuf end fallbacks
+  os_log                None     33776       0    0.0%    270208    1036     60000         0
+  os_rawx               None     31627       0    0.0%    253016    1003     60000         0
+  os_r100               None     33821       0    0.0%    270568    1029     60000         0
+  os_r020               None     31983       0    0.0%    255864    1016     60000         0
+  os_r004               None     30884       0    0.0%    247072     988     60000         0
+  os_r001               None     32304       0    0.0%    258432    1023     60000         0
+  `kept` is 0 in an arm with no gate: the gate log records the FEATURES in every arm
+  and the SELECTION only where a mode is set — an ungated arm keeps everything the
+  grade admitted, i.e. `sol tips`.
+
+  pi ROWS ENTERING THE REPLAY BUFFER, per era (the diet's volume)
+  arm                   era1      era2      era3      era4      era5
+  os_log              142704     47384     48400     15480     16240
+  os_rawx             139032     42544     41648     15280     14512
+  os_r100             142584     48744     46664     16240     16336
+  os_r020             142560     45640     39408     14864     13392
+  os_r004             142592     46856     36568     11104      9952
+  os_r001             142592     46368     40856     13848     14768
+
+  WHAT THE GATE KEPT vs WHAT IT DROPPED (mean over the run, gated arms only)
+  arm               delta kept  delta dropped      gap  margin kept  margin all
+
+  THE FEATURES THEMSELVES, in every arm (per-instance, whole run)
+  delta_ans = grade - sigmoid(v) at the answer the beam gave; margin = the
+  deliberation state (top1 - top2 over the instance's tip value scores).
+  `margin` is the GATED form (chosen minus the mean of the unchosen); `m2` is the
+  textbook top1-top2 margin, logged but not gated on — `m2=0 frac` is how often it
+  is exactly zero (a duplicate runner-up), which is why the gate reads the mean form.
+  arm              solve rate  d|solved  d|failed    sd d   margin  sd marg  m2=0 frac  corr(d,-m)
+  os_log               0.2333    0.4644   -0.5247  0.5153   0.0586   0.0766     0.4169      0.1299
+  os_rawx              0.2124    0.4728   -0.5169  0.5055   0.0597   0.0778     0.4151      0.1681
+  os_r100              0.2302    0.4625   -0.5231  0.5135   0.0585   0.0771     0.4148      0.1435
+  os_r020              0.2161    0.4692   -0.5125  0.5041   0.0591   0.0773     0.4101      0.1524
+  os_r004              0.2130    0.4827   -0.5065  0.5058   0.0592   0.0773     0.4077      0.1535
+  os_r001              0.2215    0.4754   -0.5129  0.5095   0.0587   0.0774     0.4111      0.1514
+
+  THE COUNTERFACTUAL GATES, per arm, on that arm's OWN logged features
+  Of the solved instances each cycle, take the top half by each rule and report the
+  mean pairwise JACCARD overlap between the rules' selections. This is what a gate
+  arm's mining reorder could at most have moved, computed in every arm including
+  the ungated baseline — a gate whose selection is the same set as another's cannot
+  produce a different table.
+  arm                  dhi/dlo     dhi/dlb     dhi/rnd     dlo/dlb     dlo/rnd     dlb/rnd
+  os_log                 0.000       0.338       0.362       0.330       0.296       0.322
+  os_rawx                0.000       0.355       0.360       0.320       0.305       0.320
+  os_r100                0.000       0.345       0.336       0.327       0.326       0.310
+  os_r020                0.000       0.341       0.334       0.333       0.322       0.325
+  os_r004                0.000       0.367       0.327       0.301       0.339       0.324
+  os_r001                0.000       0.353       0.352       0.319       0.322       0.332
+
+==============================================================================
+(G2) TABLE CONTENT: reconstruction, truth, and overlap between arms
+==============================================================================
+  Each arm's committed table replayed entry-for-entry from its own logged key
+  stream (Phase 0's gate B-1 machinery). `recon == n` is the reconstruction check.
+
+  L2  (the DGP has 14 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  os_log                  49    14     14    10      0.714   0.7143
+  os_rawx                 49    14     14    10      0.714   0.7143
+  os_r100                 49    14     14    10      0.714   0.7143
+  os_r020                 49    14     14    10      0.714   0.7143
+  os_r004                 49    14     14    10      0.714   0.7143
+  os_r001                 49    14     14    10      0.714   0.7143
+
+    pairwise JACCARD of the committed L2 entry sets
+                             os_log        os_rawx        os_r100        os_r020        os_r004        os_r001
+    os_log                    1.000          1.000          1.000          1.000          1.000          1.000
+    os_rawx                   1.000          1.000          1.000          1.000          1.000          1.000
+    os_r100                   1.000          1.000          1.000          1.000          1.000          1.000
+    os_r020                   1.000          1.000          1.000          1.000          1.000          1.000
+    os_r004                   1.000          1.000          1.000          1.000          1.000          1.000
+    os_r001                   1.000          1.000          1.000          1.000          1.000          1.000
+
+  L3  (the DGP has 56 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  os_log                  72    10     10     4      0.400   0.0714
+  os_rawx                 72    12     12     6      0.500   0.1071
+  os_r100                 72     9      9     3      0.333   0.0536
+  os_r020                 72    11     11     3      0.273   0.0536
+  os_r004                 72     9      9     2      0.222   0.0357
+  os_r001                 72    14     14     5      0.357   0.0893
+
+    pairwise JACCARD of the committed L3 entry sets
+                             os_log        os_rawx        os_r100        os_r020        os_r004        os_r001
+    os_log                    1.000          0.375          0.727          0.750          0.583          0.500
+    os_rawx                   0.375          1.000          0.400          0.438          0.500          0.625
+    os_r100                   0.727          0.400          1.000          0.667          0.636          0.438
+    os_r020                   0.750          0.438          0.667          1.000          0.667          0.667
+    os_r004                   0.583          0.500          0.636          0.667          1.000          0.533
+    os_r001                   0.500          0.625          0.438          0.667          0.533          1.000
+
+  L4  (the DGP has 816 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  os_log                 104     1      1     1      1.000   0.0012
+  os_rawx                104     2      2     1      0.500   0.0012
+  os_r100                104     2      2     1      0.500   0.0012
+  os_r020                104     2      2     1      0.500   0.0012
+  os_r004                104     2      2     0      0.000   0.0000
+  os_r001                104     2      2     1      0.500   0.0012
+
+    pairwise JACCARD of the committed L4 entry sets
+                             os_log        os_rawx        os_r100        os_r020        os_r004        os_r001
+    os_log                    1.000          0.500          0.500          0.500          0.000          0.500
+    os_rawx                   0.500          1.000          0.333          1.000          0.000          1.000
+    os_r100                   0.500          0.333          1.000          0.333          0.000          0.333
+    os_r020                   0.500          1.000          0.333          1.000          0.000          1.000
+    os_r004                   0.000          0.000          0.000          0.000          1.000          0.000
+    os_r001                   0.500          1.000          0.333          1.000          0.000          1.000
+
+  A gate that changes what the learner learns from can only change the table
+  through the entries it mined; identical sets here mean the gate moved trust
+  (section 4) and pacing (section H) but not the address book.
+
+==============================================================================
+(H) THE PACING COUNTERFACTUAL: when each arm's own gauge would have fired
+==============================================================================
+  A1's thermostat, unchanged (span 1, W 4, burn 4, alpha 0.5), floors L3 0.461271 / L4 0.516690, replayed from era-3 start on each arm's own
+  logged panel. The BASELINE's realised L4 commit cycle is what every yoked arm
+  actually did, so the column to read is `would fire` against it.
+
+  arm               era3 c0    n  would fire (c)  c_in_era3  vs baseline   all firings (c_in_era3)
+  os_log                 89   43             104         16            0              [16, 26, 34]
+  os_rawx                89   43             105         17            1                  [17, 30]
+  os_r100                89   43             107         19            3                  [19, 29]
+  os_r020                89   43             118         30           14                      [30]
+  os_r004                89   43             111         23            7                  [23, 34]
+  os_r001                89   43              99         11           -5              [11, 24, 38]
+
+  the baseline's REALISED L4 commit: c104. Every gate arm replayed it by clock,
+  which is what makes section (3)'s era table a content comparison.
+
+==============================================================================
+(P1) THE METER — a live, fallible executor, and delta_perf's own components
+==============================================================================
+  `tau_fire` is the FIRING threshold; `span_tau` (0.95) still governs the parity
+  RECORD, so `opened_below_tau` counts slot-openings the donor's gate would have
+  refused. `misfire` is a row whose emitted span did not exactly match what
+  `apply_any` would have written on the same observation.
+
+  arm             tau_f     fired  misfire    rate  slots  open@f  open@.95      g0   theta  calib@c  degen med g act
+  os_log           0.50   2220079   126981  0.0572     28      28        16  0.0000  0.0010       57   True    0.0000
+  os_rawx          0.50   2511819   170546  0.0679     28      28        18  0.0000  0.0010       57   True    0.0000
+  os_r100          0.50   2407167   135550  0.0563     28      28        21  0.0000  0.0010       57   True    0.0000
+  os_r020          0.50   2313796   172682  0.0746     28      28        15  0.0000  0.0010       57   True    0.0000
+  os_r004          0.50   2332222   167063  0.0716     28      28        14  0.0000  0.0010       57   True    0.0000
+  os_r001          0.50   2289399   167042  0.0730     28      28        15  0.0000  0.0010       57   True    0.0000
+
+  PER MACRO SLOT (the syllable), summed over the run:
+  arm os_rawx (the metered arm with the most executions).
+     slot     rows    fired   mean e   exact   mean g   mean d      b-e    b(s)  parity
+      2:0    15128    15128   0.0497   0.934   0.1677  -0.0162  -0.0007  0.0446   0.960
+      2:1    42956    42956   0.0320   0.954   0.1376  -0.0070   0.0069  0.0137   0.846
+      2:2    32698    32698   0.0515   0.928   0.2765  -0.0079   0.0044  0.0331   0.980
+      2:3    29541    29541   0.0434   0.940   0.2052  -0.0077   0.0077  0.0167   0.925
+      2:4    27413    27413   0.0460   0.936   0.1008  -0.0153   0.0028  0.0388   0.977
+      2:5    53895    53895   0.0199   0.968   0.1116  -0.0038   0.0053  0.0186   0.959
+      2:6    13047    13047   0.0426   0.935   0.1632  -0.0096   0.0052  0.0470   0.970
+      2:7    24847    24847   0.0330   0.952   0.2202  -0.0082   0.0015  0.0203   0.997
+      2:8    19898    19898   0.0397   0.942   0.1764  -0.0109   0.0009  0.0300   0.985
+      2:9    27576    27576   0.0389   0.947   0.1913  -0.0152  -0.0049  0.0051   0.977
+     2:10    32227    32227   0.0458   0.932   0.2130  -0.0093   0.0050  0.0127   0.971
+     2:11    15099    15099   0.0583   0.919   0.1827  -0.0210  -0.0039  0.0322   0.957
+     2:12   415382   415382   0.0481   0.935   0.1820  -0.0118   0.0051  0.0514   0.946
+     2:13   177956   177956   0.0192   0.974   0.1118  -0.0038   0.0052  0.0255   0.956
+     2:14    49254    49254   0.0272   0.961   0.1318  -0.0009   0.0105  0.0109   0.970
+     2:15    36547    36547   0.0374   0.950   0.1897  -0.0031   0.0105  0.0187   0.953
+      3:0    63534    63534   0.0330   0.945   0.1107   0.0042   0.0223  0.0137   0.807
+      3:1    56189    56189   0.1132   0.778   0.2269   0.0060   0.0346  0.0420   0.907
+      3:2    89384    89384   0.0625   0.874   0.1159  -0.0178   0.0041  0.0341   0.984
+      3:3   119966   119966   0.0448   0.926   0.1645  -0.0017   0.0158  0.0298   0.917
+      3:4    81143    81143   0.0692   0.870   0.2093   0.0076   0.0219  0.0049   0.898
+      3:5    75784    75784   0.0595   0.883   0.2215   0.0127   0.0216  0.0091   0.946
+      3:6   375186   375186   0.0594   0.887   0.1716  -0.0100   0.0060  0.0461   0.809
+      3:7   160439   160439   0.0549   0.884   0.1328   0.0026   0.0237  0.0158   0.941
+      4:0    66359    66359   0.0000   1.000   0.0109   0.0000   0.0000  0.0000   1.000
+      4:1    98727    98727   0.0000   1.000   0.0074   0.0000   0.0000  0.0000   1.000
+      4:2    86924    86924   0.0001   0.999   0.0727  -0.0001  -0.0000  0.0000   1.000
+      4:3   224720   224720   0.0000   1.000   0.0055   0.0000   0.0000  0.0000   1.000
+
+  ACT vs PLAYBACK (Gadagkar's control, on this substrate).
+  ACT     rows the head REALIZED: e measured against what `apply_any` would have
+          written, agency g > 0 (the slot command explains part of the span).
+  PLAYBK  the SAME head, the SAME contexts, but the DP realized the move: the parity
+          read computes the head's would-be error on every held-out row of every
+          slot each cycle. No efference copy for the head's output, so g == 0 by
+          construction and the CENTERED gate closes. `b - e` is the ungated signal;
+          if it fires in both columns and delta only in ACT, the gate is carrying
+          the discrimination (S13(a)'s dissection).
+
+  arm               e ACT  e PLAYBK   b-e ACT  b-e PLAY  delta ACT delta PLAY   g ACT
+  os_log           0.0340    0.0565    0.0082   -0.0024    -0.0052    -0.0012  0.1167
+  os_rawx          0.0397    0.0531    0.0080   -0.0018    -0.0048    -0.0009  0.1376
+  os_r100          0.0366    0.0560    0.0075    0.0012    -0.0057     0.0006  0.1363
+  os_r020          0.0466    0.0592    0.0123   -0.0031    -0.0045    -0.0015  0.1368
+  os_r004          0.0406    0.0585    0.0065   -0.0012    -0.0077    -0.0006  0.1536
+  os_r001          0.0441    0.0621    0.0145   -0.0040    -0.0029    -0.0020  0.1256
+
+  (PLAYBK's delta column is the ungated `b - e_shadow` multiplied by the gate's
+   value AT g = 0, which is what the mechanism would assign those rows. Playback
+   rows are never scored IN-RUN: the head did not execute them, so no credit is
+   assigned at all — the exclusion is structural, not a threshold.)
+
+  THE AGENCY VARIABLE'S OWN DISTRIBUTION, from the raw per-row sample (ACT rows):
+  arm              n rows   g == 0    g > 0  mean g|g>0   e|g==0    e|g>0
+  os_log            14620   0.6185   0.3815      0.4964   0.0009   0.1740
+  os_rawx           14609   0.5951   0.4049      0.4811   0.0010   0.1596
+  os_r100           14620   0.5947   0.4053      0.4901   0.0012   0.1768
+  os_r020           14620   0.6021   0.3979      0.4921   0.0006   0.1919
+  os_r004           14620   0.5793   0.4207      0.4900   0.0009   0.1702
+  os_r001           14620   0.6037   0.3963      0.4894   0.0007   0.1871
+
+==============================================================================
+(P2) THE 2x2: EXECUTED-AS-INTENDED x SOLVED
+==============================================================================
+  Per surviving trajectory. `int` = every head execution on it exactly matched its
+  intention; `bad` = at least one did not; `none` = the head executed nothing on it
+  (no performance to grade — kept apart, never folded into `int`).
+  `bad+solved` is THE LUCKY SUCCESS: an ill-executed trajectory the grade rewards.
+  `int+failed` is THE HONEST FAILURE: well executed, task not solved — the cell the
+  grade-only rule discards entirely.
+
+  --- os_log ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         355        1235         119         695       17364       39624       5579     1092  0.2232 -0.4209
+     2        4448       16958         923        5793         552        2046     454061    57955  0.1102 -0.5998
+     3        5182       16233         655        3637         213         704     771308    35359  0.0718 -0.6389
+     4        1712        5310         209         806          14         141     395799    15304  0.0502 -0.6500
+     5        1861        5861         169        1256           0          69     593332    17271  0.0537 -0.5936
+   ALL       13558       45597        2075       12187       18143       42584
+       P(solve | as intended) = 0.2292   P(solve | NOT as intended) = 0.1455   lucky-success share of solves = 0.1327
+  --- os_rawx ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         286        1486          69         540       17024       39987       5257     1119  0.2008 -0.4261
+     2        3685       17137         981        6131         652        2134     476743    79031  0.1193 -0.5995
+     3        4164       16287         851        4437         191         694     987360    51656  0.0741 -0.6188
+     4        1669        5001         241        1103           0         178     427626    20920  0.0634 -0.6011
+     5        1572        6111         242        1204           0          87     614833    17820  0.0506 -0.6549
+   ALL       11376       46022        2384       13415       17867       43080
+       P(solve | as intended) = 0.1982   P(solve | NOT as intended) = 0.1509   lucky-success share of solves = 0.1733
+  --- os_r100 ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         345        1094         123         790       17355       39685       5819     1143  0.3291 -0.3429
+     2        4678       16784         894        5949         521        1894     514138    52964  0.1130 -0.6326
+     3        4792       15846         844        4252         197         693     861243    44836  0.0871 -0.6979
+     4        1870        5065         148        1002          12          95     429897    19677  0.0709 -0.6470
+     5        1817        6056         225        1088           0          30     596070    16930  0.0618 -0.7296
+   ALL       13502       44845        2234       13081       18085       42397
+       P(solve | as intended) = 0.2314   P(solve | NOT as intended) = 0.1459   lucky-success share of solves = 0.1420
+  --- os_r020 ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         342        1196         135         672       17343       39704       5848     1292  0.2287 -0.4030
+     2        4216       16458         918        6802         571        1755     526599    87969  0.1300 -0.6070
+     3        4107       16377         663        4497         156         824     847882    44476  0.0707 -0.6619
+     4        1588        5054         270        1188           0          92     403418    20595  0.0628 -0.6859
+     5        1495        6050         179        1399           0          93     530049    18350  0.0656 -0.6428
+   ALL       11748       45135        2165       14558       18070       42468
+       P(solve | as intended) = 0.2065   P(solve | NOT as intended) = 0.1295   lucky-success share of solves = 0.1556
+  --- os_r004 ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         308        1199         157         714       17359       39655       5514     1166  0.2543 -0.3495
+     2        4307       16174        1037        6902         513        1787     516150    56776  0.1208 -0.5704
+     3        3786       16731         641        4692         144         630     886547    64873  0.0774 -0.5931
+     4        1158        5496         229        1143           1         165     390944    20690  0.0613 -0.6639
+     5        1029        6173         215        1684           0         115     533067    23558  0.0718 -0.6212
+   ALL       10588       45773        2279       15135       18017       42352
+       P(solve | as intended) = 0.1879   P(solve | NOT as intended) = 0.1309   lucky-success share of solves = 0.1771
+  --- os_r001 ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         308        1199         157         714       17359       39655       5514     1166  0.2545 -0.3493
+     2        4109       16136        1073        6902         614        1886     490530    73592  0.1214 -0.5990
+     3        3928       16115         917        4523         262         879     805547    44934  0.0822 -0.6357
+     4        1572        5099         151        1240           8         122     388065    25174  0.0786 -0.6732
+     5        1515        5523         331        1804           0          43     599743    22176  0.0734 -0.5706
+   ALL       11432       44072        2629       15183       18243       42585
+       P(solve | as intended) = 0.2060   P(solve | NOT as intended) = 0.1476   lucky-success share of solves = 0.1870
+
+  WHAT GOT MINED, BY CELL (at the beam's own answer — the mined unit), per arm:
+  arm               mined  as intended  NOT as int  no exec   mean d   ans-2x2 (int_s/int_f/bad_s/bad_f/non_s/non_f)
+  os_log             1036          468         105      463  -0.0223   767/2910/155/868/1034/2650
+  os_rawx            1003          448         103      452  -0.0183   625/2920/149/988/1007/2695
+  os_r100            1029          485          88      456  -0.0103   755/2849/146/938/1029/2667
+  os_r020            1016          466          87      463  -0.0072   653/2856/125/1053/1034/2663
+  os_r004             988          424         103      461  -0.0114   609/2852/145/1088/1032/2658
+  os_r001            1023          439         114      470  -0.0160   650/2775/164/1085/1043/2667
+
+==============================================================================
+(P3) THE PLASTICITY GAIN: delta_perf vs UNIFORM vs RAW-e
+==============================================================================
+  `os_log` is the UNGATED control (uniform weights, the donor's own span loss).
+  A `delta` arm weights each stored row by exp(-delta/tau_w); a `raw`/`rawx` arm by
+  the error alone (no benchmark, no agency gate) — S13(b)'s hygiene comparison.
+  All are budget-matched by running-mean normalisation, which `mean w` checks:
+  `raw` (w_raw = e literally) does NOT achieve it on this substrate and `rawx`
+  (w_raw = exp(+e/tau_w), the delta arm's own transform) does.
+
+  arm               mode   mean w  cred frac     fired  misfire    rate  end parity L2      L3      L4
+  os_log            None        -          -   2220079   126981  0.0572          0.941   0.938   1.000
+  os_rawx           rawx   1.0008     0.5341   2511819   170546  0.0679          0.958   0.901   1.000
+  os_r100          delta   0.9997     0.5387   2407167   135550  0.0563          0.956   0.955   1.000
+  os_r020          delta   0.9992     0.5281   2313796   172682  0.0746          0.956   0.881   1.000
+  os_r004          delta   0.9998     0.5451   2332222   167063  0.0716          0.935   0.904   1.000
+  os_r001          delta   0.9987     0.5390   2289399   167042  0.0730          0.941   0.906   0.998
+
+  ERA TABLE (raw e, last 3 cycles of each era; recovered fraction in brackets)
+  arm                         era1              era2              era3              era4              era5
+  os_log            0.4957 [ 0.48]    0.6189 [ 0.50]    0.6137 [ 0.68]    0.6849 [ 1.05]    0.7717 [ 1.32]
+  os_rawx           0.5842 [ 0.37]    0.5859 [ 0.55]    0.6094 [ 0.69]    0.6432 [ 1.19]    0.7847 [ 1.24]
+  os_r100           0.5278 [ 0.44]    0.6172 [ 0.50]    0.6146 [ 0.68]    0.6693 [ 1.10]    0.8021 [ 1.13]
+  os_r020           0.5278 [ 0.44]    0.6207 [ 0.49]    0.6085 [ 0.70]    0.6962 [ 1.01]    0.8142 [ 1.05]
+  os_r004           0.5156 [ 0.46]    0.5816 [ 0.56]    0.6823 [ 0.53]    0.7665 [ 0.76]    0.8819 [ 0.63]
+  os_r001           0.5165 [ 0.46]    0.6241 [ 0.49]    0.6094 [ 0.69]    0.6693 [ 1.10]    0.7917 [ 1.20]
+  stale                     0.8646            0.9062            0.9219            0.9844            0.9818
+  floor                     0.1016            0.3281            0.4714            0.6979            0.8229
+
+  THE PLANT GUARD (the span loss reaches the shared trunk, so it has to be read;
+   `handle/`'s measured interference was -0.094 / -0.044 on parse at 3-9x floor):
+  arm             parse min  parse max  parse last  infill min  infill max
+  os_log             0.6494     0.6925      0.6650      0.7051      0.7617
+  os_rawx            0.6534     0.6925      0.6645      0.7129      0.7617
+  os_r100            0.6548     0.6925      0.6556      0.7168      0.7617
+  os_r020            0.6519     0.6925      0.6776      0.7070      0.7617
+  os_r004            0.6635     0.6925      0.6883      0.7031      0.7617
+  os_r001            0.6617     0.6925      0.6691      0.7070      0.7617
+
+==============================================================================
+(P5) THE BENCHMARK TIMESCALE — delta recomputed offline across alpha
+==============================================================================
+  arm os_rawx; per-cycle per-slot means, 131 cycles.
+     alpha  eff. window  frac b>e  mean b-e   sd(b-e)  slots
+     0.005        200.0    0.8587   0.08785   0.06891     28
+     0.020         50.0    0.8513   0.05945   0.05467     28
+     0.050         20.0    0.7994   0.03285   0.04723     28
+     0.100         10.0    0.7385   0.01764   0.04333     28
+     0.300          3.3    0.6376   0.00605   0.04032     28
+     1.000          1.0    0.4923   0.00185   0.04858     28
+  (`eff. window` is 1/alpha in units of the update — here one CYCLE per slot, so
+   the in-run benchmark, which updates per macro CALL, is faster than any row here;
+   the in-run alpha is printed in each arm's config as `perf_alpha`.)
+
+==============================================================================
+(P6) THE TWO UNPRICED COLUMNS, PRICED — never folded into `t`
+==============================================================================
+  arm             n_misfire  t_misfire       t_cum   % of t     blk_ref   blk_head     blk_dp
+  os_log             126981       6349    32554752   0.0195     8517818    2220079    2637042
+  os_rawx            170546       8527    32554214   0.0262     9927268    2511819    1554804
+  os_r100            135550       6777    32553946   0.0208     9035196    2407167    2470156
+  os_r020            172682       8634    32554752   0.0265     8599570    2313796    2470268
+  os_r004            167063       8353    32553677   0.0257     8626486    2332222    1700572
+  os_r001            167042       8352    32554752   0.0257     8470588    2289399    2553308
+  Pricing misfires would move the ledger by 0.016-0.032% — below every floor in the
+  tag, so the choice is behaviourally inert and is recorded as a convention, not a
+  result. `blk_ref` exceeds `blk_head` by the span factor: the meter consumes the
+  DP's block evidence that the head's own execution does not.
+
+==============================================================================
+(R1) THE RUNG, MEASURED — how much repetition the benchmark actually got
+==============================================================================
+  rho = `perf_bench_frac`: the fraction of each execution's rows b(s) integrates.
+  Every row still receives a delta and still carries credit; only the BENCHMARK's
+  own evidence is thinned, so total volume, difficulty, the diet and the EWMA's
+  update INSTANTS (hence its staleness) are identical across rungs and only its
+  sampling jitter moves. alpha = 0.05 -> an EWMA read averages ~39
+  updates, so eff_n = (benched rows/update) x that, and SE(b) = sd(e)/sqrt(eff_n).
+  `|b-e|` is the arm's own mean ungated signal (sum_bme / rows) — the thing SE(b)
+  has to be small against for the benchmark to be carrying anything.
+
+  arm           rho rho real       rows  updates  rows/upd bench/upd    eff n   sd(e)    SE(b)    |b-e| signal/SE
+  os_r100     1.000   1.0000    2407167    23315     103.2    103.25   4026.6  0.1631  0.00257  0.01746      6.79
+  os_r020     0.200   0.2007    2313796    24915      92.9     18.64    726.9  0.1792  0.00665  0.02334      3.51
+  os_r004     0.040   0.0422    2332222    23489      99.3      4.19    163.4  0.1659  0.01298  0.02082      1.60
+  os_r001     0.008   0.0148    2289399    23882      95.9      1.42     55.3  0.1720  0.02313  0.03048      1.32
+
+  PER ERA — `bench/upd` (the realised repetition behind one b(s) update). The
+  landmarks this ladder is sized against, from the banked record: `in_s0`
+  (abundance) ran 159.4 rows/call at era 5 and `ma_s0` (scarcity) ran 75.4, i.e.
+  scarcity's OWN thinning was rho_eff = 0.47 — calls/slot/cycle was unchanged
+  (14.85 vs 14.26), so what scarcity removed was performances per update, not
+  recurrences of the context.
+  arm               era1        era2        era3        era4        era5
+  os_r100          18.83       71.16       97.32      134.81      159.29
+  os_r020           3.79       14.21       17.01       23.99       28.20
+  os_r004           1.00        3.23        4.05        5.00        5.85
+  os_r001           1.00        1.28        1.33        1.55        1.83
+  (unthinned)        18.8        71.2        97.3       134.8       159.3
+
+==============================================================================
+(R2) BENCHMARKED vs RAW, AT EACH RUNG — the ordering, with the floors
+==============================================================================
+  `os_rawx` (raw-e gain, no benchmark, no agency gate) and `os_log` (uniform
+  plasticity) are RUNG-INVARIANT: neither reads b(s), so they are the same arm at
+  every rung. Recovered fraction, last 3 cycles of each era.
+
+  arm           rho      era1      era2      era3      era4      era5
+  os_log          -    0.4835    0.4970    0.6840    1.0455    1.3224
+  os_rawx         -    0.3675    0.5541    0.6936    1.1909    1.2404
+  os_r100     1.000    0.4414    0.5000    0.6821    1.1000    1.1311
+  os_r020     0.200    0.4414    0.4940    0.6956    1.0061    1.0546
+  os_r004     0.040    0.4573    0.5616    0.5318    0.7606    0.6284
+  os_r001     0.008    0.4562    0.4880    0.6936    1.1000    1.1967
+
+  DELTA vs RAW (`os_rawx`), in recovered fraction; [x] = multiple of the
+  pooled earning-family floor 0.087. A positive cell is the benchmark
+  paying at that rung.
+  arm           rho              era1              era2              era3              era4              era5
+  os_r100     1.000    +0.0739 [0.85]    -0.0541 [0.62]    -0.0116 [0.13]    -0.0909 [1.04]    -0.1093 [1.26]
+  os_r020     0.200    +0.0739 [0.85]    -0.0601 [0.69]    +0.0019 [0.02]    -0.1848 [2.12]    -0.1858 [2.14]
+  os_r004     0.040    +0.0899 [1.03]    +0.0075 [0.09]    -0.1618 [1.86]    -0.4303 [4.95]    -0.6120 [7.03]
+  os_r001     0.008    +0.0887 [1.02]    -0.0661 [0.76]    -0.0000 [0.00]    -0.0909 [1.04]    -0.0437 [0.50]
+  given-family floors for reference: {3: 0.083, 4: 0.148, 5: 0.344}
+
+  DELTA vs UNIFORM (`os_log`), in recovered fraction; [x] = multiple of the
+  pooled earning-family floor 0.087. A positive cell is the benchmark
+  paying at that rung.
+  arm           rho              era1              era2              era3              era4              era5
+  os_r100     1.000    -0.0421 [0.48]    +0.0030 [0.03]    -0.0019 [0.02]    +0.0545 [0.63]    -0.1913 [2.20]
+  os_r020     0.200    -0.0421 [0.48]    -0.0030 [0.03]    +0.0116 [0.13]    -0.0394 [0.45]    -0.2678 [3.08]
+  os_r004     0.040    -0.0262 [0.30]    +0.0646 [0.74]    -0.1522 [1.75]    -0.2848 [3.27]    -0.6940 [7.98]
+  os_r001     0.008    -0.0273 [0.31]    -0.0090 [0.10]    +0.0096 [0.11]    +0.0545 [0.63]    -0.1257 [1.44]
+  given-family floors for reference: {3: 0.083, 4: 0.148, 5: 0.344}
+
+  THE 2x2 PER RUNG (executed-as-intended x solved, summed over the run). The
+  occupancy the sweep has to keep non-degenerate for any of the above to mean
+  anything: `bad/solved` is the lucky-success cell, `int/failed` the honest one.
+  arm           rho  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed P(sol|int) P(sol|bad)   ratio ill/solved
+  os_log          -       13558       45597        2075       12187       18143       42584     0.2292     0.1455    1.58     0.1327
+  os_rawx         -       11376       46022        2384       13415       17867       43080     0.1982     0.1509    1.31     0.1733
+  os_r100     1.000       13502       44845        2234       13081       18085       42397     0.2314     0.1459    1.59     0.1420
+  os_r020     0.200       11748       45135        2165       14558       18070       42468     0.2065     0.1295    1.60     0.1556
+  os_r004     0.040       10588       45773        2279       15135       18017       42352     0.1879     0.1309    1.44     0.1771
+  os_r001     0.008       11432       44072        2629       15183       18243       42585     0.2060     0.1476    1.40     0.1870
+
+  TRUST FORMATION per rung: pi's L4 proposal mass and argmax share at the last
+  probe of the run (the arc's trust readout), beside end parity.
+  arm           rho   L4 mass  L4 argmax   L3 mass  end par L2      L3      L4   mean w
+  os_log          -    0.1678     0.1849    0.2170      0.9406  0.9382  1.0000        -
+  os_rawx         -    0.1795     0.2578    0.1874      0.9580  0.9011  1.0000   1.0008
+  os_r100     1.000    0.1903     0.2812    0.1847      0.9561  0.9547  1.0000   0.9997
+  os_r020     0.200    0.1580     0.2135    0.1818      0.9557  0.8811  1.0000   0.9992
+  os_r004     0.040    0.1100     0.1432    0.1850      0.9346  0.9045  1.0000   0.9998
+  os_r001     0.008    0.1401     0.1667    0.2113      0.9413  0.9057  0.9984   0.9987
+
+[figures] ~/Code/research/experiments/rhm/practice/ostinato/figures/os_s0/fig1_competence.png fig2_panel.png fig3_clocks.png
+
+[fig] wrote gate_diet.png, gate_eras.png, gate_pi_mass.png to ~/Code/research/experiments/rhm/practice/ostinato/figures/os_s0
+
+[fig] wrote perf_meter.png to ~/Code/research/experiments/rhm/practice/ostinato/figures/os_s0

@@ -1,0 +1,185 @@
+==============================================================================
+corridor_fit — E2 pass 2 (executor side)   tag=co_gf arm=perf_given seed=0
+==============================================================================
+
+§0 GATES AND SCALE
+  gradcheck worst relative error      9.92e-10   (hard assert < 2e-5)
+  checkpoints                         15  c1..c15  (stride 1)
+  slots ever live                     28   head slot table 28
+  probe states                        32  (16 train / 16 held out), split by state, fixed across every checkpoint
+  SpanHead parameters (predicted span) 133,736   dim=96 v=8 max_span=8 hidden_mult=4
+  FM input dimension                  316 = 3x96 state reads + 28 slot one-hot
+    H=0    FM params    2,536     1.90% of the head
+    H=8    FM params    3,240     2.42% of the head
+    H=16   FM params    5,840     4.37% of the head   <-- PRIMARY
+
+§1 THE LABEL (the parity gate), read off the run's own record
+  gate events                         40  (opens 31, closes 9)
+  commits                             []
+  slot                mint  first_open  first_open@tau  level  span
+    2:0                1           8            None      2     2
+    2:1                1           7               7      2     2
+    2:2                1           8              11      2     2
+    2:3                1           9              10      2     2
+    2:4                1           7            None      2     2
+    2:5                1           8              11      2     2
+    2:6                1          14            None      2     2
+    2:7                1           1               1      2     2
+    2:8                1          13              15      2     2
+    2:9                1           7               8      2     2
+    2:10               1          14            None      2     2
+    2:11               1        None            None      2     2
+    2:12               1           7              11      2     2
+    2:13               1           8              11      2     2
+    2:14               1           7               7      2     2
+    2:15               1           9              11      2     2
+    3:0                1        None            None      3     4
+    3:1                1          11              11      3     4
+    3:2                1           1              13      3     4
+    3:3                1          13            None      3     4
+    3:4                1          10            None      3     4
+    3:5                1        None            None      3     4
+    3:6                1           8              13      3     4
+    3:7                1           7              10      3     4
+    4:0                1        None            None      4     8
+    4:1                1          13            None      4     8
+    4:2                1        None            None      4     8
+    4:3                1          11              14      4     8
+
+  cycle  n_live  n_open  n_open@tau   by level (live/open)
+      1      28       2           1   L2:16/1  L3:8/1  L4:4/0
+      2      28       1           0   L2:16/1  L3:8/0  L4:4/0
+      3      28       0           0   L2:16/0  L3:8/0  L4:4/0
+      4      28       0           0   L2:16/0  L3:8/0  L4:4/0
+      5      28       0           0   L2:16/0  L3:8/0  L4:4/0
+      6      28       1           0   L2:16/0  L3:8/1  L4:4/0
+      7      28       7           2   L2:16/6  L3:8/1  L4:4/0
+      8      28      11           3   L2:16/10  L3:8/1  L4:4/0
+      9      28      13           2   L2:16/11  L3:8/2  L4:4/0
+     10      28      13           3   L2:16/10  L3:8/3  L4:4/0
+     11      28      14          10   L2:16/10  L3:8/3  L4:4/1
+     12      28      14          10   L2:16/10  L3:8/3  L4:4/1
+     13      28      19          13   L2:16/13  L3:8/5  L4:4/1
+     14      28      21          14   L2:16/14  L3:8/5  L4:4/2
+     15      28      22          14   L2:16/15  L3:8/5  L4:4/2
+
+§2 THE FIT, PER CHECKPOINT (primary capacity), AND THE INSTRUMENT GUARDS
+   H   FM%     mse_tr   mse_te    |r|/|t|   ens_cos   n_ckpt  (means over checkpoints)
+    0   1.90%    0.0014   0.0056    0.0738    1.000     15
+    8   2.42%    0.0344   0.0387    0.1938    0.632     15   [ens_cos junk band < 0.65]
+   16   4.37%    0.0162   0.0217    0.1469    0.716     15
+
+§3 DECODE B — pooled over (slot, checkpoint), leave-one-SLOT-out folds
+   headline = median balanced accuracy over the lambda grid; chance 0.500
+   'adv' = self R minus the best I/O-only observer (LOGIT / IO / BEH)
+
+  --- capacity H=0 (1.90% of the head, ens_cos 1.000)   [the deterministic ridge rung] ---
+  label=open     clock=mint  floor=0   d=16  n=420   pos=138   slots=28  | R 0.746  FM 0.823  LOGIT 0.813  IO 0.792  BEH 0.737  SHUF 0.501  NORM 0.500 | adv -0.066  perm_p 0.000
+  label=open     clock=mint  floor=20   — skipped (a class has < 4 rows)
+  label=open     clock=mint  floor=50   — skipped (a class has < 4 rows)
+
+  label=open_tau clock=mint  floor=0   d=16  n=420   pos=72    slots=28  | R 0.632  FM 0.596  LOGIT 0.529  IO 0.807  BEH 0.500  SHUF 0.500  NORM 0.500 | adv -0.175  perm_p 0.000
+  label=open_tau clock=mint  floor=20   — skipped (a class has < 4 rows)
+  label=open_tau clock=mint  floor=50   — skipped (a class has < 4 rows)
+
+  label=open_tau clock=open  floor=0   d=16  n=167   pos=72    slots=23  | R 0.577  FM 0.701  LOGIT 0.684  IO 0.745  BEH 0.681  SHUF 0.408  NORM 0.442 | adv -0.168  perm_p 0.600
+  label=open_tau clock=open  floor=20   — skipped (a class has < 4 rows)
+  label=open_tau clock=open  floor=50   — skipped (a class has < 4 rows)
+
+  --- capacity H=16 (4.37% of the head, ens_cos 0.716) ---
+  label=open     clock=mint  floor=0   d=16  n=420   pos=138   slots=28  | R 0.704  FM 0.825  LOGIT 0.813  IO 0.792  BEH 0.737  SHUF 0.521  NORM 0.500 | adv -0.108  perm_p 0.000
+  label=open     clock=mint  floor=20   — skipped (a class has < 4 rows)
+  label=open     clock=mint  floor=50   — skipped (a class has < 4 rows)
+
+  label=open_tau clock=mint  floor=0   d=16  n=420   pos=72    slots=28  | R 0.505  FM 0.536  LOGIT 0.529  IO 0.807  BEH 0.500  SHUF 0.500  NORM 0.500 | adv -0.303  perm_p 0.250
+  label=open_tau clock=mint  floor=20   — skipped (a class has < 4 rows)
+  label=open_tau clock=mint  floor=50   — skipped (a class has < 4 rows)
+
+  label=open_tau clock=open  floor=0   d=16  n=167   pos=72    slots=23  | R 0.561  FM 0.642  LOGIT 0.684  IO 0.745  BEH 0.681  SHUF 0.436  NORM 0.522 | adv -0.185  perm_p 0.100
+  label=open_tau clock=open  floor=20   — skipped (a class has < 4 rows)
+  label=open_tau clock=open  floor=50   — skipped (a class has < 4 rows)
+
+§3b CAPACITY INVARIANCE of the headline cell (label=open, clock=mint, floor=20)
+
+§3c THE THREE-WAY / WITHIN-LEVEL READ (pass 1 design call 5ii's age disambiguator)
+  level L2 floor=0   n=240   pos=101   slots=16  | R 0.758  best-obs 0.850  adv -0.091  NORM 0.454
+  level L2 floor=20  — skipped (a class has < 4 rows)
+  level L3 floor=0   n=120   pos=30    slots=8   | R 0.467  best-obs 0.825  adv -0.358  NORM 0.500
+  level L3 floor=20  — skipped (a class has < 4 rows)
+  level L4 floor=0   n=60    pos=7     slots=4   | R 0.495  best-obs 0.650  adv -0.155  NORM 0.500
+  level L4 floor=20  — skipped (a class has < 4 rows)
+
+§4 DECODE A — per checkpoint, rows = slots (pass 1's exact shape)
+  9 checkpoints have both classes at >= 4
+    R      median 0.560   IQR [0.512, 0.642]
+    FM     median 0.738   IQR [0.589, 0.900]
+    LOGIT  median 0.726   IQR [0.693, 0.900]
+    IO     median 0.679   IQR [0.613, 0.883]
+    BEH    median 0.679   IQR [0.614, 0.806]
+    SHUF   median 0.452   IQR [0.451, 0.476]
+    NORM   median 0.487   IQR [0.477, 0.518]
+    advantage (R - best observer): median -0.214  IQR [-0.250, -0.167]
+
+§5 OCCUPANCY — one codebook over residual directions, applied unchanged everywhere
+  codebook K=8 over 420 directions; TV drift median 0.1250, p90 0.4071
+  named event            cycle   TV drift   percentile among all checkpoint steps
+    gate_3:2_close_c2             2   0.0000     0.0%
+    gate_2:7_close_c3             3   0.1071    42.9%
+    gate_3:2_open_c6              6   0.3571    78.6%
+    gate_2:1_open_c7              7   0.2857    71.4%
+    gate_2:4_open_c7              7   0.2857    71.4%
+    gate_2:7_open_c7              7   0.2857    71.4%
+    gate_2:9_open_c7              7   0.2857    71.4%
+    gate_2:12_open_c7             7   0.2857    71.4%
+    gate_2:14_open_c7             7   0.2857    71.4%
+    gate_3:2_close_c7             7   0.2857    71.4%
+    gate_3:7_open_c7              7   0.2857    71.4%
+    gate_2:0_open_c8              8   0.1071    28.6%
+    gate_2:2_open_c8              8   0.1071    28.6%
+    gate_2:5_open_c8              8   0.1071    28.6%
+    gate_2:13_open_c8             8   0.1071    28.6%
+    gate_3:6_open_c8              8   0.1071    28.6%
+    gate_3:7_close_c8             8   0.1071    28.6%
+    gate_2:3_open_c9              9   0.2143    64.3%
+    gate_2:4_close_c9             9   0.2143    64.3%
+    gate_2:15_open_c9             9   0.2143    64.3%
+    gate_3:7_open_c9              9   0.2143    64.3%
+    gate_2:0_close_c10           10   0.1786    57.1%
+    gate_3:4_open_c10            10   0.1786    57.1%
+    gate_3:1_open_c11            11   0.1071    35.7%
+    gate_3:4_close_c11           11   0.1071    35.7%
+    gate_4:3_open_c11            11   0.1071    35.7%
+    gate_2:0_open_c13            13   0.0357     7.1%
+    gate_2:4_open_c13            13   0.0357     7.1%
+    gate_2:8_open_c13            13   0.0357     7.1%
+    gate_3:2_open_c13            13   0.0357     7.1%
+    gate_3:3_open_c13            13   0.0357     7.1%
+    gate_4:1_open_c13            13   0.0357     7.1%
+    gate_4:3_close_c13           13   0.0357     7.1%
+    gate_2:6_open_c14            14   0.1429    50.0%
+    gate_2:8_close_c14           14   0.1429    50.0%
+    gate_2:10_open_c14           14   0.1429    50.0%
+    gate_4:3_open_c14            14   0.1429    50.0%
+    gate_2:8_open_c15            15   0.0714    14.3%
+
+§6 GUARDS
+  hierarchy-eta2 on the residual norm, POOLED over (slot, checkpoint) rows, each
+  conditioner beside a matched-random grouping of the same sizes. The GRAMMAR
+  conditioner is `dp_content` — the level-1 spelling the DP would write for that span,
+  i.e. the deep-hierarchy content this substrate has. `cycle` and `era` are the junk
+  conditioners: a residual that keys only to the calendar is junk (paper 2 section 8).
+    dp_content     n_groups    6   eta2 0.233   random-matched 0.011   excess +0.222
+    slot_id        n_groups   28   eta2 0.506   random-matched 0.064   excess +0.442
+    level          n_groups    3   eta2 0.022   random-matched 0.004   excess +0.018
+    cycle [junk]   n_groups   15   eta2 0.086   random-matched 0.034   excess +0.052
+    era [junk]     n_groups    3   eta2 0.027   random-matched 0.006   excess +0.021
+  the TRUNK control target (no slot conditioning anywhere in its computation):
+    floor=0   label=open  n=420    R 0.705  best-obs 0.792  adv -0.087
+    floor=20  — skipped (a class has < 4 rows)
+    floor=50  — skipped (a class has < 4 rows)
+
+§7 THE OUTER LOOP'S OWN GAUGE — command-energy share vs at_support
+  cmass_R ~ at_support@L3   spearman raw +0.676 (p=0.016)   residualised on cycle+era -0.366   (n=12)
+  cmass_R ~ at_support@L4   spearman raw +0.710 (p=0.010)   residualised on cycle+era +0.024   (n=12)
+
+[done in 11s]  -> rhm/practice/continuo/figures/co_gf_smoke

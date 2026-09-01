@@ -1,20 +1,22 @@
 # Self-Prediction and Self-Knowledge
 
 *Domain: representation learning, self-modeling, mechanistic interpretability*
-*Last updated: 2026-07-01*
+*Last updated: 2026-08-31*
 
 
-## Co-training a system with predictions of its own future computation produces computational self-knowledge
-*Confidence: strong*
+## Self-prediction co-training produces absorbed legibility, not consultable self-knowledge; the genuine first-person advantage is narrower — it attaches to implementation facts, lives in a sub-saturation FM's residual, and must beat a capacity-matched observer twin
+*Confidence: strong — the deflation and the narrow positive are each multiply instrumented*
 
-- Closed-loop models (receiving FM predictions of post_block3 from post_block0) encode the FM's residual vector dramatically better than open-loop models at every layer (R²=0.42 vs 0.26 at post_block3, R²=0.21 vs 0.02 at post_block0), replicated in controlled retrain with identical lr/seed/init — [controlled retrain](../../experiments/a2a_forward/CONTROLLED_RETRAIN_README.md)
-- The self-knowledge is distributed across all layers via backpropagation, including layers that never directly see the injection — early-layer R² gap (0.21 vs 0.02) is the cleanest evidence — same source
-- Calibration transfer experiment showed zero epistemic self-knowledge: competence probes (activations → own per-token loss) trained ID and evaluated OOD are identical across all conditions, and output entropy beats every activation probe — [OOD robustness](../../experiments/a2a_forward/OOD_ROBUSTNESS_README.md)
-- Cross-domain replication: MNIST ViT shows 3× stronger self-knowledge probes (Δ R²=+0.52 at post_block0) with low-rank, digit-discriminative residual structure — [MNIST experiment](../../experiments/a2a_forward/MNIST_README.md)
+- The original decode gaps stand as measurements but not as "self-knowledge": closed-loop models encode the FM's residual vector better than open-loop at every layer (R²=0.42 vs 0.26 at post_block3; 0.21 vs 0.02 at post_block0, controlled retrain; MNIST Δ R²=+0.52), because the injection puts the signal into the activations and the host absorbs the injected map — *absorbed legibility*, not a separable self-forecast the system consults — [controlled retrain](../../experiments/a2a_forward/CONTROLLED_RETRAIN_README.md), [MNIST](../../experiments/a2a_forward/MNIST_README.md), [self_model_needs_a_loop](../../ideas/self_model_needs_a_loop.md)
+- The early warning was already on file: zero epistemic self-knowledge in calibration transfer (competence probes identical across all conditions, and output entropy beats every activation probe) — [OOD robustness](../../experiments/a2a_forward/OOD_ROBUSTNESS_README.md)
+- What survives, with its controls: a first-person advantage of +0.09–0.11 (grammar) / +0.21–0.37 (language) on **implementation facts** — none on behavior — specific to the residual (a capacity-swept observer reaches 0.19–0.26 of headroom on `r` vs 0.84–0.87 on the theory span); a saturated instrument counterfeits the whole result, disarmed by the `ens_cos` + hierarchy-η² guards — paper 2[^private], [component_control](../../experiments/a2a_forward/confabulation/component_control/README.md)
+- The re-derivation boundary: whatever public evidence taught the system, an observer reads equally well — temporal privilege carries 0.0000 of oracle revision ("privilege attaches to how you process, never to what public evidence taught you"), and an outsider reads the model's own entropy better than the model's self-report (0.961 vs 0.674) — [temporal](../../experiments/rhm/confabulation/temporal/README.md), paper 2[^private]
+- The self-update corollary: an arity-2 self-model of one's *own weight update* adds nothing over the free scalars on the wire (r ≤ Δ at every capacity, a fourth time; per-datum, the forecastable part of the update is the learning rule itself) — an organ is not needed to forecast a function the system is — [audiation](../../experiments/rhm/practice/audiation/README.md)
+- In-practice instance of the same trap: an FM-residual "instruction/data" decode advantage on the practice learner's own head was a token-age (novelty) effect that dies under a 20-cycle age floor — *except* under per-datum credit, where it survives the age control (p = 0.011 vs the anchor's 0.125): the one regime where a self-side read outlived its deflation controls — [two_deltas finding 3](../../experiments/rhm/practice/two_deltas/README.md)
 
 See also: [Operators, not footprints](operators_not_footprints.md#self-modeling-instance-a-networks-activations-are-the-footprint-of-its-computation-modeling-pactivations-captures-the-manifold-distribution-bound-while-a-forward-self-model-captures-the-transformation-g-distribution-invariant) — the higher-altitude principle this instantiates: the self-model works because it compresses the weight-defined transformation, not the data-defined activation manifold.
 
-### Self-knowledge is encoded directionally (what kind of computation was surprising) rather than as scalar magnitude (how surprising)
+### The absorbed signal is encoded and used directionally (what kind of computation was surprising), not as scalar magnitude (how surprising)
 *Confidence: strong*
 
 - Vector probe Δ R² (+0.18) is 6× scalar residual-norm probe Δ R² (+0.03) in language — [controlled retrain](../../experiments/a2a_forward/CONTROLLED_RETRAIN_README.md)
@@ -42,3 +44,5 @@ See also: [Cerebellum dual role](cerebellum_and_cognitive_architecture.md#cerebe
 - MNIST residual is low-rank and digit-discriminative (top-5 PCs all discriminate digit identity, η²=0.14–0.23); language residual is full-rank and diffuse (top-1 PC explains only 2.4%) — the structure mirrors task structure — same sources
 - The capacity bottleneck must be in the forward model's *capacity*, not its *structural ability to see the input*: a per-position MLP residual captures "attention exists" (structural blindness), while a transformer FM residual captures "computation too complex for this capacity" (genuine novelty) — [open-loop analysis](../../experiments/a2a_forward/OPEN_LOOP_ANALYSIS_README.md)
 - Scaling sweep confirms: at 10% capacity the FM captures 99.9% (cosine 0.999) and computational-novelty behavioral effects shrink (delimiter d drops from +0.78 to +0.30), but the residual remains inherently high-rank in language (eff rank >235/256 at all capacity points) — [scaling sweep](../../experiments/a2a_forward/SCALING_SWEEP_README.md)
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

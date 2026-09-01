@@ -1,0 +1,1086 @@
+====================================================================================================
+woodshed / F1 part 1 — the trust-formation-rate instrument, read off existing logs
+====================================================================================================
+pi per-level proposal mass = sum of `pi.mean_mass` over that level's (level,node)
+slots (level-major layout, prop_net.slot_layout). It is a normalised distribution
+over the live action set, averaged over the probe batch. Slots not in the live set
+are masked to -inf and read exactly 0.0, so a pre-arrival level's 0.000 is a
+construction, not a measurement. tau = probe cycle - arrival cycle.
+
+====================================================================================================
+(0) INVENTORY — what was read, and each arm's arrival cycles
+====================================================================================================
+  node/tag               arm                fam    cyc  prb maxL  arrival (level: cycle/kind)
+  conductor/cd_s0        anchor             A1     116   22    3  L2:c18/commit L3:c69/commit
+  conductor/cd_s0        outer_endo         A1     146   28    3  L2:c16/commit
+  conductor/cd_s0        outer_ledger       A1     104   21    3  L2:c10/commit
+  conductor/cd_s0        outer_yield        A1     139   26    3  L2:c49/commit L3:c92/commit
+  conductor/cd_s0        yoked_endo         A1     146   28    3  L2:c16/commit
+  conductor/cd_s0        yoked_yield        A1     139   26    3  L2:c49/commit L3:c92/commit
+  maestro/ma_s0          anchor             A2     116   22    3  L2:c18/commit L3:c69/commit
+  maestro/ma_s0          learned_task       A2     125   24    3  L2:c14/commit
+  maestro/ma_s0          learned_yield      A2     130   26    3  L2:c39/commit L3:c85/commit
+  maestro/ma_s0          outer_yield        A2     139   26    3  L2:c49/commit L3:c92/commit
+  maestro/ma_s0          yoked_learned      A2     130   26    3  L2:c39/commit L3:c85/commit
+  maestro/ma_s1          learned_yield_j    A2     106   23    3  L2:c26/commit L3:c54/commit
+  maestro/ma_s1          outer_yield_j      A2     137   27    3  L2:c26/commit L3:c103/commit
+  crescendo/cr3_s0       anchor_long        A3     201   34    4  L2:c18/commit L3:c75/commit L4:c180/provisional
+  crescendo/cr3_s0       ceiling_m3         A3     162   29    4  L2:c49/commit L3:c92/commit
+  crescendo/cr3_s0       outer_yield_m3     A3     150   27    4  L2:c49/commit L3:c92/commit
+  crescendo/cr3_s0       outer_yield_m4     A3     162   29    4  L2:c49/commit L3:c92/commit L4:c129/commit
+  crescendo/cr3_s0       outer_yield_m4x    A3     166   29    4  L2:c49/commit L3:c79/commit L4:c119/commit
+  crescendo/cr3_s1       ceiling_m3_j       A3     151   28    4  L2:c26/commit L3:c103/commit
+  crescendo/cr3_s1       outer_yield_m4_j   A3     151   28    4  L2:c26/commit L3:c103/commit L4:c121/commit
+  audiation/au_s1        anchor             E1b    116   22    3  L2:c18/commit L3:c69/commit
+  audiation/au_s1        perdatum           E1b    116   22    3  L2:c19/commit L3:c62/commit
+  census/cs_s0           census_extend      F0     116   22    3  L2:c18/commit L3:c70/commit
+  census/cs_s0           census_gate        F0     116   22    3  L2:c35/commit L3:c70/commit
+  census/cs_s0           given_native       F0     116   22    3  L2:c1/gift@c1 L3:c1/gift@c1
+  census/cs_s0           given_route        F0     116   22    3  L2:c1/gift@c1 L3:c1/gift@c1
+  census/cs_s0           spiral_route       F0     116   22    3  L2:c18/commit L3:c69/commit
+  census/cs_s0           yoked_delay        F0     116   22    3  L2:c35/commit L3:c70/commit
+  assay/as_s0            anchor             F0     116   22    3  L2:c18/commit L3:c69/commit
+  assay/as_s0            complete           F0     116   22    3  L2:c18/commit L3:c72/commit
+  assay/as_s0            exact              F0     116   22    3  L2:c18/commit L3:c70/commit
+  assay/as_s0            given_c1           F0     116   22    3  L2:c1/gift@c1 L3:c1/gift@c1
+  assay/as_s0            junk_dose          F0     116   22    3  L2:c18/commit L3:c67/commit
+  assay/as_s0            strip              F0     116   22    3  L2:c18/commit L3:c67/commit
+  assay/as_s1            exact_j            F0     116   22    3  L2:c19/commit L3:c56/commit
+  assay/as_s1            given_c1_j         F0     116   22    3  L2:c1/gift@c1 L3:c1/gift@c1
+  intonation/ma_s0       mout_gate          bonus  153   28    4  L2:c43/commit L3:c83/commit L4:c115/commit
+  intonation/ma_s0       mperf_gain         bonus  153   28    4  L2:c43/commit L3:c83/commit L4:c115/commit
+  intonation/ma_s0       mperf_gate         bonus  153   28    4  L2:c43/commit L3:c83/commit L4:c115/commit
+  intonation/ma_s0       mperf_log          bonus  153   28    4  L2:c43/commit L3:c83/commit L4:c115/commit
+  intonation/ma_s0       mperf_rawx         bonus  153   28    4  L2:c43/commit L3:c83/commit L4:c115/commit
+  intonation/in_s0       outcome_gate       bonus  131   25    4  L2:c49/commit L3:c72/commit L4:c104/commit
+  intonation/in_s0       perf_gain          bonus  131   25    4  L2:c49/commit L3:c72/commit L4:c104/commit
+  intonation/in_s0       perf_gate          bonus  131   25    4  L2:c49/commit L3:c72/commit L4:c104/commit
+  intonation/in_s0       perf_log           bonus  131   25    4  L2:c49/commit L3:c72/commit L4:c104/commit
+  intonation/in_s0       perf_raw           bonus  131   25    4  L2:c49/commit L3:c72/commit L4:c104/commit
+  caesura/ca_s0          dsil_and           bonus  114   23    4  L2:c49/commit L4:c81/commit
+  caesura/ca_s0          dsil_read          bonus  176   30    4  L2:c18/commit L3:c71/commit L4:c97/commit
+  caesura/ca_s0          dsil_sched         bonus  201   34    4  L2:c18/commit L3:c77/commit L4:c180/provisional
+  caesura/ca_s0          dsil_yield         bonus  131   25    4  L2:c49/commit L3:c72/commit L4:c104/commit
+  spiral/sp_s0           fid                bonus  116   22    3  L2:c1/gift@c1 L3:c1/gift@c1
+  spiral/sp_s0           given_native       bonus  116   22    3  L2:c1/gift@c1 L3:c1/gift@c1
+  spiral/sp_s0           spiral             bonus  116   22    3  L2:c18/commit L3:c52/commit
+  spiral/sp_s0           spiral_route       bonus  116   22    3  L2:c18/commit L3:c48/commit
+
+  Note the tag-name collision: `maestro/ma_s0` and `intonation/ma_s0` are different
+  runs on different volume paths. Both are listed above under their node.
+
+====================================================================================================
+(1) POST-ARRIVAL GROWTH — one row per (arm, level) with an arrival
+====================================================================================================
+  m0/mend  : mass at the first post-arrival probe / at the last probe
+  u0/uend  : the UNIFORM reference — this level's open slots / all open slots, i.e.
+             the mass a flat pi would put here. m0 is not zero at arrival because
+             newly unmasked slots enter the softmax with untrained logits.
+  lift     : mend / uend. 1.0 = pi is indifferent to the level; >1 = it favours it.
+  d16/d32  : mass gained per 10 cycles over tau in [0,16] and [0,32] — the
+             censoring-safe rate, since every arm is measured on the same window.
+  d/10cyc  : OLS slope of mass on tau over the WHOLE post-arrival window (r2)
+  up       : fraction of consecutive post-arrival probe steps that increase
+  rho      : Spearman rank correlation of mass with tau
+  t1/2     : cycles after arrival to reach half the arm's own final mass
+  T, d0    : saturating fit m = M(1-exp(-tau/T)); d0 = M/T is the initial rate and
+             is identified even when T is not. `*` marks T outside the window or a
+             fit with r2 < 0.5 — read d0/d32 there, not T.
+  nav      : open (level,node) slots at the last probe
+  win      : tau at the last probe (the observation window; censoring matters)
+
+  --- conductor/cd_s0  [A1] the thermostat round; 6 arms
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  anchor              2   18 commit       0.0527  0.2502  0.286  0.88  0.0327  0.0406  0.0198  0.79  0.61   0.76   18.7    29.7  0.0095  0.95   16   98  0.188
+  anchor              3   69 commit       0.0222  0.2335  0.143  1.63  0.0390  0.0526  0.0509  0.95  0.82   0.94   23.3  135.5*  0.0060  0.95    8   47  0.234
+  outer_endo          2   16 commit       0.3382  0.5196  0.333  1.56 -0.1440 -0.0423  0.0292  0.84  0.76   0.95    0.0   128.1  0.0061  0.70   16  130  0.576
+  outer_ledger        2   10 commit       0.0879  0.3955  0.333  1.19  0.0235  0.0413  0.0418  0.96  0.89   0.97   28.3    59.3  0.0090  0.97   16   94  0.383
+  outer_yield         2   49 commit       0.0605  0.2802  0.286  0.98  0.0332  0.0565  0.0257  0.70  0.67   0.58   19.6    25.1  0.0125  0.93   16   90  0.284
+  outer_yield         3   92 commit       0.0188  0.2337  0.143  1.64  0.0288  0.0521  0.0543  0.95  0.83   0.95   25.1  400.0*  0.0053  0.94    8   47  0.214
+  yoked_endo          2   16 commit       0.3382  0.5196  0.333  1.56 -0.1440 -0.0423  0.0292  0.84  0.76   0.95    0.0   128.1  0.0061  0.70   16  130  0.576
+  yoked_yield         2   49 commit       0.0605  0.2802  0.286  0.98  0.0332  0.0565  0.0257  0.70  0.67   0.58   19.6    25.1  0.0125  0.93   16   90  0.284
+  yoked_yield         3   92 commit       0.0188  0.2337  0.143  1.64  0.0288  0.0521  0.0543  0.95  0.83   0.95   25.1  400.0*  0.0053  0.94    8   47  0.214
+
+  --- maestro/ma_s0  [A2] the learned-policy round; 5 arms
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  anchor              2   18 commit       0.0527  0.2502  0.286  0.88  0.0327  0.0406  0.0198  0.79  0.61   0.76   18.7    29.7  0.0095  0.95   16   98  0.188
+  anchor              3   69 commit       0.0222  0.2335  0.143  1.63  0.0390  0.0526  0.0509  0.95  0.82   0.94   23.3  135.5*  0.0060  0.95    8   47  0.234
+  learned_task        2   14 commit       0.0311  0.4340  0.333  1.30  0.0563  0.0521  0.0332  0.97  0.90   0.98   40.2    71.7  0.0074  0.98   16  111  0.393
+  learned_yield       2   39 commit       0.0147  0.3168  0.286  1.11  0.0794  0.0706  0.0287  0.80  0.60   0.84   18.0    27.5  0.0125  0.98   16   91  0.302
+  learned_yield       3   85 commit       0.0210  0.2191  0.143  1.53  0.0271  0.0388  0.0463  0.98  0.75   0.97   24.5  400.0*  0.0047  0.98    8   45  0.214
+  outer_yield         2   49 commit       0.0605  0.2802  0.286  0.98  0.0332  0.0565  0.0257  0.70  0.67   0.58   19.6    25.1  0.0125  0.93   16   90  0.284
+  outer_yield         3   92 commit       0.0188  0.2337  0.143  1.64  0.0288  0.0521  0.0543  0.95  0.83   0.95   25.1  400.0*  0.0053  0.94    8   47  0.214
+  yoked_learned       2   39 commit       0.0147  0.3168  0.286  1.11  0.0794  0.0706  0.0287  0.80  0.60   0.84   18.0    27.5  0.0125  0.98   16   91  0.302
+  yoked_learned       3   85 commit       0.0210  0.2191  0.143  1.53  0.0271  0.0388  0.0463  0.98  0.75   0.97   24.5  400.0*  0.0047  0.98    8   45  0.214
+
+  --- maestro/ma_s1  [A2] A2's stream-displaced twins
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  learned_yield_j     2   26 commit       0.0608  0.2464  0.286  0.86  0.0418  0.0442  0.0206  0.75  0.67   0.89   15.5    21.0  0.0124  0.95   16   80  0.180
+  learned_yield_j     3   54 commit       0.0129  0.1999  0.143  1.40  0.0216  0.0270  0.0417  0.96  0.77   0.99   30.0  400.0*  0.0039  0.94    8   52  0.240
+  outer_yield_j       2   26 commit       0.0608  0.2992  0.286  1.05  0.0402  0.0428  0.0217  0.73  0.59   0.67   19.2    34.0  0.0105  0.91   16  111  0.253
+  outer_yield_j       3  103 commit       0.0050  0.2314  0.143  1.62  0.0596  0.0758  0.0749  0.95  0.73   0.98   18.8  400.0*  0.0076  0.95    8   34  0.208
+
+  --- crescendo/cr3_s0  [A3] L4 opened; draw A
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  anchor_long         2   18 commit       0.0527  0.2026  0.267  0.76  0.0327  0.0428  0.0028  0.09  0.60   0.16   15.5    20.3  0.0114  0.64   16  183  0.117
+  anchor_long         3   75 commit       0.0302  0.3827  0.133  2.87  0.0228  0.0294  0.0346  0.89  0.67   0.95   47.3  132.5*  0.0055  0.91    8  126  0.508
+  anchor_long         4  180 provisional  0.0961  0.1183  0.067  1.77  0.0042       -  0.0353  0.54  0.67   0.61    0.0   15.5*       -  0.08    4   21  0.156
+  ceiling_m3          2   49 commit       0.0605  0.2576  0.286  0.90  0.0332  0.0565  0.0148  0.44  0.57   0.28   18.0    21.0  0.0139  0.87   16  113  0.221
+  ceiling_m3          3   92 commit       0.0188  0.3350  0.143  2.35  0.0288  0.0373  0.0554  0.95  0.73   0.94   39.5  400.0*  0.0055  0.94    8   70  0.432
+  outer_yield_m3      2   49 commit       0.0605  0.2653  0.286  0.93  0.0332  0.0565  0.0188  0.50  0.74   0.40   18.6    21.7  0.0136  0.85   16  101  0.219
+  outer_yield_m3      3   92 commit       0.0188  0.2550  0.143  1.78  0.0288  0.0373  0.0508  0.95  0.85   0.97   27.6  400.0*  0.0051  0.95    8   58  0.294
+  outer_yield_m4      2   49 commit       0.0605  0.2069  0.267  0.78  0.0332  0.0565  0.0091  0.17  0.67   0.10   14.5    17.2  0.0153  0.66   16  113  0.135
+  outer_yield_m4      3   92 commit       0.0188  0.2904  0.133  2.18  0.0288  0.0373  0.0499  0.94  0.73   0.92   35.5  400.0*  0.0052  0.94    8   70  0.388
+  outer_yield_m4      4  129 commit       0.0277  0.1518  0.067  2.28  0.0142  0.0323  0.0468  0.93  0.75   0.93   20.0  400.0*  0.0040  0.89    4   33  0.201
+  outer_yield_m4x     2   49 commit       0.0584  0.1843  0.267  0.69  0.0306  0.0524  0.0059  0.11  0.52   0.04   13.5    15.2  0.0147  0.65   16  117  0.060
+  outer_yield_m4x     3   79 commit       0.0055  0.2363  0.133  1.77  0.0385  0.0354  0.0296  0.89  0.65   0.87   31.7    70.9  0.0053  0.93    8   87  0.266
+  outer_yield_m4x     4  119 commit       0.0052  0.2579  0.067  3.87  0.0385  0.0582  0.0646  0.90  0.60   0.95   28.6  400.0*  0.0058  0.87    4   47  0.406
+
+  --- crescendo/cr3_s1  [A3] L4 opened; draw B (displaced)
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  ceiling_m3_j        2   26 commit       0.0608  0.2885  0.286  1.01  0.0402  0.0428  0.0169  0.61  0.52   0.57   18.5    30.0  0.0112  0.89   16  125  0.242
+  ceiling_m3_j        3  103 commit       0.0050  0.3643  0.143  2.55  0.0612  0.0869  0.0788  0.96  0.67   0.95   27.3  400.0*  0.0080  0.96    8   48  0.453
+  outer_yield_m4_j    2   26 commit       0.0608  0.2048  0.267  0.77  0.0402  0.0428  0.0108  0.25  0.52   0.37   12.8    23.0  0.0129  0.63   16  125  0.117
+  outer_yield_m4_j    3  103 commit       0.0050  0.2346  0.133  1.76  0.0612  0.0637  0.0532  0.94  0.75   0.97   18.2    40.6  0.0090  0.97    8   48  0.232
+  outer_yield_m4_j    4  121 commit       0.0329  0.2192  0.067  3.29  0.0628       -  0.0854  0.96  0.86   0.98   14.0  400.0*  0.0074  0.93    4   30  0.326
+
+  --- audiation/au_s1  [E1b] per-datum credit vs pooled anchor
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  anchor              2   18 commit       0.0527  0.2502  0.286  0.88  0.0327  0.0406  0.0198  0.79  0.61   0.76   18.7    29.7  0.0095  0.95   16   98  0.188
+  anchor              3   69 commit       0.0222  0.2335  0.143  1.63  0.0390  0.0526  0.0509  0.95  0.82   0.94   23.3  135.5*  0.0060  0.95    8   47  0.234
+  perdatum            2   19 commit       0.1704  0.1325  0.286  0.46 -0.0028  0.0053 -0.0060  0.64  0.44  -0.81    0.0    0.5*       - -0.00   16   97  0.000
+  perdatum            3   62 commit       0.3043  0.2413  0.143  1.69 -0.1165 -0.0388  0.0124  0.12  0.75   0.51    0.0    0.5*       - -0.02    8   54  0.362
+
+  --- census/cs_s0  [F0] gate/yoke/extend + the two gifted arms
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  census_extend       2   18 commit       0.0527  0.2722  0.286  0.95  0.0284  0.0422  0.0227  0.82  0.78   0.81   21.1    34.3  0.0090  0.94   16   98  0.273
+  census_extend       3   70 commit       0.0092  0.1578  0.143  1.10  0.0274  0.0262  0.0331  0.98  0.91   0.98   23.1  400.0*  0.0035  0.98    8   46  0.099
+  census_gate         2   35 commit       0.0592  0.2469  0.286  0.86  0.0413  0.0634  0.0203  0.55  0.62   0.23   15.8    18.0  0.0148  0.86   16   81  0.156
+  census_gate         3   70 commit       0.0103  0.2387  0.143  1.67  0.0381  0.0576  0.0579  0.95  0.82   0.95   22.8  400.0*  0.0058  0.95    8   46  0.232
+  given_native        2    1 gift@c1      0.3235  0.2905  0.286  1.02 -0.0136 -0.0097 -0.0016  0.12  0.52  -0.24    0.0    0.5*       - -17.08   16  115  0.148
+  given_native        3    1 gift@c1      0.1433  0.4962  0.143  3.47  0.1225  0.0717  0.0175  0.73  0.76   0.92    4.9    6.9*  0.0591  0.47    8  115  0.763
+  given_route         2    1 gift@c1      0.3235  0.2477  0.286  0.87  0.0020  0.0063 -0.0057  0.52  0.38  -0.76    0.0    0.5*       - -5.77   16  115  0.112
+  given_route         3    1 gift@c1      0.1433  0.5796  0.143  4.06  0.1274  0.0634  0.0221  0.77  0.71   0.96    8.6    9.4*  0.0441  0.36    8  115  0.831
+  spiral_route        2   18 commit       0.0527  0.2502  0.286  0.88  0.0327  0.0406  0.0198  0.79  0.61   0.76   18.7    29.7  0.0095  0.95   16   98  0.188
+  spiral_route        3   69 commit       0.0222  0.2335  0.143  1.63  0.0390  0.0526  0.0509  0.95  0.82   0.94   23.3  135.5*  0.0060  0.95    8   47  0.234
+  yoked_delay         2   35 commit       0.0592  0.2469  0.286  0.86  0.0413  0.0634  0.0203  0.55  0.62   0.23   15.8    18.0  0.0148  0.86   16   81  0.156
+  yoked_delay         3   70 commit       0.0103  0.2387  0.143  1.67  0.0381  0.0576  0.0579  0.95  0.82   0.95   22.8  400.0*  0.0058  0.95    8   46  0.232
+
+  --- assay/as_s0  [F0] the surgery six: arrival crossed with content
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  anchor              2   18 commit       0.0527  0.2502  0.286  0.88  0.0327  0.0406  0.0198  0.79  0.61   0.76   18.7    29.7  0.0095  0.95   16   98  0.188
+  anchor              3   69 commit       0.0222  0.2335  0.143  1.63  0.0390  0.0526  0.0509  0.95  0.82   0.94   23.3  135.5*  0.0060  0.95    8   47  0.234
+  complete            2   18 commit       0.0574  0.2384  0.286  0.83  0.0377  0.0454  0.0174  0.62  0.61   0.61   16.2    24.0  0.0115  0.88   16   98  0.159
+  complete            3   72 commit       0.1630  0.2757  0.143  1.93 -0.0466  0.0189  0.0470  0.66  0.82   0.87    0.0  400.0*  0.0067  0.55    8   44  0.289
+  exact               2   18 commit       0.0541  0.2242  0.286  0.78  0.0392  0.0486  0.0128  0.57  0.67   0.67   15.4    18.4  0.0128  0.93   16   98  0.125
+  exact               3   70 commit       0.0219  0.2469  0.143  1.73  0.0309  0.0532  0.0563  0.95  0.91   0.94   22.2  400.0*  0.0059  0.95    8   46  0.240
+  given_c1            2    1 gift@c1      0.3235  0.2477  0.286  0.87  0.0020  0.0063 -0.0057  0.52  0.38  -0.76    0.0    0.5*       - -5.77   16  115  0.112
+  given_c1            3    1 gift@c1      0.1433  0.5796  0.143  4.06  0.1274  0.0634  0.0221  0.77  0.71   0.96    8.6    9.4*  0.0441  0.36    8  115  0.831
+  junk_dose           2   18 commit       0.0463  0.2692  0.286  0.94  0.0294  0.0447  0.0220  0.80  0.61   0.87   21.9    34.7  0.0086  0.92   16   98  0.294
+  junk_dose           3   67 commit       0.0218  0.1819  0.143  1.27  0.0194  0.0330  0.0450  0.95  0.82   0.94   25.1  400.0*  0.0043  0.94    8   49  0.107
+  strip               2   18 commit       0.0415  0.2258  0.286  0.79  0.0226  0.0397  0.0191  0.68  0.67   0.58   22.7    31.4  0.0085  0.88   16   98  0.141
+  strip               3   67 commit       0.0280  0.2665  0.143  1.87  0.0279  0.0415  0.0635  0.95  0.82   0.94   28.3  400.0*  0.0060  0.94    8   49  0.331
+
+  --- assay/as_s1  [F0] stream-displaced twins of given_c1 / exact
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  exact_j             2   19 commit       0.0525  0.2059  0.286  0.72  0.0487  0.0430  0.0130  0.60  0.50   0.77   12.5    18.2  0.0125  0.87   16   97  0.143
+  exact_j             3   56 commit       0.1713  0.2871  0.143  2.01 -0.0411 -0.0057  0.0335  0.73  0.77   0.90    0.0  234.1*  0.0055  0.51    8   60  0.297
+  given_c1_j          2    1 gift@c1      0.3235  0.3328  0.286  1.16  0.0157  0.0091 -0.0008  0.04  0.33  -0.31    0.0    0.5*       - -23.48   16  115  0.276
+  given_c1_j          3    1 gift@c1      0.1433  0.4485  0.143  3.14  0.0700  0.0409  0.0204  0.88  0.76   0.97    5.6   26.0*  0.0149  0.31    8  115  0.625
+
+  --- intonation/ma_s0  [bonus] delta_perf on the maestro stack (NOT maestro/ma_s0)
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  mout_gate           2   43 commit       0.0186  0.1212  0.267  0.45  0.0216  0.0164  0.0082  0.89  0.76   0.98   18.5    34.7  0.0034  0.95   16  110  0.052
+  mout_gate           3   83 commit       0.0027  0.0556  0.133  0.42  0.0032  0.0057  0.0086  0.96  0.93   0.98   42.6  400.0*  0.0008  0.94    8   70  0.039
+  mout_gate           4  115 commit       0.0092  0.0493  0.067  0.74  0.0052  0.0083  0.0129  0.77  0.75   0.88   17.8  400.0*  0.0013  0.77    4   38  0.044
+  mperf_gain          2   43 commit       0.0203  0.1077  0.267  0.40  0.0064  0.0089  0.0092  0.97  0.71   0.98   33.9    95.9  0.0017  0.95   16  110  0.065
+  mperf_gain          3   83 commit       0.0091  0.1242  0.133  0.93  0.0027  0.0112  0.0204  0.92  0.79   0.95   41.1  400.0*  0.0019  0.90    8   70  0.120
+  mperf_gain          4  115 commit       0.0069  0.0582  0.067  0.87  0.0030  0.0125  0.0161  0.86  0.75   0.97   25.9  400.0*  0.0013  0.79    4   38  0.047
+  mperf_gate          2   43 commit       0.0130  0.1952  0.267  0.73  0.0082  0.0174  0.0189  0.95  0.62   0.95   50.3  183.1*  0.0025  0.96   16  110  0.156
+  mperf_gate          3   83 commit       0.0038  0.1086  0.133  0.81  0.0028  0.0068  0.0167  0.92  0.93   0.99   49.7  400.0*  0.0014  0.85    8   70  0.091
+  mperf_gate          4  115 commit       0.0066  0.0497  0.067  0.75  0.0001  0.0132  0.0174  0.88  0.62   0.92   21.5  400.0*  0.0014  0.82    4   38  0.057
+  mperf_log           2   43 commit       0.0203  0.1402  0.267  0.53  0.0053  0.0103  0.0113  0.99  0.71   0.99   45.4  156.7*  0.0017  0.97   16  110  0.135
+  mperf_log           3   83 commit       0.0046  0.0863  0.133  0.65  0.0069  0.0115  0.0125  0.95  0.71   0.96   32.8  400.0*  0.0013  0.95    8   70  0.070
+  mperf_log           4  115 commit       0.0050  0.0394  0.067  0.59  0.0025  0.0092  0.0127  0.87  0.75   0.88   23.0  400.0*  0.0010  0.82    4   38  0.029
+  mperf_rawx          2   43 commit       0.0116  0.0864  0.267  0.32  0.0081  0.0085  0.0067  0.97  0.81   0.98   36.1    68.6  0.0015  0.97   16  110  0.039
+  mperf_rawx          3   83 commit       0.0073  0.0797  0.133  0.60  0.0051  0.0083  0.0125  0.97  0.71   0.96   34.4  400.0*  0.0013  0.96    8   70  0.052
+  mperf_rawx          4  115 commit       0.0148  0.1010  0.067  1.52  0.0037  0.0229  0.0318  0.86  0.75   0.88   21.5  400.0*  0.0027  0.82    4   38  0.102
+
+  --- intonation/in_s0  [bonus] delta_perf on the crescendo stack
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  outcome_gate        2   49 commit       0.0309  0.1529  0.267  0.57  0.0083  0.0136  0.0185  0.96  0.71   0.93   32.7   96.9*  0.0030  0.96   16   82  0.070
+  outcome_gate        3   72 commit       0.2460  0.1554  0.133  1.17 -0.1395 -0.0602  0.0095  0.08  0.77   0.57    0.0  400.0*       - -0.17    8   59  0.151
+  outcome_gate        4  104 commit       0.1544  0.0870  0.067  1.30 -0.0705       - -0.0070  0.02  0.75   0.38    0.0  400.0*       - -0.61    4   27  0.109
+  perf_gain           2   49 commit       0.0606  0.1605  0.267  0.60  0.0190  0.0364  0.0160  0.58  0.47   0.44   13.8    19.4  0.0101  0.85   16   82  0.039
+  perf_gain           3   72 commit       0.1759  0.1847  0.133  1.39 -0.0825 -0.0207  0.0260  0.54  0.69   0.80    0.0  400.0*  0.0040  0.40    8   59  0.188
+  perf_gain           4  104 commit       0.0836  0.1903  0.067  2.85  0.0076       -  0.0468  0.60  0.75   0.85   15.9  400.0*  0.0062  0.53    4   27  0.281
+  perf_gate           2   49 commit       0.0349  0.2226  0.267  0.83  0.0069  0.0139  0.0247  0.97  0.82   0.99   38.6  400.0*  0.0028  0.97   16   82  0.182
+  perf_gate           3   72 commit       0.2104  0.1316  0.133  0.99 -0.1193 -0.0479  0.0089  0.09  0.85   0.58    0.0  400.0*       - -0.16    8   59  0.099
+  perf_gate           4  104 commit       0.1210  0.0719  0.067  1.08 -0.0401       - -0.0021  0.00  0.62   0.37    0.0  320.0*       - -0.78    4   27  0.070
+  perf_log            2   49 commit       0.0521  0.1449  0.267  0.54  0.0234  0.0350  0.0119  0.49  0.53   0.35   11.8    16.3  0.0103  0.83   16   82  0.052
+  perf_log            3   72 commit       0.1736  0.2170  0.133  1.63 -0.0702 -0.0061  0.0298  0.54  0.69   0.76    0.0   73.3*  0.0060  0.40    8   59  0.271
+  perf_log            4  104 commit       0.0849  0.1678  0.067  2.52  0.0225       -  0.0491  0.65  0.62   0.83    0.0  400.0*  0.0067  0.56    4   27  0.185
+  perf_raw            2   49 commit       0.0450  0.1455  0.267  0.55  0.0195  0.0338  0.0136  0.58  0.59   0.41   14.7    19.4  0.0085  0.85   16   82  0.052
+  perf_raw            3   72 commit       0.1734  0.2179  0.133  1.63 -0.0688 -0.0080  0.0278  0.58  0.77   0.80    0.0   79.3*  0.0057  0.40    8   59  0.260
+  perf_raw            4  104 commit       0.0878  0.1588  0.067  2.38  0.0146       -  0.0426  0.57  0.75   0.85    0.0  400.0*  0.0060  0.47    4   27  0.198
+
+  --- caesura/ca_s0  [bonus] delta_silence pacing
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  dsil_and            2   49 commit       0.0521  0.1586  0.308  0.52  0.0250  0.0355  0.0204  0.72  0.67   0.63   13.3    19.4  0.0097  0.92   16   65  0.044
+  dsil_and            4   81 commit       0.0477  0.2962  0.077  3.85  0.0664  0.0770  0.1059  0.95  0.88   0.98   15.6  400.0*  0.0099  0.94    4   33  0.453
+  dsil_read           2   18 commit       0.0507  0.1530  0.267  0.57  0.0246  0.0361  0.0005  0.00  0.62  -0.06   13.1   14.5*  0.0123  0.47   16  158  0.057
+  dsil_read           3   71 commit       0.0051  0.2314  0.133  1.74  0.0498  0.0486  0.0224  0.82  0.61   0.89   22.2    37.5  0.0074  0.95    8  105  0.258
+  dsil_read           4   97 commit       0.0428  0.3673  0.067  5.51  0.0283  0.0356  0.0442  0.96  0.83   0.99   36.0  400.0*  0.0050  0.95    4   79  0.544
+  dsil_sched          2   18 commit       0.0507  0.1504  0.267  0.56  0.0246  0.0369  0.0020  0.07  0.53   0.07   12.7    18.6  0.0108  0.65   16  183  0.042
+  dsil_sched          3   77 commit       0.0303  0.4461  0.133  3.35  0.0272  0.0415  0.0356  0.94  0.76   0.98   47.9   112.1  0.0061  0.97    8  124  0.667
+  dsil_sched          4  180 provisional  0.1005  0.1323  0.067  1.99  0.0059       -  0.0429  0.59  0.50   0.68    0.0   21.3*       -  0.27    4   21  0.135
+  dsil_yield          2   49 commit       0.0521  0.1449  0.267  0.54  0.0234  0.0350  0.0119  0.49  0.53   0.35   11.8    16.3  0.0103  0.83   16   82  0.052
+  dsil_yield          3   72 commit       0.1736  0.2170  0.133  1.63 -0.0702 -0.0061  0.0298  0.54  0.69   0.76    0.0   73.3*  0.0060  0.40    8   59  0.271
+  dsil_yield          4  104 commit       0.0849  0.1678  0.067  2.52  0.0225       -  0.0491  0.65  0.62   0.83    0.0  400.0*  0.0067  0.56    4   27  0.185
+
+  --- spiral/sp_s0  [bonus] the pre-A1 donor
+  arm                 L  arr kind             m0    mend   uend  lift     d16     d32    d/10   r2l    up    rho   t1/2       T      d0   r2s  nav  win   amax
+  fid                 2    1 gift@c1      0.3235  0.3299  0.286  1.15  0.0078 -0.0046  0.0023  0.23  0.48   0.47    0.0    0.5*       - -16.26   16  115  0.242
+  fid                 3    1 gift@c1      0.1433  0.4356  0.143  3.05  0.0886  0.0513  0.0157  0.82  0.81   0.98    4.8    11.5  0.0329  0.53    8  115  0.669
+  given_native        2    1 gift@c1      0.3235  0.3019  0.286  1.06 -0.0136 -0.0114  0.0030  0.13  0.52   0.29    0.0    0.5*       - -5.19   16  115  0.214
+  given_native        3    1 gift@c1      0.1433  0.4694  0.143  3.29  0.1225  0.0777  0.0122  0.47  0.67   0.64    4.3    5.8*  0.0678  0.49    8  115  0.654
+  spiral              2   18 commit       0.0484  0.2431  0.286  0.85  0.0163  0.0282  0.0223  0.94  0.72   0.96   28.8    53.7  0.0057  0.96   16   98  0.206
+  spiral              3   52 commit       0.0213  0.2393  0.143  1.68  0.0241  0.0269  0.0357  0.98  0.92   1.00   36.1  400.0*  0.0038  0.97    8   64  0.224
+  spiral_route        2   18 commit       0.0527  0.1924  0.286  0.67  0.0275  0.0304  0.0138  0.64  0.67   0.48   15.9    23.0  0.0093  0.89   16   98  0.086
+  spiral_route        3   48 commit       0.1732  0.3265  0.143  2.29 -0.0583 -0.0044  0.0381  0.77  0.64   0.90    0.0  400.0*  0.0053  0.67    8   68  0.409
+
+  REPLAY GROUPS (bit-identical post-arrival mass series — the arc's fidelity
+  discipline showing up in this instrument; aggregates below de-duplicate these):
+    L2: conductor/cd_s0/anchor == maestro/ma_s0/anchor == audiation/au_s1/anchor == census/cs_s0/spiral_route == assay/as_s0/anchor
+    L3: conductor/cd_s0/anchor == maestro/ma_s0/anchor == audiation/au_s1/anchor == census/cs_s0/spiral_route == assay/as_s0/anchor
+    L2: conductor/cd_s0/outer_endo == conductor/cd_s0/yoked_endo
+    L2: conductor/cd_s0/outer_yield == conductor/cd_s0/yoked_yield == maestro/ma_s0/outer_yield
+    L3: conductor/cd_s0/outer_yield == conductor/cd_s0/yoked_yield == maestro/ma_s0/outer_yield
+    L2: maestro/ma_s0/learned_yield == maestro/ma_s0/yoked_learned
+    L3: maestro/ma_s0/learned_yield == maestro/ma_s0/yoked_learned
+    L2: census/cs_s0/census_gate == census/cs_s0/yoked_delay
+    L3: census/cs_s0/census_gate == census/cs_s0/yoked_delay
+    L2: census/cs_s0/given_route == assay/as_s0/given_c1
+    L3: census/cs_s0/given_route == assay/as_s0/given_c1
+    L2: intonation/in_s0/perf_log == caesura/ca_s0/dsil_yield
+    L3: intonation/in_s0/perf_log == caesura/ca_s0/dsil_yield
+    L4: intonation/in_s0/perf_log == caesura/ca_s0/dsil_yield
+
+====================================================================================================
+(2) WINDOW-MATCHED MASS — the same clock for every arm: mass at fixed tau
+====================================================================================================
+  Blank = the arm's post-arrival window does not reach that tau (right-censored).
+  One row per replay group (duplicates collapsed). Sorted by mass at tau=32.
+
+  --- level 2   (mass; then the same rows as LIFT = mass / uniform share)
+  node/tag/arm                                 kind            t=0     t=8    t=16    t=24    t=32    t=40    t=56    t=72
+  assay/as_s1/given_c1_j                       gift@c1      0.3235  0.3657  0.3486  0.3407  0.3526  0.3425  0.3771  0.3639
+  census/cs_s0/given_route                     gift@c1      0.3235  0.3579  0.3267  0.3382  0.3438  0.3352  0.3311  0.3363
+  spiral/sp_s0/fid                             gift@c1      0.3235  0.3506  0.3361  0.3285  0.3087  0.3003  0.3146  0.3254
+  census/cs_s0/given_native                    gift@c1      0.3235  0.3435  0.3018  0.2769  0.2926  0.2956  0.3199  0.3097
+  spiral/sp_s0/given_native                    gift@c1      0.3235  0.3435  0.3018  0.2769  0.2871  0.2981  0.3435  0.3427
+  census/cs_s0/census_gate                     commit            -  0.0732  0.1254  0.2105  0.2621  0.2716  0.2716  0.2402
+  conductor/cd_s0/outer_yield                  commit            -  0.0653  0.1135  0.1748  0.2412  0.2618  0.2970  0.2909
+  crescendo/cr3_s0/ceiling_m3                  commit            -  0.0653  0.1135  0.1748  0.2412  0.2618  0.2970  0.2948
+  crescendo/cr3_s0/outer_yield_m3              commit            -  0.0653  0.1135  0.1748  0.2412  0.2618  0.2970  0.2948
+  crescendo/cr3_s0/outer_yield_m4              commit            -  0.0653  0.1135  0.1748  0.2412  0.2618  0.2970  0.2948
+  maestro/ma_s0/learned_yield                  commit            -  0.0783  0.1417  0.1943  0.2405  0.2648  0.2995  0.3290
+  crescendo/cr3_s0/outer_yield_m4x             commit            -  0.0657  0.1074  0.1700  0.2260  0.2381  0.2458  0.2722
+  conductor/cd_s0/outer_ledger                 commit            -  0.0979  0.1256  0.1648  0.2200  0.2553  0.3178  0.3750
+  assay/as_s0/exact                            commit            -  0.0660  0.1168  0.1729  0.2096  0.2036  0.2346  0.2372
+  conductor/cd_s0/outer_endo                   commit       0.3382  0.0638  0.1079  0.1613  0.2028  0.2223  0.2809  0.3280
+  assay/as_s0/complete                         commit            -  0.0684  0.1177  0.1743  0.2026  0.2202  0.2374  0.3047
+  maestro/ma_s1/learned_yield_j                commit            -  0.0731  0.1277  0.1855  0.2024  0.2207  0.2360  0.2441
+  maestro/ma_s0/learned_task                   commit            -  0.0866  0.1213  0.1798  0.1978  0.2166  0.2680  0.3208
+  maestro/ma_s1/outer_yield_j                  commit            -  0.0731  0.1252  0.1777  0.1977  0.2371  0.3015  0.3399
+  crescendo/cr3_s1/ceiling_m3_j                commit            -  0.0731  0.1252  0.1777  0.1977  0.2371  0.3015  0.3399
+  crescendo/cr3_s1/outer_yield_m4_j            commit            -  0.0731  0.1252  0.1777  0.1977  0.2371  0.3015  0.3399
+  assay/as_s1/exact_j                          commit            -  0.0728  0.1305  0.1772  0.1903  0.1892  0.2050  0.2462
+  crescendo/cr3_s0/anchor_long                 commit            -  0.0620  0.1051  0.1594  0.1895  0.1949  0.2271  0.2496
+  assay/as_s0/junk_dose                        commit            -  0.0545  0.0933  0.1477  0.1893  0.2014  0.2389  0.2696
+  census/cs_s0/census_extend                   commit            -  0.0603  0.0981  0.1572  0.1878  0.2065  0.2423  0.2816
+  audiation/au_s1/perdatum                     commit            -  0.1651  0.1659  0.1852  0.1874  0.1838  0.1607  0.1539
+  conductor/cd_s0/anchor                       commit            -  0.0620  0.1051  0.1594  0.1826  0.1915  0.2507  0.2883
+  intonation/in_s0/perf_gain                   commit            -  0.0619  0.0910  0.1209  0.1770  0.1840  0.2101  0.1830
+  assay/as_s0/strip                            commit            -  0.0480  0.0778  0.1213  0.1687  0.1949  0.2370  0.2848
+  caesura/ca_s0/dsil_sched                     commit            -  0.0579  0.0900  0.1307  0.1686  0.1895  0.1984  0.2305
+  caesura/ca_s0/dsil_read                      commit            -  0.0579  0.0900  0.1304  0.1661  0.1904  0.2111  0.2322
+  caesura/ca_s0/dsil_and                       commit            -  0.0584  0.0921  0.1291  0.1658  0.1828  0.1819       -
+  intonation/in_s0/perf_log                    commit            -  0.0584  0.0895  0.1109  0.1639  0.1874  0.1727  0.1493
+  intonation/in_s0/perf_raw                    commit            -  0.0496  0.0761  0.0971  0.1531  0.1645  0.1665  0.1473
+  spiral/sp_s0/spiral_route                    commit            -  0.0620  0.0966  0.1199  0.1498  0.1940  0.2180  0.2373
+  spiral/sp_s0/spiral                          commit            -  0.0549  0.0745  0.1017  0.1386  0.1768  0.1935  0.2203
+  intonation/in_s0/perf_gate                   commit            -  0.0368  0.0459  0.0562  0.0794  0.1146  0.1289  0.1866
+  intonation/in_s0/outcome_gate                commit            -  0.0327  0.0442  0.0559  0.0743  0.0922  0.1147  0.1649
+  intonation/ma_s0/mout_gate                   commit            -  0.0228  0.0532  0.0684  0.0710  0.0768  0.0912  0.0943
+  intonation/ma_s0/mperf_gate                  commit            -  0.0169  0.0262  0.0414  0.0688  0.0898  0.1285  0.1446
+  intonation/ma_s0/mperf_log                   commit            -  0.0238  0.0287  0.0405  0.0533  0.0652  0.0762  0.0871
+  intonation/ma_s0/mperf_gain                  commit            -  0.0247  0.0305  0.0371  0.0487  0.0617  0.0680  0.0884
+  intonation/ma_s0/mperf_rawx                  commit            -  0.0160  0.0246  0.0316  0.0387  0.0440  0.0615  0.0626
+  -- lift (x uniform) --                                       t=0     t=8    t=16    t=32    t=56
+  assay/as_s1/given_c1_j                       gift@c1       1.132   1.280   1.220   1.234   1.320
+  census/cs_s0/given_route                     gift@c1       1.132   1.253   1.143   1.203   1.159
+  spiral/sp_s0/fid                             gift@c1       1.132   1.227   1.176   1.080   1.101
+  census/cs_s0/given_native                    gift@c1       1.132   1.202   1.056   1.024   1.120
+  spiral/sp_s0/given_native                    gift@c1       1.132   1.202   1.056   1.005   1.202
+  census/cs_s0/census_gate                     commit            -   0.220   0.376   0.836   0.951
+  conductor/cd_s0/outer_yield                  commit            -   0.196   0.341   0.724   1.040
+  crescendo/cr3_s0/ceiling_m3                  commit            -   0.196   0.341   0.724   1.040
+  crescendo/cr3_s0/outer_yield_m3              commit            -   0.196   0.341   0.724   1.040
+  crescendo/cr3_s0/outer_yield_m4              commit            -   0.196   0.341   0.724   1.040
+  maestro/ma_s0/learned_yield                  commit            -   0.235   0.425   0.722   1.048
+  crescendo/cr3_s0/outer_yield_m4x             commit            -   0.197   0.322   0.791   0.860
+  conductor/cd_s0/outer_ledger                 commit            -   0.294   0.377   0.660   0.953
+  assay/as_s0/exact                            commit            -   0.198   0.350   0.629   0.821
+  conductor/cd_s0/outer_endo                   commit        1.015   0.191   0.324   0.608   0.843
+  assay/as_s0/complete                         commit            -   0.205   0.353   0.608   0.831
+  maestro/ma_s1/learned_yield_j                commit            -   0.219   0.383   0.709   0.826
+  maestro/ma_s0/learned_task                   commit            -   0.260   0.364   0.593   0.804
+  maestro/ma_s1/outer_yield_j                  commit            -   0.219   0.376   0.593   0.904
+  crescendo/cr3_s1/ceiling_m3_j                commit            -   0.219   0.376   0.593   0.904
+  crescendo/cr3_s1/outer_yield_m4_j            commit            -   0.219   0.376   0.593   0.904
+  assay/as_s1/exact_j                          commit            -   0.218   0.391   0.597   0.717
+  crescendo/cr3_s0/anchor_long                 commit            -   0.186   0.315   0.568   0.710
+  assay/as_s0/junk_dose                        commit            -   0.164   0.280   0.568   0.836
+  census/cs_s0/census_extend                   commit            -   0.181   0.294   0.563   0.848
+  audiation/au_s1/perdatum                     commit            -   0.495   0.498   0.562   0.563
+  conductor/cd_s0/anchor                       commit            -   0.186   0.315   0.548   0.877
+  intonation/in_s0/perf_gain                   commit            -   0.186   0.280   0.619   0.788
+  assay/as_s0/strip                            commit            -   0.144   0.233   0.506   0.829
+  caesura/ca_s0/dsil_sched                     commit            -   0.174   0.270   0.506   0.620
+  caesura/ca_s0/dsil_read                      commit            -   0.174   0.270   0.498   0.739
+  caesura/ca_s0/dsil_and                       commit            -   0.175   0.276   0.503   0.591
+  intonation/in_s0/perf_log                    commit            -   0.175   0.275   0.574   0.648
+  intonation/in_s0/perf_raw                    commit            -   0.149   0.234   0.536   0.624
+  spiral/sp_s0/spiral_route                    commit            -   0.186   0.290   0.524   0.763
+  spiral/sp_s0/spiral                          commit            -   0.165   0.223   0.438   0.677
+  intonation/in_s0/perf_gate                   commit            -   0.110   0.141   0.278   0.484
+  intonation/in_s0/outcome_gate                commit            -   0.098   0.136   0.260   0.430
+  intonation/ma_s0/mout_gate                   commit            -   0.069   0.160   0.213   0.319
+  intonation/ma_s0/mperf_gate                  commit            -   0.051   0.079   0.206   0.450
+  intonation/ma_s0/mperf_log                   commit            -   0.071   0.086   0.160   0.267
+  intonation/ma_s0/mperf_gain                  commit            -   0.074   0.091   0.146   0.238
+  intonation/ma_s0/mperf_rawx                  commit            -   0.048   0.074   0.116   0.215
+
+  --- level 3   (mass; then the same rows as LIFT = mass / uniform share)
+  node/tag/arm                                 kind            t=0     t=8    t=16    t=24    t=32    t=40    t=56    t=72
+  spiral/sp_s0/given_native                    gift@c1      0.1433  0.2986  0.3394  0.3660  0.3918  0.4006  0.3672  0.3616
+  census/cs_s0/given_native                    gift@c1      0.1433  0.2986  0.3394  0.3660  0.3729  0.3630  0.3478  0.3764
+  census/cs_s0/given_route                     gift@c1      0.1433  0.2840  0.3471  0.3412  0.3461  0.3496  0.3578  0.3707
+  spiral/sp_s0/fid                             gift@c1      0.1433  0.2562  0.2851  0.3018  0.3076  0.3340  0.3549  0.3740
+  crescendo/cr3_s1/ceiling_m3_j                commit            -  0.0537  0.1030  0.1596  0.2831  0.3183       -       -
+  assay/as_s1/given_c1_j                       gift@c1      0.1433  0.2459  0.2554  0.2807  0.2743  0.2712  0.2790  0.3098
+  maestro/ma_s1/outer_yield_j                  commit            -  0.0537  0.1004  0.1987  0.2475       -       -       -
+  assay/as_s0/complete                         commit       0.1630  0.0452  0.0884  0.1297  0.2235  0.2497       -       -
+  crescendo/cr3_s1/outer_yield_m4_j            commit            -  0.0537  0.1030  0.1570  0.2090  0.2396       -       -
+  census/cs_s0/census_gate                     commit            -  0.0346  0.0712  0.1281  0.1947  0.2091       -       -
+  assay/as_s0/exact                            commit            -  0.0451  0.0713  0.1337  0.1921  0.2051       -       -
+  conductor/cd_s0/anchor                       commit            -  0.0398  0.0846  0.1207  0.1904  0.2254       -       -
+  conductor/cd_s0/outer_yield                  commit            -  0.0318  0.0648  0.1086  0.1855  0.1835       -       -
+  audiation/au_s1/perdatum                     commit            -  0.1548  0.1178  0.1322  0.1802  0.2318       -       -
+  caesura/ca_s0/dsil_sched                     commit            -  0.0451  0.0739  0.1198  0.1632  0.1763  0.2868  0.3673
+  assay/as_s0/strip                            commit            -  0.0398  0.0727  0.1158  0.1609  0.2592       -       -
+  caesura/ca_s0/dsil_read                      commit            -  0.0481  0.0849  0.1270  0.1607  0.1928  0.2168  0.2732
+  spiral/sp_s0/spiral_route                    commit       0.1732  0.0587  0.0799  0.1179  0.1590  0.1942  0.3177       -
+  intonation/in_s0/perf_log                    commit       0.1736  0.0328  0.0613  0.0942  0.1542  0.1861  0.1925       -
+  assay/as_s1/exact_j                          commit       0.1713  0.0537  0.1055  0.1458  0.1532  0.1889  0.2684       -
+  intonation/in_s0/perf_raw                    commit       0.1734  0.0301  0.0633  0.0950  0.1479  0.1828  0.2001       -
+  maestro/ma_s0/learned_yield                  commit            -  0.0381  0.0644  0.0956  0.1452  0.1755       -       -
+  crescendo/cr3_s0/ceiling_m3                  commit            -  0.0318  0.0648  0.1045  0.1380  0.1702  0.3192       -
+  crescendo/cr3_s0/outer_yield_m3              commit            -  0.0318  0.0648  0.1045  0.1380  0.2129  0.2535       -
+  crescendo/cr3_s0/outer_yield_m4              commit            -  0.0318  0.0648  0.1045  0.1380  0.1666  0.3120       -
+  assay/as_s0/junk_dose                        commit            -  0.0299  0.0528  0.0845  0.1274  0.1857       -       -
+  crescendo/cr3_s0/anchor_long                 commit            -  0.0379  0.0667  0.1026  0.1244  0.1493  0.2673  0.3473
+  crescendo/cr3_s0/outer_yield_m4x             commit            -  0.0400  0.0670  0.1010  0.1187  0.1569  0.2240  0.2630
+  intonation/in_s0/perf_gain                   commit       0.1759  0.0256  0.0439  0.0791  0.1097  0.1669  0.2119       -
+  spiral/sp_s0/spiral                          commit            -  0.0339  0.0598  0.0848  0.1073  0.1330  0.1979       -
+  maestro/ma_s1/learned_yield_j                commit            -  0.0309  0.0475  0.0718  0.0994  0.1476       -       -
+  census/cs_s0/census_extend                   commit            -  0.0274  0.0530  0.0818  0.0929  0.1370       -       -
+  intonation/in_s0/perf_gate                   commit       0.2104  0.0093  0.0195  0.0324  0.0570  0.0954  0.1198       -
+  intonation/in_s0/outcome_gate                commit       0.2460  0.0136  0.0229  0.0389  0.0535  0.0902  0.1388       -
+  intonation/ma_s0/mperf_gain                  commit            -  0.0114  0.0134  0.0249  0.0449  0.0598  0.1241       -
+  intonation/ma_s0/mperf_log                   commit            -  0.0066  0.0157  0.0288  0.0414  0.0510  0.0736       -
+  intonation/ma_s0/mperf_rawx                  commit            -  0.0104  0.0154  0.0215  0.0338  0.0484  0.0719       -
+  intonation/ma_s0/mperf_gate                  commit            -  0.0054  0.0083  0.0152  0.0256  0.0340  0.0805       -
+  intonation/ma_s0/mout_gate                   commit            -  0.0031  0.0079  0.0143  0.0210  0.0266  0.0488       -
+  -- lift (x uniform) --                                       t=0     t=8    t=16    t=32    t=56
+  spiral/sp_s0/given_native                    gift@c1       1.003   2.090   2.376   2.743   2.570
+  census/cs_s0/given_native                    gift@c1       1.003   2.090   2.376   2.610   2.435
+  census/cs_s0/given_route                     gift@c1       1.003   1.988   2.430   2.423   2.505
+  spiral/sp_s0/fid                             gift@c1       1.003   1.793   1.996   2.153   2.484
+  crescendo/cr3_s1/ceiling_m3_j                commit            -   0.376   0.721   1.981       -
+  assay/as_s1/given_c1_j                       gift@c1       1.003   1.721   1.788   1.920   1.953
+  maestro/ma_s1/outer_yield_j                  commit            -   0.376   0.703   1.733       -
+  assay/as_s0/complete                         commit        1.141   0.316   0.619   1.564       -
+  crescendo/cr3_s1/outer_yield_m4_j            commit            -   0.376   0.721   1.567       -
+  census/cs_s0/census_gate                     commit            -   0.242   0.499   1.363       -
+  assay/as_s0/exact                            commit            -   0.316   0.499   1.345       -
+  conductor/cd_s0/anchor                       commit            -   0.279   0.592   1.333       -
+  conductor/cd_s0/outer_yield                  commit            -   0.223   0.454   1.299       -
+  audiation/au_s1/perdatum                     commit            -   1.084   0.825   1.262       -
+  caesura/ca_s0/dsil_sched                     commit            -   0.316   0.517   1.143   2.008
+  assay/as_s0/strip                            commit            -   0.279   0.509   1.126       -
+  caesura/ca_s0/dsil_read                      commit            -   0.337   0.594   1.197   1.626
+  spiral/sp_s0/spiral_route                    commit        1.212   0.411   0.559   1.113   2.224
+  intonation/in_s0/perf_log                    commit        1.215   0.229   0.429   1.156   1.444
+  assay/as_s1/exact_j                          commit        1.199   0.376   0.739   1.072   1.878
+  intonation/in_s0/perf_raw                    commit        1.214   0.211   0.443   1.110   1.501
+  maestro/ma_s0/learned_yield                  commit            -   0.267   0.451   1.016       -
+  crescendo/cr3_s0/ceiling_m3                  commit            -   0.223   0.454   0.966   2.235
+  crescendo/cr3_s0/outer_yield_m3              commit            -   0.223   0.454   0.966   1.775
+  crescendo/cr3_s0/outer_yield_m4              commit            -   0.223   0.454   0.966   2.340
+  assay/as_s0/junk_dose                        commit            -   0.209   0.369   0.892       -
+  crescendo/cr3_s0/anchor_long                 commit            -   0.265   0.467   0.871   1.871
+  crescendo/cr3_s0/outer_yield_m4x             commit            -   0.280   0.469   0.831   1.680
+  intonation/in_s0/perf_gain                   commit        1.231   0.179   0.307   0.823   1.589
+  spiral/sp_s0/spiral                          commit            -   0.237   0.418   0.751   1.385
+  maestro/ma_s1/learned_yield_j                commit            -   0.216   0.332   0.696       -
+  census/cs_s0/census_extend                   commit            -   0.192   0.371   0.650       -
+  intonation/in_s0/perf_gate                   commit        1.473   0.065   0.136   0.428   0.899
+  intonation/in_s0/outcome_gate                commit        1.722   0.096   0.160   0.401   1.041
+  intonation/ma_s0/mperf_gain                  commit            -   0.080   0.094   0.325   0.931
+  intonation/ma_s0/mperf_log                   commit            -   0.046   0.110   0.299   0.552
+  intonation/ma_s0/mperf_rawx                  commit            -   0.073   0.108   0.245   0.540
+  intonation/ma_s0/mperf_gate                  commit            -   0.038   0.058   0.185   0.604
+  intonation/ma_s0/mout_gate                   commit            -   0.022   0.055   0.152   0.366
+
+  --- level 4   (mass; then the same rows as LIFT = mass / uniform share)
+  node/tag/arm                                 kind            t=0     t=8    t=16    t=24    t=32    t=40    t=56    t=72
+  caesura/ca_s0/dsil_and                       commit            -  0.0534  0.1538  0.2507  0.2940       -       -       -
+  crescendo/cr3_s1/outer_yield_m4_j            commit            -  0.0368  0.1334  0.1751       -       -       -       -
+  crescendo/cr3_s0/outer_yield_m4x             commit            -  0.0368  0.0668  0.0972  0.1913  0.2488       -       -
+  intonation/in_s0/perf_gain                   commit       0.0836  0.0317  0.0958  0.1240       -       -       -       -
+  intonation/in_s0/perf_log                    commit       0.0849  0.0359  0.1209  0.1684       -       -       -       -
+  intonation/in_s0/perf_raw                    commit       0.0878  0.0344  0.1112  0.1517       -       -       -       -
+  caesura/ca_s0/dsil_read                      commit            -  0.0479  0.0882  0.1233  0.1567  0.2030  0.2260  0.3562
+  caesura/ca_s0/dsil_sched                     provisional  0.1005  0.0694  0.1100       -       -       -       -       -
+  crescendo/cr3_s0/outer_yield_m4              commit            -  0.0290  0.0505  0.1044  0.1311       -       -       -
+  crescendo/cr3_s0/anchor_long                 provisional  0.0961  0.0664  0.1027       -       -       -       -       -
+  intonation/ma_s0/mperf_rawx                  commit            -  0.0182  0.0207  0.0678  0.0879       -       -       -
+  intonation/in_s0/outcome_gate                commit       0.1544  0.0174  0.0415  0.0715       -       -       -       -
+  intonation/in_s0/perf_gate                   commit       0.1210  0.0156  0.0569  0.0615       -       -       -       -
+  intonation/ma_s0/mperf_gate                  commit            -  0.0068  0.0068  0.0328  0.0487       -       -       -
+  intonation/ma_s0/mperf_gain                  commit            -  0.0079  0.0116  0.0233  0.0470       -       -       -
+  intonation/ma_s0/mout_gate                   commit            -  0.0106  0.0174  0.0328  0.0356       -       -       -
+  intonation/ma_s0/mperf_log                   commit            -  0.0058  0.0090  0.0233  0.0343       -       -       -
+  -- lift (x uniform) --                                       t=0     t=8    t=16    t=32    t=56
+  caesura/ca_s0/dsil_and                       commit            -   0.695   2.000   3.822       -
+  crescendo/cr3_s1/outer_yield_m4_j            commit            -   0.552   2.001       -       -
+  crescendo/cr3_s0/outer_yield_m4x             commit            -   0.552   1.002   2.869       -
+  intonation/in_s0/perf_gain                   commit        1.253   0.475   1.436       -       -
+  intonation/in_s0/perf_log                    commit        1.274   0.539   1.813       -       -
+  intonation/in_s0/perf_raw                    commit        1.317   0.517   1.668       -       -
+  caesura/ca_s0/dsil_read                      commit            -   0.719   1.323   2.351   3.391
+  caesura/ca_s0/dsil_sched                     provisional   1.508   1.040   1.649       -       -
+  crescendo/cr3_s0/outer_yield_m4              commit            -   0.434   0.757   1.966       -
+  crescendo/cr3_s0/anchor_long                 provisional   1.441   0.996   1.541       -       -
+  intonation/ma_s0/mperf_rawx                  commit            -   0.273   0.310   1.319       -
+  intonation/in_s0/outcome_gate                commit        2.316   0.262   0.623       -       -
+  intonation/in_s0/perf_gate                   commit        1.816   0.235   0.854       -       -
+  intonation/ma_s0/mperf_gate                  commit            -   0.103   0.101   0.731       -
+  intonation/ma_s0/mperf_gain                  commit            -   0.119   0.175   0.706       -
+  intonation/ma_s0/mout_gate                   commit            -   0.159   0.261   0.533       -
+  intonation/ma_s0/mperf_log                   commit            -   0.087   0.135   0.515       -
+
+====================================================================================================
+(2b) THE CALENDAR CLOCK — the same table on ABSOLUTE cycle, not tau
+====================================================================================================
+  The since-arrival clock and the calendar clock are different questions. On the
+  calendar an earned arm's level reads 0.000 before its commit; a gifted arm's
+  reads its whole history. Both views are needed because a gifted arm's tau=0 is
+  cycle 1, when the trunk is untrained, while an earned arm's tau=0 is cycle 18-129,
+  when it is not: early-tau rates across the two families are not like for like.
+
+  --- level 2
+  node/tag/arm                                  arr     c16     c32     c48     c64     c80     c96    c116    c140    c162
+  maestro/ma_s0/learned_task                     14  0.0311  0.1267  0.2016  0.2547  0.3074  0.3624  0.4356       -       -
+  conductor/cd_s0/outer_endo                     16  0.3382  0.1079  0.2028  0.2404  0.3056  0.3497  0.4104  0.4748       -
+  maestro/ma_s0/learned_yield                    39  0.0000  0.0000  0.0874  0.2045  0.2676  0.3236  0.3422       -       -
+  maestro/ma_s1/outer_yield_j                    26  0.0000  0.0608  0.1714  0.2288  0.3025  0.3272  0.3400       -       -
+  crescendo/cr3_s1/ceiling_m3_j                  26  0.0000  0.0608  0.1714  0.2288  0.3025  0.3272  0.3376  0.3067       -
+  crescendo/cr3_s1/outer_yield_m4_j              26  0.0000  0.0608  0.1714  0.2288  0.3025  0.3272  0.3376  0.2389       -
+  assay/as_s1/given_c1_j                          1  0.3500  0.3543  0.3574  0.3720  0.3529  0.3599  0.3328       -       -
+  spiral/sp_s0/fid                                1  0.3366  0.3032  0.3183  0.3156  0.3371  0.3598  0.3299       -       -
+  crescendo/cr3_s0/ceiling_m3                    49  0.0000  0.0000  0.0000  0.1061  0.2388  0.2872  0.3071  0.2875  0.2576
+  crescendo/cr3_s0/outer_yield_m3                49  0.0000  0.0000  0.0000  0.1061  0.2388  0.2872  0.3071  0.2437       -
+  crescendo/cr3_s0/outer_yield_m4                49  0.0000  0.0000  0.0000  0.1061  0.2388  0.2872  0.3071  0.2838  0.2069
+  conductor/cd_s0/outer_yield                    49  0.0000  0.0000  0.0000  0.1061  0.2388  0.2872  0.3019       -       -
+  spiral/sp_s0/given_native                       1  0.3057  0.2920  0.3222  0.3295  0.3486  0.3669  0.3019       -       -
+  census/cs_s0/given_native                       1  0.3057  0.2920  0.2880  0.2989  0.2900  0.3141  0.2905       -       -
+  crescendo/cr3_s0/anchor_long                   18  0.0000  0.0901  0.1878  0.1926  0.2257  0.2523  0.2838  0.2354  0.2303
+  census/cs_s0/census_extend                     18  0.0000  0.0833  0.2016  0.2245  0.2548  0.2833  0.2722       -       -
+  assay/as_s0/junk_dose                          18  0.0000  0.0793  0.1846  0.2224  0.2267  0.2631  0.2692       -       -
+  crescendo/cr3_s0/outer_yield_m4x               49  0.0000  0.0000  0.0000  0.0996  0.2248  0.2595  0.2690  0.2170  0.1782
+  conductor/cd_s0/anchor                         18  0.0000  0.0901  0.1878  0.2098  0.2648  0.2870  0.2502       -       -
+  census/cs_s0/given_route                        1  0.3252  0.3449  0.3317  0.3350  0.3201  0.3218  0.2477       -       -
+  census/cs_s0/census_gate                       35  0.0000  0.0000  0.0966  0.2608  0.2837  0.2609  0.2469       -       -
+  spiral/sp_s0/spiral                            18  0.0000  0.0743  0.1264  0.1813  0.1845  0.2336  0.2431       -       -
+  caesura/ca_s0/dsil_sched                       18  0.0000  0.0798  0.1614  0.1858  0.2008  0.2311  0.2428  0.2045  0.1889
+  assay/as_s0/complete                           18  0.0000  0.1014  0.1977  0.2425  0.2764  0.2959  0.2384       -       -
+  assay/as_s0/strip                              18  0.0000  0.0675  0.1593  0.1992  0.2530  0.2681  0.2258       -       -
+  assay/as_s0/exact                              18  0.0000  0.1019  0.2068  0.2115  0.2381  0.2116  0.2242       -       -
+  intonation/in_s0/perf_gain                     49  0.0000  0.0000  0.0000  0.0878  0.1728  0.2009  0.2106       -       -
+  assay/as_s1/exact_j                            19  0.0000  0.1065  0.1882  0.2035  0.2107  0.2359  0.2059       -       -
+  spiral/sp_s0/spiral_route                      18  0.0000  0.0901  0.1368  0.2096  0.2147  0.1945  0.1924       -       -
+  caesura/ca_s0/dsil_read                        18  0.0000  0.0798  0.1588  0.1974  0.2251  0.2372  0.1754  0.1449  0.1534
+  intonation/in_s0/outcome_gate                  49  0.0000  0.0000  0.0000  0.0428  0.0713  0.1099  0.1605       -       -
+  intonation/in_s0/perf_gate                     49  0.0000  0.0000  0.0000  0.0448  0.0745  0.1244  0.1544       -       -
+  intonation/in_s0/perf_log                      49  0.0000  0.0000  0.0000  0.0874  0.1614  0.1817  0.1534       -       -
+  intonation/ma_s0/mperf_gate                    43  0.0000  0.0000  0.0130  0.0329  0.0909  0.1126  0.1463  0.2018       -
+  intonation/in_s0/perf_raw                      49  0.0000  0.0000  0.0000  0.0742  0.1495  0.1784  0.1461       -       -
+  audiation/au_s1/perdatum                       19  0.0000  0.1564  0.1909  0.1667  0.1468  0.1404  0.1325       -       -
+  intonation/ma_s0/mout_gate                     43  0.0000  0.0000  0.0186  0.0681  0.0745  0.0932  0.0951  0.1185       -
+  intonation/ma_s0/mperf_gain                    43  0.0000  0.0000  0.0203  0.0350  0.0622  0.0627  0.0897  0.1023       -
+  intonation/ma_s0/mperf_log                     43  0.0000  0.0000  0.0203  0.0361  0.0626  0.0714  0.0887  0.1229       -
+  intonation/ma_s0/mperf_rawx                    43  0.0000  0.0000  0.0116  0.0292  0.0441  0.0593  0.0623  0.0786       -
+  conductor/cd_s0/outer_ledger                   10  0.0879  0.1496  0.2490  0.3100  0.3722  0.3878       -       -       -
+  maestro/ma_s1/learned_yield_j                  26  0.0000  0.0608  0.1812  0.2148  0.2328  0.2585       -       -       -
+  caesura/ca_s0/dsil_and                         49  0.0000  0.0000  0.0000  0.0874  0.1634  0.1882       -       -       -
+
+  --- level 3
+  node/tag/arm                                  arr     c16     c32     c48     c64     c80     c96    c116    c140    c162
+  census/cs_s0/given_route                        1  0.3481  0.3452  0.3282  0.3533  0.3640  0.4186  0.5796       -       -
+  census/cs_s0/given_native                       1  0.3357  0.3746  0.3747  0.3561  0.3911  0.4014  0.4962       -       -
+  spiral/sp_s0/given_native                       1  0.3357  0.3746  0.3721  0.3522  0.3696  0.3572  0.4694       -       -
+  assay/as_s1/given_c1_j                          1  0.2516  0.2744  0.2517  0.2816  0.3287  0.3670  0.4485       -       -
+  spiral/sp_s0/fid                                1  0.2830  0.3182  0.3386  0.3661  0.3769  0.3837  0.4356       -       -
+  spiral/sp_s0/spiral_route                      48  0.0000  0.0000  0.1732  0.0799  0.1590  0.2202  0.3265       -       -
+  assay/as_s1/exact_j                            56  0.0000  0.0000  0.0000  0.0537  0.1458  0.1889  0.2871       -       -
+  assay/as_s0/complete                           72  0.0000  0.0000  0.0000  0.0000  0.0452  0.1297  0.2757       -       -
+  intonation/in_s0/perf_log                      72  0.0000  0.0000  0.0000  0.0000  0.0328  0.0942  0.2742       -       -
+  assay/as_s0/strip                              67  0.0000  0.0000  0.0000  0.0000  0.0595  0.1362  0.2665       -       -
+  assay/as_s0/exact                              70  0.0000  0.0000  0.0000  0.0000  0.0529  0.1448  0.2469       -       -
+  intonation/in_s0/perf_raw                      72  0.0000  0.0000  0.0000  0.0000  0.0301  0.0950  0.2419       -       -
+  audiation/au_s1/perdatum                       62  0.0000  0.0000  0.0000  0.3043  0.1221  0.1947  0.2413       -       -
+  spiral/sp_s0/spiral                            52  0.0000  0.0000  0.0000  0.0465  0.0967  0.1339  0.2393       -       -
+  census/cs_s0/census_gate                       70  0.0000  0.0000  0.0000  0.0000  0.0427  0.1421  0.2387       -       -
+  conductor/cd_s0/anchor                         69  0.0000  0.0000  0.0000  0.0000  0.0504  0.1382  0.2335       -       -
+  caesura/ca_s0/dsil_read                        71  0.0000  0.0000  0.0000  0.0000  0.0543  0.1331  0.1949  0.2545  0.2542
+  assay/as_s0/junk_dose                          67  0.0000  0.0000  0.0000  0.0000  0.0434  0.1136  0.1819       -       -
+  intonation/in_s0/perf_gain                     72  0.0000  0.0000  0.0000  0.0000  0.0256  0.0791  0.1735       -       -
+  caesura/ca_s0/dsil_sched                       77  0.0000  0.0000  0.0000  0.0000  0.0303  0.0858  0.1724  0.3265  0.3836
+  census/cs_s0/census_extend                     70  0.0000  0.0000  0.0000  0.0000  0.0335  0.0884  0.1578       -       -
+  crescendo/cr3_s0/anchor_long                   75  0.0000  0.0000  0.0000  0.0000  0.0302  0.0933  0.1522  0.3113  0.3645
+  crescendo/cr3_s0/outer_yield_m4x               79  0.0000  0.0000  0.0000  0.0000  0.0055  0.0702  0.1413  0.2347  0.2294
+  maestro/ma_s0/learned_yield                    85  0.0000  0.0000  0.0000  0.0000  0.0000  0.0358  0.1397       -       -
+  intonation/in_s0/outcome_gate                  72  0.0000  0.0000  0.0000  0.0000  0.0136  0.0389  0.1302       -       -
+  intonation/in_s0/perf_gate                     72  0.0000  0.0000  0.0000  0.0000  0.0093  0.0324  0.1105       -       -
+  conductor/cd_s0/outer_yield                    92  0.0000  0.0000  0.0000  0.0000  0.0000  0.0188  0.1086       -       -
+  crescendo/cr3_s0/ceiling_m3                    92  0.0000  0.0000  0.0000  0.0000  0.0000  0.0188  0.1045  0.2194  0.3350
+  crescendo/cr3_s0/outer_yield_m3                92  0.0000  0.0000  0.0000  0.0000  0.0000  0.0188  0.1045  0.2750       -
+  crescendo/cr3_s0/outer_yield_m4                92  0.0000  0.0000  0.0000  0.0000  0.0000  0.0188  0.1045  0.2147  0.2904
+  crescendo/cr3_s1/ceiling_m3_j                 103  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0849  0.3104       -
+  crescendo/cr3_s1/outer_yield_m4_j             103  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0849  0.2164       -
+  maestro/ma_s1/outer_yield_j                   103  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0834       -       -
+  intonation/ma_s0/mperf_gain                    83  0.0000  0.0000  0.0000  0.0000  0.0000  0.0118  0.0467  0.1219       -
+  intonation/ma_s0/mperf_log                     83  0.0000  0.0000  0.0000  0.0000  0.0000  0.0100  0.0435  0.0735       -
+  intonation/ma_s0/mperf_rawx                    83  0.0000  0.0000  0.0000  0.0000  0.0000  0.0134  0.0363  0.0735       -
+  intonation/ma_s0/mperf_gate                    83  0.0000  0.0000  0.0000  0.0000  0.0000  0.0064  0.0270  0.0817       -
+  intonation/ma_s0/mout_gate                     83  0.0000  0.0000  0.0000  0.0000  0.0000  0.0055  0.0219  0.0481       -
+  conductor/cd_s0/outer_endo                      -  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000       -
+  conductor/cd_s0/yoked_endo                      -  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000       -
+  maestro/ma_s0/learned_task                      -  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000       -       -
+  conductor/cd_s0/outer_ledger                    -  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000       -       -       -
+  maestro/ma_s1/learned_yield_j                  54  0.0000  0.0000  0.0000  0.0368  0.0798  0.1601       -       -       -
+  caesura/ca_s0/dsil_and                          -  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000       -       -       -
+
+  --- level 4
+  node/tag/arm                                  arr     c16     c32     c48     c64     c80     c96    c116    c140    c162
+  caesura/ca_s0/dsil_read                        97  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.1016  0.1999  0.3096
+  intonation/in_s0/perf_log                     104  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0714       -       -
+  intonation/in_s0/perf_gain                    104  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0615       -       -
+  intonation/in_s0/perf_raw                     104  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0533       -       -
+  intonation/in_s0/perf_gate                    104  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0335       -       -
+  intonation/in_s0/outcome_gate                 104  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0239       -       -
+  intonation/ma_s0/mperf_rawx                   115  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0074  0.0748       -
+  intonation/ma_s0/mout_gate                    115  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0046  0.0373       -
+  intonation/ma_s0/mperf_gain                   115  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0034  0.0263       -
+  intonation/ma_s0/mperf_gate                   115  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0033  0.0360       -
+  crescendo/cr3_s0/outer_yield_m4x              119  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0026  0.0857  0.2653
+  intonation/ma_s0/mperf_log                    115  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0025  0.0268       -
+  crescendo/cr3_s0/anchor_long                  180  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
+  crescendo/cr3_s0/ceiling_m3                     -  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
+  crescendo/cr3_s0/outer_yield_m3                 -  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000       -
+  crescendo/cr3_s0/outer_yield_m4               129  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0327  0.1518
+  crescendo/cr3_s1/ceiling_m3_j                   -  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000       -
+  crescendo/cr3_s1/outer_yield_m4_j             121  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.1521       -
+  caesura/ca_s0/dsil_sched                      180  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
+  caesura/ca_s0/dsil_and                         81  0.0000  0.0000  0.0000  0.0000  0.0000  0.1395       -       -       -
+
+====================================================================================================
+(2c) THE SHAPE — de-funding, then the crossing back to indifference
+====================================================================================================
+  lift = mass / (this level's open slots / all open slots). A newly unmasked level
+  enters the softmax at lift ~= 1 (untrained logits). The columns:
+    lift0    lift at the first post-arrival probe
+    liftmin  the minimum lift over the post-arrival window, and the tau it occurs at
+    cross1   the first tau at which lift reaches 1.0 (interpolated). This is the
+             censoring-safe 'time to indifference' — pi has stopped de-funding the
+             level and is proposing it at chance.
+    liftend  lift at the last probe
+
+  --- level 2
+  node/tag/arm                                 kind          lift0  liftmin   @tau  cross1  liftend  win
+  assay/as_s1/given_c1_j                       gift@c1       1.132    1.132      0     0.0    1.165  115
+  census/cs_s0/given_native                    gift@c1       1.132    0.962     23    28.1    1.017  115
+  spiral/sp_s0/given_native                    gift@c1       1.132    0.962     23    28.1    1.057  115
+  spiral/sp_s0/fid                             gift@c1       1.132    1.042     39    39.0    1.155  115
+  conductor/cd_s0/outer_yield                  commit        0.182    0.182      7    46.8    0.981   90
+  crescendo/cr3_s0/ceiling_m3                  commit        0.182    0.182      7    46.8    0.901  113
+  crescendo/cr3_s0/outer_yield_m3              commit        0.182    0.182      7    46.8    0.929  101
+  crescendo/cr3_s0/outer_yield_m4              commit        0.182    0.182      7    46.8    0.776  113
+  maestro/ma_s0/learned_yield                  commit        0.044    0.044      1    50.3    1.109   91
+  conductor/cd_s0/outer_ledger                 commit        0.264    0.253      9    58.9    1.187   94
+  assay/as_s0/complete                         commit        0.172    0.172      6    68.1    0.834   98
+  crescendo/cr3_s0/outer_yield_m4x             commit        0.175    0.175      7    68.5    0.691  117
+  maestro/ma_s1/outer_yield_j                  commit        0.183    0.183      6    70.4    1.047  111
+  crescendo/cr3_s1/ceiling_m3_j                commit        0.183    0.183      6    70.4    1.010  125
+  crescendo/cr3_s1/outer_yield_m4_j            commit        0.183    0.183      6    70.4    0.768  125
+  assay/as_s0/strip                            commit        0.125    0.125      6    70.9    0.790   98
+  conductor/cd_s0/anchor                       commit        0.158    0.158      6    70.9    0.876   98
+  conductor/cd_s0/outer_endo                   commit        1.015    0.191      8    74.0    1.559  130
+  maestro/ma_s0/learned_task                   commit        0.093    0.093      2    77.7    1.302  111
+  census/cs_s0/census_extend                   commit        0.158    0.158      6    82.3    0.953   98
+  assay/as_s0/junk_dose                        commit        0.139    0.139      6    82.4    0.942   98
+  crescendo/cr3_s0/anchor_long                 commit        0.158    0.158      6    92.5    0.760  183
+  maestro/ma_s1/learned_yield_j                commit        0.183    0.183      6       -    0.862   80
+  audiation/au_s1/perdatum                     commit        0.511    0.411     85       -    0.464   97
+  census/cs_s0/census_gate                     commit        0.178    0.178      5       -    0.864   81
+  census/cs_s0/given_route                     gift@c1       1.132    0.867    115       -    0.867  115
+  assay/as_s0/exact                            commit        0.162    0.162      6       -    0.785   98
+  assay/as_s1/exact_j                          commit        0.158    0.158      5       -    0.721   97
+  intonation/ma_s0/mout_gate                   commit        0.056    0.056      5       -    0.454  110
+  intonation/ma_s0/mperf_gain                  commit        0.061    0.061      5       -    0.404  110
+  intonation/ma_s0/mperf_gate                  commit        0.039    0.039      5       -    0.732  110
+  intonation/ma_s0/mperf_log                   commit        0.061    0.061      5       -    0.526  110
+  intonation/ma_s0/mperf_rawx                  commit        0.035    0.035      5       -    0.324  110
+  intonation/in_s0/outcome_gate                commit        0.093    0.093      7       -    0.573   82
+  intonation/in_s0/perf_gain                   commit        0.182    0.172     10       -    0.602   82
+  intonation/in_s0/perf_gate                   commit        0.105    0.102     10       -    0.835   82
+  intonation/in_s0/perf_log                    commit        0.156    0.156      7       -    0.543   82
+  intonation/in_s0/perf_raw                    commit        0.135    0.135      7       -    0.546   82
+  caesura/ca_s0/dsil_and                       commit        0.156    0.156      7       -    0.515   65
+  caesura/ca_s0/dsil_read                      commit        0.152    0.152      6       -    0.574  158
+  caesura/ca_s0/dsil_sched                     commit        0.152    0.152      6       -    0.564  183
+  spiral/sp_s0/spiral                          commit        0.145    0.145      6       -    0.851   98
+  spiral/sp_s0/spiral_route                    commit        0.158    0.158      6       -    0.673   98
+    gift@c1    n= 5  median cross1=  28.1 (4/5 ever cross)  median liftmin=0.962  median liftend=1.057
+    earned     n=38  median cross1=  70.4 (18/38 ever cross)  median liftmin=0.158  median liftend=0.780
+
+  --- level 3
+  node/tag/arm                                 kind          lift0  liftmin   @tau  cross1  liftend  win
+  census/cs_s0/given_native                    gift@c1       1.003    1.003      0     0.0    3.473  115
+  census/cs_s0/given_route                     gift@c1       1.003    1.003      0     0.0    4.057  115
+  assay/as_s1/given_c1_j                       gift@c1       1.003    1.003      0     0.0    3.139  115
+  spiral/sp_s0/fid                             gift@c1       1.003    1.003      0     0.0    3.050  115
+  spiral/sp_s0/given_native                    gift@c1       1.003    1.003      0     0.0    3.285  115
+  maestro/ma_s1/outer_yield_j                  commit        0.035    0.035      1    20.0    1.620   34
+  crescendo/cr3_s1/outer_yield_m4_j            commit        0.035    0.035      1    21.1    1.759   48
+  crescendo/cr3_s1/ceiling_m3_j                commit        0.035    0.035      1    21.7    2.550   48
+  assay/as_s1/exact_j                          commit        1.199    0.376      8    23.4    2.010   60
+  assay/as_s0/exact                            commit        0.153    0.153      2    25.6    1.728   46
+  census/cs_s0/census_gate                     commit        0.072    0.072      2    26.1    1.671   46
+  assay/as_s0/complete                         commit        1.141    0.316      8    26.1    1.930   44
+  caesura/ca_s0/dsil_read                      commit        0.036    0.036      1    26.8    1.735  105
+  audiation/au_s1/perdatum                     commit        2.130    0.735     10    26.9    1.689   54
+  caesura/ca_s0/dsil_sched                     commit        0.212    0.212      3    27.6    3.346  124
+  conductor/cd_s0/anchor                       commit        0.156    0.156      3    27.7    1.634   47
+  spiral/sp_s0/spiral_route                    commit        1.212    0.411      8    28.9    2.285   68
+  conductor/cd_s0/outer_yield                  commit        0.132    0.132      4    28.9    1.636   47
+  intonation/in_s0/perf_log                    commit        1.215    0.229      8    29.5    1.628   59
+  assay/as_s0/strip                            commit        0.196    0.196      5    29.8    1.865   49
+  intonation/in_s0/perf_raw                    commit        1.214    0.211      8    30.0    1.634   59
+  maestro/ma_s0/learned_yield                  commit        0.147    0.147      3    31.6    1.534   45
+  crescendo/cr3_s0/ceiling_m3                  commit        0.132    0.132      4    34.3    2.345   70
+  crescendo/cr3_s0/outer_yield_m3              commit        0.132    0.132      4    34.3    1.785   58
+  crescendo/cr3_s0/outer_yield_m4              commit        0.132    0.132      4    34.3    2.178   70
+  assay/as_s0/junk_dose                        commit        0.152    0.152      5    34.7    1.274   49
+  intonation/in_s0/perf_gain                   commit        1.231    0.179      8    35.3    1.385   59
+  crescendo/cr3_s0/anchor_long                 commit        0.211    0.211      5    35.8    2.871  126
+  crescendo/cr3_s0/outer_yield_m4x             commit        0.038    0.038      1    36.4    1.772   87
+  maestro/ma_s1/learned_yield_j                commit        0.091    0.091      2    39.2    1.399   52
+  census/cs_s0/census_extend                   commit        0.064    0.064      2    41.6    1.105   46
+  spiral/sp_s0/spiral                          commit        0.149    0.149      4    45.3    1.675   64
+  intonation/in_s0/outcome_gate                commit        1.722    0.096      8    54.5    1.165   59
+  intonation/ma_s0/mout_gate                   commit        0.019    0.019      5       -    0.417   70
+  intonation/ma_s0/mperf_gain                  commit        0.064    0.064      5       -    0.931   70
+  intonation/ma_s0/mperf_gate                  commit        0.027    0.027      5       -    0.815   70
+  intonation/ma_s0/mperf_log                   commit        0.032    0.032      5       -    0.647   70
+  intonation/ma_s0/mperf_rawx                  commit        0.051    0.051      5       -    0.598   70
+  intonation/in_s0/perf_gate                   commit        1.473    0.065      8       -    0.987   59
+    gift@c1    n= 5  median cross1=   0.0 (5/5 ever cross)  median liftmin=1.003  median liftend=3.285
+    earned     n=34  median cross1=  29.6 (28/34 ever cross)  median liftmin=0.132  median liftend=1.653
+
+  --- level 4
+  node/tag/arm                                 kind          lift0  liftmin   @tau  cross1  liftend  win
+  caesura/ca_s0/dsil_sched                     provisional   1.508    0.076      1     7.7    1.985   21
+  crescendo/cr3_s0/anchor_long                 provisional   1.441    0.064      1     8.1    1.775   21
+  crescendo/cr3_s1/outer_yield_m4_j            commit        0.493    0.493      7    11.4    3.288   30
+  intonation/in_s0/perf_log                    commit        1.274    0.539      8    11.6    2.517   27
+  caesura/ca_s0/dsil_read                      commit        0.642    0.642      7    11.7    5.510   79
+  caesura/ca_s0/dsil_and                       commit        0.619    0.619      7    12.0    3.851   33
+  intonation/in_s0/perf_gain                   commit        1.253    0.475      8    12.6    2.855   27
+  intonation/in_s0/perf_raw                    commit        1.317    0.517      8    12.9    2.383   27
+  crescendo/cr3_s0/outer_yield_m4x             commit        0.078    0.078      1    16.0    3.869   47
+  crescendo/cr3_s0/outer_yield_m4              commit        0.416    0.416      7    18.6    2.277   33
+  intonation/in_s0/outcome_gate                commit        2.316    0.262      8    22.2    1.304   27
+  intonation/ma_s0/mperf_rawx                  commit        0.222    0.222      5    23.8    1.515   38
+  intonation/in_s0/perf_gate                   commit        1.816    0.235      8    25.5    1.079   27
+  intonation/ma_s0/mout_gate                   commit        0.137    0.137      5       -    0.739   38
+  intonation/ma_s0/mperf_gain                  commit        0.103    0.103      5       -    0.873   38
+  intonation/ma_s0/mperf_gate                  commit        0.100    0.099     17       -    0.745   38
+  intonation/ma_s0/mperf_log                   commit        0.075    0.075      5       -    0.591   38
+    earned     n=17  median cross1=  12.6 (13/17 ever cross)  median liftmin=0.235  median liftend=1.985
+
+====================================================================================================
+(3) PER-LEVEL ORDERING — is the clock slower higher up?
+====================================================================================================
+  Within each arm that has arrivals at >=2 levels: T, t1/2 and slope by level.
+  conductor/cd_s0/anchor                       L2: d32=0.0406 t1/2= 18.7 lift= 0.88 win=98  L3: d32=0.0526 t1/2= 23.3 lift= 1.63 win=47
+  conductor/cd_s0/outer_yield                  L2: d32=0.0565 t1/2= 19.6 lift= 0.98 win=90  L3: d32=0.0521 t1/2= 25.1 lift= 1.64 win=47
+  conductor/cd_s0/yoked_yield                  L2: d32=0.0565 t1/2= 19.6 lift= 0.98 win=90  L3: d32=0.0521 t1/2= 25.1 lift= 1.64 win=47
+  maestro/ma_s0/anchor                         L2: d32=0.0406 t1/2= 18.7 lift= 0.88 win=98  L3: d32=0.0526 t1/2= 23.3 lift= 1.63 win=47
+  maestro/ma_s0/learned_yield                  L2: d32=0.0706 t1/2= 18.0 lift= 1.11 win=91  L3: d32=0.0388 t1/2= 24.5 lift= 1.53 win=45
+  maestro/ma_s0/outer_yield                    L2: d32=0.0565 t1/2= 19.6 lift= 0.98 win=90  L3: d32=0.0521 t1/2= 25.1 lift= 1.64 win=47
+  maestro/ma_s0/yoked_learned                  L2: d32=0.0706 t1/2= 18.0 lift= 1.11 win=91  L3: d32=0.0388 t1/2= 24.5 lift= 1.53 win=45
+  maestro/ma_s1/learned_yield_j                L2: d32=0.0442 t1/2= 15.5 lift= 0.86 win=80  L3: d32=0.0270 t1/2= 30.0 lift= 1.40 win=52
+  maestro/ma_s1/outer_yield_j                  L2: d32=0.0428 t1/2= 19.2 lift= 1.05 win=111  L3: d32=0.0758 t1/2= 18.8 lift= 1.62 win=34
+  crescendo/cr3_s0/anchor_long                 L2: d32=0.0428 t1/2= 15.5 lift= 0.76 win=183  L3: d32=0.0294 t1/2= 47.3 lift= 2.87 win=126  L4: d32=     - t1/2=  0.0 lift= 1.77 win=21
+  crescendo/cr3_s0/ceiling_m3                  L2: d32=0.0565 t1/2= 18.0 lift= 0.90 win=113  L3: d32=0.0373 t1/2= 39.5 lift= 2.35 win=70
+  crescendo/cr3_s0/outer_yield_m3              L2: d32=0.0565 t1/2= 18.6 lift= 0.93 win=101  L3: d32=0.0373 t1/2= 27.6 lift= 1.78 win=58
+  crescendo/cr3_s0/outer_yield_m4              L2: d32=0.0565 t1/2= 14.5 lift= 0.78 win=113  L3: d32=0.0373 t1/2= 35.5 lift= 2.18 win=70  L4: d32=0.0323 t1/2= 20.0 lift= 2.28 win=33
+  crescendo/cr3_s0/outer_yield_m4x             L2: d32=0.0524 t1/2= 13.5 lift= 0.69 win=117  L3: d32=0.0354 t1/2= 31.7 lift= 1.77 win=87  L4: d32=0.0582 t1/2= 28.6 lift= 3.87 win=47
+  crescendo/cr3_s1/ceiling_m3_j                L2: d32=0.0428 t1/2= 18.5 lift= 1.01 win=125  L3: d32=0.0869 t1/2= 27.3 lift= 2.55 win=48
+  crescendo/cr3_s1/outer_yield_m4_j            L2: d32=0.0428 t1/2= 12.8 lift= 0.77 win=125  L3: d32=0.0637 t1/2= 18.2 lift= 1.76 win=48  L4: d32=     - t1/2= 14.0 lift= 3.29 win=30
+  audiation/au_s1/anchor                       L2: d32=0.0406 t1/2= 18.7 lift= 0.88 win=98  L3: d32=0.0526 t1/2= 23.3 lift= 1.63 win=47
+  audiation/au_s1/perdatum                     L2: d32=0.0053 t1/2=  0.0 lift= 0.46 win=97  L3: d32=-0.0388 t1/2=  0.0 lift= 1.69 win=54
+  census/cs_s0/census_extend                   L2: d32=0.0422 t1/2= 21.1 lift= 0.95 win=98  L3: d32=0.0262 t1/2= 23.1 lift= 1.10 win=46
+  census/cs_s0/census_gate                     L2: d32=0.0634 t1/2= 15.8 lift= 0.86 win=81  L3: d32=0.0576 t1/2= 22.8 lift= 1.67 win=46
+  census/cs_s0/given_native                    L2: d32=-0.0097 t1/2=  0.0 lift= 1.02 win=115  L3: d32=0.0717 t1/2=  4.9 lift= 3.47 win=115
+  census/cs_s0/given_route                     L2: d32=0.0063 t1/2=  0.0 lift= 0.87 win=115  L3: d32=0.0634 t1/2=  8.6 lift= 4.06 win=115
+  census/cs_s0/spiral_route                    L2: d32=0.0406 t1/2= 18.7 lift= 0.88 win=98  L3: d32=0.0526 t1/2= 23.3 lift= 1.63 win=47
+  census/cs_s0/yoked_delay                     L2: d32=0.0634 t1/2= 15.8 lift= 0.86 win=81  L3: d32=0.0576 t1/2= 22.8 lift= 1.67 win=46
+  assay/as_s0/anchor                           L2: d32=0.0406 t1/2= 18.7 lift= 0.88 win=98  L3: d32=0.0526 t1/2= 23.3 lift= 1.63 win=47
+  assay/as_s0/complete                         L2: d32=0.0454 t1/2= 16.2 lift= 0.83 win=98  L3: d32=0.0189 t1/2=  0.0 lift= 1.93 win=44
+  assay/as_s0/exact                            L2: d32=0.0486 t1/2= 15.4 lift= 0.78 win=98  L3: d32=0.0532 t1/2= 22.2 lift= 1.73 win=46
+  assay/as_s0/given_c1                         L2: d32=0.0063 t1/2=  0.0 lift= 0.87 win=115  L3: d32=0.0634 t1/2=  8.6 lift= 4.06 win=115
+  assay/as_s0/junk_dose                        L2: d32=0.0447 t1/2= 21.9 lift= 0.94 win=98  L3: d32=0.0330 t1/2= 25.1 lift= 1.27 win=49
+  assay/as_s0/strip                            L2: d32=0.0397 t1/2= 22.7 lift= 0.79 win=98  L3: d32=0.0415 t1/2= 28.3 lift= 1.87 win=49
+  assay/as_s1/exact_j                          L2: d32=0.0430 t1/2= 12.5 lift= 0.72 win=97  L3: d32=-0.0057 t1/2=  0.0 lift= 2.01 win=60
+  assay/as_s1/given_c1_j                       L2: d32=0.0091 t1/2=  0.0 lift= 1.16 win=115  L3: d32=0.0409 t1/2=  5.6 lift= 3.14 win=115
+  intonation/ma_s0/mout_gate                   L2: d32=0.0164 t1/2= 18.5 lift= 0.45 win=110  L3: d32=0.0057 t1/2= 42.6 lift= 0.42 win=70  L4: d32=0.0083 t1/2= 17.8 lift= 0.74 win=38
+  intonation/ma_s0/mperf_gain                  L2: d32=0.0089 t1/2= 33.9 lift= 0.40 win=110  L3: d32=0.0112 t1/2= 41.1 lift= 0.93 win=70  L4: d32=0.0125 t1/2= 25.9 lift= 0.87 win=38
+  intonation/ma_s0/mperf_gate                  L2: d32=0.0174 t1/2= 50.3 lift= 0.73 win=110  L3: d32=0.0068 t1/2= 49.7 lift= 0.81 win=70  L4: d32=0.0132 t1/2= 21.5 lift= 0.75 win=38
+  intonation/ma_s0/mperf_log                   L2: d32=0.0103 t1/2= 45.4 lift= 0.53 win=110  L3: d32=0.0115 t1/2= 32.8 lift= 0.65 win=70  L4: d32=0.0092 t1/2= 23.0 lift= 0.59 win=38
+  intonation/ma_s0/mperf_rawx                  L2: d32=0.0085 t1/2= 36.1 lift= 0.32 win=110  L3: d32=0.0083 t1/2= 34.4 lift= 0.60 win=70  L4: d32=0.0229 t1/2= 21.5 lift= 1.52 win=38
+  intonation/in_s0/outcome_gate                L2: d32=0.0136 t1/2= 32.7 lift= 0.57 win=82  L3: d32=-0.0602 t1/2=  0.0 lift= 1.17 win=59  L4: d32=     - t1/2=  0.0 lift= 1.30 win=27
+  intonation/in_s0/perf_gain                   L2: d32=0.0364 t1/2= 13.8 lift= 0.60 win=82  L3: d32=-0.0207 t1/2=  0.0 lift= 1.39 win=59  L4: d32=     - t1/2= 15.9 lift= 2.85 win=27
+  intonation/in_s0/perf_gate                   L2: d32=0.0139 t1/2= 38.6 lift= 0.83 win=82  L3: d32=-0.0479 t1/2=  0.0 lift= 0.99 win=59  L4: d32=     - t1/2=  0.0 lift= 1.08 win=27
+  intonation/in_s0/perf_log                    L2: d32=0.0350 t1/2= 11.8 lift= 0.54 win=82  L3: d32=-0.0061 t1/2=  0.0 lift= 1.63 win=59  L4: d32=     - t1/2=  0.0 lift= 2.52 win=27
+  intonation/in_s0/perf_raw                    L2: d32=0.0338 t1/2= 14.7 lift= 0.55 win=82  L3: d32=-0.0080 t1/2=  0.0 lift= 1.63 win=59  L4: d32=     - t1/2=  0.0 lift= 2.38 win=27
+  caesura/ca_s0/dsil_and                       L2: d32=0.0355 t1/2= 13.3 lift= 0.52 win=65  L4: d32=0.0770 t1/2= 15.6 lift= 3.85 win=33
+  caesura/ca_s0/dsil_read                      L2: d32=0.0361 t1/2= 13.1 lift= 0.57 win=158  L3: d32=0.0486 t1/2= 22.2 lift= 1.74 win=105  L4: d32=0.0356 t1/2= 36.0 lift= 5.51 win=79
+  caesura/ca_s0/dsil_sched                     L2: d32=0.0369 t1/2= 12.7 lift= 0.56 win=183  L3: d32=0.0415 t1/2= 47.9 lift= 3.35 win=124  L4: d32=     - t1/2=  0.0 lift= 1.99 win=21
+  caesura/ca_s0/dsil_yield                     L2: d32=0.0350 t1/2= 11.8 lift= 0.54 win=82  L3: d32=-0.0061 t1/2=  0.0 lift= 1.63 win=59  L4: d32=     - t1/2=  0.0 lift= 2.52 win=27
+  spiral/sp_s0/fid                             L2: d32=-0.0046 t1/2=  0.0 lift= 1.15 win=115  L3: d32=0.0513 t1/2=  4.8 lift= 3.05 win=115
+  spiral/sp_s0/given_native                    L2: d32=-0.0114 t1/2=  0.0 lift= 1.06 win=115  L3: d32=0.0777 t1/2=  4.3 lift= 3.29 win=115
+  spiral/sp_s0/spiral                          L2: d32=0.0282 t1/2= 28.8 lift= 0.85 win=98  L3: d32=0.0269 t1/2= 36.1 lift= 1.68 win=64
+  spiral/sp_s0/spiral_route                    L2: d32=0.0304 t1/2= 15.9 lift= 0.67 win=98  L3: d32=-0.0044 t1/2=  0.0 lift= 2.29 win=68
+
+  Within-arm paired comparison (only arms with BOTH levels; sign of L3 minus L2):
+    d32 (mass/10cyc over tau<=32)      n=39  L3>L2 in 15/39  median L2=0.0369  median L3=0.0354
+    t1/2                               n=39  L3>L2 in 26/39  median L2=15.8609  median L3=23.1165
+    mass at last probe                 n=39  L3>L2 in 24/39  median L2=0.2242  median L3=0.2363
+    lift at last probe                 n=39  L3>L2 in 38/39  median L2=0.7903  median L3=1.6889
+    L4 vs L3: d32                      n= 8  L4>L3 in 5/8  median L3=0.0113  median L4=0.0180
+    L4 vs L3: t1/2                     n=16  L4>L3 in 2/16  median L3=32.2798  median L4=16.8572
+    L4 vs L3: mass_end                 n=16  L4>L3 in 4/16  median L3=0.2008  median L4=0.1253
+    L4 vs L3: lift_end                 n=16  L4>L3 in 11/16  median L3=1.5063  median L4=1.8799
+
+  Aggregate over de-duplicated (arm, level) cells, by level and arrival kind:
+  cross1 = cycles from arrival back to chance-level share (after the trough).
+  tau@.10 / tau@.20 = cycles to reach an ABSOLUTE mass of 0.10 / 0.20 — the
+  complement to cross1, whose threshold needs less absolute mass higher up
+  (uniform share is 0.286 at L2, 0.143 at L3, 0.067 at L4).
+   level kind       n   med d16   med d32  med t1/2  med cross1  med t@.10  med t@.20  med mend  med lift  med win
+       2 earned    38    0.0279    0.0409      18.0        70.4       15.3       33.1    0.2147      0.78     98.0
+       2 gift@c1    5    0.0020   -0.0046       0.0        28.1        0.0        0.0    0.3019      1.06    115.0
+       3 earned    34    0.0235    0.0282      24.8        29.6       20.0       41.4    0.2336      1.65     59.0
+       3 gift@c1    5    0.1225    0.0634       4.9         0.0        0.0        3.0    0.4694      3.29    115.0
+       4 earned    17    0.0059    0.0229      15.9        12.6       15.2       29.9    0.1323      1.99     33.0
+
+====================================================================================================
+(4) NAMED CONTRASTS
+====================================================================================================
+
+  --- ARRIVAL: gift at c1 vs perfect content at commit time (assay)  (level 3)
+  arm                                       arr      m0    mend     d16     d32   t1/2    m@16    m@32    m@56  lift@32  liftend   amax  win
+  assay/as_s0/given_c1                        1  0.1433  0.5796  0.1274  0.0634    8.6  0.3471  0.3461  0.3578    2.423    4.057  0.831  115
+  assay/as_s0/exact                          70  0.0219  0.2469  0.0309  0.0532   22.2  0.0713  0.1921       -    1.345    1.728  0.240   46
+  assay/as_s0/complete                       72  0.1630  0.2757 -0.0466  0.0189    0.0  0.0884  0.2235       -    1.564    1.930  0.289   44
+  assay/as_s0/anchor                         69  0.0222  0.2335  0.0390  0.0526   23.3  0.0846  0.1904       -    1.333    1.634  0.234   47
+  assay/as_s0/junk_dose                      67  0.0218  0.1819  0.0194  0.0330   25.1  0.0528  0.1274       -    0.892    1.274  0.107   49
+  assay/as_s0/strip                          67  0.0280  0.2665  0.0279  0.0415   28.3  0.0727  0.1609       -    1.126    1.865  0.331   49
+  assay/as_s1/given_c1_j                      1  0.1433  0.4485  0.0700  0.0409    5.6  0.2554  0.2743  0.2790    1.920    3.139  0.625  115
+  assay/as_s1/exact_j                        56  0.1713  0.2871 -0.0411 -0.0057    0.0  0.1055  0.1532  0.2684    1.072    2.010  0.297   60
+  census/cs_s0/given_route                    1  0.1433  0.5796  0.1274  0.0634    8.6  0.3471  0.3461  0.3578    2.423    4.057  0.831  115
+  census/cs_s0/given_native                   1  0.1433  0.4962  0.1225  0.0717    4.9  0.3394  0.3729  0.3478    2.610    3.473  0.763  115
+  census/cs_s0/spiral_route                  69  0.0222  0.2335  0.0390  0.0526   23.3  0.0846  0.1904       -    1.333    1.634  0.234   47
+
+  --- ARRIVAL, level 2  (level 2)
+  arm                                       arr      m0    mend     d16     d32   t1/2    m@16    m@32    m@56  lift@32  liftend   amax  win
+  assay/as_s0/given_c1                        1  0.3235  0.2477  0.0020  0.0063    0.0  0.3267  0.3438  0.3311    1.203    0.867  0.112  115
+  assay/as_s0/exact                          18  0.0541  0.2242  0.0392  0.0486   15.4  0.1168  0.2096  0.2346    0.629    0.785  0.125   98
+  assay/as_s0/anchor                         18  0.0527  0.2502  0.0327  0.0406   18.7  0.1051  0.1826  0.2507    0.548    0.876  0.188   98
+  census/cs_s0/given_route                    1  0.3235  0.2477  0.0020  0.0063    0.0  0.3267  0.3438  0.3311    1.203    0.867  0.112  115
+  census/cs_s0/spiral_route                  18  0.0527  0.2502  0.0327  0.0406   18.7  0.1051  0.1826  0.2507    0.548    0.876  0.188   98
+
+  --- CREDIT: per-datum vs pooled (audiation au_s1)  (level 3)
+  arm                                       arr      m0    mend     d16     d32   t1/2    m@16    m@32    m@56  lift@32  liftend   amax  win
+  audiation/au_s1/anchor                     69  0.0222  0.2335  0.0390  0.0526   23.3  0.0846  0.1904       -    1.333    1.634  0.234   47
+  audiation/au_s1/perdatum                   62  0.3043  0.2413 -0.1165 -0.0388    0.0  0.1178  0.1802       -    1.262    1.689  0.362   54
+
+  --- CREDIT: per-datum vs pooled, level 2  (level 2)
+  arm                                       arr      m0    mend     d16     d32   t1/2    m@16    m@32    m@56  lift@32  liftend   amax  win
+  audiation/au_s1/anchor                     18  0.0527  0.2502  0.0327  0.0406   18.7  0.1051  0.1826  0.2507    0.548    0.876  0.188   98
+  audiation/au_s1/perdatum                   19  0.1704  0.1325 -0.0028  0.0053    0.0  0.1659  0.1874  0.1607    0.562    0.464  0.000   97
+
+  --- THE NEW RUNG: L4 after commit, both draws (crescendo)  (level 4)
+  arm                                       arr      m0    mend     d16     d32   t1/2    m@16    m@32    m@56  lift@32  liftend   amax  win
+  crescendo/cr3_s0/outer_yield_m4           129  0.0277  0.1518  0.0142  0.0323   20.0  0.0505  0.1311       -    1.966    2.277  0.201   33
+  crescendo/cr3_s0/outer_yield_m4x          119  0.0052  0.2579  0.0385  0.0582   28.6  0.0668  0.1913       -    2.869    3.869  0.406   47
+  crescendo/cr3_s0/anchor_long              180  0.0961  0.1183  0.0042       -    0.0  0.1027       -       -        -    1.775  0.156   21
+  crescendo/cr3_s1/outer_yield_m4_j         121  0.0329  0.2192  0.0628       -   14.0  0.1334       -       -        -    3.288  0.326   30
+  intonation/in_s0/perf_gain                104  0.0836  0.1903  0.0076       -   15.9  0.0958       -       -        -    2.855  0.281   27
+  intonation/ma_s0/mperf_gain               115  0.0069  0.0582  0.0030  0.0125   25.9  0.0116  0.0470       -    0.706    0.873  0.047   38
+  caesura/ca_s0/dsil_yield                  104  0.0849  0.1678  0.0225       -    0.0  0.1209       -       -        -    2.517  0.185   27
+
+  --- PACING: how the commit was paced (A1/A2/A3 L3)  (level 3)
+  arm                                       arr      m0    mend     d16     d32   t1/2    m@16    m@32    m@56  lift@32  liftend   amax  win
+  conductor/cd_s0/anchor                     69  0.0222  0.2335  0.0390  0.0526   23.3  0.0846  0.1904       -    1.333    1.634  0.234   47
+  conductor/cd_s0/outer_yield                92  0.0188  0.2337  0.0288  0.0521   25.1  0.0648  0.1855       -    1.299    1.636  0.214   47
+  conductor/cd_s0/yoked_yield                92  0.0188  0.2337  0.0288  0.0521   25.1  0.0648  0.1855       -    1.299    1.636  0.214   47
+  maestro/ma_s0/learned_yield                85  0.0210  0.2191  0.0271  0.0388   24.5  0.0644  0.1452       -    1.016    1.534  0.214   45
+  maestro/ma_s0/yoked_learned                85  0.0210  0.2191  0.0271  0.0388   24.5  0.0644  0.1452       -    1.016    1.534  0.214   45
+  maestro/ma_s0/outer_yield                  92  0.0188  0.2337  0.0288  0.0521   25.1  0.0648  0.1855       -    1.299    1.636  0.214   47
+  crescendo/cr3_s0/outer_yield_m4            92  0.0188  0.2904  0.0288  0.0373   35.5  0.0648  0.1380  0.3120    0.966    2.178  0.388   70
+  crescendo/cr3_s0/ceiling_m3                92  0.0188  0.3350  0.0288  0.0373   39.5  0.0648  0.1380  0.3192    0.966    2.345  0.432   70
+  census/cs_s0/census_extend                 70  0.0092  0.1578  0.0274  0.0262   23.1  0.0530  0.0929       -    0.650    1.105  0.099   46
+  census/cs_s0/census_gate                   70  0.0103  0.2387  0.0381  0.0576   22.8  0.0712  0.1947       -    1.363    1.671  0.232   46
+
+====================================================================================================
+(5) EXPOSURE vs CLOCK — does mass track cycles or executions?
+====================================================================================================
+  Cumulative level-l executions at each probe come from `log.entry.hist.beam[l]`
+  (the per-entry execution histogram of the beam/solve path). For each (arm, level)
+  we regress post-arrival mass on tau and on log10(1+cumulative executions) and
+  report both r2, plus the partial correlation of mass with executions given tau.
+  node/tag/arm                                  L  r2(tau)  r2(logU)  r(m,U|tau)      U_end
+  conductor/cd_s0/anchor                        2    0.787     0.707      -0.787    1995426
+  conductor/cd_s0/anchor                        3    0.948     0.882      -0.165    1099238
+  conductor/cd_s0/outer_endo                    2    0.837     0.061      -0.935    4622789
+  conductor/cd_s0/outer_ledger                  2    0.959     0.947      -0.424    3073888
+  conductor/cd_s0/outer_yield                   2    0.697     0.642      -0.647    2541675
+  conductor/cd_s0/outer_yield                   3    0.946     0.901       0.005     988438
+  conductor/cd_s0/yoked_endo                    2    0.837     0.061      -0.935    4622789
+  conductor/cd_s0/yoked_yield                   2    0.697     0.642      -0.647    2541675
+  conductor/cd_s0/yoked_yield                   3    0.946     0.901       0.005     988438
+  maestro/ma_s0/anchor                          2    0.787     0.707      -0.787    1995426
+  maestro/ma_s0/anchor                          3    0.948     0.882      -0.165    1099238
+  maestro/ma_s0/learned_task                    2    0.974     0.930      -0.745    3306844
+  maestro/ma_s0/learned_yield                   2    0.803     0.842       0.479    2632958
+  maestro/ma_s0/learned_yield                   3    0.980     0.948       0.324     915176
+  maestro/ma_s0/outer_yield                     2    0.697     0.642      -0.647    2541675
+  maestro/ma_s0/outer_yield                     3    0.946     0.901       0.005     988438
+  maestro/ma_s0/yoked_learned                   2    0.803     0.842       0.479    2632958
+  maestro/ma_s0/yoked_learned                   3    0.980     0.948       0.324     915176
+  maestro/ma_s1/learned_yield_j                 2    0.748     0.681      -0.798    1809355
+  maestro/ma_s1/learned_yield_j                 3    0.964     0.972       0.809     929188
+  maestro/ma_s1/outer_yield_j                   2    0.733     0.719      -0.206    3034479
+  maestro/ma_s1/outer_yield_j                   3    0.953     0.878       0.100     858146
+  crescendo/cr3_s0/anchor_long                  2    0.090     0.124       0.500    4315216
+  crescendo/cr3_s0/anchor_long                  3    0.886     0.918       0.626    3905716
+  crescendo/cr3_s0/anchor_long                  4    0.540     0.007      -0.923     369090
+  crescendo/cr3_s0/ceiling_m3                   2    0.443     0.450       0.128    3371188
+  crescendo/cr3_s0/ceiling_m3                   3    0.952     0.947       0.174    1650390
+  crescendo/cr3_s0/outer_yield_m3               2    0.497     0.478      -0.207    2893841
+  crescendo/cr3_s0/outer_yield_m3               3    0.952     0.931       0.105    1304188
+  crescendo/cr3_s0/outer_yield_m4               2    0.169     0.193       0.355    3178695
+  crescendo/cr3_s0/outer_yield_m4               3    0.941     0.933       0.049    1538639
+  crescendo/cr3_s0/outer_yield_m4               4    0.930     0.930       0.333     550467
+  crescendo/cr3_s0/outer_yield_m4x              2    0.114     0.159       0.603    2607603
+  crescendo/cr3_s0/outer_yield_m4x              3    0.890     0.905       0.387    1945961
+  crescendo/cr3_s0/outer_yield_m4x              4    0.903     0.877      -0.045     997086
+  crescendo/cr3_s1/ceiling_m3_j                 2    0.608     0.620       0.216    3579736
+  crescendo/cr3_s1/ceiling_m3_j                 3    0.960     0.913       0.114    1281968
+  crescendo/cr3_s1/outer_yield_m4_j             2    0.251     0.284       0.482    3359967
+  crescendo/cr3_s1/outer_yield_m4_j             3    0.942     0.888       0.079    1118564
+  crescendo/cr3_s1/outer_yield_m4_j             4    0.962     0.953      -0.246     699702
+  audiation/au_s1/anchor                        2    0.787     0.707      -0.787    1995426
+  audiation/au_s1/anchor                        3    0.948     0.882      -0.165    1099238
+  audiation/au_s1/perdatum                      2    0.637     0.542       0.628     751467
+  audiation/au_s1/perdatum                      3    0.116     0.073      -0.833    1328110
+  assay/as_s0/anchor                            2    0.787     0.707      -0.787    1995426
+  assay/as_s0/anchor                            3    0.948     0.882      -0.165    1099238
+  assay/as_s0/complete                          2    0.622     0.581      -0.523    2373084
+  assay/as_s0/complete                          3    0.661     0.025      -0.927    1106886
+  assay/as_s0/exact                             2    0.569     0.509      -0.761    2269436
+  assay/as_s0/exact                             3    0.951     0.922       0.230    1095906
+  assay/as_s0/given_c1                          2    0.519     0.223       0.485    8254543
+  assay/as_s0/given_c1                          3    0.769     0.712       0.344    9174369
+  assay/as_s0/junk_dose                         2    0.797     0.720      -0.764    1996050
+  assay/as_s0/junk_dose                         3    0.954     0.888       0.213     879553
+  assay/as_s0/strip                             2    0.677     0.576      -0.793    1900111
+  assay/as_s0/strip                             3    0.952     0.939       0.401    1175077
+  assay/as_s1/exact_j                           2    0.602     0.551      -0.795    1811785
+  assay/as_s1/exact_j                           3    0.734     0.050      -0.886    1469417
+  assay/as_s1/given_c1_j                        2    0.037     0.011       0.587    9102770
+  assay/as_s1/given_c1_j                        3    0.881     0.708       0.109    7698229
+  intonation/ma_s0/mout_gate                    2    0.895     0.743       0.816     326860
+  intonation/ma_s0/mout_gate                    3    0.960     0.556      -0.207     247217
+  intonation/ma_s0/mout_gate                    4    0.768     0.275      -0.154     188836
+  intonation/ma_s0/mperf_gain                   2    0.970     0.524       0.170     322740
+  intonation/ma_s0/mperf_gain                   3    0.924     0.259      -0.281     247864
+  intonation/ma_s0/mperf_gain                   4    0.855     0.316      -0.554     187932
+  intonation/ma_s0/mperf_gate                   2    0.952     0.739       0.479     331731
+  intonation/ma_s0/mperf_gate                   3    0.920     0.463      -0.780     248233
+  intonation/ma_s0/mperf_gate                   4    0.884     0.263      -0.585     189867
+  intonation/ma_s0/mperf_log                    2    0.985     0.723       0.163     324690
+  intonation/ma_s0/mperf_log                    3    0.952     0.659       0.204     247031
+  intonation/ma_s0/mperf_log                    4    0.871     0.689      -0.228     187856
+  intonation/ma_s0/mperf_rawx                   2    0.965     0.566       0.593     323240
+  intonation/ma_s0/mperf_rawx                   3    0.968     0.440      -0.277     248609
+  intonation/ma_s0/mperf_rawx                   4    0.864     0.236      -0.529     188670
+  intonation/in_s0/outcome_gate                 2    0.962     0.140      -0.008     512537
+  intonation/in_s0/outcome_gate                 3    0.075     0.428      -0.984      56320
+  intonation/in_s0/outcome_gate                 4    0.018     0.693      -0.998     185869
+  intonation/in_s0/perf_gain                    2    0.578     0.193       0.246     512916
+  intonation/in_s0/perf_gain                    3    0.541     0.021      -0.934      77433
+  intonation/in_s0/perf_gain                    4    0.596     0.007      -0.892     141824
+  intonation/in_s0/perf_gate                    2    0.975     0.352      -0.367     512341
+  intonation/in_s0/perf_gate                    3    0.092     0.399      -0.988      72329
+  intonation/in_s0/perf_gate                    4    0.003     0.585      -0.971      27136
+  intonation/in_s0/perf_log                     2    0.487     0.239       0.335     512913
+  intonation/in_s0/perf_log                     3    0.536     0.000      -0.712     119156
+  intonation/in_s0/perf_log                     4    0.653     0.017      -0.906     141824
+  intonation/in_s0/perf_raw                     2    0.577     0.806       0.754     512354
+  intonation/in_s0/perf_raw                     3    0.577     0.002      -0.824      58778
+  intonation/in_s0/perf_raw                     4    0.573     0.003      -0.943      76183
+  caesura/ca_s0/dsil_and                        2    0.720     0.243       0.323     512913
+  caesura/ca_s0/dsil_and                        4    0.951     0.000           -     237625
+  caesura/ca_s0/dsil_read                       2    0.003     0.272       0.533     513126
+  caesura/ca_s0/dsil_read                       3    0.824     0.257       0.425     223358
+  caesura/ca_s0/dsil_read                       4    0.957     0.000           -     235370
+  caesura/ca_s0/dsil_sched                      2    0.067     0.336       0.543     513126
+  caesura/ca_s0/dsil_sched                      3    0.944     0.165       0.185     340010
+  caesura/ca_s0/dsil_sched                      4    0.587     0.014      -0.952     113152
+  caesura/ca_s0/dsil_yield                      2    0.487     0.239       0.335     512913
+  caesura/ca_s0/dsil_yield                      3    0.536     0.000      -0.712     119156
+  caesura/ca_s0/dsil_yield                      4    0.653     0.017      -0.906     141824
+
+  medians over 101 cells: r2(tau)=0.803  r2(logU)=0.576  partial r(m,U|tau)=-0.165
+  (tau and cumulative executions are near-collinear post-arrival, so the levels
+   regression cannot separate them. The increments below can, a little.)
+
+  INCREMENTS — between consecutive probes, mass gained per cycle vs executions of
+  that level per cycle over the same interval. r_raw is their correlation; r|tau
+  partials out the interval's midpoint tau (mass gain decelerates with tau, and
+  so does everything else, which is the whole confound).
+  node/tag/arm                                  L   n   r_raw   r|tau  Urate_med
+  conductor/cd_s0/anchor                        2  18   0.107   0.662      20702
+  conductor/cd_s0/anchor                        3  11  -0.081   0.277      26040
+  conductor/cd_s0/outer_endo                    2  25  -0.184  -0.465      39018
+  conductor/cd_s0/outer_ledger                  2  18  -0.184  -0.150      29447
+  conductor/cd_s0/outer_yield                   2  18  -0.363   0.115      34339
+  conductor/cd_s0/outer_yield                   3  12   0.084   0.596      18458
+  maestro/ma_s0/learned_task                    2  21  -0.130   0.041      27712
+  maestro/ma_s0/learned_yield                   2  20  -0.287   0.051      31120
+  maestro/ma_s0/learned_yield                   3  12   0.446   0.452      16877
+  maestro/ma_s1/learned_yield_j                 2  18  -0.134   0.239      22130
+  maestro/ma_s1/learned_yield_j                 3  13   0.209  -0.115      14295
+  maestro/ma_s1/outer_yield_j                   2  22  -0.175   0.192      30720
+  maestro/ma_s1/outer_yield_j                   3  11   0.151   0.233      22434
+  crescendo/cr3_s0/anchor_long                  2  30  -0.032   0.299      25936
+  crescendo/cr3_s0/anchor_long                  3  21  -0.077  -0.611      34148
+  crescendo/cr3_s0/anchor_long                  4   6  -0.898  -0.923      10694
+  crescendo/cr3_s0/ceiling_m3                   2  21  -0.220   0.188      35236
+  crescendo/cr3_s0/ceiling_m3                   3  15   0.001   0.147      19775
+  crescendo/cr3_s0/outer_yield_m3               2  19  -0.281   0.147      34971
+  crescendo/cr3_s0/outer_yield_m3               3  13  -0.148   0.026      17456
+  crescendo/cr3_s0/outer_yield_m4               2  21  -0.356  -0.031      33145
+  crescendo/cr3_s0/outer_yield_m4               3  15   0.167   0.586      19558
+  crescendo/cr3_s0/outer_yield_m4               4   8   0.349   0.157      12855
+  crescendo/cr3_s0/outer_yield_m4x              2  21  -0.095   0.138      21057
+  crescendo/cr3_s0/outer_yield_m4x              3  17   0.035   0.110      22400
+  crescendo/cr3_s0/outer_yield_m4x              4  10  -0.064  -0.002      19894
+  crescendo/cr3_s1/ceiling_m3_j                 2  23  -0.459  -0.290      30988
+  crescendo/cr3_s1/ceiling_m3_j                 3  12   0.042   0.118      29884
+  crescendo/cr3_s1/outer_yield_m4_j             2  23  -0.576  -0.091      30988
+  crescendo/cr3_s1/outer_yield_m4_j             3  12   0.213   0.269      24039
+  crescendo/cr3_s1/outer_yield_m4_j             4   7   0.017   0.523      19099
+  audiation/au_s1/perdatum                      2  18  -0.096  -0.112       2082
+  audiation/au_s1/perdatum                      3  12   0.125  -0.558      24578
+  assay/as_s0/complete                          2  18  -0.320   0.448      27408
+  assay/as_s0/complete                          3  11  -0.280  -0.381      27167
+  assay/as_s0/exact                             2  18  -0.121   0.240      24427
+  assay/as_s0/exact                             3  11  -0.255  -0.007      25454
+  assay/as_s0/junk_dose                         2  18   0.056   0.324      19909
+  assay/as_s0/junk_dose                         3  11  -0.428  -0.589      16614
+  assay/as_s0/strip                             2  18  -0.314   0.226      20270
+  assay/as_s0/strip                             3  11  -0.146   0.071      30451
+  assay/as_s1/exact_j                           2  18   0.201   0.466      17982
+  assay/as_s1/exact_j                           3  13  -0.325  -0.456      32291
+  assay/as_s1/given_c1_j                        2  21   0.339   0.316      75020
+  assay/as_s1/given_c1_j                        3  21   0.161   0.379      65050
+  intonation/ma_s0/mout_gate                    2  21   0.533   0.453          0
+  intonation/ma_s0/mout_gate                    3  14  -0.313   0.042          0
+  intonation/ma_s0/mout_gate                    4   8   0.056  -0.018          0
+  intonation/ma_s0/mperf_gain                   2  21  -0.001  -0.082          0
+  intonation/ma_s0/mperf_gain                   3  14  -0.257  -0.044          0
+  intonation/ma_s0/mperf_gain                   4   8  -0.355   0.106          4
+  intonation/ma_s0/mperf_gate                   2  21   0.034  -0.028          0
+  intonation/ma_s0/mperf_gate                   3  14  -0.422  -0.156          0
+  intonation/ma_s0/mperf_gate                   4   8   0.224  -0.249          4
+  intonation/ma_s0/mperf_log                    2  21  -0.143   0.101          0
+  intonation/ma_s0/mperf_log                    3  14  -0.257   0.070          2
+  intonation/ma_s0/mperf_log                    4   8   0.327   0.394         46
+  intonation/ma_s0/mperf_rawx                   2  21   0.055  -0.084          0
+  intonation/ma_s0/mperf_rawx                   3  14  -0.045  -0.227          0
+  intonation/ma_s0/mperf_rawx                   4   8  -0.000  -0.175          0
+  intonation/in_s0/outcome_gate                 2  17  -0.003  -0.008          0
+  intonation/in_s0/outcome_gate                 3  13  -0.630  -0.550          0
+  intonation/in_s0/outcome_gate                 4   8  -0.930  -0.891          0
+  intonation/in_s0/perf_gain                    2  17   0.028   0.016          0
+  intonation/in_s0/perf_gain                    3  13  -0.626  -0.744          0
+  intonation/in_s0/perf_gain                    4   8  -0.341  -0.231          0
+  intonation/in_s0/perf_gate                    2  17   0.038   0.092          0
+  intonation/in_s0/perf_gate                    3  13  -0.923  -0.894          0
+  intonation/in_s0/perf_gate                    4   8  -0.785  -0.747          0
+  intonation/in_s0/perf_log                     2  17   0.178   0.100          0
+  intonation/in_s0/perf_log                     3  13  -0.236  -0.273          0
+  intonation/in_s0/perf_log                     4   8  -0.385  -0.524          0
+  intonation/in_s0/perf_raw                     2  17   0.190   0.123          0
+  intonation/in_s0/perf_raw                     3  13  -0.364  -0.375          0
+  intonation/in_s0/perf_raw                     4   8  -0.489  -0.487        267
+  caesura/ca_s0/dsil_and                        2  15   0.268   0.112          0
+  caesura/ca_s0/dsil_read                       2  26   0.097  -0.071          0
+  caesura/ca_s0/dsil_read                       3  18   0.058   0.038          0
+  caesura/ca_s0/dsil_sched                      2  30   0.028   0.020          0
+  caesura/ca_s0/dsil_sched                      3  21  -0.053   0.071          0
+  caesura/ca_s0/dsil_sched                      4   6  -0.968  -0.975          0
+    L2: n= 35  median r_raw=-0.095  median r|tau=+0.101  positive r|tau in 24/35
+    L3: n= 31  median r_raw=-0.081  median r|tau=+0.026  positive r|tau in 16/31
+    L4: n= 15  median r_raw=-0.341  median r|tau=-0.231  positive r|tau in 4/15
+    ALL: n= 81  median r_raw=-0.095  median r|tau=+0.038  positive r|tau in 44/81
+
+====================================================================================================
+(6) INSTRUMENT — what this readout can and cannot resolve
+====================================================================================================
+  1. Probe cadence is `probe_every` = 8 cycles, plus the first and last cycle of every era, so any time constant below ~8 cycles is at the sampling limit and T/t1/2 for such cells is reported but not resolved. There is no per-cycle pi mass series in `results.json`; the only per-cycle pi artifact in the arc is audiation's `snapshots/probe_trace.npz` (raw, unmasked logits), which lives on the volume and is not in the fetched mirror.
+  2. m0 is NOT zero. A level's slots are masked out of the softmax until its table is committed, and they re-enter carrying whatever the untrained logits give — near the uniform share of the live action set. So the number to read is the rise above the uniform reference (`lift`), not the raw mass; `m0` differences across arms are partly the head's arbitrary state at the moment of unmasking.
+  3. Right-censoring is severe and uneven: L4 arrivals leave 21-46 cycles of window while L2 arrivals leave 60-180. `M` (the saturating asymptote) is extrapolation wherever `win` is short relative to `T`; `m@tau` at matched tau is the censoring-safe comparison and is why section (2) exists.
+  4. Mass is a normalised distribution over the live action set: L1's 32 primitive slots always compete, and every level's mass is jointly constrained. A rise at L3 is arithmetically a fall somewhere else.
+  5. A level's mass is spread over only the (level,node) slots that hold a table entry, and extension/recert opens more slots mid-run. `navail` and `m/slot` separate the two, but the split is only read at the last probe here.
+  6. Arrival for gifted arms is cycle 1 by construction, which is also the cycle the probe series starts, so their m0 is the untrained head's mass, whereas an earned arm's m0 is measured after 18-129 cycles of unrelated training. The two m0s are not the same kind of number; m@tau is.
+  7. Single seed everywhere. The stream-displaced twins (`ma_s1`, `cr3_s1`, `as_s1`) bound draw-luck only. Census finding 7's floors apply to error-rate readings, not directly to mass; no floor for mass has been measured, and the displaced pairs here are the only handle on one.
+  8. The exposure column exists only where `entry` recording was on; census's gifted arms have no `entry` and are absent from section (5).

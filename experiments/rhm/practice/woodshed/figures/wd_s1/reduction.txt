@@ -1,0 +1,152 @@
+==========================================================================================
+woodshed / wd_s1 — does rehearsal compress the trust clock gift could not skip?
+==========================================================================================
+  arms: exact_reh, exact, exact_exp, given_c1
+
+==========================================================================================
+(0) GATES — what licenses reading this tag at all
+==========================================================================================
+  (a) CROSS-TAG REPLAY, full length. `woodshed.py` adds exactly one block, gated on
+      `reh_level`. Every arm that does not set it must reproduce `as_s0`'s arm of
+      the same name bit-for-bit over all 116 cycles. That IS the knobs-off gate.
+      anchor       not in this tag — skipped
+      exact        max|delta| over 13 series = 0.000e+00   cycle counts equal = True   -> PASS
+      given_c1     max|delta| over 13 series = 0.000e+00   cycle counts equal = True   -> PASS
+
+  (b) IN-TAG TWIN GATE. `exact_reh` / `exact_exp` are `exact` plus rehearsal, and
+      rehearsal cannot fire before the rehearsed level arrives. Up to that cycle
+      all three must be identical; at it they may diverge and not before.
+      exact_reh    first rehearsal cycle = 71   pre-window c1-c70: max|delta| = 0.000e+00 -> PASS   first divergence from `exact` = c71
+      exact_exp    first rehearsal cycle = 71   pre-window c1-c70: max|delta| = 0.000e+00 -> PASS   first divergence from `exact` = c71
+
+  (c) THE ONE-BIT PAIR. `exact_reh` and `exact_exp` run the same episodes and take
+      the same number of gradient steps on the same-size pair sets; they differ in
+      whether the success filter picks which trajectories pi imitates.
+      rehearsal cycles: 46 vs 46
+      first rehearsal cycle pair-count match (the assertable one): used 1264 vs 1264  -> PASS
+      later cycles differing in pairs-used: 44/45 (expected once the arms diverge; NOT a gate)
+      NOTE: `n_pairs_all` is structurally constant (train_on='tips' keeps every surviving trajectory), so matching it is vacuous and is not a gate.
+
+  (d) THE UNREHEARSED LEVEL is this round's only in-tag noise handle. Rehearsal
+      targets L3 only, so whatever spread the three `exact` arms show at L2 is what
+      trajectory divergence alone produces in this instrument. Quantified at the end
+      of section (2). It is not a measured floor (single seed, n=3) but it is the
+      only same-tag reference the round contains.
+
+==========================================================================================
+(1) REHEARSAL LEDGER — what rehearsal actually did
+==========================================================================================
+  succ        terminal possible-set success rate of the rehearsal episodes
+  offered     pairs the rehearsal beam produced (all surviving trajectories)
+  used        pairs actually appended to pi's buffer this cycle
+  f_macro     fraction of the USED supervision whose target is a macro slot (L>=2)
+  f_level     fraction whose target is a slot of the REHEARSED level
+  g           rehearsal groundings (extra practice compute, never priced into the
+              arm's declared per-solve budget; recorded so the price is on record)
+
+  --- exact_exp  (level 3, mode expose, 64 episodes/cycle, 46 rehearsal cycles)
+    cyc    succ  offered    used  f_macro  f_level     pbuf          g
+     71   0.154     8192    1264    0.663    0.545    60000     191168
+     74   0.102     8192     832    0.310    0.136    60000      72896
+     77   0.128     8192    1048    0.324    0.130    60000      72896
+     80   0.115     8192     944    0.306    0.091    60000      72896
+     83   0.104     8192     848    0.320    0.117    60000      72896
+     86   0.120     8192     984    0.343    0.111    60000      72896
+     89   0.186     8192    1520    0.351    0.152    60000      72896
+     92   0.128     8192    1048    0.357    0.150    60000      72896
+     95   0.164     8192    1344    0.363    0.161    60000      72896
+     98   0.145     8192    1184    0.378    0.157    60000      72896
+    101   0.174     8192    1424    0.343    0.148    60000      72896
+    104   0.209     8192    1712    0.397    0.137    60000      72896
+    107   0.200     8192    1640    0.358    0.157    60000      72896
+    110   0.164     8192    1344    0.388    0.205    60000      72896
+    113   0.207     8192    1696    0.399    0.199    60000      72896
+    116   0.122     8192    1000    0.387    0.200    60000      72896
+  TOTAL   0.156   376832   58832    0.370    0.163             3589760
+
+  --- exact_reh  (level 3, mode credit, 64 episodes/cycle, 46 rehearsal cycles)
+    cyc    succ  offered    used  f_macro  f_level     pbuf          g
+     71   0.154     8192    1264    0.685    0.552    60000     191168
+     74   0.145     8192    1184    0.391    0.112    60000      72896
+     77   0.135     8192    1104    0.363    0.164    60000      72896
+     80   0.131     8192    1072    0.373    0.166    60000      72896
+     83   0.136     8192    1112    0.352    0.138    60000      72896
+     86   0.181     8192    1480    0.373    0.209    60000      72896
+     89   0.153     8192    1256    0.338    0.123    60000      72896
+     92   0.094     8192     768    0.345    0.229    60000      72896
+     95   0.145     8192    1184    0.454    0.242    60000      72896
+     98   0.160     8192    1312    0.537    0.305    60000      72896
+    101   0.174     8192    1424    0.463    0.261    60000      72896
+    104   0.194     8192    1592    0.381    0.166    60000      72896
+    107   0.115     8192     944    0.433    0.282    60000      72896
+    110   0.073     8192     600    0.390    0.268    60000      72896
+    113   0.146     8192    1192    0.392    0.249    60000      72896
+    116   0.134     8192    1096    0.515    0.278    60000      72896
+  TOTAL   0.151   376832   56840    0.417    0.217             3589760
+
+==========================================================================================
+(2) TRUST — the part-1 instrument on this tag (see reduce_trust.py for semantics)
+==========================================================================================
+  arm             L  arr kind             m0    mend  lift0  liftmin  cross1  liftend     d16     d32   t1/2    m@16    m@32   amax  win
+  exact           2   18 commit       0.0541  0.2242  0.162    0.162       -    0.785  0.0392  0.0486   15.4  0.1168  0.2096  0.125   98
+  exact_exp       2   18 commit       0.0541  0.2041  0.162    0.162       -    0.714  0.0392  0.0486   14.0  0.1168  0.2096  0.120   98
+  exact_reh       2   18 commit       0.0541  0.1975  0.162    0.162       -    0.691  0.0392  0.0486   13.5  0.1168  0.2096  0.078   98
+  given_c1        2    1 gift@c1      0.3235  0.2477  1.132    0.867       -    0.867  0.0020  0.0063    0.0  0.3267  0.3438  0.112  115
+  exact           3   70 commit       0.0219  0.2469  0.153    0.153    25.6    1.728  0.0309  0.0532   22.2  0.0713  0.1921  0.240   46
+  exact_exp       3   70 commit       0.0644  0.2961  0.451    0.451    18.0    2.073  0.0422  0.0528   21.0  0.1318  0.2334  0.375   46
+  exact_reh       3   70 commit       0.0521  0.3922  0.365    0.365    16.1    2.745  0.0563  0.0690   26.4  0.1422  0.2728  0.555   46
+  given_c1        3    1 gift@c1      0.1433  0.5796  1.003    1.003     0.0    4.057  0.1274  0.0634    8.6  0.3471  0.3461  0.831  115
+
+  THE CELL. `exact` is the clock as it runs with no rehearsal; `exact_reh` is the
+  same clock with credited rehearsal; `exact_exp` with matched uncredited exposure;
+  `given_c1` is the clock already paid. Read cross1, lift@32 and liftend across the
+  four at the same tau.
+    level 3:
+      exact        arr c70   cross1=  25.6  lift@16= 0.499  lift@32= 1.345  liftend= 1.728  massend=0.2469  argmax=0.240
+      exact_reh    arr c70   cross1=  16.1  lift@16= 0.996  lift@32= 1.910  liftend= 2.745  massend=0.3922  argmax=0.555
+      exact_exp    arr c70   cross1=  18.0  lift@16= 0.923  lift@32= 1.634  liftend= 2.073  massend=0.2961  argmax=0.375
+      given_c1     arr c1    cross1=   0.0  lift@16= 2.430  lift@32= 2.423  liftend= 4.057  massend=0.5796  argmax=0.831
+    level 2:
+      exact        arr c18   cross1=     -  lift@16= 0.350  lift@32= 0.629  liftend= 0.785  massend=0.2242  argmax=0.125
+      exact_reh    arr c18   cross1=     -  lift@16= 0.350  lift@32= 0.629  liftend= 0.691  massend=0.1975  argmax=0.078
+      exact_exp    arr c18   cross1=     -  lift@16= 0.350  lift@32= 0.629  liftend= 0.714  massend=0.2041  argmax=0.120
+      given_c1     arr c1    cross1=     -  lift@16= 1.143  lift@32= 1.203  liftend= 0.867  massend=0.2477  argmax=0.112
+
+  SPREAD OF THE THREE `exact` ARMS (exact / exact_reh / exact_exp). L2 is NOT
+  rehearsed, so its spread is divergence alone; L3 is the rehearsed level.
+     level stat          exact  exact_reh  exact_exp    range  range/median
+         2 liftend      0.7846     0.6913     0.7144   0.0933         0.131
+         2 massend      0.2242     0.1975     0.2041   0.0267         0.131
+         2 argmax       0.1250     0.0781     0.1198   0.0469         0.391
+         3 liftend      1.7284     2.7452     2.0730   1.0168         0.490
+         3 massend      0.2469     0.3922     0.2961   0.1453         0.490
+         3 argmax       0.2396     0.5547     0.3750   0.3151         0.840
+
+==========================================================================================
+(3) MONEY — recovered fraction per era (`assay`'s readout, same form)
+==========================================================================================
+  arm                          era1             era2             era3             era4             era5
+  exact_reh           0.486 /+0.496    0.551 /+0.614    0.615 /+0.680    0.705 /+0.976    0.870 /+0.705
+  exact               0.486 /+0.496    0.549 /+0.617    0.629 /+0.649    0.793 /+0.670    0.917 /+0.410
+  exact_exp           0.486 /+0.496    0.548 /+0.620    0.638 /+0.630    0.774 /+0.733    0.911 /+0.448
+  given_c1            0.530 /+0.438    0.525 /+0.659    0.567 /+0.788    0.655 /+1.152    0.833 /+0.934
+  stale                       0.865            0.906            0.922            0.984            0.982
+  floor                       0.102            0.328            0.471            0.698            0.823
+
+  `anchor` not run in this tag (unchanged replay). Importing it from as_s0; era references identical = True.
+  anchor (as_s0)             +0.524           +0.619           +0.644           +0.564           +0.202
+
+  ERAS 4-5 BRACKET: anchor -> given_c1
+    era 4: bracket +0.564 .. +1.152 (span +0.588)
+      exact_reh      +0.976   closes +0.701 of the bracket
+      exact          +0.670   closes +0.180 of the bracket
+      exact_exp      +0.733   closes +0.289 of the bracket
+    era 5: bracket +0.202 .. +0.934 (span +0.732)
+      exact_reh      +0.705   closes +0.687 of the bracket
+      exact          +0.410   closes +0.284 of the bracket
+      exact_exp      +0.448   closes +0.336 of the bracket
+
+==========================================================================================
+GATE SUMMARY
+==========================================================================================
+  ALL PASS
