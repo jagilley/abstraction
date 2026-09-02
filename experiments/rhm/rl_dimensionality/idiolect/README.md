@@ -97,13 +97,13 @@ At `m = 2,3,4` the two runs end up **further from each other than either travell
 
 The two *verifier* arms diverge similarly and near-additively (EI-exact vs EI-parse: 0.0154–0.0200 bits JS, against 0.0056–0.0153 for either vs pretrained), i.e. they too drifted in roughly different directions rather than different distances along one axis.
 
-**Reproducible in amount, arbitrary in direction** is the signature of an idiolect rather than a correction: a mechanism converging on a genuinely better convention would have both runs find approximately the same one.
+**Reproducible in amount, arbitrary in direction** is the signature of an idiolect rather than a correction: a mechanism converging on a genuinely better convention would have both runs find approximately the same one. The narrowing of the angle toward `m = 6` is taken up in [`direction/`](direction/README.md), which shows it is a level mixture — near-perfect alignment at the shallow levels where the verifier filters hard, near-orthogonality at the deep levels where it does not — and traces the aligned part to the verifier selecting the synonyms the model executes most reliably.
 
 ## Findings
 
 1. **A verifier that is invariant to surface choice lets surface choice drift, increasingly so as synonymy grows** (EI-parse `kl_cond` 0.017 → 0.078 bits across `m = 2→6`), while a canonical-answer verifier's drift shrinks over the same range (0.055 → 0.024) — the parent's verifier × dimensionality reversal, on an independent measurement.
 2. **The drift co-occurs with improvement on everything the verifier can see.** At `m=6`, six EI rounds raise root validity, raise grammaticality above the pretrained model's, and raise drift 13× above pretrained — monotonically and in both seeds. Under the canonical-answer verifier the same drift co-occurs with *falling* validity, which separates "drift that buys reward" from "drift that is damage."
-3. **The direction of the drift is largely private.** Independent seeds from the identical basis drift comparably far and 45–79° apart, 4–6.6× the same-seed noise floor; at `m ≤ 4` they are further from each other than from their common ancestor.
+3. **The direction of the drift has a private part and a shared part.** Independent seeds from the identical basis drift comparably far and 45–79° apart, 4–6.6× the same-seed noise floor; at `m ≤ 4` they are further from each other than from their common ancestor. The child node [`direction/`](direction/README.md) resolves why the angle *falls* with `m`: the shared part is the verifier's selection on grammaticality leaking onto the synonym coordinate through the model's uneven competence at synonyms, present exactly where attempts often fail (shallow levels, high `m`); a selection-free control removes it at every level, and a fresh pretraining seed reproduces it because the difficulty profile is the grammar's. The private part is a random walk where the model is already fluent.
 4. **A KL anchor nearly eliminates it** (0.0125 vs 0.0783 at `m=6`), which prices the effect: the same mechanism that the parent found preserves the basis also preserves shared vocabulary.
 
 ## Scope and what this does not show
@@ -113,6 +113,12 @@ RHM synonyms are **interchangeable by construction** — there is no meaning dif
 Single substrate, single model size (2.68M params), one rule seed, and — for everything except the EI arms — a single training seed. The EI results are the ones carrying the claims and they are replicated across two seeds plus a same-seed rerun. Level-resolved statistics are in the JSON but not analyzed here; whether drift concentrates at particular hierarchy levels is open.
 
 The natural next probes: a **`kl_coef` sweep**, since the anchor suppresses the effect almost entirely and a dose-response curve would price shared-vocabulary preservation against reward gain; and, for the real phenomenon rather than the mechanism, a **coin-then-define test** on frontier models — elicit a coined term, then ask for a cold definition in independent fresh contexts, against real technical terms of matched corpus rarity, testing whether coined terms are stable in-context and unstable out of it.
+
+## Children
+
+### [`direction/`](direction/README.md) — why the seeds' drift directions converge as `m` grows (2026-09-01)
+
+The falling angle (75° → 45°) is real (bootstrap ±2°, noise null 60°) and verifier-caused. Per level, the cross-seed angle is small and the shared drift aligns with the pretrained checkpoint's competence at each synonym exactly where the model's validity is low (m = 6, L1–L3: 17°/10°/16°, cos +0.75/+0.79/+0.83), and near-orthogonal where validity is 1. A selection-free EI arm (random reward) drifts ~90° from both seeds at every level; EI from a fresh pretraining seed drifts toward the same shallow-level synonyms because the two checkpoints agree on which are hard (cos up to 0.94). Drift thus has a private random-walk component and a shared pull toward the already-fluent forms — a narrowing, not a convention. The one-step selection differential conditioned on validity cannot see this and sits at its noise floor; teacher-forced loss by synonym is the instrument.
 
 ## Reproduction
 

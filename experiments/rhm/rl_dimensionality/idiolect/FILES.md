@@ -16,6 +16,12 @@
 | `idiolect_results_seed43.json` | The complete sweep — all mechanisms × 5 m × 2 verifiers, EI per-round checkpoints, the same-seed rerun, and the seed-43 privacy arm. **Quote numbers from this one**; it is the aggregator's default. |
 | `idiolect_results_full.json` | The first sweep, before the seed-43 arm existed. Kept as the record of the run reported mid-session; its generations are independently sampled, so values differ from the above in the third decimal |
 
+## Children
+
+| Folder | Summary |
+|---|---|
+| [`direction/`](direction/README.md) | Why the two seeds' drift directions converge as m grows: verifier selection on grammaticality leaking onto the synonym coordinate through uneven competence at synonyms; selection-free and fresh-pretraining-seed controls. File index in [`direction/FILES.md`](direction/FILES.md) |
+
 ## Gotchas
 
 - **`generate_rules_invertible` is load-bearing.** Exact rule recovery requires collision-free rules; `build_rule_inverse` raises if the rules are not. It also means possible-set cardinality is always 0 or 1, so parse *ambiguity* is definitionally absent from this substrate — grammaticality is the only parse-side signal available.

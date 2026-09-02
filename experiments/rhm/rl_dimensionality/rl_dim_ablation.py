@@ -313,7 +313,7 @@ def run_setting(
     # Model
     n_layer: int = 6, n_head: int = 6, n_embd: int = 192,
     # Reward arms to train RL conditions on, run sequentially in this job
-    reward_type: str = "both",  # "exact" | "parse" | "both"
+    reward_type: str = "both",  # "exact" | "parse" | "both" | "random" (EI-only control)
     # Pretraining (to plateau)
     pretrain_min_steps: int = 3000,
     pretrain_max_steps: int = 30000,
@@ -480,6 +480,11 @@ def run_setting(
         elif rw == "parse":
             full = torch.cat([prefix, generated], dim=1)
             return parse_valid_fractions_torch(full, rules_t).mean(dim=1)
+        elif rw == "random":
+            # selection-free control: a uniform-random reward makes the EI
+            # argmax pick a uniformly random sample per prompt, so SFT sees
+            # the policy's own unfiltered samples (self-imitation only)
+            return torch.rand(generated.shape[0], device=generated.device)
         raise ValueError(rw)
 
     # ------------------------------------------------------------------
