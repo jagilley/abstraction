@@ -49,6 +49,7 @@ import collections
 import numpy as np
 
 SUPPORT_DEFAULT = 3
+SUBW_FLOOR = 1e-4            # [trap] a sub-half the arm has never committed
 DELIV_ALPHA = 0.3            # EWMA rate of the delivery ledger
 DELIV_INIT = 1.0             # optimistic init: an unseen half-key is worth trying once
 
@@ -277,6 +278,37 @@ def select_comp(n_pr, d, quota, agent):
     return _round_robin(val, [(i,) for i in range(len(val))], d, quota, n_pr)
 
 
+def select_trust(n_pr, d, quota, agent):
+    """[trap] THE GUARD AT THE RIGHT DEPTH — novelty times the arm's OWN USE RECORD.
+
+    `phase0_trap.py` [9]/[9b]: at the level the clean half lives on, the arm's committed table is
+    0.25-0.50 precise and hard membership in it is no guard at all (it prefers the arm's own
+    committed junk rows). But a clean half is itself a pair of lower-level rows, and at THAT
+    level the arm has a beam use record — `log['entry']['hist']['beam']`, the priced beam's own
+    per-entry selection count, already recorded and already paid for in every arm. The beam's
+    selection mass sits on TRUE rows at 0.73-0.93 against a table precision of 0.25-0.50 (lift
+    1.8-3.2x; `census`'s junk-filter result, on this node's own logs).
+
+    So: score a candidate by the product of its two sub-halves' use shares. `agent["subw"]` is
+    that map (flat tuple -> share, from `trap_menu.trust_weights`); a sub-half the arm has never
+    committed scores `SUBW_FLOOR`, which keeps the quota fillable and keeps the arm from simply
+    refusing everything early, when its table is small.
+
+    No truth, no exact map, no clean derivation — only the arm's own history of which of its own
+    entries its own executor chose.
+    """
+    halves = [tuple(int(x) for x in h) for h in agent["halves"]]
+    covered = agent["covered"]
+    subw = agent.get("subw") or {}
+    if not halves or len(halves[0]) < 2:
+        return select_endo(n_pr, d, quota, {**agent, "ledger": None})
+    half = len(halves[0]) // 2
+    prio = np.array([(1.0 / (1.0 + covered.get(h, 0)))
+                     * (subw.get(h[:half], SUBW_FLOOR) * subw.get(h[half:], SUBW_FLOOR))
+                     for h in halves], float)
+    return _round_robin(prio, halves, d, quota, n_pr)
+
+
 def select_comp_free(n_pr, d, quota, agent):
     """THE KNOWN NEGATIVE, unpinned — the honest beta=2 pole. Same rule, no quota: the arm may
     move the difficulty mix as well as the content, which is the axis the pinned arm gives up.
@@ -289,6 +321,7 @@ def select_comp_free(n_pr, d, quota, agent):
 SELECTORS = {
     "exo": select_exo, "bisect": select_bisect, "endo": select_endo,
     "novel": select_novel, "comp": select_comp, "comp_free": select_comp_free,
+    "trust": select_trust,                      # [trap]
 }
 NEEDS_ORACLE = ("bisect",)
 QUOTA_FREE = ("comp_free",)
@@ -314,7 +347,11 @@ def select(mode, n_pr, d=None, quota=None, oracle=None, agent=None):
 # --------------------------------------------------------------------------- #
 
 _FORBIDDEN = ("truth", "truth_flat", "clean", "keys", "inverse", "inverse_bottom",
-              "exact", "rules", "lower_flat", "oracle")
+              "exact", "rules", "lower_flat", "oracle",
+              # [trap] T-4: the world's own distractor tag never reaches an agent bundle.
+              # `subw` is the arm's OWN use record over its OWN committed rows and is allowed;
+              # anything naming the trap, the substitution mask or the bank is not.
+              "trap", "distractor", "is_d", "bank")
 
 
 def containment_gate(agent):
@@ -407,6 +444,32 @@ def question_gate(verbose=False):
            "ledger": DeliveryLedger()}
     s0 = select("endo", n_pr, d, quota, agent=ag0)
     out["Q-10_empty_clean_ok"] = bool(len(s0) == n_pr and check_quota(d, s0, quota)[0])
+
+    # [trap] Q-12/Q-13 need REAL sub-half structure, so they build their own 4-wide halves
+    # (at era 3 a clean half is a level-3 key and its own halves are level-2 keys).
+    h4 = [tuple(int(x) for x in r) for r in rng.integers(0, 8, size=(K, 4))]
+    subs = sorted({h[:2] for h in h4} | {h[2:] for h in h4})
+    ag4 = {"halves": h4, "covered": {}, "value": rng.random(K), "ledger": DeliveryLedger()}
+
+    used = set(subs[:len(subs) // 4])                      # the rows the beam actually used
+    w = {r: (1.0 if r in used else 0.0) for r in subs}
+    tot = sum(w.values()) or 1.0
+    subw = {k: v / tot for k, v in w.items()}
+
+    st = select("trust", n_pr, d, quota, agent={**ag4, "subw": subw})
+    st2 = select("trust", n_pr, d, quota, agent={**ag4, "subw": subw})
+    out["Q-12_trust_quota"] = bool(len(st) == n_pr and len(set(st.tolist())) == n_pr
+                                   and check_quota(d, st, quota)[0]
+                                   and np.array_equal(st, st2))
+
+    def _hits(sel):
+        return sum(1 for i in sel if h4[i][:2] in used and h4[i][2:] in used)
+    base = _hits(select("novel", n_pr, d, quota, agent=ag4))
+    out["Q-13_trust_prefers_used"] = bool(_hits(st) > base)
+    out["Q-13_detail"] = {"trust_hits": int(_hits(st)), "novel_hits": int(base), "of": n_pr,
+                          "n_sub_rows": len(subs), "n_used": len(used)}
+    sn = select("trust", n_pr, d, quota, agent={**ag4, "subw": {}})
+    out["Q-13_no_record_ok"] = bool(len(sn) == n_pr and check_quota(d, sn, quota)[0])
 
     out["ALL"] = all(bool(v) for k, v in out.items() if not k.endswith("_detail"))
     if verbose:

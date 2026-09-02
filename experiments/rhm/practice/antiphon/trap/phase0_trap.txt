@@ -1,0 +1,318 @@
+========================================================================================
+PHASE 0 — THE TRAP, sized offline (antiphon/trap)
+========================================================================================
+
+[2] WORTHLESSNESS PROOF — halves of a true level-L flat are true level-(L-1) flats
+     L3:      56 true flats, half width 2  ->  halves that are NOT true rows: 0   OK
+     L4:     816 true flats, half width 4  ->  halves that are NOT true rows: 0   OK
+     L5:  205824 true flats, half width 8  ->  halves that are NOT true rows: 0   OK
+     => a junk half is a junk key with CERTAINTY, and `Miner.build`'s ratchet (both
+        halves must be rows of the operative lower table) refuses it forever.
+
+[0]/[1] GEOMETRY and the JUNK-HALF POOLS  (n = 400,000 DGP draws)
+     era      tgt clean blocks     clean lvl  true halves  junk halves  native f  budget
+     L1n25      2 24                       -            -            -         -     480   [the clean part is a single block = a level-1 feature; every level-1 feature is a valid row, so no junk half exists]
+     L2n12      3 26,27                    2    13/14                9     0.332     400
+     L3n6       4 28,29,30,31              3    44/56               96     0.546     560
+     L4n3       4 -                        -            -            -         -      96   [the damage cell swallows the mined span; no clean half]
+     L5n1       4 -                        -            -            -         -      72   [the damage cell swallows the mined span; no clean half]
+     => the trap atom exists in 2 of 5 eras: L2n12, L3n6
+
+[1b] THE BREADTH-FIRST TAKE SHARE — exact, no mining model needed.
+     `_round_robin` takes one candidate per DISTINCT key in priority order before it
+     takes a second, and every uncovered half ties at novelty 1.0. So a novelty
+     selector's distractor share is set by the POOL RATIO, not by the menu's mass:
+       era       junk halves  true halves  pool share  over-take vs the null at native f
+       L2n12               9           13       0.409                               1.23x
+       L3n6               96           44       0.686                               1.25x
+     => a breadth-first novelty judge OVER-takes the trap while f < the pool share
+        and UNDER-takes it above; the nerdsnipe it can produce is bounded by that
+        ratio, and the ratio is a property of the grammar's ambiguity at the node.
+     The knob's useful direction is therefore BOTH ways. Predicted over-take
+     (novelty judge's junk intake / the null's) across the menu's worthless rate f:
+       era         f=0.15     f=0.3   f=0.546     f=0.7     f=0.9
+       L2n12         2.73      1.36      0.75      0.58      0.45
+       L3n6          4.57      2.29      1.26      0.98      0.76
+     (a ratio above 1 is a judge doing WORSE than not selecting at all — the
+      nerdsnipe; below 1 is breadth capping its own junk intake.)
+
+[6] CLOSURE ARITHMETIC — is an UNLEARNABLE channel constructible at matched d*?
+     era       junk-half pool  budget/support   closes?
+     L2n12                  9             133      True
+     L3n6                  96             186      True
+     A channel is 'unlearnable' only if its keys never recur, i.e. if its pool is
+     larger than the era's observation budget divided by mine_support. On this
+     grammar the reachable junk-half pool is SMALLER, so every junk half closes —
+     the noisy-TV guard ('does disagreement close when I collect there') has no work
+     to do at matched difficulty. The unlearnable pole needs the difficulty pin off.
+
+[3] d*-ORTHOGONALITY (n = 24,000 per era)
+     era       native d*  distractor d*      TV  native f  min avail/need @f=0.9  draw s
+     L2n12         2.347          2.459   0.074     0.342                   32.0    2.38
+     L3n6          3.271          3.202   0.039     0.548                   32.0    1.66
+     TV near 0 => the trap does not move difficulty: the d* quota (the native head's
+     own histogram) stays fillable and a distractor cannot redefine 'difficulty'.
+
+[4] CONSTRUCTION COST — the per-era distractor bank
+     L2n12:   92,150 distractor slots at f=0.9, hit rate 0.342 ->   269,452 native draws ~   26.7 s (17 MB as int8)
+     L3n6:  129,010 distractor slots at f=0.9, hit rate 0.548 ->   235,513 native draws ~   16.3 s (15 MB as int8)
+     Drawn ONCE per era at era start (a bank keyed by clean half, so the trap can be
+     presented uniform over the junk-half pool); ~0 marginal cost per cycle against
+     an ~10.5 s cycle.
+
+[7] THE BANKED LOGS (an_s0) — read BEFORE the simulation, which they calibrate
+     (a) THE TRAP ATOM'S PRECONDITION — does the question's clean half reach the
+         miner untouched? Every at-support key's clean half must be a legal parse
+         of the CLEAN node (a set of 140 tuples of 4096 possible, at era 3).
+       arm           era  @sup  true  clean halves  in pool  contained  repaired distinct
+       q_exo           2    31    11            16       16       True                  9
+       q_exo           3    37     8            32       32       True                  8
+       q_bisect        2    31    13            16       16       True                 11
+       q_bisect        3    39    30            31       31       True                 10
+       q_endo          2    27     9            18       18       True                  9
+       q_endo          3    68    11            60       60       True                 10
+       q_novel         2    35    11            20       20       True                 10
+       q_novel         3    62    17            57       57       True                  9
+       q_comp          2    22     6            12       12       True                  8
+       q_comp          3    39     7            33       33       True                  9
+       q_comp_free     2    18     4            10       10       True                  7
+       q_comp_free     3    47     9            30       30       True                 12
+     (b) delivered_true vs the menu's clean-half true rate, and the INCUMBENT
+         credit rule (`the delivered key is not yet at support`)
+         (the bound binds only on the arm that SELECTS NOTHING; a selecting arm
+          lifts its own clean-true rate above the menu's, which is the point)
+       arm          lvl  delivered_true  menu clean-true   <=?  credit_rate  dose_hit
+       q_exo          2           0.793                -  None        0.117     0.540
+       q_exo          3           0.463            0.668  True        0.340     0.182
+       q_exo          4           0.447            0.454  True        0.503     0.033
+       q_bisect       2           0.683                -  None        0.142     0.393
+       q_bisect       3           0.631            0.668  True        0.362     0.139
+       q_bisect       4           0.722            0.454 False        0.453     0.041
+       q_endo         2           0.796                -  None        0.124     0.371
+       q_endo         3           0.533            0.668  True        0.329     0.161
+       q_endo         4           0.407            0.454  True        0.622     0.032
+       q_novel        2           0.802                -  None        0.133     0.399
+       q_novel        3           0.503            0.668  True        0.383     0.180
+       q_novel        4           0.397            0.454  True        0.688     0.038
+       q_comp         2           0.722                -  None        0.104     0.472
+       q_comp         3           0.419            0.668  True        0.245     0.161
+       q_comp         4           0.405            0.454  True        0.482     0.029
+       q_comp_free    2           0.720                -  None        0.116     0.487
+       q_comp_free    3           0.530            0.668  True        0.247     0.135
+       q_comp_free    4           0.342            0.454  True        0.571     0.029
+
+     (c) THE CEILING ON AN ENDOGENOUS RATCHET GUARD — a prospective guard that
+         prefers candidates whose clean half is a row of the arm's OWN operative
+         lower table inherits that table's precision exactly.
+       era2 (clean level L2; trap pool 9 junk halves vs 13 true)
+         arm           committed t/n  precision  junk@sup  in trap pool  overlap
+         q_exo                  8/11      0.727         6             6    1.000
+         q_bisect               9/14      0.643         8             8    1.000
+         q_endo                10/14      0.714         6             6    1.000
+         q_novel               10/16      0.625         8             8    1.000
+         q_comp                10/14      0.714         6             6    1.000
+         q_comp_free            7/10      0.700         6             6    1.000
+       era3 (clean level L3; trap pool 96 junk halves vs 44 true)
+         arm           committed t/n  precision  junk@sup  in trap pool  overlap
+         q_exo                   3/8      0.375        32            26    0.812
+         q_bisect               8/16      0.500        32            27    0.844
+         q_endo                  3/6      0.500        34            28    0.824
+         q_novel                5/15      0.333        36            32    0.889
+         q_comp                 3/12      0.250        26            20    0.769
+         q_comp_free             3/8      0.375        31            25    0.806
+
+[9] THE USE RECORD AS A GUARD — `log['entry']['hist']['beam']` vs `true_mask`
+       arm          lvl  rows  true  table prec  use-wt prec   lift  row-wise AUC
+       q_exo          2    11     8       0.727        0.791   1.09         0.458
+       q_exo          3     8     3       0.375        0.733   1.95         0.400
+       q_bisect       2    14     9       0.643        0.818   1.27         0.600
+       q_bisect       3    16     8       0.500        0.926   1.85         0.688
+       q_endo         2    14    10       0.714        0.801   1.12         0.500
+       q_endo         3     6     3       0.500        0.904   1.81         0.889
+       q_novel        2    16    10       0.625        0.836   1.34         0.617
+       q_novel        3    15     5       0.333        0.733   2.20         0.580
+       q_comp         2    14    10       0.714        0.768   1.07         0.375
+       q_comp         3    12     3       0.250        0.792   3.17         0.704
+       q_comp_free    2    10     7       0.700        0.713   1.02         0.429
+       q_comp_free    3     8     3       0.375        0.819   2.18         0.733
+     The lift is at L3, where the table is imprecise (0.25-0.50): the beam's own
+     selection mass sits on TRUE rows at 0.73-0.93. But the row-wise AUC is thin —
+     the mass concentrates on ONE dominant true row rather than rank-ordering the
+     rest — so the record works as a WEIGHT, not as a membership test.
+
+[9b] THE GUARD AT THE RIGHT DEPTH. A clean half at era 3 is a level-3 key; its own
+     two halves are level-2 keys, and that is the level where the arm has both a
+     committed table and a use record. Junk share of the pool a novelty judge draws
+     from, under each guard (lower is better; the pool ratio is the unguarded value):
+       arm           own L2 table  recon ok  unguarded  ratchet-L2  trust-L2  ceiling
+       q_exo                 8/11      True      0.686       0.581     0.498    0.154
+       q_bisect              9/14      True      0.686       0.719     0.448    0.154
+       q_endo               10/14      True      0.686       0.635     0.463    0.154
+       q_novel              10/16      True      0.686       0.678     0.431    0.154
+       q_comp               10/14      True      0.686       0.646     0.536    0.154
+       q_comp_free           7/10      True      0.686       0.659     0.540    0.154
+     Only 8 of the 96 junk clean halves have BOTH level-2 halves in the true L2
+     table (0.083 by count, 0.140 by mass) — so a perfect L2 table would refuse
+     91.7% of the trap. The arms' own tables carry 3-6 junk L2 rows, and hard
+     membership routes the trap straight through them; USE-WEIGHTING the same
+     rows recovers about a third of the gap, in every arm.
+
+[5] SELECTOR SIMULATION — the real `questions.py` selectors on real menus, with the
+     delivery model taken from the null arm's own banked stream ([7a]).
+
+     era L2n12 -> L3  (native f = 0.332; true halves 13, junk halves 9; modelled operative L2 table 8/11 true; delivery tau = 1.8, fit residual 0.113)
+            f selector    take  mined  distinct  @sup  true@sup  junk@sup  recall
+        0.332 exo          0.328  0.355        63    28         4        24  0.0714
+        0.332 novel        0.404  0.407        53    33         4        29  0.0714
+        0.332 endo         0.417  0.378        54    32         4        28  0.0714
+        0.332 ratchet      0.409  0.415        67    33         4        29  0.0714
+        0.332 comp         0.330  0.333        51    27         4        23  0.0714
+        0.332 bisect       0.391  0.400        66    32         4        28  0.0714
+        0.150 exo          0.156  0.158        48    23         4        19  0.0714
+        0.150 novel        0.396  0.407        58    29         4        25  0.0714
+        0.150 endo         0.411  0.422        56    32         4        28  0.0714
+        0.150 ratchet      0.400  0.375        58    30         4        26  0.0714
+        0.150 comp         0.152  0.172        48    23         4        19  0.0714
+        0.150 bisect       0.391  0.380        63    28         4        24  0.0714
+        0.300 exo          0.302  0.323        57    30         4        26  0.0714
+        0.300 novel        0.407  0.375        52    28         4        24  0.0714
+        0.300 endo         0.420  0.403        49    28         4        24  0.0714
+        0.300 ratchet      0.403  0.415        59    32         4        28  0.0714
+        0.300 comp         0.296  0.282        53    23         4        19  0.0714
+        0.300 bisect       0.391  0.412        57    32         4        28  0.0714
+        0.700 exo          0.693  0.675        55    26         3        23  0.0536
+        0.700 novel        0.415  0.430        57    33         4        29  0.0714
+        0.700 endo         0.420  0.425        59    27         4        23  0.0714
+        0.700 ratchet      0.412  0.432        55    29         4        25  0.0714
+        0.700 comp         0.685  0.652        52    34         4        30  0.0714
+        0.700 bisect       0.400  0.385        56    28         4        24  0.0714
+        0.800 exo          0.806  0.802        50    31         4        27  0.0714
+        0.800 novel        0.426  0.425        50    30         4        26  0.0714
+        0.800 endo         0.427  0.407        53    28         4        24  0.0714
+        0.800 ratchet      0.428  0.400        59    31         4        27  0.0714
+        0.800 comp         0.805  0.760        49    30         4        26  0.0714
+        0.800 bisect       0.410  0.383        57    31         4        27  0.0714
+        0.900 exo          0.894  0.890        51    28         2        26  0.0357
+        0.900 novel        0.460  0.487        53    28         4        24  0.0714
+        0.900 endo         0.446  0.458        52    26         4        22  0.0714
+        0.900 ratchet      0.448  0.465        56    29         4        25  0.0714
+        0.900 comp         0.898  0.895        47    27         3        24  0.0536
+        0.900 bisect       0.421  0.445        57    32         4        28  0.0714
+       VALIDATION vs banked q_exo end-of-era: distinct 62 | @sup 31 | true 11 | junk 20   (model at f=0.332: see the exo row)
+
+     era L3n6 -> L4  (native f = 0.546; true halves 44, junk halves 96; modelled operative L3 table 3/8 true; delivery tau = 1.4, fit residual 0.913)
+            f selector    take  mined  distinct  @sup  true@sup  junk@sup  recall
+        0.546 exo          0.553  0.566       248    60        18        42  0.0221
+        0.546 novel        0.710  0.720       271   107        23        84  0.0282
+        0.546 endo         0.715  0.727       269   108        24        84  0.0294
+        0.546 ratchet      0.719  0.700       264   110        24        86  0.0294
+        0.546 comp         0.531  0.532       244    57        18        39  0.0221
+        0.546 bisect       0.317  0.330       220    55        27        28  0.0331
+        0.546 ratchet_l2   0.652  0.657       239    66        19        47  0.0233
+        0.546 trust        0.651  0.655       246    69        19        50  0.0233
+        0.150 exo          0.153  0.164       167    37        20        17  0.0245
+        0.150 novel        0.683  0.666       260   114        27        87  0.0331
+        0.150 endo         0.695  0.684       258   111        25        86  0.0306
+        0.150 ratchet      0.675  0.689       271   103        25        78  0.0306
+        0.150 comp         0.149  0.145       158    33        20        13  0.0245
+        0.150 bisect       0.312  0.330       221    51        26        25  0.0319
+        0.150 ratchet_l2   0.580  0.598       237    72        23        49  0.0282
+        0.150 trust        0.604  0.595       242    80        25        55  0.0306
+        0.300 exo          0.310  0.316       206    43        19        24  0.0233
+        0.300 novel        0.674  0.659       265   112        26        86  0.0319
+        0.300 endo         0.683  0.680       269   113        25        88  0.0306
+        0.300 ratchet      0.685  0.686       272   106        27        79  0.0331
+        0.300 comp         0.302  0.277       197    40        19        21  0.0233
+        0.300 bisect       0.313  0.309       204    59        28        31  0.0343
+        0.300 ratchet_l2   0.600  0.593       221    72        25        47  0.0306
+        0.300 trust        0.605  0.620       238    71        23        48  0.0282
+        0.700 exo          0.697  0.675       244    72        15        57  0.0184
+        0.700 novel        0.719  0.746       266   114        19        95  0.0233
+        0.700 endo         0.721  0.754       269   113        19        94  0.0233
+        0.700 ratchet      0.711  0.729       267   109        19        90  0.0233
+        0.700 comp         0.693  0.659       262    69        16        53  0.0196
+        0.700 bisect       0.328  0.309       214    54        27        27  0.0331
+        0.700 ratchet_l2   0.660  0.643       221    66        16        50  0.0196
+        0.700 trust        0.673  0.673       238    72        18        54  0.0221
+        0.800 exo          0.803  0.809       258    73        11        62  0.0135
+        0.800 novel        0.757  0.755       267   119        23        96  0.0282
+        0.800 endo         0.755  0.755       259   121        22        99  0.0270
+        0.800 ratchet      0.776  0.770       263   112        22        90  0.0270
+        0.800 comp         0.800  0.793       249    75        13        62  0.0159
+        0.800 bisect       0.350  0.341       218    61        28        33  0.0343
+        0.800 ratchet_l2   0.686  0.670       234    65        14        51  0.0172
+        0.800 trust        0.704  0.688       247    69        15        54  0.0184
+        0.900 exo          0.893  0.884       259    79         8        71  0.0098
+        0.900 novel        0.784  0.786       269   112        20        92  0.0245
+        0.900 endo         0.786  0.775       271   111        17        94  0.0208
+        0.900 ratchet      0.788  0.795       275    98        12        86  0.0147
+        0.900 comp         0.899  0.896       261    71         4        67  0.0049
+        0.900 bisect       0.414  0.441       247    58        26        32  0.0319
+        0.900 ratchet_l2   0.721  0.716       250    76        14        62  0.0172
+        0.900 trust        0.727  0.716       255    75        13        62  0.0159
+       VALIDATION vs banked q_exo end-of-era: distinct 192 | @sup 37 | true 8 | junk 29   (model at f=0.546: see the exo row)
+
+[5c] DOES THE INCUMBENT DELIVERY LEDGER DISCRIMINATE? Its credit rule is `the
+     delivered key was not yet at support`, so a channel with an inexhaustible key
+     supply keeps full weight. Mean ledger weight, junk halves vs true halves,
+     on the `endo` arm:
+       era           f  w(junk half)  w(true half)   ratio
+       era2      0.332         0.244         0.084    2.92
+       era2      0.150         0.124         0.085    1.47
+       era2      0.300         0.246         0.028    8.68
+       era2      0.700         0.233         0.102    2.29
+       era2      0.800         0.267         0.114    2.35
+       era2      0.900         0.143         0.158    0.91
+       era3      0.546         0.940         0.900    1.04
+       era3      0.150         0.956         0.802    1.19
+       era3      0.300         0.972         0.836    1.16
+       era3      0.700         0.925         0.944    0.98
+       era3      0.800         0.912         0.959    0.95
+       era3      0.900         0.906         0.979    0.93
+
+[5b] THE SELECTION PREMIUM vs THE WORLD'S WORTHLESS FRACTION
+     true keys at support at the target level, minus the null arm's, per f.
+     (First-order model: the delivery model, the plant and the committed table are
+      held fixed, so this reads the MENU's arithmetic only.)
+
+     era L2n12 -> L3
+            f  exo true@sup      D novel       D endo    D ratchet D ratchet_l2      D trust       D comp     D bisect
+        0.150             4           +0           +0           +0            -            -           +0           +0
+        0.300             4           +0           +0           +0            -            -           +0           +0
+        0.332             4           +0           +0           +0            -            -           +0           +0
+        0.700             3           +1           +1           +1            -            -           +1           +1
+        0.800             4           +0           +0           +0            -            -           +0           +0
+        0.900             2           +2           +2           +2            -            -           +1           +2
+
+     era L3n6 -> L4
+            f  exo true@sup      D novel       D endo    D ratchet D ratchet_l2      D trust       D comp     D bisect
+        0.150            20           +7           +5           +5           +3           +5           +0           +6
+        0.300            19           +7           +6           +8           +6           +4           +0           +9
+        0.546            18           +5           +6           +6           +1           +1           +0           +9
+        0.700            15           +4           +4           +4           +1           +3           +1          +12
+        0.800            11          +12          +11          +11           +3           +4           +2          +17
+        0.900             8          +12           +9           +4           +6           +5           -4          +18
+
+     The RATCHET guard (prefer a clean half that is a row of MY OWN operative lower
+     table) is rejected here, offline: [7c] measures that table at precision 0.25-0.50
+     at L3, so the guard prefers the arm's own committed JUNK rows 50-75% of the time
+     and its distractor take is indistinguishable from the unguarded judge's. A guard
+     that stands on your own table inherits your table's errors.
+
+[8] THE REJECTED CHANNELS
+     (i) A FOREIGN GRAMMAR (a second RHM at the same shape, independent rules).
+         `crystallize.units.apply_move` materialises every span through a max-sum DP
+         over THIS world's `rules_t` and renders it through `canon`, so the agent
+         cannot produce a foreign-legal answer; and `run_arm` block (b) mines only
+         `out['x'][ps > 0.5]`, i.e. answers the WORLD's exact grader passed. A
+         foreign instance is therefore never mined and the channel degenerates into
+         'burn priced budget, bank nothing'. Grading it under a foreign grader would
+         put foreign-legal answers into the value buffer and the generator's
+         fine-tune set — moving the plant, not the question distribution.
+     (ii) AN UNLEARNABLE CHANNEL AT MATCHED DIFFICULTY. d* small => near a legal
+         derivation => solved => mined; and [6] shows the reachable junk-half pool is
+         smaller than budget/support, so whatever is posed recurs and closes. An
+         unlearnable arm therefore has to give up the difficulty pin, exactly as
+         `q_comp_free` gives it up to be the honest comfort pole.
+
+wrote ~/Code/research/experiments/rhm/practice/antiphon/trap/phase0_trap.json

@@ -1,0 +1,317 @@
+{
+  "floor": {
+    "per_arm": {
+      "dsil_sched": {
+        "first_live_cycle": 25,
+        "n_points": 177,
+        "n_blocks": 163,
+        "sd_N": 0.009391287018252363,
+        "mean_N": 0.00030038019333216754,
+        "v_tol": 0.0046956435091261815,
+        "mean_D": 0.0010642473544591718
+      },
+      "dsil_yield": {
+        "first_live_cycle": 55,
+        "n_points": 77,
+        "n_blocks": 43,
+        "sd_N": 0.0046312710361336405,
+        "mean_N": -0.00019618789678325216,
+        "v_tol": 0.0023156355180668203,
+        "mean_D": 0.002122646100996363
+      },
+      "dsil_read": {
+        "first_live_cycle": 25,
+        "n_points": 152,
+        "n_blocks": 117,
+        "sd_N": 0.01082378924390558,
+        "mean_N": 0.0007378879309009043,
+        "v_tol": 0.00541189462195279,
+        "mean_D": 0.0015231457242839645
+      },
+      "dsil_and": {
+        "first_live_cycle": 55,
+        "n_points": 60,
+        "n_blocks": 31,
+        "sd_N": 0.005204640377830447,
+        "mean_N": 0.00011720097473369127,
+        "v_tol": 0.0026023201889152233,
+        "mean_D": 0.0026698628940591265
+      }
+    },
+    "pooled": {
+      "n_blocks": 354,
+      "sd_N": 0.009186928538972404,
+      "v_tol": 0.004593464269486202
+    },
+    "caesura_governing": 0.00321442,
+    "caesura_in_tag_sched": 0.00492,
+    "governing": 0.0046
+  },
+  "governing_tol_dsil": 0.0046,
+  "bounded_gate": {
+    "first_live_cycle": 25,
+    "n_cycles_compared": 152,
+    "first_divergence_cycle": 43,
+    "n_cycles_differing": 6,
+    "n_quiet_at_donor_floor": 4,
+    "n_quiet_at_new_floor": 4,
+    "bootstrap_commits": [
+      18
+    ],
+    "realised_action_cycles": [
+      18,
+      46,
+      71,
+      85,
+      97,
+      155,
+      167,
+      176
+    ]
+  },
+  "split": {
+    "dsil (on dsil_read, tol 0.0046)": {
+      "first_live_cycle": 25,
+      "n_fires": 4,
+      "fire_cycles": [
+        43,
+        44,
+        45,
+        46
+      ],
+      "per_era": {
+        "era1": {
+          "window": [
+            1,
+            46
+          ],
+          "first_fire": 43,
+          "n_fires": 4
+        },
+        "era2": {
+          "window": [
+            47,
+            85
+          ],
+          "first_fire": null,
+          "n_fires": 0
+        },
+        "era3": {
+          "window": [
+            86,
+            155
+          ],
+          "first_fire": null,
+          "n_fires": 0
+        },
+        "era4": {
+          "window": [
+            156,
+            167
+          ],
+          "first_fire": null,
+          "n_fires": 0
+        },
+        "era5": {
+          "window": [
+            168,
+            176
+          ],
+          "first_fire": null,
+          "n_fires": 0
+        },
+        "era6": {
+          "window": [
+            177,
+            176
+          ],
+          "first_fire": null,
+          "n_fires": 0
+        }
+      }
+    },
+    "yield (on dsil_yield, tol {\"3\": 0.46127129019246205, \"4\": 0.5166900731510206})": {
+      "first_live_cycle": 1,
+      "n_fires": 7,
+      "fire_cycles": [
+        49,
+        58,
+        72,
+        88,
+        104,
+        114,
+        122
+      ],
+      "per_era": {
+        "era1": {
+          "window": [
+            1,
+            58
+          ],
+          "first_fire": 49,
+          "n_fires": 2
+        },
+        "era2": {
+          "window": [
+            59,
+            88
+          ],
+          "first_fire": 72,
+          "n_fires": 2
+        },
+        "era3": {
+          "window": [
+            89,
+            114
+          ],
+          "first_fire": 104,
+          "n_fires": 2
+        },
+        "era4": {
+          "window": [
+            115,
+            122
+          ],
+          "first_fire": 122,
+          "n_fires": 1
+        },
+        "era5": {
+          "window": [
+            123,
+            131
+          ],
+          "first_fire": null,
+          "n_fires": 0
+        },
+        "era6": {
+          "window": [
+            132,
+            131
+          ],
+          "first_fire": null,
+          "n_fires": 0
+        }
+      }
+    },
+    "deadlock_check": {
+      "yield_first_live_cycle": 1,
+      "verdict": "the ADVANCE owner's gauge is defined from the first cycle, so an era can always end even while the COMMIT owner is still bootstrapping; and the era CAP forces an advance regardless. The split cannot deadlock the way a dsil-driven arm without the bootstrap does.",
+      "mirror_note": "on the MIRROR arm the ADVANCE owner reads `dsil`, which does not exist before a slot opens \u2014 so its era-1 advance falls through to the cap. Since CRESCENDO_LADDER == CRESCENDO_CAPS, the cap IS the arc's own advance bootstrap and lands on the schedule arm's own cycle."
+    }
+  },
+  "menu": {
+    "source": "~/Code/research/experiments/rhm/practice/antiphon/phase0.json",
+    "carried": true,
+    "reach": {
+      "2": {
+        "64": 13,
+        "256": 14,
+        "512": 14,
+        "1024": 14,
+        "2048": 14,
+        "4096": 14,
+        "8192": 14,
+        "16384": 14
+      },
+      "3": {
+        "64": 18,
+        "256": 40,
+        "512": 46,
+        "1024": 50,
+        "2048": 52,
+        "4096": 52,
+        "8192": 52,
+        "16384": 52
+      },
+      "4": {
+        "64": 0,
+        "256": 2,
+        "512": 23,
+        "1024": 64,
+        "2048": 153,
+        "4096": 292,
+        "8192": 453,
+        "16384": 592
+      }
+    },
+    "obs_budget": {
+      "2": 480,
+      "3": 400,
+      "4": 560
+    },
+    "ambiguity": {
+      "2": {
+        "node": 12,
+        "n_true_seen": 14,
+        "n_true_total": 14,
+        "n_junk_seen": 9,
+        "mass_true": 0.7573766666666668
+      },
+      "3": {
+        "node": 6,
+        "n_true_seen": 52,
+        "n_true_total": 56,
+        "n_junk_seen": 104,
+        "mass_true": 0.4236350000000001
+      },
+      "4": {
+        "node": 3,
+        "n_true_seen": 768,
+        "n_true_total": 816,
+        "n_junk_seen": 7573,
+        "mass_true": 0.1844166666666663
+      }
+    },
+    "ladder_matches": true,
+    "geometry": {
+      "L1n25": {
+        "target_level": 2,
+        "node": 12,
+        "clean_offsets": [
+          0
+        ],
+        "has_clean": true
+      },
+      "L2n12": {
+        "target_level": 3,
+        "node": 6,
+        "clean_offsets": [
+          2,
+          3
+        ],
+        "has_clean": true
+      },
+      "L3n6": {
+        "target_level": 4,
+        "node": 3,
+        "clean_offsets": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "has_clean": true
+      },
+      "L4n3": {
+        "target_level": 4,
+        "node": 3,
+        "clean_offsets": [],
+        "has_clean": false
+      },
+      "L5n1": {
+        "target_level": 4,
+        "node": 2,
+        "clean_offsets": [],
+        "has_clean": false
+      }
+    }
+  },
+  "protocol": {
+    "span": 1,
+    "W": 4,
+    "alpha": 0.5,
+    "burn": 4,
+    "v_tol": "sd(N)/sqrt(W)",
+    "skip": "commit and advance cycles (regime changes)"
+  }
+}

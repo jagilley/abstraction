@@ -20,6 +20,14 @@ does NOT fix: `outer_yield_m4` was never run under `antiphon.py`, and the G-F ga
 fork against `anchor_long` and `given_c1` only. The interaction reading is therefore a CROSS-TAG
 reading and is labelled as one everywhere it appears.
 
+[antiphon-s2] THE ATTRIBUTION TABLE NOW CARRIES EVERY SELECTOR FAMILY, not only the oracle.
+`an_s0` composed the ORACLE selector with the pacer; the object the round is about is the
+learner's own judge, so `an_s2` runs `q_endo_loop` / `q_comp_loop` / `q_novel_loop` — the same
+`_Q_LOOP` pacer crossed with the three selectors that read only the learner's own state. Each
+family gets its own four rows (pacer-alone / selection-alone / composed / composed - additive)
+against the SAME baseline, so the endo lanes sit beside the oracle lanes like for like. A family
+whose arms are not on disk is skipped, so this file still reproduces `an_s0`+`an_s1` exactly.
+
 CPU only, no GPU, no Modal, no new runs. Run from experiments/:
     PYTHONPATH=. python3 rhm/practice/antiphon/pacer_marginal.py
 """
@@ -33,6 +41,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PRACTICE = os.path.dirname(HERE)
 AN = os.path.join(HERE, "figures", "an_s0")
 AN1 = os.path.join(HERE, "figures", "an_s1")     # [an_s1] the IN-TAG pacer-only arm
+AN2 = os.path.join(HERE, "figures", "an_s2")     # [antiphon-s2] the composed non-oracle arms
+
+# [antiphon-s2] (family, the schedule-paced selection arm, the loop-paced composed arm). The
+# oracle family is `an_s0`'s; the other three are `an_s2`'s. Order is the order the round
+# reads them in: the cell first, then the two poles.
+FAMILIES = [("oracle  (bisect)", AN, "q_bisect", AN, "q_bisect_loop"),
+            ("ENDO    (the judge)", AN, "q_endo", AN2, "q_endo_loop"),
+            ("comfort (comp)", AN, "q_comp", AN2, "q_comp_loop"),
+            ("novelty (novel)", AN, "q_novel", AN2, "q_novel_loop")]
 CR = os.path.join(PRACTICE, "crescendo", "figures", "cr3_s0")
 
 
@@ -163,6 +180,31 @@ def main():
         "an_s0/q_bisect": profile(AN, "q_bisect", su_an),
         "an_s0/q_bisect_loop": profile(AN, "q_bisect_loop", su_an),
     }
+    # [antiphon-s2] fold in whichever composed non-oracle arms are on disk. `an_s2` is asserted
+    # to be the SAME SUBSTRATE as `an_s0` here as well as at setup time (`--ref-tag an_s0`),
+    # because every lane below differences against `an_s0/q_exo`.
+    fams, su_a2 = [], None
+    if os.path.isdir(AN2) and os.path.isfile(os.path.join(AN2, "setup.json")):
+        su_a2 = setup(AN2)
+        same2 = (all(np.allclose(np.asarray(su_an["refs"][k], float),
+                                 np.asarray(su_a2["refs"][k], float))
+                     for k in su_an["refs"] if k != "macro_true")
+                 and su_an["read_acc"] == su_a2["read_acc"]
+                 and su_an.get("stale_task_matched") == su_a2.get("stale_task_matched"))
+        assert same2, "an_s2 trained a different substrate from an_s0 — lanes are not comparable"
+        print(f"[an_s2] present; substrate identical to an_s0: {same2}")
+    for fam, sroot, sarm, croot, carm in FAMILIES:
+        if not (os.path.isfile(os.path.join(sroot, sarm, "results.json"))
+                and os.path.isfile(os.path.join(croot, carm, "results.json"))):
+            continue
+        stag = "an_s0" if sroot is AN else "an_s2"
+        ctag = "an_s0" if croot is AN else "an_s2"
+        sk, ck = f"{stag}/{sarm}", f"{ctag}/{carm}"
+        if sk not in P:
+            P[sk] = profile(sroot, sarm, su_an if sroot is AN else su_a2)
+        if ck not in P:
+            P[ck] = profile(croot, carm, su_an if croot is AN else su_a2)
+        fams.append((fam, sk, ck))
     if in_tag:
         su_a1 = setup(AN1)
         P["an_s1/outer_yield_m4"] = profile(AN1, "outer_yield_m4", su_a1)
@@ -181,7 +223,7 @@ def main():
               f"{cert['lifetimes']} cycles: max|diff| = {worst:.3e} -> "
               f"{'PASS, the pacer lane is IN-TAG' if cert['pass'] else 'FAIL, the lane stays CROSS-TAG'}")
 
-    print("\n[0] the four trajectories, absolute")
+    print("\n[0] the trajectories, absolute")
     print(f"  {'arm':26s}{'cyc':>5}{'L2c':>5}{'L3c':>5}{'L4c':>5}"
           f"{'L2 rec':>8}{'L3 rec':>8}{'L4 rec':>8}"
           + "".join(f"{'rf e' + str(j + 1):>9}" for j in range(5))
@@ -203,60 +245,106 @@ def main():
     else:
         pacer = ("cr3_s0/outer_yield_m4", "cr3_s0/anchor_long")
         pacer_label = "pacer-alone  [CROSS-TAG]"
-    seln = ("an_s0/q_bisect", "an_s0/q_exo")
-    comp = ("an_s0/q_bisect_loop", "an_s0/q_exo")
-    lanes = [(pacer_label, pacer), ("selection-alone", seln), ("composed", comp)]
+    base = "an_s0/q_exo"
 
-    print("\n[1] THE MARGINALS, one statistic per block. Baseline of every lane is the SAME")
-    print("    trajectory (cr3_s0/anchor_long == an_s0/q_exo, bit-identical).")
+    print("\n[1] THE MARGINALS, one block per SELECTOR FAMILY, one statistic per sub-block.")
+    print("    Baseline of every lane is the SAME trajectory (cr3_s0/anchor_long ==")
+    print("    an_s0/q_exo, bit-identical). The pacer-alone row is the same lane in every")
+    print("    family — it is repeated so each family reads as a complete 2x2.")
     rows = {}
-    print(f"\n  {'lane':28s}" + "".join(f"{'rf e' + str(j + 1):>10}" for j in range(5)))
-    for name, (a, b) in lanes:
-        d = dsub(P[a]["rf"], P[b]["rf"])
-        rows.setdefault(name, {})["rf"] = d
-        print(f"  {name:28s}" + "".join(fmt(x, 10) for x in d))
-    print(f"  {'sum of the two singles':28s}"
-          + "".join(fmt(None if (x is None or y is None) else x + y, 10)
-                    for x, y in zip(rows[pacer_label]["rf"],
-                                    rows["selection-alone"]["rf"])))
-    print(f"  {'composed - that sum':28s}"
-          + "".join(fmt(None if (c is None or x is None or y is None) else c - (x + y), 10)
-                    for c, x, y in zip(rows["composed"]["rf"],
-                                       rows[pacer_label]["rf"],
-                                       rows["selection-alone"]["rf"])))
+    for fam, sk, ck in fams:
+        lanes = [(pacer_label, pacer), ("selection-alone", (sk, base)),
+                 ("composed", (ck, base))]
+        R = rows.setdefault(fam, {})
+        print("\n" + "-" * 92)
+        print(f"  FAMILY: {fam}     selection-alone = {sk}     composed = {ck}")
+        print("-" * 92)
 
-    print(f"\n  {'lane':28s}" + "".join(f"{'L4sh e' + str(j + 1):>10}" for j in (2, 3, 4)))
-    for name, (a, b) in lanes:
-        d = dsub(P[a]["l4_share"], P[b]["l4_share"])
-        rows[name]["l4_share"] = d
-        print(f"  {name:28s}" + "".join(fmt(d[j], 10) for j in (2, 3, 4)))
+        print(f"\n  {'lane':28s}" + "".join(f"{'rf e' + str(j + 1):>10}" for j in range(5)))
+        for name, (a, b) in lanes:
+            d = dsub(P[a]["rf"], P[b]["rf"])
+            R.setdefault(name, {})["rf"] = d
+            print(f"  {name:28s}" + "".join(fmt(x, 10) for x in d))
+        add = [None if (x is None or y is None) else x + y
+               for x, y in zip(R[pacer_label]["rf"], R["selection-alone"]["rf"])]
+        inter = [None if (c is None or x is None) else c - x
+                 for c, x in zip(R["composed"]["rf"], add)]
+        R["additive"] = add
+        R["interaction"] = inter
+        print(f"  {'sum of the two singles':28s}" + "".join(fmt(x, 10) for x in add))
+        print(f"  {'composed - that sum':28s}" + "".join(fmt(x, 10) for x in inter))
 
-    print(f"\n  {'lane':28s}{'L2 commit':>12}{'L3 commit':>12}{'L4 commit':>12}"
-          f"{'L4 book n':>11}{'L4 book prec':>14}")
-    for name, (a, b) in lanes:
-        ca, cb = P[a]["commits"], P[b]["commits"]
-        ta, tb = P[a]["tab"], P[b]["tab"]
-        d = {"L2": ca.get(2, 0) - cb.get(2, 0), "L3": ca.get(3, 0) - cb.get(3, 0),
-             "L4": ca.get(4, 0) - cb.get(4, 0),
-             "book_n": (ta.get(4, {}).get("n"), tb.get(4, {}).get("n")),
-             "book_p": (ta.get(4, {}).get("prec"), tb.get(4, {}).get("prec"))}
-        rows[name]["commits"] = d
-        print(f"  {name:28s}{d['L2']:>+12}{d['L3']:>+12}{d['L4']:>+12}"
-              f"{str(d['book_n'][0]) + ' vs ' + str(d['book_n'][1]):>11}"
-              f"{str(round(d['book_p'][0], 3) if d['book_p'][0] is not None else None) + ' vs ' + str(round(d['book_p'][1], 3) if d['book_p'][1] is not None else None):>14}")
+        print(f"\n  {'lane':28s}" + "".join(f"{'L4sh e' + str(j + 1):>10}" for j in (2, 3, 4)))
+        for name, (a, b) in lanes:
+            d = dsub(P[a]["l4_share"], P[b]["l4_share"])
+            R[name]["l4_share"] = d
+            print(f"  {name:28s}" + "".join(fmt(d[j], 10) for j in (2, 3, 4)))
 
-    print(f"\n  {'lane':28s}{'d L2 recall':>13}{'d L3 recall':>13}{'d L4 recall':>13}"
-          f"{'d L4 true@sup':>15}")
-    for name, (a, b) in lanes:
-        d = {}
-        for l in (2, 3, 4):
-            ea, eb = P[a]["end"].get(l), P[b]["end"].get(l)
-            d[l] = None if not (ea and eb) else ea["recall"] - eb["recall"]
-        dt4 = (P[a]["end"][4]["true"] - P[b]["end"][4]["true"]) if 4 in P[a]["end"] else None
-        d["true4"] = dt4
-        rows[name]["recall"] = d
-        print(f"  {name:28s}{fmt(d[2], 13)}{fmt(d[3], 13)}{fmt(d[4], 13)}"
-              f"{(('%+d' % dt4) if dt4 is not None else '-'):>15}")
+        print(f"\n  {'lane':28s}{'L2 commit':>12}{'L3 commit':>12}{'L4 commit':>12}"
+              f"{'L4 book n':>11}{'L4 book prec':>14}")
+        for name, (a, b) in lanes:
+            ca, cb = P[a]["commits"], P[b]["commits"]
+            ta, tb = P[a]["tab"], P[b]["tab"]
+            d = {"L2": ca.get(2, 0) - cb.get(2, 0), "L3": ca.get(3, 0) - cb.get(3, 0),
+                 "L4": ca.get(4, 0) - cb.get(4, 0),
+                 "book_n": (ta.get(4, {}).get("n"), tb.get(4, {}).get("n")),
+                 "book_p": (ta.get(4, {}).get("prec"), tb.get(4, {}).get("prec"))}
+            R[name]["commits"] = d
+            print(f"  {name:28s}{d['L2']:>+12}{d['L3']:>+12}{d['L4']:>+12}"
+                  f"{str(d['book_n'][0]) + ' vs ' + str(d['book_n'][1]):>11}"
+                  f"{str(round(d['book_p'][0], 3) if d['book_p'][0] is not None else None) + ' vs ' + str(round(d['book_p'][1], 3) if d['book_p'][1] is not None else None):>14}")
+
+        print(f"\n  {'lane':28s}{'d L2 recall':>13}{'d L3 recall':>13}{'d L4 recall':>13}"
+              f"{'d L4 true@sup':>15}")
+        for name, (a, b) in lanes:
+            d = {}
+            for l in (2, 3, 4):
+                ea, eb = P[a]["end"].get(l), P[b]["end"].get(l)
+                d[l] = None if not (ea and eb) else ea["recall"] - eb["recall"]
+            dt4 = (P[a]["end"][4]["true"] - P[b]["end"][4]["true"]) if 4 in P[a]["end"] else None
+            d["true4"] = dt4
+            R[name]["recall"] = d
+            print(f"  {name:28s}{fmt(d[2], 13)}{fmt(d[3], 13)}{fmt(d[4], 13)}"
+                  f"{(('%+d' % dt4) if dt4 is not None else '-'):>15}")
+
+        # [antiphon-s2] THE LIFETIME FRAMING, as numbers beside the lane rather than as prose.
+        # Loop arms leave eras early, so a lane that runs SHORT has its positives conservative
+        # and its negatives suspect toward time cost. Printed per lane, per family.
+        print(f"\n  {'lane':28s}{'cycles':>9}{'d cycles':>10}{'d priced':>11}   read as")
+        for name, (a, b) in lanes:
+            dc = P[a]["n_cycles"] - P[b]["n_cycles"]
+            dp = (P[a]["t_cum"] - P[b]["t_cum"]) / P[b]["t_cum"]
+            how = ("lifetime-matched" if dc == 0 else
+                   ("SHORT: +ve conservative, -ve suspect (time cost)"
+                    if dc < 0 else "LONG: +ve suspect (time bought)"))
+            R[name]["lifetime"] = {"n_cycles": P[a]["n_cycles"], "d_cycles": dc,
+                                   "d_priced_frac": dp, "read_as": how}
+            print(f"  {name:28s}{P[a]['n_cycles']:>9}{dc:>+10}{dp * 100:>+10.1f}%   {how}")
+
+    # --- [antiphon-s2] THE ONE TABLE THE ROUND IS READ ON --------------------------------
+    if len(fams) > 1:
+        print("\n" + "=" * 92)
+        print("[1b] LIKE-FOR-LIKE ATTRIBUTION AT THE DEEP ERAS — every family in one table")
+        print("=" * 92)
+        print(f"  {'family':22s}{'lane':24s}{'rf e4':>10}{'rf e5':>10}"
+              f"{'d cyc':>8}{'d priced':>10}")
+        print(f"  {'(all families)':22s}{pacer_label:24s}"
+              f"{fmt(rows[fams[0][0]][pacer_label]['rf'][3], 10)}"
+              f"{fmt(rows[fams[0][0]][pacer_label]['rf'][4], 10)}"
+              f"{rows[fams[0][0]][pacer_label]['lifetime']['d_cycles']:>+8}"
+              f"{rows[fams[0][0]][pacer_label]['lifetime']['d_priced_frac'] * 100:>+9.1f}%")
+        for fam, sk, ck in fams:
+            R = rows[fam]
+            for name in ("selection-alone", "composed"):
+                lt = R[name]["lifetime"]
+                print(f"  {fam:22s}{name:24s}{fmt(R[name]['rf'][3], 10)}"
+                      f"{fmt(R[name]['rf'][4], 10)}{lt['d_cycles']:>+8}"
+                      f"{lt['d_priced_frac'] * 100:>+9.1f}%")
+            print(f"  {fam:22s}{'additive (pacer+seln)':24s}"
+                  f"{fmt(R['additive'][3], 10)}{fmt(R['additive'][4], 10)}")
+            print(f"  {fam:22s}{'INTERACTION':24s}"
+                  f"{fmt(R['interaction'][3], 10)}{fmt(R['interaction'][4], 10)}")
+            print()
 
     print("\n[2] CAVEATS, stated where the numbers are")
     if in_tag and cert and cert["pass"]:
@@ -275,9 +363,15 @@ def main():
     print("        the schedule arm the lifetime ceiling, so a POSITIVE loop delta cannot have")
     print("        been bought with time — but a NEGATIVE one may be a time cost. Read the")
     print("        pacer-alone negatives with that, and the composed positives as conservative.")
+    print("        [antiphon-s2] this is now PRINTED per lane per family (the `d cyc` /")
+    print("        `d priced` / `read as` block), not left as prose.")
 
     out = {"same_refs": bool(same_refs), "same_substrate": bool(same_sub),
            "in_tag_pacer": bool(in_tag), "certification": cert, "pacer_lane": pacer_label,
+           # [antiphon-s2] `marginals` is now keyed by SELECTOR FAMILY, then by lane. The
+           # single-family shape `an_s0`+`an_s1` produced is the len(fams)==1 case of this.
+           "families": [{"family": f, "selection_alone": s, "composed": c}
+                        for f, s, c in fams],
            "profiles": P, "marginals": rows}
     with open(os.path.join(HERE, "pacer_marginal.json"), "w") as f:
         json.dump(out, f, indent=1, default=float)

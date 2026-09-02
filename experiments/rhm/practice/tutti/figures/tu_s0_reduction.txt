@@ -1,0 +1,1266 @@
+=== tutti (the unification node: both currencies, and the selector, in one loop) — tag tu_s0 ===
+ladder [('L1n25', 60), ('L2n12', 50), ('L3n6', 70), ('L4n3', 12), ('L5n1', 9)] = 201 cycles/arm scheduled; caps [60, 50, 70, 12, 9] = 201; setup 598s; stale buffer 0.1269 -> 0.1541
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+
+==============================================================================
+(0) GATES
+==============================================================================
+  CROSS-TAG REPLAY (A3's TREATMENT, WHOLE LIFE — this round's baseline IS that arm): cr3_s0/outer_yield_m4 not fetched locally — skipped
+  CROSS-TAG REPLAY (A1's thermostat through the earning eras — the chain back to A2): ma_s0/outer_yield not fetched locally — skipped
+  G-F smoke scale (in-process vs maestro.py, panel ON, maxl=3): max|fork - donor| = 0.000e+00, self-replay control = 0.000e+00, commits equal = True  -> PASS
+
+  IN-TAG TWIN GATE (each arm vs tu_y_exo, to the first action by EITHER; tu_y_exo's own first commit is c49).
+  [tacet] NOTE: every arm here is treated from c1, so a non-zero delta below is the
+  round's variable — read it as WHEN THE GATE FIRST BOUND, not as a failure.
+    tu_d_exo       c1-c17   (first action c18 (own)) max|delta| = 0.000e+00  -> identical
+    tu_s_exo       c1-c17   (first action c18 (own)) max|delta| = 0.000e+00  -> identical
+    tu_s_endo      c1-c29   (first action c30 (own)) max|delta| = 1.640e+02  -> differs
+    tu_s_yk        c1-c29   (first action c30 (own)) max|delta| = 0.000e+00  -> identical
+    tu_d_endo      c1-c29   (first action c30 (own)) max|delta| = 1.640e+02  -> differs
+    tu_y_endo      c1-c45   (first action c46 (own)) max|delta| = 1.640e+02  -> differs
+    tu_m_exo       c1-c48   (first action c49 (own)) max|delta| = 0.000e+00  -> identical
+
+  OBSERVATION PANEL vs the donor's G-Y miner (level 4, every cycle):
+    tu_y_exo         agree=True over 131 cycles
+    tu_d_exo         agree=True over 184 cycles
+    tu_s_exo         agree=True over 141 cycles
+    tu_s_endo        agree=True over 117 cycles
+    tu_s_yk          agree=True over 117 cycles
+    tu_d_endo        agree=True over 160 cycles
+    tu_y_endo        agree=True over 126 cycles
+    tu_m_exo         agree=True over 164 cycles
+
+  POLICY GATE (offline, no GPU): ALL PASS (21 checks)
+
+  ENDO READ: LABEL-FREE BY CONSTRUCTION: PASS — positions depend only on ['era.level', 'era.node', 's', 'depth']; none of ['truth', 'rules', 'inverse_maps', 'committed', 'canon', 'true_mask', 'grade'] appears in the read's code
+    era 1 cell L1n25 blocks [25, 26] -> parent L2n12 blocks [24, 26]
+    era 2 cell L2n12 blocks [24, 26] -> parent L3n6 blocks [24, 28]
+    era 3 cell L3n6 blocks [24, 28] -> parent L4n3 blocks [24, 32]
+    era 4 cell L4n3 blocks [24, 32] -> parent L5n1 blocks [16, 32]
+    era 5 cell L5n1 blocks [16, 32] -> parent L6n0 blocks [0, 32]  (parent IS the root: the read is the unconditional marginal)
+
+  DEAD ZONES: measured, not defaulted: PASS, matches floors.json = None
+    {'tol_ledger': 0.02944712566990095, 'tol_yield_l3': 0.46127129019246205, 'tol_yield_l4': 0.5166900731510206, 'tol_endo': 0.01091575129919287}
+    provenance: cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)
+
+  ENDO PRICE (measured on the run's own GPU): one read over 256 sequences = 1.3 ms = 273 grounding-equivalents; charged 267g
+
+==============================================================================
+(1) THE ACTION TRACE — what the loop did, and when
+==============================================================================
+  arm                 policy    read cycles  commits  advances  chosen  capped  rode cap
+  tu_y_exo             quiet   yield    131        3         5       7       1      True
+  tu_d_exo             quiet    dsil    184        1         5       2       4      True
+  tu_s_exo             quiet   yield    141        1         5       5       1      True
+  tu_s_endo            quiet   yield    117        2         5       6       1      True
+  tu_s_yk               yoke    None    117        2         5       0       0     False
+  tu_d_endo            quiet    dsil    160        2         5       4       3      True
+  tu_y_endo            quiet   yield    126        3         5       6       2      True
+  tu_m_exo             quiet    dsil    164        2         5       3       4      True
+
+  PER-ARM ACTIONS (cycle, kind, level, why, and the statistic at that instant)
+
+    tu_y_exo  eras: e1 c1-58 (58c), e2 c59-88 (30c), e3 c89-114 (26c), e4 c115-122 (8c), e5 c123-131 (9c)
+      c49   era1 commit   L2  why=quiet  V=   0.2772 tol=  0.4613 V/tol=    0.60
+      c58   era1 advance  L-  why=quiet  V=   0.2344 tol=  0.4613 V/tol=    0.51
+      c72   era2 commit   L3  why=quiet  V=   0.4019 tol=  0.5167 V/tol=    0.78
+      c88   era2 advance  L-  why=quiet  V=   0.3928 tol=  0.5167 V/tol=    0.76
+      c104  era3 commit   L4  why=quiet  V=   0.2767 tol=  0.5167 V/tol=    0.54
+      c114  era3 advance  L-  why=quiet  V=   0.4297 tol=  0.5167 V/tol=    0.83
+      c122  era4 advance  L-  why=quiet  V=   0.4062 tol=  0.5167 V/tol=    0.79
+      c131  era5 advance  L-  why=cap    V=   0.0625 tol=  0.5167 V/tol=    0.12
+
+    tu_d_exo  eras: e1 c1-43 (43c), e2 c44-93 (50c), e3 c94-163 (70c), e4 c164-175 (12c), e5 c176-184 (9c)
+      c18   era1 commit   L2  why=quiet  V=        - tol=       - V/tol=       -
+      c43   era1 advance  L-  why=quiet  V=   0.0042 tol=  0.0046 V/tol=    0.91
+      c93   era2 advance  L-  why=cap    V=   0.0005 tol=  0.0046 V/tol=    0.11
+      c163  era3 advance  L-  why=cap    V=  -0.0003 tol=  0.0046 V/tol=   -0.07
+      c175  era4 advance  L-  why=cap    V=   0.0010 tol=  0.0046 V/tol=    0.22
+      c184  era5 advance  L-  why=cap    V=  -0.0002 tol=  0.0046 V/tol=   -0.05
+
+    tu_s_exo  eras: e1 c1-46 (46c), e2 c47-90 (44c), e3 c91-121 (31c), e4 c122-132 (11c), e5 c133-141 (9c)
+      c18   era1 commit   L2  why=quiet  V=   1.3676 tol=  0.4613 V/tol=    2.96
+      c46   era1 advance  L-  why=quiet  V=   0.4075 tol=  0.4613 V/tol=    0.88
+      c90   era2 advance  L-  why=quiet  V=   0.5154 tol=  0.5167 V/tol=    1.00
+      c121  era3 advance  L-  why=quiet  V=   0.4120 tol=  0.5167 V/tol=    0.80
+      c132  era4 advance  L-  why=quiet  V=   0.5078 tol=  0.5167 V/tol=    0.98
+      c141  era5 advance  L-  why=cap    V=   0.0625 tol=  0.5167 V/tol=    0.12
+
+    tu_s_endo  eras: e1 c1-46 (46c), e2 c47-86 (40c), e3 c87-96 (10c), e4 c97-108 (12c), e5 c109-117 (9c)
+      c30   era1 commit   L2  why=quiet  V=   0.8034 tol=  0.4613 V/tol=    1.74
+      c46   era1 advance  L-  why=quiet  V=   0.3977 tol=  0.4613 V/tol=    0.86
+      c61   era2 commit   L3  why=quiet  V=   0.5945 tol=  0.5167 V/tol=    1.15
+      c86   era2 advance  L-  why=quiet  V=   0.4308 tol=  0.5167 V/tol=    0.83
+      c96   era3 advance  L-  why=quiet  V=   0.4531 tol=  0.5167 V/tol=    0.88
+      c108  era4 advance  L-  why=quiet  V=   0.4160 tol=  0.5167 V/tol=    0.81
+      c117  era5 advance  L-  why=cap    V=   0.5312 tol=  0.5167 V/tol=    1.03
+
+    tu_s_yk  eras: e1 c1-46 (46c), e2 c47-86 (40c), e3 c87-96 (10c), e4 c97-108 (12c), e5 c109-117 (9c)
+      c30   era1 commit   L2  why=clock  V=        - tol=       - V/tol=       -
+      c46   era1 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c61   era2 commit   L3  why=clock  V=        - tol=       - V/tol=       -
+      c86   era2 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c96   era3 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c108  era4 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+      c117  era5 advance  L-  why=clock  V=        - tol=       - V/tol=       -
+
+    tu_d_endo  eras: e1 c1-52 (52c), e2 c53-69 (17c), e3 c70-139 (70c), e4 c140-151 (12c), e5 c152-160 (9c)
+      c30   era1 commit   L2  why=quiet  V=        - tol=       - V/tol=       -
+      c52   era1 advance  L-  why=quiet  V=   0.0039 tol=  0.0046 V/tol=    0.86
+      c60   era2 commit   L3  why=quiet  V=   0.0042 tol=  0.0046 V/tol=    0.92
+      c69   era2 advance  L-  why=quiet  V=   0.0041 tol=  0.0046 V/tol=    0.90
+      c139  era3 advance  L-  why=cap    V=   0.0000 tol=  0.0046 V/tol=    0.00
+      c151  era4 advance  L-  why=cap    V=   0.0016 tol=  0.0046 V/tol=    0.35
+      c160  era5 advance  L-  why=cap    V=   0.0009 tol=  0.0046 V/tol=    0.20
+
+    tu_y_endo  eras: e1 c1-58 (58c), e2 c59-77 (19c), e3 c78-105 (28c), e4 c106-117 (12c), e5 c118-126 (9c)
+      c46   era1 commit   L2  why=quiet  V=   0.2754 tol=  0.4613 V/tol=    0.60
+      c58   era1 advance  L-  why=quiet  V=   0.4121 tol=  0.4613 V/tol=    0.89
+      c69   era2 commit   L3  why=quiet  V=   0.5117 tol=  0.5167 V/tol=    0.99
+      c77   era2 advance  L-  why=quiet  V=   0.4375 tol=  0.5167 V/tol=    0.85
+      c97   era3 commit   L4  why=quiet  V=   0.4198 tol=  0.5167 V/tol=    0.81
+      c105  era3 advance  L-  why=quiet  V=   0.4375 tol=  0.5167 V/tol=    0.85
+      c117  era4 advance  L-  why=cap    V=   0.0156 tol=  0.5167 V/tol=    0.03
+      c126  era5 advance  L-  why=cap    V=   0.0312 tol=  0.5167 V/tol=    0.06
+
+    tu_m_exo  eras: e1 c1-60 (60c), e2 c61-73 (13c), e3 c74-143 (70c), e4 c144-155 (12c), e5 c156-164 (9c)
+      c49   era1 commit   L2  why=quiet  V=        - tol=       - V/tol=       -
+      c60   era1 advance  L-  why=cap    V=   0.0209 tol=  0.0046 V/tol=    4.55
+      c73   era2 advance  L-  why=quiet  V=   0.0037 tol=  0.0046 V/tol=    0.81
+      c101  era3 commit   L4  why=quiet  V=   0.0008 tol=  0.0046 V/tol=    0.18
+      c143  era3 advance  L-  why=cap    V=  -0.0003 tol=  0.0046 V/tol=   -0.07
+      c155  era4 advance  L-  why=cap    V=   0.0005 tol=  0.0046 V/tol=    0.12
+      c164  era5 advance  L-  why=cap    V=  -0.0002 tol=  0.0046 V/tol=   -0.05
+
+  COMMIT CYCLES AND WHAT WAS COMMITTED
+  arm              lvl  cycle  era  prov  entries  recall    prec  cert@    driver
+  tu_y_exo           2     49    1 False       14   0.714   0.714     18      loop
+  tu_y_exo           3     72    2 False       10   0.071   0.400   None      loop
+  tu_y_exo           4    104    3 False        1   0.001   1.000   None      loop
+  tu_d_exo           2     18    1 False       11   0.571   0.727     18      loop
+  tu_s_exo           2     18    1 False       11   0.571   0.727     18      loop
+  tu_s_endo          2     30    1 False       14   0.714   0.714     30      loop
+  tu_s_endo          3     61    2 False       11   0.089   0.455     54      loop
+  tu_s_yk            2     30    1 False       13   0.643   0.692     18      loop
+  tu_s_yk            3     61    2 False       13   0.071   0.308   None      loop
+  tu_d_endo          2     30    1 False       14   0.714   0.714     30      loop
+  tu_d_endo          3     60    2 False        4   0.036   0.500   None      loop
+  tu_y_endo          2     46    1 False       15   0.714   0.667     30      loop
+  tu_y_endo          3     69    2 False        8   0.071   0.500   None      loop
+  tu_y_endo          4     97    3 False        1   0.001   1.000   None      loop
+  tu_m_exo           2     49    1 False       14   0.714   0.714     18      loop
+  tu_m_exo           4    101    3 False        2   0.001   0.500   None      loop
+
+==============================================================================
+(1b) THE LEARNED POLICY'S OWN RECORD — the mixtures, the fit, the action diff
+==============================================================================
+  THE FITTED MIXTURES (unit-norm weights on each gauge's paired-interval slope,
+  IN FLOOR UNITS; the bucket is `will_commit` = would a firing install a table).
+  A1's thermostat is the point (0, 1, 0) with theta = 1 in this same class.
+    arm/reward        bucket           ledger         yield   endo_excess    theta
+    learned_yield   installs          +0.2106       +0.9440       +0.2540   1.2085
+    learned_yield   advances          +0.0495       +0.8506       +0.5235   1.0980
+    learned_task    installs          -0.7806       +0.2146       +0.5871   1.4253
+    learned_task    advances          -0.4221       +0.1367       +0.8962   0.7083
+
+  THE ACTION DIFF — learned vs the hand-written thermostat, IN THIS TAG
+  (both ran live on their own trajectories, so this is a difference between two
+   runs and not a counterfactual; the pre-GPU replay is in fit.json.)
+
+  WHAT THE LEARNED POLICY READ AT EACH OF ITS OWN ACTIONS
+
+==============================================================================
+(2) GAUGE vs YOKE — the mandatory timing control (census finding 4)
+==============================================================================
+  The yoke replays the gauge arm's realised action cycles by clock and reads
+  nothing. A divergence would mean the reads are not inert; identity means the
+  criterion contributed nothing beyond a cycle number, which is a finding, and the
+  priced-time column is then what the read cost for a trajectory a clock reproduces.
+  [tacet] In this tag the yokes ARE the treatments (each carries one gate knob), so
+  a non-zero delta below is the round's variable and `first divergence` reads as
+  WHEN THE GATE FIRST BOUND. What must still hold is commits/advances EQUAL — that
+  is what makes the arms lifetime- and pacing-identical.
+
+  tu_s_yk vs tu_s_yk  (n=117 cycles)
+    max|delta| over 12 trajectory series = 0.000e+00; first divergence cycle = None
+    commits [(2, 30), (3, 61)] vs [(2, 30), (3, 61)]   equal = True
+    advances [46, 86, 96, 108, 117] vs [46, 86, 96, 108, 117]   equal = True
+    priced time t_cum 29009715 vs 29009715  (difference +0 = what the read cost)
+
+==============================================================================
+(3) THE THREE CLOCKS: certificate, coverage, value
+==============================================================================
+  CLOCK 1 — the SHADOW certificate (read-only in every arm, incl. the driven ones)
+  arm               L2 fired  L3 fired  L2 c2cert  L3 c2cert  commit L2  commit L3
+  tu_y_exo                18        76         17         17         49         72
+  tu_d_exo                18        58         17         12         18       None
+  tu_s_exo                18        63         17         16         18       None
+  tu_s_endo               30        54         29          6         30         61
+  tu_s_yk                 18      None         17       None         30         61
+  tu_d_endo               30        63         29         10         30         60
+  tu_y_endo               30      None         29       None         46         69
+  tu_m_exo                18        79         17         18         49       None
+
+  CLOCK 2 — COVERAGE: end-of-run committed table per level
+  arm              lvl  frozen n   recall    prec  live n  live rec  live prec
+  tu_y_exo           2        14    0.714   0.714      18     0.929      0.722
+  tu_y_exo           3        10    0.071   0.400      27     0.143      0.296
+  tu_y_exo           4         1    0.001   1.000       2     0.001      0.500
+  tu_d_exo           2        11    0.571   0.727      18     0.857      0.667
+  tu_d_exo           3         -        -       -      25     0.179      0.400
+  tu_d_exo           4         -        -       -      12     0.006      0.417
+  tu_s_exo           2        11    0.571   0.727      19     0.929      0.684
+  tu_s_exo           3         -        -       -      24     0.179      0.417
+  tu_s_exo           4         -        -       -       5     0.005      0.800
+  tu_s_endo          2        14    0.714   0.714      17     0.857      0.706
+  tu_s_endo          3        11    0.089   0.455      25     0.179      0.400
+  tu_s_endo          4         -        -       -       5     0.001      0.200
+  tu_s_yk            2        13    0.643   0.692      17     0.857      0.706
+  tu_s_yk            3        13    0.071   0.308      23     0.107      0.261
+  tu_s_yk            4         -        -       -       4     0.001      0.250
+  tu_d_endo          2        14    0.714   0.714      20     0.929      0.650
+  tu_d_endo          3         4    0.036   0.500      25     0.143      0.320
+  tu_d_endo          4         -        -       -       3     0.001      0.333
+  tu_y_endo          2        15    0.714   0.667      19     0.929      0.684
+  tu_y_endo          3         8    0.071   0.500      25     0.196      0.440
+  tu_y_endo          4         1    0.001   1.000       1     0.001      1.000
+  tu_m_exo           2        14    0.714   0.714      17     0.786      0.647
+  tu_m_exo           3         -        -       -      28     0.179      0.357
+  tu_m_exo           4         2    0.001   0.500       8     0.002      0.250
+
+  CLOCK 3 — VALUE: recovered fraction per era (e, and (stale-e)/(stale-floor))
+  arm                          era1             era2             era3             era4             era5
+  tu_y_exo            0.496 /+0.484    0.619 /+0.497    0.614 /+0.684    0.685 /+1.045    0.772 /+1.322
+  tu_d_exo            0.452 /+0.540    0.576 /+0.572    0.582 /+0.753    0.852 /+0.464    0.925 /+0.355
+  tu_s_exo            0.498 /+0.480    0.570 /+0.581    0.696 /+0.501    0.889 /+0.333    0.963 /+0.120
+  tu_s_endo           0.491 /+0.489    0.556 /+0.607    0.689 /+0.516    0.770 /+0.748    0.924 /+0.366
+  tu_s_yk             0.509 /+0.466    0.554 /+0.610    0.723 /+0.441    0.821 /+0.570    0.932 /+0.311
+  tu_d_endo           0.497 /+0.481    0.651 /+0.441    0.578 /+0.763    0.791 /+0.676    0.881 /+0.634
+  tu_y_endo           0.516 /+0.457    0.621 /+0.494    0.655 /+0.592    0.634 /+1.224    0.838 /+0.907
+  tu_m_exo            0.497 /+0.482    0.625 /+0.486    0.457 /+1.031    0.505 /+1.673    0.694 /+1.814
+  stale                     0.865            0.906            0.922            0.984            0.982
+  floor                     0.102            0.328            0.471            0.698            0.823
+
+  DELTA TO TU_Y_EXO, per era, in recovered fraction
+  Read against the MEASURED depth-6 stream floor (census finding 7): 0.087 in the
+  earning family and 0.083/0.148/0.344 in the given family for eras 3/4/5. Ranks
+  and signs in the deep eras are the currency; fractions are not.
+  arm                   era1      era2      era3      era4      era5
+  tu_d_exo             0.057     0.075     0.069    -0.582    -0.967
+  tu_s_exo            -0.003     0.084    -0.183    -0.712    -1.202
+  tu_s_endo            0.006     0.110    -0.168    -0.297    -0.956
+  tu_s_yk             -0.017     0.113    -0.243    -0.476    -1.011
+  tu_d_endo           -0.002    -0.056     0.079    -0.370    -0.689
+  tu_y_endo           -0.026    -0.003    -0.092     0.179    -0.415
+  tu_m_exo            -0.001    -0.011     0.347     0.627     0.492
+
+==============================================================================
+(4) pi PER-LEVEL MASS, ARGMAX SHARE, AND MACRO EXPANSIONS, per arm per era
+==============================================================================
+
+  L2 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  tu_y_exo             0.065     0.182     0.162     0.143     0.145
+  tu_d_exo             0.141     0.268     0.486     0.528     0.577
+  tu_s_exo             0.150     0.285     0.355     0.392     0.430
+  tu_s_endo            0.079     0.178     0.246     0.247     0.238
+  tu_s_yk              0.093     0.214     0.227     0.247     0.230
+  tu_d_endo            0.111     0.150     0.204     0.202     0.218
+  tu_y_endo            0.078     0.131     0.187     0.145     0.170
+  tu_m_exo             0.078     0.139     0.255     0.182     0.188
+
+  L3 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  tu_y_exo             0.000     0.061     0.213     0.243     0.217
+  tu_d_exo             0.000     0.000     0.000     0.000     0.000
+  tu_s_exo             0.000     0.000     0.000     0.000     0.000
+  tu_s_endo            0.000     0.083     0.129     0.236     0.248
+  tu_s_yk              0.000     0.088     0.124     0.197     0.196
+  tu_d_endo            0.000     0.018     0.266     0.367     0.356
+  tu_y_endo            0.000     0.022     0.139     0.179     0.186
+  tu_m_exo             0.000     0.000     0.000     0.000     0.000
+
+  L4 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  tu_y_exo             0.000     0.000     0.038     0.131     0.168
+  tu_d_exo             0.000     0.000     0.000     0.000     0.000
+  tu_s_exo             0.000     0.000     0.000     0.000     0.000
+  tu_s_endo            0.000     0.000     0.000     0.000     0.000
+  tu_s_yk              0.000     0.000     0.000     0.000     0.000
+  tu_d_endo            0.000     0.000     0.000     0.000     0.000
+  tu_y_endo            0.000     0.000     0.040     0.157     0.192
+  tu_m_exo             0.000     0.000     0.254     0.464     0.502
+
+  L2 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  tu_y_exo             0.000     0.029     0.049     0.036     0.052
+  tu_d_exo             0.000     0.148     0.547     0.612     0.698
+  tu_s_exo             0.000     0.169     0.333     0.388     0.458
+  tu_s_endo            0.000     0.052     0.193     0.208     0.182
+  tu_s_yk              0.000     0.120     0.169     0.203     0.161
+  tu_d_endo            0.000     0.000     0.091     0.083     0.117
+  tu_y_endo            0.000     0.003     0.089     0.052     0.070
+  tu_m_exo             0.000     0.008     0.193     0.078     0.068
+
+  L3 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  tu_y_exo             0.000     0.010     0.250     0.331     0.271
+  tu_d_exo             0.000     0.000     0.000     0.000     0.000
+  tu_s_exo             0.000     0.000     0.000     0.000     0.000
+  tu_s_endo            0.000     0.005     0.060     0.253     0.279
+  tu_s_yk              0.000     0.010     0.055     0.185     0.169
+  tu_d_endo            0.000     0.000     0.378     0.557     0.521
+  tu_y_endo            0.000     0.000     0.122     0.188     0.214
+  tu_m_exo             0.000     0.000     0.000     0.000     0.000
+
+  L4 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3      era4      era5
+  tu_y_exo             0.000     0.000     0.010     0.094     0.185
+  tu_d_exo             0.000     0.000     0.000     0.000     0.000
+  tu_s_exo             0.000     0.000     0.000     0.000     0.000
+  tu_s_endo            0.000     0.000     0.000     0.000     0.000
+  tu_s_yk              0.000     0.000     0.000     0.000     0.000
+  tu_d_endo            0.000     0.000     0.000     0.000     0.000
+  tu_y_endo            0.000     0.000     0.016     0.221     0.299
+  tu_m_exo             0.000     0.000     0.385     0.695     0.786
+
+  MACRO EXPANSIONS the beam ran (blocks.mat_dp, per-cycle mean by era)
+  arm                     era1        era2        era3        era4        era5
+  tu_y_exo                8843        3972        5455           0           0
+  tu_d_exo               11933           0           0           0           0
+  tu_s_exo               11155           0           0           0           0
+  tu_s_endo              11021        8485           0           0           0
+  tu_s_yk                11014        8480           0          18           0
+  tu_d_endo               9750       19937           0           0           0
+  tu_y_endo               8747       17818        8426           0           0
+  tu_m_exo                8549           0        3349           0           0
+
+==============================================================================
+(5) THE LEDGER — what each arm read, and what it cost
+==============================================================================
+  ear's convention: the learner's own experience is free, a counterfactual read is
+  priced, and instruments logged in every arm are free. Only the POLICY's input
+  stream is charged, and the charge lands in `counts['ground']` -> `t_cum`, which
+  nothing in the cycle loop reads.
+  arm                     read  n reads  priced  spend(g)    t_cum end   t_cum+read  read % of
+  tu_y_exo               yield        0       0         0     32554752     32554752     0.000%
+  tu_d_exo                dsil        0       0         0     43787795     43787795     0.000%
+  tu_s_exo               yield        0       0         0     33873382     33873382     0.000%
+  tu_s_endo              yield        0       0         0     29009178     29009178     0.000%
+  tu_s_yk                 None        0       0         0     29009715     29009715     0.000%
+  tu_d_endo               dsil        0       0         0     39857325     39857325     0.000%
+  tu_y_endo              yield        0       0         0     31082413     31082413     0.000%
+  tu_m_exo                dsil        0       0         0     38286202     38286202     0.000%
+
+==============================================================================
+(6) THE MEASURED FLOORS, RE-DERIVED IN-TAG on the schedule arm
+==============================================================================
+  reference arm: tu_y_exo (131 cycles, 7 windows dropped at era boundaries / commits); span=1 W=4
+  gauge         n_win      sd(N)    mean(N)  v_tol=sd/2    mean(D)  D/floor   governed by
+  ledger           92    0.05487   -0.00309     0.02744   +0.00903     0.33       0.02945
+  yield            92    0.91322   -0.01630     0.45661   +0.91033     1.99L3 0.4613/L4 0.5167
+  endo             92    0.02792   +0.00608     0.01396   -0.00167    -0.12       0.01092
+  endo_cell        92    0.03353   +0.00760     0.01677   -0.00492    -0.29          None
+  endo_excess      92    0.02406   -0.00152     0.01203   +0.00325     0.27          None
+  dsil             43    0.00449   -0.00007     0.00225   +0.00171     0.76       0.00460   (from c55: the gauge does not exist before a slot opens)
+
+  >>> THE ENDO DEAD ZONE, measured on tu_s0/tu_y_exo: v_tol = 0.0139617
+      pass it to the main run as  --tol-endo 0.0139617
+
+==============================================================================
+(7) THE SHADOW PANEL — every gauge replayed through the same rule, in every arm
+==============================================================================
+  Counterfactual: what each gauge WOULD have licensed in each arm, per era, if it
+  had been the driven read. Exact only up to the arm's first action (after that the
+  arm's own trajectory is the one the gauge was measured on), so `first_action` is
+  printed beside it and a shadow decision must never be read as a measured one.
+
+    tu_y_exo  (first action c49)
+      ledger       e1[58c armed@5 quiet@10]  e2[30c armed@78 quiet@79]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@49]  e2[30c armed@65 quiet@72]  e3[26c armed@94 quiet@104]  e4[8c armed@120 quiet@122]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[30c armed@78 quiet@79]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@38]  e2[30c armed@82 quiet@83]  e3[26c armed@110 quiet@111]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[30c armed@65 quiet@66]  e3[26c armed@None quiet@None]  e4[8c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    tu_d_exo  (first action c18)
+      ledger       e1[43c armed@5 quiet@10]  e2[50c armed@None quiet@None]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[43c armed@5 quiet@None]  e2[50c armed@51 quiet@57]  e3[70c armed@98 quiet@120]  e4[12c armed@168 quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[43c armed@None quiet@None]  e2[50c armed@85 quiet@86]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[43c armed@25 quiet@27]  e2[50c armed@None quiet@None]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[43c armed@5 quiet@16]  e2[50c armed@50 quiet@55]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    tu_s_exo  (first action c18)
+      ledger       e1[46c armed@5 quiet@10]  e2[44c armed@None quiet@None]  e3[31c armed@None quiet@None]  e4[11c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[46c armed@5 quiet@46]  e2[44c armed@59 quiet@90]  e3[31c armed@95 quiet@121]  e4[11c armed@126 quiet@132]  e5[9c armed@None quiet@None]
+      endo         e1[46c armed@None quiet@None]  e2[44c armed@52 quiet@55]  e3[31c armed@None quiet@None]  e4[11c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[46c armed@25 quiet@27]  e2[44c armed@74 quiet@75]  e3[31c armed@None quiet@None]  e4[11c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[46c armed@5 quiet@16]  e2[44c armed@51 quiet@54]  e3[31c armed@None quiet@None]  e4[11c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    tu_s_endo  (first action c30)
+      ledger       e1[46c armed@5 quiet@10]  e2[40c armed@67 quiet@68]  e3[10c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[46c armed@5 quiet@34]  e2[40c armed@61 quiet@62]  e3[10c armed@91 quiet@96]  e4[12c armed@101 quiet@108]  e5[9c armed@113 quiet@None]
+      endo         e1[46c armed@None quiet@None]  e2[40c armed@64 quiet@66]  e3[10c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[46c armed@35 quiet@36]  e2[40c armed@64 quiet@68]  e3[10c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[46c armed@5 quiet@16]  e2[40c armed@None quiet@None]  e3[10c armed@91 quiet@92]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    tu_s_yk  (first action c30)
+      ledger       e1[46c armed@5 quiet@10]  e2[40c armed@67 quiet@68]  e3[10c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[46c armed@5 quiet@35]  e2[40c armed@62 quiet@78]  e3[10c armed@91 quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[46c armed@None quiet@None]  e2[40c armed@None quiet@None]  e3[10c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[46c armed@36 quiet@40]  e2[40c armed@67 quiet@70]  e3[10c armed@None quiet@None]  e4[12c armed@101 quiet@102]  e5[9c armed@None quiet@None]
+      endo_excess  e1[46c armed@5 quiet@16]  e2[40c armed@None quiet@None]  e3[10c armed@93 quiet@94]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    tu_d_endo  (first action c30)
+      ledger       e1[52c armed@5 quiet@10]  e2[17c armed@65 quiet@67]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[52c armed@5 quiet@34]  e2[17c armed@66 quiet@None]  e3[70c armed@74 quiet@78]  e4[12c armed@144 quiet@149]  e5[9c armed@None quiet@None]
+      endo         e1[52c armed@49 quiet@51]  e2[17c armed@None quiet@None]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[52c armed@35 quiet@36]  e2[17c armed@64 quiet@66]  e3[70c armed@123 quiet@124]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[52c armed@5 quiet@16]  e2[17c armed@None quiet@None]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    tu_y_endo  (first action c46)
+      ledger       e1[58c armed@5 quiet@10]  e2[19c armed@75 quiet@76]  e3[28c armed@None quiet@None]  e4[12c armed@110 quiet@111]  e5[9c armed@None quiet@None]
+      yield        e1[58c armed@5 quiet@46]  e2[19c armed@63 quiet@69]  e3[28c armed@82 quiet@97]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[58c armed@None quiet@None]  e2[19c armed@None quiet@None]  e3[28c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[58c armed@37 quiet@41]  e2[19c armed@66 quiet@68]  e3[28c armed@103 quiet@104]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[58c armed@5 quiet@16]  e2[19c armed@75 quiet@76]  e3[28c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+    tu_m_exo  (first action c49)
+      ledger       e1[60c armed@5 quiet@10]  e2[13c armed@None quiet@None]  e3[70c armed@103 quiet@104]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      yield        e1[60c armed@5 quiet@49]  e2[13c armed@66 quiet@None]  e3[70c armed@78 quiet@101]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo         e1[60c armed@None quiet@None]  e2[13c armed@None quiet@None]  e3[70c armed@93 quiet@94]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_cell    e1[60c armed@37 quiet@38]  e2[13c armed@None quiet@None]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+      endo_excess  e1[60c armed@5 quiet@16]  e2[13c armed@None quiet@None]  e3[70c armed@None quiet@None]  e4[12c armed@None quiet@None]  e5[9c armed@None quiet@None]
+
+==============================================================================
+(8) THE ADDRESS-BOOK BATTERY, plant guard, certificates, cost
+==============================================================================
+  END-OF-RUN BATTERY: e per condition (last era), and the next-level currency split
+  arm                  cond  e(last era)  g/solve  solved  T3@sup  T3built  T4@sup  T4built
+  tu_y_exo           a_full        0.773    463.0      87       4        1       1        1
+  tu_y_exo          b_table        0.773    463.0      87       4        1       1        1
+  tu_y_exo           b_span        0.990    463.0       4       0        0       0        0
+  tu_y_exo          c_prims        0.669    463.0     127       8        3       2        1
+  tu_d_exo           a_full        0.914    463.0      33       2        0       0        0
+  tu_d_exo          b_table        0.914    463.0      33       2        0       0        0
+  tu_d_exo           b_span        0.982    463.0       7       0        0       0        0
+  tu_d_exo          c_prims        0.909    463.0      35       4        0       0        0
+  tu_s_exo           a_full        0.956    463.0      17       0        0       0        0
+  tu_s_exo          b_table        0.956    463.0      17       0        0       0        0
+  tu_s_exo           b_span        0.979    463.0       8       0        0       0        0
+  tu_s_exo          c_prims        0.919    463.0      31       2        0       0        0
+  tu_s_endo          a_full        0.935    463.0      25       1        0       0        0
+  tu_s_endo         b_table        0.935    463.0      25       1        0       0        0
+  tu_s_endo          b_span        0.992    463.0       3       0        0       0        0
+  tu_s_endo         c_prims        0.849    463.0      58       6        5       1        0
+  tu_s_yk            a_full        0.940    463.0      23       1        0       0        0
+  tu_s_yk           b_table        0.940    463.0      23       1        0       0        0
+  tu_s_yk            b_span        0.984    463.0       6       0        0       0        0
+  tu_s_yk           c_prims        0.888    463.0      43       4        2       0        0
+  tu_d_endo          a_full        0.875    463.0      48       3        1       0        0
+  tu_d_endo         b_table        0.875    463.0      48       3        1       0        0
+  tu_d_endo          b_span        0.982    463.0       7       0        0       0        0
+  tu_d_endo         c_prims        0.833    463.0      64       7        5       1        1
+  tu_y_endo          a_full        0.833    463.0      64       2        2       1        1
+  tu_y_endo         b_table        0.833    463.0      64       2        2       1        1
+  tu_y_endo          b_span        0.990    463.0       4       0        0       0        0
+  tu_y_endo         c_prims        0.732    463.0     103       6        5       1        1
+  tu_m_exo           a_full        0.685    463.0     121       9        4       1        1
+  tu_m_exo          b_table        0.685    463.0     121       9        4       1        1
+  tu_m_exo           b_span        0.990    463.0       4       0        0       0        0
+  tu_m_exo          c_prims        0.661    463.0     130       8        5       1        1
+
+  G-Y / OBSERVATION PANEL: distinct next-level tuples at support, end of each era
+  tu_y_exo         L3/L4 at support 3:     51/16    59/41    61/56    61/59    69/60
+  tu_d_exo         L3/L4 at support 3:      36/8    58/43   64/116   65/124   71/126
+  tu_s_exo         L3/L4 at support 3:      37/9    59/43    64/73    65/81    71/82
+  tu_s_endo        L3/L4 at support 3:     40/10    54/33    56/41    58/49    61/56
+  tu_s_yk          L3/L4 at support 3:     43/14    57/38    58/54    58/58    63/60
+  tu_d_endo        L3/L4 at support 3:     42/12    48/21   55/101   57/112   65/116
+  tu_y_endo        L3/L4 at support 3:     51/20    54/30    59/50    59/52    66/53
+  tu_m_exo         L3/L4 at support 3:     51/20    54/30    65/77    65/78    69/80
+
+  PLANT GUARD, CERTIFICATES, COST
+  tu_y_exo         parse 0.649-0.693  infill 0.705-0.762  cert L2 c18 L3 c76  recerts  12    14.1 s/cycle
+  tu_d_exo         parse 0.654-0.693  infill 0.723-0.766  cert L2 c18 L3 c58  recerts  10    13.2 s/cycle
+  tu_s_exo         parse 0.659-0.693  infill 0.717-0.758  cert L2 c18 L3 c63  recerts   8    13.9 s/cycle
+  tu_s_endo        parse 0.649-0.689  infill 0.701-0.748  cert L2 c30 L3 c54  recerts  10    14.6 s/cycle
+  tu_s_yk          parse 0.654-0.693  infill 0.697-0.762  cert L2 c18 L3 cNone  recerts  10    14.7 s/cycle
+  tu_d_endo        parse 0.654-0.689  infill 0.701-0.750  cert L2 c30 L3 c63  recerts  17    14.6 s/cycle
+  tu_y_endo        parse 0.656-0.690  infill 0.707-0.752  cert L2 c30 L3 cNone  recerts  10    14.4 s/cycle
+  tu_m_exo         parse 0.657-0.693  infill 0.707-0.762  cert L2 c18 L3 c79  recerts   4    13.1 s/cycle
+
+  TOTAL 16617s = 4.62 GPU-h
+
+==============================================================================
+(A) THE CROSSING: the L4 commit, and the r**2 ceiling it was drawn from
+==============================================================================
+  The DGP's levels, as DISTINCT flat tuples (the recall denominator): L2 14, L3 56, L4 816.
+  `T4 subset T3xT3`: an L4 entry exists only if BOTH of its 4-tuple halves are rows
+  of the operative L3 table, so a frozen L3 of recall r caps L4 near r**2.
+
+  arm               L4 commit c_in_era  entries   recall    prec  buildable  of which true  share taken
+  tu_y_exo                104       16        1   0.0012   1.000          8              1        0.125
+  tu_d_exo               None     None        -        -       -          0              0            -
+  tu_s_exo               None     None        -        -       -          0              0            -
+  tu_s_endo              None     None        -        -       -         15              4            -
+  tu_s_yk                None     None        -        -       -         11              1            -
+  tu_d_endo              None     None        -        -       -          3              1            -
+  tu_y_endo                97       20        1   0.0012   1.000          4              2        0.250
+  tu_m_exo                101       28        2   0.0012   0.500          0              0            -
+
+  `buildable` = distinct L4 tuples at support 3 in the arm's own observation
+  panel whose two halves are both rows of its FROZEN L3, at the cycle named. It is
+  the honest ceiling for that arm's L4 commit; `share taken` is what it took of it.
+  A cancelled commit (the empty-table guard) appears in the action trace, not here.
+
+==============================================================================
+(C) THE GAUGE AT THE FRONTIER: what paced the L4 commit, and the L5 alternative
+==============================================================================
+  Driven read: `yield` = -(distinct level-`read_level` tuples at support).
+  `read_level` = min(active+1, gy_level=4), so at era 3 (active=4) it is the level
+  BEING EARNED, not one above it. Floors that governed the run: L3 0.46127129019246205, L4 0.5166900731510206.
+
+  read_level actually used, per era (logged per cycle)
+  arm                  era1     era2     era3     era4     era5
+  tu_y_exo                3        4        4        4        4
+  tu_d_exo                3        4        4        4        4
+  tu_s_exo                3        4        4        4        4
+  tu_s_endo               3        4        4        4        4
+  tu_s_yk                 3        4        4        4        4
+  tu_d_endo               3        4        4        4        4
+  tu_y_endo               3        4        4        4        4
+  tu_m_exo                3        4        4        4        4
+
+  THE OBSERVATION PANEL, end of run: distinct tuples at support, per level.
+  Levels 5 and 6 are logged UNCHARGED in every arm and were never driven — Phase 0
+  measured them degenerate (max 1-2 over an entire run, first non-zero at c89-124),
+  which is the reason the L4 commit is paced on the L4 stream's own quieting.
+  arm                   L3      L4      L5      L6  L5 first>0
+  tu_y_exo              69      60       1       0         105
+  tu_d_exo              71     126       1       0         177
+  tu_s_exo              71      82       0       0        None
+  tu_s_endo             61      56       0       0        None
+  tu_s_yk               63      60       0       0        None
+  tu_d_endo             65     116       0       0        None
+  tu_y_endo             66      53       3       0          98
+  tu_m_exo              69      80       3       1         103
+
+  THE L4 AT-SUPPORT SERIES over era 3 (the series the commit was read on):
+  per-era first -> last, and the mean per-cycle increment against the L4 floor.
+  arm               era     n   first    last   d/cycle  x floor
+  tu_y_exo            1    58       0      16     0.281    0.543
+  tu_y_exo            2    30      18      41     0.793    1.535
+  tu_y_exo            3    26      41      56     0.600    1.161
+  tu_y_exo            4     8      56      59     0.429    0.829
+  tu_y_exo            5     9      59      60     0.125    0.242
+  tu_d_exo            1    43       0       8     0.190    0.369
+  tu_d_exo            2    50       8      43     0.714    1.382
+  tu_d_exo            3    70      44     116     1.043    2.020
+  tu_d_exo            4    12     116     124     0.727    1.408
+  tu_d_exo            5     9     124     126     0.250    0.484
+  tu_s_exo            1    46       0       9     0.200    0.387
+  tu_s_exo            2    44       9      43     0.791    1.530
+  tu_s_exo            3    31      43      73     1.000    1.935
+  tu_s_exo            4    11      73      81     0.800    1.548
+  tu_s_exo            5     9      81      82     0.125    0.242
+  tu_s_endo           1    46       0      10     0.222    0.430
+  tu_s_endo           2    40      10      33     0.590    1.141
+  tu_s_endo           3    10      34      41     0.778    1.505
+  tu_s_endo           4    12      41      49     0.727    1.408
+  tu_s_endo           5     9      49      56     0.875    1.693
+  tu_s_yk             1    46       0      14     0.311    0.602
+  tu_s_yk             2    40      16      38     0.564    1.092
+  tu_s_yk             3    10      40      54     1.556    3.011
+  tu_s_yk             4    12      55      58     0.273    0.528
+  tu_s_yk             5     9      58      60     0.250    0.484
+  tu_d_endo           1    52       0      12     0.235    0.455
+  tu_d_endo           2    17      14      21     0.438    0.847
+  tu_d_endo           3    70      22     101     1.145    2.216
+  tu_d_endo           4    12     102     112     0.909    1.759
+  tu_d_endo           5     9     113     116     0.375    0.726
+  tu_y_endo           1    58       0      20     0.351    0.679
+  tu_y_endo           2    19      20      30     0.556    1.075
+  tu_y_endo           3    28      30      50     0.741    1.434
+  tu_y_endo           4    12      50      52     0.182    0.352
+  tu_y_endo           5     9      52      53     0.125    0.242
+  tu_m_exo            1    60       0      20     0.339    0.656
+  tu_m_exo            2    13      21      30     0.750    1.452
+  tu_m_exo            3    70      31      77     0.667    1.290
+  tu_m_exo            4    12      77      78     0.091    0.176
+  tu_m_exo            5     9      79      80     0.125    0.242
+
+==============================================================================
+(E) EXTENSION: the r**2-wall bypass
+==============================================================================
+  Phase 0 measured the wall binds and that extension is the lever: buildable L4 over
+  the FROZEN L3 vs over the LIVE L3 was 15 vs 25 (cd_s0/outer_yield), 13 vs 26
+  (ma_s0/learned_yield), 8 vs 13 (anchor) — i.e. extension roughly doubles the
+  ceiling an L4 commit is drawn from.
+
+  arm               lvl  events   cands  admitted  final n  final recall  final prec
+  tu_y_exo            2       0       0         0       14        0.7143       0.714
+  tu_y_exo            3       0       0         0       10        0.0714       0.400
+  tu_y_exo            4       0       0         0        1        0.0012       1.000
+  tu_d_exo            2       0       0         0       11        0.5714       0.727
+  tu_s_exo            2       0       0         0       11        0.5714       0.727
+  tu_s_endo           2       0       0         0       14        0.7143       0.714
+  tu_s_endo           3       0       0         0       11        0.0893       0.455
+  tu_s_yk             2       0       0         0       13        0.6429       0.692
+  tu_s_yk             3       0       0         0       13        0.0714       0.308
+  tu_d_endo           2       0       0         0       14        0.7143       0.714
+  tu_d_endo           3       0       0         0        4        0.0357       0.500
+  tu_y_endo           2       0       0         0       15        0.7143       0.667
+  tu_y_endo           3       0       0         0        8        0.0714       0.500
+  tu_y_endo           4       0       0         0        1        0.0012       1.000
+  tu_m_exo            2       0       0         0       14        0.7143       0.714
+  tu_m_exo            4       0       0         0        2        0.0012       0.500
+
+  and what the treatment vs the extension arm actually held at L4:
+  arm               frozen L3  buildable L4  L4 entries  L4 true
+  tu_y_exo                 10             8           1        1
+
+==============================================================================
+(G) THE GATE: what each arm refused, and what the refusal was made of
+==============================================================================
+  gate_frac = 0.5 of SOLVED TIPS kept on the pi channel; the
+  mining cap (8) is untouched, so mining volume is matched and
+  only its content moves. The value buffer is UNGATED in every arm (delta is the
+  residual of the value head's own forecast).
+
+  PER-ARM TOTALS over the whole run
+  arm                   mode  sol tips    kept  kept %   pi rows   mined  pbuf end fallbacks
+  tu_y_exo              None     33776       0    0.0%    270208    1036     60000         0
+  tu_d_exo              None     37973       0    0.0%    303784    1387     60000         0
+  tu_s_exo              None     27747       0    0.0%    221976    1044     60000         0
+  tu_s_endo             None     23628       0    0.0%    189024     873     60000         0
+  tu_s_yk               None     24835       0    0.0%    198680     887     60000         0
+  tu_d_endo             None     29416       0    0.0%    235328    1157     60000         0
+  tu_y_endo             None     28710       0    0.0%    229680     955     60000         0
+  tu_m_exo              None     45485       0    0.0%    363880    1282     60000         0
+  `kept` is 0 in an arm with no gate: the gate log records the FEATURES in every arm
+  and the SELECTION only where a mode is set — an ungated arm keeps everything the
+  grade admitted, i.e. `sol tips`.
+
+  pi ROWS ENTERING THE REPLAY BUFFER, per era (the diet's volume)
+  arm                   era1      era2      era3      era4      era5
+  tu_y_exo            142704     47384     48400     15480     16240
+  tu_d_exo             83360     77224    123872     12224      7104
+  tu_s_exo             87368     72920     45976     10232      5480
+  tu_s_endo            92728     59624     13216     17120      6336
+  tu_s_yk              98080     65880     12376     15552      6792
+  tu_d_endo           103272     21656     86272     15840      8288
+  tu_y_endo           136536     24096     37424     19480     12144
+  tu_m_exo            146832     21864    141496     35368     18320
+
+  WHAT THE GATE KEPT vs WHAT IT DROPPED (mean over the run, gated arms only)
+  arm               delta kept  delta dropped      gap  margin kept  margin all
+
+  THE FEATURES THEMSELVES, in every arm (per-instance, whole run)
+  delta_ans = grade - sigmoid(v) at the answer the beam gave; margin = the
+  deliberation state (top1 - top2 over the instance's tip value scores).
+  `margin` is the GATED form (chosen minus the mean of the unchosen); `m2` is the
+  textbook top1-top2 margin, logged but not gated on — `m2=0 frac` is how often it
+  is exactly zero (a duplicate runner-up), which is why the gate reads the mean form.
+  arm              solve rate  d|solved  d|failed    sd d   margin  sd marg  m2=0 frac  corr(d,-m)
+  tu_y_exo             0.2333    0.4644   -0.5247  0.5153   0.0586   0.0766     0.4169      0.1299
+  tu_d_exo             0.1816    0.4888   -0.4758  0.4773   0.0630   0.0762     0.3742      0.1705
+  tu_s_exo             0.1749    0.5127   -0.4722  0.4812   0.0619   0.0758     0.3805      0.1700
+  tu_s_endo            0.1778    0.5175   -0.5011  0.4922   0.0634   0.0807     0.3941      0.1643
+  tu_s_yk              0.1872    0.5085   -0.5067  0.4978   0.0622   0.0778     0.3888      0.1580
+  tu_d_endo            0.1590    0.5289   -0.4705  0.4678   0.0631   0.0782     0.3901      0.1803
+  tu_y_endo            0.2024    0.4945   -0.4987  0.5004   0.0572   0.0754     0.4258      0.1643
+  tu_m_exo             0.2497    0.4310   -0.5180  0.5113   0.0552   0.0738     0.4287      0.1459
+
+  THE COUNTERFACTUAL GATES, per arm, on that arm's OWN logged features
+  Of the solved instances each cycle, take the top half by each rule and report the
+  mean pairwise JACCARD overlap between the rules' selections. This is what a gate
+  arm's mining reorder could at most have moved, computed in every arm including
+  the ungated baseline — a gate whose selection is the same set as another's cannot
+  produce a different table.
+  arm                  dhi/dlo     dhi/dlb     dhi/rnd     dlo/dlb     dlo/rnd     dlb/rnd
+  tu_y_exo               0.000       0.338       0.362       0.330       0.296       0.322
+  tu_d_exo               0.000       0.381       0.316       0.302       0.354       0.312
+  tu_s_exo               0.000       0.378       0.336       0.285       0.323       0.358
+  tu_s_endo              0.000       0.361       0.292       0.316       0.352       0.326
+  tu_s_yk                0.000       0.365       0.337       0.307       0.328       0.338
+  tu_d_endo              0.000       0.366       0.323       0.314       0.335       0.342
+  tu_y_endo              0.000       0.350       0.366       0.334       0.319       0.342
+  tu_m_exo               0.000       0.333       0.333       0.343       0.326       0.322
+
+==============================================================================
+(G2) TABLE CONTENT: reconstruction, truth, and overlap between arms
+==============================================================================
+  Each arm's committed table replayed entry-for-entry from its own logged key
+  stream (Phase 0's gate B-1 machinery). `recon == n` is the reconstruction check.
+
+  L2  (the DGP has 14 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  tu_y_exo                49    14     14    10      0.714   0.7143
+  tu_d_exo                18    11     11     8      0.727   0.5714
+  tu_s_exo                18    11     11     8      0.727   0.5714
+  tu_s_endo               30    14     14    10      0.714   0.7143
+  tu_s_yk                 30    13     13     9      0.692   0.6429
+  tu_d_endo               30    14     14    10      0.714   0.7143
+  tu_y_endo               46    15     15    10      0.667   0.7143
+  tu_m_exo                49    14     14    10      0.714   0.7143
+
+    pairwise JACCARD of the committed L2 entry sets
+                           tu_y_exo       tu_d_exo       tu_s_exo      tu_s_endo        tu_s_yk      tu_d_endo      tu_y_endo       tu_m_exo
+    tu_y_exo                  1.000          0.786          0.786          0.867          0.929          0.867          0.812          1.000
+    tu_d_exo                  0.786          1.000          1.000          0.786          0.846          0.786          0.733          0.786
+    tu_s_exo                  0.786          1.000          1.000          0.786          0.846          0.786          0.733          0.786
+    tu_s_endo                 0.867          0.786          0.786          1.000          0.929          1.000          0.933          0.867
+    tu_s_yk                   0.929          0.846          0.846          0.929          1.000          0.929          0.867          0.929
+    tu_d_endo                 0.867          0.786          0.786          1.000          0.929          1.000          0.933          0.867
+    tu_y_endo                 0.812          0.733          0.733          0.933          0.867          0.933          1.000          0.812
+    tu_m_exo                  1.000          0.786          0.786          0.867          0.929          0.867          0.812          1.000
+
+  L3  (the DGP has 56 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  tu_y_exo                72    10     10     4      0.400   0.0714
+  tu_s_endo               61    11     11     5      0.455   0.0893
+  tu_s_yk                 61    13     13     4      0.308   0.0714
+  tu_d_endo               60     4      4     2      0.500   0.0357
+  tu_y_endo               69     8      8     4      0.500   0.0714
+
+    pairwise JACCARD of the committed L3 entry sets
+                           tu_y_exo      tu_s_endo        tu_s_yk      tu_d_endo      tu_y_endo
+    tu_y_exo                  1.000          0.235          0.278          0.167          0.385
+    tu_s_endo                 0.235          1.000          0.333          0.250          0.118
+    tu_s_yk                   0.278          0.333          1.000          0.214          0.167
+    tu_d_endo                 0.167          0.250          0.214          1.000          0.091
+    tu_y_endo                 0.385          0.118          0.167          0.091          1.000
+
+  L4  (the DGP has 816 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  tu_y_exo               104     1      1     1      1.000   0.0012
+  tu_y_endo               97     1      1     1      1.000   0.0012
+  tu_m_exo               101     2      0     0        nan   0.0000
+
+    pairwise JACCARD of the committed L4 entry sets
+                           tu_y_exo      tu_y_endo       tu_m_exo
+    tu_y_exo                  1.000          1.000          0.000
+    tu_y_endo                 1.000          1.000          0.000
+    tu_m_exo                  0.000          0.000          0.000
+
+  A gate that changes what the learner learns from can only change the table
+  through the entries it mined; identical sets here mean the gate moved trust
+  (section 4) and pacing (section H) but not the address book.
+
+==============================================================================
+(H) THE PACING COUNTERFACTUAL: when each arm's own gauge would have fired
+==============================================================================
+  A1's thermostat, unchanged (span 1, W 4, burn 4, alpha 0.5), floors L3 0.461271 / L4 0.516690, replayed from era-3 start on each arm's own
+  logged panel. The BASELINE's realised L4 commit cycle is what every yoked arm
+  actually did, so the column to read is `would fire` against it.
+
+  arm               era3 c0    n  would fire (c)  c_in_era3  vs baseline   all firings (c_in_era3)
+  tu_y_exo               89   43             104         16         None              [16, 26, 34]
+  tu_d_exo               94   91             120         27         None                  [27, 83]
+  tu_s_exo               91   51             121         31         None                  [31, 42]
+  tu_s_endo              87   31              96         10         None                  [10, 22]
+  tu_s_yk                87   31             101         15         None                      [15]
+  tu_d_endo              70   91              78          9         None               [9, 80, 88]
+  tu_y_endo              78   49              97         20         None                  [20, 28]
+  tu_m_exo               74   91             101         28         None          [28, 42, 54, 61]
+
+  the baseline's REALISED L4 commit: cNone. Every gate arm replayed it by clock,
+  which is what makes section (3)'s era table a content comparison.
+
+==============================================================================
+(P1) THE METER — a live, fallible executor, and delta_perf's own components
+==============================================================================
+  `tau_fire` is the FIRING threshold; `span_tau` (0.95) still governs the parity
+  RECORD, so `opened_below_tau` counts slot-openings the donor's gate would have
+  refused. `misfire` is a row whose emitted span did not exactly match what
+  `apply_any` would have written on the same observation.
+
+  arm             tau_f     fired  misfire    rate  slots  open@f  open@.95      g0   theta  calib@c  degen med g act
+  tu_y_exo         0.50   2220079   126981  0.0572     28      28        16  0.0000  0.0010       57   True    0.0000
+  tu_d_exo         0.50   5650125   161804  0.0286     16      16        14  0.0000  0.0010       26   True    0.0000
+  tu_s_exo         0.50   3036027   108156  0.0356     16      16        15  0.0000  0.0010       26   True    0.0000
+  tu_s_endo        0.50   1987524   134330  0.0676     24      24        11  0.2500  0.0625       35  False    0.5000
+  tu_s_yk          0.50   1850887   141960  0.0767     24      24        10  0.2500  0.0625       35  False    0.5000
+  tu_d_endo        0.50   3440055   154380  0.0449     24      24        18  0.2500  0.0625       35  False    0.5000
+  tu_y_endo        0.50   2020480    85996  0.0426     28      28        20  0.0000  0.0010       52   True    0.0000
+  tu_m_exo         0.50   3784072    96415  0.0255     20      20        16  0.0000  0.0010       57   True    0.0000
+
+  PER MACRO SLOT (the syllable), summed over the run:
+  arm tu_d_exo (the metered arm with the most executions).
+     slot     rows    fired   mean e   exact   mean g   mean d      b-e    b(s)  parity
+      2:0   104304   104304   0.0217   0.971   0.1588  -0.0044   0.0040  0.0314   0.911
+      2:1   139972   139972   0.0227   0.974   0.2284  -0.0003   0.0083  0.0364   0.966
+      2:2   131405   131405   0.0210   0.971   0.1610  -0.0037   0.0047  0.0195   0.920
+      2:3    67208    67208   0.0287   0.963   0.2432  -0.0038   0.0058  0.0100   0.955
+      2:4    50748    50748   0.0287   0.961   0.1376  -0.0023   0.0088  0.0202   0.983
+      2:5   196132   196132   0.0128   0.984   0.1561  -0.0009   0.0050  0.0314   0.991
+      2:6   259185   259185   0.0131   0.980   0.1004  -0.0024   0.0046  0.0028   0.990
+      2:7   212502   212502   0.0158   0.981   0.1949  -0.0029   0.0031  0.0085   0.976
+      2:8    36752    36752   0.0297   0.960   0.1940  -0.0079   0.0013  0.0044   0.972
+      2:9   125180   125180   0.0190   0.977   0.1882  -0.0011   0.0068  0.0153   0.971
+     2:10   158745   158745   0.0291   0.961   0.1950  -0.0022   0.0093  0.0344   0.982
+     2:11    44363    44363   0.0320   0.962   0.3202  -0.0039   0.0043  0.0133   0.978
+     2:12  1650913  1650913   0.0303   0.961   0.2035  -0.0045   0.0067  0.0308   0.960
+     2:13  1699217  1699217   0.0172   0.978   0.1289  -0.0049   0.0026  0.0140   0.984
+     2:14   127638   127638   0.0175   0.977   0.1151  -0.0040   0.0040  0.0281   0.976
+     2:15   645861   645861   0.0213   0.973   0.2142  -0.0012   0.0071  0.0185   0.963
+
+  ACT vs PLAYBACK (Gadagkar's control, on this substrate).
+  ACT     rows the head REALIZED: e measured against what `apply_any` would have
+          written, agency g > 0 (the slot command explains part of the span).
+  PLAYBK  the SAME head, the SAME contexts, but the DP realized the move: the parity
+          read computes the head's would-be error on every held-out row of every
+          slot each cycle. No efference copy for the head's output, so g == 0 by
+          construction and the CENTERED gate closes. `b - e` is the ungated signal;
+          if it fires in both columns and delta only in ACT, the gate is carrying
+          the discrimination (S13(a)'s dissection).
+
+  arm               e ACT  e PLAYBK   b-e ACT  b-e PLAY  delta ACT delta PLAY   g ACT
+  tu_y_exo         0.0340    0.0565    0.0082   -0.0024    -0.0052    -0.0012  0.1167
+  tu_d_exo         0.0222    0.0364    0.0051    0.0012    -0.0037     0.0006  0.1726
+  tu_s_exo         0.0277    0.0423    0.0060   -0.0001    -0.0044    -0.0000  0.1874
+  tu_s_endo        0.0401    0.0629    0.0049    0.0040    -0.0220     0.0001  0.1512
+  tu_s_yk          0.0477    0.0691    0.0053    0.0052    -0.0256     0.0001  0.1453
+  tu_d_endo        0.0321    0.0520    0.0050    0.0008    -0.0140     0.0000  0.2109
+  tu_y_endo        0.0289    0.0618    0.0049    0.0015    -0.0053     0.0007  0.1363
+  tu_m_exo         0.0191    0.0413    0.0035   -0.0015    -0.0040    -0.0007  0.0955
+
+  (PLAYBK's delta column is the ungated `b - e_shadow` multiplied by the gate's
+   value AT g = 0, which is what the mechanism would assign those rows. Playback
+   rows are never scored IN-RUN: the head did not execute them, so no credit is
+   assigned at all — the exclusion is structural, not a threshold.)
+
+  THE AGENCY VARIABLE'S OWN DISTRIBUTION, from the raw per-row sample (ACT rows):
+  arm              n rows   g == 0    g > 0  mean g|g>0   e|g==0    e|g>0
+  tu_y_exo          14620   0.6185   0.3815      0.4964   0.0009   0.1740
+  tu_d_exo          30720   0.5812   0.4188      0.5519   0.0004   0.1139
+  tu_s_exo          22464   0.5684   0.4316      0.5581   0.0003   0.1175
+  tu_s_endo         16023   0.5953   0.4047      0.5140   0.0021   0.1870
+  tu_s_yk           15992   0.5845   0.4155      0.5148   0.0017   0.1906
+  tu_d_endo         24279   0.5205   0.4795      0.4989   0.0018   0.1446
+  tu_y_endo         14679   0.6069   0.3931      0.5065   0.0028   0.1874
+  tu_m_exo          20956   0.6414   0.3586      0.5109   0.0008   0.1473
+
+==============================================================================
+(P2) THE 2x2: EXECUTED-AS-INTENDED x SOLVED
+==============================================================================
+  Per surviving trajectory. `int` = every head execution on it exactly matched its
+  intention; `bad` = at least one did not; `none` = the head executed nothing on it
+  (no performance to grade — kept apart, never folded into `int`).
+  `bad+solved` is THE LUCKY SUCCESS: an ill-executed trajectory the grade rewards.
+  `int+failed` is THE HONEST FAILURE: well executed, task not solved — the cell the
+  grade-only rule discards entirely.
+
+  --- tu_y_exo ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         355        1235         119         695       17364       39624       5579     1092  0.2232 -0.4209
+     2        4448       16958         923        5793         552        2046     454061    57955  0.1102 -0.5998
+     3        5182       16233         655        3637         213         704     771308    35359  0.0718 -0.6389
+     4        1712        5310         209         806          14         141     395799    15304  0.0502 -0.6500
+     5        1861        5861         169        1256           0          69     593332    17271  0.0537 -0.5936
+   ALL       13558       45597        2075       12187       18143       42584
+       P(solve | as intended) = 0.2292   P(solve | NOT as intended) = 0.1455   lucky-success share of solves = 0.1327
+  --- tu_d_exo ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1        3134       10632         492        2655        6794       20325      53006     5217  0.1436 -0.6675
+     2        7735       32343        1011        5226         907        3978     642176    25457  0.0561 -0.7705
+     3       13730       47516        1306        6170         448        2510    3191040    84544  0.0472 -0.7995
+     4        1410        9492          85        1012          33         256     954222    28133  0.0551 -0.8645
+     5         845        7156          43        1081           0          91     809681    18453  0.0506 -0.8666
+   ALL       26854      107139        2937       16144        8182       27160
+       P(solve | as intended) = 0.2004   P(solve | NOT as intended) = 0.1539   lucky-success share of solves = 0.0986
+  --- tu_s_exo ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1        3493       12441         534        2986        6894       20756      65268     5908  0.1326 -0.6736
+     2        7439       28145        1042        4313         634        3483     609521    24860  0.0526 -0.7486
+     3        4941       21238         566        3437         240        1322    1065940    39813  0.0509 -0.8370
+     4        1173        8325          77        1308          29         352     657208    19726  0.0503 -0.8556
+     5         595        7231          90        1021           0         279     638090    17849  0.0544 -0.8201
+   ALL       17641       77380        2309       13065        7797       26192
+       P(solve | as intended) = 0.1857   P(solve | NOT as intended) = 0.1502   lucky-success share of solves = 0.1157
+  --- tu_s_endo ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1        1597        5654         439        3215        9555       26644      28320     6275  0.1400 -0.4603
+     2        5611       24375         921        5494         921        3638     389698    26565  0.0369 -0.6231
+     3        1254        6516         390        1937           8         135     342530    22809  0.0345 -0.5477
+     4        1744        7403         396        2583           0         162     640117    43596  0.0348 -0.5085
+     5         623        6437         164        1878           5         109     586859    35085  0.0351 -0.5198
+   ALL       10829       50385        2310       15107       10489       30688
+       P(solve | as intended) = 0.1769   P(solve | NOT as intended) = 0.1326   lucky-success share of solves = 0.1758
+  --- tu_s_yk ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1        1637        5872         507        3052       10116       25920      29797     6263  0.1474 -0.4891
+     2        5996       22880        1335        6439         904        3406     430282    31437  0.0390 -0.6206
+     3        1198        5977         322        2457          27         259     304235    24861  0.0504 -0.4716
+     4        1502        7435         422        2671          20         238     576516    42605  0.0441 -0.5084
+     5         649        6055         189        2179          11         133     510057    36794  0.0358 -0.4722
+   ALL       10982       48219        2775       16798       11078       29956
+       P(solve | as intended) = 0.1855   P(solve | NOT as intended) = 0.1418   lucky-success share of solves = 0.2017
+  --- tu_d_endo ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1        2551        8986         615        4051        9743       27302      45214     8314  0.1119 -0.5450
+     2        1980       10500         241        2055         486        2146      95678     6269  0.0347 -0.6917
+     3        9250       49202        1231        9702         303        1992    1853329    91900  0.0467 -0.6955
+     4        1731        8806         233        1405          16          97     798219    29987  0.0418 -0.6681
+     5         892        6629         141        1486           3          65     647615    17910  0.0350 -0.7414
+   ALL       16404       84123        2461       18699       10551       31602
+       P(solve | as intended) = 0.1632   P(solve | NOT as intended) = 0.1163   lucky-success share of solves = 0.1305
+  --- tu_y_endo ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1        1124        3381         415        2426       15528       36518      19007     4590  0.2504 -0.4192
+     2        2096       10936         397        3037         519        2471     101393    10034  0.0988 -0.6069
+     3        3829       18252         593        4721         256        1021     668399    37210  0.0754 -0.6201
+     4        2136        8073         282        1583          17         197     601802    19384  0.0531 -0.6929
+     5        1351        6449         167        1148           0         101     629879    14778  0.0477 -0.6910
+   ALL       10536       47091        1854       12915       16320       40308
+       P(solve | as intended) = 0.1828   P(solve | NOT as intended) = 0.1255   lucky-success share of solves = 0.1496
+  --- tu_m_exo ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         733        2140         224        1166       17397       39780      10604     1923  0.2025 -0.4695
+     2        1994        7491         402        2179         337         909      63934     5303  0.0969 -0.6401
+     3       15395       43212        1518        7122         774        3659    2233109    72546  0.0500 -0.7480
+     4        4285        6746         136         963           0         158     755408     8790  0.0312 -0.7817
+     5        2129        6259         155         530           6         137     721017     7853  0.0289 -0.7692
+   ALL       24536       65848        2435       11960       18514       44643
+       P(solve | as intended) = 0.2715   P(solve | NOT as intended) = 0.1692   lucky-success share of solves = 0.0903
+
+  WHAT GOT MINED, BY CELL (at the beam's own answer — the mined unit), per arm:
+  arm               mined  as intended  NOT as int  no exec   mean d   ans-2x2 (int_s/int_f/bad_s/bad_f/non_s/non_f)
+  tu_y_exo           1036          468         105      463  -0.0223   767/2910/155/868/1034/2650
+  tu_d_exo           1387         1037         126      224  -0.0226   1523/6926/191/1172/424/1540
+  tu_s_exo           1044          707         109      228  -0.0340   999/5008/161/948/418/1490
+  tu_s_endo           873          460         105      308  -0.0415   605/3185/144/1122/582/1850
+  tu_s_yk             887          465         128      294  -0.0526   617/3012/177/1231/608/1843
+  tu_d_endo          1157          735         117      305  -0.0360   911/5333/138/1393/579/1886
+  tu_y_endo           955          439          80      436  -0.0084   605/2974/120/940/907/2518
+  tu_m_exo           1282          713         104      465  -0.0279   1410/4233/164/886/1047/2756
+
+==============================================================================
+(P5) THE BENCHMARK TIMESCALE — delta recomputed offline across alpha
+==============================================================================
+  arm tu_d_exo; per-cycle per-slot means, 184 cycles.
+     alpha  eff. window  frac b>e  mean b-e   sd(b-e)  slots
+     0.005        200.0    0.9546   0.09113   0.06048     16
+     0.020         50.0    0.9084   0.04213   0.04755     16
+     0.050         20.0    0.7911   0.01803   0.04033     16
+     0.100         10.0    0.7196   0.00907   0.03589     16
+     0.300          3.3    0.6422   0.00304   0.03366     16
+     1.000          1.0    0.5126   0.00092   0.04100     16
+  (`eff. window` is 1/alpha in units of the update — here one CYCLE per slot, so
+   the in-run benchmark, which updates per macro CALL, is faster than any row here;
+   the in-run alpha is printed in each arm's config as `perf_alpha`.)
+
+==============================================================================
+(P6) THE TWO UNPRICED COLUMNS, PRICED — never folded into `t`
+==============================================================================
+  arm             n_misfire  t_misfire       t_cum   % of t     blk_ref   blk_head     blk_dp
+  tu_y_exo           126981       6349    32554752   0.0195     8517818    2220079    2637042
+  tu_d_exo           161804       8090    43787795   0.0185    11300250    5650125    1026252
+  tu_s_exo           108156       5408    33873382   0.0160     6072054    3036027    1026252
+  tu_s_endo          134330       6716    29009178   0.0232     5760922    1987524    2370674
+  tu_s_yk            141960       7098    29009715   0.0245     4975440    1850887    2369146
+  tu_d_endo          154380       7719    39857325   0.0194    10207274    3440055    2369648
+  tu_y_endo           85996       4300    31082413   0.0138     7840536    2020480    4256330
+  tu_m_exo            96415       4821    38286202   0.0126    17551892    3784072    2899946
+  Pricing misfires would move the ledger by 0.016-0.032% — below every floor in the
+  tag, so the choice is behaviourally inert and is recorded as a convention, not a
+  result. `blk_ref` exceeds `blk_head` by the span factor: the meter consumes the
+  DP's block evidence that the head's own execution does not.
+
+==============================================================================
+(D) delta-SILENCE: the gauge, the commits it paced, and what it deferred
+==============================================================================
+  `dsil` = mean b(s) over the OPEN slots — the per-macro-slot benchmark the meter
+  already maintains, in the panel's error convention. It is None until a slot opens,
+  so it CANNOT pace the L2 commit: at the cycle level l is committed the level-l
+  slots do not exist, and the gauge only ever speaks about levels <= l-1.
+
+  arm             read 1st dsil c  dsil min  dsil last  max open           commits (lvl@c)                  advances
+  tu_y_exo       yield         55   0.02416    0.02416        28[(2, 49), (3, 72), (4, 104)]   [58, 88, 114, 122, 131]
+  tu_d_exo        dsil         25   0.01411    0.01994        16                 [(2, 18)]   [43, 93, 163, 175, 184]
+  tu_s_exo       yield         25   0.01818    0.02012        16                 [(2, 18)]   [46, 90, 121, 132, 141]
+  tu_s_endo      yield         34   0.02832    0.03973        24        [(2, 30), (3, 61)]    [46, 86, 96, 108, 117]
+  tu_s_yk         None         34   0.03197    0.03711        24        [(2, 30), (3, 61)]    [46, 86, 96, 108, 117]
+  tu_d_endo       dsil         34   0.02075    0.02115        24        [(2, 30), (3, 60)]   [52, 69, 139, 151, 160]
+  tu_y_endo      yield         50   0.02033    0.02918        28[(2, 46), (3, 69), (4, 97)]   [58, 77, 105, 117, 126]
+  tu_m_exo        dsil         55   0.01299    0.02084        20       [(2, 49), (4, 101)]   [60, 73, 143, 155, 164]
+
+  COMMIT CYCLES against the comparator (A1's yield thermostat) and the schedule:
+
+  THE VETO'S LEDGER (`dsil_and` only): every cycle the yield thermostat licensed
+  a commit and delta-silence was consulted.
+  tu_d_exo: 1 consultations — 0 DEFER, 0 pass, 0 absent (gauge not yet alive)
+    c18   era1 L2 bootstrap dsil=        - open=0 V=        -
+  tu_s_exo: 1 consultations — 0 DEFER, 0 pass, 0 absent (gauge not yet alive)
+    c18   era1 L2 bootstrap dsil=        - open=0 V=        -
+  tu_s_endo: 1 consultations — 0 DEFER, 0 pass, 0 absent (gauge not yet alive)
+    c30   era1 L2 bootstrap dsil=        - open=0 V=        -
+  tu_d_endo: 1 consultations — 0 DEFER, 0 pass, 0 absent (gauge not yet alive)
+    c30   era1 L2 bootstrap dsil=        - open=0 V=        -
+
+  THE ERA TABLE, against the measured floors (this tag is NOT yoked — the
+  question IS the pacing — so lifetimes differ and the deep-era deltas conflate
+  pacing with practice time; `dsil_sched` is the lifetime ceiling by construction.
+  arm                        era1              era2              era3              era4              era5   cycles
+  tu_y_exo         0.4957 [ 0.48]    0.6189 [ 0.50]    0.6137 [ 0.68]    0.6849 [ 1.05]    0.7717 [ 1.32]      131
+  tu_d_exo         0.4523 [ 0.54]    0.5755 [ 0.57]    0.5825 [ 0.75]    0.8516 [ 0.46]    0.9253 [ 0.36]      184
+  tu_s_exo         0.4983 [ 0.48]    0.5703 [ 0.58]    0.6962 [ 0.50]    0.8889 [ 0.33]    0.9627 [ 0.12]      141
+  tu_s_endo        0.4913 [ 0.49]    0.5556 [ 0.61]    0.6892 [ 0.52]    0.7700 [ 0.75]    0.9236 [ 0.37]      117
+  tu_s_yk          0.5087 [ 0.47]    0.5538 [ 0.61]    0.7231 [ 0.44]    0.8212 [ 0.57]    0.9323 [ 0.31]      117
+  tu_d_endo        0.4974 [ 0.48]    0.6510 [ 0.44]    0.5781 [ 0.76]    0.7908 [ 0.68]    0.8811 [ 0.63]      160
+  tu_y_endo        0.5156 [ 0.46]    0.6207 [ 0.49]    0.6554 [ 0.59]    0.6337 [ 1.22]    0.8377 [ 0.91]      126
+  tu_m_exo         0.4965 [ 0.48]    0.6250 [ 0.49]    0.4575 [ 1.03]    0.5052 [ 1.67]    0.6936 [ 1.81]      164
+
+==============================================================================
+(0T) THE CROSS-TAG REPLAYS — the round's load-bearing gate
+==============================================================================
+
+  tu_y_exo vs ca_s0/dsil_yield  [full life]
+    window 131 cycles (lifetimes [131, 131])
+    max|here - donor| over 13 series = 0.000e+00
+    commit events equal: True    advance events equal: True
+
+  tu_d_exo vs ca_s0/dsil_read  [bounded at Phase 0's c43]
+    window 42 cycles (lifetimes [184, 176])
+    max|here - donor| over 13 series = 0.000e+00
+    commit events equal: True    advance events equal: True
+    (asserted only inside the window; above c43 this arm is a RE-INSTANTIATION at the corrected floor, not a replay)
+
+  BORROWED LIFETIME CEILING: ca_s0/dsil_sched, 201 cycles at the caps. Licensed by the full-life replay above: `tu_y_exo` IS an in-tag `ca_s0` arm, bit for bit, so the schedule arm's lifetime bound carries into this tag without re-paying for it. No loop arm here may outrun it.
+    its commits: [(2, 18), (3, 77), (4, 180)]
+
+  Phase 0's floor: governing tol_dsil = 0.0046 (pooled in-tag on ca_s0) vs the donor's governing 0.00321442
+
+==============================================================================
+(1T) THE PORT'S CONTROLS — quota, volume, priced budget, selection compute
+==============================================================================
+  arm            mode      K   cyc  quota_ok      d*   d*menu     dev  vol_ok   mined         t_cum
+  tu_y_exo        exo   2048   131     1.000   2.609    2.609  +0.000   0.969    1036      32554752
+  tu_d_exo        exo   2048   184     1.000   2.847    2.852  -0.005   0.804    1387      43787795
+  tu_s_exo        exo   2048   141     1.000   2.719    2.723  -0.003   0.787    1044      33873382
+  tu_s_endo      endo   2048   117     1.000   2.648    2.655  -0.008   0.786     873      29009178
+  tu_s_yk         exo   2048   117     1.000   2.648    2.655  -0.008   0.846     887      29009715
+  tu_d_endo      endo   2048   160     1.000   2.883    2.879  +0.004   0.706    1157      39857325
+  tu_y_endo      endo   2048   126     1.000   2.674    2.694  -0.021   0.833     955      31082413
+  tu_m_exo        exo   2048   164     1.000   2.839    2.835  +0.004   0.921    1282      38286202
+
+  priced budget spread across arms: 33.75% (29009178 .. 43787795). NOTE this tag's arms are NOT lifetime-matched on the pacing axis by design, so t_cum is compared WITHIN a lifetime pair (a yoke and its source) and reported, not asserted, across pacers.
+
+==============================================================================
+(2T) THE DOSE — P(delivered key == designed key), per era, on a fallible executor
+==============================================================================
+  arm            pooled     era1     era2     era3     era4     era5   credit  deliv_true
+  tu_y_exo        0.284    0.524    0.168    0.062    0.000    0.014    0.345       0.646
+  tu_d_exo        0.197    0.548    0.204    0.035    0.000    0.000    0.559       0.421
+  tu_s_exo        0.251    0.550    0.207    0.029    0.000    0.000    0.501       0.518
+  tu_s_endo       0.238    0.416    0.210    0.025    0.010    0.000    0.417       0.546
+  tu_s_yk         0.275    0.501    0.216    0.055    0.000    0.000    0.409       0.542
+  tu_d_endo       0.171    0.418    0.137    0.047    0.000    0.000    0.589       0.373
+  tu_y_endo       0.198    0.373    0.163    0.009    0.000    0.000    0.404       0.624
+  tu_m_exo        0.219    0.519    0.192    0.030    0.000    0.014    0.392       0.631
+
+  `an_s0` (exact-DP executor) for comparison: pooled 0.165-0.222, era 1 0.37-0.54,
+  era 2 0.14-0.18, era 3 0.03-0.05, ~0 in the consumption eras (no clean half).
+  The eras 4-5 collapse is THE LEVEL CAP, NOT DEPTH: structural grip is exactly
+  (s-1)/s at every era where the MINED LEVEL TRACKS THE ERA, and under
+  max_macro_level=4 eras 4-5 stop tracking — the damage cell swallows the whole span,
+  there is no clean half, and every selector falls through to a quota-legal index
+  order. Same cap, same collapse, as `antiphon`. Not a fact about deep eras.
+  A LOWER era-1 dose here is the fallible executor's own signature and bounds how
+  much of the selector's designed lever actually reaches the miner.
+  tu_s_endo: delivery ledger {"n_halves": 93, "posed": 734, "landed": 254, "mean_w": 0.7235405282187335}
+  tu_d_endo: delivery ledger {"n_halves": 160, "posed": 1006, "landed": 571, "mean_w": 0.8228116211670539}
+  tu_y_endo: delivery ledger {"n_halves": 134, "posed": 788, "landed": 291, "mean_w": 0.7791139102438144}
+
+==============================================================================
+(3T) THE DIVISION OF LABOR — commit owner x advance owner x selector
+==============================================================================
+  arm           commit    adv   sel  cyc   L2   L3   L4                    advances
+  tu_y_exo       yield  yield   exo  131   49   72  104     [58, 88, 114, 122, 131]
+  tu_d_exo        dsil   dsil   exo  184   18    -    -     [43, 93, 163, 175, 184]
+  tu_s_exo        dsil  yield   exo  141   18    -    -     [46, 90, 121, 132, 141]
+  tu_s_endo       dsil  yield  endo  117   30   61    -      [46, 86, 96, 108, 117]
+  tu_s_yk         yoke   yoke   exo  117   30   61    -      [46, 86, 96, 108, 117]
+  tu_d_endo       dsil   dsil  endo  160   30   60    -     [52, 69, 139, 151, 160]
+  tu_y_endo      yield  yield  endo  126   46   69   97     [58, 77, 105, 117, 126]
+  tu_m_exo       yield   dsil   exo  164   49    -  101     [60, 73, 143, 155, 164]
+  [ceiling]      sched  sched     -  201   18   77  180                          []
+
+  VALUE: recovered fraction per era
+  arm               era1      era2      era3      era4      era5
+  tu_y_exo         0.484     0.497     0.684     1.045     1.322
+  tu_d_exo         0.540     0.572     0.753     0.464     0.355
+  tu_s_exo         0.480     0.581     0.501     0.333     0.120
+  tu_s_endo        0.489     0.607     0.516     0.748     0.366
+  tu_s_yk          0.466     0.610     0.441     0.570     0.311
+  tu_d_endo        0.481     0.441     0.763     0.676     0.634
+  tu_y_endo        0.457     0.494     0.592     1.224     0.907
+  tu_m_exo         0.482     0.486     1.031     1.673     1.814
+  [ceiling]        0.498     0.608     0.817     1.242     1.497
+
+  DELTA TO tu_y_exo (outcome currency owns both), per era, in recovered fraction
+  Floors (census finding 7, depth 6): earning family 0.087; given family
+  0.083 / 0.148 / 0.344 at eras 3/4/5. Ranks and signs are the currency.
+  arm               era1      era2      era3      era4      era5
+  tu_y_exo         0.000     0.000     0.000     0.000     0.000
+  tu_d_exo         0.057     0.075     0.069    -0.582    -0.967
+  tu_s_exo        -0.003     0.084    -0.183    -0.712    -1.202
+  tu_s_endo        0.006     0.110    -0.168    -0.297    -0.956
+  tu_s_yk         -0.017     0.113    -0.243    -0.476    -1.011
+  tu_d_endo       -0.002    -0.056     0.079    -0.370    -0.689
+  tu_y_endo       -0.026    -0.003    -0.092     0.179    -0.415
+  tu_m_exo        -0.001    -0.011     0.347     0.627     0.492
+
+  DELTA TO ca_s0/dsil_sched (the lifetime ceiling), per era, in recovered fraction
+  Floors (census finding 7, depth 6): earning family 0.087; given family
+  0.083 / 0.148 / 0.344 at eras 3/4/5. Ranks and signs are the currency.
+  arm               era1      era2      era3      era4      era5
+  tu_y_exo        -0.015    -0.111    -0.133    -0.197    -0.175
+  tu_d_exo         0.042    -0.036    -0.064    -0.779    -1.142
+  tu_s_exo        -0.018    -0.027    -0.316    -0.909    -1.377
+  tu_s_endo       -0.009    -0.002    -0.301    -0.494    -1.131
+  tu_s_yk         -0.032     0.002    -0.376    -0.673    -1.186
+  tu_d_endo       -0.017    -0.167    -0.054    -0.567    -0.863
+  tu_y_endo       -0.041    -0.114    -0.225    -0.018    -0.590
+  tu_m_exo        -0.016    -0.122     0.214     0.430     0.317
+
+==============================================================================
+(4T) THE SELECTOR, PER PACER — free-paced and lifetime-clean
+==============================================================================
+
+  split  (dsil commit / yield advance)
+    contrast                                era1      era2      era3      era4      era5
+    FREE-PACED  tu_s_endo - tu_s_exo       0.009     0.026     0.015     0.415     0.246
+      lifetimes                       117 vs 141 cycles — NOT matched; the clock is inside this number
+    YOKED       tu_s_endo - tu_s_yk        0.023    -0.003     0.075     0.179     0.055
+      yoke replay exact               True   (source actions [30, 46, 61, 86, 96, 108, 117], yoke actions [30, 46, 61, 86, 96, 108, 117])
+      lifetimes                       117 vs 117 cycles — matched by construction; this number is CONTENT ALONE
+
+  dsil   (dsil owns both)
+    contrast                                era1      era2      era3      era4      era5
+    FREE-PACED  tu_d_endo - tu_d_exo      -0.059    -0.131     0.010     0.212     0.279
+      lifetimes                       160 vs 184 cycles — NOT matched; the clock is inside this number
+
+  yield  (yield owns both)
+    contrast                                era1      era2      era3      era4      era5
+    FREE-PACED  tu_y_endo - tu_y_exo      -0.026    -0.003    -0.092     0.179    -0.415
+      lifetimes                       126 vs 131 cycles — NOT matched; the clock is inside this number
+
+  The comparison ACROSS rows is the interaction: does what selection buys depend
+  on who paces? `antiphon` measured deep-era value ~ fully interaction between
+  selection and the pacer on the exact-DP executor (+0.279/+0.273 at eras 4/5 over
+  additive). NOTE: this tag carries no schedule-paced selector arm, so `antiphon`'s
+  ADDITIVE decomposition (composed - sum of singles) is not computable here; what
+  is reported is the pacer-conditional marginal, free-paced and lifetime-clean.
+
+==============================================================================
+(5T) THE SPLIT'S TRACE, and the reset counterfactual
+==============================================================================
+
+  tu_s_exo: commit reads dsil, advance reads yield, reset = any-action
+    commits (level, cycle, owner, V, V/tol): [(2, 18, 'dsil', None, None)]
+    advances: [46, 90, 121, 132, 141]
+    bootstrap commits (gauge absent): [(18, 2, 'cert')]
+    cycles the commit owner could not speak: 24
+    cycles BOTH latches were quiet: [46] -> action taken {46: 'advance'}
+    c46: both latches quiet, ADVANCE taken — active level 2 already committed: True
+    COUNTERFACTUAL (own-action-only reset, same rule, replayed on this arm's
+      own logged reads): commit owner would first fire at c43
+      (realised 18); advance owner at c46 (realised 46).
+      Divergence in the quiet verdict at cNone. This is a counterfactual, not an arm: the trajectory would part company there.
+
+  tu_s_endo: commit reads dsil, advance reads yield, reset = any-action
+    commits (level, cycle, owner, V, V/tol): [(2, 30, 'dsil', None, None), (3, 61, 'dsil', 0.0038965121373519783, 0.8470678559460822)]
+    advances: [46, 86, 96, 108, 117]
+    bootstrap commits (gauge absent): [(30, 2, 'cert')]
+    cycles the commit owner could not speak: 33
+    cycles BOTH latches were quiet: [86] -> action taken {86: 'advance'}
+    c86: both latches quiet, ADVANCE taken — active level 3 already committed: True
+    COUNTERFACTUAL (own-action-only reset, same rule, replayed on this arm's
+      own logged reads): commit owner would first fire at c61
+      (realised 30); advance owner at c34 (realised 46).
+      Divergence in the quiet verdict at cNone. This is a counterfactual, not an arm: the trajectory would part company there.
+
+  tu_m_exo: commit reads yield, advance reads dsil, reset = any-action
+    commits (level, cycle, owner, V, V/tol): [(2, 49, 'yield', 0.2771632669575439, 0.6008682370886329), (4, 101, 'yield', 0.47338026762008667, 0.916178367300904)]
+    advances: [60, 73, 143, 155, 164]
+    bootstrap commits (gauge absent): []
+    cycles the commit owner could not speak: 0
+    cycles BOTH latches were quiet: [] -> action taken {}
+    COUNTERFACTUAL (own-action-only reset, same rule, replayed on this arm's
+      own logged reads): commit owner would first fire at c49
+      (realised 49); advance owner at c73 (realised 60).
+      Divergence in the quiet verdict at cNone. This is a counterfactual, not an arm: the trajectory would part company there.
+
+==============================================================================
+(7T) THE FLOOR COUNTERFACTUAL — A1's rule on each arm's own logged series,
+     at the governing floor 0.0046 and at the donor's 0.00321442
+==============================================================================
+  arm          dsil live  fires@gov  first  fires@donor  first  differ  yield fires  first    realised commits
+  tu_y_exo            55         23     68           19     69       4            7     49[(2, 49), (3, 72), (4, 104)]
+  tu_d_exo            25          1     43           99     49     100           16     57           [(2, 18)]
+  tu_s_exo            25          4     43           21     46      23            4     46           [(2, 18)]
+  tu_s_endo           34         18     61           16     71       2            4     46  [(2, 30), (3, 61)]
+  tu_s_yk             34          6     56            0      -       6            6     78  [(2, 30), (3, 61)]
+  tu_d_endo           34          3     52            0      -       3           11     46  [(2, 30), (3, 60)]
+  tu_y_endo           50          2     76           21     64      19            6     46[(2, 46), (3, 69), (4, 97)]
+  tu_m_exo            55          1     73           17     85      18           29     49 [(2, 49), (4, 101)]
+
+  READ: `fires@gov` vs `fires@donor` is the FLOOR held against itself on ONE
+  series. Where the two columns agree, the dead-zone change is not what decided
+  this arm's crossings; where they differ, `differ` counts the cycles whose quiet
+  verdict the floor alone flips. `yield fires` is the comparison gauge at floors
+  that did not move between the two tags.
+    tu_y_exo: verdict flips at [68, 78, 85, 94]
+    tu_d_exo: verdict flips at [43, 49, 50, 51, 52, 53, 54, 55, 56, 61, 62, 63]
+    tu_s_exo: verdict flips at [43, 44, 45, 71, 72, 73, 74, 75, 76, 77, 78, 79]
+    tu_s_endo: verdict flips at [61, 70]
+    tu_s_yk: verdict flips at [56, 57, 58, 59, 60, 61]
+    tu_d_endo: verdict flips at [52, 60, 69]
+    tu_y_endo: verdict flips at [64, 65, 66, 67, 69, 84, 85, 86, 87, 88, 89, 90]
+    tu_m_exo: verdict flips at [73, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95]
+
+  the donor's own arm, same read: ca_s0/dsil_read fires@gov 4 (first 43), fires@donor 4 (first 46), verdict differs on 6 cycles [43, 44, 45, 71, 85, 97]; realised commits [(2, 18), (3, 71), (4, 97)]
+
+==============================================================================
+(8T) THE PRICED CLOCK — value at matched cumulative spend vs the ceiling
+==============================================================================
+  ceiling ca_s0/dsil_sched: 201 cycles, final t_cum 50697843
+  arm           cyc        t_cum  vs ceil         bias  era4 arm  era4 ceil@spend       d  era5 arm  era5 ceil@spend       d
+  tu_y_exo      131     32554752   -35.8%     conserv+     1.045                -       -     1.322                -       -
+  tu_d_exo      184     43787795   -13.6%     conserv+     0.464                -       -     0.355                -       -
+  tu_s_exo      141     33873382   -33.2%     conserv+     0.333                -       -     0.120                -       -
+  tu_s_endo     117     29009178   -42.8%     conserv+     0.748                -       -     0.366                -       -
+  tu_s_yk       117     29009715   -42.8%     conserv+     0.570                -       -     0.311                -       -
+  tu_d_endo     160     39857325   -21.4%     conserv+     0.676                -       -     0.634                -       -
+  tu_y_endo     126     31082413   -38.7%     conserv+     1.224                -       -     0.907                -       -
+  tu_m_exo      164     38286202   -24.5%     conserv+     1.673                -       -     1.814                -       -
+
+  THE CEILING'S OWN ENTRY COST (cumulative priced spend at its first cycle in each era):
+    era3: t_cum 27684915 at c111
+    era4: t_cum 45860838 at c181
+    era5: t_cum 48924429 at c193
+  So a dash above is not a missing number: it says the schedule arm had not yet
+  REACHED that era at this arm's total spend. Every loop arm here arrives in eras
+  4-5 on less priced spend than the ceiling needs to get there:
+    tu_y_exo     era4: reached at t_cum 32554752; the ceiling first entered era4 at 45860838 (0.71x the arm's spend)
+    tu_d_exo     era4: reached at t_cum 43787795; the ceiling first entered era4 at 45860838 (0.95x the arm's spend)
+    tu_s_exo     era4: reached at t_cum 33873382; the ceiling first entered era4 at 45860838 (0.74x the arm's spend)
+    tu_s_endo    era4: reached at t_cum 29009178; the ceiling first entered era4 at 45860838 (0.63x the arm's spend)
+    tu_s_yk      era4: reached at t_cum 29009715; the ceiling first entered era4 at 45860838 (0.63x the arm's spend)
+    tu_d_endo    era4: reached at t_cum 39857325; the ceiling first entered era4 at 45860838 (0.87x the arm's spend)
+    tu_y_endo    era4: reached at t_cum 31082413; the ceiling first entered era4 at 45860838 (0.68x the arm's spend)
+    tu_m_exo     era4: reached at t_cum 38286202; the ceiling first entered era4 at 45860838 (0.83x the arm's spend)
+
+  `d` is the arm minus the ceiling AT THE ARM'S OWN CUMULATIVE SPEND, so the
+  lifetime gap is priced out of the comparison rather than argued around. Read the
+  bias column with every row: an arm that spent less than the ceiling cannot have
+  bought a positive delta with time, and its negative deltas are the suspect ones.
+  Floors unchanged: earning family 0.087; given family 0.083 / 0.148 / 0.344 at
+  eras 3/4/5 (census finding 7). Ranks and signs are the currency.
+
+[figures] ~/Code/research/experiments/rhm/practice/tutti/figures/tu_s0/fig1_competence.png fig2_panel.png fig3_clocks.png
+
+[fig] wrote gate_diet.png, gate_eras.png, gate_pi_mass.png to ~/Code/research/experiments/rhm/practice/tutti/figures/tu_s0
+
+[fig] wrote perf_meter.png to ~/Code/research/experiments/rhm/practice/tutti/figures/tu_s0

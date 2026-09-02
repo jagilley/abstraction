@@ -181,6 +181,10 @@ that picks 64 of the menu's 2048.
 | `q_novel` | the same half-key novelty **without** the delivery ledger | **the nerdsnipe control** — novelty is maximised by the junk keys §2(a) measured, so this is the aleatoric trap with no guard |
 | `q_comp` | highest own value-head `v(x0)` within stratum | **the known negative, difficulty-pinned** — comfort in *content* at matched difficulty |
 | `q_bisect_loop` | the oracle selector on `outer_yield_m4`'s thermostat | **additive, outside the core** — does selection *compose* with the pacer? The pacer already buys coverage by spending cycles (17 more, for 2.4× the observations, in `cr3_s0`), so whether selection is redundant under loop pacing is the cell that ties this tag to the SPEC's outer-loop framing. Comparator: the banked `cr3_s0/outer_yield_m4`, not the schedule family |
+| `q_endo_loop` | the endogenous judge on `outer_yield_m4`'s thermostat | **[s2] THE CELL** — the composed arm for the object the round is about. `an_s0`'s composition cell put the *oracle* in the loop; this one puts the learner's own Δ`at_support`-per-priced-sample judge there. Twin: `q_endo` |
+| `q_comp_loop` | highest own `v(x0)` within stratum, on the thermostat | **[s2] the comfort pole under the pacer** — does pacing amplify or *rescue* the difficulty-collapse hazard that made `q_comp` the tag's slowest climber? The composed hazard is specific: the thermostat reads the learner's own yield, and a comfort-seeking selector feeds it easy solves. Twin: `q_comp` |
+| `q_novel_loop` | half-key novelty, guard removed, on the thermostat | **[s2] the nerdsnipe pole under the pacer**, and the ablation that says what the delivery ledger buys *in the loop*: a nerdsniped arm banks junk keys, which is exactly what the yield gauge counts. Last in `an_s2`'s run order, most cuttable. Twin: `q_novel` |
+| `q_trust` | novelty × the arm's **own beam use record** over its own committed rows one level below the clean half | **[m] the use-record selector.** Spec-identical to the trap lane's `t00_trust` (its trap-off twin); named in the `q_*` family so the metered tag's premium table is uniform. Rationale, measured offline: `trap/DESIGN.md` §4.8 — hard membership in the arm's own table is no guard (it prefers the arm's own committed junk 50–75% of the time, table precision 0.25–0.50), but *use-weighting* the same rows cuts the junk share of the judge's pool from 0.686 to 0.43–0.54 in every arm. Reads no truth, no exact map, no clean derivation. **Era-1 fallback**: at era 1 the target level is 2, so `sub = 0`, there is no lower table, `subw = {}` and the selector falls through to plain novelty — stated, not hidden |
 | `q_comp_free` | highest own value-head `v(x0)` over the whole menu, **no quota** | **the known negative, unpinned** — the honest `fourwall` β=2 pole. The pinned arm alone cannot reproduce that negative (the pin removes the main comfort axis), so a null there would be ambiguous between "instrument blind" and "pin removed the failure mode"; the pair decomposes the comfort pole into difficulty-comfort and content-comfort. Volume, priced budget and lifetime stay pinned; **the realised difficulty mix is logged every cycle, because the deviation IS the arm's definition**. Last in run order: most cuttable |
 
 **Which half of the key the question fixes.** The damage cell at level ℓ is exactly one of the two
@@ -216,6 +220,75 @@ every selector falls through to a quota-legal index order. Stated, not hidden; l
    that the `endo` / `novel` / `comp` bundles contain no truth table, no exact inverse map and
    no clean derivation (`conductor`'s N-1 label-freeness pattern).
 
+---
+
+## 3a. [m] The strongly-metered regime (`an_m0`) — the port where questions are scarce
+
+**Why.** Every question-port run so far ran at **abundance**: `n_pr = 64` posed per cycle,
+~15 solved, `mine_cap = 8` taken by the donor's subsample, π's buffer full by c26–c35. The
+knob's effect on the table is diluted twice and every arm asks more than it can use. The claim
+under test is the roadmap's: knowing *which* questions to ask is load-bearing when questions are
+**scarce**.
+
+**The knob** is `intonation` Round A's, unchanged: `n_pr` 64 → 24 and `pr_width` 16 → 8 — *the
+meter can afford 24 graded performances a cycle instead of 64, and a width-8 search instead of
+width-16*. Both are purchases. The grammar, the ladder, the caps, `mine_support`, the plan
+budget and every floor are untouched, so the world's truth does not move. Both are already
+`cfg` keys on this stack (`antiphon_run(..., n_pr, pr_width, ...)` → `_d6_cfg`), so **no code
+change was needed for the knob itself**.
+
+**`mine_cap` is deliberately NOT scaled**, and neither is `prop_buf_cap`. They are the arc's own
+constants and the fact that the mining cap **stops binding** *is* the regime. The consequence is
+stated rather than engineered around: with solves below the cap the mining subsample is never
+taken, so **the mined stream IS the solved stream**, and a selector that solves *more* mines
+more. Under §3's volume pin that would read as a control failure; here it is the finding, and
+the reduction reports solves/cycle and mined/cycle per arm rather than a pass/fail on the cap.
+
+**The two arcs sit at the same operating point**, which is what makes Round A's metered numbers
+a usable prior: `an_s0/q_exo` runs 15.08 solves/cycle at 1.88× the cap, cap binding 97.5%, π
+buffer full at c30 — against `in_s0`'s 14.9 / 1.87× / 95.4% / c26.
+
+**Sized offline first** (`phase0_metered.py` → `phase0_metered.json`), from `an_s0`'s own
+per-cycle record, exactly as `ma_s0` was sized from `in_s0`'s. A `--quick` smoke cannot size a
+regime — at quick scale every regime looks scarce. Holding the solve *fraction* fixed gives an
+**upper bound** by construction, since a width-8 search solves a smaller fraction (`ma_s0`
+predicted 5.60 this way and realized 4.28–4.65):
+
+| | abundance (`an_s0`, measured) | metered (predicted, upper bound) | `ma_s0` (measured) |
+|---|---|---|---|
+| solves/cycle | 15.01–16.93 | **5.99** | 4.28–4.65 |
+| vs `mine_cap` 8 | 1.88–2.12× | **0.75×** | 0.54–0.58× |
+| cap binds | 95.5–98.5% | **11.5%** | 4.6–5.9% |
+| obs/cycle | 7.89–7.97 (the cap) | **5.88** | 4.17–4.54 |
+| π rows/cycle | 2071–2335 | **828** | 149–322 |
+| π buffer full | c26–c35 | ~c73 | never |
+
+**The per-era observation budget** falls to 0.74× overall (1608 → 1182 observations): era 1
+480 → 359, era 2 400 → 303, era 3 560 → 405, era 4 96 → 69, era 5 72 → 46.
+
+**The sizing fact the round turns on.** At K = 2048 the menu reaches 14 / 52 / 153 true keys at
+L2 / L3 / L4, and the budget can drive `budget / support` keys to support:
+
+| level | reach @ K=2048 | keys the budget can drive, abundance | metered | |
+|---|---|---|---|---|
+| L2 | 14 | 160 | 119 | reach ≤ budget in both |
+| L3 | 52 | 133 | 100 | reach ≤ budget in both |
+| **L4** | **153** | **186** | **135** | **the budget BINDS at the metered knob** |
+
+Under abundance the budget could in principle drive every reachable key at every level. At the
+metered knob it cannot at L4 — so *which* of the reachable keys the questions aim at starts to
+determine the L4 book. **That is the structural condition selection needs, and this round is the
+first in the arc that has it.** The L3 predicted window is unchanged from `an_s0`'s (reach still
+sits under the metered budget there); the L4@sup column is where the meter bites, and at the
+banked δ = 0.44 the oracle's predicted L4@sup falls 67.3 → 59.4.
+
+**The arms**: `q_exo, q_bisect, q_endo, q_novel, q_comp, q_trust` (`ANTIPHON_M_ARMS`) — the
+`an_s0` schedule-paced core, **minus `q_comp_free`** (its d\* deviation is its definition and
+the quota is exactly what the regime tests) and **plus `q_trust`**. No pacer: one knob moves.
+201 cycles at the caps, lifetime-identical by construction, K = 2048, `--ref-tag an_s0`.
+
+---
+
 **Delivered dose ≠ design dose** is a first-class instrument, not a caveat: every cycle logs the
 *designed* key of each posed instance beside the key the miner actually recorded, so
 P(delivered = designed) is measured per era per level, in every arm. The smoke measures it
@@ -229,12 +302,16 @@ before the main run, and it is what turns Phase 0's δ prior into a number.
 |---|---|
 | `questions.py` | **The selectors and the quota**, out of the Modal app so every rule is auditable with no GPU (`conductor/policy.py`'s pattern). `target_geometry` / `half_keys` (which part of the mined span the damage cannot touch), `quota_of` / `check_quota`, the `_round_robin` selection kernel (breadth before depth, fully deterministic, no RNG), `DeliveryLedger`, the six selectors, and the offline gate suite Q-1…Q-10. |
 | `antiphon.py` | The substrate. Forks `../crescendo/crescendo.py`; every addition marked `# [antiphon]`. Entrypoints: `preflight` (the donor's), `fidelity_smoke` (G-F + gate Q-11), `antiphon_run`. |
-| `analyze_antiphon.py` | The reduction — §0 fidelity, §1 controls, §2 dose, §3 climb (cycle clock *and* priced clock), §4 tables + the r² wall, §5 climbing speed, §6 value, §7 nerdsnipe, §8 trust, §9 `ess_use`. Four figures. |
+| `analyze_antiphon.py` | The reduction — §0 fidelity, §1 controls, §2 dose, §3 climb (cycle clock *and* priced clock), §4 tables + the r² wall, §5 climbing speed, §6 value, §7 nerdsnipe, §8 trust, §9 `ess_use`. Four figures. **[s2]** `--merge-tag` takes a comma-separated LIST (one tag still works, so `an_s0 --merge-tag an_s1` reproduces exactly), and §0 gained the **sibling twin window** (`LOOP_SIBLING`). Every other section is arm-list agnostic — it reads `summary["order"]` — so the new arms need no further wiring. |
 | `launch_detached.py` | Session-isolated detached launcher (the donor's, retargeted). |
 | `phase0_question.py` | **The offline phase.** The DGP's parse ambiguity at each mining node, the true-key marginals, the random-draw model calibrated against the donors' logs, menu reach vs K, the r² payoff curve, the predicted windows, the d\* alphabet and the menu's wall-clock cost. Writes `phase0.json`. No GPU, no Modal, no substrate. |
 | `phase0.json` | Phase 0's output. |
-| `pacer_marginal.py` | The pacer-alone marginal recomputed from the banked `cr3_s0` logs on `an_s0`'s own statistics, so the three lanes sit in one like-for-like table (§6b). Checks the like-for-like precondition rather than assuming it. Writes `pacer_marginal.json`. CPU only. |
+| `pacer_marginal.py` | The pacer-alone marginal recomputed from the banked `cr3_s0` logs on `an_s0`'s own statistics, so the three lanes sit in one like-for-like table (§6b). Checks the like-for-like precondition rather than assuming it. Writes `pacer_marginal.json`. CPU only. **[s2]** now emits one four-row block **per selector family** (`FAMILIES`: oracle / endo / comfort / novelty), each against the same baseline, plus a per-lane lifetime block (`d cycles` / `d priced` / `read as`) and a §1b deep-era table that puts every family's era-4/5 cells in one place. A family whose arms are not on disk is skipped, so `an_s0`+`an_s1` alone reproduce the old table unchanged. |
 | `pacer_marginal.json` | Its output. |
+| `phase0_metered.py` | **[m] Phase 0 for the strongly-metered round**, §3a's whole table. Reads `an_s0`'s banked per-cycle logs and `phase0.json`; measures the abundance regime, predicts the metered one as an upper bound (solve fraction held fixed), recomputes the per-era observation budget, and re-runs the reach-vs-budget and predicted-window tables at that budget. Writes `phase0_metered.json`. No GPU, no Modal, no new runs. |
+| `phase0_metered.json` | Its output. |
+| `metered_premium.py` | **[m] The premium table.** Each selector minus `q_exo` *within its own tag*, on L4 true keys at support and on eras-4/5 recovered fraction, with the metered point beside the abundance point — "does the port's premium rise when questions are scarce". Asserts the two tags trained the same substrate (so §6's normalisation is shared), prints the measured regime of each, and builds the metered column's in-tag handle from the **metered null's own displacement structure** rather than transferring `crescendo`'s abundance-measured floors. `an_s0`'s regime row is backfilled from `phase0_metered.json` and labelled as such. Writes `metered_premium.json`. CPU only. |
+| `metered_premium.json` | Its output. |
 
 `policy.py` and `floors.json` are **deliberately absent**: the rule and the dead zones are A1's,
 reached by importing `rhm.practice.maestro.policy`, exactly as in the donor. The 20 offline
@@ -251,6 +328,9 @@ policy gates (P-1…P-12, L-1…L-8) therefore apply unchanged and are re-run fo
 | **cross-tag (full scale)** | **`an_s0/q_exo` vs `cr3_s0/anchor_long`, all 201 cycles, every logged series** — the menu machinery, the reader forward over 2048 candidates and the value forward over 2048 candidates are inert on the arm that takes the menu's head. **The round's load-bearing gate**, and free | `analyze_antiphon.py` §0 | **PASS — 0.000e+00** on all 13 series over all 201 cycles; commit events identical. Substrate identity confirmed independently at setup (`read_acc` 1.0000, stale buffer 0.1269 / 0.154052734375, all exact) |
 | **cross-tag → IN-TAG certification (full scale)** | **`an_s1/outer_yield_m4` vs `cr3_s0/outer_yield_m4`** — with `question_mode` unset, does the fork reproduce the donor's **thermostat** path over its whole trajectory? (The `an_gf` gate covered `anchor_long` and `given_c1` only, so the loop path was certified structurally but not measured.) | `analyze_antiphon.py` §0b | **PASS — 0.000e+00** on all 13 series, **lifetimes 162 vs 162**, commit events identical. This is what promotes §6b's pacer-alone column from a cross-tag borrow to an in-tag column |
 | **in-tag twin (donor's own)** | `an_s1/outer_yield_m4` is bit-identical to the schedule arm until its own first loop action | §0 twin window | **c18** — exactly the anchor's L2 commit cycle, i.e. the loop arm diverges at its first action and not before |
+| **[m] G-F at the metered knob** | the fork must still replay `crescendo.py` in process **at the knob the metered round runs** — the port-off path is not knob-dependent by inspection, but the round's whole contrast rests on it, so it is measured rather than argued. `fidelity_smoke` gained optional `n_pr` / `pr_width` overrides whose defaults are the values it already used, so `an_gf` reproduces bit-for-bit | `antiphon.py::fidelity_smoke --n-pr 24 --pr-width 8` (`an_gf_m`) | see §6 |
+| **[m] regime certification** | per arm, in-run and written into `summary["arms"][arm]["regime"]`: `n_pr`, `pr_width`, solves/cycle, solves ÷ `mine_cap`, cap-binding fraction, obs/cycle, π rows/cycle, π buffer fill and the cycle it filled. Read off values the arm already logs, so it is free and is written in **every** tag — in an abundance tag it is the reference column. `intonation` Round A's discipline: the regime is a measured property of the run, not a knob setting | `antiphon.py`, end of each arm (`[regime]` line) | see §6 |
+| **[s2] SIBLING twin** | the gate for a loop-paced *question* arm. Its `q_exo` window is uninformative (the port acts on c1 by design), so the statement that **the pacer is the only thing that moved** has to be made against the arm's schedule-paced sibling: same selector, same stream key, `commit` the only difference — therefore bit-identical until the first action either arm takes. `loop_actions` is not carried in the final `results.json`, so the action clock is read off the commit/advance **events** both arms write | `analyze_antiphon.py` §0 (`LOOP_SIBLING`) | retro-checked on the banked headline arm: `q_bisect_loop` vs `q_bisect` first divergence **c19**, first action either arm c19 (sched c19 / loop c32) — **PASS**. `an_s2`'s three arms carry the same gate |
 | **quota** | every arm's per-cycle d\* histogram bin-for-bin equal to the cycle's quota (and `q_comp_free`'s deviation reported as a number) | `analyze_antiphon.py` §1 | **PASS — 1.000** in all six pinned arms (201/201 cycles each). Mean selected d\* is **2.752** in every pinned arm against a menu mean of 2.757 (dev −0.005). `q_comp_free`: quota_ok **0.025**, d\* 2.392, **dev −0.364** — the designed deviation, measured |
 | **volume** | mined count == `mine_cap` = 8 in every cycle of every arm | in-run print `[q!] VOLUME SHORTFALL` + §1 | **0.955–0.985** across arms (`q_bisect` lowest at 0.955, `q_endo` highest at 0.985; `q_exo`, which selects nothing, 0.975). Total mined 1585–1601 of a possible 1608 in the six 201-cycle arms — i.e. the spread is ~1% and the incumbent sits inside it, so no arm starved its solve rate |
 | **priced budget** | cumulative groundings comparable across arms | §1 `t_cum` | **matched to 0.02%**: 50,687,475–50,700,109 across the six 201-cycle arms. Cycle cost 10.1–10.3 s in every arm |
@@ -278,6 +358,13 @@ is therefore a tight proxy for the ceiling, not a degraded one.
 | `an_smoke` | seven arms end-to-end at `--quick`, `--question-k 512` | the port wires end-to-end; `q_exo`/`q_bisect`/`q_endo` clean. **The dose read is NOT informative at this scale**: at `--quick` the substrate is barely trained and the solve rate is ~1/24, so `mine_cap` is never filled (`[q!] VOLUME SHORTFALL: mined 1 < 8`) and `dose=0.0` on one sample. The delivery-fidelity measurement therefore moves to `an_s0`'s own first cycles, where mining is at cap |
 | `an_s0` | the main run: 7 arms — six schedule-paced at 201 cycles, plus the loop-paced `q_bisect_loop` at 180 | **complete**, 2026-09-01, app `ap-QtxyavT89Isn0tmTlkMOML`. 1386 arm-cycles at 10.1–10.3 s/cycle; **4.12 GPU-h** realized. All gates in §5 pass |
 | `an_s1` | the **in-tag pacer-only arm**: `outer_yield_m4`'s policy with `question_mode` unset, one arm, merged into the reduction (`crescendo`'s `cr3_s1` pattern) | **complete**, 2026-09-01, app `ap-OdqgzfzuPUDLuPoPf3zsh8`. 162 cycles at **10.68 s/cycle** (against a 10.2 projection), **0.669 GPU-h** realized against a 0.63 estimate — +6%, all of it the per-cycle rate, since the loop arm carries the recert and the shadow auditions at every rung it holds. `--ref-tag an_s0` asserted substrate identity at setup before any cycle ran. **§0b certification PASS at 0.000e+00** |
+
+| `an_s2_smoke` | the three `[s2]` arms at `--quick --question-k 512 --total-cap 12`: does the port cross with the pacer end-to-end? | **PASS**, 2026-09-01, app `ap-PSB22qk7BCsyfkujFP3uD0`. 335 s / **0.09 GPU-h**; 3 arms × 12 cycles at 6.9–7.1 s/cycle. Policy 21/21, question 10/10, floor gate PASS, RNG-neutrality assert PASS, **0 quota misses**; `ledger=on` in `q_endo_loop` only. No loop *action* at that scale (quick era caps are 7 against `burn + W = 8`), which is expected — the loop path itself is certified at full scale by `an_s1` at 0.000e+00 |
+| `an_gf_m` | **[m] G-F re-gated AT THE METERED KNOB** (`fidelity_smoke --n-pr 24 --pr-width 8`) | **PASS — 0.000e+00** on `anchor_long` and `given_c1` against a 0.000e+00 donor self-replay control, commits equal; question gate **13/13** (Q-1…Q-13, the trap lane's two included); **Q-11 in-substrate interface check PASS (21 cells)**, with the ceiling still out-targeting the head on distinct needy true keys at the metered knob: exo→bisect **7→10** (L1n25→L2), **8→18** (L2n12→L3), **1→9** (L3n6→L4) |
+| `an_m_probe` | **[m] Phase A**: `q_exo` alone at `--n-pr 24 --pr-width 8`, era 1 only (full 5-era ladder with `--total-cap 60`, so `measure_refs` builds a 5-era refs vector and `--ref-tag an_s0` stays assertable), `--ref-tag an_s0` | **CERTIFIES**, 2026-09-01. 1260 s / **0.35 GPU-h**; 60 cycles at **9.8 s/cycle**. `[ref]` substrate identity to `an_s0` PASSED. Regime measured: **6.08 solves/cycle = 0.76× the cap**, cap binds **23.3%**, obs/cycle **5.72**, π **432 rows/cycle**, buffer **43.2% at c60 and never full**. **L2 committed at c23** (certificate c23, 11 entries, recall 0.571) — the commit-path risk a 1.4× thinner observation stream posed is settled. 46 of 60 cycles below cap, every one with `mined == solved`; **0 quota misses** |
+| `an_s2` | **the composed cell for the non-oracle selectors**: `q_endo_loop`, `q_comp_loop`, `q_novel_loop` at 201-cycle caps, `--ref-tag an_s0` | **complete**, 2026-09-01, app `ap-FMPLzOUhaaUly2mfac2R2h`. 450 arm-cycles at 11.0/11.4/11.3 s/cycle, **1.58 GPU-h** realized. `[ref]` substrate identity to `an_s0` **asserted and PASSED** before any cycle (refs identical, `read_acc` 1.0/1.0, stale 0.1269250065088272 / 0.154052734375 exact both sides). Lifetimes 186 / 130 / 134. All §5 gates pass, including the new sibling-twin gate |
+
+| `an_m0` | **[m] the strongly-metered main run**: `q_exo, q_bisect, q_endo, q_trust, q_novel, q_comp` at `--n-pr 24 --pr-width 8`, 201 cycles at the caps, `--ref-tag an_s0` | **complete**, 2026-09-02, app `ap-79ccPMSuKhuT8J9HuUH52c`. 1206 arm-cycles at 10.06–10.33 s/cycle, **12,987 s = 3.61 GPU-h** (against a 3.48 projection off the probe's era-1-only 9.8 s/cycle — the probe underestimated because era 1 runs width 18 pre-commit and width 3 after, while the later eras carry more committed macros). `[ref]` substrate identity to `an_s0` **asserted and PASSED**. Question gate 13/13, trap gate PASS. All six arms 201 cycles, lifetime-identical by construction. Arm order was budget-risk order, deviating from the brief's listed order to put `q_trust` fourth rather than last: it is the one arm with **no abundance twin**, so cutting it would have lost strictly more than cutting either pole. Nothing was cut |
 
 **The delivery-dose gate, at full scale** (`q_exo`, era 1, the arm that does no selection):
 P(delivered key == designed key) = **0.33 / 0.63 / 0.50 / 0.50 / 0.29** at c1/c2/c3/c10/c20,
@@ -309,7 +396,34 @@ beyond this format note.
 Volume `rhm-scaling-data:/data/rhm_practice_antiphon/<tag>/`; fetched copies, figures and
 `reduction.txt` under `figures/<tag>/`.
 
+**[s2] the volume control, which FIRED — and on exactly one arm.** `mine_cap` = 8 is asserted
+per cycle in every arm; a shortfall means the selector starved its own solve rate and is
+reported, not absorbed (`wd_s0`'s lesson). Every shortfall in the tag has `mined == solved`,
+i.e. the arm mined everything it had. Short cycles / era cycles (mean `n_mined`):
+
+| arm | era 1 | era 2 | era 3 | era 4 | **era 5** |
+|---|---|---|---|---|---|
+| `q_exo` (the null: no selection) | 3/60 (7.87) | 1/50 (7.94) | 1/70 (7.99) | 0/12 (8.00) | 0/9 (**8.00**) |
+| `an_s1/outer_yield_m4` (pacer only) | 1/56 (7.91) | 0/50 (8.00) | 0/35 (8.00) | 1/12 (7.92) | 0/9 (**8.00**) |
+| `q_bisect_loop` | 4/60 (7.77) | 0/32 (8.00) | 1/67 (7.96) | 0/12 (8.00) | 0/9 (**8.00**) |
+| `q_endo_loop` | 2/58 (7.91) | 1/50 (7.98) | 1/57 (7.95) | 0/12 (8.00) | 0/9 (**8.00**) |
+| **`q_comp_loop`** | 4/47 (7.79) | 1/27 (7.93) | 0/41 (8.00) | 1/6 (7.67) | **7/9 (6.22)** |
+| `q_novel_loop` | 2/60 (7.92) | 0/33 (8.00) | 4/24 (7.71) | 0/8 (8.00) | 0/9 (**8.00**) |
+| `q_endo` / `q_comp` / `q_novel` (schedule) | 2–4/60 | 1/50 | 0/70 | 0–1/12 | 0/9 (**8.00**) |
+
+Every other arm in the tag — schedule or loop, oracle or not — holds 8.00 in eras 4 and 5.
+`q_comp_loop` alone falls to **6.22**, mining 56 of a possible 72 era-5 observations (77.8%).
+So its era-5 number is not a pure selection contrast: part of it is a volume failure at the
+deepest era. Stated where the number is, per §3's rule. Its era-1..3 shortfalls sit inside
+`q_exo`'s own null band.
+
 ## 6a. Reduction
+
+**[s2]** the full-tag reduction is now
+`analyze_antiphon.py --tag an_s0 --merge-tag an_s1,an_s2 --fetch --figures`; its stdout is
+banked at `figures/an_s2/reduction.txt` and the extended attribution table at
+`figures/an_s2/pacer_marginal.txt` (`figures/an_s0/reduction.txt` is left as the `an_s0`-only
+record; `figures/an_s0/reduction.json` is the merged superset).
 
 `analyze_antiphon.py --tag an_s0 --fetch --figures` → `figures/an_s0/reduction.txt`,
 `reduction.json`, and four figures: `coverage_vs_cycle.png`, `coverage_vs_priced.png`,
@@ -389,6 +503,52 @@ Baseline for all three lanes = `cr3_s0/anchor_long` ≡ `an_s0/q_exo`.
 Lifetime / priced spend against the baseline: pacer-alone −39 cycles / −19.6%; selection-alone
 0 / +0.0%; composed −21 cycles / −11.0%.
 
+### 6b-bis. [s2] the same table for the three NON-ORACLE selectors
+
+`an_s2` crosses the same `_Q_LOOP` pacer with the three selectors that read only the learner's
+own state, so the composed cell is asked of the object the round is about. Same baseline
+(`an_s0/q_exo` ≡ `cr3_s0/anchor_long`), same pacer-alone lane (`an_s1`, in-tag, certified),
+same statistics. `pacer_marginal.py` emits one block per family; the deep-era rows:
+
+| family | lane | rf e4 | rf e5 | Δ cycles | Δ priced | read as |
+|---|---|---|---|---|---|---|
+| *(all)* | pacer-alone **[IN-TAG]** | +0.091 | −0.060 | −39 | −19.6% | short |
+| oracle | selection-alone | −0.085 | +0.322 | 0 | +0.0% | matched |
+| oracle | composed | **+0.285** | **+0.536** | −21 | −11.0% | short |
+| oracle | additive | +0.006 | +0.262 | | | |
+| oracle | **interaction** | **+0.279** | **+0.273** | | | |
+| **ENDO** | selection-alone | +0.130 | +0.716 | 0 | +0.0% | matched |
+| **ENDO** | composed | **+0.179** | **+0.885** | −15 | −7.7% | short |
+| **ENDO** | additive | +0.221 | +0.656 | | | |
+| **ENDO** | **interaction** | **−0.042** | **+0.230** | | | |
+| comfort | selection-alone | +0.097 | −0.290 | 0 | +0.0% | matched |
+| comfort | composed | −0.309 | −0.601 | −71 | −35.5% | short |
+| comfort | additive | +0.188 | −0.350 | | | |
+| comfort | **interaction** | **−0.497** | **−0.251** | | | |
+| novelty | selection-alone | −0.055 | +0.033 | 0 | +0.0% | matched |
+| novelty | composed | −0.224 | −0.087 | −67 | −34.8% | short |
+| novelty | additive | +0.036 | −0.027 | | | |
+| novelty | **interaction** | **−0.261** | **−0.060** | | | |
+
+"short" = the lane leaves eras early, so its **positives are conservative** and its
+**negatives are suspect toward time cost** — the §6b(b) caveat, now printed per lane rather
+than left as prose. Read the comfort and novelty composed negatives with that, and note
+separately that `q_comp_loop`'s era-5 cell also carries the volume failure recorded in §6.
+
+π's L4 beam share (§8's instrument), Δ to the same baseline:
+
+| family | e3 | e4 | e5 |
+|---|---|---|---|
+| pacer-alone **[IN-TAG]** | +0.061 | +0.098 | +0.149 |
+| oracle: selection-alone / composed | +0.000 / **+0.274** | −0.004 / **+0.260** | +0.066 / **+0.263** |
+| **ENDO**: selection-alone / composed | +0.000 / **+0.259** | +0.016 / **+0.256** | +0.080 / **+0.292** |
+| comfort: selection-alone / composed | +0.000 / +0.053 | −0.002 / −0.019 | +0.045 / +0.001 |
+| novelty: selection-alone / composed | +0.000 / +0.080 | −0.021 / +0.112 | −0.004 / +0.236 |
+
+Commits (Δ to baseline) and the L4 book: ENDO composed L2 +28 / L3 +2 / **L4 −54**, book 3
+entries at precision 0.333; comfort composed L4 −82, book 1 at 1.000; novelty composed L4 −74,
+book 2 at 0.500. Oracle composed was L4 −59, book 7 at 0.429.
+
 ### The recommendation, and what happened to it
 
 Recorded because the round's own reasoning is part of the record. Two options were put up: (i)
@@ -457,7 +617,27 @@ event nothing had to be cut — **the projection was pessimistic**.
 | `an_smoke` | **0.749** | 7 arms at `--quick`; its dose read turned out uninformative at that scale (§6) |
 | `an_s0` | **4.121** | 1386 arm-cycles at 10.1–10.3 s/cycle |
 | `an_s1` | **0.669** | 162 cycles at 10.68 s/cycle, against a 0.63 estimate (+6%) |
-| **total** | **≈5.99** | against ≈6.63 authorized (≈6.0 for the tag + ≈0.63 for `an_s1`) |
+| `an_s2_smoke` | **0.09** | 3 arms at `--quick --total-cap 12`, 335 s |
+| `an_s2` | **1.58** | 450 arm-cycles at 11.0–11.4 s/cycle; lifetimes 186/130/134 against a 160–201 projection |
+| `an_gf_m` | **≈0.15** | wall-clock; the metered G-F + Q-1…Q-13 + Q-11 |
+| `an_m_probe` | **0.35** | 60 cycles at 9.8 s/cycle + the 609 s setup |
+| `an_m0` | **3.61** | 1206 arm-cycles at 10.06–10.33 s/cycle |
+| **total** | **≈11.62** | `an_s0`-round ≈5.99 + `[s2]` **1.67** (auth. 1.3–2.0) + `[m]` **4.11** (auth. ≈2–2.5; the overrun is the per-cycle rate, not extra arms — see below) |
+
+**[m] why 4.11 and not the ≈2–2.5 estimated.** The meter shrinks the practice beam to
+(24×8)/(64×16) = **0.19×** of its work, but the **menu reads are unchanged** — the reader and
+value forwards over all 2048 candidates run in every arm by §3's compute pin — and so are the
+auditions, probes, recerts and π training. Those fixed costs dominate, so the per-cycle rate
+fell only 10.2 → 10.2 s/cycle at full-run scale (the probe's era-1 slice read 9.8). A metered
+round on this stack is therefore **not** cheaper per cycle in proportion to its meter; it is
+cheaper in *observations*, which is the point. Recorded so the next metered round is projected
+off 10.2 s/cycle rather than off the knob ratio.
+
+**[s2] why 1.58 and not the 1.90 projected at halt 1.** The per-cycle rate ran hot as expected
+(11.0–11.4 s/cycle against 10.2–10.7, the same recert-and-shadow-audition cost `an_s1` paid),
+but the two pole arms **left their eras early** — `q_comp_loop` at 130 cycles and `q_novel_loop`
+at 134 against the 186 the cell arm ran — so the tag came in under a projection built on
+`q_bisect_loop`'s 180. Nothing was cut; `q_novel_loop` ran in full.
 
 The main run came in **0.7 GPU-h under its own projection** because the realized rate was
 10.1–10.3 s/cycle against the 11.25 s/cycle read off `crescendo`'s average — i.e. the +13% I
@@ -467,5 +647,15 @@ menu reads are cheaper than the ~13% estimate. The one arm that ran *slower* tha
 every rung it holds, not the port's.
 
 Single seed; ranks, signs and multiples of measured floors are the claims.
+
+## Children
+
+| folder | what |
+|---|---|
+| [`trap/`](trap/DESIGN.md) | **Worthless answers installed in the question menu (`tr_gf`, `tr_smoke`, `tr_s0`).** `phase0_trap.py` sizes the premise offline (the foreign-grammar channel is impossible on a world-typed action space with success-filtered mining; the native atom is a candidate whose clean half parses to a junk key — non-convertibility is exact; the world serves 54.6% such at era 3; the breadth-first pool-ratio bound 0.686; two guards rejected offline, the use record promoted). `trap_menu.py`: the per-era distractor bank, the substitution, `trust_weights`, gate suite T-3. `analyze_trap.py`: §0 era-1 twins, dose, climb split true/junk, committed-table and use-weighted precision, the premium vs the native dose, the take series. Five arms at f = 0.90. Record: `DESIGN.md` (design + offline sizing, updated with the staged-code status) and `FILES.md`. Results are written up in the round's joint writeup, [`../tutti/README.md`](../tutti/README.md) finding 3. |
+
+**Extensions after the README** (`an_s2`, the loop-paced judge and poles; `an_m0`, the port at
+the strongly-metered knob) are recorded in §3/§3a/§6 above and written up in
+[`../tutti/README.md`](../tutti/README.md) findings 2 and 5.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

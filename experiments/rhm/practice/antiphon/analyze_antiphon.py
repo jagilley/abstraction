@@ -46,6 +46,14 @@ GF_SERIES = ["e", "succ", "dres", "t_cum", "n_moves", "width", "g_per_solve", "e
              "vloss", "gloss", "n_solved", "n_mined", "m_per_solve"]
 SUPPORT = 3
 
+# [antiphon-s2] every loop-paced question arm and the schedule-paced arm it is a twin of.
+# For a loop arm the `q_exo` window is uninformative (the port acts on c1 by design), so the
+# gate that says the PACER is the only thing that moved is the SIBLING window: same selector,
+# same stream, differing in `commit` alone, therefore bit-identical until the loop's own first
+# action. Reported as a cycle number, not a boolean.
+LOOP_SIBLING = {"q_bisect_loop": "q_bisect", "q_endo_loop": "q_endo",
+                "q_comp_loop": "q_comp", "q_novel_loop": "q_novel"}
+
 
 # --------------------------------------------------------------------------- #
 def fetch(tag):
@@ -94,12 +102,27 @@ def keyset(lg, i, level):
 
 
 # --------------------------------------------------------------------------- #
-def sec0_fidelity(A, order, out):
+def sec0_fidelity(A, order, out, setup=None):
     print("\n" + "=" * 88)
     print("§0  FIDELITY — is the menu machinery inert?")
     print("=" * 88)
+    # [antiphon-m] the cross-tag replay is a statement about the PORT, at the donor's own
+    # operating point. A tag that moves `n_pr` or `pr_width` is a different point on purpose,
+    # so `q_exo` cannot and must not replay `cr3_s0/anchor_long` there — the gate is not
+    # failed, it is inapplicable, and saying "FAIL" would be a false alarm. The in-process G-F
+    # at the metered knob (`an_gf_m`) is what covers the fork there.
+    cfgm = (setup or {}).get("config") or {}
+    metered = bool(cfgm) and (int(cfgm.get("n_pr", 64)) != 64
+                              or int(cfgm.get("pr_width", 16)) != 16)
     ref = _load(os.path.join(DONOR, "anchor_long"), "results.json")
-    if ref is None:
+    if metered:
+        print(f"  [n/a] this tag runs at n_pr={cfgm.get('n_pr')} pr_width={cfgm.get('pr_width')},"
+              f" not the donor's 64/16, so the cross-tag `q_exo` replay does NOT apply.")
+        print("        The fork is gated at THIS knob by the in-process G-F (`an_gf_m`);")
+        print("        `q_exo` here is the tag's own metered null, not a replay of anything.")
+        out["fidelity"] = {"applicable": False, "n_pr": cfgm.get("n_pr"),
+                           "pr_width": cfgm.get("pr_width")}
+    elif ref is None:
         print("  [skip] cr3_s0/anchor_long not fetched under crescendo/figures/")
     elif "q_exo" not in A:
         print("  [skip] q_exo not in this tag")
@@ -169,6 +192,40 @@ def sec0_fidelity(A, order, out):
                     "bit-identical to the schedule arm until its own first loop action")
             print(f"    {a:16s} first divergence: c{first}  ({note})" if first
                   else f"    {a:16s} never diverged")
+
+    # [antiphon-s2] THE SIBLING TWIN WINDOW — the gate for a loop-paced question arm.
+    sib = {}
+    for a in order:
+        b = LOOP_SIBLING.get(a)
+        if b is None or b not in A:
+            continue
+        la, lb = A[a]["log"], A[b]["log"]
+        L = min(len(la["cycle"]), len(lb["cycle"]))
+        first = None
+        for i in range(L):
+            if any(abs(float(la[k][i]) - float(lb[k][i])) > 0 for k in GF_SERIES):
+                first = i + 1
+                break
+        # `loop_actions` is not carried in the final results.json, so the action clock is
+        # read off the EVENTS both arms write: an action is a commit or an era advance, and
+        # divergence must begin at the first one either arm takes, never before it.
+        act = lambda r: min((int(e["cycle"]) for e in r["events"]
+                             if e["kind"] in ("commit", "advance")), default=None)
+        act_a, act_b = act(A[a]), act(A[b])
+        first_act = min([q for q in (act_a, act_b) if q is not None], default=None)
+        ok = (first is None) or (first_act is not None and first >= first_act)
+        sib[a] = {"sibling": b, "first_divergence": first, "first_action": first_act,
+                  "first_action_loop": act_a, "first_action_sched": act_b,
+                  "overlap": L, "pass": bool(ok)}
+    if sib:
+        print("\n  [antiphon-s2] SIBLING twin windows: each loop-paced question arm vs its")
+        print("  schedule-paced sibling (same selector, same stream, `commit` the only diff)")
+        for a, q in sib.items():
+            print(f"    {a:16s} vs {q['sibling']:12s} first divergence: "
+                  f"c{q['first_divergence']}   first action (either arm): c{q['first_action']}"
+                  f"  [loop c{q['first_action_loop']} / sched c{q['first_action_sched']}]"
+                  f"   -> {'PASS (identical until the first action)' if q['pass'] else 'FAIL'}")
+        out["sibling_twin"] = sib
 
 
 def sec1_controls(A, order, setup, out):
@@ -579,8 +636,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", default="an_s0")
     ap.add_argument("--merge-tag", default="",
-                    help="a second tag whose arms are folded into this reduction "
-                         "(crescendo's --merge-tag pattern; used for an_s1's pacer-only arm)")
+                    help="one or more comma-separated tags whose arms are folded into this "
+                         "reduction (crescendo's --merge-tag pattern; used for an_s1's "
+                         "pacer-only arm and an_s2's composed non-oracle arms)")
     ap.add_argument("--fetch", action="store_true")
     ap.add_argument("--figures", action="store_true")
     args = ap.parse_args()
@@ -600,10 +658,13 @@ def main():
     # [an_s1] fold in a second tag's arms. Their refs must be the same object or §6's
     # recovered fractions would be computed against a different normalisation — asserted,
     # not assumed (`crescendo`'s cross-tag discipline).
-    if args.merge_tag:
+    # [antiphon-s2] `--merge-tag` now takes a COMMA-SEPARATED LIST (one tag still works,
+    # so `an_s0 --merge-tag an_s1` reproduces exactly). Each tag's refs and substrate are
+    # asserted identical before any of its arms enters the reduction.
+    for mtag in [t.strip() for t in args.merge_tag.split(",") if t.strip()]:
         if args.fetch:
-            fetch(args.merge_tag)
-        mroot = os.path.join(FIG, args.merge_tag)
+            fetch(mtag)
+        mroot = os.path.join(FIG, mtag)
         msetup, msummary = _load(mroot, "setup.json"), _load(mroot, "summary.json")
         assert msetup and msummary, f"no setup/summary under {mroot}"
         for k in setup["refs"]:
@@ -611,19 +672,19 @@ def main():
                 continue
             assert np.allclose(np.asarray(setup["refs"][k], float),
                                np.asarray(msetup["refs"][k], float)), \
-                f"--merge-tag {args.merge_tag} has different refs for {k}: not the same substrate"
+                f"--merge-tag {mtag} has different refs for {k}: not the same substrate"
         assert (setup.get("stale_task_matched") == msetup.get("stale_task_matched")
                 and setup["read_acc"] == msetup["read_acc"]), \
-            f"--merge-tag {args.merge_tag} trained a different substrate"
+            f"--merge-tag {mtag} trained a different substrate"
         for a in msummary["order"]:
             r = _load(os.path.join(mroot, a), "results.json")
             if r is None:
                 continue
-            lab = a if a not in A else f"{a}@{args.merge_tag}"
+            lab = a if a not in A else f"{a}@{mtag}"
             A[lab] = r
             order.append(lab)
             summary["cycle_seconds"][lab] = msummary["cycle_seconds"].get(a)
-        print(f"[merge] folded {args.merge_tag}: {msummary['order']} "
+        print(f"[merge] folded {mtag}: {msummary['order']} "
               f"(refs and substrate identical — asserted)")
     print("=" * 88)
     print(f"ANTIPHON — the question port.  tag={args.tag}  arms={order}")
@@ -632,7 +693,7 @@ def main():
     print("=" * 88)
 
     out = {"tag": args.tag, "order": order}
-    sec0_fidelity(A, order, out)
+    sec0_fidelity(A, order, out, setup)
     sec1_controls(A, order, setup, out)
     sec2_dose(A, order, out)
     traj = sec3_climb(A, order, setup, out)

@@ -1,0 +1,382 @@
+✓ Finished downloading files to local!
+✓ Finished downloading files to local!
+✓ Finished downloading files to local!
+[merge] folded an_s1: ['outer_yield_m4'] (refs and substrate identical — asserted)
+[merge] folded an_s2: ['q_endo_loop', 'q_comp_loop', 'q_novel_loop'] (refs and substrate identical — asserted)
+========================================================================================
+ANTIPHON — the question port.  tag=an_s0  arms=['q_exo', 'q_bisect', 'q_endo', 'q_novel', 'q_comp', 'q_bisect_loop', 'q_comp_free', 'outer_yield_m4', 'q_endo_loop', 'q_comp_loop', 'q_novel_loop']
+  menu K=2048  modes={'q_exo': 'exo', 'q_bisect': 'bisect', 'q_endo': 'endo', 'q_novel': 'novel', 'q_comp': 'comp', 'q_bisect_loop': 'bisect', 'q_comp_free': 'comp_free'}
+  cycle seconds: {'q_exo': 10.2, 'q_bisect': 10.1, 'q_endo': 10.3, 'q_novel': 10.3, 'q_comp': 10.2, 'q_bisect_loop': 10.2, 'q_comp_free': 10.2, 'outer_yield_m4': 10.7, 'q_endo_loop': 11.0, 'q_comp_loop': 11.4, 'q_novel_loop': 11.3}
+========================================================================================
+
+========================================================================================
+§0  FIDELITY — is the menu machinery inert?
+========================================================================================
+  q_exo vs cr3_s0/anchor_long over 201 cycles, 13 series
+    max|diff| = 0.000e+00   commits equal: True
+    per series: e:0.0e+00  succ:0.0e+00  dres:0.0e+00  t_cum:0.0e+00  n_moves:0.0e+00  width:0.0e+00  g_per_solve:0.0e+00  e_practice:0.0e+00  vloss:0.0e+00  gloss:0.0e+00  n_solved:0.0e+00  n_mined:0.0e+00  m_per_solve:0.0e+00
+    VERDICT: PASS — the menu machinery is inert at full scale
+
+  §0b  an_s1/outer_yield_m4 vs cr3_s0/outer_yield_m4 (lifetimes 162 vs 162)
+    max|diff| = 0.000e+00   commits equal: True
+    per series: e:0.0e+00  succ:0.0e+00  dres:0.0e+00  t_cum:0.0e+00  n_moves:0.0e+00  width:0.0e+00  g_per_solve:0.0e+00  e_practice:0.0e+00  vloss:0.0e+00  gloss:0.0e+00  n_solved:0.0e+00  n_mined:0.0e+00  m_per_solve:0.0e+00
+    VERDICT: PASS — the fork reproduces the donors thermostat path at full scale; §6b promotes to IN-TAG
+
+  In-tag twin windows: every arm vs q_exo up to its own first divergence
+    q_bisect         first divergence: c1  (by design c1 — the port acts on cycle 1)
+    q_endo           first divergence: c1  (by design c1 — the port acts on cycle 1)
+    q_novel          first divergence: c1  (by design c1 — the port acts on cycle 1)
+    q_comp           first divergence: c1  (by design c1 — the port acts on cycle 1)
+    q_bisect_loop    first divergence: c1  (by design c1 — the port acts on cycle 1)
+    q_comp_free      first divergence: c1  (by design c1 — the port acts on cycle 1)
+    outer_yield_m4   first divergence: c18  (port OFF in this arm — this is the donor's own in-tag twin gate: bit-identical to the schedule arm until its own first loop action)
+    q_endo_loop      first divergence: c1  (by design c1 — the port acts on cycle 1)
+    q_comp_loop      first divergence: c1  (by design c1 — the port acts on cycle 1)
+    q_novel_loop     first divergence: c1  (by design c1 — the port acts on cycle 1)
+
+  [antiphon-s2] SIBLING twin windows: each loop-paced question arm vs its
+  schedule-paced sibling (same selector, same stream, `commit` the only diff)
+    q_bisect_loop    vs q_bisect     first divergence: c19   first action (either arm): c19  [loop c32 / sched c19]   -> PASS (identical until the first action)
+    q_endo_loop      vs q_endo       first divergence: c30   first action (either arm): c30  [loop c46 / sched c30]   -> PASS (identical until the first action)
+    q_comp_loop      vs q_comp       first divergence: c35   first action (either arm): c35  [loop c35 / sched c60]   -> PASS (identical until the first action)
+    q_novel_loop     vs q_novel      first divergence: c29   first action (either arm): c29  [loop c47 / sched c29]   -> PASS (identical until the first action)
+
+========================================================================================
+§1  CONTROLS — what each arm pinned
+========================================================================================
+  arm             mode         cyc  quota_ok  vol_ok  d*_sel  d*_menu     dev       t_cum   mined
+  q_exo           exo          201     1.000   0.975   2.752    2.757  -0.005    50688282    1596
+  q_bisect        bisect       201     1.000   0.955   2.752    2.757  -0.005    50699725    1585
+  q_endo          endo         201     1.000   0.985   2.752    2.757  -0.005    50689357    1601
+  q_novel         novel        201     1.000   0.975   2.752    2.757  -0.005    50691507    1599
+  q_comp          comp         201     1.000   0.975   2.752    2.757  -0.005    50700109    1597
+  q_bisect_loop   bisect       180     1.000   0.972   2.780    2.784  -0.003    45096109    1423
+  q_comp_free     comp_free    201     0.025   0.965   2.392    2.757  -0.364    50687475    1594
+  outer_yield_m4  (port off)   162
+  q_endo_loop     endo         186     1.000   0.978   2.733    2.735  -0.002    46798534    1479
+  q_comp_loop     comp         130     1.000   0.900   2.728    2.734  -0.006    32715462    1010
+  q_novel_loop    novel        134     1.000   0.955   2.582    2.582  +0.001    33033389    1060
+
+  quota_ok = fraction of cycles whose selected d* histogram equalled the quota
+  (the menu head's, i.e. the donor's own mix). vol_ok = fraction of cycles that
+  mined the full `mine_cap`. `dev` is the difficulty deviation: ~0 by construction
+  in every arm but `q_comp_free`, where it IS the arm's definition.
+
+========================================================================================
+§2  DELIVERED DOSE vs DESIGN DOSE  (`wd_s0`'s lesson, as an instrument)
+========================================================================================
+  P(the key the miner recorded == the key the question designed), per era per arm,
+  measured in EVERY arm including the ones that never see a designed key.
+  arm                     era1        era2        era3        era4        era5         all  deliv_true   credit
+  q_exo                  0.540       0.182       0.043       0.000       0.000       0.222       0.554    0.347
+  q_bisect               0.393       0.139       0.054       0.000       0.000       0.171       0.688    0.338
+  q_endo                 0.371       0.161       0.039       0.010       0.000       0.165       0.554    0.401
+  q_novel                0.399       0.180       0.046       0.021       0.000       0.181       0.544    0.447
+  q_comp                 0.472       0.161       0.034       0.010       0.014       0.194       0.503    0.310
+  q_bisect_loop          0.394       0.176       0.043       0.010       0.000       0.179       0.655    0.337
+  q_comp_free            0.487       0.135       0.036       0.000       0.014       0.192       0.502    0.354
+  q_endo_loop            0.388       0.191       0.042       0.000       0.000       0.185       0.541    0.401
+  q_comp_loop            0.485       0.145       0.034       0.000       0.000       0.216       0.496    0.402
+  q_novel_loop           0.400       0.163       0.032       0.000       0.014       0.226       0.621    0.371
+
+  `deliv_true` = fraction of mined observations that were a TRUE table row at all
+  (Phase 0's ceiling on this, from the grammar's own parse ambiguity, is 0.42 at L3
+  and 0.18 at L4 under a uniform draw). `credit` = fraction of observations that
+  advanced a key not already at support — the ledger's currency.
+
+========================================================================================
+§3  THE CLIMB — at-support coverage against the cycle clock and the PRICED clock
+========================================================================================
+
+  LEVEL 2  (|true| = 14)
+  arm               N_obs  @sup  true  junk  recall   prec   trajectory of TRUE@sup by decile of cycles
+  q_exo              1596    19    13     6   0.929  0.684   8/10/10/10/10/10/11/11/11/13
+  q_bisect           1585    22    14     8   1.000  0.636   9/10/12/12/13/13/14/14/14/14
+  q_endo             1601    18    12     6   0.857  0.667   9/10/10/10/11/11/11/11/11/12
+  q_novel            1599    21    13     8   0.929  0.619   9/10/11/11/11/11/11/12/12/13
+  q_comp             1597    19    13     6   0.929  0.684   8/9/10/10/10/10/12/12/12/13
+  q_bisect_loop      1423    21    14     7   1.000  0.667   9/11/11/11/12/13/13/13/14/14
+  q_comp_free        1594    19    13     6   0.929  0.684   7/9/9/11/11/12/12/12/12/13
+  outer_yield_m4     1290    19    12     7   0.857  0.632   8/9/10/10/10/11/11/11/11/12
+  q_endo_loop        1479    20    13     7   0.929  0.650   9/10/10/11/12/12/12/13/13/13
+  q_comp_loop        1010    18    12     6   0.857  0.667   6/8/8/9/9/9/9/9/9/12
+  q_novel_loop       1060    20    13     7   0.929  0.650   9/9/10/11/12/13/13/13/13/13
+
+    at matched cumulative priced spend (32715462 groundings):
+      q_exo            true@sup   11 at c131
+      q_bisect         true@sup   13 at c131
+      q_endo           true@sup   11 at c131
+      q_novel          true@sup   11 at c131
+      q_comp           true@sup   11 at c131
+      q_bisect_loop    true@sup   13 at c131
+      q_comp_free      true@sup   12 at c131
+      outer_yield_m4   true@sup   11 at c131
+      q_endo_loop      true@sup   13 at c131
+      q_comp_loop      true@sup   12 at c130
+      q_novel_loop     true@sup   13 at c133
+
+  LEVEL 3  (|true| = 56)
+  arm               N_obs  @sup  true  junk  recall   prec   trajectory of TRUE@sup by decile of cycles
+  q_exo              1124    51    19    32   0.339  0.373   0/0/0/4/10/12/12/13/13/18
+  q_bisect           1118    51    19    32   0.339  0.373   0/0/0/9/11/14/14/15/15/18
+  q_endo             1126    50    16    34   0.286  0.320   0/0/0/4/8/10/11/12/12/16
+  q_novel            1126    55    19    36   0.339  0.345   0/0/0/7/10/14/14/16/16/18
+  q_comp             1127    37    11    26   0.196  0.297   0/0/0/4/6/6/6/6/6/11
+  q_bisect_loop       957    45    20    25   0.357  0.444   0/0/0/7/13/15/15/15/16/20
+  q_comp_free        1125    47    16    31   0.286  0.340   0/0/0/3/4/6/9/10/10/16
+  outer_yield_m4      847    47    15    32   0.268  0.319   0/0/0/1/6/10/12/13/13/15
+  q_endo_loop        1020    45    17    28   0.304  0.378   0/0/0/7/11/14/14/14/15/15
+  q_comp_loop         644    27     7    20   0.125  0.259   0/0/0/2/4/5/5/6/7/7
+  q_novel_loop        585    36    16    20   0.286  0.444   0/0/0/0/1/9/12/13/14/15
+
+    at matched cumulative priced spend (32715462 groundings):
+      q_exo            true@sup   12 at c131
+      q_bisect         true@sup   14 at c131
+      q_endo           true@sup   11 at c131
+      q_novel          true@sup   14 at c131
+      q_comp           true@sup    6 at c131
+      q_bisect_loop    true@sup   15 at c131
+      q_comp_free      true@sup    6 at c131
+      outer_yield_m4   true@sup   13 at c131
+      q_endo_loop      true@sup   14 at c131
+      q_comp_loop      true@sup    7 at c130
+      q_novel_loop     true@sup   16 at c133
+
+  LEVEL 4  (|true| = 816)
+  arm               N_obs  @sup  true  junk  recall   prec   trajectory of TRUE@sup by decile of cycles
+  q_exo              1596   113    22    91   0.027  0.195   1/2/6/9/12/16/16/19/20/22
+  q_bisect           1585   132    50    82   0.061  0.379   0/6/11/15/25/30/37/42/49/50
+  q_endo             1601   143    35   108   0.043  0.245   0/4/8/15/19/21/24/28/33/35
+  q_novel            1599   144    39   105   0.048  0.271   1/4/9/16/23/27/29/32/34/39
+  q_comp             1597   114    27    87   0.033  0.237   1/5/8/11/14/18/20/22/25/27
+  q_bisect_loop      1423    82    32    50   0.039  0.390   0/0/5/9/13/21/29/30/32/32
+  q_comp_free        1594   136    26   110   0.032  0.191   3/3/4/10/15/18/20/22/24/26
+  outer_yield_m4     1290    99    22    77   0.027  0.222   0/0/4/8/10/13/17/21/22/22
+  q_endo_loop        1479   123    30    93   0.037  0.244   0/2/7/12/16/21/26/26/28/30
+  q_comp_loop        1010    75    18    57   0.022  0.240   1/2/3/5/7/9/14/16/18/18
+  q_novel_loop       1060    65    21    44   0.026  0.323   0/2/5/7/11/12/15/18/20/21
+
+    at matched cumulative priced spend (32715462 groundings):
+      q_exo            true@sup   16 at c131
+      q_bisect         true@sup   31 at c131
+      q_endo           true@sup   23 at c131
+      q_novel          true@sup   29 at c131
+      q_comp           true@sup   18 at c131
+      q_bisect_loop    true@sup   30 at c131
+      q_comp_free      true@sup   19 at c131
+      outer_yield_m4   true@sup   21 at c131
+      q_endo_loop      true@sup   26 at c131
+      q_comp_loop      true@sup   18 at c130
+      q_novel_loop     true@sup   21 at c133
+
+========================================================================================
+§4  WHAT THE COMMITS FROZE, and the r^2 wall
+========================================================================================
+  The `bldbl` row is end-of-run: L4 keys at support whose BOTH halves are in that
+  arm's end-of-run at-support L3 set (the LIVE set, not the committed frozen table),
+  by the substrate's own `buildable()` ratchet. The r^2 figure beside it is Phase 0's
+  law evaluated at that arm's L3 recall, for comparison.
+  arm              lvl  cycle  entries  recall   prec    bldbl L4|live L3  true
+  q_exo              2     18       11   0.571  0.727
+  q_exo              3     75        8   0.054  0.375
+  q_exo              4    180        5   0.001  0.200
+  q_exo                   end                                          51    11   (L3 recall 0.339 -> r^2*816 = 94)
+  q_bisect           2     19       14   0.643  0.643
+  q_bisect           3     82       16   0.143  0.500
+  q_bisect           4    180        7   0.006  0.714
+  q_bisect                end                                          63    20   (L3 recall 0.339 -> r^2*816 = 94)
+  q_endo             2     30       14   0.714  0.714
+  q_endo             3     69        6   0.054  0.500
+  q_endo             4    180        3   0.002  0.667
+  q_endo                  end                                          61    16   (L3 recall 0.286 -> r^2*816 = 67)
+  q_novel            2     29       16   0.714  0.625
+  q_novel            3     80       15   0.089  0.333
+  q_novel            4    180       13   0.002  0.154
+  q_novel                 end                                          62    18   (L3 recall 0.339 -> r^2*816 = 94)
+  q_comp             2     60       14   0.714  0.714
+  q_comp             3     78       12   0.054  0.250
+  q_comp             4    180        5   0.001  0.200
+  q_comp                  end                                          33     7   (L3 recall 0.196 -> r^2*816 = 31)
+  q_bisect_loop      2     32       16   0.714  0.625
+  q_bisect_loop      3     83       15   0.143  0.533
+  q_bisect_loop      4    121        7   0.004  0.429
+  q_bisect_loop           end                                          39    15   (L3 recall 0.357 -> r^2*816 = 104)
+  q_comp_free        2     20       10   0.500  0.700
+  q_comp_free        3     73        8   0.054  0.375
+  q_comp_free        4    180        2   0.001  0.500
+  q_comp_free             end                                          43     9   (L3 recall 0.286 -> r^2*816 = 67)
+  outer_yield_m4     2     49       14   0.714  0.714
+  outer_yield_m4     3     92       21   0.125  0.333
+  outer_yield_m4     4    129        5   0.002  0.400
+  outer_yield_m4          end                                          39     7   (L3 recall 0.268 -> r^2*816 = 59)
+  q_endo_loop        2     46       15   0.714  0.667
+  q_endo_loop        3     77       16   0.107  0.375
+  q_endo_loop        4    126        3   0.001  0.333
+  q_endo_loop             end                                          54    13   (L3 recall 0.304 -> r^2*816 = 75)
+  q_comp_loop        2     35       11   0.571  0.727
+  q_comp_loop        3     64        9   0.071  0.444
+  q_comp_loop        4     98        1   0.001  1.000
+  q_comp_loop             end                                          14     3   (L3 recall 0.125 -> r^2*816 = 13)
+  q_novel_loop       2     47       16   0.714  0.625
+  q_novel_loop       3     78       13   0.107  0.462
+  q_novel_loop       4    106        2   0.001  0.500
+  q_novel_loop            end                                          20     6   (L3 recall 0.286 -> r^2*816 = 67)
+
+========================================================================================
+§5  CLIMBING SPEED — cycles to each commit, and cycles to a recall threshold
+========================================================================================
+  arm               L2 commit  L3 commit  L4 commit   cyc       t_cum
+  q_exo                    18         75        180   201    50688282
+  q_bisect                 19         82        180   201    50699725
+  q_endo                   30         69        180   201    50689357
+  q_novel                  29         80        180   201    50691507
+  q_comp                   60         78        180   201    50700109
+  q_bisect_loop            32         83        121   180    45096109
+  q_comp_free              20         73        180   201    50687475
+  outer_yield_m4           49         92        129   162    40748768
+  q_endo_loop              46         77        126   186    46798534
+  q_comp_loop              35         64         98   130    32715462
+  q_novel_loop             47         78        106   134    33033389
+
+========================================================================================
+§6  THE THREE CLOCKS and deep-era recovered fraction
+========================================================================================
+  arm                          era1             era2             era3             era4             era5
+  q_exo               0.471 /+0.515    0.523 /+0.664    0.510 /+0.915    0.646 /+1.182    0.793 /+1.186
+  q_bisect            0.424 /+0.578    0.516 /+0.676    0.504 /+0.927    0.670 /+1.097    0.742 /+1.508
+  q_endo              0.433 /+0.565    0.503 /+0.697    0.520 /+0.892    0.609 /+1.312    0.680 /+1.902
+  q_novel             0.459 /+0.531    0.549 /+0.617    0.563 /+0.796    0.661 /+1.127    0.788 /+1.219
+  q_comp              0.406 /+0.601    0.470 /+0.754    0.486 /+0.967    0.618 /+1.279    0.839 /+0.896
+  q_bisect_loop       0.415 /+0.589    0.554 /+0.610    0.451 /+1.044    0.564 /+1.467    0.708 /+1.721
+  q_comp_free         0.426 /+0.575    0.497 /+0.709    0.498 /+0.940    0.675 /+1.079    0.843 /+0.874
+  outer_yield_m4      0.474 /+0.512    0.582 /+0.562    0.519 /+0.894    0.620 /+1.273    0.803 /+1.126
+  q_endo_loop         0.455 /+0.537    0.509 /+0.688    0.460 /+1.025    0.595 /+1.361    0.653 /+2.071
+  q_comp_loop         0.436 /+0.562    0.512 /+0.682    0.524 /+0.882    0.734 /+0.873    0.889 /+0.585
+  q_novel_loop        0.446 /+0.548    0.564 /+0.592    0.587 /+0.744    0.710 /+0.958    0.807 /+1.098
+  stale                     0.865            0.906            0.922            0.984            0.982
+  floor                     0.102            0.328            0.471            0.698            0.823
+
+  DELTA TO q_exo (the exogenous ladder, and the lifetime ceiling)
+  Read against the MEASURED depth-6 stream floors (census finding 7): 0.087 in
+  the earning family, 0.083/0.148/0.344 for eras 3/4/5 in the given family, and
+  crescendo's own in-node era-4/5 displacement floors 0.030/0.410.
+  arm                   era1      era2      era3      era4      era5
+  q_bisect             0.063     0.012     0.012    -0.085     0.322
+  q_endo               0.050     0.033    -0.023     0.130     0.716
+  q_novel              0.016    -0.047    -0.119    -0.055     0.033
+  q_comp               0.085     0.090     0.052     0.097    -0.290
+  q_bisect_loop        0.074    -0.054     0.129     0.285     0.536
+  q_comp_free          0.059     0.045     0.025    -0.103    -0.311
+  outer_yield_m4      -0.003    -0.102    -0.021     0.091    -0.060
+  q_endo_loop          0.022     0.024     0.110     0.179     0.885
+  q_comp_loop          0.047     0.018    -0.033    -0.309    -0.601
+  q_novel_loop         0.033    -0.072    -0.171    -0.224    -0.087
+
+========================================================================================
+§7  THE NERDSNIPE — what each arm AIMED at, and what it BANKED
+========================================================================================
+  Phase 0: the grammar's own parse ambiguity makes 104 junk keys reachable at L3
+  and 7573 at L4 — 0.58 and 0.82 of the observation mass under a uniform draw. Junk
+  is maximally novel, forever, so a novelty-greedy judge maximises it by definition.
+
+  arm               designed_true designed_needy  banked_true_L3  banked_junk_L3  banked_true_L4  banked_junk_L4
+  q_exo                     0.414          0.132              19              32              22              91
+  q_bisect                  0.844          0.629              19              32              50              82
+  q_endo                    0.394          0.152              16              34              35             108
+  q_novel                   0.395          0.144              19              36              39             105
+  q_comp                    0.424          0.150              11              26              27              87
+  q_bisect_loop             0.847          0.623              20              25              32              50
+  q_comp_free               0.421          0.149              16              31              26             110
+  outer_yield_m4                -              -              15              32              22              77
+  q_endo_loop               0.412          0.138              17              28              30              93
+  q_comp_loop               0.455          0.177               7              20              18              57
+  q_novel_loop              0.483          0.153              16              20              21              44
+
+  delivery ledger (endo only):
+    q_endo          {'n_halves': 168, 'posed': 1433, 'landed': 574, 'mean_w': 0.6070848699471404}
+    q_endo_loop     {'n_halves': 166, 'posed': 1311, 'landed': 527, 'mean_w': 0.6485213028557593}
+
+========================================================================================
+§8  TRUST — pi's proposal mass by level (crescendo finding 3's instrument)
+========================================================================================
+  Share of the PRICED beam's entry selections falling at each macro level, per era
+  (`log['entry']['hist']['beam']`, the entry-identity instrument — the same source
+  crescendo finding 3's monotone L4 mass came off). A level with no committed table
+  is absent by construction.
+  arm               era   per-level share of beam entry selections
+  q_exo               1   L2:1.000
+  q_exo               2   L2:0.634  L3:0.366
+  q_exo               3   L2:0.408  L3:0.592
+  q_exo               4   L2:0.325  L3:0.593  L4:0.082
+  q_exo               5   L2:0.339  L3:0.549  L4:0.111
+  q_bisect            1   L2:1.000
+  q_bisect            2   L2:0.800  L3:0.200
+  q_bisect            3   L2:0.488  L3:0.512
+  q_bisect            4   L2:0.381  L3:0.541  L4:0.078
+  q_bisect            5   L2:0.340  L3:0.482  L4:0.178
+  q_endo              1   L2:1.000
+  q_endo              2   L2:0.514  L3:0.486
+  q_endo              3   L2:0.377  L3:0.623
+  q_endo              4   L2:0.333  L3:0.569  L4:0.098
+  q_endo              5   L2:0.318  L3:0.490  L4:0.191
+  q_novel             1   L2:1.000
+  q_novel             2   L2:0.651  L3:0.349
+  q_novel             3   L2:0.429  L3:0.571
+  q_novel             4   L2:0.409  L3:0.530  L4:0.062
+  q_novel             5   L2:0.345  L3:0.547  L4:0.107
+  q_comp              2   L2:0.471  L3:0.529
+  q_comp              3   L2:0.370  L3:0.630
+  q_comp              4   L2:0.329  L3:0.591  L4:0.081
+  q_comp              5   L2:0.277  L3:0.566  L4:0.157
+  q_bisect_loop       1   L2:1.000
+  q_bisect_loop       2   L2:0.936  L3:0.064
+  q_bisect_loop       3   L2:0.415  L3:0.311  L4:0.274
+  q_bisect_loop       4   L2:0.351  L3:0.307  L4:0.342
+  q_bisect_loop       5   L2:0.300  L3:0.325  L4:0.375
+  q_comp_free         1   L2:1.000
+  q_comp_free         2   L2:0.597  L3:0.403
+  q_comp_free         3   L2:0.515  L3:0.485
+  q_comp_free         4   L2:0.554  L3:0.416  L4:0.030
+  q_comp_free         5   L2:0.504  L3:0.417  L4:0.079
+  outer_yield_m4      1   L2:1.000
+  outer_yield_m4      2   L2:0.890  L3:0.110
+  outer_yield_m4      3   L2:0.595  L3:0.344  L4:0.061
+  outer_yield_m4      4   L2:0.411  L3:0.409  L4:0.180
+  outer_yield_m4      5   L2:0.364  L3:0.375  L4:0.261
+  q_endo_loop         1   L2:1.000
+  q_endo_loop         2   L2:0.588  L3:0.412
+  q_endo_loop         3   L2:0.354  L3:0.388  L4:0.259
+  q_endo_loop         4   L2:0.277  L3:0.385  L4:0.338
+  q_endo_loop         5   L2:0.222  L3:0.375  L4:0.404
+  q_comp_loop         1   L2:1.000
+  q_comp_loop         2   L2:0.935  L3:0.065
+  q_comp_loop         3   L2:0.493  L3:0.454  L4:0.053
+  q_comp_loop         4   L2:0.459  L3:0.477  L4:0.063
+  q_comp_loop         5   L2:0.391  L3:0.497  L4:0.112
+  q_novel_loop        1   L2:1.000
+  q_novel_loop        2   L2:0.753  L3:0.247
+  q_novel_loop        3   L2:0.449  L3:0.472  L4:0.080
+  q_novel_loop        4   L2:0.320  L3:0.486  L4:0.195
+  q_novel_loop        5   L2:0.292  L3:0.360  L4:0.348
+
+========================================================================================
+§9  ess_use — the effective number of table entries IN USE (provenance lane's)
+========================================================================================
+  exp(entropy) of the per-entry selection histogram from the beam's own executions.
+  Asks whether selection concentrates USE as well as observation.
+  arm                       L2          L3          L4     (n_entries)
+  q_exo                  5.274       2.452       1.000  {'2': 11, '3': 8, '4': 5}
+  q_bisect               5.462       3.110       1.179  {'2': 14, '3': 16, '4': 7}
+  q_endo                 6.064       2.602       1.109  {'2': 14, '3': 6, '4': 3}
+  q_novel                6.538       3.529       1.525  {'2': 16, '3': 15, '4': 13}
+  q_comp                 6.161       2.950       1.020  {'2': 14, '3': 12, '4': 5}
+  q_bisect_loop          5.986       3.297       1.058  {'2': 16, '3': 15, '4': 7}
+  q_comp_free            5.278       2.368       1.000  {'2': 10, '3': 8, '4': 2}
+  outer_yield_m4         5.046       3.662       1.039  {'2': 14, '3': 21, '4': 5}
+  q_endo_loop            5.846       3.915       1.285  {'2': 15, '3': 16, '4': 3}
+  q_comp_loop            5.893       3.766       1.000  {'2': 11, '3': 9, '4': 1}
+  q_novel_loop           5.557       2.614       1.001  {'2': 16, '3': 13, '4': 2}
+
+  figures -> ~/Code/research/experiments/rhm/practice/antiphon/figures/an_s0
+
+wrote ~/Code/research/experiments/rhm/practice/antiphon/figures/an_s0/reduction.json

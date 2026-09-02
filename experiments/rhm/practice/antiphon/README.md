@@ -246,3 +246,32 @@ The learned question-judge inside the composed loop (the A2 move over this round
 interpretation (c), not a live hypothesis · an `/add-belief` pass for director-not-author,
 read against `performance_error_is_the_bridge` §3's trajectory-grain agency law · a seed pair
 on the interaction cell if it becomes load-bearing externally.
+
+## Extensions (2026-09-01→02) — recorded in the round's joint writeup
+
+Three follow-on runs on this node's machinery, written up as findings 2, 3, and 5 of
+[`../tutti/README.md`](../tutti/README.md) (the unification round), with the machinery records in
+[`FILES.md`](FILES.md) §3/§3a/§6 and [`trap/`](trap/DESIGN.md):
+
+- **`an_s2` — the endogenous judge and both poles under the yield pacer.** `q_endo_loop` posts
+  +0.179/+0.885 at eras 4/5 over the certified baseline (the largest era-5 cell in the arc, L4
+  beam share 0.404, L4 commit c126 vs its sibling's c180); the comfort and novelty poles under
+  the pacer are both negative with negative interactions (the comfort arm is the one arm on
+  which the volume control fired).
+- **`tr_s0` — worthless answers installed.** A menu 90% built from candidates whose clean half
+  is a junk key. No judge is nerdsniped at any dose (the breadth-first pool-ratio bound); the
+  oracle's coverage premium *shrinks*; deep-era value goes to the two judges that pose
+  solvable-as-designed questions (the incumbent +0.352/+1.393, the use-record-guarded `trust`
+  +0.276/+1.022), the oracle posts none.
+- **`an_m0` — the port at the strongly-metered knob** (24 posed/cycle, width 8). The mining
+  premium survives in ratio (oracle 2.2× the null in both regimes); every selector pays a solve
+  tax the mining subsample hid at abundance; π's L4 trust collapses tag-wide on a ladder sized
+  for abundance's rows, so no selector beats the null on value.
+
+**Correction to this README's machinery description, on the record.** The delivery ledger
+(`q_endo`'s guard) was described above as the noisy-TV guard. Measured offline and in vivo in
+the trap round, its credit rule ("not yet at support") does not discriminate junk from true keys
+(weight ratio 1.04 at era 3; it prefers the trap at era 2). What it does is prefer halves the
+learner has repaired to the designed key before — the *solvability* half of a learning-progress
+band-pass — and that, not junk avoidance, is where its value comes from (interpretation (b) of
+the joint writeup). The reading of interpretation (c) above stands unchanged.

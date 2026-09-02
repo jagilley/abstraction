@@ -1,0 +1,197 @@
+============================================================================================
+THE PACER-ALONE MARGINAL — computed on `an_s0`'s own statistics
+============================================================================================
+
+[pre] refs identical across tags: True   substrate identical: True
+      read_acc 1.0 / 1.0   stale 0.154052734375 / 0.154052734375
+      (and reduction §0: an_s0/q_exo replays cr3_s0/anchor_long at 0.000e+00 over
+       all 201 cycles and 13 series, so BOTH baselines are the same trajectory)
+[an_s2] present; substrate identical to an_s0: True
+
+[cert] an_s1/outer_yield_m4 vs cr3_s0/outer_yield_m4 over [162, 162] cycles: max|diff| = 0.000e+00 -> PASS, the pacer lane is IN-TAG
+
+[0] the trajectories, absolute
+  arm                         cyc  L2c  L3c  L4c  L2 rec  L3 rec  L4 rec    rf e1    rf e2    rf e3    rf e4    rf e5   L4sh e3   L4sh e4   L4sh e5
+  cr3_s0/anchor_long          201   18   75  180   0.929   0.339   0.027    0.515    0.664    0.915    1.182    1.186     0.000     0.082     0.111
+  cr3_s0/outer_yield_m4       162   49   92  129   0.857   0.268   0.027    0.512    0.562    0.894    1.273    1.126     0.061     0.180     0.261
+  an_s0/q_exo                 201   18   75  180   0.929   0.339   0.027    0.515    0.664    0.915    1.182    1.186     0.000     0.082     0.111
+  an_s0/q_bisect              201   19   82  180   1.000   0.339   0.061    0.578    0.676    0.927    1.097    1.508     0.000     0.078     0.178
+  an_s0/q_bisect_loop         180   32   83  121   1.000   0.357   0.039    0.589    0.610    1.044    1.467    1.721     0.274     0.342     0.375
+  an_s0/q_endo                201   30   69  180   0.857   0.286   0.043    0.565    0.697    0.892    1.312    1.902     0.000     0.098     0.191
+  an_s2/q_endo_loop           186   46   77  126   0.929   0.304   0.037    0.537    0.688    1.025    1.361    2.071     0.259     0.338     0.404
+  an_s0/q_comp                201   60   78  180   0.929   0.196   0.033    0.601    0.754    0.967    1.279    0.896     0.000     0.081     0.157
+  an_s2/q_comp_loop           130   35   64   98   0.857   0.125   0.022    0.562    0.682    0.882    0.873    0.585     0.053     0.063     0.112
+  an_s0/q_novel               201   29   80  180   0.929   0.339   0.048    0.531    0.617    0.796    1.127    1.219     0.000     0.062     0.107
+  an_s2/q_novel_loop          134   47   78  106   0.929   0.286   0.026    0.548    0.592    0.744    0.958    1.098     0.080     0.195     0.348
+  an_s1/outer_yield_m4        162   49   92  129   0.857   0.268   0.027    0.512    0.562    0.894    1.273    1.126     0.061     0.180     0.261
+
+[1] THE MARGINALS, one block per SELECTOR FAMILY, one statistic per sub-block.
+    Baseline of every lane is the SAME trajectory (cr3_s0/anchor_long ==
+    an_s0/q_exo, bit-identical). The pacer-alone row is the same lane in every
+    family — it is repeated so each family reads as a complete 2x2.
+
+--------------------------------------------------------------------------------------------
+  FAMILY: oracle  (bisect)     selection-alone = an_s0/q_bisect     composed = an_s0/q_bisect_loop
+--------------------------------------------------------------------------------------------
+
+  lane                             rf e1     rf e2     rf e3     rf e4     rf e5
+  pacer-alone  [IN-TAG]           -0.003    -0.102    -0.021    +0.091    -0.060
+  selection-alone                 +0.063    +0.012    +0.012    -0.085    +0.322
+  composed                        +0.074    -0.054    +0.129    +0.285    +0.536
+  sum of the two singles          +0.059    -0.090    -0.010    +0.006    +0.262
+  composed - that sum             +0.015    +0.036    +0.139    +0.279    +0.273
+
+  lane                           L4sh e3   L4sh e4   L4sh e5
+  pacer-alone  [IN-TAG]           +0.061    +0.098    +0.149
+  selection-alone                 +0.000    -0.004    +0.066
+  composed                        +0.274    +0.260    +0.263
+
+  lane                           L2 commit   L3 commit   L4 commit  L4 book n  L4 book prec
+  pacer-alone  [IN-TAG]                +31         +17         -51     5 vs 5    0.4 vs 0.2
+  selection-alone                       +1          +7          +0     7 vs 5  0.714 vs 0.2
+  composed                             +14          +8         -59     7 vs 5  0.429 vs 0.2
+
+  lane                          d L2 recall  d L3 recall  d L4 recall  d L4 true@sup
+  pacer-alone  [IN-TAG]              -0.071       -0.071       +0.000             +0
+  selection-alone                    +0.071       +0.000       +0.034            +28
+  composed                           +0.071       +0.018       +0.012            +10
+
+  lane                           cycles  d cycles   d priced   read as
+  pacer-alone  [IN-TAG]             162       -39     -19.6%   SHORT: +ve conservative, -ve suspect (time cost)
+  selection-alone                   201        +0      +0.0%   lifetime-matched
+  composed                          180       -21     -11.0%   SHORT: +ve conservative, -ve suspect (time cost)
+
+--------------------------------------------------------------------------------------------
+  FAMILY: ENDO    (the judge)     selection-alone = an_s0/q_endo     composed = an_s2/q_endo_loop
+--------------------------------------------------------------------------------------------
+
+  lane                             rf e1     rf e2     rf e3     rf e4     rf e5
+  pacer-alone  [IN-TAG]           -0.003    -0.102    -0.021    +0.091    -0.060
+  selection-alone                 +0.050    +0.033    -0.023    +0.130    +0.716
+  composed                        +0.022    +0.024    +0.110    +0.179    +0.885
+  sum of the two singles          +0.047    -0.069    -0.044    +0.221    +0.656
+  composed - that sum             -0.025    +0.093    +0.154    -0.042    +0.230
+
+  lane                           L4sh e3   L4sh e4   L4sh e5
+  pacer-alone  [IN-TAG]           +0.061    +0.098    +0.149
+  selection-alone                 +0.000    +0.016    +0.080
+  composed                        +0.259    +0.256    +0.292
+
+  lane                           L2 commit   L3 commit   L4 commit  L4 book n  L4 book prec
+  pacer-alone  [IN-TAG]                +31         +17         -51     5 vs 5    0.4 vs 0.2
+  selection-alone                      +12          -6          +0     3 vs 5  0.667 vs 0.2
+  composed                             +28          +2         -54     3 vs 5  0.333 vs 0.2
+
+  lane                          d L2 recall  d L3 recall  d L4 recall  d L4 true@sup
+  pacer-alone  [IN-TAG]              -0.071       -0.071       +0.000             +0
+  selection-alone                    -0.071       -0.054       +0.016            +13
+  composed                           +0.000       -0.036       +0.010             +8
+
+  lane                           cycles  d cycles   d priced   read as
+  pacer-alone  [IN-TAG]             162       -39     -19.6%   SHORT: +ve conservative, -ve suspect (time cost)
+  selection-alone                   201        +0      +0.0%   lifetime-matched
+  composed                          186       -15      -7.7%   SHORT: +ve conservative, -ve suspect (time cost)
+
+--------------------------------------------------------------------------------------------
+  FAMILY: comfort (comp)     selection-alone = an_s0/q_comp     composed = an_s2/q_comp_loop
+--------------------------------------------------------------------------------------------
+
+  lane                             rf e1     rf e2     rf e3     rf e4     rf e5
+  pacer-alone  [IN-TAG]           -0.003    -0.102    -0.021    +0.091    -0.060
+  selection-alone                 +0.085    +0.090    +0.052    +0.097    -0.290
+  composed                        +0.047    +0.018    -0.033    -0.309    -0.601
+  sum of the two singles          +0.082    -0.012    +0.031    +0.188    -0.350
+  composed - that sum             -0.035    +0.030    -0.064    -0.497    -0.251
+
+  lane                           L4sh e3   L4sh e4   L4sh e5
+  pacer-alone  [IN-TAG]           +0.061    +0.098    +0.149
+  selection-alone                 +0.000    -0.002    +0.045
+  composed                        +0.053    -0.019    +0.001
+
+  lane                           L2 commit   L3 commit   L4 commit  L4 book n  L4 book prec
+  pacer-alone  [IN-TAG]                +31         +17         -51     5 vs 5    0.4 vs 0.2
+  selection-alone                      +42          +3          +0     5 vs 5    0.2 vs 0.2
+  composed                             +17         -11         -82     1 vs 5    1.0 vs 0.2
+
+  lane                          d L2 recall  d L3 recall  d L4 recall  d L4 true@sup
+  pacer-alone  [IN-TAG]              -0.071       -0.071       +0.000             +0
+  selection-alone                    +0.000       -0.143       +0.006             +5
+  composed                           -0.071       -0.214       -0.005             -4
+
+  lane                           cycles  d cycles   d priced   read as
+  pacer-alone  [IN-TAG]             162       -39     -19.6%   SHORT: +ve conservative, -ve suspect (time cost)
+  selection-alone                   201        +0      +0.0%   lifetime-matched
+  composed                          130       -71     -35.5%   SHORT: +ve conservative, -ve suspect (time cost)
+
+--------------------------------------------------------------------------------------------
+  FAMILY: novelty (novel)     selection-alone = an_s0/q_novel     composed = an_s2/q_novel_loop
+--------------------------------------------------------------------------------------------
+
+  lane                             rf e1     rf e2     rf e3     rf e4     rf e5
+  pacer-alone  [IN-TAG]           -0.003    -0.102    -0.021    +0.091    -0.060
+  selection-alone                 +0.016    -0.047    -0.119    -0.055    +0.033
+  composed                        +0.033    -0.072    -0.171    -0.224    -0.087
+  sum of the two singles          +0.013    -0.149    -0.141    +0.036    -0.027
+  composed - that sum             +0.020    +0.077    -0.031    -0.261    -0.060
+
+  lane                           L4sh e3   L4sh e4   L4sh e5
+  pacer-alone  [IN-TAG]           +0.061    +0.098    +0.149
+  selection-alone                 +0.000    -0.021    -0.004
+  composed                        +0.080    +0.112    +0.236
+
+  lane                           L2 commit   L3 commit   L4 commit  L4 book n  L4 book prec
+  pacer-alone  [IN-TAG]                +31         +17         -51     5 vs 5    0.4 vs 0.2
+  selection-alone                      +11          +5          +0    13 vs 5  0.154 vs 0.2
+  composed                             +29          +3         -74     2 vs 5    0.5 vs 0.2
+
+  lane                          d L2 recall  d L3 recall  d L4 recall  d L4 true@sup
+  pacer-alone  [IN-TAG]              -0.071       -0.071       +0.000             +0
+  selection-alone                    +0.000       +0.000       +0.021            +17
+  composed                           +0.000       -0.054       -0.001             -1
+
+  lane                           cycles  d cycles   d priced   read as
+  pacer-alone  [IN-TAG]             162       -39     -19.6%   SHORT: +ve conservative, -ve suspect (time cost)
+  selection-alone                   201        +0      +0.0%   lifetime-matched
+  composed                          134       -67     -34.8%   SHORT: +ve conservative, -ve suspect (time cost)
+
+============================================================================================
+[1b] LIKE-FOR-LIKE ATTRIBUTION AT THE DEEP ERAS — every family in one table
+============================================================================================
+  family                lane                         rf e4     rf e5   d cyc  d priced
+  (all families)        pacer-alone  [IN-TAG]       +0.091    -0.060     -39    -19.6%
+  oracle  (bisect)      selection-alone             -0.085    +0.322      +0     +0.0%
+  oracle  (bisect)      composed                    +0.285    +0.536     -21    -11.0%
+  oracle  (bisect)      additive (pacer+seln)       +0.006    +0.262
+  oracle  (bisect)      INTERACTION                 +0.279    +0.273
+
+  ENDO    (the judge)   selection-alone             +0.130    +0.716      +0     +0.0%
+  ENDO    (the judge)   composed                    +0.179    +0.885     -15     -7.7%
+  ENDO    (the judge)   additive (pacer+seln)       +0.221    +0.656
+  ENDO    (the judge)   INTERACTION                 -0.042    +0.230
+
+  comfort (comp)        selection-alone             +0.097    -0.290      +0     +0.0%
+  comfort (comp)        composed                    -0.309    -0.601     -71    -35.5%
+  comfort (comp)        additive (pacer+seln)       +0.188    -0.350
+  comfort (comp)        INTERACTION                 -0.497    -0.251
+
+  novelty (novel)       selection-alone             -0.055    +0.033      +0     +0.0%
+  novelty (novel)       composed                    -0.224    -0.087     -67    -34.8%
+  novelty (novel)       additive (pacer+seln)       +0.036    -0.027
+  novelty (novel)       INTERACTION                 -0.261    -0.060
+
+
+[2] CAVEATS, stated where the numbers are
+    (a) The pacer-alone column is IN-TAG: `an_s1` ran `outer_yield_m4`'s policy
+        under `antiphon.py` with `question_mode` unset and replayed
+        `cr3_s0/outer_yield_m4` at 0.000e+00 over its whole trajectory. The
+        interaction rows are an in-tag reading.
+    (b) INDEPENDENT of (a), and not fixed by any gating run: the two pacer lanes
+        are NOT lifetime-matched. Loop arms leave eras early, so against the
+        schedule baseline the pacer arm runs short. crescendo's construction makes
+        the schedule arm the lifetime ceiling, so a POSITIVE loop delta cannot have
+        been bought with time — but a NEGATIVE one may be a time cost. Read the
+        pacer-alone negatives with that, and the composed positives as conservative.
+        [antiphon-s2] this is now PRINTED per lane per family (the `d cyc` /
+        `d priced` / `read as` block), not left as prose.
+
+wrote ~/Code/research/experiments/rhm/practice/antiphon/pacer_marginal.json

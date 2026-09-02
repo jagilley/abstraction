@@ -1,47 +1,289 @@
-"""antiphon — THE QUESTION PORT: CAN QUESTION-CHOICE BE AN OUTER-LOOP ACTION?
+"""tutti (the unification node) — BOTH CURRENCIES, AND THE SELECTOR, IN ONE LOOP.
 
-FORKED from `../crescendo/crescendo.py` (A3), which is untouched; every addition here is marked
-`# [antiphon]`. The substrate, the ladder, the caps, the reads, the shadow panel, the yoke
-mechanic, the measured floors and every gate are A1's/A2's/A3's. `maestro/policy.py` is NOT
-forked — this round adds no rule, it adds an ACTION — so it is imported exactly as the donor
-imports it.
+FORKED from `../caesura/caesura.py` (E' round 3), which is untouched; every addition here is
+marked `# [tutti]`. IMPORTED, not forked: `../maestro/policy.py` (A1's rule and its measured
+dead zones), `../antiphon/questions.py` (the question port's selectors and its quota — so
+gates Q-1..Q-10 apply here unchanged), and, through the donor, `../native/span/span_net.py`.
+Through the donor: `../intonation/` (delta_perf, the fallible executor), `../tacet/`,
+`../crescendo/` (A3 — the yoke idiom, the L4 frontier, the floors), `../maestro/`,
+`../conductor/`.
 
-WHAT CHANGES, AND IT IS ONE CALL SITE. Every node in this arc has taken its questions from
-outside: block (a) of the cycle loop draws `n_pr` fresh instances of the era's damage cell and
-practises on them. Here the world instead offers a MENU of `question_k` candidates from the SAME
-cell, and the arm's selector picks the `n_pr` it will practise on. THE CELL IS STILL THE
-WORLD'S; only the SELECTION is the arm's. That is the whole port, and it is `run_arm`'s one
-touched line.
+THE QUESTION. The loop has THREE actions — COMMIT level l, ADVANCE the era, SELECT the
+questions — and two currencies can license them:
 
-  1. `question_mode` / `question_k` — THE TWO NEW CFG KEYS. `question_mode=None` (the default)
-     restores the donor's two lines exactly, which is what makes `fidelity_smoke` a real gate.
+  outcome currency    one-level-up `at_support` yield, A1's thermostat (`crescendo`, A3).
+  execution currency  delta-SILENCE, `dsil` = mean b(s) over OPEN slots, read through A1's
+                      `QuietPolicy` unchanged (`caesura`). Live only because `intonation`
+                      un-gated the span head below parity, so the executor is fallible.
 
-  2. THE MENU'S HEAD IS THE DONOR'S OWN DRAW. `pose_questions` receives the head already made,
-     by the donor's own `context_instances` call at the donor's own RNG position, and the tail
-     is drawn on a disjoint seed through `context_instances`'s own `default_rng` (which touches
-     no global stream). So `q_exo` — the arm that takes the head — is BIT-IDENTICAL to
-     `crescendo`'s `anchor_long`, full scale, all 201 cycles. That cross-tag replay is this
-     round's load-bearing gate: it is the proof that the menu machinery, the reader forward over
-     2048 candidates and the value forward over 2048 candidates are inert, and it is free.
+`two_deltas` interpretation (b) asks whether the within-level type law is CURRENCY-scoped
+rather than LEVEL-scoped. `caesura` finding 5 is the only positive evidence for it: single
+seed, un-yoked, and governed by a floor 1.43x TIGHTER than its own in-tag noise. `antiphon`
+adds a third lever whose deep-era value was ~ fully INTERACTION with the pacer. So:
 
-  3. RNG ISOLATION, THREE WAYS (`woodshed`'s `rehrng` discipline). The port's own numpy streams
-     are its own (`qrng`); every torch read it makes is a `no_grad` forward on a dropout-free
-     net, so it draws nothing; and the whole block is wrapped in `_rng_snapshot`/`_rng_restore`
-     anyway, so even a future edit that DOES draw cannot move the shared position. Belt,
-     braces, and a third belt, because the fidelity gate is the round.
+  (1) do the two currencies DIVIDE LABOR or INTERFERE across the loop's actions --
+      (a) delta-silence owns both, (b) yield owns both, (c) the SPLIT: delta-silence paces
+      commit, yield owns era advance (the QUEUE's stated shape, unmeasured)?
+  (2) does `caesura` finding 5 survive RE-INSTANTIATION at a new fork -- a different file,
+      a corrected dead zone, and a world in which the selector is live?
+  (3) does the selector's value depend on WHO PACES -- the interaction, one level up from
+      `antiphon`'s?
 
-  4. THE SELECTION COMPUTE RUNS IN EVERY ARM. The reader parse and the value forward over the
-     whole menu are taken by every arm and USED only by the arms whose rule reads them
-     (`ostinato`'s rung-invariant-comparator discipline), so no arm gets a free read another
-     pays for. Charged in the ledger and reported.
+WHAT THIS FORK ADDS — two things, and no new rule.
 
-  5. DELIVERED DOSE != DESIGN DOSE (`wd_s0`'s lesson, as an instrument rather than a caveat).
-     Every cycle logs, per mined instance, the key the QUESTION designed beside the key the
-     MINER actually recorded, so P(delivered == designed) is measured per era per level in
-     every arm — including the arms that never look at a designed key.
+  1. THE QUESTION PORT, grafted from `antiphon.py`'s `# [antiphon]` block. Each cycle the
+     world offers a MENU of K = 2048 candidate repair episodes drawn from the era's own
+     damage cell, and the arm's SELECTOR picks the n_pr = 64 it practises on. The damage cell
+     at level l is exactly one half of the level-(l+1) span that gets mined, so the selector
+     controls half of every mined key by construction. `exo` = the menu's head in the donor's
+     own RNG order (i.e. NO selection, and a bit-identical replay of the donor); `endo` =
+     half-key novelty vs the arm's own at-support set x a posed-vs-landed delivery ledger --
+     the only selector that can be an outer-loop ACTION. The selection compute (a reader
+     forward and a value forward over all 2048) runs in EVERY arm and is used only by the
+     arms whose rule reads it (`ostinato`'s rung-invariant-comparator discipline).
 
-The selectors themselves live in `questions.py`, out of the Modal app, with their own offline
-gate suite (Q-1..Q-10).
+  2. `loop_commit` — A SECOND POLICY OBJECT that owns the COMMIT while the primary owns the
+     ADVANCE. This is not a new rule: `QuietPolicy` is already a pure object with its own
+     buffer, latch and clock, and the donor already builds a second one (`dsil_det`, the
+     veto's read-only detector) in every arm. The split is that detector promoted from
+     read-only to licensing. Pinned, and each could have gone the other way:
+
+       - PRECEDENCE is the donor's, unchanged: a quiet commit-latch COMMITS the active level
+         if there is one to commit; a quiet advance-latch ADVANCES otherwise. If both are
+         quiet on one cycle, COMMIT wins and the advance is not taken that cycle.
+       - BOTH policies reset on EVERY action and at every era start, not only on their own.
+         The donor's stated reason for resetting is REGIME CHANGE, and a commit installs a
+         table (a regime change for the yield gauge) while an advance changes the damage cell
+         (a regime change for the executor delta-silence hears). Resetting own-action-only
+         would make the split differ from (a)/(b) in TWO things rather than one. The
+         own-action-only rule is a COUNTERFACTUAL readout in the reduction, never an arm.
+       - THE BOOTSTRAP carries over verbatim: delta-silence cannot license the first crossing
+         (slots are minted BY a commit — gate D), so where the commit owner reads `dsil` and
+         the gauge is absent the commit falls back to the arc's default rule (`delta_prov`)
+         and is logged `kind: "bootstrap"`. In the split this produces a configuration that
+         has never run: bootstrapped commits ALONGSIDE yield-driven era advances in era 1.
+       - A cycle whose read is undefined is not a decision point, PER POLICY.
+       - The yoke generalises for free: `YokePolicy` replays COMMIT and ADVANCE cycles
+         separately from a plan, so `loop_commit` is ignored under `kind == "yoke"`.
+       - With `loop_commit` absent, `loop_c is None` and every line is the donor's (gate X-2).
+
+THE FLOOR. `tol_dsil` is re-derived in-tag by A1's own null-ABBA statistic on `ca_s0`'s logged
+`dsil` series (a pure function of `log["panel"]`, so it costs zero GPU): POOLED 0.0046 over the
+donor's four arms, against the 0.00321442 the donor's run was actually governed by. The
+consequence is stated rather than hidden: `tu_d_exo` is then NOT a bit-identical replay of
+`ca_s0/dsil_read` — offline replay of A1's rule at both floors puts the first divergence in the
+quiet verdict at c43 — so that arm is a BOUNDED cross-tag gate over c1..c42 and a genuine
+re-instantiation above it, while `tu_y_exo` (yield-paced, and therefore floor-independent)
+carries the round's full-scale replay gate.
+
+L5 IS CLOSED IN THIS TAG AND CANNOT BE OPENED IN IT. `max_macro_level` also sets the proposal
+head's slot layout, the ranges of the committed/miners dicts, the panel's committable half and
+the shadow audition's matched-size random control, which draws from the arm's own shared RNG
+stream — so an maxl=5 arm diverges from `ca_s0` in the shared stream from the first cycle
+`miners[5]` is non-empty, and BOTH cross-tag replays die. See `DESIGN.md` §8 for the shape of
+the sibling tag.
+
+  --- the donor's own header follows, unedited ---
+
+intonation (E' round 2) — THE delta_perf NODE: a live, FALLIBLE executor, so that
+PERFORMANCE ERROR (execution-vs-intention) exists on this substrate for the first time.
+
+FORKED from `../tacet/tacet.py` (E3'), which is untouched; every addition here is marked
+`# [intonation]`. Through it: `../crescendo/` (A3 — the thermostat, the L4 frontier, the yoke,
+the measured floors), `../maestro/policy.py` (IMPORTED, not forked — this round adds no
+outer-loop rule), and `../native/span/span_net.py` (IMPORTED — the executor primitive, the
+parity gate and gates S-1..S-6 are that module's, unmodified).
+
+THE DIAGNOSIS THIS IS BUILT FROM. Two quantities got one name. The bridge line
+(`ideas/performance_error_is_the_bridge.md`) defines delta as a PERFORMANCE error —
+`e = ||realization - intention||`, benchmarked against a CONTEXT-CONDITIONAL running average of
+itself `b(s)`, and gated on agency: `delta_perf = (b(s) - e) * sigmoid((g - g0)/theta)`. It
+reads execution quality INDEPENDENT OF TASK SUCCESS. The E-track nodes on this stack
+(`audiation`, `tacet`) instead used `delta = grade - v(s)`, an OUTCOME surprise.
+`../../../mjc/two_clocks/` measured that credit factorizes into precision (which experiences —
+delta_perf's content) x value (toward what end — the grade's content) and that sharing one
+channel is DESTRUCTIVE interference; gating mining on outcome-delta is the shared-channel case.
+
+WHY RHM HAS NEVER HAD delta_perf. The A-track stack is routing-only: a macro is executed by
+`macros.apply_any`, an exact max-sum DP over `T[l-1]` plus per-block infill. Intention and
+realization COINCIDE, so `e == 0` identically and the quantity is zero by construction.
+`../native/span/` built the live executor (`SpanHead`, conditioned on the macro slot, emitting
+the span's level-1 features) and gated it SHUT behind a held-out exact-match parity gate at
+tau = 0.95 — i.e. it is allowed to fire only where it is already ~never wrong.
+
+WHAT THIS NODE CHANGES — one thing. The head fires BELOW parity (`span_tau_fire`, default
+0.50, with `span_min_hold` untouched), so realization is FALLIBLE and `e` is a live quantity:
+
+    intention   what `apply_any` would write for this slot command on this observation.
+                A FREE, EXACT reference: the head's own firing path already computes the
+                trunk's block logits, and the DP is a pure function of them (`dp_features`).
+                No learned forward model is needed anywhere.
+    realization what the head actually emitted.
+    e           1 - (blocks matching) / span, per executed row.  [graded Hamming; the
+                exact-match BIT is `e == 0` and is logged beside it]
+    b(s)        per-macro-SLOT EWMA of e — the slot is the syllable, i.e. Gadagkar's
+                per-context benchmark. NEVER a global scalar (S13(b): the scalar form
+                fixates worse than raw error).
+    g           agency = (the head's emission BECAME the realization) x (the arity gap:
+                the fraction of the span where the realization differs from the
+                SLOT-FREE per-block argmax, i.e. what the macro command explains).
+                Graded, per S13(a). g == 0 identically on base moves and on DP-executed
+                macros: those are this substrate's PLAYBACK condition.
+    delta_perf  (b(s) - e) * sigmoid((g - g0)/theta), the gate CENTERED (sigma(0) = 0.5
+                leaks half the channel — S13(a)'s correction), g0/theta calibrated
+                self-supervised from the arm's own active/passive g medians.
+
+THE READOUT THAT HAS NEVER EXISTED HERE: the 2x2, executed-as-intended x solved, per
+trajectory. Outcome-delta gives the well-motivated failure and the ill-motivated success
+maximal credit with opposite signs, and mining keys on the outcome column — so the current
+rule mines the lucky success and discards the honest failure. Every arm in this tag tabulates
+that 2x2: counts, what was mined from each cell, what pi mass formed, and the era table.
+
+THE TWO CONSUMPTIONS (each against its own control, and never sharing a channel with the
+grade — `two_clocks`' separate-channels law is a design constraint here):
+
+  (i)  delta_perf as a PER-SAMPLE GAIN on the span head's own plasticity (the bridge's
+       efferent form, `w = exp(-delta/tau_w)`, budget-matched by running-mean normalisation —
+       `plasticity_gain`'s canonical form) against UNIFORM (ungated) head training and against
+       a RAW-`e` gain (S13(b)'s hygiene comparison).
+  (ii) delta_perf as a GATE on what gets mined and what trains pi, against grade-only
+       selection (the current rule) and against the OUTCOME-delta gate `tacet` ran.
+
+ARMS (single seed; every arm is a clock YOKE of `perf_log`, so all six are lifetime-,
+era-boundary- and commit-cycle-identical and differ in exactly one knob — `tacet`'s reasoning,
+unchanged; the pacing half is bought back offline by the thermostat replay in the reduction):
+
+    perf_log     span head firing below parity; delta_perf METERED AND CONSUMED BY NOTHING.
+                 The instrument arm, the uniform-plasticity control for (i), the grade-only
+                 baseline for (ii), and the clock source every other arm replays.
+    perf_gain    (i) delta_perf gain on the head's per-sample plasticity.
+    perf_raw     (i) raw-`e` gain, no benchmark, no agency gate — the hygiene control.
+    perf_gate    (ii) delta_perf gate on mining and on pi, at `tacet`'s matched volume.
+    outcome_gate (ii) `tacet`'s `gate_delta_hi` rule (delta = grade - v) at the same volume,
+                 on this same live-executor substrate — the matched-volume CONTENT control.
+
+PRICING, SAID OUT LOUD. (a) The intention reference is an INSTRUMENT, not part of the agent's
+execution: it consults the committed table on the head's firing path, so `native/` finding 5's
+table-ablation claim is NOT made in a delta-metering arm, and `blk_ref` is tallied separately
+and never folded into the ledger. (b) Head misfires are NOT priced into `t` — the ledger is the
+arc's cross-tag comparable instrument and making it arm-dependent would confound "the gate
+changed what was learned" with "the gate changed what things cost"; instead `n_misfire` and the
+counterfactual `t_misfire = n_misfire * c_mat` are printed BESIDE the ledger, never in it.
+(c) delta metering draws no RNG on the shared stream and costs no grounding.
+
+FIDELITY. With every `# [intonation]` knob off, this file replays `tacet.py` in process at
+0.000e+00 (gate G-F), and `tacet.py` in turn replays `crescendo.py`. The span head, its parity
+gate and its executor are `span_net`'s, imported: gates S-1..S-6 are re-run here unchanged
+(`span_selfcheck` in `../native/span/span.py` is the record; gate I-0 asserts the imports are
+that module's). A `PerfExecutor` with `perf_meter=False` and `span_tau_fire=None` IS
+`SN.SpanExecutor`.
+
+DONOR DOCSTRING FOLLOWS.
+
+tacet (E3') — THE delta-GATE: does choosing what NOT to learn from change what is learned?
+
+FORKED from `../crescendo/crescendo.py` (A3), which is untouched; every addition here is
+marked `# [tacet]`. The substrate, the ladder, the reads, the shadow panel, the yoke mechanic,
+the measured floors, `commit_max_level` and every gate are A1's, A2's and A3's. `policy.py` is
+NOT forked — this round adds no outer-loop rule; it IMPORTS A2's module, which carries A1's
+thermostat byte-for-byte. `crescendo.py` is imported only by the G-F smoke, as the donor.
+
+THE QUESTION (ROADMAP Sec 7.1.3, first shape E3'; QUEUE "Track E'"). The current learning rule
+is GRADE-ONLY SELECTION: mining consumes the agent's own chosen answers on the instances it
+solved, and pi is supervised on every surviving trajectory that solved (`train_on="solved"`).
+Nothing else about the datum is read. `audiation` (E1/E1b) measured that the per-datum signal
+an in-loop gate should consume is alive at DECISION TIME and needs no forward model: delta =
+grade - v(s), the residual of the value head's own outcome forecast (pre-update readout decodes
+the value-error target at 0.293), and the DELIBERATION STATE, the unchosen candidates' own
+value scores (0.133), against <= 0.05 for every update-derived source. So this round gates on
+those two scalars and on nothing else. There is no forward model anywhere in this file.
+
+WHAT CHANGES, AND IT IS ONE FUNCTION.
+
+  1. THE GATE (`gate_select`). Per cycle the practice beam returns B = `n_pr` instances x
+     W = `pr_width` surviving tips. Two consumption sites are gated, at the unit each one
+     actually consumes:
+       * MINING consumes `out["x"]` — the beam's own chosen answer per instance — restricted
+         to the instances it SOLVED, then randomly subsampled to `mine_cap`. The gate replaces
+         the random subsample with a delta-ranked one AT THE SAME CAP, so mining volume is
+         EXACTLY unchanged and only the content moves. (Measured on `cr3_s0/outer_yield_m4`:
+         ~16 instances solve per cycle against a cap of 8, and the cap binds on 96% of cycles,
+         so the mining channel is a 50%-selective, exactly-volume-matched content choice on
+         almost every cycle of the run. Stated because it is a design fact and not an
+         omission: on that channel the RANDOM gate is the current rule re-drawn — same rate,
+         different draw — so `gate_random` is the honest floor for "a gate that selects at
+         this rate on no signal", in both channels, rather than a copy of the baseline.)
+       * pi SUPERVISION consumes every surviving tip that solved, all `budget` steps of it.
+         The gate keeps `gate_frac` of those tips, ranked by the same scalar. Volume is matched
+         ACROSS gate arms by construction (the same K every cycle), and `gate_random` is the
+         volume control against the ungated baseline.
+     The VALUE BUFFER is deliberately NOT gated. It is the source of the very forecast delta is
+     the residual of; gating its diet would make the gate self-referential and would confound
+     "the gate changed what was learned" with "the gate changed the gauge".
+
+  2. THE SCALARS ARE ALREADY ON THE WIRE, and cost nothing. `beam_moves`/`beam_moves_prop`
+     already compute `final` — the value head's score of every surviving tip — to pick the
+     answer. This fork returns it (`out["tip_val"]`, `out["best"]`); no extra forward pass, no
+     extra grounding charged, no RNG touched. From it:
+         delta_tip[i,w] = succ[i,w] - sigmoid(final[i,w])       (per trajectory)
+         delta_ans[i]   = ps[i]    - sigmoid(final[i,best_i])   (per instance, the mined unit)
+         margin[i]      = sigmoid(top1) - sigmoid(top2) over instance i's W tip scores
+                          — the deliberation state, as a scalar: how decided the final
+                            selection was, i.e. how much the unchosen candidates' own value
+                            scores disagreed with the chosen one.
+     Both are materialised BEFORE the grade is applied, which is the surviving "timing" claim
+     of ROADMAP Sec 4.2 in the scalar form Sec 7.1.2 says the value head already satisfies.
+
+  3. NO GRADIENT-BUDGET MATCHING IS NEEDED, and that is a property of the substrate, not a
+     concession. `prop_train` takes a FIXED `prop_steps` gradient steps per cycle sampling from
+     a fixed-capacity replay buffer, so a gate changes the buffer's DIET, never the number of
+     updates; mining takes no gradients at all; the value head is ungated. `audiation`'s
+     per-datum arm had to match Sigma-lr to its anchor; here there is nothing to match.
+
+  4. THE ARMS ARE PACING-MATCHED BY THE YOKE. The outer loop's actions are absorbing, so an arm
+     whose gate changes what pi learns would also drift in WHEN it commits and advances, and
+     the deep-era comparison would conflate the gate's content with the gate's pacing. Every
+     gate arm is therefore a CLOCK YOKE of the ungated baseline (`crescendo`'s `ceiling_m3`
+     mechanic): it replays `outer_yield_m4`'s realised commit and advance cycles, so it is
+     lifetime-identical, era-boundary-identical and commit-cycle-identical, and differs from
+     the baseline in exactly one knob — what the gate let it learn from. The pacing question is
+     then answered OFFLINE at no extra arm: A1's thermostat is replayed on each arm's own
+     logged L4 at-support series (`phase0_l4.py`'s machinery, reused by the reduction), which
+     says when each arm WOULD have committed had it been driving.
+
+  5. THE ARMS. Six, all routing-only, all on the anchor's stream, all at `max_macro_level=4`,
+     all sharing `crescendo`'s Phase-0-sized ladder and caps:
+       outer_yield_m4   A3's treatment, VERBATIM (gate off)      the baseline == GRADE-ONLY
+                                                                 SELECTION, the clock source,
+                                                                 and the full-life cross-tag
+                                                                 replay gate against cr3_s0
+       gate_delta_hi    yoke; keep the HIGHEST-delta successes   "learn from the surprising"
+       gate_delta_lo    yoke; keep the LOWEST-delta successes    "learn from the expected"
+       gate_delib       yoke; keep the LOWEST-margin instances   the deliberation-state gate:
+                                                                 "learn from the contested"
+       gate_random      yoke; keep a random K at matched size    THE VOLUME CONTROL
+       gate_all         yoke; `mine_cap=0` + `prop_train_on=     LEARN FROM EVERYTHING
+                        "tips"`                                  (see below)
+     Both delta directions are run because ROADMAP Sec 1.2 claim 3 / Sec 4.3's trust-vs-habit
+     framing makes either sign interesting and an arm pair is cheaper than an argument.
+
+  6. WHAT "LEARN FROM EVERYTHING" MEANS HERE, stated because it is a design call. Mining is
+     only DEFINED over solved configurations — "a solved config is a valid r* derivation, so
+     the target is well defined" (the substrate's own comment on `finetune_generator`); mining
+     an unsolved answer would feed the miner a parse of something that is not a derivation, so
+     "everything" there would not be learning from everything, it would be learning from
+     garbage. So `gate_all` takes the widest well-defined diet on each channel: mining drops
+     the `mine_cap` subsample entirely (every solved answer, not 8 of them), and pi is
+     supervised on EVERY surviving tip regardless of grade (`prop_train_on="tips"`, an existing
+     donor knob — the beam's value head selected those tips, so they are the widest set the
+     donor's own machinery admits). Both are donor knobs; `gate_all` adds no new code.
+
+  7. FORK DISCIPLINE. With `gate_mode=None` (the default everywhere) every addition is inert:
+     the two new `out` keys are unread, `prop_pairs` takes its donor path, and the mining
+     subsample draws the identical `rng.permutation` from the identical stream. `fidelity_smoke`
+     asserts the in-process replay of `crescendo.py` at 0.000e+00; `preflight` asserts a pure
+     yoke with the gate off is bit-identical to the baseline; and the reduction asserts
+     `outer_yield_m4` replays `cr3_s0/outer_yield_m4` over its WHOLE life.
 
 DONOR DOCSTRING FOLLOWS.
 
@@ -425,7 +667,7 @@ Run from experiments/:
 (ratchet's own run lines: `rhm/practice/ratchet/ratchet.py::ratchet`.)
 """
 
-import collections     # [antiphon] the port's key/half-key histograms
+import collections     # [tutti] the port's key/half-key histograms
 import copy
 import inspect          # [conductor] gate N-1 reads the endo read's own source
 import json
@@ -446,13 +688,11 @@ from rhm.rhm_sculpt_latent import _build_rich_controller
 from rhm.practice.crystallize.units import (
     apply_move, build_move_set, corrupt_hier, grade, on_grammar_rate, oracle_rollout)
 from rhm.practice.ratchet import macros as MC
-# [antiphon] the question port's selectors and its difficulty quota, out of the Modal app so
-# every rule is auditable and gate-able with no GPU (`conductor/policy.py`'s convention).
+# [tutti] the QUESTION PORT's selectors and its difficulty quota, IMPORTED from
+# `antiphon/questions.py` and not forked -- exactly as `maestro/policy.py` is imported
+# and not forked. The selector rule did not change; the loop did. Gates Q-1..Q-10 in
+# `questions.py::question_gate` therefore apply here unchanged and are re-run for this node.
 from rhm.practice.antiphon import questions as QS
-# [trap] the trap channel — the distractor bank, the substitution, and the trust weights, out
-# of the Modal app so every rule is auditable and gate-able with no GPU (`questions.py`'s
-# convention). With `trap_frac` unset every line it owns is inert.
-from rhm.practice.antiphon.trap import trap_menu as TM
 from rhm.practice.native.prop import prop_net as PN
 from rhm.practice.native.span import span_net as SN
 # [conductor] the outer loop lives outside the Modal app, so every rule is auditable and
@@ -461,9 +701,9 @@ from rhm.practice.native.span import span_net as SN
 from rhm.practice.maestro import policy as PO
 
 
-# [antiphon] a new app and a new remote root; the donors' tags are never written to.
-app = modal.App("rhm-practice-antiphon", image=image)
-REMOTE = "rhm_practice_antiphon"
+# [tutti] a new app and a new remote root; the donors' tags are never written to.
+app = modal.App("rhm-practice-tutti", image=image)          # [tutti]
+REMOTE = "rhm_practice_tutti"                                # [tutti]
 
 # [spiral] the depth-6 substrate, exactly as `tall/` measured it admissible. m=2 is NOT a
 # choice: m>=3 flattens the depth ladder (gradient 1.06-1.30x against m=2's 3.25x) and walls
@@ -676,12 +916,11 @@ def context_instances(rules, ctx, n, s, depth, v, m, seed, require_broken=True,
 
 
 # --------------------------------------------------------------------------- #
-# [antiphon] THE QUESTION PORT — the menu, and the arm's selection from it
+# [tutti] THE QUESTION PORT — the menu, and the arm's selection from it
 # --------------------------------------------------------------------------- #
 
 def pose_questions(mode, *, rules, era, cfg, s, depth, v, m, cyc, head, shared, value_net,
-                   controller, device, miners, operative, maxl, qledger, n_pr, k_menu,
-                   tstate=None, trap_frac=None):
+                   controller, device, miners, operative, maxl, qledger, n_pr, k_menu):
     """Build the cycle's MENU and let the arm's selector pick its `n_pr` questions.
 
     `head` is the donor's own draw, already made, at the donor's own RNG position — so the
@@ -706,39 +945,6 @@ def pose_questions(mode, *, rules, era, cfg, s, depth, v, m, cyc, head, shared, 
         c_all = np.concatenate([c_h, c_t])
     else:
         r_all, x_all, c_all = r_h, x_h, c_h
-
-    # --- [trap] THE TRAP CHANNEL. A fraction `trap_frac` of the menu's slots — chosen uniformly
-    #     over ALL K, the head's `n_pr` included, so the arm that selects nothing consumes them
-    #     at exactly the menu rate — are substituted with candidates whose CLEAN HALF parses to
-    #     a key that is no true row. Such an answer cannot contribute a true key at the target
-    #     level, ever (`trap/DESIGN.md` F4, proved on the DGP's own tables). Volume is preserved;
-    #     the substitution is d*-orthogonal by construction and is measured as such. With
-    #     `trap_frac` unset nothing below runs and `is_d` is all-False.
-    _tgeom = QS.target_geometry(era["level"], era["node"], maxl, s)
-    is_d = np.zeros(len(r_all), bool)
-    trow = None
-    if trap_frac and tstate is not None and TM.trap_applies(_tgeom, era["level"]):
-        key = f"{era['level']}:{era['node']}"
-        bank = tstate["bank"].get(key)
-        if bank is None:
-            tflat = {tuple(int(z) for z in r)
-                     for r in shared["truth"][TM.clean_level(era["level"])]["flat"]}
-            need = int(np.ceil(float(trap_frac) * k_menu)) * int(cfg.get("trap_bank_mult") or 4)
-
-            def _draw(n, attempt):
-                return context_instances(
-                    rules, era_ctx(era), n, s, depth, v, m,
-                    seed=int(cfg["seed"]) + 700_000_000 + 10_000 * int(era["level"])
-                         + 137 * int(attempt), with_clean=True)
-
-            bank = TM.build_bank(
-                _draw, tflat, _tgeom,
-                lambda c: MC.exact_features(c, shared["inverse_maps"][-1], v, s),
-                need, spread=(cfg.get("trap_spread") or "uniform"), rng=tstate["rng"])
-            tstate["bank"][key] = bank
-            print(f"[trap]   era {key}: bank {bank.state() if bank else None}", flush=True)
-        r_all, x_all, c_all, is_d, trow = TM.install_trap(
-            r_all, x_all, c_all, frac=trap_frac, bank=bank, rng=tstate["rng"], n_pr=n_pr)
 
     # the difficulty alphabet, and THE QUOTA — the donor's own realised d* mix, which every
     # pinned arm must reproduce bin-for-bin. `nearest_derivation_cost` is the same exact DP the
@@ -782,14 +988,6 @@ def pose_questions(mode, *, rules, era, cfg, s, depth, v, m, cyc, head, shared, 
                if off else collections.Counter())
         agent = {"halves": [tuple(int(z) for z in h) for h in halves],
                  "covered": dict(cov), "value": vs, "ledger": qledger}
-        if mode == "trust":
-            # [trap] the arm's OWN use record over its OWN committed rows, one level below the
-            # clean half — the level where it has both a table and a beam selection history.
-            sub = tgt - 2
-            lw = operative(sub) if sub >= 1 else None
-            agent["subw"] = (TM.trust_weights(lw["flat"],
-                                              (tstate or {}).get("use", {}).get(str(sub)))
-                             if lw is not None else {})
 
     sel = QS.select(mode, n_pr, d=d, quota=quota, oracle=oracle, agent=agent)
     qok, got = QS.check_quota(d, sel, quota)
@@ -816,16 +1014,9 @@ def pose_questions(mode, *, rules, era, cfg, s, depth, v, m, cyc, head, shared, 
                                      if k in truth_flat and k not in banked})),
         "n_distinct_halves": int(len({tuple(int(z) for z in h) for h in halves[sel]})),
         "at_support_before": int(len(banked)),
-        # [trap] the trap's own dose instrument, in EVERY arm: what the world offered and what
-        # this selector took. Null when the trap is off.
-        "trap": (None if trow is None else {
-            **trow, "take": float(is_d[sel].mean()),
-            "menu_frac": float(is_d.mean()),
-            "d_mean_native": float(np.mean(np.asarray(d)[~is_d])) if (~is_d).any() else None,
-            "d_mean_trap": float(np.mean(np.asarray(d)[is_d])) if is_d.any() else None}),
     }
-    return (r_all[sel], x_all[sel], c_all[sel], designed[sel], halves[sel], qrow,
-            is_d[sel])
+    return (r_all[sel], x_all[sel], c_all[sel], designed[sel], halves[sel], qrow)
+
 
 
 # --------------------------------------------------------------------------- #
@@ -855,6 +1046,437 @@ def fit_width(n_moves, budget, g_budget):
 
 
 # --------------------------------------------------------------------------- #
+# [intonation] THE FALLIBLE EXECUTOR AND delta_perf
+# --------------------------------------------------------------------------- #
+#
+# `SN.SpanExecutor` is imported, not copied; `PerfExecutor` SUBCLASSES it, so `native/span/` is
+# untouched and gates S-1..S-6 apply to the parent unchanged. Two things are added and nothing
+# is removed:
+#
+#   (1) THE FIRING THRESHOLD IS LOWERED, NOT REMOVED. `span_tau_fire` (0.50) replaces
+#       `span_tau` (0.95) in the OPEN decision only; `span_min_hold` is untouched, the parity
+#       series is still measured and logged at full resolution, and the reduction can read off
+#       what the tau = 0.95 gate would have done. The point is a FALLIBLE executor, not a
+#       vandalised one: `native/` finding 4 measured L3 heads ending at exact-match parity
+#       0.76-0.94, i.e. wrong on 6-24% of calls — real error, and the majority of executions
+#       still correct — while `native/` finding 5's UNTRAINED-head control (parity ~0) pays
+#       +0.40-0.51 e, which is what vandalism looks like. 0.50 sits between them.
+#
+#   (2) THE METER. On every row the head actually executes, all four bridge quantities are
+#       computed from tensors the firing path already has:
+#
+#         intention   tgt  = SN.dp_features(logits, move, s)   -- what `apply_any` writes.
+#                     `trunk` returns (pooled, logits) and the donor discards `logits`; the DP
+#                     is a pure function of them, so the EXACT reference is free. This is why
+#                     no learned forward model appears anywhere in this node.
+#         realization got  = head.emit(...)                    -- what the head wrote.
+#         e           1 - mean(got == tgt) over the span's blocks (graded Hamming; the
+#                     alphabet is unordered categorical, so Hamming is the metric. The
+#                     exact-match BIT the parity gate uses is `e == 0`, logged beside it).
+#         g           a_exec * a_gap, both in [0, 1]:
+#                       a_exec  1 iff the head's emission became the realization (an efference
+#                               copy exists for THIS output). 0 on base moves and on
+#                               DP-executed macros -- this substrate's PLAYBACK condition,
+#                               identical in every other respect.
+#                       a_gap   mean(got != argmax(logits over the span)) -- the arity gap:
+#                               how much the SLOT COMMAND explains over the slot-free
+#                               per-block prediction. Zero when the macro call bought nothing
+#                               the base infill would not have written, which is the "an
+#                               efference copy of doing nothing grants no agency" case
+#                               (S13(a): agency came out GRADED, not binary).
+#         delta       (b(slot) - e) * sigmoid((g - g0)/theta), the gate CENTERED.
+#
+#       `b(slot)` is a per-macro-slot EWMA of e at rate `perf_alpha` -- Gadagkar's
+#       per-syllable benchmark, and NOT the global scalar (S13(b) measured the scalar form
+#       fixating worse than raw error). It is read BEFORE it is updated, so delta is never a
+#       residual against a benchmark that has already seen this row.
+#
+# Everything here is unpriced instrument: no grounding is charged, and the executor's own
+# dedicated numpy stream is drawn from exactly once per macro call, as in the donor, so the
+# shared per-arm torch stream is untouched and the twin gate stays licensed.
+
+
+def perf_gate_sigma(g, g0, theta):
+    """The CENTERED agency gate. sigma(0) = 0.5, so the literal sigma(g/theta) leaks half the
+    channel when g = 0 (S13(a)'s correction, measured on the playback control)."""
+    return 1.0 / (1.0 + np.exp(-np.clip((g - g0) / max(theta, 1e-6), -30.0, 30.0)))
+
+
+class PerfMeter:
+    """Per-slot benchmark b(s), the gate's calibration, and the per-cycle accumulators.
+
+    Lives beside the executor rather than in it so that a yoked arm's meter state is a plain
+    picklable object the log can carry, and so the reduction can recompute delta offline at a
+    different `perf_alpha` from the per-cycle sums (S13(c): the benchmark timescale has an
+    INTERIOR optimum, above sampling jitter and below competence drift, and this substrate has
+    never measured where that is -- so the series that lets it be read off is logged rather
+    than the choice being defended)."""
+
+    def __init__(self, alpha=0.05, g0=None, theta=None, calib_min=2048):
+        self.alpha = float(alpha)
+        self.bench = {}                 # slot_key -> b(s)
+        self.g0, self.theta = g0, theta
+        self.calib_min = int(calib_min)
+        self.cal_active, self.cal_passive = [], []
+        self.calibrated = g0 is not None and theta is not None
+        self.cal_event = None
+        self.reset_cycle()
+
+    def reset_cycle(self):
+        self.acc = {}                   # slot_key -> dict of sums
+        self.rows = []                  # bounded per-row sample, for the record
+        self.cell = {}                  # 2x2 counters, filled by the runner
+        self.n_call = 0
+
+    def _cell(self, key):
+        if key not in self.acc:
+            self.acc[key] = {"n": 0, "n_fire": 0, "sum_e": 0.0, "sum_e2": 0.0, "sum_g": 0.0,
+                             "sum_d": 0.0, "sum_bme": 0.0, "sum_b": 0.0, "n_exact": 0,
+                             "sum_w": 0.0}
+        return self.acc[key]
+
+    def calibrate(self, force=False):
+        """g0 = midpoint of the ACTIVE and PASSIVE g medians, theta = their gap / 8 --
+        `agency_gate`'s protocol verbatim, self-supervised, no test-set tuning. On this
+        substrate the passive class is exactly g == 0 (a base move, or a macro the DP
+        executed), so the estimate reduces to g0 = median(g_active)/2."""
+        if self.calibrated and not force:
+            return False
+        if len(self.cal_active) < self.calib_min:
+            return False
+        m_a = float(np.median(np.asarray(self.cal_active, dtype=np.float64)))
+        m_p = (float(np.median(np.asarray(self.cal_passive, dtype=np.float64)))
+               if self.cal_passive else 0.0)
+        gap = abs(m_a - m_p)
+        if gap <= 1e-9:                 # degenerate: the head never leaves the base prediction
+            self.g0, self.theta = 0.5 * m_a, max(m_a / 8.0, 1e-3)
+        else:
+            self.g0, self.theta = 0.5 * (m_a + m_p), gap / 8.0
+        self.calibrated = True
+        self.cal_event = {"m_active": m_a, "m_passive": m_p, "g0": self.g0,
+                          "theta": self.theta, "n_active": len(self.cal_active),
+                          "n_passive": len(self.cal_passive), "degenerate": gap <= 1e-9}
+        self.cal_active, self.cal_passive = [], []
+        return True
+
+    def score(self, key, e, g, fired):
+        """e, g: 1-D float arrays over the rows of ONE execution. Returns (delta, b_used).
+
+        Before calibration the gate is held at 1.0 and delta is (b - e) ungated, which is
+        logged as such -- the warmup is short (one calibration draw) and pretending to a gate
+        that has not been calibrated would be the leak the centering exists to close."""
+        b0 = self.bench.get(key)
+        if b0 is None:
+            b0 = float(np.mean(e))      # a slot's first sight sets its own benchmark: delta ~ 0
+            self.bench[key] = b0
+        gate = (perf_gate_sigma(g, self.g0, self.theta) if self.calibrated
+                else np.ones_like(g))
+        delta = (b0 - e) * gate
+        self.bench[key] = (1.0 - self.alpha) * b0 + self.alpha * float(np.mean(e))
+        if not self.calibrated:
+            (self.cal_active if fired else self.cal_passive).extend(
+                [float(q) for q in g[:512]])
+        c = self._cell(key)
+        c["n"] += int(e.shape[0])
+        c["n_fire"] += int(e.shape[0]) if fired else 0
+        c["sum_e"] += float(e.sum()); c["sum_e2"] += float((e * e).sum())
+        c["sum_g"] += float(g.sum()); c["sum_d"] += float(delta.sum())
+        c["sum_bme"] += float(((b0 - e)).sum()); c["sum_b"] += b0 * int(e.shape[0])
+        c["n_exact"] += int((e <= 1e-12).sum())
+        self.n_call += 1
+        return delta, b0
+
+    def sample_rows(self, key, e, g, delta, b0, fired, cap, rng):
+        """A bounded random subsample of the raw per-row quantities, so the reduction can
+        recompute delta at any benchmark timescale and any gate calibration off the record."""
+        if len(self.rows) >= cap:
+            return
+        n = int(e.shape[0])
+        take = min(4, n, cap - len(self.rows))
+        idx = rng.integers(0, n, size=take) if n > take else np.arange(take)
+        for i in idx:
+            self.rows.append([key, int(fired), round(float(e[i]), 5), round(float(g[i]), 5),
+                              round(float(delta[i]), 5), round(float(b0), 5)])
+
+
+def _perf_executor(base_cls):
+    """Built lazily so the module imports without torch (the donor's own idiom for the head)."""
+    import torch
+
+    class PerfExecutor(base_cls):
+        """`SN.SpanExecutor` plus the meter. With `meter=None` and `tau_fire=None` this class
+        IS its parent: `apply` takes the parent's branch on every call (gate I-1)."""
+
+        kind = "perf"
+
+        def __init__(self, *a, meter=None, row_cap=192, row_seed=0, **kw):
+            super().__init__(*a, **kw)
+            self.meter = meter
+            self.row_cap = int(row_cap)
+            self.rrng = np.random.default_rng(int(row_seed))
+            self.last = None            # per-row (delta, e, exact) of the most recent apply
+            self.cred = {}              # slot_key -> per-row credit, in lockstep with `buf`
+            self.counts.update(self._extra())
+
+        @staticmethod
+        def _extra():
+            # `blk_ref` is what the INTENTION REFERENCE consumed and is never folded into `t`;
+            # `n_misfire` is the counterfactual price of a botched span, tallied beside the
+            # ledger rather than in it (see the module header, PRICING).
+            return {"blk_ref": 0, "n_misfire": 0, "n_fired": 0}
+
+        def reset(self):
+            super().reset()
+            self.counts.update(self._extra())
+
+        # -- the credit-carrying buffer ------------------------------------------------ #
+        def _store(self, obs, key, cred=None):
+            """The parent's `_store`, with a per-row credit column kept in lockstep. The rng
+            draw, the bijective held-out code and the caps are the parent's exactly."""
+            n = obs.shape[0]
+            take = min(self.per_call, n)
+            idx = torch.from_numpy(self.rng.permutation(n)[:take]).to(obs.device)
+            rows = obs.index_select(0, idx).detach().cpu()
+            code = ((rows + 1) * self.powers).sum(1) % 1000003
+            is_hold = (code * 48271) % 100 < int(round(self.hold_frac * 100))
+            if cred is None:
+                cv = torch.full((take,), float("nan"))
+            else:
+                cv = torch.as_tensor(np.asarray(cred, dtype=np.float32))[idx.cpu()]
+            for tgt, cap, sel, cbuf in ((self.hold, self.hold_cap, is_hold, None),
+                                        (self.buf, self.cap, ~is_hold, self.cred)):
+                part = rows[sel]
+                if part.shape[0] == 0:
+                    continue
+                tgt[key] = part if key not in tgt else torch.cat([tgt[key], part])[-cap:]
+                if cbuf is not None:
+                    cpart = cv[sel]
+                    cbuf[key] = cpart if key not in cbuf else \
+                        torch.cat([cbuf[key], cpart])[-cap:]
+
+        # -- execution ----------------------------------------------------------------- #
+        def _fire_only(self, x, obs, pos, move, info, canon, n0, chunk):
+            """The head executes, nothing is metered — the parent's own firing path, with the
+            capture kept (a probe's contexts are still contexts the head will be tested on, and
+            excluding them would change the held-out split the parity gate reads)."""
+            if self.capture:
+                self._store(obs, SN.slot_key(move["level"], move["node"]), None)
+            span = int(move["span"])
+            outs = []
+            with torch.no_grad():
+                for i in range(0, n0, chunk):
+                    ob = obs[i:i + chunk]
+                    pooled, _ = SN.trunk(self.core, ob)
+                    sid = torch.full((ob.shape[0],), info["id"], dtype=torch.long,
+                                     device=x.device)
+                    outs.append(self.head.emit(pooled, move["blk0"], span, sid))
+            got = torch.cat(outs) if len(outs) > 1 else outs[0]
+            self.counts["mat_head"] += n0
+            self.counts["blk_head"] += n0
+            self.last = None
+            new = x.clone()
+            new.scatter_(1, pos, canon[got].reshape(n0, -1))
+            return new
+
+        def apply(self, generator, x, move, rules_t, canon, depth, v, m, s, chunk=16384):
+            if self.meter is None:
+                return super().apply(generator, x, move, rules_t, canon, depth, v, m, s,
+                                     chunk=chunk)
+            n0 = x.shape[0]
+            if move.get("kind") != "macro":
+                self.last = None
+                return super(SN.SpanExecutor, self).apply(generator, x, move, rules_t, canon,
+                                                          depth, v, m, s)
+            key = SN.slot_key(move["level"], move["node"])
+            info = self.slots.get(key)
+            pos = SN.span_positions(move, n0, s, x.device)
+            obs = x.clone().scatter_(1, pos, torch.full_like(pos, -1))
+            fired = bool(self.fire and info is not None and info.get("open"))
+            # THE BENCHMARK IS OVER THE AGENT'S OWN PERFORMANCES, not over its instruments.
+            # `_ENTRY_REC["phase"]` already splits the priced practice + metering beams
+            # ("beam") from every unpriced probe and audition ("probe"), and the probes run on
+            # a different instance distribution — a context-conditional b(s) fed from them
+            # would be benchmarking the bird against someone else's song. The head still FIRES
+            # in probes (the arm's behaviour must not depend on who is watching); only the
+            # meter is off there.
+            metering = _ENTRY_REC.get("phase") == "beam"
+            if fired and not metering:
+                return self._fire_only(x, obs, pos, move, info, canon, n0, chunk)
+            if not fired:
+                # PLAYBACK: the DP realizes the move, so nothing the head emitted became real.
+                # No efference copy for the head's output -> g == 0 -> the centered gate closes
+                # by mechanism rather than by a hand-written exclusion. The head's would-be
+                # error on these contexts is not left unmeasured: the parity read computes it
+                # for every held-out row of every slot, open or closed, once per cycle.
+                if self.capture and info is not None:
+                    self._store(obs, key, None)
+                self.last = None
+                return super(SN.SpanExecutor, self).apply(generator, x, move, rules_t, canon,
+                                                          depth, v, m, s)
+            span, b0_ = int(move["span"]), move["blk0"]
+            got_l, tgt_l, base_l = [], [], []
+            with torch.no_grad():
+                for i in range(0, n0, chunk):
+                    ob = obs[i:i + chunk]
+                    pooled, logits = SN.trunk(self.core, ob)
+                    sid = torch.full((ob.shape[0],), info["id"], dtype=torch.long,
+                                     device=x.device)
+                    got_l.append(self.head.emit(pooled, b0_, span, sid))     # realization
+                    tgt_l.append(SN.dp_features(logits, move, s))            # intention (free)
+                    base_l.append(logits[:, b0_:b0_ + span, :].argmax(-1))   # arity-1 read
+            got = torch.cat(got_l) if len(got_l) > 1 else got_l[0]
+            tgt = torch.cat(tgt_l) if len(tgt_l) > 1 else tgt_l[0]
+            base = torch.cat(base_l) if len(base_l) > 1 else base_l[0]
+            match = (got == tgt)
+            e = (1.0 - match.float().mean(1)).cpu().numpy().astype(np.float64)
+            g = (got != base).float().mean(1).cpu().numpy().astype(np.float64)
+            delta, b0 = self.meter.score(key, e, g, True)
+            self.meter.sample_rows(key, e, g, delta, b0, True, self.row_cap, self.rrng)
+            if self.capture and info is not None:
+                self._store(obs, key, delta)
+            self.counts["mat_head"] += n0
+            self.counts["blk_head"] += n0
+            self.counts["blk_ref"] += n0 * span      # what the INSTRUMENT consumed, never `t`
+            self.counts["n_fired"] += n0
+            n_bad = int((~match.all(1)).sum())
+            self.counts["n_misfire"] += n_bad
+            self.last = {"delta": delta, "e": e, "exact": match.all(1).cpu().numpy()}
+            new = x.clone()
+            new.scatter_(1, pos, canon[got].reshape(n0, -1))
+            return new
+
+    return PerfExecutor
+
+
+_PERF_EXEC = None
+
+
+def build_perf_executor(*a, **kw):
+    global _PERF_EXEC
+    if _PERF_EXEC is None:
+        _PERF_EXEC = _perf_executor(SN.SpanExecutor)
+    return _PERF_EXEC(*a, **kw)
+
+
+def perf_span_train_terms(core, head, ex, slots, s, batch, rng, device, *, mode,
+                          tau_w, w_raw_cap, w_clip, wnorm):
+    """(i) THE EFFERENT RETURN: delta_perf as a PER-SAMPLE GAIN on the head's own plasticity.
+
+    `SN.span_train_terms`' loss exactly -- same slots, same rng draw, same targets recomputed
+    from the current executor, same cross-entropy -- with per-row weights:
+
+        delta : w_raw = exp(-delta / tau_w)     `plasticity_gain`'s canonical direction, from
+                                                Kim, Parvin & Ivry 2019: worse than benchmark
+                                                (delta < 0) -> BOOST, at benchmark f(0) = 1 ->
+                                                nominal, better than benchmark -> ATTENUATE.
+                                                The gain is protection, not acceleration.
+        raw   : w_raw = e                       "any error-modulated lr", no benchmark, no
+                                                agency gate -- S13(b)'s hygiene control.
+
+    `w_hat = clip(w_raw / EWMA(w_raw), 0, w_clip)` is the matched-average-budget normalisation
+    (META_ADAPT #4e: fix the budget or the rule games scale rather than allocation) with the
+    saturating cap (Kim's effect is categorical). A stored row carries credit only if the head
+    EXECUTED it in the beam phase; rows captured on a closed slot, or in a probe, or before the
+    slot first opened carry none and take w_raw = 1 (nominal). Their share is logged as
+    `cred_frac` in every metered arm, because it bounds how much of the diet the gain can
+    actually reach.
+
+    `mode="uniform"` never reaches this function: the runner calls `SN.span_train_terms`
+    itself, so the ungated arm is bit-identical to a plain span arm rather than merely equal
+    in expectation."""
+    import torch
+    import torch.nn.functional as F
+    terms, accs, wstat = [], {}, {"n": 0, "n_cred": 0, "sum_w": 0.0, "sum_d": 0.0}
+    for key, info in slots.items():
+        rows = ex.buf.get(key)
+        if info.get("move") is None or rows is None or rows.shape[0] < 8:
+            continue
+        idx = torch.from_numpy(rng.integers(0, rows.shape[0], size=min(batch, rows.shape[0])))
+        obs = rows[idx].to(device)
+        move = info["move"]
+        pooled, logits = SN.trunk(core, obs)
+        with torch.no_grad():
+            tgt = SN.dp_features(logits.detach(), move, s)
+        sid = torch.full((obs.shape[0],), info["id"], dtype=torch.long, device=device)
+        lg, _ = head(pooled, move["blk0"], move["span"], sid, teacher=tgt)
+        ce = F.cross_entropy(lg.reshape(-1, lg.shape[-1]), tgt.reshape(-1),
+                             reduction="none").view(tgt.shape).mean(1)
+        cred = getattr(ex, "cred", {}).get(key)
+        d = (cred[idx].numpy().astype(np.float64)
+             if (cred is not None and cred.shape[0] == rows.shape[0])
+             else np.full(idx.shape[0], np.nan))
+        have = ~np.isnan(d)
+        if mode == "rawx":
+            # [intonation/A] THE HYGIENE CONTROL, FIXED. `in_s0`'s `raw` arm used
+            # `plasticity_gain`'s literal `w_raw = e`, which is right for a continuous MuJoCo
+            # residual and wrong here: 94% of executions are EXACT, so `EWMA(e) ~ 0.03`, the 6%
+            # non-exact rows saturate `w_clip`, and the realised mean weight came out 0.4015
+            # against the delta arm's 0.9997 — the control trained its head at ~40% of nominal
+            # plasticity and the comparison was confounded by budget rather than by hygiene.
+            # `rawx` uses the SAME exponential transform, the same cap and the same normaliser
+            # as the delta arm and differs from it in exactly the two things S13(b) is about:
+            # no benchmark subtraction and no agency gate. exp(+e/tau_w) is exp(-delta/tau_w)
+            # with delta replaced by -e.
+            with torch.no_grad():
+                err = (1.0 - (lg.argmax(-1) == tgt).float().mean(1)).cpu().numpy()
+            w_raw = np.exp(np.clip(err.astype(np.float64) / tau_w, -30.0, np.log(w_raw_cap)))
+        elif mode == "raw":
+            # the raw-error gain is evaluated with the arm's CURRENT head, exactly as
+            # `plasticity_gain`'s `raw_err` arm evaluates it with the arm's current FM: it
+            # needs no stored credit and therefore no benchmark and no agency gate, which is
+            # precisely the comparison S13(b) asks for.
+            with torch.no_grad():
+                err = (1.0 - (lg.argmax(-1) == tgt).float().mean(1)).cpu().numpy()
+            w_raw = err.astype(np.float64)
+        else:
+            w_raw = np.where(have, np.exp(np.clip(-np.nan_to_num(d) / tau_w, -30.0,
+                                                  np.log(w_raw_cap))), 1.0)
+        wnorm[0] = (1 - wnorm[1]) * wnorm[0] + wnorm[1] * float(np.mean(w_raw))
+        w_hat = np.clip(w_raw / max(wnorm[0], 1e-8), 0.0, w_clip).astype(np.float32)
+        wt = torch.as_tensor(w_hat, device=device)
+        terms.append((ce * wt).mean())
+        accs[key] = float((lg.argmax(-1) == tgt).all(-1).float().mean())
+        wstat["n"] += int(w_hat.shape[0]); wstat["n_cred"] += int(have.sum())
+        wstat["sum_w"] += float(w_hat.sum())
+        wstat["sum_d"] += float(np.nan_to_num(d).sum())
+    if not terms:
+        return None, accs, wstat
+    return sum(terms) / len(terms), accs, wstat
+
+
+def expand_selected_perf(generator, flat, sel, ms, ex, rules_t, canon, depth, v, m, s):
+    """`PN.expand_selected`, plus the per-(row, col) execution credit the beam has to carry.
+
+    Line-for-line the donor's loop -- same move order, same `hit.nonzero`, same `apply` call,
+    same assembly -- so the child tensor and `n_mat` are bit-identical to `PN.expand_selected`.
+    What is added is reading `ex.last` after each call, which the executor set for exactly the
+    rows it was just handed. Only used when the meter is on."""
+    import torch
+    n, kk = sel.shape
+    out = torch.zeros(n, kk, flat.shape[1], dtype=flat.dtype, device=flat.device)
+    cred = torch.zeros(n, kk, dtype=torch.float32, device=flat.device)
+    nbad = torch.zeros(n, kk, dtype=torch.float32, device=flat.device)
+    nexe = torch.zeros(n, kk, dtype=torch.float32, device=flat.device)
+    n_mat = 0
+    for j in range(len(ms)):
+        hit = sel == j
+        if not bool(hit.any()):
+            continue
+        rows, cols = hit.nonzero(as_tuple=True)
+        child = ex.apply(generator, flat[rows], ms[j], rules_t, canon, depth, v, m, s)
+        out[rows, cols] = child
+        last = getattr(ex, "last", None)
+        if last is not None:
+            cred[rows, cols] = torch.as_tensor(last["delta"], dtype=torch.float32,
+                                               device=flat.device)
+            nbad[rows, cols] = torch.as_tensor(~last["exact"], dtype=torch.float32,
+                                               device=flat.device)
+            nexe[rows, cols] = 1.0
+        n_mat += int(rows.numel())
+    return out, n_mat, cred, nbad, nexe
+
+
+# --------------------------------------------------------------------------- #
 # the beam, over a MIXED action set (base level moves + earned macros)
 # --------------------------------------------------------------------------- #
 
@@ -877,10 +1499,26 @@ def beam_moves(controller, generator, value, x0, roots, ms, rules_t, canon, dept
         counts = {"mat": 0, "ground": 0}
         hist_x = [beams.clone()] if collect else None
         hist_par = [] if collect else None
+        # [intonation] the per-TIP execution ledger the 2x2 is read off. `track` is on only
+        # when the meter is (`ex.last` exists), so an untreated beam is the donor's.
+        track = (getattr(ex, "meter", None) is not None
+                 and _ENTRY_REC.get("phase") == "beam")
+        acc = ({q: torch.zeros(batch, 1, device=device) for q in ("d", "bad", "exe")}
+               if track else None)
         for _ in range(budget):
             flat = beams.reshape(batch * width, length)
-            children = [ex.apply(generator, flat, ms[k], rules_t, canon, depth, v, m, s)
-                        for k in range(n_moves)]
+            children, kcred, kbad, kexe = [], [], [], []
+            for k in range(n_moves):
+                children.append(ex.apply(generator, flat, ms[k], rules_t, canon,
+                                         depth, v, m, s))
+                if track:
+                    lz = getattr(ex, "last", None)
+                    z = torch.zeros(flat.shape[0], device=device)
+                    kcred.append(z if lz is None else torch.as_tensor(
+                        lz["delta"], dtype=torch.float32, device=device))
+                    kbad.append(z if lz is None else torch.as_tensor(
+                        ~lz["exact"], dtype=torch.float32, device=device))
+                    kexe.append(z if lz is None else torch.ones_like(z))
             cand = torch.stack(children, dim=1).reshape(batch, width * n_moves, length)
             counts["mat"] += batch * width * n_moves
             tgt = roots.repeat_interleave(width * n_moves)
@@ -891,6 +1529,10 @@ def beam_moves(controller, generator, value, x0, roots, ms, rules_t, canon, dept
             _, top = scores.topk(keep, dim=1)
             parent = torch.div(top, n_moves, rounding_mode="floor")
             mv = top % n_moves
+            if track:
+                for nm, src in (("d", kcred), ("bad", kbad), ("exe", kexe)):
+                    inc = torch.stack(src, dim=1).reshape(batch, width * n_moves)
+                    acc[nm] = acc[nm].gather(1, parent) + inc.gather(1, top)
             beams = cand.gather(1, top[:, :, None].expand(-1, -1, length))
             prev = seqs.gather(1, parent[:, :, None].expand(-1, -1, seqs.shape[2])) \
                 if seqs.shape[2] else seqs.new_zeros(batch, keep, 0)
@@ -905,7 +1547,21 @@ def beam_moves(controller, generator, value, x0, roots, ms, rules_t, canon, dept
         best = final.argmax(dim=1)
         rows = torch.arange(batch, device=device)
         out = {"x": beams[rows, best], "seq": seqs[rows, best], "counts": counts,
-               "tips_x": beams, "tips_seq": seqs}
+               "tips_x": beams, "tips_seq": seqs,
+               # [tacet] THE SCALARS THE GATE READS, already computed above to pick the answer:
+               # the value head's score of every surviving tip, and which tip won. Returning
+               # them costs nothing — no forward pass, no grounding charged, no RNG drawn — and
+               # they are unread unless `gate_mode` is set. `final` is a LOGIT (the value head
+               # is trained under `binary_cross_entropy_with_logits`), so the gate takes its
+               # sigmoid; `best` indexes `tip_val` at the answer `out["x"]` actually is.
+               "tip_val": final, "best": best}
+        if track:
+            # [intonation] per surviving tip: the summed delta_perf of the head executions on
+            # its own trajectory, how many of them there were, and how many were NOT exact.
+            # `tip_bad == 0 and tip_exe > 0` is "executed as intended" — the 2x2's row axis.
+            out["tip_dperf"] = acc["d"]
+            out["tip_bad"] = acc["bad"]
+            out["tip_exe"] = acc["exe"]
         if collect:
             idx = torch.arange(width, device=device)[None, :].expand(batch, -1).contiguous()
             traj = [None] * (budget + 1)
@@ -959,6 +1615,11 @@ def beam_moves_prop(controller, generator, value, x0, roots, ms, rules_t, canon,
         z_tip = _encode_chunked(controller, x0)                               # (batch, D)
         counts["ground"] += batch
 
+        # [intonation] the per-TIP execution ledger; see `beam_moves`.
+        track = (getattr(ex, "meter", None) is not None
+                 and _ENTRY_REC.get("phase") == "beam")
+        acc = ({q: torch.zeros(batch, 1, device=device) for q in ("d", "bad", "exe")}
+               if track else None)
         for _ in range(budget):
             flat = beams.reshape(batch * width, length)
             zf = z_tip.reshape(batch * width, -1)
@@ -971,8 +1632,12 @@ def beam_moves_prop(controller, generator, value, x0, roots, ms, rules_t, canon,
                 exp_idx = PN.explore_moves(sel, n_moves, explore, erng, device)
                 sel = torch.sort(torch.cat([sel, exp_idx], dim=1), dim=1).values
             kk = sel.shape[1]
-            child, n_mat = PN.expand_selected(generator, flat, sel, ms, ex.apply,
-                                              rules_t, canon, depth, v, m, s)
+            if track:
+                child, n_mat, kcred, kbad, kexe = expand_selected_perf(
+                    generator, flat, sel, ms, ex, rules_t, canon, depth, v, m, s)
+            else:
+                child, n_mat = PN.expand_selected(generator, flat, sel, ms, ex.apply,
+                                                  rules_t, canon, depth, v, m, s)
             cand = child.reshape(batch, width * kk, length)
             counts["mat"] += n_mat
             tgt = roots.repeat_interleave(width * kk)
@@ -985,6 +1650,10 @@ def beam_moves_prop(controller, generator, value, x0, roots, ms, rules_t, canon,
             col = top % kk
             mv = sel.reshape(batch, width, kk).gather(
                 1, parent[:, :, None].expand(-1, -1, kk)).gather(2, col[:, :, None]).squeeze(2)
+            if track:
+                for nm, src in (("d", kcred), ("bad", kbad), ("exe", kexe)):
+                    acc[nm] = acc[nm].gather(1, parent) + \
+                        src.reshape(batch, width * kk).gather(1, top)
             beams = cand.gather(1, top[:, :, None].expand(-1, -1, length))
             z_tip = z_all.reshape(batch, width * kk, -1).gather(
                 1, top[:, :, None].expand(-1, -1, z_all.shape[-1]))
@@ -1001,7 +1670,13 @@ def beam_moves_prop(controller, generator, value, x0, roots, ms, rules_t, canon,
         best = final.argmax(dim=1)
         rows = torch.arange(batch, device=device)
         out = {"x": beams[rows, best], "seq": seqs[rows, best], "counts": counts,
-               "tips_x": beams, "tips_seq": seqs}
+               "tips_x": beams, "tips_seq": seqs,
+               # [tacet] the same two keys the enumerated beam now returns; see there.
+               "tip_val": final, "best": best}
+        if track:                                        # [intonation] see `beam_moves`
+            out["tip_dperf"] = acc["d"]
+            out["tip_bad"] = acc["bad"]
+            out["tip_exe"] = acc["exe"]
         if collect:
             idx = torch.arange(width, device=device)[None, :].expand(batch, -1).contiguous()
             traj = [None] * (budget + 1)
@@ -1110,7 +1785,8 @@ def finetune_generator(generator, opt, new_leaves, replay_leaves, bottom_map, *,
 
 def finetune_generator_span(generator, head, ex, slots, opt, new_leaves, replay_leaves,
                             bottom_map, *, v, s, n_blocks, n_steps, batch, replay_frac, device,
-                            rng, span_rng, span_batch, lam=1.0):
+                            rng, span_rng, span_batch, lam=1.0,
+                            perf_gain=None):
     """THE PLANT LEARNS, WITH A CORRIDOR HEAD (`../span/span.py`'s, verbatim apart from the
     `lam == 0` short-circuit). `finetune_generator` op-for-op — same batches, same number of
     optimizer steps, same masking draws, same level-1 loss — plus the span head's self-imitation
@@ -1119,6 +1795,10 @@ def finetune_generator_span(generator, head, ex, slots, opt, new_leaves, replay_
     `lam == 0` skips the term entirely rather than adding `0 * term`. Adding a zeroed term would
     be numerically a no-op but not GRAPH-identical, and the composed fidelity arm (`given_fid`)
     is an assertion about graph identity, not about tolerances."""
+    # [intonation] `perf_gain` (a dict, or None) switches the span term from `SN`'s uniform
+    # form to the per-sample weighted one. None is the donor EXACTLY — the donor's own function
+    # is called, not an equal-in-expectation re-derivation — which is what makes the ungated
+    # arm a real control rather than a numerically-close one.
     import torch
     import torch.nn.functional as F
     powers = v ** torch.arange(s, device=device)
@@ -1126,6 +1806,7 @@ def finetune_generator_span(generator, head, ex, slots, opt, new_leaves, replay_
     if head is not None:
         head.train()
     last, slast, sacc = 0.0, None, {}
+    wstat = None
     n_rep = int(round(batch * replay_frac))
     n_new = batch - n_rep
     for _ in range(n_steps):
@@ -1155,8 +1836,15 @@ def finetune_generator_span(generator, head, ex, slots, opt, new_leaves, replay_
         mask.scatter_(1, mb, True)
         loss = F.cross_entropy(logits[mask], feats[mask])
         if head is not None and slots and lam:
-            sterm, sacc = SN.span_train_terms(generator, head, ex, slots, s, span_batch,
-                                              span_rng, device)
+            if perf_gain is None:
+                sterm, sacc = SN.span_train_terms(generator, head, ex, slots, s, span_batch,
+                                                  span_rng, device)
+            else:
+                sterm, sacc, wstat = perf_span_train_terms(
+                    generator, head, ex, slots, s, span_batch, span_rng, device,
+                    mode=perf_gain["mode"], tau_w=perf_gain["tau_w"],
+                    w_raw_cap=perf_gain["w_raw_cap"], w_clip=perf_gain["w_clip"],
+                    wnorm=perf_gain["wnorm"])
             if sterm is not None:
                 loss = loss + lam * sterm
                 slast = float(sterm.item())
@@ -1170,6 +1858,8 @@ def finetune_generator_span(generator, head, ex, slots, opt, new_leaves, replay_
     generator.eval()
     if head is not None:
         head.eval()
+    if perf_gain is not None:
+        perf_gain["last_wstat"] = wstat          # [intonation] logged, never consumed
     return last, slast, sacc
 
 
@@ -1184,7 +1874,138 @@ def push(buf, x, r, y, cap):
 # THE PORT'S LEARNING: self-imitation of the beam's own chosen trajectories
 # --------------------------------------------------------------------------- #
 
-def prop_pairs(out, roots, succ, slots, budget, train_on="solved"):
+# --------------------------------------------------------------------------- #
+# [tacet] THE GATE — what the learner consumes but chooses not to learn from
+# --------------------------------------------------------------------------- #
+
+GATE_MODES = ("delta_hi", "delta_lo", "delib", "random",
+              # [intonation] the two delta_PERF orders. `perf_hi` keeps the trajectories whose
+              # HEAD EXECUTIONS went best relative to their own recent selves — "learn from
+              # what you played well", which is orthogonal to whether the task was solved and
+              # is the whole point of the node. `perf_lo` is its mirror, carried so the
+              # direction is a measured fact rather than an assumption; neither is run in the
+              # main tag beyond `perf_hi` (arm budget).
+              "perf_hi", "perf_lo",
+              # [intonation/A] THE COVERAGE FIX. `in_s0` measured Sigma-delta_perf EXACTLY ZERO
+              # on 57.0% of the gate's candidates — trajectories the head never executed on —
+              # so more than half the ranking fell to index order and the gate was, on those
+              # rows, `gate_random` with extra steps. `perf_mean` makes the no-execution policy
+              # DELIBERATE and two-key: (1) a trajectory the head executed on is always
+              # preferred to one it did not (no performance evidence is not the same as average
+              # performance), and (2) within the executed set the key is delta_perf PER
+              # EXECUTION, not summed — a trial's quality is its average rendition, and the sum
+              # conflates how well it was played with how much of it was played.
+              "perf_mean")
+
+
+def gate_features(out, succ, ps, n_pr, width):
+    """The two decision-time scalars, per trajectory and per instance, from what the beam
+    already computed. No forward pass, no RNG, no grounding charged.
+
+    `audiation` finding 3 located the per-datum grade-news at decision time and named exactly
+    two carriers: the pre-update value readout (which decodes the value-error target at 0.293)
+    and the deliberation state — the unchosen candidates' own value scores (0.133). Both are
+    materialised BEFORE the grade arrives. This function is the whole of what the gate reads.
+
+        v_tip    sigmoid of the value head's score of each surviving tip           (B, W)
+        d_tip    grade - v, per trajectory: `succ` is that tip's own terminal
+                 possible-set success, so for a solved tip d = 1 - v is how
+                 SURPRISING the success was                                        (B, W)
+        v_ans    v at the tip the beam actually answered with                       (B,)
+        d_ans    ps - v_ans: the same residual at the MINED unit                    (B,)
+        margin   sigmoid(v at the chosen tip) - mean over the UNCHOSEN tips of
+                 sigmoid(v) — the deliberation state as one scalar. Small margin
+                 == the unchosen candidates scored nearly as well as the chosen
+                 one, i.e. the selection was contested                              (B,)
+        m2       sigmoid(top1) - sigmoid(top2), the textbook decision margin,
+                 LOGGED but not gated on. It is the more familiar statistic and
+                 the more degenerate one: the beam's tips are configurations, and
+                 two distinct move sequences can reach the same configuration, so
+                 top1 == top2 exactly whenever the runner-up is a duplicate of the
+                 answer, and the gate would then be ranking on ties. The mean form
+                 uses all W-1 unchosen scores — which is literally what `audiation`
+                 finding 3 decoded — and is zero only if every tip scores alike     (B,)
+
+    Returned as numpy so everything downstream (ranking, logging, the reduction) is host-side
+    and deterministic.
+    """
+    import torch
+    val = out["tip_val"].detach()                       # (B, W) LOGITS
+    B, W = val.shape
+    assert B == n_pr and W == width, f"gate: unexpected tip block {val.shape}"
+    p = torch.sigmoid(val)
+    best = out["best"].detach()
+    v_ans = p.gather(1, best[:, None]).squeeze(1)
+    if W > 1:
+        rest = (p.sum(1) - v_ans) / (W - 1)             # mean over the UNCHOSEN tips
+        margin = v_ans - rest
+        top = p.topk(2, dim=1).values
+        m2 = top[:, 0] - top[:, 1]
+    else:
+        margin = torch.zeros_like(v_ans)
+        m2 = torch.zeros_like(v_ans)
+    v_tip = p.cpu().numpy().astype(np.float64)
+    y_tip = np.asarray(succ, dtype=np.float64).reshape(B, W)
+    fe = {"v_tip": v_tip, "d_tip": y_tip - v_tip, "y_tip": y_tip,
+          "v_ans": v_ans.cpu().numpy().astype(np.float64),
+          "d_ans": np.asarray(ps, dtype=np.float64) - v_ans.cpu().numpy().astype(np.float64),
+          "margin": margin.cpu().numpy().astype(np.float64),
+          "m2": m2.cpu().numpy().astype(np.float64)}
+    # [intonation] THE EXECUTION COLUMN, per tip and at the answer. Free on the wire in exactly
+    # the sense the value scores are: the beam accumulated it while materialising, no forward
+    # pass and no grounding. `p_tip` is the trajectory's summed delta_perf; `bad_tip` how many
+    # of its head executions were NOT exact; `exe_tip` how many there were. A tip the head
+    # never executed on has p = 0 and exe = 0 — no performance evidence, which ranks neutral
+    # rather than good or bad, and is counted separately in the 2x2 so it is never silently
+    # folded into "as intended".
+    if "tip_dperf" in out:
+        for src, dst in (("tip_dperf", "p_tip"), ("tip_bad", "bad_tip"), ("tip_exe", "exe_tip")):
+            fe[dst] = out[src].detach().cpu().numpy().astype(np.float64).reshape(B, W)
+        bi = best.cpu().numpy()
+        rows_ = np.arange(B)
+        fe["p_ans"] = fe["p_tip"][rows_, bi]
+        fe["bad_ans"] = fe["bad_tip"][rows_, bi]
+        fe["exe_ans"] = fe["exe_tip"][rows_, bi]
+    return fe
+
+
+def gate_order(mode, cand, score, margin, grng, perf=None, nexe=None):
+    """The candidate indices, ordered best-first under `mode`.
+
+    `cand` is a 1-D index array into the candidate set (mining: solved instances; pi: solved
+    tips). `score` is delta at that unit, `margin` the deliberation state broadcast to it.
+    Ties are broken by index so the ordering is a deterministic function of the run, never of
+    dict order or of a sort's internal state — which matters because `delib` ties by
+    construction (all W tips of an instance share their instance's margin).
+
+    `random` draws from `grng`, the gate's OWN numpy stream, so the shared per-arm RNG the twin
+    gate rests on is never perturbed by the gate's own bookkeeping."""
+    if mode == "delta_hi":
+        key = (-score[cand], cand)
+    elif mode == "delta_lo":
+        key = (score[cand], cand)
+    elif mode == "delib":
+        key = (margin[cand], cand)                  # ascending margin == most contested first
+    elif mode == "random":
+        return cand[grng.permutation(cand.shape[0])]
+    # [intonation] the delta_PERF orders. `perf` is the summed execution credit at the same
+    # unit; ties (a unit the head never executed on, so perf == 0) fall to index order, and
+    # the reduction prints how many there were, on `tacet`'s own `m2 == 0` convention.
+    elif mode == "perf_hi":
+        key = (-perf[cand], cand)
+    elif mode == "perf_lo":
+        key = (perf[cand], cand)
+    elif mode == "perf_mean":
+        ex_ = np.asarray(nexe, dtype=np.float64)[cand] if nexe is not None \
+            else np.zeros(cand.shape[0])
+        mu = np.where(ex_ > 0, perf[cand] / np.maximum(ex_, 1.0), 0.0)
+        key = (-(ex_ > 0).astype(np.float64), -mu, cand)
+    else:
+        raise ValueError(f"unknown gate_mode {mode!r}")
+    return cand[np.lexsort(key[::-1])]
+
+
+def prop_pairs(out, roots, succ, slots, budget, train_on="solved", keep=None):
     """The beam's own chosen trajectories, as (state, root-index, slot) supervision.
 
     `beam_moves(collect=True)` already hands these back: `traj[t]` is the per-step state of
@@ -1201,8 +2022,14 @@ def prop_pairs(out, roots, succ, slots, budget, train_on="solved"):
     B, W = seq.shape[0], seq.shape[1]
     length = traj[0].shape[2]
     slot_t = torch.as_tensor(slots, dtype=torch.long, device=seq.device)
-    keep = torch.as_tensor(succ > 0.5, device=seq.device).reshape(B, W) \
+    sel = torch.as_tensor(succ > 0.5, device=seq.device).reshape(B, W) \
         if train_on == "solved" else torch.ones(B, W, dtype=torch.bool, device=seq.device)
+    # [tacet] THE GATE, on the pi channel. `keep` is a (B, W) boolean over trajectories; the
+    # grade filter above still runs first, so the gate can only ever REFUSE data the donor's
+    # rule already admitted. `keep=None` is the donor exactly.
+    if keep is not None:
+        sel = sel & torch.as_tensor(np.asarray(keep), device=seq.device).reshape(B, W)
+    keep = sel
     if not bool(keep.any()):
         return None
     rr = roots.to(seq.device)[:, None].expand(B, W)
@@ -1781,6 +2608,308 @@ ARMS = {
                          "recert": True,
                          "loop": {"kind": "yoke", "of": "outer_yield_m4_j"},
                          "cfg": {"commit_max_level": 3, "stream_burn": 1024}},
+    # ---------------------------------------------------------------------------------------
+    # [tacet] THE GATE ARMS (E3'). The baseline is A3's treatment `outer_yield_m4` VERBATIM —
+    # not a renamed copy — so this tag's ungated arm is the same object `cr3_s0` measured and
+    # the full-life cross-tag replay is a real gate rather than a re-definition.
+    #
+    # EVERY gate arm is a CLOCK YOKE of that baseline (`ceiling_m3`'s mechanic, one level of
+    # abstraction up: there it isolated one bit of the COMMIT RULE, here it isolates one knob
+    # of the LEARNING RULE). The reason is the one A3 wrote down: the outer loop's actions are
+    # absorbing, so an arm that learns from a different diet would also commit and advance at
+    # different cycles, and the era-4/5 read would conflate the gate's content with the gate's
+    # pacing. Yoked, the arms are lifetime-identical, era-boundary-identical and
+    # commit-cycle-identical, and differ in exactly one knob. What the yoke costs is the
+    # pacing half of the question, and that is bought back offline for free: A1's thermostat
+    # replayed on each arm's OWN logged L4 at-support series says when it would have committed
+    # had it been driving (`phase0_l4.py`'s machinery, in the reduction).
+    #
+    # All five carry `gate_frac` from the run config; only `gate_mode` differs between the
+    # four gates, and `gate_all` carries no gate at all — it relaxes the donor's own two knobs.
+    # ---------------------------------------------------------------------------------------
+    "gate_delta_hi": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": False,
+                      "recert": True, "loop": {"kind": "yoke", "of": "outer_yield_m4"},
+                      "cfg": {"gate_mode": "delta_hi"}},
+    "gate_delta_lo": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": False,
+                      "recert": True, "loop": {"kind": "yoke", "of": "outer_yield_m4"},
+                      "cfg": {"gate_mode": "delta_lo"}},
+    "gate_delib":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": False,
+                      "recert": True, "loop": {"kind": "yoke", "of": "outer_yield_m4"},
+                      "cfg": {"gate_mode": "delib"}},
+    "gate_random":   {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": False,
+                      "recert": True, "loop": {"kind": "yoke", "of": "outer_yield_m4"},
+                      "cfg": {"gate_mode": "random"}},
+    # LEARN FROM EVERYTHING, in the widest form each channel admits (see the module docstring,
+    # item 6): mining keeps every solved answer instead of `mine_cap` of them, and pi is
+    # supervised on every surviving tip instead of only the solved ones. Both are DONOR knobs.
+    "gate_all":      {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": False,
+                      "recert": True, "loop": {"kind": "yoke", "of": "outer_yield_m4"},
+                      "cfg": {"mine_cap": 0, "prop_train_on": "tips"}},
+    # THE INERTNESS ARM, for `preflight` only: a pure yoke with no gate and no relaxation, so
+    # it must be BIT-IDENTICAL to `outer_yield_m4`. It is what licenses reading every arm above
+    # as "the baseline plus one knob" rather than "the baseline plus a yoke plus one knob".
+    "gate_off_y":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": False,
+                      "recert": True, "loop": {"kind": "yoke", "of": "outer_yield_m4"}},
+    # ---------------------------------------------------------------------------------------
+    # [intonation] THE delta_perf ARMS. Every one is A3's treatment `outer_yield_m4` — same
+    # thermostat, same reads, same ladder — PLUS the span head, firing below parity, PLUS the
+    # meter. `perf_log` is the clock source and consumes nothing; the other four are clock
+    # yokes of it carrying exactly one knob each, so they are lifetime-, era-boundary- and
+    # commit-cycle-identical (`tacet`'s reasoning, which is `crescendo`'s one level up).
+    #
+    # `perf_log` is deliberately NOT `outer_yield_m4` itself: turning the executor on changes
+    # the trajectory, so this tag's baseline is its own object and the cross-tag replay against
+    # `tc_s0`/`cr3_s0` is a bounded gate (the arms are bit-identical until the span loss's
+    # first optimizer step after the L2 commit) rather than a full-life one.
+    # ---------------------------------------------------------------------------------------
+    "perf_log":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True}},
+    "perf_gain":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "perf_log"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "perf_gain": "delta"}},
+    "perf_raw":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "perf_log"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "perf_gain": "raw"}},
+    "perf_gate":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "perf_log"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "gate_mode": "perf_hi"}},
+    "outcome_gate": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "perf_log"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "gate_mode": "delta_hi"}},
+    # PREFLIGHT ONLY. `perf_off_y` is the yoke's inertness check with the meter off and the
+    # firing threshold at the donor's tau; `perf_fid` is the span head wired and the meter ON
+    # but firing at tau = 0.95 — i.e. the donor's own executor with an observer attached, which
+    # is how gate I-2 asserts that metering alone changes no behaviour.
+    # ---------------------------------------------------------------------------------------
+    # [caesura] delta-SILENCE AS A COMMIT INPUT. Four arms, one seed, `intonation`'s executor
+    # and meter in all of them (so `dsil` exists in every arm's panel and every counterfactual
+    # is computable offline everywhere), differing ONLY in what paces the commit.
+    #
+    #   dsil_yield   A1's thermostat on `yield` — `intonation`'s `perf_log` verbatim. The
+    #                comparator, the clock reference, and the arm whose logged `dsil` series
+    #                gives the ungated counterfactual.
+    #   dsil_read    the SAME thermostat, same span/W/burn/alpha, reading `dsil` INSTEAD of
+    #                `yield`. delta-silence CHOOSES the crossing. This is the arm that asks
+    #                whether a within-level execution signal can license a crossing at all —
+    #                `teacher_slot` measured the within-level LEDGER refusing exactly that, and
+    #                b(s) is a different within-level quantity, so the refusal is a question
+    #                and not a prediction.
+    #   dsil_and     the yield thermostat chooses, delta-silence may only DELAY (`dsil_veto`).
+    #                The arm that separates the metering signal's seat: TIMING, not choice.
+    #   dsil_sched   the schedule (`delta_prov`, certify-else-boundary), so the two treatments
+    #                are read against a pacer that reads nothing at all as well as against A1's.
+    #
+    # NOT yoked, and that is the round's one deliberate departure from `intonation`: the
+    # question here IS the pacing, so pinning the arms to a common clock would delete the
+    # variable. The cost is the one A1/A2 carried and named — the arms are not
+    # lifetime-matched, so deep-era deltas conflate pacing with practice time — and it is
+    # bought back the way A3 bought it back: `dsil_sched`'s scheduled era lengths are the caps,
+    # so it is the LIFETIME CEILING and no loop arm can outrun it.
+    "dsil_yield":   {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True}},
+    "dsil_read":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "dsil"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True}},
+    "dsil_and":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True, "dsil_veto": True}},
+    "dsil_sched":   {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True}},
+    # PREFLIGHT ONLY, and load-bearing there for the same reason `perf_given` was in
+    # `intonation`: a loop arm cannot arm on a forty-step substrate (the donor's own gate-C
+    # note — "the loop arms ride their caps here"), so neither the gauge's DRIVING path nor the
+    # veto would ever execute. `dsil_pf_gauge` holds the true tables, which mints every slot at
+    # c1 and makes `dsil` live from c2, so `QuietPolicy("dsil")` is stepped on real reads.
+    # `dsil_pf_veto` commits on the SCHEDULE with seeded miners, so commits actually fire and
+    # the veto is consulted — before the first commit the gauge does not exist (the `absent`
+    # branch, which must be inert) and after it does (the `defer`/`pass` branches).
+    "dsil_pf_boot": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "quiet", "read": "dsil"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True}},
+    "dsil_pf_gauge": {"vocab": "true", "commit": None, "prop_k": 4, "span": True,
+                      "loop": {"kind": "quiet", "read": "dsil"},
+                      "cfg": {"span_tau_fire": 0.50, "perf_meter": True}},
+    "dsil_pf_veto":  {"vocab": "earned", "commit": "late", "prop_k": 4, "span": True,
+                      "recert": True,
+                      "cfg": {"span_tau_fire": 0.50, "perf_meter": True, "dsil_veto": True}},
+    # ---------------------------------------------------------------------------------------
+    # [tutti] THE UNIFICATION ARMS. Eight paid, one seed. `intonation`'s executor and meter in
+    # every one (so `dsil` exists in every panel and every counterfactual is computable
+    # everywhere), and the QUESTION PORT ON in every one (so the selection compute — the reader
+    # forward and the value forward over all K menu candidates — is taken by every arm and used
+    # only by the arms whose selector reads it; `ostinato`'s rung-invariant-comparator
+    # discipline). `question_mode="exo"` is the menu's HEAD in the donor's own RNG order, i.e.
+    # NO selection, and a bit-identical replay of the donor. `question_mode=None` is used only
+    # inside G-F.
+    #
+    # The two axes:
+    #
+    #   COMMIT / ADVANCE assignment      SELECTOR
+    #     yield  / yield   (b)             exo   (no selection; the replay gate + baseline row)
+    #     dsil   / dsil    (a)             endo  (half-key novelty x delivery ledger — the only
+    #     dsil   / yield   (c) THE SPLIT           selector that can be an outer-loop ACTION)
+    #     yield  / dsil    the MIRROR
+    #
+    # The MIRROR exists because "any two-gauge mix beats one" is a live alternative reading of a
+    # split win under the simultaneous-reset rule: it gives each signal the OTHER's seat, so a
+    # split win that is about the ASSIGNMENT separates from one that is about having two latches.
+    #
+    # NOT yoked on the pacing axis, and that is the donor's deliberate departure carried
+    # forward: the question here IS the pacing, so pinning the pacers to a common clock would
+    # delete the variable. The lifetime confound is bought back A3's way — the donor's
+    # `ca_s0/dsil_sched` (201 cycles at the caps) is the lifetime ceiling no loop arm can
+    # outrun, borrowed cross-tag and licensed by `tu_y_exo`'s own 0.000e+00 replay.
+    # The SELECTOR axis IS yoked: `tu_s_yk` replays `tu_s_endo`'s realised commit AND advance
+    # cycles with the selector off — lifetime-identical, one bit differing (`crescendo`'s
+    # `ceiling_m3` idiom), which separates selection CONTENT from the clock selection induces.
+    "tu_y_exo":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo"}},
+    "tu_d_exo":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "dsil"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "exo"}},
+    # (c) THE SPLIT — the QUEUE's stated shape. `loop` owns the ADVANCE, `loop_commit` owns the
+    #     COMMIT. delta-silence gets the compile-trigger seat
+    #     (`practice_manufactures_its_own_credit` S1 component (3) designed it for) and the
+    #     one-level-up yield gauge keeps the crossing-of-eras it has always owned.
+    "tu_s_exo":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "loop_commit": {"kind": "quiet", "read": "dsil"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "exo"}},
+    "tu_s_endo":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "loop_commit": {"kind": "quiet", "read": "dsil"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "endo"}},
+    # THE ONE-BIT CLOCK YOKE of the composed arm. Runs immediately after it and replays its
+    # MEASURED actions (commits and advances, including cap-forced ones) by clock and by
+    # nothing else, with the selector OFF. Unlike `ceiling_m3` the pair is NOT bit-identical up
+    # to a divergence cycle — the selector acts at c1 — so the twin-window gate is replaced by
+    # X-5's exact-replay gate.
+    "tu_s_yk":      {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "tu_s_endo"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo"}},
+    "tu_d_endo":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "dsil"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "endo"}},
+    "tu_y_endo":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "endo"}},
+    # THE MIRROR: each signal in the other's seat. yield licenses the COMMIT, delta-silence the
+    # ADVANCE. delta-silence still cannot speak before a slot is open, so the ADVANCE owner
+    # needs the same fallback the commit owner needs — `dsil_bootstrap` covers both sites.
+    "tu_m_exo":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "dsil"},
+                     "loop_commit": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "exo"}},
+    # PREFLIGHT ONLY, for the reason `dsil_pf_*` and `perf_given` exist: a loop arm cannot arm
+    # on a forty-step substrate, so neither the split's driving path nor the port's selectors
+    # would ever execute at preflight sizes.
+    #   tu_pf_split  true tables -> every slot minted at c1 -> `dsil` live from c2, so BOTH
+    #                policies are stepped on real reads and gate X-1/X-4 bite.
+    #   tu_pf_boot   the split with EARNED tables -> exercises the split's bootstrap branch
+    #                (bootstrapped commits alongside yield-driven advances), gate X-3.
+    #   tu_pf_q      the endogenous selector with true tables, so the port's agent bundle,
+    #                the quota and the delivery ledger all execute.
+    #   tu_pf_yk     a yoke of `tu_pf_boot`, so X-5's two-policy replay is exercised.
+    #   tu_pf_off    `loop_commit` absent and the port off -> gate X-2's inertness twin.
+    "tu_pf_split":  {"vocab": "true", "commit": "loop", "prop_k": 4, "span": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "loop_commit": {"kind": "quiet", "read": "dsil"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "exo"}},
+    "tu_pf_boot":   {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "loop_commit": {"kind": "quiet", "read": "dsil"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "exo"}},
+    "tu_pf_q":      {"vocab": "true", "commit": "loop", "prop_k": 4, "span": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "loop_commit": {"kind": "quiet", "read": "dsil"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "endo"}},
+    "tu_pf_yk":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "tu_pf_boot"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo"}},
+    "tu_pf_off":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True}},
+    # ---------------------------------------------------------------------------------------
+    # [intonation/A] THE STRONGLY-METERED REGIME. Same arms, same knobs, one regime: the run
+    # config buys FEWER GRADED PERFORMANCES PER CYCLE (`n_pr` 64 -> 24, `pr_width` 16 -> 8), so
+    # useful experience is scarce relative to what the learner needs. `in_s0` measured the
+    # abundance it is being contrasted with: 14.9 solved instances/cycle against a mining cap of
+    # 8 (the cap bound on 95.4% of cycles) and a pi replay buffer that filled at cycle 26 of 131
+    # and stayed full. Nothing about the WORLD moves — same grammar, same damage ladder, same
+    # action set, same budget per plan, same floors — only how many performances the meter can
+    # afford to grade. Two arms carry the round's own fixes (`perf_mean`, `rawx`); the other two
+    # are `in_s0`'s arms verbatim so the regime is the only thing that changed.
+    "mperf_log":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True}},
+    "mperf_gain":   {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "mperf_log"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "perf_gain": "delta"}},
+    "mperf_gate":   {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "mperf_log"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "gate_mode": "perf_mean"}},
+    "mout_gate":    {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "mperf_log"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "gate_mode": "delta_hi"}},
+    "mperf_rawx":   {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "mperf_log"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "perf_gain": "rawx"}},
+    # PREFLIGHT ONLY, and load-bearing there: a loop arm cannot commit on a forty-step
+    # substrate (the thermostat correctly never arms — see gate C's note), so no slot is ever
+    # MINTED and the whole firing path would go untested. `perf_given` holds the true tables,
+    # which mints every slot at c1, so the fallible executor, the meter, the 2x2 and both
+    # consumers all execute before a paid setup. `given`'s stream, so it perturbs nothing.
+    "perf_given":   {"vocab": "true", "commit": None, "prop_k": 4, "span": True,
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True}},
+    "perf_given_g": {"vocab": "true", "commit": None, "prop_k": 4, "span": True,
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "perf_gain": "delta"}},
+    "perf_off_y":   {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "perf_log"},
+                     "cfg": {"span_tau_fire": None}},
+    "perf_fid":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                     "recert": True, "loop": {"kind": "yoke", "of": "perf_log"},
+                     "cfg": {"span_tau_fire": None, "perf_meter": True}},
 }
 ARMS["fid"] = dict(ARMS["given_fid"])          # the SPEC's name for the in-tag assertion
 
@@ -1831,122 +2960,37 @@ TWIN = {
     "outer_yield_m3": "enum_live",
     # [crescendo] the displaced twins take their ORIGINAL's stream key.
     "outer_yield_m4_j": "enum_live", "ceiling_m3_j": "enum_live",
-    # [antiphon] every question arm takes the anchor's stream, so each is bit-identical to
-    # `q_exo` until its own first DIFFERENT question — which is c1, by design. The stream key
-    # still matters: without it the arms would differ by stream position as well as by
-    # selection, and the contrast would be confounded (`handle/`'s discipline).
-    "q_exo": "enum_live", "q_bisect": "enum_live", "q_endo": "enum_live",
-    "q_novel": "enum_live", "q_comp": "enum_live", "q_comp_free": "enum_live",
-    "q_bisect_loop": "enum_live",
-    # [antiphon-s2] the three NON-ORACLE selectors under the pacer. Same stream key as their
-    # schedule-paced siblings, so `q_endo_loop` is bit-identical to `q_endo` until the loop's
-    # FIRST ACTION and to nothing else — the sibling twin window the round is read on.
-    "q_endo_loop": "enum_live", "q_comp_loop": "enum_live", "q_novel_loop": "enum_live",
-    # [antiphon-m] the use-record selector, on the same stream as every other question arm.
-    "q_trust": "enum_live",
-    # [trap] the trap arms share the question arms' stream key, so a dose contrast is not
-    # confounded by stream position (`handle/`'s discipline, as above).
-    "t90_exo": "enum_live", "t90_bisect": "enum_live", "t90_novel": "enum_live",
-    "t90_endo": "enum_live", "t90_trust": "enum_live",
-    "t15_exo": "enum_live", "t15_novel": "enum_live", "t15_endo": "enum_live",
-    "t00_trust": "enum_live",
+    # [tacet] every gate arm takes the anchor's stream, exactly as the baseline does, so each
+    # differs from `outer_yield_m4` by its gate knob and by nothing else.
+    "gate_delta_hi": "enum_live", "gate_delta_lo": "enum_live", "gate_delib": "enum_live",
+    "gate_random": "enum_live", "gate_all": "enum_live", "gate_off_y": "enum_live",
+    # [intonation] every delta_perf arm takes the anchor's stream too, so each is bit-identical
+    # to `anchor_long`/`outer_yield_m4` until its own port switches on (the span head is minted
+    # off its OWN generator — gate S-1 — so its mere existence costs the shared stream nothing).
+    "perf_log": "enum_live", "perf_gain": "enum_live", "perf_raw": "enum_live",
+    "perf_gate": "enum_live", "outcome_gate": "enum_live",
+    "perf_off_y": "enum_live", "perf_fid": "enum_live",
+    "perf_given": "given", "perf_given_g": "given",
+    "dsil_yield": "enum_live", "dsil_read": "enum_live", "dsil_and": "enum_live",
+    "dsil_sched": "enum_live", "dsil_pf_gauge": "given", "dsil_pf_veto": "enum_live",
+    "dsil_pf_boot": "enum_live",
+    # [tutti] every unification arm takes the anchor's stream, so each is bit-identical to
+    # its family's carrier until its own first action (the in-tag twin gate). The endo arms
+    # diverge at c1 BY CONSTRUCTION — the selector acts on cycle 1 — which is why their
+    # lifetime control is the yoke and not a twin window.
+    "tu_y_exo": "enum_live", "tu_d_exo": "enum_live", "tu_s_exo": "enum_live",
+    "tu_s_endo": "enum_live", "tu_s_yk": "enum_live", "tu_d_endo": "enum_live",
+    "tu_y_endo": "enum_live", "tu_m_exo": "enum_live",
+    "tu_pf_split": "given", "tu_pf_boot": "enum_live", "tu_pf_q": "given",
+    "tu_pf_yk": "enum_live", "tu_pf_off": "enum_live",
+    "mperf_log": "enum_live", "mperf_gain": "enum_live", "mperf_gate": "enum_live",
+    "mout_gate": "enum_live", "mperf_rawx": "enum_live",
 }
 STREAM = {"never_base": 0, "given": 1, "practice_gated": 2, "practice_early": 3,
           "practice_late": 4,
           # [spiral] a NEW stream index, so the spiral arms neither perturb nor inherit the
           # donor arms' stream position.
           "enum_live": 5}
-
-# --------------------------------------------------------------------------- #
-# [antiphon] THE QUESTION-PORT ARMS.
-#
-# The controlled core is SIX arms that are `anchor_long` in every respect but the selector, so
-# they are SCHEDULE-PACED at the caps and LIFETIME-IDENTICAL at 201 cycles by construction — no
-# deep-era comparison in the core can have been bought with time, and the question knob is read
-# against a clock nothing else moves. `q_bisect_loop` sits outside the core: it is the donor's
-# own thermostat arm with the oracle selector, and its comparator is the banked
-# `cr3_s0/outer_yield_m4`, not the schedule family. It answers whether selection and pacing
-# COMPOSE — the pacer already buys coverage by spending cycles (17 more of them, for 2.4x the
-# observations, in `cr3_s0`), so whether selection is redundant under loop pacing is the cell
-# that connects this tag to the SPEC's outer-loop framing.
-# --------------------------------------------------------------------------- #
-_Q_SCHED = {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": False,
-            "recert": True}
-_Q_LOOP = {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": False, "recert": True,
-           "loop": {"kind": "quiet", "read": "yield"}}
-ARMS.update({
-    # THE EXOGENOUS LADDER — and, in this parameterization, the RANDOM-QUESTIONS arm too: the
-    # era ladder's demand IS a uniform draw over instances of the era's cell, so the two
-    # coincide. It takes the menu's head, which is the donor's own draw at the donor's own RNG
-    # position, so it is also the full-scale bit-identical replay of `cr3_s0/anchor_long`.
-    "q_exo":         {**_Q_SCHED, "cfg": {"question_mode": "exo"}},
-    # THE CEILING: oracle bisection, r-squared-aware at the active level.
-    "q_bisect":      {**_Q_SCHED, "cfg": {"question_mode": "bisect"}},
-    # THE ENDOGENOUS JUDGE: half-key novelty against its own banked vocabulary, weighted by its
-    # own delivery ledger — Delta-`at_support` per priced sample, with the noisy-TV guard.
-    "q_endo":        {**_Q_SCHED, "cfg": {"question_mode": "endo"}},
-    # THE NERDSNIPE CONTROL: the same rule with the guard removed.
-    "q_novel":       {**_Q_SCHED, "cfg": {"question_mode": "novel"}},
-    # THE KNOWN NEGATIVE, difficulty-pinned (comfort in CONTENT at matched difficulty).
-    "q_comp":        {**_Q_SCHED, "cfg": {"question_mode": "comp"}},
-    # ADDITIVE: does selection compose with the pacer? Comparator is `cr3_s0/outer_yield_m4`.
-    "q_bisect_loop": {**_Q_LOOP, "cfg": {"question_mode": "bisect"}},
-    # THE KNOWN NEGATIVE, UNPINNED — the honest beta=2 pole; volume, budget and lifetime stay
-    # pinned, the difficulty mix does not, and its realised d* histogram is logged every cycle
-    # because the deviation IS the arm's definition. Last in the run order: most cuttable.
-    "q_comp_free":   {**_Q_SCHED, "cfg": {"question_mode": "comp_free"}},
-})
-
-# --------------------------------------------------------------------------- #
-# [antiphon-s2] THE COMPOSED CELL FOR THE NON-ORACLE SELECTORS.
-#
-# `an_s0` composed the ORACLE selector with the pacer (`q_bisect_loop`) and found the deep-era
-# value to be almost entirely interaction. The selector in that cell is not a value system: it
-# reads the truth table. These three arms cross the SAME pacer with the three selectors that
-# only read the learner's own state, so the composed cell is asked of the object the round is
-# actually about — the judge that grades questions from inside.
-#
-#   q_endo_loop   the endogenous judge under the pacer      THE CELL
-#   q_comp_loop   the comfort pole under the pacer          does pacing amplify or RESCUE the
-#                                                           difficulty-collapse hazard that
-#                                                           made `q_comp` the tag's slowest
-#                                                           climber?
-#   q_novel_loop  the guard-removed judge under the pacer   the nerdsnipe pole under the pacer,
-#                                                           and the ablation that says what the
-#                                                           delivery ledger buys in the loop
-#
-# Each is its schedule-paced sibling in every respect but `commit`, and each carries the same
-# `_Q_LOOP` spec `q_bisect_loop` carries, so the pacer is the donor's, unchanged.
-# --------------------------------------------------------------------------- #
-ARMS.update({
-    # ---- [trap] THE TRAP ARMS. Identical to the question-port arms in every respect but the
-    # world's menu: a fraction `trap_frac` of it is candidates whose clean half is junk, so
-    # their answers cannot contribute a true key at the target level. The trap is a property of
-    # the WORLD and is shared by every arm at a dose; the arms differ only in the selector, so
-    # every control in `../FILES.md` section 3 carries over unchanged. The native rate on this
-    # grammar is 0.546 at era 3, and `an_s0`'s four matching arms ARE the native dose, banked.
-    "t90_exo":       {**_Q_SCHED, "cfg": {"question_mode": "exo", "trap_frac": 0.90}},
-    "t90_bisect":    {**_Q_SCHED, "cfg": {"question_mode": "bisect", "trap_frac": 0.90}},
-    "t90_novel":     {**_Q_SCHED, "cfg": {"question_mode": "novel", "trap_frac": 0.90}},
-    "t90_endo":      {**_Q_SCHED, "cfg": {"question_mode": "endo", "trap_frac": 0.90}},
-    # the guard `trap/phase0_trap.py` [9]/[9b] promotes: novelty times the arm's OWN beam use
-    # record over the rows one level below the clean half.
-    "t90_trust":     {**_Q_SCHED, "cfg": {"question_mode": "trust", "trap_frac": 0.90}},
-    "t15_exo":       {**_Q_SCHED, "cfg": {"question_mode": "exo", "trap_frac": 0.15}},
-    "t15_novel":     {**_Q_SCHED, "cfg": {"question_mode": "novel", "trap_frac": 0.15}},
-    "t15_endo":      {**_Q_SCHED, "cfg": {"question_mode": "endo", "trap_frac": 0.15}},
-    # the trust guard with the trap OFF — its own f = 0 twin, and the in-tag trap-off arm.
-    "t00_trust":     {**_Q_SCHED, "cfg": {"question_mode": "trust"}},
-    # [antiphon-m] THE USE-RECORD SELECTOR IN THE QUESTION-PORT FAMILY. Spec-identical to the
-    # trap lane's `t00_trust` (its trap-off twin) — same `_Q_SCHED`, same mode, no `trap_frac`
-    # — and named `q_trust` so the metered tag reads as six `q_*` arms and the premium table
-    # (each selector minus `q_exo`) is uniform. Both names resolve to the same config, so
-    # `tr_s0` still reproduces from `t00_trust`.
-    "q_trust":       {**_Q_SCHED, "cfg": {"question_mode": "trust"}},
-    "q_endo_loop":   {**_Q_LOOP, "cfg": {"question_mode": "endo"}},
-    "q_comp_loop":   {**_Q_LOOP, "cfg": {"question_mode": "comp"}},
-    "q_novel_loop":  {**_Q_LOOP, "cfg": {"question_mode": "novel"}},
-})
 
 
 def parse_arms(spec):
@@ -2692,6 +3736,11 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                              lr=cfg["value_lr_online"] or cfg["value_lr"], weight_decay=1e-4)
     rng = np.random.default_rng(cfg["seed"] + 77)
     grng = np.random.default_rng(cfg["seed"] + 991)
+    # [tacet] THE GATE'S OWN numpy STREAM, on the idiom the port's explore RNG already uses
+    # ("its RNG is its own, so the shared stream is undisturbed and the twin gate stays
+    # licensed"). Only `gate_mode="random"` ever draws from it, so the two delta arms and the
+    # deliberation arm are deterministic functions of the run.
+    ggrng = np.random.default_rng(cfg["seed"] + 3_141_593)
 
     # ---- PORT 2: the span head, its slots, and the executor (`../span/span.py`'s block,
     #      verbatim). The head is minted off its OWN generator, so its existence costs the
@@ -2700,6 +3749,25 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
     head, slots = None, {}
     slot_events, gate_events = [], []
     span_rng = np.random.default_rng(cfg["seed"] + 20_250_820)     # its OWN stream
+    # ---- [intonation] THE METER and the two consumers. All three default OFF, so with them
+    #      unset this block is `tacet.py` exactly.
+    #        perf_meter  the executor becomes fallible-and-measured (needs `span`).
+    #        span_tau_fire  the firing threshold, BELOW `span_tau`; the parity record stays at
+    #                     `span_tau` so the reduction can read off what the 0.95 gate did.
+    #        perf_gain   (i) the per-sample plasticity consumer: "delta" | "raw" | None.
+    #        gate_mode="perf_hi"  (ii) the selection consumer.
+    pmeter = (PerfMeter(alpha=cfg["perf_alpha"], g0=cfg.get("perf_g0"),
+                        theta=cfg.get("perf_theta"), calib_min=cfg["perf_calib_min"])
+              if (use_span and cfg.get("perf_meter")) else None)
+    perf_gain = None
+    if pmeter is not None and cfg.get("perf_gain"):
+        assert cfg["perf_gain"] in ("delta", "raw", "rawx"), cfg["perf_gain"]
+        perf_gain = {"mode": cfg["perf_gain"], "tau_w": cfg["perf_tau_w"],
+                     "w_raw_cap": cfg["perf_w_raw_cap"], "w_clip": cfg["perf_w_clip"],
+                     # [w_norm, ewma_alpha] — the matched-average-budget normaliser, carried
+                     # across cycles so the budget is matched over the run, not per cycle.
+                     "wnorm": [1.0, cfg["perf_w_ewma"]], "last_wstat": None}
+    perf_log_rows, perf_cells, calib_events = [], [], []
     if use_span:
         head = SN.build_head(SN.slot_count(s, depth, maxl), v, cfg["state_dim"],
                              s ** (maxl - 1), cfg["seed"] * 100 + 13, device,
@@ -2708,10 +3776,22 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             p.requires_grad_(True)
         gopt.add_param_group({"params": list(head.parameters()),
                               "lr": cfg["span_lr"] or cfg["gen_lr"], "weight_decay": 1e-4})
-        ex = SN.SpanExecutor(generator, head, slots, cap=cfg["span_buf_cap"],
-                             hold_cap=cfg["span_hold_cap"], hold_frac=cfg["span_hold_frac"],
-                             per_call=cfg["span_capture"], seed=cfg["seed"] + 5_150_101,
-                             v=v, length=shared["length"])
+        if pmeter is None:
+            ex = SN.SpanExecutor(generator, head, slots, cap=cfg["span_buf_cap"],
+                                 hold_cap=cfg["span_hold_cap"], hold_frac=cfg["span_hold_frac"],
+                                 per_call=cfg["span_capture"], seed=cfg["seed"] + 5_150_101,
+                                 v=v, length=shared["length"])
+        else:
+            # [intonation] the SAME constructor arguments, the same dedicated seed, the same
+            # buffers — `PerfExecutor` differs from its parent only by carrying the meter.
+            ex = build_perf_executor(generator, head, slots, cap=cfg["span_buf_cap"],
+                                     hold_cap=cfg["span_hold_cap"],
+                                     hold_frac=cfg["span_hold_frac"],
+                                     per_call=cfg["span_capture"],
+                                     seed=cfg["seed"] + 5_150_101,
+                                     v=v, length=shared["length"], meter=pmeter,
+                                     row_cap=cfg["perf_row_cap"],
+                                     row_seed=cfg["seed"] + 6_260_101)
     else:
         ex = SN.PlainExecutor()
 
@@ -2888,21 +3968,26 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
     events = []
     log = {"cycle": [], "era": [], "level": [], "t_cum": [], "e": [], "succ": [], "dres": [],
            "n_moves": [], "width": [], "g_per_solve": [], "e_practice": [], "vloss": [],
+           # [tacet] the gate's per-cycle record, written in EVERY arm (see `gate_log`).
+           "gate": [],
+           # [intonation] the meter's per-cycle record: per-slot e/b/g/delta sums, the 2x2
+           # cells, the gate calibration and the unpriced misfire counterfactual.
+           "perf": [],
            "gloss": [], "n_solved": [], "n_mined": [], "miner": [], "aud": [], "cert": [],
            "probe": [], "vocab": [], "prop": [], "span": [], "blocks": [],
            "m_per_solve": [], "committed_grade": [], "gy": [], "entry": [],
            # [conductor] the decision trace and the shadow panel, per cycle, in every arm.
            "loop": [], "panel": [],
-           # [antiphon] the question port's per-cycle record: what was on the menu, what was
+           # [tutti] the question port's per-cycle record: what was on the menu, what was
            # selected, what difficulty mix came out, and what the questions actually DELIVERED
-           # against what they designed. Written in every arm, including `q_exo` (where it is
-           # the donor's own draw described) and including the arms that never look at a
-           # designed key — so the dose is measured on the same axis everywhere.
+           # against what they designed. Written in every arm, including the `exo` arms (where
+           # it is the donor's own draw, described) — so the dose is measured on the same axis
+           # everywhere, and on a FALLIBLE executor for the first time.
            "q": []}
 
-    # ---- [antiphon] THE QUESTION PORT'S OWN STATE ----------------------------------------
+    # ---- [tutti] THE QUESTION PORT'S OWN STATE -------------------------------------------
     # `question_mode=None` -> the port is off and every line below is inert, which is the
-    # configuration `fidelity_smoke` gates at 0.000e+00 against `crescendo.py`.
+    # configuration `fidelity_smoke` gates at 0.000e+00 against `caesura.py`.
     qmode = cfg.get("question_mode") or None
     k_menu = int(cfg.get("question_k") or 0) or int(cfg["n_pr"])
     # its OWN numpy stream (`woodshed`'s `rehrng` discipline) — reserved so a future rule that
@@ -2910,15 +3995,6 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
     qrng = np.random.default_rng(cfg["seed"] + 909_090)
     qledger = QS.DeliveryLedger() if qmode in ("endo",) else None
     q_designed = q_halves = None
-    # ---- [trap] THE TRAP CHANNEL'S OWN STATE -------------------------------------------
-    # `trap_frac=None` -> `install_trap` returns its inputs untouched and the fork is
-    # bit-identical, which is what gate G-T asserts. The bank is built once per era; the use
-    # accumulator is pure bookkeeping over the entry recorder's already-computed output.
-    tfrac = cfg.get("trap_frac") or None
-    tstate = {"bank": {}, "use": {}, "rng": np.random.default_rng(cfg["seed"] + 717_171)}
-    if tfrac or qmode == "trust":
-        print(f"[trap]   arm={arm} trap_frac={tfrac} spread={cfg.get('trap_spread')} "
-              f"mode={qmode}", flush=True)
     if qmode:
         print(f"[q]      arm={arm} question_mode={qmode} K={k_menu} n_pr={cfg['n_pr']} "
               f"ledger={'on' if qledger is not None else 'off'}", flush=True)
@@ -2959,15 +4035,70 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
         loop_spec["fit"] = fitobj
     loop_floors = {"ledger": cfg["tol_ledger"], "endo": cfg["tol_endo"],
                    "endo_excess": cfg["tol_endo"],
+                   # [caesura] delta-silence's own MEASURED dead zone. `QuietPolicy` refuses a
+                   # defaulted floor by construction, which is the property that forces this to
+                   # be measured rather than chosen: it is derived by the same null-ABBA
+                   # procedure that measured `tol_endo`, on this round's Phase-A probe, and
+                   # passed in explicitly (reduction §6 re-derives it in-tag).
+                   "dsil": cfg["tol_dsil"],
                    "yield_by_level": {3: cfg["tol_yield_l3"], 4: cfg["tol_yield_l4"]}}
     yoke_plan = cfg.get("yoke_plan") or []
     if isinstance(yoke_plan, str):
         yoke_plan = json.loads(yoke_plan)
+    # [caesura] THE VETO'S DETECTOR. `dsil_and` lets delta-silence gate commit TIMING without
+    # letting it choose the crossing: A1's yield thermostat still decides WHICH rung and WHEN it
+    # is ready, and a commit it licenses is DEFERRED on any cycle the executor is still moving.
+    # The detector is A1's own `QuietPolicy` on the `dsil` read, stepped read-only — this round
+    # adds no rule, it adds a gauge and one conjunction.
+    dsil_det = (PO.build_policy({"kind": "quiet", "read": "dsil",
+                                 "span": cfg["loop_span"], "W": cfg["loop_W"],
+                                 "burn": cfg["loop_burn"], "alpha": cfg["loop_alpha"]},
+                                floors=loop_floors)
+                if cfg.get("dsil_veto") else None)
+    dsil_events = []
     loop = PO.build_policy({**loop_spec,
                             "span": cfg["loop_span"], "W": cfg["loop_W"],
                             "burn": cfg["loop_burn"], "alpha": cfg["loop_alpha"]},
                            floors=loop_floors, yoke_plan=yoke_plan)
     driven = loop.kind == "quiet"
+    # [tutti] THE SPLIT: A SECOND POLICY OBJECT THAT OWNS THE COMMIT.
+    #
+    # `loop` owns the ADVANCE, and owns the COMMIT too unless `loop_commit` is present. This
+    # adds no RULE — `QuietPolicy` is A1's, imported, and the donor already builds a second
+    # instance of it (`dsil_det`, the veto's read-only detector) in every arm. The split is
+    # that detector promoted from read-only to LICENSING.
+    #
+    # Both objects are built from the same span/W/burn/alpha and the same measured floors, so
+    # the ONLY thing that differs between a split arm and a pure one is WHICH SERIES licenses
+    # WHICH ACTION. Under `kind == "yoke"` the plan already distinguishes COMMIT cycles from
+    # ADVANCE cycles, so a yoke of a split arm needs no second object and this is skipped —
+    # which is what makes the one-bit clock yoke work for a two-policy source.
+    loop_c_spec = dict(spec.get("loop_commit") or {})
+    loop_c = None
+    if loop_c_spec and loop.kind != "yoke":
+        loop_c = PO.build_policy({**loop_c_spec,
+                                  "span": cfg["loop_span"], "W": cfg["loop_W"],
+                                  "burn": cfg["loop_burn"], "alpha": cfg["loop_alpha"]},
+                                 floors=loop_floors)
+        assert loop_c.read_key != getattr(loop, "read_key", None), (
+            f"{arm}: the split's two policies must read DIFFERENT series "
+            f"(both read {loop_c.read_key!r}) — otherwise it is not a split")
+        print(f"[split]  arm={arm} COMMIT reads {loop_c.read_key} "
+              f"(tol {loop_c.tol_for(None) if loop_c.v_tol_default is not None else 'per-level'})"
+              f" | ADVANCE reads {loop.read_key}", flush=True)
+
+    def _acted_all(kind, cyc_, why=""):
+        """[tutti] BOTH policies re-arm on EVERY action and at every era start, not only on
+        their own. The donor's stated reason for resetting is REGIME CHANGE: a commit installs
+        a table (a regime change for the yield gauge) and an advance changes the damage cell (a
+        regime change for the executor delta-silence hears). Resetting own-action-only would
+        make a split arm differ from a pure one in TWO things — which gauge licenses, and how
+        each clock re-arms — instead of one. The own-action-only rule is a COUNTERFACTUAL
+        replayed offline in the reduction from each policy's own logged trace, never an arm."""
+        loop.acted(kind, cyc_, why=why)
+        if loop_c is not None:
+            loop_c.acted(kind, cyc_, why=why)
+
     # [conductor] BOTH endo keys carry the price. The driven key is `endo_read_key`, which is
     # `endo_excess` by default, and a price map keyed only on `endo` silently falls through to
     # 0 — which is what happened in `cd_s0`, where `outer_endo` recorded `spend 0g` for 146
@@ -3012,7 +4143,7 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             ec = int(caps[era_i]) if era_i < len(caps) else \
                 int(era.get("cycles") or cfg["era_cycles"])
         era_end = cyc + ec
-        loop.acted("era_start", era_start, why=f"era{era_i + 1}")
+        _acted_all("era_start", era_start, why=f"era{era_i + 1}")   # [tutti]
         print(f"\n----- arm={arm} ERA {era_i + 1}: damage {era['name']} "
               f"(earning level {active}) c{era_start}..{era_end}"
               f"{' (cap)' if loop.kind != 'schedule' else ''} -----", flush=True)
@@ -3049,28 +4180,34 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 port_pr = dict(port, explore=int(cfg["prop_explore"]), erng=erng)
 
             # --- (a) practice: wide closed-loop beam on fresh instances of this era's cell
-            # [antiphon] THE QUESTION PORT'S ONE CALL SITE. The draw below is the donor's,
+            # [tutti] THE QUESTION PORT'S ONE CALL SITE. The draw below is the donor's,
             # byte-for-byte, at the donor's own RNG position — `with_clean=True` changes the
             # return value and nothing else (`context_instances` computes `clean` either way).
             # With `question_mode=None` these are the donor's two lines and nothing more runs.
             r_np, x_np, cl_np = context_instances(
                 rules, era_ctx(era), cfg["n_pr"], s, depth, v, m,
                 seed=cfg["seed"] + 100_000 + 1000 * cyc, with_clean=True)
-            qrow, q_designed, q_halves, q_isd = None, None, None, None
+            qrow, q_designed, q_halves = None, None, None
             if qmode:
                 # RNG SANDBOX (belt, braces, third belt): the port draws on its own numpy
                 # streams and takes only no-grad forwards on dropout-free nets, so it consumes
                 # nothing — and the snapshot/restore makes that true by construction rather
-                # than by inspection. The round's load-bearing gate is `q_exo` replaying
-                # `cr3_s0/anchor_long` bit-for-bit at full scale; this is what protects it.
+                # than by inspection. The round's load-bearing gate is `tu_y_exo` replaying
+                # `ca_s0/dsil_yield` bit-for-bit at full scale; this is what protects it.
+                # (The nets are left in `.eval()` on the way out, which is safe here because
+                # every trainer in this file calls `.train()` at entry — asserted by the
+                # 0.000e+00 replay rather than by inspection.)
                 _q_state = _rng_snapshot()
-                (r_np, x_np, cl_np, q_designed, q_halves, qrow, q_isd) = pose_questions(
+                (r_np, x_np, cl_np, q_designed, q_halves, qrow) = pose_questions(
                     qmode, rules=rules, era=era, cfg=cfg, s=s, depth=depth, v=v, m=m, cyc=cyc,
                     head=(r_np, x_np, cl_np), shared=shared, value_net=value,
                     controller=controller, device=device, miners=miners, operative=operative,
-                    maxl=maxl, qledger=qledger, n_pr=cfg["n_pr"], k_menu=k_menu,
-                    tstate=tstate, trap_frac=tfrac)          # [trap]
+                    maxl=maxl, qledger=qledger, n_pr=cfg["n_pr"], k_menu=k_menu)
                 _rng_restore(_q_state)
+                if not qrow["quota_ok"]:
+                    print(f"[q!]     arm={arm} c{cyc} QUOTA DEVIATION mode={qmode} "
+                          f"d*={qrow['d_mean']:.3f} vs menu {qrow['d_mean_menu']:.3f}",
+                          flush=True)
             out = plan(controller, generator, value, torch.from_numpy(x_np),
                        torch.from_numpy(r_np), ms, rules_t, canon, depth, v, m, s,
                        budget=cfg["budget"], beam_width=p_width, device=device,
@@ -3089,6 +4226,128 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             ps, _ = grade(out["x"].cpu().numpy(), r_np, rules, s)
             e_practice = 1.0 - float(ps.mean())
 
+            # --- (a2) [tacet] THE GATE. Read the two decision-time scalars off what the beam
+            #          already computed, then decide, per consumption channel, which of the
+            #          data the GRADE already admitted this arm will actually learn from.
+            #
+            #          Order matters and is stated: the grade filter is upstream of the gate in
+            #          both channels, so the gate is always a RESTRICTION of the current rule,
+            #          never a relaxation. `gate_all` is the one arm that relaxes it, and it
+            #          does so through the donor's own knobs (`mine_cap=0`, `prop_train_on`),
+            #          not through the gate.
+            #
+            #          The VALUE BUFFER is above this line on purpose: `push` has already run.
+            #          delta is the residual of the value head's forecast, so gating the value
+            #          head's own diet would make the gate self-referential.
+            gmode = cfg.get("gate_mode")
+            gfe = (gate_features(out, succ, ps, B, W)
+                   if (gmode or cfg.get("gate_log")) else None)
+            keep_tip, mine_ord, grec = None, None, None
+            # [intonation] THE 2x2 — executed-as-intended x solved — and delta_perf as one more
+            # ordering scalar. `p_tip` is the trajectory's summed delta_perf; the row axis is
+            # `bad == 0`, i.e. every head execution on this trajectory exactly matched its
+            # intention. A trajectory the head never executed on is its OWN cell (`exe == 0`)
+            # and is never folded into "as intended": nothing was performed, so there is no
+            # performance to grade. This block runs in EVERY metered arm, consuming nothing
+            # unless `gate_mode` is a perf mode.
+            p_tip = p_flat = None
+            if gfe is not None and "p_tip" in gfe:
+                p_tip, p_flat = gfe["p_tip"], gfe["p_tip"].reshape(-1)
+                bad_f, exe_f = gfe["bad_tip"].reshape(-1), gfe["exe_tip"].reshape(-1)
+                sol_f = (succ > 0.5)
+                intent = (bad_f == 0) & (exe_f > 0)
+                none_x = (exe_f == 0)
+                cells = {
+                    # the four cells, plus the no-execution row kept apart
+                    "int_solved": int((intent & sol_f).sum()),
+                    "int_failed": int((intent & ~sol_f).sum()),
+                    "bad_solved": int((~intent & ~none_x & sol_f).sum()),   # LUCKY SUCCESS
+                    "bad_failed": int((~intent & ~none_x & ~sol_f).sum()),
+                    "non_solved": int((none_x & sol_f).sum()),
+                    "non_failed": int((none_x & ~sol_f).sum()),
+                    "n_tip": int(sol_f.shape[0]),
+                    "n_exec_tip": int((exe_f > 0).sum()),
+                    "sum_exe": float(exe_f.sum()), "sum_bad": float(bad_f.sum()),
+                    "d_int": round(float(p_flat[intent].mean()), 5) if intent.any() else None,
+                    "d_bad": round(float(p_flat[~intent & ~none_x].mean()), 5)
+                             if (~intent & ~none_x).any() else None,
+                }
+                # and the same 2x2 at the MINED unit (the beam's own answer per instance),
+                # which is the unit the vocabulary is actually built from.
+                ai = (gfe["bad_ans"] == 0) & (gfe["exe_ans"] > 0)
+                an = (gfe["exe_ans"] == 0)
+                sa = (ps > 0.5)
+                cells.update({"ans_int_solved": int((ai & sa).sum()),
+                              "ans_int_failed": int((ai & ~sa).sum()),
+                              "ans_bad_solved": int((~ai & ~an & sa).sum()),
+                              "ans_bad_failed": int((~ai & ~an & ~sa).sum()),
+                              "ans_non_solved": int((an & sa).sum()),
+                              "ans_non_failed": int((an & ~sa).sum())})
+                cells["c"] = cyc
+                perf_cells.append(cells)
+            if gfe is not None:
+                d_tip, mg = gfe["d_tip"].reshape(-1), np.repeat(gfe["margin"], W)
+                sol_tip = np.flatnonzero(succ > 0.5)
+                n_keep = (max(1, int(round(float(cfg["gate_frac"]) * sol_tip.shape[0])))
+                          if sol_tip.shape[0] else 0)
+                grec = {"c": cyc, "mode": gmode, "n_sol_tip": int(sol_tip.shape[0]),
+                        "n_sol_inst": int((ps > 0.5).sum()), "n_keep_tip": 0,
+                        # the gate's own inputs, per instance, in EVERY arm — 3 x n_pr floats
+                        # a cycle, which is what makes the counterfactual gate computable
+                        # offline for the ungated baseline too.
+                        "d_ans": [round(float(x), 5) for x in gfe["d_ans"]],
+                        "margin": [round(float(x), 5) for x in gfe["margin"]],
+                        # the textbook top1-top2 margin, logged beside the gated one so the
+                        # reduction can say how degenerate it is (see `gate_features`).
+                        "m2": [round(float(x), 5) for x in gfe["m2"]],
+                        "ps": [int(x) for x in (ps > 0.5)]}
+                if p_flat is not None:                     # [intonation]
+                    grec["p_ans"] = [round(float(x), 5) for x in gfe["p_ans"]]
+                    grec["bad_ans"] = [int(x) for x in gfe["bad_ans"]]
+                    grec["exe_ans"] = [int(x) for x in gfe["exe_ans"]]
+                if gmode and sol_tip.shape[0]:
+                    order = gate_order(gmode, sol_tip, d_tip, mg, ggrng, perf=p_flat,
+                                       nexe=(gfe["exe_tip"].reshape(-1)
+                                             if "exe_tip" in gfe else None))
+                    kept = order[:n_keep]
+                    keep_tip = np.zeros(B * W, dtype=bool)
+                    keep_tip[kept] = True
+                    grec["n_keep_tip"] = int(n_keep)
+                    grec["d_kept"] = round(float(np.mean(d_tip[kept])), 5)
+                    grec["d_drop"] = (round(float(np.mean(d_tip[order[n_keep:]])), 5)
+                                      if order.shape[0] > n_keep else None)
+                    grec["m_kept"] = round(float(np.mean(mg[kept])), 5)
+                    if p_flat is not None:                 # [intonation]
+                        grec["p_kept"] = round(float(np.mean(p_flat[kept])), 5)
+                        grec["p_drop"] = (round(float(np.mean(p_flat[order[n_keep:]])), 5)
+                                          if order.shape[0] > n_keep else None)
+                        # how many of the kept tips were EXECUTED AS INTENDED, and how many
+                        # of the ranking's decisions were made on ties (perf == 0, i.e. no
+                        # head execution on that trajectory) — `tacet`'s `m2 == 0` convention.
+                        grec["int_kept"] = int(((gfe["bad_tip"].reshape(-1)[kept] == 0)
+                                                & (gfe["exe_tip"].reshape(-1)[kept] > 0)).sum())
+                        grec["p_tie"] = int((p_flat[sol_tip] == 0).sum())
+                        # [intonation/A] the tie count on the key THIS mode ranks by: for
+                        # `perf_mean` the no-execution rows are ordered last on purpose and are
+                        # not ties, so the honest number is ties WITHIN the executed set.
+                        _ex = gfe["exe_tip"].reshape(-1)[sol_tip] > 0
+                        grec["n_exec_cand"] = int(_ex.sum())
+                        _mu = np.where(_ex, p_flat[sol_tip] / np.maximum(
+                            gfe["exe_tip"].reshape(-1)[sol_tip], 1.0), np.nan)
+                        grec["p_tie_exec"] = int((_mu[_ex] == 0).sum()) if _ex.any() else 0
+                if gmode and cfg.get("gate_mine"):
+                    # the MINING order: the same scalar at the mined unit (the beam's own
+                    # answer per instance), over the solved instances only.
+                    sol_inst = np.flatnonzero(ps > 0.5)
+                    if sol_inst.shape[0]:
+                        mine_ord = gate_order(gmode, np.arange(sol_inst.shape[0]),
+                                              gfe["d_ans"][sol_inst], gfe["margin"][sol_inst],
+                                              ggrng,
+                                              perf=(gfe["p_ans"][sol_inst]      # [intonation]
+                                                    if "p_ans" in gfe else None),
+                                              nexe=(gfe["exe_ans"][sol_inst]
+                                                    if "exe_ans" in gfe else None))
+
             # --- (b) THE VOCABULARY IS MINED from what the agent actually solved, parsed by
             #         the agent's OWN generator. Every level's span containing this era's
             #         damage cell is observed; whether an observation becomes an ENTRY is
@@ -3100,16 +4359,45 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             #         rather than a substrate one (round 1's `cald_s0` trap, one level up).
             mine_src = (out["x"][torch.from_numpy(ps > 0.5).to(device)]
                         if cfg["mine_from"] == "chosen" else solved)
-            # [antiphon] the mined rows' indices BACK INTO THE POSED BATCH, recorded so the
-            # designed key of a question can be joined to the key its answer delivered. Pure
-            # bookkeeping: it reads `rng.permutation`'s result, it does not move it.
-            _solved_idx = np.flatnonzero(ps > 0.5)
-            _mine_idx = _solved_idx if cfg["mine_from"] == "chosen" else None
             if cfg["mine_cap"] and mine_src.shape[0] > cfg["mine_cap"]:
-                sel = torch.from_numpy(rng.permutation(mine_src.shape[0])[:cfg["mine_cap"]])
+                # [tacet] THE DRAW IS UNCONDITIONAL, exactly as in the donor, and only the
+                # ORDERING it is read through changes. Keeping the `rng.permutation` call on
+                # the same branch with the same argument is what makes the shared per-arm
+                # stream identical between a gate arm and the baseline, so the first
+                # divergence between them is the gate's CONTENT and never its bookkeeping.
+                perm = rng.permutation(mine_src.shape[0])
+                take = (perm if (mine_ord is None or cfg["mine_from"] != "chosen")
+                        else mine_ord)[:cfg["mine_cap"]]
+                sel = torch.from_numpy(np.ascontiguousarray(take))
                 mine_src = mine_src[sel.to(device)]
-                if _mine_idx is not None:
-                    _mine_idx = _mine_idx[sel.numpy()]
+                mine_take = np.asarray(take)               # [intonation]
+            else:
+                mine_take = np.arange(mine_src.shape[0])   # [intonation] the cap did not bind
+            # [tutti] THE MINED ROWS' INDICES BACK INTO THE POSED BATCH, so the designed key of
+            # a question can be joined to the key its answer actually delivered. `antiphon`
+            # carried its own parallel index here; the donor already computes exactly that
+            # object (`intonation`'s `mine_take` over `np.flatnonzero(ps > 0.5)`), so this
+            # REUSES it rather than adding a second one. Pure bookkeeping: it reads
+            # `rng.permutation`'s result, it does not move it. `mine_ord` is None in every arm
+            # of this tag (no diet gate is built — that seat is closed by measurement), so
+            # `mine_take` is the donor's own permutation.
+            _mine_idx = None
+            if qmode and cfg["mine_from"] == "chosen":
+                _si = np.flatnonzero(ps > 0.5)
+                _mine_idx = (_si[mine_take] if mine_take.shape[0] <= _si.shape[0] else _si)
+            # [intonation] WHAT GOT MINED, BY 2x2 CELL — in every arm, gated or not, so the
+            # ungated baseline's own diet is on the record in the same units. `mine_take`
+            # indexes the solved instances (`mine_from="chosen"`), which is the mined unit.
+            if grec is not None and gfe is not None and "p_ans" in gfe \
+                    and cfg["mine_from"] == "chosen":
+                si = np.flatnonzero(ps > 0.5)
+                ki = si[mine_take] if mine_take.shape[0] <= si.shape[0] else si
+                grec["mine_n"] = int(ki.shape[0])
+                grec["mine_int"] = int(((gfe["bad_ans"][ki] == 0)
+                                        & (gfe["exe_ans"][ki] > 0)).sum())
+                grec["mine_bad"] = int((gfe["bad_ans"][ki] > 0).sum())
+                grec["mine_non"] = int((gfe["exe_ans"][ki] == 0).sum())
+                grec["mine_p"] = round(float(gfe["p_ans"][ki].mean()), 5) if ki.size else None
             #         Levels are mined only up to `era_level + 1`: during era k the agent forms
             #         level-(k+1) chunks out of what it is currently producing. Mining level 3
             #         during era 1 would hand era 2 a finished vocabulary before era 2 begins,
@@ -3119,7 +4407,7 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 # generator's block head is unsupervised at visible positions (0.63), which
                 # capped the earned level-3 vocabulary's precision at ~0.3.
                 pf = MC.parse_features(shared["reader"], mine_src, s=s).cpu().numpy()
-                # [antiphon] the counts the target miner held BEFORE this cycle's observations,
+                # [tutti] the counts the target miner held BEFORE this cycle's observations,
                 # so "did this question move a key that was not already banked" is answerable.
                 _tgt = min(maxl, era["level"] + 1)
                 _cnt_before = dict(miners[_tgt].counts) if qmode and _tgt in miners else None
@@ -3127,35 +4415,40 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                     span = s ** (ell - 1)
                     node = (era["node"] * s ** (era["level"] - 1)) // span
                     miners[ell].observe(pf[:, node * span:(node + 1) * span])
-                # [antiphon] DELIVERED DOSE vs DESIGN DOSE, and the delivery ledger's credit.
+                # [tutti] DELIVERED DOSE vs DESIGN DOSE, and the delivery ledger's credit.
                 # `wd_s0`'s lesson as an instrument: the question-posing machinery is measured
-                # against its own design every cycle, in every arm, rather than assumed.
-                if qmode and qrow is not None and _mine_idx is not None and _cnt_before is not None:
+                # against its own design every cycle, in every arm, rather than assumed. NEW
+                # HERE: the repair is executed by a FALLIBLE span head, so this is the first
+                # time the dose is read on an executor that can miss — if it falls below
+                # `an_s0`'s 0.45 at era 1 the knob's grip is narrower on this substrate, and
+                # that is a number rather than a caveat.
+                if qmode and qrow is not None and _mine_idx is not None \
+                        and _cnt_before is not None:
                     _sp = s ** (_tgt - 1)
                     _nd = (era["node"] * s ** (era["level"] - 1)) // _sp
                     _delivered = pf[:, _nd * _sp:(_nd + 1) * _sp]
                     _des = q_designed[_mine_idx]
-                    _hit = [bool(np.array_equal(_delivered[j], _des[j]))
-                            for j in range(len(_mine_idx))]
+                    _n = min(len(_mine_idx), _delivered.shape[0])
+                    _hit = [bool(np.array_equal(_delivered[j], _des[j])) for j in range(_n)]
                     _support = int(cfg["mine_support"])
                     _truth_t = {tuple(int(z) for z in r)
                                 for r in shared["truth"][_tgt]["flat"]}
-                    _dk = [tuple(int(z) for z in r) for r in _delivered]
+                    _dk = [tuple(int(z) for z in r) for r in _delivered[:_n]]
                     # credit = the observation advanced a key that was NOT already banked
                     _credit = [1 if _cnt_before.get(k, 0) < _support else 0 for k in _dk]
                     if qledger is not None and q_halves is not None and q_halves.shape[1]:
-                        qledger.update([tuple(int(z) for z in h) for h in q_halves[_mine_idx]],
-                                       _credit)
+                        qledger.update(
+                            [tuple(int(z) for z in h) for h in q_halves[_mine_idx][:_n]],
+                            _credit)
                     qrow.update({
-                        "n_mined": int(len(_mine_idx)), "n_solved": int(len(_solved_idx)),
+                        "n_mined": int(_n), "n_solved": int(len(np.flatnonzero(ps > 0.5))),
                         "dose_hit": float(np.mean(_hit)) if _hit else None,
-                        "delivered_true": float(np.mean([k in _truth_t for k in _dk])),
-                        "designed_true_mined": float(np.mean(
-                            [tuple(int(z) for z in r) in _truth_t for r in _des])),
+                        "delivered_true": (float(np.mean([k in _truth_t for k in _dk]))
+                                           if _dk else None),
+                        "designed_true_mined": (float(np.mean(
+                            [tuple(int(z) for z in r) in _truth_t for r in _des[:_n]]))
+                            if _n else None),
                         "credit_rate": float(np.mean(_credit)) if _credit else None,
-                        # [trap] what fraction of the OBSERVATIONS came from the trap
-                        "trap_mined": (None if q_isd is None or not len(_mine_idx)
-                                       else float(np.mean(q_isd[_mine_idx]))),
                         "at_support_after": int(sum(
                             1 for c in miners[_tgt].counts.values() if c >= _support)),
                         "ledger": (qledger.state() if qledger is not None else None)})
@@ -3194,7 +4487,8 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                     shared["bottom_map"], v=v, s=s, n_blocks=shared["n_blocks"],
                     n_steps=cfg["gen_steps"], batch=cfg["batch_size"],
                     replay_frac=cfg["replay_frac"], device=device, rng=grng,
-                    span_rng=span_rng, span_batch=cfg["span_batch"], lam=cfg["span_lam"])
+                    span_rng=span_rng, span_batch=cfg["span_batch"], lam=cfg["span_lam"],
+                    perf_gain=perf_gain)      # [intonation] None == the donor's own function
             else:
                 gloss = finetune_generator(generator, gopt, solved.cpu(), shared["replay"]["x"],
                                            shared["bottom_map"], v=v, s=s,
@@ -3210,16 +4504,26 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             if use_span and slots:
                 par = SN.parity(generator, head, ex, slots, s, v,
                                 min_hold=cfg["span_min_hold"])
+                # [intonation] THE ONE CHANGE: the FIRING threshold. `span_tau_fire` (None ==
+                # the donor's `span_tau`) is what decides whether the head executes; the
+                # PARITY RECORD is unchanged and `open_tau` is logged beside `open` on every
+                # event, so the tau = 0.95 counterfactual is readable straight off the log.
+                # Lowering it is the whole treatment: at 0.95 the head is allowed to fire only
+                # where it is already ~never wrong, so `e` is ~0 and delta_perf is degenerate.
+                tau_fire = cfg.get("span_tau_fire")
+                tau_fire = cfg["span_tau"] if tau_fire is None else float(tau_fire)
                 for key, cell in par.items():
                     was = slots[key]["open"]
-                    now = cell["exact"] is not None and cell["exact"] >= cfg["span_tau"]
+                    now = cell["exact"] is not None and cell["exact"] >= tau_fire
+                    at_tau = cell["exact"] is not None and cell["exact"] >= cfg["span_tau"]
                     slots[key]["open"] = now
                     if now != was:
                         gate_events.append({"cycle": cyc, "slot": key, "open": bool(now),
+                                            "open_tau": bool(at_tau),
                                             "exact": cell["exact"], "n": cell["n"]})
                         print(f"[gate]   arm={arm} c{cyc} slot {key} "
                               f"{'OPEN' if now else 'CLOSE'} exact={cell['exact']} "
-                              f"n={cell['n']}", flush=True)
+                              f"n={cell['n']} tau_fire={tau_fire}", flush=True)
             vloss = value_steps(value, vopt, controller, buf, shared["replay"],
                                 n_steps=cfg["n_grad"], batch=cfg["value_batch"],
                                 replay_frac=cfg["replay_frac"], device=device, rng=rng)
@@ -3233,12 +4537,17 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             if prop is not None:
                 pairs = prop_pairs(out, torch.from_numpy(r_np), succ,
                                    PN.move_slots(ms, offsets), cfg["budget"],
-                                   train_on=cfg["prop_train_on"])
+                                   train_on=cfg["prop_train_on"],
+                                   keep=keep_tip)          # [tacet] the gate; None == donor
                 if pairs is None and cfg["prop_train_on"] == "solved":
                     # nothing solved this cycle: a policy that cannot generate a success cannot
                     # be improved by imitating an empty set, so fall back to the beam's own
                     # survivors (which the value did select) rather than skipping the update
                     # and letting a bad filter freeze itself in.
+                    # [tacet] the fallback is UNGATED, deliberately: it fires only when the
+                    # grade filter itself came back empty, so there is nothing for the gate to
+                    # be selective about, and gating a rescue path would turn "no successes
+                    # this cycle" into "no pi update this cycle" — a different intervention.
                     pairs = prop_pairs(out, torch.from_numpy(r_np), succ,
                                        PN.move_slots(ms, offsets), cfg["budget"],
                                        train_on="tips")
@@ -3308,7 +4617,20 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             e_cell = endo_read(generator, endo_x, shared["bottom_map"],
                                cell_span_blocks(era, s, depth),
                                v=v, s=s, n_blocks=shared["n_blocks"])
+            # [caesura] the gauge. `pmeter.bench` is `intonation`'s per-macro-slot benchmark,
+            # already maintained; nothing new is computed and nothing new is priced. Averaged
+            # over the OPEN slots only, because a closed slot's b(s) describes an executor the
+            # agent is not running. `dsil_all` (every minted slot) is logged beside it so the
+            # other definition is readable off the record.
+            _open_keys = [k for k, sl in slots.items() if sl.get("open")]
+            _bench = (pmeter.bench if pmeter is not None else {})
+            _bo = [float(_bench[k]) for k in _open_keys if k in _bench]
+            _ba = [float(x) for x in _bench.values()]
+            _dsil_now = (float(np.mean(_bo)) if _bo else None)
+            _dsil_all = (float(np.mean(_ba)) if _ba else None)
+            _dsil_n, _dsil_open = len(_ba), len(_bo)
             panel = {"cycle": cyc, "era": era_i + 1, "active": int(active),
+                     "dsil_all": _dsil_all,
                      "read_level": int(read_level),
                      # ERROR CONVENTION throughout (lower is better), so every gauge shares one
                      # sign convention and `policy.py` is indifferent to which it is handed.
@@ -3316,6 +4638,15 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                      "yield": (None if y_next is None else -float(y_next)),
                      "yield_level": int(read_level),
                      "yield_active": (None if y_active is None else -float(y_active)),
+                     # [caesura] delta-SILENCE, in the panel's error convention already (b(s)
+                     # IS an error: the per-slot mean of the head's own execution error against
+                     # what `apply_any` would have written). One scalar: the mean of b(s) over
+                     # the slots that are OPEN this cycle, i.e. over the executor the agent is
+                     # actually running. `None` before any slot opens — the gauge does not
+                     # exist yet, which is a fact about the signal's TYPE and is why `dsil`
+                     # cannot pace the L2 commit. Logged in EVERY arm, driven in two.
+                     "dsil": _dsil_now, "dsil_level": int(active),
+                     "dsil_n": int(_dsil_n), "dsil_open": int(_dsil_open),
                      "endo": e_par, "endo_level": int(era["level"] + 1),
                      "endo_cell": e_cell,
                      # [conductor] THE EXCESS FORM, and why it exists. `endo_yield`'s read was
@@ -3372,6 +4703,41 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 if charged:
                     counts["ground"] += int(charged)
                 linfo = loop.step(cyc, panel)
+            # [caesura] THE DETECTOR, read-only: same cycle, same panel, A1's rule unchanged.
+            # Stepped OUTSIDE the driven/undriven split, because a veto arm may be paced by
+            # `yield` or by the schedule and the conjunction has to be evaluated either way —
+            # and stepped only when the gauge EXISTS, on the donor's own idiom two lines up: a
+            # cycle whose read is undefined is not a decision point, so handing the thermostat
+            # a None would not merely crash it (it does), it would invent a decision.
+            if dsil_det is not None:
+                if panel.get("dsil") is None:
+                    linfo = {**linfo, "dsil_quiet": False, "dsil_V": None,
+                             "dsil_read": None, "dsil_skipped": "gauge absent"}
+                else:
+                    _dinfo = dsil_det.step(cyc, panel)
+                    linfo = {**linfo, "dsil_quiet": bool(_dinfo.get("quiet")),
+                             "dsil_V": _dinfo.get("V"), "dsil_read": panel.get("dsil")}
+            # [tutti] THE COMMIT POLICY, stepped on the same cycle and the same panel with
+            # A1's rule unchanged. The donor's guard applies PER POLICY: a cycle whose read is
+            # undefined is not a decision point for the policy that reads it, so `loop_c` is
+            # stepped only where its own gauge exists. `cq` is the commit licence the block (g)
+            # dispatch reads; `None` means "this policy could not speak this cycle", which is
+            # what the bootstrap branch is for.
+            cq, cinfo = None, None
+            if loop_c is not None:
+                _cread = panel.get(loop_c.read_key)
+                if _cread is None:
+                    linfo = {**linfo, "c_quiet": None, "c_V": None, "c_read": None,
+                             "c_key": loop_c.read_key, "c_skipped": "read undefined this cycle"}
+                else:
+                    charged_c = ledger.charge(loop_c.needs_at(cyc))
+                    if charged_c:
+                        counts["ground"] += int(charged_c)
+                    cinfo = loop_c.step(cyc, panel)
+                    cq = bool(cinfo.get("quiet"))
+                    linfo = {**linfo, "c_quiet": cq, "c_V": cinfo.get("V"),
+                             "c_read": _cread, "c_key": loop_c.read_key,
+                             "c_v_tol": cinfo.get("v_tol"), "c_v_mult": cinfo.get("v_mult")}
             linfo["era"] = era_i + 1
             linfo["c_in_era"] = c_in_era
 
@@ -3548,6 +4914,42 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                     lic = bool(fire_cert and (gate_quiet if gate_quiet is not None else True))
                     do_commit = bool(lic or at_boundary)
                     prov = not lic
+                elif (cfg.get("dsil_bootstrap") and spec["commit"] == "loop"
+                      # [tutti] the bootstrap belongs to whichever policy OWNS THE COMMIT: the
+                      # second object when the split is on, the primary otherwise. `_c_owner`
+                      # is `loop_c or loop`, and the branch is entered exactly when the commit
+                      # owner reads `dsil` and the gauge does not exist this cycle. With
+                      # `loop_commit` absent this is the donor's condition, character for
+                      # character.
+                      and getattr((loop_c or loop), "read_key", None) == "dsil"
+                      and panel.get("dsil") is None):
+                    # [caesura] THE BOOTSTRAP, and why the arm cannot exist without it.
+                    #
+                    # delta-silence is computed over the OPEN SLOTS, and slots are minted BY a
+                    # commit. So before the first commit the gauge does not exist, the donor's
+                    # own "read undefined this cycle" guard correctly skips the thermostat, the
+                    # loop never acts, no slot is ever minted — and the arm DEADLOCKS. That is
+                    # not a scale artifact: it is the type structure of the signal, and gate
+                    # D-1 shows it directly (`dsil_read` at preflight: 0 cycles with dsil, 0
+                    # open slots, 0 commits, at every scale).
+                    #
+                    # So the honest statement of what this arm can be asked is: delta-silence
+                    # CANNOT license the first crossing — it can only license crossings above
+                    # the level whose executor it can hear. While the gauge is absent the arm
+                    # falls back to the arc's own default rule (`delta_prov`, certify-else-
+                    # boundary), and every commit taken that way is LOGGED AS A BOOTSTRAP so
+                    # the reduction never counts it as a delta-silence firing.
+                    lic = bool(fire_cert and (gate_quiet if gate_quiet is not None else True))
+                    do_commit = bool(lic or at_boundary)
+                    prov = not lic
+                    if do_commit:
+                        dsil_events.append({"cycle": cyc, "era": era_i + 1,
+                                            "level": int(active), "kind": "bootstrap",
+                                            "dsil": None, "dsil_open": 0,
+                                            "why": ("cert" if lic else "boundary")})
+                        print(f"[dsil]   arm={arm} c{cyc} BOOTSTRAP L{active} commit "
+                              f"({'cert' if lic else 'boundary'}) — the gauge does not exist "
+                              f"until a slot is open", flush=True)
                 elif spec["commit"] == "loop":
                     # [conductor] THE OUTER LOOP OWNS THE COMMIT. Not a conjunction with the
                     # certificate and not a fallback to the era boundary: the loop drives, the
@@ -3557,8 +4959,17 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                     # did, and finding 4 is that the conjunction contributed nothing beyond a
                     # cycle number.) A loop commit is NOT provisional — the loop chose it, so it
                     # pays the pre-commit audition exactly as a certified commit does.
+                    #
+                    # [tutti] THE SPLIT'S ONE LINE. With `loop_commit` absent this reads
+                    # `loop.quiet` — the donor exactly. With it present the COMMIT licence is
+                    # the second policy's latch and the ADVANCE licence (block (g4)) stays the
+                    # primary's, which is the whole of the division-of-labor treatment. A yoked
+                    # arm ignores both and replays the plan's COMMIT cycles, which is what lets
+                    # a two-policy arm be clock-yoked at all.
                     if loop.kind == "yoke":
                         do_commit = bool(loop.commit_now(cyc))
+                    elif loop_c is not None:
+                        do_commit = bool(cq)          # None (gauge absent) -> False
                     else:
                         do_commit = bool(loop.quiet)
                     prov = False
@@ -3575,6 +4986,31 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                         do_commit = bool(fire_cert or at_boundary)
                         prov = not fire_cert
             surg_rec = None
+            # [caesura] THE VETO. delta-silence gates commit TIMING and nothing else: the yield
+            # thermostat still chose the rung and the cycle, and a commit it licensed is
+            # DEFERRED on any cycle the executor is still moving. Deliberately NOT counted as a
+            # loop action — the rule did not spend its firing, it was held — which is the
+            # difference between "delta-silence delayed the commit" (this arm) and
+            # "delta-silence replaced the gauge" (`dsil_read`). Before any slot is open the
+            # gauge does not exist, and the veto is INERT by construction rather than blocking:
+            # a signal that cannot speak must not be read as saying no. Every deferral is
+            # logged with the read that caused it.
+            if (dsil_det is not None and do_commit
+                    and panel.get("dsil") is not None and not linfo.get("dsil_quiet")):
+                dsil_events.append({"cycle": cyc, "era": era_i + 1, "level": int(active),
+                                    "kind": "defer", "dsil": panel.get("dsil"),
+                                    "dsil_open": panel.get("dsil_open"),
+                                    "V": linfo.get("dsil_V")})
+                print(f"[dsil]   arm={arm} c{cyc} DEFER L{active} commit — executor still "
+                      f"moving (dsil={panel.get('dsil')}, V={linfo.get('dsil_V')})", flush=True)
+                do_commit = False
+            elif dsil_det is not None and do_commit:
+                dsil_events.append({"cycle": cyc, "era": era_i + 1, "level": int(active),
+                                    "kind": ("pass" if panel.get("dsil") is not None
+                                             else "absent"),
+                                    "dsil": panel.get("dsil"),
+                                    "dsil_open": panel.get("dsil_open"),
+                                    "V": linfo.get("dsil_V")})
             loop_tried_commit = bool(do_commit and spec["commit"] == "loop")
             if do_commit:
                 tbl = miners[active].build(operative(active - 1), cfg["mine_support"])
@@ -3585,7 +5021,7 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             # the rule must re-arm before licensing another. Without this the loop would fire
             # again on the very next cycle from the same quiet reading.
             if loop_tried_commit and not do_commit:
-                loop.acted(PO.COMMIT, cyc, why="empty_table")
+                _acted_all(PO.COMMIT, cyc, why="empty_table")       # [tutti]
                 loop_actions.append({"cycle": cyc, "era": era_i + 1, "kind": PO.COMMIT,
                                      "level": int(active), "why": "quiet",
                                      "cancelled": "empty_table",
@@ -3710,17 +5146,33 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                           loop_V=linfo.get("V"), loop_v_tol=linfo.get("v_tol"),
                           loop_v_mult=linfo.get("v_mult"), loop_D=linfo.get("D"),
                           loop_read_level=linfo.get("read_level"),
+                          # [tutti] WHO LICENSED THIS COMMIT. On a split arm the commit
+                          # owner is the second policy, so the donor's `loop_*` columns above
+                          # describe the ADVANCE owner and would silently mis-attribute the
+                          # event. These are the commit owner's own read at the instant it
+                          # fired; `None` on every non-split arm.
+                          commit_owner=(loop_c.read_key if loop_c is not None
+                                        else getattr(loop, "read_key", None)),
+                          commit_V=linfo.get("c_V"), commit_read=linfo.get("c_read"),
+                          commit_v_tol=linfo.get("c_v_tol"),
+                          commit_v_mult=linfo.get("c_v_mult"),
+                          split=bool(loop_c is not None),
                           **{f"tab_{k}": val for k, val in
                              MC.grade_table(tbl, shared["truth"][active]).items()})
                 events.append(ev)
                 if spec["commit"] == "loop":
-                    loop.acted(PO.COMMIT, cyc)
+                    _acted_all(PO.COMMIT, cyc)                      # [tutti]
                     loop_actions.append(
                         {"cycle": cyc, "era": era_i + 1, "kind": PO.COMMIT,
                          "level": int(active),
                          "why": ("clock" if loop.kind == "yoke" else "quiet"),
                          "V": linfo.get("V"), "v_tol": linfo.get("v_tol"),
                          "v_mult": linfo.get("v_mult"), "c_in_era": c_in_era,
+                         # [tutti] the commit owner's own statistic (None off the split)
+                         "owner": (loop_c.read_key if loop_c is not None else None),
+                         "owner_V": linfo.get("c_V"),
+                         "owner_v_tol": linfo.get("c_v_tol"),
+                         "owner_v_mult": linfo.get("c_v_mult"),
                          # [maestro] what the LEARNED policy read and weighted at this instant
                          "bucket": linfo.get("bucket"), "a": linfo.get("a"),
                          "per_gauge": linfo.get("per_gauge")})
@@ -3872,6 +5324,16 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             #     fires on the era's final cycle and under the loop that cycle is not known in
             #     advance. With the loop off `era_last == (c_in_era >= ec) == (c_in_era == ec)`,
             #     which is the donor's trigger exactly.
+            #     [tutti] THE SPLIT NEEDS NO CODE HERE, AND THAT IS THE POINT. `loop` IS the
+            #     advance owner by definition, so the donor's three lines below are already
+            #     the split's advance rule. PRECEDENCE is preserved by the donor's own
+            #     mechanism rather than by a new branch: a commit in block (g) calls
+            #     `_acted_all(COMMIT, ...)`, which resets BOTH policies, so `loop.quiet` is
+            #     False by the time this block reads it — one quiet reading can never fire
+            #     both, exactly as in `conductor`. On the MIRROR arm (`loop` reads `dsil`) the
+            #     gauge does not exist before a slot opens, so the advance falls through to
+            #     `hit_cap` below — and since the ladder is set EQUAL to the caps, the cap is
+            #     the arc's own advance bootstrap and lands on the schedule arm's own cycle.
             adv, adv_why = False, None
             if spec["commit"] == "loop" or loop.kind == "yoke":
                 if loop.kind == "yoke":
@@ -3883,7 +5345,7 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 adv, adv_why = True, "cap"
             era_last = bool(adv or hit_cap)
             if adv and loop.kind != "schedule":
-                loop.acted(PO.ADVANCE, cyc, why=adv_why)
+                _acted_all(PO.ADVANCE, cyc, why=adv_why)            # [tutti]
                 loop_actions.append(
                     {"cycle": cyc, "era": era_i + 1, "kind": PO.ADVANCE, "level": None,
                      "why": adv_why, "c_in_era": c_in_era,
@@ -3972,6 +5434,13 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             log["e_practice"].append(e_practice); log["vloss"].append(vloss)
             log["gloss"].append(gloss); log["n_solved"].append(int(solved.shape[0]))
             log["n_mined"].append(int(mine_src.shape[0]))
+            # [tacet] the gate's own record. `n_pairs`/`pbuf` are appended here rather than in
+            # (c') so the diet the gate actually produced is beside its inputs in one row.
+            if grec is not None:
+                grec["n_pairs"] = int(pinfo.get("n_pairs") or 0)
+                grec["pbuf_n"] = int(pinfo.get("n") or 0)
+                grec["fallback"] = bool(pinfo.get("fallback"))
+                log["gate"].append(grec)
             log["miner"].append({str(ell): miners[ell].state() for ell in range(2, maxl + 1)})
             log["aud"].append(aud)
             log["cert"].append({"A": A, "b": cert["b"], "run": int(cert["run"]),
@@ -3996,13 +5465,6 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 tmask[str(ell)] = [int(tuple(int(x) for x in r) in tset)
                                    for r in committed[ell]["flat"]]
             log["entry"].append({"hist": ent, "true_mask": tmask})
-            # [trap] cumulative per-entry beam use, for the `trust` selector. Pure bookkeeping
-            # over values already computed and already logged: no RNG, no forward, no cost.
-            for _lv, _h in ((ent.get("beam") or {}).items() if ent else ()):
-                _acc = tstate["use"].get(_lv)
-                if _acc is None or len(_acc) != len(_h):
-                    _acc = [0] * len(_h)
-                tstate["use"][_lv] = [a + b for a, b in zip(_acc, _h)]
             log["gy"].append(gy_miner.state() if gy_miner is not None else None)
             log["committed_grade"].append(
                 {str(ell): (None if committed[ell] is None
@@ -4022,6 +5484,43 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 "open": {k: bool(sl["open"]) for k, sl in slots.items()},
                 "n_open": int(sum(1 for sl in slots.values() if sl["open"])),
                 "buf": tb, "hold": hb, "sloss": sloss, "sacc": sacc})
+            # ---- [intonation] THE METER'S OWN ROW. Per-slot sums (from which the reduction
+            #      recomputes delta at ANY benchmark timescale — S13(c)'s interior optimum,
+            #      unmeasured on this substrate, so the series is logged rather than the choice
+            #      defended), the 2x2 cells, the gate's calibration, and the counterfactual
+            #      misfire price that is deliberately NOT in the ledger.
+            if pmeter is not None:
+                mrow = {"c": cyc,
+                        "slot": {k: {q: (round(x, 6) if isinstance(x, float) else x)
+                                     for q, x in cell.items()}
+                                 for k, cell in pmeter.acc.items()},
+                        "bench": {k: round(float(x), 6) for k, x in pmeter.bench.items()},
+                        "g0": pmeter.g0, "theta": pmeter.theta,
+                        "calibrated": bool(pmeter.calibrated),
+                        "n_call": int(pmeter.n_call),
+                        "rows": list(pmeter.rows),
+                        "cells": perf_cells[-1] if perf_cells else None,
+                        "n_fired": int(blocks_cycle.get("n_fired", 0)),
+                        "n_misfire": int(blocks_cycle.get("n_misfire", 0)),
+                        "blk_ref": int(blocks_cycle.get("blk_ref", 0)),
+                        # never folded into `t`; see the module header, PRICING (b)
+                        "t_misfire": round(blocks_cycle.get("n_misfire", 0) * cfg["c_mat"], 4),
+                        "wstat": (perf_gain or {}).get("last_wstat")}
+                log["perf"].append(mrow)
+                if pmeter.calibrate():
+                    calib_events.append({"cycle": cyc, **pmeter.cal_event})
+                    print(f"[calib]  arm={arm} c{cyc} agency gate g0={pmeter.g0:.5f} "
+                          f"theta={pmeter.theta:.5f} "
+                          f"(active median {pmeter.cal_event['m_active']:.5f}, "
+                          f"passive {pmeter.cal_event['m_passive']:.5f}, "
+                          f"n={pmeter.cal_event['n_active']})", flush=True)
+                if mrow["n_fired"]:
+                    print(f"[perf]   arm={arm} c{cyc} fired={mrow['n_fired']} "
+                          f"misfire={mrow['n_misfire']} "
+                          f"({mrow['n_misfire'] / max(mrow['n_fired'], 1):.3f}) "
+                          f"cells={ {k: v for k, v in (mrow['cells'] or {}).items() if k.startswith(('int_', 'bad_', 'non_'))} }",
+                          flush=True)
+                pmeter.reset_cycle()
             for slot in list(move_age):
                 move_age[slot] += 1
             a_act = aud.get(str(active), {})
@@ -4037,28 +5536,18 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             # (where it is empty by construction).
             log["loop"].append(linfo)
             log["panel"].append(panel)
-            # [antiphon] the question row, in every arm (None when the port is off).
-            log["q"].append(qrow)
+            # [tutti] the question row, in every arm (None when the port is off). The VOLUME
+            # control (`antiphon`'s, and `wd_s0`'s lesson's second half) is asserted here rather
+            # than absorbed: a selector that starves the solve rate mines fewer than `mine_cap`
+            # and that is a CONTROL FAILURE, reported as a number, not a shrug. On the `exo`
+            # arms it fires as the substrate's own warm-up null, which is what makes it
+            # interpretable when it fires on a treated arm.
             if qrow is not None:
-                # the VOLUME pin, checked in flight and printed loudly rather than asserted:
-                # a selector that starved the solve rate below `mine_cap` would silently stop
-                # matching volume, and a 3-GPU-h run is the wrong place to raise.
-                if qrow.get("n_mined") is not None and int(qrow["n_mined"]) < cfg["mine_cap"]:
-                    print(f"[q!]  arm={arm} c{cyc} VOLUME SHORTFALL: mined "
-                          f"{qrow['n_mined']} < mine_cap {cfg['mine_cap']} "
-                          f"(solved {qrow.get('n_solved')})", flush=True)
-                if not qrow.get("quota_ok", True):
-                    print(f"[q!]  arm={arm} c{cyc} QUOTA MISS: {qrow['d_hist']} != "
-                          f"{qrow['quota']}", flush=True)
-                if cyc % 10 == 0 or cyc <= 3:
-                    print(f"[q]   arm={arm:14s} c{cyc:3d} L{qrow['target_level']} "
-                          f"designed:{qrow['n_distinct_designed']:3d}d "
-                          f"{qrow['n_designed_true']:3d}T {qrow['n_designed_banked']:3d}B  "
-                          f"halves:{qrow['n_distinct_halves']:3d}  "
-                          f"d*={qrow['d_mean']:.2f}(menu {qrow['d_mean_menu']:.2f})  "
-                          f"dose={qrow.get('dose_hit')}  credit={qrow.get('credit_rate')}  "
-                          f"at_sup {qrow.get('at_support_before')}->"
-                          f"{qrow.get('at_support_after')}", flush=True)
+                _nm = qrow.get("n_mined")
+                if _nm is not None and cfg["mine_cap"] and _nm < int(cfg["mine_cap"]):
+                    print(f"[q!]     arm={arm} c{cyc} VOLUME SHORTFALL: mined {_nm} < "
+                          f"{cfg['mine_cap']} (solved {qrow.get('n_solved')})", flush=True)
+            log["q"].append(qrow)
             if cyc % cfg["checkpoint_every"] == 0:
                 write_results(outdir, arm, cfg, eras, refs, log, events, complete=False,
                               extra={"prop_k": prop_k_spec, "span_mode": use_span,
@@ -4067,11 +5556,7 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                                      "shadow_cert": _cert_summary(shadow_cert),
                                      "stream_burn": burn_rec,
                                      "loop_actions": loop_actions,
-                                     "ledger": ledger.state(),
-                                     # [antiphon] the port's own record
-                                     "question_mode": qmode, "question_k": k_menu,
-                                     "q_ledger": (qledger.state()
-                                                  if qledger is not None else None)})
+                                     "ledger": ledger.state()})
             if era_last:
                 break
             if total_cap and cyc >= total_cap:
@@ -4228,18 +5713,34 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                          "stream_burn": burn_rec,
                          "gy_final": (gy_miner.state() if gy_miner is not None else None),
                          "gauge_hist": {str(k): q for k, q in gauge_hist.items()},
-                         # [antiphon] the port's own record, in the arm's results.json
-                         "question_mode": qmode, "question_k": k_menu,
+                         # [intonation] the meter's own summary objects
+                         "perf_mode": (None if pmeter is None else
+                                       {"tau_fire": cfg.get("span_tau_fire"),
+                                        "alpha": cfg["perf_alpha"],
+                                        "gain": cfg.get("perf_gain"),
+                                        "gate_mode": cfg.get("gate_mode")}),
+                         "calib_events": calib_events,
+                         "perf_cells": perf_cells,
+                         "dsil_events": dsil_events,          # [caesura]
+                         # [tutti] the port's own record and the split's own record, in the
+                         # arm's results.json, so the reduction never has to infer either.
+                         "q_mode": qmode, "q_k": (k_menu if qmode else None),
                          "q_ledger": (qledger.state() if qledger is not None else None),
-                         "miner_counts": {str(ell): [[list(map(int, k)), int(c)]
-                                                     for k, c in sorted(mn.counts.items())]
-                                          for ell, mn in miners.items()},
+                         "split": ({"commit_read": loop_c.read_key,
+                                    "advance_read": getattr(loop, "read_key", None),
+                                    "reset": "any-action"}
+                                   if loop_c is not None else None),
                          **obs_extra})
     return {"log": log, "events": events, "ablation": ablation, "stream_burn": burn_rec,
+            "calib_events": calib_events, "perf_cells": perf_cells,     # [intonation]
+            "dsil_events": dsil_events,                                 # [caesura]
+            "q_mode": qmode, "q_k": (k_menu if qmode else None),        # [tutti]
+            "q_ledger": (qledger.state() if qledger is not None else None),
+            "split": ({"commit_read": loop_c.read_key,
+                       "advance_read": getattr(loop, "read_key", None),
+                       "reset": "any-action"} if loop_c is not None else None),
             "shadow_cert": _cert_summary(shadow_cert),
             "gy_final": (gy_miner.state() if gy_miner is not None else None),
-            "question_mode": qmode, "question_k": k_menu,
-            "q_ledger": (qledger.state() if qledger is not None else None),
             "gauge_hist": {str(k): q for k, q in gauge_hist.items()}, **obs_extra}
 
 
@@ -4385,10 +5886,85 @@ def _cfg(**kw):
         # `extend_tol` is the admission slack on the audition error (0.0 = must not hurt).
         extend_cap=8, extend_tol=0.0,
         yoke_cycle=None, yoke_provisional=False,
-        # [trap] the trap channel's keys, defaulted OFF. With `trap_frac=None` `install_trap`
-        # returns its inputs untouched and this fork is bit-identical to the port with the
-        # trap absent, which is what gate G-T asserts.
-        trap_frac=None, trap_spread="uniform", trap_bank_mult=4,
+        # --- [tacet] THE GATE'S OWN KNOBS. All four default to the donor's behaviour, so a
+        #     config that does not name them produces `crescendo.py` bit-for-bit.
+        #     NAME CAUTION, because this substrate now carries three unrelated "gates":
+        #       `gate_level`/`gate_W`/`gate_theta`  — census's L2 ADMISSION gate on the commit
+        #       `span_tau` + `gate_events`          — span's PARITY gate on a corridor slot
+        #       `gate_mode`/`gate_frac`/`gate_mine` — THIS round's LEARNING gate, below
+        #     Nothing below reads or writes any key belonging to the other two.
+        #       gate_mode   None (off) | delta_hi | delta_lo | delib | random
+        #       gate_frac   the fraction of SOLVED TIPS the pi channel keeps. 0.5 is the
+        #                   chosen selectivity: comparable to what the mining channel's
+        #                   `mine_cap=8` already applies to ~13 solved instances/cycle (0.6),
+        #                   round, and gentle enough to leave the replay buffer a real diet.
+        #       gate_mine   whether the gate also reorders the mining subsample. On by
+        #                   default when a mode is set; the cap is UNCHANGED, so mining volume
+        #                   is matched exactly and only its content moves.
+        #       gate_log    the per-cycle record of the gate's own inputs. Pure reads of
+        #                   tensors the beam already produced; on in EVERY arm, including the
+        #                   ungated baseline, so the counterfactual "what would this gate have
+        #                   kept here" is computable offline for every arm.
+        gate_mode=None, gate_frac=0.5, gate_mine=True, gate_log=True,
+        # --- [intonation] THE delta_perf KNOBS. Every one of them defaults OFF/None, so a
+        #     config that does not name them produces `tacet.py` bit-for-bit (gate G-F).
+        #       span_tau_fire  the FIRING threshold, below `span_tau`. None == the donor
+        #                      (fire only at parity). 0.50 is the treatment: `native/`
+        #                      finding 4 measured L3 heads ending at 0.76-0.94 exact-match
+        #                      parity — fallible and mostly right — while finding 5's
+        #                      untrained-head control (parity ~0) costs +0.40-0.51 e. The
+        #                      point is a fallible executor, not a vandalised one.
+        #       perf_meter     compute e / b(s) / g / delta_perf per execution. Needs `span`.
+        #       perf_alpha     the benchmark's EWMA rate, per macro CALL. S13(c) says the
+        #                      timescale has an interior optimum (above sampling jitter,
+        #                      below competence drift) and nobody has measured where on this
+        #                      substrate — so 0.05 is a starting point sized on the smoke's
+        #                      measured calls/slot/cycle, and the per-cycle per-slot SUMS are
+        #                      logged so the reduction can recompute delta at any alpha.
+        #       perf_g0/theta  the centered gate's parameters. None == calibrated in-run from
+        #                      the arm's own active/passive g medians (`agency_gate`'s
+        #                      protocol: g0 = midpoint, theta = gap/8), self-supervised.
+        #       perf_gain      (i) the plasticity consumer: None | "delta" | "raw".
+        #       perf_tau_w     f(delta) = exp(-delta/tau_w). CALIBRATED, not guessed, against
+        #                      the effect the direction comes from: Kim, Parvin & Ivry 2019
+        #                      measure task success ATTENUATING implicit adaptation by ~35%.
+        #                      `in_smoke` measured the head's own scale here — misfire rate
+        #                      0.04-0.20, so b(s) sits near 0.1 and a correct row earns
+        #                      delta ~ +0.1 — and at tau_w = 0.20 that row's weight is
+        #                      exp(-0.5) = 0.61, i.e. a 39% attenuation. A missed row
+        #                      (delta ~ -0.4) saturates the cap either way, which is the
+        #                      categorical half of Kim's result.
+        #       perf_w_raw_cap the pre-normalisation cap (Kim's effect is categorical).
+        #       perf_w_clip    the post-normalisation clip.
+        #       perf_w_ewma    the budget normaliser's own rate.
+        #       perf_row_cap   how many raw per-row (e, g, delta, b) samples to keep a cycle.
+        span_tau_fire=None, perf_meter=False, perf_alpha=0.05,
+        perf_g0=None, perf_theta=None, perf_calib_min=2048,
+        perf_gain=None, perf_tau_w=0.20, perf_w_raw_cap=4.0, perf_w_clip=4.0,
+        perf_w_ewma=0.05, perf_row_cap=192,
+        # --- [caesura] delta-silence as a commit input. Both default OFF, so a config that
+        #     does not name them produces `intonation.py` bit-for-bit (gate G-F).
+        #       dsil_veto  the CONJUNCTION arm: A1's yield thermostat chooses, delta-silence
+        #                  may only delay. Never an action — a deferred commit re-fires as
+        #                  soon as the executor quiets.
+        #       tol_dsil   delta-silence's MEASURED dead zone. `QuietPolicy` refuses a default,
+        #                  which is what forces this to be measured; the sentinel below is a
+        #                  placeholder that only the never-driven arms may carry.
+        dsil_veto=False, dsil_bootstrap=False, tol_dsil=None,
+        # --- [tutti] the question port's two keys, defaulted OFF: with `question_mode=None`
+        #     `run_arm` takes the donor's own draw and NOTHING in the port runs, which is the
+        #     configuration `fidelity_smoke` gates at 0.000e+00 against `caesura.py`.
+        #       question_mode  None | "exo" | "endo" | "bisect" | "novel" | "comp" |
+        #                      "comp_free"  (the last four are `questions.py`'s and exist for
+        #                      the offline gate suite Q-1..Q-10 and for gate Q-11; only `exo`
+        #                      and `endo` are RUN in this tag — the oracle is not an action the
+        #                      learner can take, and the two comfort poles are `antiphon`'s
+        #                      measured negatives).
+        #       question_k     the MENU size. `antiphon` sized K = 2048 offline as the value
+        #                      that matches reach to the per-era observation budget at both L3
+        #                      and L4; the era caps here are the same, so the sizing carries
+        #                      and `phase0_tutti.py` re-checks it rather than assuming it.
+        question_mode=None, question_k=2048,
     )
     cfg.update(kw)
     return cfg
@@ -4416,10 +5992,6 @@ def _d6_cfg(**kw):
     # means "equal to max_macro_level", i.e. the donor's behaviour exactly — so this file is
     # `maestro.py` unless an arm sets the key.
     cfg.update(commit_max_level=None)
-    # [antiphon] the port's two keys, defaulted OFF: with `question_mode=None` `run_arm` takes
-    # the donor's own two lines and nothing else runs, which is the configuration
-    # `fidelity_smoke` gates at 0.000e+00 against `crescendo.py`.
-    cfg.update(question_mode=None, question_k=0)
     cfg.update(n_corrupt=1, budget=8, g_budget=482, max_macro_level=3,
                probe_widths=(1, 2, 4), probe_every=8,
                # span_min_hold 256 -> 128. MEASURED reason: in Phase A the composed arm
@@ -4607,54 +6179,91 @@ CRESCENDO_LADDER = "1:25:60,2:12:50,3:6:70,4:3:12,5:1:9"
 # then the treatment, then `ceiling_m3` — which replays the treatment's MEASURED actions and so
 # must run after it — then the two variants, `outer_yield_m3` last as the most cuttable.
 CRESCENDO_ARMS = ("anchor_long,outer_yield_m4,ceiling_m3,outer_yield_m4x,outer_yield_m3")
-
-# [antiphon] the round's own ladder is the DONOR'S, unchanged — that is what makes `q_exo` a
-# full-scale replay of `cr3_s0/anchor_long` and what lets `crescendo`'s measured floors and
-# deep-era comparisons carry over untouched.
-ANTIPHON_CAPS = CRESCENDO_CAPS
-ANTIPHON_LADDER = CRESCENDO_LADDER
-# Run order is budget-risk order: the carrier first (nothing is readable without it), then the
-# ceiling, the two endogenous arms, the pinned negative, the additive pacer cell, and the
-# unpinned negative last as the most cuttable.
-ANTIPHON_ARMS = ("q_exo,q_bisect,q_endo,q_novel,q_comp,q_bisect_loop,q_comp_free")
-# [antiphon-s2] the composed cell for the NON-ORACLE selectors, run as its own tag (`an_s2`)
-# with `--ref-tag an_s0` so it sits on the certified shared baseline. `ANTIPHON_ARMS` is left
-# exactly as `an_s0` ran it, so that tag still reproduces from the default. Run order is
-# budget-risk order: the cell first, the comfort pole second, the nerdsnipe pole last as the
-# most cuttable (`summary.json` is rewritten after every arm).
-ANTIPHON_S2_ARMS = ("q_endo_loop,q_comp_loop,q_novel_loop")
-# [antiphon-m] THE STRONGLY-METERED CORE (`an_m0`). The same schedule-paced core `an_s0` ran,
-# minus `q_comp_free` (its d* deviation is its definition and the quota is exactly what the
-# regime tests) and plus `q_trust`, at `--n-pr 24 --pr-width 8`. No pacer: one knob moves.
-# `mine_cap` is deliberately NOT scaled — it is the arc's constant, and the fact that it STOPS
-# BINDING is the regime (`intonation` Round A's discipline, and its stated consequence: with
-# solves below the cap the mining subsample is never taken, so the mined stream IS the solved
-# stream and a selector that solves more mines more).
-ANTIPHON_M_ARMS = ("q_exo,q_bisect,q_endo,q_novel,q_comp,q_trust")
-ANTIPHON_M_N_PR = 24
-ANTIPHON_M_PR_WIDTH = 8
-# Phase 0 sized the menu: at K=2048 the reachable true-key set (52 of 56 at L3, 153 of 816 at
-# L4) matches the observation budget the earning eras can actually spend (400 and 560
-# observations, i.e. at most 133 and 186 keys driven to support 3). K=4096 buys reach the
-# budget cannot spend; K=256 leaves 12 L3 keys and 151 L4 keys unreachable.
-ANTIPHON_K = 2048
 # The draw-B tag: the signature pair rebuilt on a displaced stream. Order load-bearing.
 CRESCENDO_TWINS = "outer_yield_m4_j,ceiling_m3_j"
 
+# [tacet] E3'. The LADDER AND CAPS ARE A3'S, UNCHANGED — this round moves the learning rule,
+# not the world, so `TACET_CAPS is CRESCENDO_CAPS` and `TACET_LADDER is CRESCENDO_LADDER`, and
+# the baseline arm is A3's treatment verbatim. Anything else would make the cross-tag replay
+# against `cr3_s0` a comparison of two different runs rather than a fidelity gate.
+TACET_CAPS = CRESCENDO_CAPS
+TACET_LADDER = CRESCENDO_LADDER
+# Arm ORDER is load-bearing twice over: `outer_yield_m4` must run FIRST because every other arm
+# replays its MEASURED action cycles (passed in at runtime by the yoke handoff), and the
+# remaining order is a budget-risk decision — the two delta directions first (the round's
+# question), then the matched-volume random control WITHOUT WHICH THEY DO NOT MEAN ANYTHING,
+# then the deliberation-state gate (the queue's other named scalar), and `gate_all` last as the
+# most cuttable: it is the only arm nothing volume-controls (its diet differs in size and in
+# composition at once), so it is the least interpretable per cycle spent, and both of its knobs
+# are the donor's rather than this round's.
+TACET_ARMS = ("outer_yield_m4,gate_delta_hi,gate_delta_lo,gate_random,gate_delib,gate_all")
+
+# [intonation] THE LADDER AND CAPS ARE A3'S, UNCHANGED, for `tacet`'s reason one level further
+# on: this round moves the EXECUTOR, not the world, so the ladder, the caps, the reads, the
+# floors and the outer-loop rule are all inherited and the only new object is the meter.
+INTON_CAPS = TACET_CAPS
+INTON_LADDER = TACET_LADDER
+# Arm ORDER is load-bearing twice, as in `tacet`. `perf_log` must run FIRST because every other
+# arm replays its MEASURED action cycles (the yoke handoff). The rest is a budget-risk
+# ordering, cuttable from the right:
+#   perf_gain     (i) the proposal itself — the bridge's own efferent form.
+#   perf_gate     (ii) the E3' question asked with the RIGHT delta.
+#   outcome_gate  (ii)'s exactly-volume-matched CONTENT control, and `tacet`'s own arm re-run
+#                 on the live-executor substrate — without it `perf_gate` means nothing.
+#   perf_raw      (i)'s hygiene control (S13(b)). Last, and the most cuttable: it is the one
+#                 comparison in this node that already has a 3-seed answer in another domain
+#                 (`plasticity_gain`, `bridge_assembly`), so cutting it costs a cross-domain
+#                 replication rather than the node's own question.
+INTON_ARMS = "perf_log,perf_gain,perf_gate,outcome_gate,perf_raw"
+# [intonation/A] the strongly-metered re-run. `mperf_log` first (the yoke handoff); then the
+# weighting arm (the half of the hypothesis that does not reduce volume at all), then the two
+# volume-matched gates, then the fixed hygiene control last as the cuttable one.
+METERED_ARMS = "mperf_log,mperf_gain,mperf_gate,mout_gate,mperf_rawx"
+# Phase A: the baseline arm ALONE through era 1, at the real configuration. `--quick` cannot
+# size this round — its substrate is trained for 800 steps and solves 0.16 instances/cycle,
+# so every regime looks scarce there. This probe measures the three things the design criterion
+# names (solved instances/cycle, whether the mining cap still binds, whether pi's buffer fills)
+# AND the one risk the offline sizing cannot settle: whether a 1.5x thinner observation stream
+# still lets L2 commit inside era 1.
+METERED_PROBE = "mperf_log"
+# [caesura] the round's arms. `dsil_sched` runs FIRST: its scheduled era lengths are the caps,
+# so it is the lifetime ceiling and the carrier, and nothing is readable without it. Then the
+# comparator, then the two treatments, the conjunction last as the most cuttable (it is the
+# weaker claim: a veto can only ever delay what the yield gauge already chose).
+CAESURA_ARMS = "dsil_sched,dsil_yield,dsil_read,dsil_and"
+# [tutti] THE UNIFICATION ARMS, in run order, and the order IS the design.
+#   tu_y_exo    (b) yield owns both, no selection. FIRST: it is the in-tag fidelity carrier and
+#               the round's load-bearing full-scale cross-tag replay of `ca_s0/dsil_yield`
+#               (yield-paced, so `tol_dsil` cannot touch it), and it is the (yield, exo) cell.
+#   tu_d_exo    (a) delta-silence owns both, no selection — `caesura` finding 5 RE-INSTANTIATED
+#               at the corrected floor, and a BOUNDED cross-tag gate to c42 (the offline-
+#               computed first cycle at which 0.0046 and 0.00321442 differ in the verdict).
+#   tu_s_exo    (c) THE SPLIT, no selection — the QUEUE's cell, the division of labor clean.
+#   tu_s_endo   the composition: both currencies AND the selector in one loop.
+#   tu_s_yk     its ONE-BIT CLOCK YOKE (selector off). Runs immediately after its source,
+#               because the plan is that source's MEASURED actions, passed in at runtime.
+#   tu_d_endo   the selector under a pure execution-currency pacer.
+#   tu_y_endo   the selector under a pure outcome-currency pacer — the live-executor twin of
+#               the cell `an_s2` is measuring on the exact-DP executor.
+#   tu_m_exo    THE MIRROR (yield commits, delta-silence advances). LAST, i.e. the tail cut if
+#               the smoke's s/cycle overruns: it is a control on the interpretation of a split
+#               win ("any two-gauge mix" vs "this assignment"), not a cell of the 3x2.
+TUTTI_ARMS = ("tu_y_exo,tu_d_exo,tu_s_exo,tu_s_endo,tu_s_yk,tu_d_endo,tu_y_endo,tu_m_exo")
+# The in-tag pooled null-ABBA re-derivation of delta-silence's dead zone on `ca_s0`'s own logged
+# `dsil` series (`phase0_tutti.py` prints it beside the donor's two numbers). NOT a default:
+# it is passed explicitly on the command line, and this constant exists so the value the design
+# was reviewed with is on the record in the file that uses it.
+TUTTI_TOL_DSIL = 0.0046
+
 
 @app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=36000, memory=32768)
-def antiphon_run(
-    tag: str = "an_s0",
-    arms: str = ANTIPHON_ARMS,
-    # [antiphon] the port's two knobs at run level. `question_k` is the MENU size, sized
-    # by Phase 0 against the observation budget the earning eras can spend; the per-arm
-    # `question_mode` comes from the arm spec, so a mode is never a run-level default.
-    question_k: int = ANTIPHON_K,
-    trap_spread: str = "uniform",                                           # [trap]
+def tutti_run(                                             # [tutti]
+    tag: str = "tu_s0",
+    arms: str = TUTTI_ARMS,
     # [conductor] the loop's own knobs. `tol_endo` has NO default on purpose: a driven read with
     # no measured dead zone is an error (`floor_gate`), and the endo floor is the one that has no
     # offline series, so it is measured on the smoke tag and passed in explicitly.
-    era_caps: str = ANTIPHON_CAPS, total_cap: int = 0,
+    era_caps: str = INTON_CAPS, total_cap: int = 0,
     loop_span: int = 1, loop_w: int = 4, loop_burn: int = 4, loop_alpha: float = 0.5,
     tol_ledger: float = MEASURED_FLOORS["ledger"],
     tol_yield_l3: float = MEASURED_FLOORS["yield_by_level"][3],
@@ -4673,7 +6282,7 @@ def antiphon_run(
     # PRODUCTION configuration inside an otherwise-quick run, and make the eras long enough for
     # the rule to form windows at all.
     quick_cycles: int = 0, quick_probe_clean: int = 0, quick_gen_steps: int = 0,
-    eras: str = ANTIPHON_LADDER, seed: int = 0, era_cycles: int = 24, budget: int = 8,
+    eras: str = INTON_LADDER, seed: int = 0, era_cycles: int = 24, budget: int = 8,
     # [crescendo] the round's one constant: L4 becomes committable. `commit_max_level` stays
     # `None` at the run level (== `max_macro_level`); only `ceiling_m3` sets it, per arm.
     pr_width: int = 16, g_budget: int = 482, max_macro_level: int = 4,
@@ -4696,33 +6305,52 @@ def antiphon_run(
     collect_task_matched: bool = True, tm_episodes: int = 8192,
     gy_level: int = 4, gate_win: int = 12, gate_theta: int = 0,
     extend_cap: int = 8, extend_tol: float = 0.0, entry_rec: bool = True,
+    # [tacet] the gate, at run level. `gate_mode` is deliberately NOT settable here — it is a
+    # per-ARM property (`ARMS[...]["cfg"]`), because an arm IS its gate; what the run owns is
+    # the selectivity every gate arm shares and whether the mining channel is gated at all.
+    gate_frac: float = 0.5, gate_mine: bool = True, gate_log: bool = True,
+    # [intonation] the meter, at run level. `perf_meter`, `perf_gain` and `gate_mode` are NOT
+    # settable here — they are per-ARM properties, because an arm IS its consumer; what the run
+    # owns is the shared calibration every metered arm uses.
+    # [caesura] delta-silence's measured dead zone. No default: `QuietPolicy` raises without
+    # one, which is the property that keeps a floor measured rather than chosen. -1 is the
+    # "not supplied" sentinel (Modal's CLI cannot pass None through a typed float) and is only
+    # legal in a run whose arms never DRIVE on `dsil`.
+    tol_dsil: float = -1.0,
+    # [tutti] the port's MENU size at run level. `question_mode` is deliberately NOT settable
+    # here — it is a per-ARM property (`ARMS[...]["cfg"]`), because an arm IS its selector;
+    # what the run owns is the menu every arm draws from and pays the same forwards over.
+    question_k: int = 2048,
+    span_tau_fire: float = 0.50, perf_alpha: float = 0.05,
+    perf_g0: float = -1.0, perf_theta: float = -1.0, perf_calib_min: int = 2048,
+    perf_tau_w: float = 0.20, perf_w_raw_cap: float = 4.0, perf_w_clip: float = 4.0,
+    perf_w_ewma: float = 0.05, perf_row_cap: int = 192,
     ref_tag: str = "", rule_seed: int = 0, train_seed: int = 1, quick: bool = False,
 ):
-    """ANTIPHON. Can question-choice be an outer-loop action — does question QUALITY move
-    climbing speed at matched priced budget, and can the learner's own value signal grade
-    questions?
+    """INTONATION (E′ round 2). Give the practice arc a live, FALLIBLE executor, so that
+    performance error — execution vs intention, independent of task success — exists on this
+    substrate for the first time; then consume it two ways, each against its own control.
 
-    Seven arms on `crescendo`'s ladder, one seed. Six are the CONTROLLED CORE: `anchor_long`'s
-    configuration in every respect but the selector, so they are schedule-paced at the caps and
-    LIFETIME-IDENTICAL at 201 cycles, and only the selection moves. The seventh is additive: the
-    donor's own thermostat arm with the oracle selector, read against the banked
-    `cr3_s0/outer_yield_m4`, which asks whether selection and pacing compose.
+    Five arms on A3's ladder, caps and world, at `max_macro_level=4`, all with `native/span`'s
+    corridor head firing BELOW its parity gate. `perf_log` meters delta_perf and consumes
+    nothing (the instrument arm, the uniform control, the grade-only baseline and the clock
+    source); `perf_gain`/`perf_raw` consume it as a per-sample plasticity gain against a raw-e
+    gain; `perf_gate`/`outcome_gate` consume it as a selection gate against the outcome-delta
+    gate `tacet` ran. See the module docstring for the signal's exact form, why the intention
+    reference is free and exact, what is and is not priced, and the 2x2.
 
-      q_exo         the menu's head = the donor's own draw     THE EXOGENOUS LADDER (and, here,
-                                                              the random-questions arm too),
-                                                              and the full-scale bit-identical
-                                                              replay of cr3_s0/anchor_long
-      q_bisect      oracle key-coverage, r^2-aware            THE CEILING
-      q_endo        own reader's half-key novelty x own
-                    delivery ledger                            THE ENDOGENOUS JUDGE
-      q_novel       the same, guard removed                    THE NERDSNIPE CONTROL
-      q_comp        own value head, difficulty-pinned          the known negative (content)
-      q_bisect_loop the oracle selector on the thermostat      ADDITIVE: does it compose?
-      q_comp_free   own value head, difficulty FREE            the known negative (difficulty)
+    DONOR DOCSTRING FOLLOWS.
 
-    Volume (`n_pr`, `mine_cap`), priced budget, lifetime and — for every arm but `q_comp_free` —
-    the per-cycle d* histogram are pinned; only selection moves. `q_comp_free`'s realised
-    difficulty mix is logged every cycle, because the deviation IS that arm's definition.
+    TACET (E3′). Does gating what the learner LEARNS FROM — on delta = grade - v(s) and on
+    the deliberation state, both alive at decision time and both free on the wire — change what
+    the table contains, what trust forms, and whether the range extends?
+
+    Six arms on A3's ladder, caps and world, all routing-only, all at `max_macro_level=4`. The
+    baseline is A3's treatment verbatim (grade-only selection, the current rule); every other
+    arm is a clock yoke of it carrying exactly one knob. See the module docstring for the gate's
+    definition, why the value buffer is ungated, why no gradient-budget matching is needed, and
+    what "learn from everything" is taken to mean on a channel that is only defined over solved
+    derivations.
 
     DONOR DOCSTRING FOLLOWS.
 
@@ -4781,12 +6409,19 @@ def antiphon_run(
                   tm_episodes=tm_episodes, rule_seed=rule_seed, train_seed=train_seed,
                   gy_level=gy_level, gate_W=gate_win, gate_theta=gate_theta,
                   extend_cap=extend_cap, extend_tol=extend_tol, entry_rec=entry_rec,
-                  # [antiphon] the menu size; `question_mode` stays None at run level and is
-                  # set per arm by `ARMS[...]["cfg"]`, so no arm can inherit a mode by accident.
-                  question_k=question_k, question_mode=None,
-                  # [trap] run-level defaults: OFF. A dose comes from the arm spec, so no arm
-                  # can inherit a trap by accident — the same discipline as `question_mode`.
-                  trap_frac=None, trap_spread=trap_spread)
+                  # [tacet] the gate's run-level knobs. `gate_mode` stays absent here, so the
+                  # run config is the donor's unless an ARM names a mode.
+                  gate_frac=gate_frac, gate_mine=gate_mine, gate_log=gate_log,
+                  # [intonation] a negative sentinel means "calibrate in-run", because Modal's
+                  # CLI cannot pass None through a typed float.
+                  tol_dsil=(None if tol_dsil < 0 else tol_dsil),     # [caesura]
+                  question_k=question_k,                             # [tutti]
+                  span_tau_fire=span_tau_fire, perf_alpha=perf_alpha,
+                  perf_g0=(None if perf_g0 < 0 else perf_g0),
+                  perf_theta=(None if perf_theta < 0 else perf_theta),
+                  perf_calib_min=perf_calib_min, perf_tau_w=perf_tau_w,
+                  perf_w_raw_cap=perf_w_raw_cap, perf_w_clip=perf_w_clip,
+                  perf_w_ewma=perf_w_ewma, perf_row_cap=perf_row_cap)
     if quick:
         cfg.update(controller_steps=800, generator_steps=800, value_steps=800,
                    reader_steps=600, value_episodes=6_000, n_train_episodes=20_000,
@@ -4824,7 +6459,11 @@ def antiphon_run(
           f"alpha={cfg['loop_alpha']}  floors ledger={cfg['tol_ledger']} "
           f"yieldL3={cfg['tol_yield_l3']} yieldL4={cfg['tol_yield_l4']} "
           f"endo={cfg['tol_endo']}  n_endo={cfg['n_endo']} endo_price={cfg['endo_price']}g\n"
-          f"  entry_rec={entry_rec}   device={device}", flush=True)
+          f"  entry_rec={entry_rec}   device={device}\n"
+          # [tacet] the round's own line: the gate's shared selectivity and, per arm, its mode.
+          f"  GATE: frac={cfg['gate_frac']} mine={cfg['gate_mine']} log={cfg['gate_log']}  "
+          f"modes=" + str({a: (ARMS[a].get("cfg") or {}).get("gate_mode")
+                           for _, a, _ in parse_arms(arms)}), flush=True)
 
     # ---- selfchecks BEFORE the paid setup, INSIDE AN RNG SANDBOX --------------------- #
     # `entry_recorder_check` builds models and samples pools, and reseeds to 0 to do it
@@ -4853,16 +6492,6 @@ def antiphon_run(
     eg = endo_gate(s=cfg["s"], depth=cfg["depth"], eras=ers)
     print(f"[endo] label-free-by-construction PASS: {json.dumps(eg, cls=NumpyEncoder)}",
           flush=True)
-    # [antiphon] the question port's own offline suite, in the same sandbox: quota feasibility,
-    # containment (an agent bundle carries no truth object), determinism, breadth, the ledger's
-    # discrimination, and the span geometry. Pure arithmetic on synthetic menus — free, and a
-    # leaked oracle or a broken quota fails in milliseconds rather than after a paid setup.
-    qg = QS.question_gate(verbose=False)
-    tg = TM.trap_gate(verbose=False)                                        # [trap] T-3
-    assert tg["ALL"], f"the trap gate FAILED: {tg}"
-    assert qg["ALL"], f"question gate FAILED: {qg}"
-    print(f"[q] question gate PASS: "
-          f"{sum(1 for k in qg if k != 'ALL' and not k.endswith('_detail'))} checks", flush=True)
     _rng_restore(_rng0)
     _got_draw = torch.randn(4).tolist()
     _rng_restore(_rng0)
@@ -4982,11 +6611,6 @@ def antiphon_run(
                    # importantly — the DEAD ZONES THAT GOVERNED THIS RUN with their provenance,
                    # written into the run rather than left in a script.
                    "policy_gate": pg, "endo_gate": eg, "endo_bench": bench, "floor_gate": fg,
-                   # [antiphon] the port's gate and its sizing, written into the run itself
-                   "question_gate": qg, "trap_gate": tg,                # [trap]
-                   "question_k": cfg["question_k"],
-                   "question_modes": {lab: (ARMS[b].get("cfg") or {}).get("question_mode")
-                                      for lab, b, _ov in parse_arms(arms)},
                    # [maestro] the fitted policies that governed this run, with their gate.
                    "fit_gate": fitg, "fitted": cfg["fitted"],
                    "floors": {"ledger": cfg["tol_ledger"], "yield_L3": cfg["tol_yield_l3"],
@@ -5047,38 +6671,6 @@ def antiphon_run(
                     "first": r["log"]["e"][idx[0]], "last": r["log"]["e"][idx[-1]],
                     "min": min(r["log"]["e"][i] for i in idx),
                     "mean": float(np.mean([r["log"]["e"][i] for i in idx]))}
-        # [antiphon-m] REGIME CERTIFICATION, per arm, in-run. Under `intonation` Round A's
-        # discipline the regime is a MEASURED property of the run, not a knob setting: what
-        # matters is whether the mining cap still binds, and how full pi's buffer gets. All of
-        # it is read off values the arm already logged, so it costs nothing and is written for
-        # every arm in every tag (abundance included, where it is the reference column).
-        _qs = [q["n_solved"] for q in (r["log"].get("q") or [])
-               if q and q.get("n_solved") is not None]
-        _pr = [(x or {}).get("n_pairs", 0) for x in (r["log"].get("prop") or [])]
-        _pb = [(x or {}).get("n", 0) for x in (r["log"].get("prop") or [])]
-        _bcap = int(cfg.get("prop_buf_cap") or 0)
-        _full = next((i + 1 for i, x in enumerate(_pb) if _bcap and x >= _bcap), None)
-        regime = {
-            "n_pr": int(cfg["n_pr"]), "pr_width": int(cfg["pr_width"]),
-            "mine_cap": int(cfg["mine_cap"]),
-            "solves_per_cycle": (float(np.mean(_qs)) if _qs else None),
-            "solves_x_cap": (float(np.mean(_qs)) / cfg["mine_cap"] if _qs else None),
-            "cap_binds_frac": (float(np.mean([s >= cfg["mine_cap"] for s in _qs]))
-                               if _qs else None),
-            "obs_per_cycle": float(np.mean(r["log"]["n_mined"])) if r["log"].get("n_mined") else None,
-            "prop_rows_per_cycle": (float(np.mean(_pr)) if _pr else None),
-            "prop_buf_end_frac": (float(_pb[-1]) / _bcap if (_pb and _bcap) else None),
-            "prop_buf_full_cycle": _full}
-        summary["arms"][label]["regime"] = regime
-        if regime["solves_per_cycle"] is not None:
-            print(f"[regime] {label}: n_pr={regime['n_pr']} pr_width={regime['pr_width']}  "
-                  f"solves/cyc {regime['solves_per_cycle']:.2f} = "
-                  f"{regime['solves_x_cap']:.2f}x cap {regime['mine_cap']}  "
-                  f"cap binds {regime['cap_binds_frac']:.1%}  "
-                  f"obs/cyc {regime['obs_per_cycle']:.2f}  "
-                  f"pi rows/cyc {regime['prop_rows_per_cycle']:.0f}  "
-                  f"pi buffer end {regime['prop_buf_end_frac']:.1%}"
-                  + (f" (full at c{_full})" if _full else " (never full)"), flush=True)
         cs = r["shadow_cert"]
         ent = r["log"]["entry"][-1] if r["log"].get("entry") else {}
         beam = (ent.get("hist") or {}).get("beam", {})
@@ -5921,6 +7513,15 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
                   # tolerances are not measured floors and no reading from this run is one.
                   loop_W=2, loop_burn=1, loop_span=1,
                   tol_ledger=1e-9, tol_yield_l3=1e-9, tol_yield_l4=1e-9, tol_endo=1e-9,
+                  # [caesura] dust, like every other floor in preflight — SAID OUT LOUD: this
+                  # is a code-path check and no number here is a measurement.
+                  tol_dsil=1e-9,
+                  # [tutti] a TINY menu (n_pr=8 here), so the port's every branch — the
+                  # tail draw, the quota, the exact-feature parse, both selector bundles, the
+                  # delivery ledger and the dose join — runs at toy sizes before a paid setup.
+                  # The K that matters is sized offline (`phase0_tutti.py`) and set at run
+                  # level; this number is a code-path check and is not a measurement.
+                  question_k=64,
                   n_endo=32, endo_price=3, era_caps=(6, 6, 5, 5, 5), total_cap=0,
                   # [maestro] the LEARNED paths must fire here too. The real mixtures are used
                   # (so the fitted object's shape, its bucket table and its per-gauge estimator
@@ -5986,7 +7587,33 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
     # A3 arms lead, in the MAIN RUN'S ORDER, so the L4 commit branch, the `commit_max_level`
     # refusal, the L4 extension and the yoke handoff FROM an m4 arm are all executed before a
     # paid setup; `ceiling_m3` must follow `outer_yield_m4`, exactly as in the real run.
-    ARM_SWEEP = ("anchor_long", "outer_yield_m4", "ceiling_m3", "outer_yield_m4x",
+    # [tacet] THE GATE ARMS LEAD, in the MAIN RUN'S ORDER, with `gate_off_y` appended
+    # immediately after the baseline: every gate branch (each mode's tip ranking, each mode's
+    # mining reorder, the relaxed `mine_cap=0` / `prop_train_on="tips"` diet, the yoke handoff
+    # FROM the gated baseline, and the gate log in an arm with no gate) is executed at toy
+    # sizes before a paid setup, and the pure-yoke inertness check below has its arm.
+    # [intonation] THE delta_perf ARMS LEAD, in the MAIN RUN'S ORDER, with `perf_off_y` and
+    # `perf_fid` appended right after `perf_log`: every new branch — the fallible executor's
+    # fired and playback paths, the meter's benchmark/gate/2x2, both plasticity-gain modes, the
+    # perf ordering on both channels, the yoke handoff FROM a span arm, and a metered arm with
+    # the firing threshold left at the donor's tau — runs at toy sizes before a paid setup.
+    ARM_SWEEP = (# [tutti] the unification arms first: the split's two policy objects, the
+                 # bootstrap under a split, the endogenous selector, the two-policy yoke and
+                 # the inertness twin. A loop arm cannot arm on a forty-step substrate, which
+                 # is why `tu_pf_split`/`tu_pf_q` hold the TRUE tables (every slot minted at
+                 # c1, so `dsil` is live from c2 and BOTH policies are stepped on real reads).
+                 "tu_pf_split", "tu_pf_boot", "tu_pf_q", "tu_pf_yk", "tu_pf_off",
+                 "tu_y_exo", "tu_d_exo", "tu_s_exo", "tu_s_endo", "tu_s_yk",
+                 "tu_d_endo", "tu_y_endo", "tu_m_exo",
+                 "dsil_sched", "dsil_yield", "dsil_read", "dsil_and",
+                 "dsil_pf_gauge", "dsil_pf_veto", "dsil_pf_boot",
+                 "perf_given", "perf_given_g",
+                 "mperf_log", "mperf_gain", "mperf_gate", "mout_gate", "mperf_rawx",
+                 "perf_log", "perf_off_y", "perf_fid", "perf_gain", "perf_gate",
+                 "outcome_gate", "perf_raw",
+                 "outer_yield_m4", "gate_off_y", "gate_delta_hi", "gate_delta_lo",
+                 "gate_random", "gate_delib", "gate_all",
+                 "anchor_long", "ceiling_m3", "outer_yield_m4x",
                  "outer_yield_m3",
                  # `census_extend` carries the extension op on a SCHEDULE commit, which is what
                  # makes gate C-3 non-vacuous at preflight sizes (the loop cannot commit here).
@@ -6002,6 +7629,14 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
         _ls = ARMS[arm].get("loop") or {}
         if _ls.get("kind") == "yoke":
             _ov["yoke_plan"] = json.dumps(_plans.get(_ls["of"], []))
+        # [intonation] the donor's preflight forces the parity gate OPEN (`span_tau=0.0`) so the
+        # corridor path is reachable on a forty-step substrate. A treated arm's `span_tau_fire`
+        # of 0.50 would then be STRICTER than the gate it is supposed to sit below, and the
+        # firing path — the whole node — would go untested. Pinned to the preflight's own
+        # `span_tau` here so every metered arm fires; the 0.50 the main run uses is a config
+        # fact the reduction reads, not something this run can check.
+        if (ARMS[arm].get("cfg") or {}).get("span_tau_fire") is not None:
+            _ov["span_tau_fire"] = float(cfg["span_tau"])
         # a driven endo arm needs a floor; at preflight scale there is no measured one, so a
         # placeholder is used and SAID SO — preflight checks the code path, never a number.
         _cfg_a = ({**cfg, "tol_endo": 1e-3, "_preflight_placeholder_endo_tol": True}
@@ -6078,77 +7713,601 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
     # It is tested where it is not vacuous: on the schedule arm, which commits at the era
     # boundary by `delta_prov`, against a preflight-only clone of itself carrying the ceiling
     # control's one cfg override and nothing else. That IS the mechanism, isolated.
-    _al = json.load(open(f"{outdir}/anchor_long/results.json"))
+    # [intonation] guarded: the arm list is a parameter, and running the delta_perf subset
+    # alone (which is the normal way to re-check this node after a fix) leaves the donor's
+    # schedule arm absent. `tacet` guarded the one donor line that assumed the full sweep for
+    # exactly this reason; gate C is re-checked whenever `anchor_long` is in `--arms`.
+    ok["crescendo_gate_C"] = "skipped - anchor_long not in --arms"
 
     def _commits(r, lv=None):
         return [e for e in r["events"]
                 if e["kind"] == "commit" and (lv is None or e["level"] == lv)]
 
-    # C-1  THE NEW RUNG IS REACHABLE: an L4 commit installs a level-4 table and grows the
-    #      action set by one macro per L4 node (2**(depth-4) = 4).
-    _al_l4 = _commits(_al, 4)
-    assert _al_l4, "no arm committed L4 — the new rung's commit path is untested"
-    _grew = _al_l4[0]["n_moves_after"] - _al_l4[0]["n_moves_before"]
-    assert _grew == cfg["s"] ** (cfg["depth"] - 4), \
-        f"the L4 commit did not grow the action set by one macro per L4 node: +{_grew}"
+    if _ran("anchor_long"):
+        _al = json.load(open(f"{outdir}/anchor_long/results.json"))
 
-    # C-2  `commit_max_level` BINDS, and binds ONLY on the level it names. The clone runs on
-    #      the same stream, the same spec and the same cfg but for the one key.
-    _r3 = run_arm("anchor_long_m3", "anchor_long", {"commit_max_level": 3},
-                  shared, cfg, ers, refs, outdir, device)
-    _c3 = json.load(open(f"{outdir}/anchor_long_m3/results.json"))
-    assert not _commits(_c3, 4), "commit_max_level=3 did not forbid the L4 commit"
-    assert ([(e["level"], e["cycle"]) for e in _commits(_c3)]
-            == [(e["level"], e["cycle"]) for e in _commits(_al) if e["level"] <= 3]), \
-        "commit_max_level=3 moved a commit at a level it does not name"
-    assert _c3["log"]["panel"][-1]["commit_max_level"] == 3, "commit_max_level did not reach"
-    assert _al["log"]["panel"][-1]["commit_max_level"] == cfg["max_macro_level"]
-    #      and the pair must be BIT-IDENTICAL up to the forbidden commit — the property the
-    #      whole ceiling-control design rests on.
-    _cut = int(_al_l4[0]["cycle"])
-    _w = max(_cut - 1, 0)
-    _worst = max(float(np.abs(np.asarray(_al["log"][k][:_w], float)
-                              - np.asarray(_c3["log"][k][:_w], float)).max())
-                 for k in ("e", "succ", "n_moves", "width", "n_solved", "gloss")) if _w else 0.0
-    assert _worst == 0.0, \
-        f"the ceiling pair diverges BEFORE the forbidden L4 commit (c{_cut}): max|d|={_worst}"
+        # C-1  THE NEW RUNG IS REACHABLE: an L4 commit installs a level-4 table and grows the
+        #      action set by one macro per L4 node (2**(depth-4) = 4).
+        _al_l4 = _commits(_al, 4)
+        assert _al_l4, "no arm committed L4 — the new rung's commit path is untested"
+        _grew = _al_l4[0]["n_moves_after"] - _al_l4[0]["n_moves_before"]
+        assert _grew == cfg["s"] ** (cfg["depth"] - 4), \
+            f"the L4 commit did not grow the action set by one macro per L4 node: +{_grew}"
 
-    # C-3  EXTENSION reaches the new rung's frozen table. Checked on `census_extend`, which
-    #      commits by the same boundary rule and carries `extend` — the loop-driven extension
-    #      arm cannot commit here for the reason given above.
-    _cx = json.load(open(f"{outdir}/census_extend/results.json"))
-    _ext_lv = {e["level"] for e in _cx["events"] if e["kind"] == "extend"}
-    assert _ext_lv, "census_extend never ran an extension"
-    assert 4 in _ext_lv or cfg["max_macro_level"] < 4, \
-        f"extension never reached the new rung (levels seen: {sorted(_ext_lv)})"
+        # C-2  `commit_max_level` BINDS, and binds ONLY on the level it names. The clone runs on
+        #      the same stream, the same spec and the same cfg but for the one key.
+        _r3 = run_arm("anchor_long_m3", "anchor_long", {"commit_max_level": 3},
+                      shared, cfg, ers, refs, outdir, device)
+        _c3 = json.load(open(f"{outdir}/anchor_long_m3/results.json"))
+        assert not _commits(_c3, 4), "commit_max_level=3 did not forbid the L4 commit"
+        assert ([(e["level"], e["cycle"]) for e in _commits(_c3)]
+                == [(e["level"], e["cycle"]) for e in _commits(_al) if e["level"] <= 3]), \
+            "commit_max_level=3 moved a commit at a level it does not name"
+        assert _c3["log"]["panel"][-1]["commit_max_level"] == 3, "commit_max_level did not reach"
+        assert _al["log"]["panel"][-1]["commit_max_level"] == cfg["max_macro_level"]
+        #      and the pair must be BIT-IDENTICAL up to the forbidden commit — the property the
+        #      whole ceiling-control design rests on.
+        _cut = int(_al_l4[0]["cycle"])
+        _w = max(_cut - 1, 0)
+        _worst = max(float(np.abs(np.asarray(_al["log"][k][:_w], float)
+                                  - np.asarray(_c3["log"][k][:_w], float)).max())
+                     for k in ("e", "succ", "n_moves", "width", "n_solved", "gloss")) if _w else 0.0
+        assert _worst == 0.0, \
+            f"the ceiling pair diverges BEFORE the forbidden L4 commit (c{_cut}): max|d|={_worst}"
 
-    # C-4  THE LIFETIME CEILING binds: no loop arm outruns the schedule arm.
-    _n = lambda r: len(r["log"]["cycle"])
-    _loops = {}
-    for _lbl in ("outer_yield_m4", "ceiling_m3", "outer_yield_m4x", "outer_yield_m3"):
-        _loops[_lbl] = json.load(open(f"{outdir}/{_lbl}/results.json"))
-        assert _n(_loops[_lbl]) <= _n(_al), \
-            f"{_lbl} ran {_n(_loops[_lbl])} cycles against the schedule arm's {_n(_al)} — the " \
-            f"lifetime ceiling does not bind; `eras` and `era_caps` must agree"
-    # C-5  neither ceiling arm holds an L4 table, whatever the loop did.
-    for _lbl in ("ceiling_m3", "outer_yield_m3"):
-        assert not _commits(_loops[_lbl], 4), f"{_lbl} committed L4"
+        # C-3  EXTENSION reaches the new rung's frozen table. Checked on `census_extend`, which
+        #      commits by the same boundary rule and carries `extend` — the loop-driven extension
+        #      arm cannot commit here for the reason given above.
+        _cx = json.load(open(f"{outdir}/census_extend/results.json"))
+        _ext_lv = {e["level"] for e in _cx["events"] if e["kind"] == "extend"}
+        assert _ext_lv, "census_extend never ran an extension"
+        assert 4 in _ext_lv or cfg["max_macro_level"] < 4, \
+            f"extension never reached the new rung (levels seen: {sorted(_ext_lv)})"
 
-    ok["crescendo_gate_C"] = {
-        "C-1 L4 commit (schedule arm)": [
-            (e["level"], e["cycle"], e["n_entries"], e.get("tab_recall"),
-             e.get("tab_precision"), e["n_moves_before"], e["n_moves_after"]) for e in _al_l4],
-        "C-2 commit_max_level binds": {
-            "anchor_long": [(e["level"], e["cycle"]) for e in _commits(_al)],
-            "anchor_long_m3": [(e["level"], e["cycle"]) for e in _commits(_c3)],
-            "pre_commit_window": _w, "max_abs_delta": _worst},
-        "C-3 extend levels": sorted(_ext_lv),
-        "C-4 cycles": {"anchor_long": _n(_al),
-                       **{k: _n(v) for k, v in _loops.items()}},
-        "C-5 loop_armed_at_preflight_scale": {
-            k: bool(v.get("loop_actions")) for k, v in _loops.items()},
-        "note": "code paths only — the preflight seeds its miners from truth and its dead "
-                "zones are 1e-9 dust, so no number here is a measurement"}
+        # C-4  THE LIFETIME CEILING binds: no loop arm outruns the schedule arm.
+        _n = lambda r: len(r["log"]["cycle"])
+        _loops = {}
+        for _lbl in ("outer_yield_m4", "ceiling_m3", "outer_yield_m4x", "outer_yield_m3"):
+            _loops[_lbl] = json.load(open(f"{outdir}/{_lbl}/results.json"))
+            assert _n(_loops[_lbl]) <= _n(_al), \
+                f"{_lbl} ran {_n(_loops[_lbl])} cycles against the schedule arm's {_n(_al)} — the " \
+                f"lifetime ceiling does not bind; `eras` and `era_caps` must agree"
+        # C-5  neither ceiling arm holds an L4 table, whatever the loop did.
+        for _lbl in ("ceiling_m3", "outer_yield_m3"):
+            assert not _commits(_loops[_lbl], 4), f"{_lbl} committed L4"
+
+        ok["crescendo_gate_C"] = {
+            "C-1 L4 commit (schedule arm)": [
+                (e["level"], e["cycle"], e["n_entries"], e.get("tab_recall"),
+                 e.get("tab_precision"), e["n_moves_before"], e["n_moves_after"]) for e in _al_l4],
+            "C-2 commit_max_level binds": {
+                "anchor_long": [(e["level"], e["cycle"]) for e in _commits(_al)],
+                "anchor_long_m3": [(e["level"], e["cycle"]) for e in _commits(_c3)],
+                "pre_commit_window": _w, "max_abs_delta": _worst},
+            "C-3 extend levels": sorted(_ext_lv),
+            "C-4 cycles": {"anchor_long": _n(_al),
+                           **{k: _n(v) for k, v in _loops.items()}},
+            "C-5 loop_armed_at_preflight_scale": {
+                k: bool(v.get("loop_actions")) for k, v in _loops.items()},
+            "note": "code paths only — the preflight seeds its miners from truth and its dead "
+                    "zones are 1e-9 dust, so no number here is a measurement"}
+
+    # ---- [tacet] GATE T: the gate must have BOUND, and the yoke must be INERT without it.
+    # Every check here is a code-path / invariant check at toy sizes; no number is a
+    # measurement. The gate's own effect is a question for the main run, not for this one.
+    _T = {}
+    _base = json.load(open(f"{outdir}/outer_yield_m4/results.json")) if \
+        _ran("outer_yield_m4") else None
+    _gseries = ("e", "succ", "n_moves", "width", "n_solved", "n_mined", "gloss", "vloss")
+
+    def _maxd(r1, r2, keys=_gseries, n=None):
+        n = n if n is not None else min(len(r1["log"]["cycle"]), len(r2["log"]["cycle"]))
+        return max(float(np.abs(np.asarray(r1["log"][k][:n], float)
+                                - np.asarray(r2["log"][k][:n], float)).max())
+                   for k in keys) if n else 0.0
+
+    # T-1  THE PURE YOKE IS INERT. `gate_off_y` replays the baseline's own realised actions
+    #      with no gate and no relaxation, so it must be BIT-IDENTICAL to it over its whole
+    #      life. This is what licenses reading every gate arm as "the baseline plus one knob"
+    #      rather than "the baseline plus a yoke plus one knob".
+    if _base is not None and _ran("gate_off_y"):
+        _gy = json.load(open(f"{outdir}/gate_off_y/results.json"))
+        _d = _maxd(_base, _gy)
+        _T["T-1 pure yoke inert"] = {"max_abs_delta": _d,
+                                     "cycles": (len(_base["log"]["cycle"]),
+                                                len(_gy["log"]["cycle"])),
+                                     "commits_equal": ([(e["level"], e["cycle"]) for e in
+                                                        _commits(_base)]
+                                                       == [(e["level"], e["cycle"]) for e in
+                                                           _commits(_gy)])}
+        assert _d == 0.0 and _T["T-1 pure yoke inert"]["commits_equal"], \
+            f"a pure yoke with the gate off is NOT the baseline: {_T['T-1 pure yoke inert']}"
+
+    # T-2  THE GATE LOG EXISTS IN EVERY ARM, including the ungated baseline — that is what
+    #      makes the counterfactual gate computable offline everywhere.
+    for _lbl in ("outer_yield_m4", "gate_delta_hi", "gate_delta_lo", "gate_random",
+                 "gate_delib", "gate_all"):
+        if not _ran(_lbl):
+            continue
+        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+        _g = _r["log"].get("gate") or []
+        assert len(_g) == len(_r["log"]["cycle"]), \
+            f"{_lbl}: the gate log has {len(_g)} rows against {len(_r['log']['cycle'])} cycles"
+        assert all(len(q["d_ans"]) == _r["config"]["n_pr"] for q in _g), \
+            f"{_lbl}: the gate log's per-instance features are not one per instance"
+        _T[f"T-2 gate log:{_lbl}"] = {
+            "rows": len(_g),
+            "mode": _g[-1]["mode"],
+            "n_sol_tip": [q["n_sol_tip"] for q in _g[-3:]],
+            "n_keep_tip": [q["n_keep_tip"] for q in _g[-3:]],
+            "n_pairs": [q["n_pairs"] for q in _g[-3:]],
+            "d_ans_range": [round(min(min(q["d_ans"]) for q in _g), 4),
+                            round(max(max(q["d_ans"]) for q in _g), 4)],
+            "margin_range": [round(min(min(q["margin"]) for q in _g), 4),
+                             round(max(max(q["margin"]) for q in _g), 4)],
+            # [tacet] how often the textbook top1-top2 margin is EXACTLY zero (a duplicate
+            # runner-up), which is why the gate reads the mean-over-unchosen form instead.
+            "m2_exact_zero_frac": round(
+                sum(1 for q in _g for x in q["m2"] if x == 0.0)
+                / max(1, sum(len(q["m2"]) for q in _g)), 4)}
+
+    # T-3  THE GATE BINDS: on a cycle with more than one solved tip, a gate arm must keep
+    #      strictly fewer of them than the baseline did, and it must keep the number
+    #      `gate_frac` names — the same number in every gate arm, which is what makes the
+    #      random arm a matched-volume control rather than merely a random one.
+    _keeps = {}
+    for _lbl in ("gate_delta_hi", "gate_delta_lo", "gate_random", "gate_delib"):
+        if not _ran(_lbl):
+            continue
+        _g = json.load(open(f"{outdir}/{_lbl}/results.json"))["log"]["gate"]
+        _keeps[_lbl] = [(q["n_sol_tip"], q["n_keep_tip"]) for q in _g]
+        for _ns, _nk in _keeps[_lbl]:
+            if _ns:
+                assert _nk == max(1, int(round(cfg["gate_frac"] * _ns))), \
+                    f"{_lbl}: kept {_nk} of {_ns} solved tips at gate_frac={cfg['gate_frac']}"
+    if len(_keeps) > 1:
+        _ref = list(_keeps.values())[0]
+        for _lbl, _v in _keeps.items():
+            assert [q[1] for q in _v[:len(_ref)]] == [q[1] for q in _ref[:len(_v)]], \
+                f"{_lbl}: the gate arms are not volume-matched cycle for cycle"
+    _T["T-3 gate binds"] = {k: v[-3:] for k, v in _keeps.items()}
+    # the gate can only REFUSE something on a cycle that solved more than one tip; at preflight
+    # sizes (24 instances, a 40-step substrate) that is not guaranteed, so the refusal check is
+    # asserted only where it is defined and RECORDED either way.
+    _binds = [(ns, nk) for v in _keeps.values() for ns, nk in v if ns > 1]
+    _T["T-3 refusals"] = {"cycles_with_>1_solved_tip": len(_binds),
+                          "refused_on": sum(1 for ns, nk in _binds if nk < ns)}
+    if _binds:
+        assert any(nk < ns for ns, nk in _binds), \
+            "the gate never refused a solved tip on any cycle where it could have"
+
+    # T-4  THE MINING CHANNEL IS VOLUME-MATCHED AND CONTENT-MOVED. Every gate arm mines the
+    #      same NUMBER of answers as the baseline on every cycle (the cap is untouched), and
+    #      at least one of them mines a DIFFERENT set (otherwise the reorder is a no-op).
+    if _base is not None:
+        for _lbl in ("gate_delta_hi", "gate_delta_lo", "gate_random", "gate_delib"):
+            if not _ran(_lbl):
+                continue
+            _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+            _n = min(len(_base["log"]["cycle"]), len(_r["log"]["cycle"]))
+            # only the pre-divergence window is a fair test: after the arms diverge they solve
+            # different instances, so the mined COUNT may legitimately differ.
+            _pre = next((i for i in range(_n)
+                         if _base["log"]["n_solved"][i] != _r["log"]["n_solved"][i]), _n)
+            assert (_base["log"]["n_mined"][:_pre] == _r["log"]["n_mined"][:_pre]), \
+                f"{_lbl}: the mining CAP moved before the arms diverged — volume is not matched"
+            _T[f"T-4 mining matched:{_lbl}"] = {"pre_divergence_cycles": _pre,
+                                                "n_mined": _r["log"]["n_mined"][:_pre]}
+
+    # T-5  `gate_all` RELAXES BOTH CHANNELS: it mines without a cap (so on a cycle where the
+    #      baseline hit the cap it mines strictly more) and supervises pi on unsolved tips too.
+    if _base is not None and _ran("gate_all"):
+        _ga = json.load(open(f"{outdir}/gate_all/results.json"))
+        assert _ga["config"]["mine_cap"] == 0 and _ga["config"]["prop_train_on"] == "tips", \
+            "gate_all did not receive the relaxed diet"
+        _gg = _ga["log"]["gate"]
+        _T["T-5 learn-from-everything"] = {
+            "mine_cap": _ga["config"]["mine_cap"],
+            "prop_train_on": _ga["config"]["prop_train_on"],
+            "n_mined_last3": _ga["log"]["n_mined"][-3:],
+            "baseline_n_mined_last3": _base["log"]["n_mined"][-3:],
+            "n_pairs_last3": [q["n_pairs"] for q in _gg[-3:]],
+            "baseline_n_pairs_last3": [q["n_pairs"] for q in
+                                       (_base["log"]["gate"] or [{}])[-3:]]}
+    ok["tacet_gate_T"] = _T
+
+    # ---- [intonation] GATE I: the meter is real, the executor is fallible-not-vandalised, and
+    # the 2x2 is NON-DEGENERATE. Code paths and invariants at toy sizes; no number here is a
+    # measurement. Gate I-3 is the one the brief names explicitly — below-parity firing has to
+    # actually produce executed-NOT-as-intended rows, or the whole node measures nothing.
+    _I = {}
+    # the 2x2 gate reads the first metered arm that MINTED slots and fired; at preflight sizes
+    # that is `perf_given` (see its arm note), and in the main run it is `perf_log`.
+    _pl = None
+    for _c in ("perf_given", "perf_log", "perf_gain"):
+        if not _ran(_c):
+            continue
+        _cand = json.load(open(f"{outdir}/{_c}/results.json"))
+        if sum(int(q.get("n_fired", 0)) for q in (_cand["log"].get("perf") or [])):
+            _pl = _cand
+            _I["I-3 source arm"] = _c
+            break
+
+    # I-0  the executor primitive is `native/span/span_net.py`'s, imported and subclassed —
+    #      never re-implemented. If this ever fails, gates S-1..S-6 no longer cover this file.
+    _PE = _perf_executor(SN.SpanExecutor)
+    _I["I-0 imported primitive"] = {
+        "PerfExecutor_bases": [c.__name__ for c in _PE.__mro__[1:3]],
+        "span_net_module": SN.__name__,
+        "subclass_of_SpanExecutor": issubclass(_PE, SN.SpanExecutor),
+        "parity_is_span_nets": SN.parity.__module__,
+        "dp_features_is_span_nets": SN.dp_features.__module__}
+    assert issubclass(_PE, SN.SpanExecutor) and SN.parity.__module__.endswith("span_net"), \
+        _I["I-0 imported primitive"]
+
+    # I-1  METERING ALONE MOVES NOTHING. `perf_fid` carries the meter with the firing threshold
+    #      left at the donor's tau, so it is `span`-on-at-parity with an observer attached; it
+    #      must be bit-identical to a `perf_off_y` yoke, which has neither. This is what
+    #      separates "the head fires below parity" (the treatment) from "the meter runs" (an
+    #      instrument), and it is the reason the meter is allowed to be unpriced.
+    if _ran("perf_fid") and _ran("perf_off_y"):
+        _pf = json.load(open(f"{outdir}/perf_fid/results.json"))
+        _po = json.load(open(f"{outdir}/perf_off_y/results.json"))
+        _d = _maxd(_pf, _po)
+        _I["I-1 meter inert"] = {
+            "max_abs_delta": _d,
+            "cycles": (len(_pf["log"]["cycle"]), len(_po["log"]["cycle"])),
+            "commits_equal": ([(e["level"], e["cycle"]) for e in _commits(_pf)]
+                              == [(e["level"], e["cycle"]) for e in _commits(_po)])}
+        assert _d == 0.0 and _I["I-1 meter inert"]["commits_equal"], \
+            f"the meter is NOT inert at tau_fire == span_tau: {_I['I-1 meter inert']}"
+
+    # I-2  THE FIRING THRESHOLD BINDS, AND ONLY IT. Every metered arm carries tau_fire 0.50;
+    #      `perf_fid` carries the donor's 0.95. The gate EVENTS carry `open_tau` beside `open`,
+    #      so the tau = 0.95 counterfactual is on the record in every arm.
+    for _lbl in ("perf_given", "perf_given_g", "perf_log", "perf_gain", "perf_raw",
+                 "perf_gate", "outcome_gate"):
+        if not _ran(_lbl):
+            continue
+        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+        assert _r["config"]["perf_meter"], f"{_lbl} did not receive the meter"
+        assert _r["config"]["span_tau_fire"] is not None, f"{_lbl} has no firing threshold"
+        assert float(_r["config"]["span_tau_fire"]) <= float(_r["config"]["span_tau"]), \
+            f"{_lbl}'s firing threshold sits ABOVE its parity gate — nothing fires below parity"
+        _ge = _r.get("gate_events") or []
+        _I[f"I-2 firing:{_lbl}"] = {
+            "tau_fire": _r["config"]["span_tau_fire"], "span_tau": _r["config"]["span_tau"],
+            "n_gate_events": len(_ge),
+            "opened_below_tau": sum(1 for e in _ge if e.get("open")
+                                    and not e.get("open_tau")),
+            "n_open_last": (_r["log"]["span"][-1]["n_open"] if _r["log"]["span"] else None),
+            "perf_rows": len(_r["log"].get("perf") or [])}
+        assert len(_r["log"].get("perf") or []) == len(_r["log"]["cycle"]), \
+            f"{_lbl}: the meter log has {len(_r['log'].get('perf') or [])} rows against " \
+            f"{len(_r['log']['cycle'])} cycles"
+
+    # I-3  THE 2x2 IS NON-DEGENERATE — the gate the brief names. Below-parity firing must
+    #      produce (a) actual head executions, (b) executions that were NOT as intended, and
+    #      (c) both a bad-and-solved cell (the LUCKY SUCCESS) and an as-intended cell. If the
+    #      head never fires, or never misses, `e` is identically zero and delta_perf does not
+    #      exist on this substrate after all.
+    if _pl is not None:
+        _pr = _pl["log"].get("perf") or []
+        _cells = [q["cells"] for q in _pr if q.get("cells")]
+        _tot = {k: int(sum(c.get(k, 0) for c in _cells))
+                for k in ("int_solved", "int_failed", "bad_solved", "bad_failed",
+                          "non_solved", "non_failed", "n_exec_tip")}
+        _fired = int(sum(q.get("n_fired", 0) for q in _pr))
+        _miss = int(sum(q.get("n_misfire", 0) for q in _pr))
+        _I["I-3 2x2 non-degenerate"] = {
+            **_tot, "n_fired_rows": _fired, "n_misfire_rows": _miss,
+            "misfire_frac": round(_miss / max(_fired, 1), 4),
+            "n_slots_with_bench": len(_pr[-1]["bench"]) if _pr else 0,
+            "calibrated": bool(_pr[-1]["calibrated"]) if _pr else False,
+            "g0": _pr[-1]["g0"] if _pr else None,
+            "theta": _pr[-1]["theta"] if _pr else None}
+        # At preflight sizes the substrate is trained for a few dozen steps and a slot may not
+        # reach `span_min_hold` at all, so this is asserted only where firing HAPPENED and
+        # recorded either way — the main run's smoke is where it must bite.
+        _I["I-3 2x2 non-degenerate"]["both_rows"] = bool(
+            (_tot["int_solved"] + _tot["int_failed"] > 0)
+            and (_tot["bad_solved"] + _tot["bad_failed"] > 0))
+        if _fired:
+            # THE GATE THE NODE RESTS ON, in the half this run can check: below-parity firing
+            # has to produce executed-NOT-as-intended rows. The other half — that the
+            # as-intended row is also populated — needs a TRAINED head, which a forty-step
+            # preflight substrate is not; it is checked on the smoke and on the main run's own
+            # meter log (reduction P1/P2), and recorded here as `both_rows`.
+            assert _miss > 0, (
+                "the head fired and was NEVER wrong — `e` is identically zero, so there is no "
+                "performance error on this substrate: lower `span_tau_fire`")
+            assert _tot["bad_solved"] + _tot["bad_failed"] > 0, \
+                "no executed-NOT-as-intended trajectory at all — the 2x2 has one row"
+
+    # I-4  THE GAIN ARMS ACTUALLY WEIGHT. `perf_gain`/`perf_raw` must have produced a weight
+    #      statistic with credit attached to a real fraction of their rows, and their mean
+    #      weight must sit near 1 (the matched-average-budget normalisation working).
+    for _lbl in ("perf_given_g", "perf_gain", "perf_raw"):
+        if not _ran(_lbl):
+            continue
+        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+        _ws = [q["wstat"] for q in (_r["log"].get("perf") or []) if q.get("wstat")]
+        assert _r["config"]["perf_gain"] in ("delta", "raw"), f"{_lbl}: no gain mode"
+        _I[f"I-4 gain:{_lbl}"] = {
+            "mode": _r["config"]["perf_gain"], "n_weighted_cycles": len(_ws),
+            "mean_w": (round(sum(q["sum_w"] for q in _ws)
+                             / max(sum(q["n"] for q in _ws), 1), 4) if _ws else None),
+            "cred_frac": (round(sum(q["n_cred"] for q in _ws)
+                                / max(sum(q["n"] for q in _ws), 1), 4) if _ws else None)}
+
+    # I-5  THE PERF GATE BINDS AND IS VOLUME-MATCHED TO THE OUTCOME GATE. Same `gate_frac`,
+    #      same kept count cycle-for-cycle: that is what makes `outcome_gate` a matched-volume
+    #      CONTENT control for `perf_gate` rather than merely a different arm.
+    _pk = {}
+    for _lbl in ("perf_gate", "outcome_gate"):
+        if not _ran(_lbl):
+            continue
+        _g = json.load(open(f"{outdir}/{_lbl}/results.json"))["log"]["gate"]
+        _pk[_lbl] = [(q["n_sol_tip"], q["n_keep_tip"]) for q in _g]
+        _I[f"I-5 keeps:{_lbl}"] = {"last3": _pk[_lbl][-3:],
+                                   "p_tie_last3": [q.get("p_tie") for q in _g[-3:]],
+                                   "mine_cells_last3": [(q.get("mine_int"), q.get("mine_bad"),
+                                                         q.get("mine_non")) for q in _g[-3:]]}
+    if len(_pk) == 2:
+        _a, _b = list(_pk.values())
+        _n2 = min(len(_a), len(_b))
+        assert [q[1] for q in _a[:_n2]] == [q[1] for q in _b[:_n2]], \
+            "perf_gate and outcome_gate are not volume-matched cycle for cycle"
+        _I["I-5 volume matched"] = True
+    ok["intonation_gate_I"] = _I
+
+    # ---- [caesura] GATE D: the delta-silence gauge exists, is readable by A1's UNCHANGED
+    # thermostat, is DRIVEN in exactly the arm that names it, and the veto both fires and stays
+    # inert where the signal cannot speak. Code paths and invariants at toy sizes; no number is
+    # a measurement.
+    _D = {}
+    for _lbl in ("dsil_sched", "dsil_yield", "dsil_read", "dsil_and",
+                 "dsil_pf_gauge", "dsil_pf_veto", "dsil_pf_boot"):
+        if not _ran(_lbl):
+            continue
+        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+        _pn = _r["log"]["panel"]
+        _has = [q for q in _pn if q.get("dsil") is not None]
+        _D[f"D-1 gauge:{_lbl}"] = {
+            "panel_rows": len(_pn),
+            "cycles_with_dsil": len(_has),
+            "first_cycle_with_dsil": (_has[0]["cycle"] if _has else None),
+            "dsil_range": ([round(min(q["dsil"] for q in _has), 6),
+                            round(max(q["dsil"] for q in _has), 6)] if _has else None),
+            "max_open_slots": max((q.get("dsil_open") or 0) for q in _pn),
+            "read": (_r.get("loop") or {}).get("read"),
+            "dsil_events": len(_r.get("dsil_events") or [])}
+        # D-1  the gauge is in EVERY arm's panel (that is what makes the counterfactual
+        #      computable offline everywhere), and it is None before any slot opens.
+        assert len(_pn) == len(_r["log"]["cycle"]), f"{_lbl}: panel rows != cycles"
+        assert all((q.get("dsil") is None) == ((q.get("dsil_open") or 0) == 0) for q in _pn), \
+            f"{_lbl}: dsil is present exactly when a slot is open — it is not"
+    # D-2  the READ is what the arm names, and only that arm drives on it.
+    if _ran("dsil_read") and _ran("dsil_yield"):
+        _rr = json.load(open(f"{outdir}/dsil_read/results.json"))
+        _ry = json.load(open(f"{outdir}/dsil_yield/results.json"))
+        _D["D-2 driven read"] = {"dsil_read": (_rr.get("loop") or {}).get("read"),
+                                 "dsil_yield": (_ry.get("loop") or {}).get("read")}
+        assert (_rr.get("loop") or {}).get("read") == "dsil", "dsil_read is not reading dsil"
+        assert (_ry.get("loop") or {}).get("read") == "yield", "dsil_yield lost its read"
+    # D-3  THE VETO FIRES, AND IS INERT WHERE THE SIGNAL CANNOT SPEAK. Every `absent` event is
+    #      a cycle where a commit was licensed with no open slot; the veto must have let it
+    #      through, or a gauge that does not exist would be blocking the L2 commit forever.
+    _vet = "dsil_pf_veto" if _ran("dsil_pf_veto") else ("dsil_and" if _ran("dsil_and")
+                                                        else None)
+    if _vet:
+        _ra = json.load(open(f"{outdir}/{_vet}/results.json"))
+        _D["D-3 veto source arm"] = _vet
+        _ev = _ra.get("dsil_events") or []
+        _D["D-3 veto"] = {
+            "n_events": len(_ev),
+            "by_kind": {k: sum(1 for e in _ev if e["kind"] == k)
+                        for k in ("defer", "pass", "absent")},
+            "commits": [(e["level"], e["cycle"]) for e in _commits(_ra)],
+            "levels_deferred": sorted({e["level"] for e in _ev if e["kind"] == "defer"})}
+        assert all(e["dsil"] is None for e in _ev if e["kind"] == "absent"), \
+            "an `absent` veto event carried a live gauge"
+        assert not any(e["kind"] == "defer" and e["dsil"] is None for e in _ev), \
+            "the veto blocked a commit on a gauge that does not exist — it is not inert"
+        # the veto may only DELAY: it must not remove a level the yield arm reached, unless the
+        # run ended first. Recorded, and asserted only where the comparator ran.
+        if _ran("dsil_yield"):
+            _ry = json.load(open(f"{outdir}/dsil_yield/results.json"))
+            _D["D-3 veto"]["yield_commits"] = [(e["level"], e["cycle"]) for e in _commits(_ry)]
+        assert _D["D-3 veto"]["n_events"] > 0, (
+            f"{_vet}: the veto was never consulted — the conjunction path is untested")
+    # D-4  `dsil_sched` reads nothing and must carry no dsil events at all.
+    if _ran("dsil_sched"):
+        _rs = json.load(open(f"{outdir}/dsil_sched/results.json"))
+        assert not (_rs.get("dsil_events") or []), "the schedule arm ran the veto"
+        _D["D-4 schedule inert"] = {"dsil_events": 0,
+                                    "commits": [(e["level"], e["cycle"])
+                                                for e in _commits(_rs)]}
+    # D-5  THE BOOTSTRAP FIRES, AND ONLY WHILE THE GAUGE IS ABSENT. Without it a `dsil`-driven
+    #      arm deadlocks by construction (slots are minted BY a commit, and the gauge is
+    #      computed over slots), which is a fact about the signal's TYPE, not about scale.
+    _bs = "dsil_pf_boot" if _ran("dsil_pf_boot") else ("dsil_read" if _ran("dsil_read")
+                                                       else None)
+    if _bs:
+        _rb = json.load(open(f"{outdir}/{_bs}/results.json"))
+        _ev = [e for e in (_rb.get("dsil_events") or []) if e["kind"] == "bootstrap"]
+        _pn = _rb["log"]["panel"]
+        _first = next((q["cycle"] for q in _pn if q.get("dsil") is not None), None)
+        _D["D-5 bootstrap"] = {
+            "arm": _bs, "n_bootstrap_commits": len(_ev),
+            "at": [(e["level"], e["cycle"], e["why"]) for e in _ev],
+            "first_cycle_with_dsil": _first,
+            "commits": [(e["level"], e["cycle"]) for e in _commits(_rb)],
+            "max_open_slots": max((q.get("dsil_open") or 0) for q in _pn)}
+        assert _ev, (f"{_bs}: the bootstrap never fired, so the gauge never came alive and a "
+                     f"dsil-driven arm deadlocks — see the arm note")
+        assert _first is not None and max((q.get("dsil_open") or 0) for q in _pn) > 0, \
+            f"{_bs}: no slot ever opened even after the bootstrap commit"
+        assert all(_first is None or e["cycle"] < _first for e in _ev), \
+            f"{_bs}: a bootstrap commit was taken while the gauge WAS available"
+    ok["caesura_gate_D"] = _D
+
+    # ---- [tutti] GATE X: THE SPLIT. Two policy objects, each licensing one action; the
+    # bootstrap under the split; the donor's precedence preserved; the two-policy yoke; and
+    # inertness when `loop_commit` is absent. Code paths and invariants at toy sizes; no number
+    # here is a measurement.
+    _X = {}
+
+    def _acts(rj, kind):
+        return [a for a in (rj.get("loop_actions") or []) if a["kind"] == kind
+                and not a.get("cancelled")]
+
+    # X-1  the two policies exist, are DISTINCT, and each reads only its own series.
+    for _lbl in ("tu_pf_split", "tu_pf_boot", "tu_pf_q", "tu_s_exo", "tu_s_endo",
+                 "tu_m_exo"):
+        if not _ran(_lbl):
+            continue
+        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+        _sp = _r.get("split")
+        assert _sp, f"{_lbl}: no split record — `loop_commit` did not build a second policy"
+        assert _sp["commit_read"] != _sp["advance_read"], \
+            f"{_lbl}: both policies read {_sp['commit_read']!r} — that is not a split"
+        _want = ARMS[_lbl]["loop_commit"]["read"]
+        assert _sp["commit_read"] == _want, \
+            f"{_lbl}: the COMMIT owner reads {_sp['commit_read']!r}, arm says {_want!r}"
+        assert _sp["advance_read"] == ARMS[_lbl]["loop"]["read"], \
+            f"{_lbl}: the ADVANCE owner reads the wrong series"
+        # the commit owner's own read is on the LOOP TRACE in every cycle it could speak,
+        # under its own key and never under the advance owner's.
+        _lg = _r["log"]["loop"]
+        _spoke = [q for q in _lg if q.get("c_quiet") is not None]
+        _X[f"X-1 {_lbl}"] = {**_sp, "n_cycles": len(_lg),
+                             "n_cycles_commit_owner_spoke": len(_spoke),
+                             "n_cycles_gauge_absent": sum(
+                                 1 for q in _lg if q.get("c_skipped"))}
+        assert all(q.get("c_key") == _want for q in _lg if q.get("c_key")), \
+            f"{_lbl}: the commit owner's trace carries the wrong key"
+
+    # X-2  INERTNESS. With `loop_commit` absent the arm is the donor: `tu_pf_off` must carry no
+    #      split record, no `c_*` trace columns, and must be bit-identical to `dsil_yield`'s
+    #      shape of decision (same driven key, same policy kind).
+    if _ran("tu_pf_off"):
+        _r = json.load(open(f"{outdir}/tu_pf_off/results.json"))
+        assert _r.get("split") is None, "tu_pf_off built a second policy with no loop_commit"
+        assert _r.get("q_mode") is None, "tu_pf_off ran the question port with no mode"
+        _lg = _r["log"]["loop"]
+        assert not any("c_quiet" in q or "c_key" in q for q in _lg), \
+            "tu_pf_off's loop trace carries the split's columns — the branch is not inert"
+        _X["X-2 inertness"] = {"split": None, "q_mode": None, "n_cycles": len(_lg),
+                               "driven_read": (_lg[0].get("read") if _lg else None)}
+
+    # X-3  THE BOOTSTRAP UNDER A SPLIT — and the configuration that has never run: bootstrapped
+    #      commits ALONGSIDE yield-driven era advances, in the same era.
+    if _ran("tu_pf_boot"):
+        _r = json.load(open(f"{outdir}/tu_pf_boot/results.json"))
+        _ev = [e for e in (_r.get("dsil_events") or []) if e["kind"] == "bootstrap"]
+        _pn = _r["log"]["panel"]
+        _first = next((q["cycle"] for q in _pn if q.get("dsil") is not None), None)
+        _adv = _acts(_r, PO.ADVANCE)
+        _X["X-3 split bootstrap"] = {
+            "n_bootstrap_commits": len(_ev),
+            "at": [(e["level"], e["cycle"], e["why"]) for e in _ev],
+            "first_cycle_with_dsil": _first,
+            "advances": [(a["cycle"], a.get("why")) for a in _adv],
+            "advances_before_gauge": [a["cycle"] for a in _adv
+                                      if _first is None or a["cycle"] < _first]}
+        assert _ev, ("tu_pf_boot: the split's bootstrap never fired, so a dsil-COMMIT arm "
+                     "deadlocks exactly as `dsil_read` would without it")
+        assert all(_first is None or e["cycle"] < _first for e in _ev), \
+            "tu_pf_boot: a bootstrap commit was taken while the gauge WAS available"
+
+    # X-4  PRECEDENCE, and the simultaneous re-arm. A cycle can carry at most one loop action,
+    #      and where both latches were quiet the action taken must be the COMMIT.
+    for _lbl in ("tu_pf_split", "tu_pf_boot", "tu_pf_q"):
+        if not _ran(_lbl):
+            continue
+        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+        _by, _byq = {}, {}
+        for a in (_r.get("loop_actions") or []):
+            _by.setdefault(int(a["cycle"]), []).append(a["kind"])
+            # PRECEDENCE is a statement about QUIET READINGS: "a quiet reading commits if
+            # there is something to commit and advances otherwise". A CAP-FORCED advance is
+            # not a quiet reading — it is the era ending — and the donor takes one on the same
+            # cycle as a boundary commit whenever the two coincide (which at preflight's
+            # six-cycle eras is common). So the assertion is over the gauge-driven actions and
+            # the cap co-occurrence is REPORTED beside it rather than asserted away.
+            if a.get("why") not in ("cap", "clock"):
+                _byq.setdefault(int(a["cycle"]), []).append(a["kind"])
+        _both = {c: k for c, k in _byq.items() if len(k) > 1}
+        _cap_co = {c: k for c, k in _by.items() if len(k) > 1 and c not in _both}
+        _lg = {int(q["cycle"]): q for q in _r["log"]["loop"] if q.get("cycle")}
+        _dual = [c for c, q in _lg.items()
+                 if q.get("quiet") and q.get("c_quiet") and c in _by]
+        _X[f"X-4 {_lbl}"] = {"cycles_with_two_gauge_actions": _both,
+                             "cycles_commit_plus_capped_advance": _cap_co,
+                             "cycles_both_latches_quiet": sorted(_dual),
+                             "action_taken_there": {c: _by[c] for c in sorted(_dual)}}
+        assert not _both, (f"{_lbl}: cycle(s) {sorted(_both)} carry two GAUGE-DRIVEN loop "
+                           f"actions — the donor's precedence (commit-or-advance, never both) "
+                           f"is broken")
+        # PRECEDENCE, in the donor's own words: "a quiet reading COMMITS the active level IF
+        # THERE IS ONE TO COMMIT, and ADVANCES otherwise." A both-quiet cycle that advanced is
+        # a violation only where a commit was AVAILABLE — i.e. the era's active level did not
+        # already carry a table. (The reduction's S5T check carries the same correction.)
+        _pan = {int(q["cycle"]): q for q in _r["log"]["panel"]}
+        _cev = [e for e in _r.get("events", []) if e.get("kind") == "commit"]
+        for c in _dual:
+            if _by[c][0] == PO.COMMIT:
+                continue
+            _act = int((_pan.get(c) or {}).get("active") or 0)
+            _prior = any(int(e["level"]) == _act and int(e["cycle"]) < c for e in _cev)
+            _X[f"X-4 {_lbl}"].setdefault("both_quiet_already_committed", {})[c] = _prior
+            assert _prior, (
+                f"{_lbl}: at c{c} BOTH latches were quiet, a commit WAS available at level "
+                f"{_act}, and the action taken was {_by[c]} — precedence says COMMIT wins")
+
+    # X-5  THE TWO-POLICY YOKE replays its source's realised COMMIT and ADVANCE cycles exactly,
+    #      and builds no second policy of its own (a yoke reads nothing).
+    if _ran("tu_pf_yk") and _ran("tu_pf_boot"):
+        _ry = json.load(open(f"{outdir}/tu_pf_yk/results.json"))
+        _rs = json.load(open(f"{outdir}/tu_pf_boot/results.json"))
+        assert _ry.get("split") is None, "the yoke built a second policy — it reads nothing"
+        _pc = lambda r, k: sorted(a["cycle"] for a in _acts(r, k))
+        _X["X-5 two-policy yoke"] = {
+            "source_commits": _pc(_rs, PO.COMMIT), "yoke_commits": _pc(_ry, PO.COMMIT),
+            "source_advances": _pc(_rs, PO.ADVANCE), "yoke_advances": _pc(_ry, PO.ADVANCE)}
+        assert _pc(_ry, PO.COMMIT) == _pc(_rs, PO.COMMIT), \
+            f"the yoke did not replay its source's COMMIT cycles: {_X['X-5 two-policy yoke']}"
+        assert _pc(_ry, PO.ADVANCE) == _pc(_rs, PO.ADVANCE), \
+            f"the yoke did not replay its source's ADVANCE cycles: {_X['X-5 two-policy yoke']}"
+
+    # X-6  THE PORT RAN, and the two selectors did different things. The offline suite
+    #      (Q-1..Q-10) proves the rules; Q-11 proves the wiring; this proves the ARM carries it.
+    for _lbl in ("tu_pf_q", "tu_pf_split", "tu_s_endo", "tu_y_exo"):
+        if not _ran(_lbl):
+            continue
+        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+        _q = [q for q in _r["log"]["q"] if q]
+        _want = ARMS[_lbl]["cfg"].get("question_mode")
+        assert _r.get("q_mode") == _want, \
+            f"{_lbl}: q_mode {_r.get('q_mode')!r} != arm's {_want!r}"
+        assert len(_q) == len(_r["log"]["cycle"]), \
+            f"{_lbl}: the question row is missing on {len(_r['log']['cycle']) - len(_q)} cycles"
+        _X[f"X-6 {_lbl}"] = {
+            "mode": _r.get("q_mode"), "k": _r.get("q_k"),
+            "quota_ok_frac": round(sum(1 for q in _q if q["quota_ok"]) / max(len(_q), 1), 4),
+            "d_mean": round(float(np.mean([q["d_mean"] for q in _q])), 4),
+            "d_mean_menu": round(float(np.mean([q["d_mean_menu"] for q in _q])), 4),
+            "n_distinct_needy": [q["n_distinct_needy"] for q in _q[:4]],
+            "has_clean": [q["has_clean"] for q in _q[:4]],
+            # the dose instrument, on a FALLIBLE executor — reported at every scale it can be
+            # read, because the full-scale read wants a shape to compare to.
+            "dose_hit": [q.get("dose_hit") for q in _q[:8]],
+            "n_mined": [q.get("n_mined") for q in _q[:8]],
+            "ledger": _r.get("q_ledger")}
+        assert all(q["quota_ok"] for q in _q), \
+            f"{_lbl}: the difficulty quota was missed — selection moved the difficulty"
+    ok["tutti_gate_X"] = _X
 
     # ---- [assay] the surgery and the instrument must have EXECUTED, not merely not crashed
     # [crescendo] scoped to the DONOR'S levels (2..3). No surgery arm runs in A3's tag, the
@@ -6199,38 +8358,45 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
     # THE INSTRUMENT: entry selections must be recorded, at both levels, in the beam phase
     # [crescendo] read off whichever schedule arm ran, so a targeted re-run still checks it.
     _anc = "anchor" if _ran("anchor") else ("anchor_long" if _ran("anchor_long") else None)
-    an = json.load(open(f"{outdir}/{_anc}/results.json"))
-    ent = [q for q in an["log"]["entry"] if (q.get("hist") or {}).get("beam")]
-    assert ent, "the entry-identity instrument recorded nothing in the beam phase"
-    lvs = sorted({k for q in ent for k in q["hist"]["beam"]})
-    assert set(lvs) & {"2"}, f"no L2 entry selections recorded (levels seen: {lvs})"
-    assert all("true_mask" in q for q in ent), "the truth mask did not reach the log"
-    ok["entry_instrument"] = {
-        "cycles_with_beam_selections": len(ent), "levels": lvs,
-        "total_beam_selections": int(sum(sum(v) for q in ent
-                                         for v in q["hist"]["beam"].values())),
-        "phases": sorted({p for q in an["log"]["entry"] for p in (q.get("hist") or {})})}
+    # [intonation] guarded: the schedule arms are donor shapes, and a delta_perf-only
+    # `--arms` subset carries neither. The instrument and twin checks below read one of
+    # them, so they are skipped (and SAID SO) rather than crashing a targeted re-run.
+    if _anc is None:
+        ok["entry_instrument"] = "skipped - no schedule arm in --arms"
+        ok["twins_with_instrument"] = "skipped - no schedule arm in --arms"
+    else:
+        an = json.load(open(f"{outdir}/{_anc}/results.json"))
+        ent = [q for q in an["log"]["entry"] if (q.get("hist") or {}).get("beam")]
+        assert ent, "the entry-identity instrument recorded nothing in the beam phase"
+        lvs = sorted({k for q in ent for k in q["hist"]["beam"]})
+        assert set(lvs) & {"2"}, f"no L2 entry selections recorded (levels seen: {lvs})"
+        assert all("true_mask" in q for q in ent), "the truth mask did not reach the log"
+        ok["entry_instrument"] = {
+            "cycles_with_beam_selections": len(ent), "levels": lvs,
+            "total_beam_selections": int(sum(sum(v) for q in ent
+                                             for v in q["hist"]["beam"].values())),
+            "phases": sorted({p for q in an["log"]["entry"] for p in (q.get("hist") or {})})}
 
-    # THE TWIN CLAIM WITH THE INSTRUMENT ON: a treated arm must be bit-identical to the anchor
-    # up to its first surgery. This is the assertion the SPEC asks for by name.
-    SER_ = ["e", "succ", "dres", "t_cum", "n_moves", "width", "g_per_solve", "e_practice",
-            "vloss", "gloss", "n_solved", "n_mined", "m_per_solve"]
-    ok["twins_with_instrument"] = {}
-    for mode in _surg_modes:
-        rj = json.load(open(f"{outdir}/{mode}/results.json"))
-        c1_ = min(e["cycle"] for e in rj["events"] if e["kind"] == "surgery")
-        w = c1_ - 1
-        d = 0.0
-        for k in SER_:
-            x = np.asarray(an["log"][k][:w], float)
-            y = np.asarray(rj["log"][k][:w], float)
-            q = min(len(x), len(y))
-            d = max(d, float(np.abs(x[:q] - y[:q]).max()) if q else 0.0)
-        ok["twins_with_instrument"][mode] = {"first_surgery": c1_, "window": w,
-                                             "max_abs_delta": d}
-        assert d == 0.0, (f"{mode} diverges from the anchor BEFORE its first surgery "
-                          f"(c1-c{w}, max|delta| = {d:.3e}) — the instrument or the surgery "
-                          f"is not behaviour-neutral")
+        # THE TWIN CLAIM WITH THE INSTRUMENT ON: a treated arm must be bit-identical to the anchor
+        # up to its first surgery. This is the assertion the SPEC asks for by name.
+        SER_ = ["e", "succ", "dres", "t_cum", "n_moves", "width", "g_per_solve", "e_practice",
+                "vloss", "gloss", "n_solved", "n_mined", "m_per_solve"]
+        ok["twins_with_instrument"] = {}
+        for mode in _surg_modes:
+            rj = json.load(open(f"{outdir}/{mode}/results.json"))
+            c1_ = min(e["cycle"] for e in rj["events"] if e["kind"] == "surgery")
+            w = c1_ - 1
+            d = 0.0
+            for k in SER_:
+                x = np.asarray(an["log"][k][:w], float)
+                y = np.asarray(rj["log"][k][:w], float)
+                q = min(len(x), len(y))
+                d = max(d, float(np.abs(x[:q] - y[:q]).max()) if q else 0.0)
+            ok["twins_with_instrument"][mode] = {"first_surgery": c1_, "window": w,
+                                                 "max_abs_delta": d}
+            assert d == 0.0, (f"{mode} diverges from the anchor BEFORE its first surgery "
+                              f"(c1-c{w}, max|delta| = {d:.3e}) — the instrument or the surgery "
+                              f"is not behaviour-neutral")
     # ---- [conductor] THE LOOP'S OWN IN-TAG ASSERTIONS ----------------------------------
     # The donor's stream-burn check is dropped here (its twins `given_c1_j`/`exact_j` are
     # `assay`'s arms and this round does not run them); what replaces it is the pair of
@@ -6244,14 +8410,15 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
     #        actions cycle for cycle. At preflight scale this is a mechanic check, not the
     #        finding — the finding is what `analyze_conductor.py` §2 measures at full scale.
     ok["loop_twins"] = {}
-    an = json.load(open(f"{outdir}/{_anc}/results.json"))
+    an = (json.load(open(f"{outdir}/{_anc}/results.json")) if _anc else None)
     # [crescendo] the donor's five loop arms PLUS this round's four, each against the schedule
     # arm that shares its stream. The A3 arms are the ones that matter here: the check says the
     # level-4 miner, the widened panel and `commit_max_level` are all non-invasive before the
     # arm's own first action.
-    for arm_ in [x for x in ("outer_yield", "yoked_yield", "outer_endo", "yoked_endo",
-                             "outer_ledger", "outer_yield_m4", "ceiling_m3",
-                             "outer_yield_m4x", "outer_yield_m3") if _ran(x)]:
+    for arm_ in ([x for x in ("outer_yield", "yoked_yield", "outer_endo", "yoked_endo",
+                              "outer_ledger", "outer_yield_m4", "ceiling_m3",
+                              "outer_yield_m4x", "outer_yield_m3") if _ran(x)]
+                 if an is not None else []):
         rj = json.load(open(f"{outdir}/{arm_}/results.json"))
         acts = [a["cycle"] for a in (rj.get("loop_actions") or [])]
         w = (min(acts) - 1) if acts else len(rj["log"]["cycle"])
@@ -6293,8 +8460,14 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
     ok["gy_observed"] = {a_: json.load(open(f"{outdir}/{a_}/results.json"))["gy_final"]["n_obs"]
                          for a_ in ("anchor", "outer_yield", "outer_endo", "outer_ledger",
                                     "anchor_long", "outer_yield_m4") if _ran(a_)}
+    # [tacet] `if _ran(a_)` added — the donor's line was the one place in `preflight` that
+    # assumed the FULL arm sweep, so any `--arms` subset omitting `outer_yield`/`outer_endo`/
+    # `outer_ledger` crashed here AFTER every gate had already passed. (Caught in flight on this
+    # node's first preflight, which runs a 13-arm subset.) The sibling line above was already
+    # guarded; this one was not.
     ok["obs_gy_agree"] = {a_: json.load(open(f"{outdir}/{a_}/results.json"))["obs_gy_agree"]
-                          for a_ in ("anchor", "outer_yield", "outer_endo", "outer_ledger")}
+                          for a_ in ("anchor", "outer_yield", "outer_endo", "outer_ledger",
+                                     "outer_yield_m4") if _ran(a_)}
     print("\n=== PREFLIGHT OK — every call resolved at the depth-6 grammar ===")
     print(json.dumps({k: q for k, q in ok.items() if k != "_spiral_shared"},
                      indent=2, cls=NumpyEncoder))
@@ -6386,8 +8559,10 @@ def fidelity_d4(tag: str = "fid_d4", cycles: int = 5, arms: str = "given,practic
     return out
 
 
+
+
 def q_interface_check(shared, cfg, ers, device):
-    """[antiphon] GATE Q-11 — every selector, every era, on the REAL substrate, at toy sizes.
+    """[tutti] GATE Q-11 — every selector, every era, on the REAL substrate, at toy sizes.
 
     The offline suite (`questions.question_gate`) checks the rules on synthetic menus; this
     checks the wiring: the reader forward, the value forward, the exact-feature parse, the
@@ -6417,17 +8592,13 @@ def q_interface_check(shared, cfg, ers, device):
     for era in ers:
         head = context_instances(rules, era_ctx(era), cfg["n_pr"], s_, depth, v, m,
                                  seed=cfg["seed"] + 12_345, with_clean=True)
-        for mode in ("exo", "bisect", "endo", "novel", "comp", "comp_free", "trust"):
+        for mode in ("exo", "bisect", "endo", "novel", "comp", "comp_free"):
             led = QS.DeliveryLedger() if mode == "endo" else None
-            # [trap] the gate exercises the trap channel too: `tstate` present, `trap_frac`
-            # from the cfg (None in the fidelity path, so the block stays inert there).
-            r_, x_, c_, des, hal, row, isd = pose_questions(
+            r_, x_, c_, des, hal, row = pose_questions(
                 mode, rules=rules, era=era, cfg=cfg, s=s_, depth=depth, v=v, m=m, cyc=1,
                 head=head, shared=shared, value_net=value_net,
                 controller=shared["controller"], device=device, miners=miners,
-                operative=operative, maxl=maxl, qledger=led, n_pr=cfg["n_pr"], k_menu=k_menu,
-                tstate={"bank": {}, "use": {}, "rng": np.random.default_rng(0)},
-                trap_frac=cfg.get("trap_frac"))
+                operative=operative, maxl=maxl, qledger=led, n_pr=cfg["n_pr"], k_menu=k_menu)
             assert r_.shape[0] == x_.shape[0] == c_.shape[0] == des.shape[0] == cfg["n_pr"], \
                 f"{era['name']}/{mode}: selector returned the wrong volume"
             assert row["quota_ok"] or mode == "comp_free", \
@@ -6463,12 +8634,7 @@ def q_interface_check(shared, cfg, ers, device):
 
 
 @app.function(image=image, volumes={DATA_DIR: volume}, gpu="L4", timeout=7200, memory=32768)
-def fidelity_smoke(tag: str = "gf_smoke", cycles: int = 4, seed: int = 0,
-                   # [antiphon-m] the metered knob, so G-F can be re-gated AT THE KNOB the
-                   # metered round runs. Defaults are the values this entrypoint already used
-                   # (`n_pr=24` in its own cfg, `pr_width` left at `_cfg`'s 16), so `an_gf`
-                   # reproduces bit-for-bit; `--pr-width 8 --n-pr 24` is the metered gate.
-                   n_pr: int = 24, pr_width: int = 0):
+def fidelity_smoke(tag: str = "gf_smoke", cycles: int = 4, seed: int = 0):
     """G-F, layer 1 — WITH THE SURGERY OFF, does this file's `run_arm` reproduce
     `census.py`'s, bit for bit, on the depth-6 substrate, WITH the entry instrument installed?
 
@@ -6490,28 +8656,51 @@ def fidelity_smoke(tag: str = "gf_smoke", cycles: int = 4, seed: int = 0,
     bit-for-bit window at the real configuration, for free.
     """
     import torch
-    # [antiphon] retargeted to THIS fork's direct donor, `crescendo.py` (which in its own turn
-    # replays `maestro.py` at 0.000e+00, which replays `conductor.py`, which replays `assay.py`,
-    # so the chain is intact). The gate runs with `question_mode` UNSET, which is the exact
-    # configuration in which this file IS its donor: `run_arm` takes the donor's own two-line
-    # practice draw, `pose_questions` is never called, and the only other additions are one
-    # extra logged key (`q`, all None) and two extra results fields. If this is not 0.000e+00
-    # the fork has drifted and no question contrast means anything. The FULL-SCALE half of the
-    # gate is the cross-tag one: `an_s0/q_exo` against `cr3_s0/anchor_long`, all 201 cycles,
-    # which the reduction checks and which costs nothing.
-    from rhm.practice.crescendo import crescendo as SP
+    # [tacet] retargeted to THIS fork's direct donor, `crescendo.py` (which in its own turn
+    # replays `maestro.py` at 0.000e+00, which replays `conductor.py`, which replays
+    # `assay.py`, so the chain back to the substrate is intact). The gate runs with
+    # `gate_mode` unset, which is the exact configuration in which this file IS its donor: the
+    # two new `out` keys are unread, `prop_pairs` takes its `keep=None` branch, the mining
+    # subsample draws the identical `rng.permutation`, and the only other addition is one
+    # unread per-cycle log list. If this is not 0.000e+00 the fork has drifted and no gate
+    # contrast means anything.
+    #
+    # `gate_log` is left ON for the gate, deliberately: the per-cycle feature record runs in
+    # every arm of the main run, so the thing being certified inert is the file AS IT WILL RUN,
+    # not a stripped version of it.
+    # [intonation] retargeted one more link along the chain: THIS fork's direct donor is
+    # `tacet.py` (which replays `crescendo.py` at 0.000e+00, which replays `maestro.py`, which
+    # replays `conductor.py`, which replays `assay.py`). The gate runs with EVERY
+    # `# [intonation]` knob off — `perf_meter` False, `span_tau_fire` None, `perf_gain` None,
+    # `gate_mode` unset — which is the exact configuration in which this file IS `tacet.py`:
+    # `PerfExecutor` is never constructed, `beam_moves*`'s `track` is False on a plain or plain
+    # span executor, `finetune_generator_span` calls `SN.span_train_terms` itself, the parity
+    # gate's `tau_fire` resolves to `span_tau`, and the only remaining addition is one unread
+    # per-cycle log list. `gate_log` stays ON, as in `tacet`'s own G-F, so what is certified
+    # inert is the file AS IT WILL RUN.
+    # [tutti] retargeted one more link along the chain: THIS fork's direct donor is
+    # `caesura.py` (which replays `intonation.py` at 0.000e+00, which replays `tacet.py`, which
+    # replays `crescendo.py`, `maestro.py`, `conductor.py`, `assay.py`). The gate runs with
+    # EVERY `# [tutti]` knob off — `question_mode` None and `loop_commit` absent on both arms —
+    # which is the exact configuration in which this file IS `caesura.py`: `pose_questions` is
+    # never called, `context_instances` is asked for `with_clean=True` and the third return is
+    # discarded into `cl_np` (the donor computes `clean` either way, so no work and no RNG
+    # moves), `loop_c` is None so `_acted_all` is `loop.acted` and the commit dispatch reads
+    # `loop.quiet`, and the only remaining additions are two unread per-cycle log lists.
+    from rhm.practice.caesura import caesura as SP
 
     cfg = _d6_cfg(era_cycles=cycles, seed=seed, probe_every=2, probe_widths=(1, 2),
                   controller_steps=800, generator_steps=800, value_steps=800, reader_steps=600,
-                  value_episodes=6_000, n_train_episodes=20_000, n_pr=int(n_pr),
-                  **({"pr_width": int(pr_width)} if pr_width else {}),
-                  n_rt=96, n_score=96,
+                  value_episodes=6_000, n_train_episodes=20_000, n_pr=24, n_rt=96, n_score=96,
                   n_aud=48, n_probe_clean=128, checkpoint_every=10 ** 9, gen_steps=5,
                   sil_min_cycle=2, prop_warmup=1, prop_steps=12, prop_buf_cap=20_000,
-                  # [antiphon] the gate runs at the ROUND's own `max_macro_level=4`, so the
-                  # arms and the level structure are the ones the tag will use; the only thing
-                  # off is the port itself.
-                  tm_episodes=512, mine_cap=8, max_macro_level=4)
+                  # [tacet] the G-F runs at `max_macro_level=4`, not the donor's 3. A3 had to
+                  # run its own G-F at 3 because `maestro.py` had no L4 path to compare
+                  # against; `crescendo.py` does, so the gate here can exercise the exact
+                  # configuration the main run uses — L4 miner live, panel widened, four-level
+                  # slot layout — rather than a configuration one rung short of it.
+                  max_macro_level=4,
+                  tm_episodes=512, mine_cap=8)
     ers = parse_eras("1:25,2:12,3:6")
     for e_ in ers:
         e_["cycles"] = cycles
@@ -6519,15 +8708,9 @@ def fidelity_smoke(tag: str = "gf_smoke", cycles: int = 4, seed: int = 0,
     torch.manual_seed(cfg["train_seed"]); np.random.seed(cfg["train_seed"])
     torch.set_float32_matmul_precision("high")
     started = time.time()
-    print(f"[gf] depth={cfg['depth']} m={cfg['m']} cycles/era={cycles} "
-          f"maxl={cfg['max_macro_level']} — antiphon vs crescendo (question_mode UNSET)",
+    print(f"[gf] depth={cfg['depth']} m={cfg['m']} cycles/era={cycles} maxl={cfg['max_macro_level']} "
+          f"— tutti vs caesura (gate_log ON; every [tutti] knob off)",
           flush=True)
-    qg = QS.question_gate(verbose=False)
-    tg = TM.trap_gate(verbose=False)                                        # [trap] T-3
-    assert tg["ALL"], f"the trap gate FAILED: {tg}"
-    assert qg["ALL"], f"question gate FAILED: {qg}"
-    print(f"[gf] question gate PASS ("
-          f"{sum(1 for k in qg if k != 'ALL' and not k.endswith('_detail'))} checks)", flush=True)
 
     _install_identity_miner(cfg["mine_support"])
     # [assay] the instrument is INSTALLED for this gate. It patches `MC.macro_features`, which
@@ -6542,9 +8725,7 @@ def fidelity_smoke(tag: str = "gf_smoke", cycles: int = 4, seed: int = 0,
     SERIES = ["e", "succ", "dres", "t_cum", "n_moves", "width", "g_per_solve", "e_practice",
               "vloss", "gloss", "n_solved", "n_mined", "m_per_solve"]
     rows, worst_fork, worst_ctrl = [], 0.0, 0.0
-    # [antiphon] `anchor_long` is the arm the round actually runs (every question arm is that
-    # arm plus a selector), so the gate is taken on it rather than on the donor's `anchor`.
-    for arm in ("anchor_long", "given_c1"):
+    for arm in ("anchor", "given_c1"):
         a1 = SP.run_arm(arm, arm, {}, shared, cfg, ers, refs, f"{outdir}/donor1", device)
         a2 = SP.run_arm(arm, arm, {}, shared, cfg, ers, refs, f"{outdir}/donor2", device)
         b = run_arm(arm, arm, {}, shared, cfg, ers, refs, f"{outdir}/fork", device)
@@ -6565,26 +8746,32 @@ def fidelity_smoke(tag: str = "gf_smoke", cycles: int = 4, seed: int = 0,
               f"max|donor-donor| = {max(row['control'].values()):.3e}  "
               f"commits equal: {row['events_equal']}", flush=True)
 
-    # [antiphon] GATE Q-11, on the substrate this gate already paid for.
-    qif = q_interface_check(shared, cfg, ers, device)
     out = {"scale": "smoke", "rows": rows, "worst_fork": worst_fork,
            "worst_donor_self_replay": worst_ctrl,
            "events_equal": all(r["events_equal"] for r in rows),
-           "q_interface": qif,
            "seconds": time.time() - started}
     with open(f"{outdir}/gate.json", "w") as fh:
         json.dump(out, fh, indent=2, cls=NumpyEncoder)
     volume.commit()
-    print(f"\n[gf] === G-F (smoke scale) === max|fork - crescendo| = {worst_fork:.3e}   "
+    print(f"\n[gf] === G-F (smoke scale) === max|fork - caesura| = {worst_fork:.3e}   "
           f"control = {worst_ctrl:.3e}", flush=True)
-    out["question_gate"] = qg
-    out["trap_gate"] = tg                                                   # [trap]
-    assert out["events_equal"], "G-F FAILED: commit events differ from crescendo.py"
+    assert out["events_equal"], "G-F FAILED: commit events differ from caesura.py"
     assert worst_fork <= worst_ctrl, (
-        f"G-F FAILED: the antiphon fork perturbed crescendo.py's code path "
-        f"({worst_fork:.3e} > self-replay control {worst_ctrl:.3e}) — the menu call site, the "
-        f"`with_clean=True` return or the extra log key is not transparent")
-    print("G-F PASS — with `question_mode` unset, this fork replays crescendo.py.")
+        f"G-F FAILED: the tutti fork perturbed caesura.py's code path "
+        f"({worst_fork:.3e} > self-replay control {worst_ctrl:.3e}) — the question port's "
+        f"`with_clean` draw, the split's second policy object, or one of the two new log rows "
+        f"is not transparent")
+    print("G-F PASS — with every [tutti] knob off, this fork replays caesura.py.")
+
+    # [tutti] GATE Q-11, on the substrate this gate already paid for. The port's selectors are
+    # `questions.py`'s, imported unchanged, so Q-1..Q-10 already hold offline; this is the
+    # WIRING check, and it runs the oracle and both comfort poles too — modes this tag does not
+    # pay an arm for — because the endogenous judge is scored against the oracle's own aiming
+    # statistic in the reduction and that statistic has to be known to exist here.
+    out["q11"] = q_interface_check(shared, cfg, ers, device)
+    with open(f"{outdir}/gate.json", "w") as fh:
+        json.dump(out, fh, indent=2, cls=NumpyEncoder)
+    volume.commit()
     return out
 
 
@@ -6882,4 +9069,4 @@ def _collect_task_matched(shared, cfg, era, device, n_episodes=8192):
 
 @app.local_entrypoint()
 def main(quick: bool = True):
-    antiphon_run.remote(quick=quick)
+    tutti_run.remote(quick=quick)

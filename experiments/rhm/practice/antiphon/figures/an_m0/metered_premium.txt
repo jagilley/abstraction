@@ -1,0 +1,51 @@
+================================================================================================
+THE PREMIUM TABLE — the question port at two meters   (abundance an_s0 | metered an_m0)
+================================================================================================
+
+[pre] same substrate as an_s0: True   read_acc 1.0 / 1.0   stale 0.154052734375 / 0.154052734375
+      refs identical, so section 6's recovered fraction is normalised by the SAME
+      stale/floor pair in both columns and the two premiums are like-for-like.
+
+[0] THE REGIME, as measured in each tag (the round's precondition, not its result)
+  tag/arm                 n_pr  width  solv/cyc   x cap  cap binds  obs/cyc  pi rows  buf end  buf full
+  an_s0/q_exo               64     16     15.08   1.88x     97.5%     7.94     2114  100.0%       c30   [backfilled from phase0_metered.json]
+  an_s0/q_bisect            64     16     15.79   1.97x     95.5%     7.89     2188  100.0%       c32   [backfilled from phase0_metered.json]
+  an_s0/q_endo              64     16     16.93   2.12x     98.5%     7.97     2335  100.0%       c26   [backfilled from phase0_metered.json]
+  an_s0/q_novel             64     16     15.01   1.88x     97.5%     7.96     2071  100.0%       c27   [backfilled from phase0_metered.json]
+  an_s0/q_comp              64     16     16.51   2.06x     97.5%     7.95     2263  100.0%       c33   [backfilled from phase0_metered.json]
+  an_m0/q_exo               24      8      5.25   0.66x     14.1%     5.03      351  100.0%      c169
+  an_m0/q_bisect            24      8      4.50   0.56x      9.0%     4.38      302  100.0%      c199
+  an_m0/q_endo              24      8      4.86   0.61x     11.7%     4.60      347  100.0%      c177
+  an_m0/q_novel             24      8      4.74   0.59x     10.1%     4.56      323  100.0%      c186
+  an_m0/q_comp              24      8      4.77   0.60x     11.3%     4.53      337  100.0%      c180
+  an_m0/q_trust             24      8      4.92   0.61x     13.0%     4.76      333  100.0%      c176
+
+[1] FLOORS. The abundance column is read against crescendo's MEASURED floors
+    (in-node era-4 0.03, era-5 0.41, earning-family 0.087).
+    The metered column has NO banked twin, so those floors are NOT transferred.
+    Its in-tag handle is the metered null's own displacement structure — the sd
+    of `q_exo`'s own per-cycle recovered fraction. This is a weaker object than a
+    twinned-arm displacement floor and is labelled as one:
+      era 4: sd over the 3 cycles section 6 reads = 0.018   over the whole era = 0.330
+      era 5: sd over the 3 cycles section 6 reads = 0.028   over the whole era = 0.056
+
+[2] THE PREMIUM — each selector MINUS `q_exo`, within its own tag
+  selector        L4true AB    L4true ME     rf e4 AB     rf e4 ME     rf e5 AB     rf e5 ME
+  q_bisect              +28          +15       -0.085       -0.300       +0.322       +0.033
+  q_endo                +13           +5       +0.130       -0.073       +0.716       -0.120
+  q_novel               +17           +7       -0.055       -0.106       +0.033       -0.044
+  q_comp                 +5           +5       +0.097       -0.218       -0.290       -0.082
+  q_trust                 -           +8            -       +0.030            -       -0.016
+
+[3] DOES THE PREMIUM RISE WHEN QUESTIONS ARE SCARCE?  metered premium / abundance
+    premium, per selector. A ratio > 1 means the same selector buys more at the
+    metered knob. Ratios are printed only where the abundance premium is non-zero
+    and both signs agree; where the signs differ the pair is printed instead.
+  selector                   L4 true                 rf e4                 rf e5
+  q_bisect         +28 -> +15  0.54x-0.0848 -> -0.3  3.54x+0.322 -> +0.0328  0.10x
+  q_endo            +13 -> +5  0.38x+0.13 -> -0.0727 (sign)+0.716 -> -0.12 (sign)
+  q_novel           +17 -> +7  0.41x-0.0545 -> -0.106  1.94x+0.0328 -> -0.0437 (sign)
+  q_comp             +5 -> +5  1.00x+0.097 -> -0.218 (sign)-0.29 -> -0.082  0.28x
+  q_trust                          -                     -                     -
+
+wrote ~/Code/research/experiments/rhm/practice/antiphon/metered_premium.json

@@ -510,6 +510,34 @@ does not author the answer** — per-step provenance gates discard the found-but
 work the ask licensed, and the trajectory-grain provenance experiment is `woodshed` itself,
 already run and already positive. Full record: [antiphon/README.md](antiphon/README.md).
 
+### [`tutti/`](tutti/README.md) — the unification round (2026-09-01→02)
+
+**Goal**: put what the E/F line built into Track A's loop and turn the crank — five lanes in one
+conversation: the second rung and the deep-era question grip sized offline (`tutti/sizing/`);
+the endogenous question-judge and both poles under the yield pacer (`antiphon` `an_s2`);
+worthless answers installed in the question menu (`antiphon/trap/`); both currencies and the
+selector over one crank on the live executor, one-bit yoke per lever (`tutti` `tu_s0`); and the
+port at the strongly-metered knob (`antiphon` `an_m0`). ≈14.4 GPU-h, twelve bit-identity gates
+at 0.000e+00.
+
+**Finding**: **the loop's three actions get measured owners, and the assignment is not the
+one the QUEUE guessed** — the one-level-up yield gauge owns *what to freeze* (δ-silence as
+commit owner never crosses above its bootstrap at the honest floor; `caesura` finding 5 was
+floor-sensitive), δ-silence owns *when to move on* (the mirror is the only arm above the
+lifetime ceiling, +0.43/+0.32 at eras 4/5, by ending era 2 before yield could freeze L3 — the
+extension effect by two independent clocks), and the question judge that carries value is a
+**learning-progress band-pass** (across `an_s2`, `tr_s0`, `an_m0` the mining order tracks the
+novelty edge and the value order tracks solvable-as-designed questions: `q_endo_loop`
++0.179/+0.885, the largest era-5 cell in the arc; under a 90%-worthless menu the incumbent
++0.352/+1.393 and the use-record-guarded judge +0.276/+1.022 while the oracle posts none and
+no judge is nerdsniped). The meter preserves the port's mining premium in ratio (oracle 2.2×
+the null) and exposes a solve tax every selector pays, but starves π's trust tag-wide on a
+ladder sized for abundance, so the reward side is untested. And the second extension is a
+**change of key**: arrival, not the r² wall, stops L5 (~100× the observations at any admissible
+world), while under the grammar's own parent-feature key every level is 16 rules — the merge
+op is on the critical path as a level-size lever, specced as `enharmonic/`[^private].
+Full record: [tutti/README.md](tutti/README.md).
+
 ## Reproduce
 
 ```bash
@@ -535,3 +563,5 @@ Full commands, calibrations and volume layout: [`crystallize/README.md`](crystal
 seed-triple convention), [`tall/README.md`](tall/README.md),
 [`transpose/FILES.md`](transpose/FILES.md), [`setlist/FILES.md`](setlist/FILES.md)
 (joint findings: [`typed_gaps/README.md`](typed_gaps/README.md)).
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
