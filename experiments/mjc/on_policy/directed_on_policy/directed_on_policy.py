@@ -785,6 +785,8 @@ def run_directed_on_policy(cfg: dict) -> dict:
 @app.local_entrypoint()
 def directed_on_policy(
     quick: bool = False,
+    spawn: bool = False,                      # queue server-side and return; see below
+
     tag: str = "",
     seed: int = 0,
     policies: str = _ALL_POLICIES,
@@ -913,6 +915,17 @@ def directed_on_policy(
         render_policies=[p for p in render_policies.split(",") if p.strip()],
         render_n=render_n,
     )
+    if spawn:
+        # ADDITIVE, default-off. `modal run --detach <file>::<local entrypoint>` does not survive
+        # the client process dying (the call is cancelled mid-round), which makes this file
+        # unrunnable from a restartable container. `.spawn()` queues the call server-side and
+        # returns; the durable artifact is then the volume copy rather than the local mirror:
+        #     modal volume get mujoco-control-data /directed_on_policy/<tag>/results.json <dest>
+        # With spawn=False every prior code path is byte-identical.
+        call = run_directed_on_policy.spawn(cfg)
+        print(f"[spawn] call {call.object_id} queued for tag={tag!r}")
+        print(f"[spawn] results -> /data/directed_on_policy/{tag}/results.json")
+        return
     out = run_directed_on_policy.remote(cfg)
     localdir = os.path.join(os.path.dirname(__file__), "figures", "directed_on_policy_" + tag)
     os.makedirs(localdir, exist_ok=True)
