@@ -40,6 +40,7 @@ typed maintenance):
 | offbook | [`offbook/`](offbook/README.md) | **the port back** on this substrate: seam-time audition (enumeration) vs π-routing vs both ports, the address-book battery and poison twin — then three canary rounds (credit currency, exposure placement, reflex-loop delay) on why the chain level is never adopted | **written up; SUSPECT** (2026-08-27, see `accompanist/`) — 1 seed/run, bit-identity twins + cross-tag exact controls |
 | accompanist | [`accompanist/`](accompanist/README.md) | the follow-up to offbook: library construction (`d1`–`d3`: content ladder, legato's nesting, the model adapting) and the delay operator (`d3b`, `presto/`: naive vs efference copy) on offbook's piece and on a fast 120 ms-segment piece | **written up** — the pivot: the incumbent's free forward model, not the piece, is what refuses the deep unit |
 | acappella | [`acappella/`](acappella/README.md) | the re-port with **no forward model anywhere**: a priced real-rollout incumbent under a declared budget on `etude/`'s substrate, then (amendment) the feedback/delay axis — reflex vs keyed/auditioned library under an unbridgeable observation delay | **written up** — the grounding economy halts at its own pre-fixed gate (0/15 search cells beat the reflex); re-sited on feedback, a model-free **segment-span niche opens at 192 ms** |
+| solo | [`solo/`](solo/README.md) | **re-internalization with no forward model** at acappella's niche (Δ = 8): a behaviour-cloned reflex as the trunk, offbook's Port 1 (π over member slots) and Port 2 (span head, parity measured on the plant), the address-book battery, the primitive legal at every seam, δ_perf against the tape as intention reference logged; then a probe replacing the relative imitation filter with two pre-fixed absolute bands | **written up** — routing, corridor and address book all port at segment span; adoption tracks the meter (feel at Δ = 0, memory at Δ = 8); learning buys a 4× grounding cut and a 10× tighter quarantine, **not error** — the construction prior is the best selector and the bands starve π |
 
 ## Shared substrate
 
@@ -342,6 +343,29 @@ they pay most). B2 (trust at Δ=8) and the presto fast-piece escalation are queu
 licensing conditions, not run. Single seed; bit-identity gates against `etude/` and across tags.
 Full record: [`acappella/README.md`](acappella/README.md).
 
+### solo — re-internalization with no forward model: the three signatures port at segment span; learning buys cost, not error (2026-09-04 → 05, written up)
+
+**Goal**: run `rhm/practice/native/`'s consolidation on the plant with nothing imaginary in the
+loop, at the delay where committed content pays — a behaviour-cloned reflex supplying the trunk
+acappella said Port 2 lacked, π over member-library slots, a span head with parity measured as
+execution reproduction on the plant, the address-book battery, the primitive legal at every seam,
+and δ_perf against the committed tape's own trajectory logged as an instrument.
+
+**Headline**: **routing, corridor and address book all port, model-free.** Routing cuts groundings
+4× and priced time 3.8× at a 6% error cost against enumeration; deleting the table at zero
+groundings *lowers* error in every trained arm while untrained heads collapse to 0.72; trust forms
+(segment mass 0.73 → 0.98) and both ports quarantine the poison tenfold against enumeration; the
+corridor head beats the tape on every parity-open slot; and π routes to the primitive 0.99 of the
+time at Δ = 0 and 0.00 at Δ = 8 — the learner plays by feel where feel wins and from memory where
+memory wins. What learning did **not** buy is error: the routed arms start at the construction-order
+prior (0.0955), climb, and settle at 0.12 against the donor's 8-tape 0.0838, and a probe that
+replaced the relative imitation filter with two pre-fixed absolute bands starved π (pass 0.05 and
+0.01) and left the untrained arm at the prior — the best routed error in either run. The certifier
+throughout is the body through the resettable plant: content by held-out replay, trust by
+body-graded self-imitation, internalization by plant-measured parity; timing has none. Single
+seed; fourteen-check bit-identity against `acappella/b1`, twins at 0.000e+00 over 120 cycles.
+Full record: [`solo/README.md`](solo/README.md).
+
 ## Reproduce
 
 ```bash
@@ -382,6 +406,7 @@ Modal volume (`mujoco-control-data`): `/data/bridge_assembly/dsw_<cell>_s<seed>/
 [`offbook/FILES.md`](offbook/FILES.md) ·
 [`accompanist/FILES.md`](accompanist/FILES.md) ·
 [`acappella/FILES.md`](acappella/FILES.md) ·
+[`solo/FILES.md`](solo/FILES.md) ·
 [`estimability/FILES.md`](estimability/FILES.md) ·
 [`priced_plasticity/FILES.md`](priced_plasticity/FILES.md) ·
 [`aleatoric_flip/FILES.md`](aleatoric_flip/FILES.md) ·
