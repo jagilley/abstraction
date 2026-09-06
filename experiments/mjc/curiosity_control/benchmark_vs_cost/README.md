@@ -56,7 +56,7 @@ lives entirely in the error *dynamics*.
 The mjc noisy-TV cell (no per-round noise-cell error was logged, only occupancy); avoidance-vs-indifference
 toward noise (no logged drive implements either formulation, and the noise sits off the value corridor);
 the agency gate σ(g/θ) (no arity-1/arity-2 pair in any log); closed-loop behavior of a δ-driven policy.
-a2a substrate single-seed; windows chosen post-hoc; cross-formulation comparisons rely on normalized
+Windows chosen post-hoc; cross-formulation comparisons rely on normalized
 metrics (P>0, fake-fraction, discriminability), not raw magnitudes.
 
 ## Figures & reproduce

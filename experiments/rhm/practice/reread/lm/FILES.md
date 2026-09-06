@@ -77,7 +77,7 @@ positions are where nearly all the extractable uncertainty lives.
 
 v=16, s=2, L=6, m=4, rule_seed 0 (the donor's regime, so its reference lines transfer);
 GPT 8L/8H/256D (6.34M params), T=64; AdamW lr 3e-4, wd 0.01, batch 64;
-`max_steps` 20 000 = **81.9M tokens consumed**; data_seed 7, seed 42, single seed.
+`max_steps` 20 000 = **81.9M tokens consumed**; data_seed 7, seed 42.
 Checkpoints: 250, 387, 601, 931, 1443, 2236, 3466, 5372, 8326, **12000**, 12904, 20000.
 Arms: `fresh`, `frozen_200000`, `frozen_16384`, `frozen_2048`, `frozen_512`.
 Measurement: 8 000 aligned eval sequences (eval_seed 999), 512 oracle sequences,

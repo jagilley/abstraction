@@ -9,8 +9,7 @@
 2026-08-17 caveat block (reframe iv: free data ≠ free extraction; a token's extractable news is
 indexed by the reader's current vocabulary — the book re-read six months later teaches a
 different set of things because the reader changed).
-**Runs**: `rr_s0` (this node, sculpting) and [`lm0`](lm/README.md) (the twin), both 2026-08-17,
-single seed.
+**Runs**: `rr_s0` (this node, sculpting) and [`lm0`](lm/README.md) (the twin), both 2026-08-17.
 
 ## The question
 
@@ -83,7 +82,7 @@ Taken together: the reread claim holds where the reader itself is what climbs, w
 multiplier (6.4× at no penalty; higher multipliers untested above the wall) and a measured
 boundary (the corpus's depth capacity). On the executor side, frozen archives renew competence
 but not vocabulary — under an instrument whose reader cannot climb, which is the scope condition
-to carry forward rather than a refutation. Recorded as strongly suggestive on single seeds;
+to carry forward rather than a refutation. Recorded as strongly suggestive;
 the twin's two-instrument agreement and its free fidelity gate are the main reasons for
 confidence.
 
@@ -99,7 +98,7 @@ confidence.
   cells), consistent with ratchet's inert-plant finding — so the monolith comparison is against
   a near-horizontal line.
 - `deep__dense_*` L3 auditions floor at exactly 1.000 for many passes — degenerate cells, not
-  measurements. Single seed; scheduled commits (the certificate deliberately not under test);
+  measurements. Scheduled commits (the certificate deliberately not under test);
   one archive size (192) at one (v,s,L,m).
 
 ## Reproduce

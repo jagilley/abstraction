@@ -206,7 +206,6 @@ cut of 13 groundings in ~16400).
 | **the depth test** | d0's 3-term ordering `e_chain ≤ e_seg ≤ e_reflex` (`aud_chain` / `lib_seg` / `reflex`), per Δ, with both ordering margins, the guard margin in m and as a fraction, and the chain's distance to the guard (presto decision 11). Separates a **segment-span** niche (offbook 7d) from a **chain-span** one. |
 | **the converse halt** | reflex best at every Δ ⇒ no niche, B2 not licensed, regardless of the priced ledger. |
 | **the range** | Δ ∈ {0,1,2,3,4,6,8,12,16} steps = 0–384 ms at `dt_ctrl` 0.024. **Not extended or re-tuned on failure** (legato F2); the pre-declared escalation is presto's fast piece as a separate round. |
-| **seeds** | single seed 0, as everywhere in this arc. |
 
 ### Decisions taken for B1, with reasons
 

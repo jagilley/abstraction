@@ -1,6 +1,6 @@
 # The temporal confabulation test: is the joint system's privileged access epistemically charged?
 
-**Status**: **OL arm run** (2026-08-10, cloud agent, single seed) — the second pre-registered
+**Status**: **OL arm run** (2026-08-10, cloud agent) — the second pre-registered
 falsifier **fired cleanly**, and the doc's conjecture is answered: privilege survives the axis change,
 charge is present and reportable, and **their intersection is exactly empty**. Two pre-registered
 predictions were contradicted by the run and are left standing below rather than edited out (the
@@ -188,7 +188,7 @@ privileged-but-inert, the depth result in miniature).
   → The sweep bracketed both; the qualitative contrast (temporal advantage a fraction of depth's,
   charge-null at every point) holds across it.
 
-## Results — OL arm (2026-08-10, cloud agent, single seed)
+## Results — OL arm (2026-08-10, cloud agent)
 
 **The harness is a controlled fork and both anchors reproduce.** Wake val 1.5447 against the depth
 battery's published 1.5447; the depth arm re-run at the temporal report positions reproduces the

@@ -3,7 +3,7 @@
 **Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [../../../ideas/physical_control_substrate.md](../../../ideas/physical_control_substrate.md)
 **Cousins** (the arity thread): [ACTIVE_VISION](../../a2a_forward/reaching/ACTIVE_VISION_README.md), [REACHING_INTERNAL](../../a2a_forward/reaching/REACHING_INTERNAL_README.md), RHM length-gen
 **Code**: `arity_torque.py` (env: [`../pusher_env.py`](../pusher_env.py)) · File index: [FILES.md](FILES.md)
-**Status**: done, single seed. **Date**: 2026-07-16.
+**Status**: done. **Date**: 2026-07-16.
 **Builds on this**: [`dynamics_shift/`](../dynamics_shift/README.md) (Cut #3's model-based agent is an arity-2 FM built on this cut's idiom)
 
 ---
@@ -14,7 +14,7 @@
 
 **Apparatus**: 100K transitions (i.i.d. policy, 4.8% contact → 19,101 free-flight test transitions); capacity sweep hidden ∈ {8,16,32,64,128,256} × {arity-1, arity-2}, 2-layer MLP, Huber loss, **identical data — only the input differs**.
 
-## Result (single seed)
+## Result
 
 | readout | finding |
 |---|---|
@@ -26,7 +26,7 @@ The pusher velocity change here is almost *entirely* command-driven (the actuato
 
 ## Caveat
 
-Under i.i.d./no-seek collection the puck is an **inert distractor** (rarely touched → tiny near-noise Δv), so its per-dim R² is noisy (`puck_vy` goes slightly negative at high capacity) and `R²_all` droops as capacity grows (big models overfit the tiny puck signal). This does not touch the conclusion — the actuated pusher dims are flat and definitive — but it is why the "all dims" panel (fig1 left) is not monotone. Single seed.
+Under i.i.d./no-seek collection the puck is an **inert distractor** (rarely touched → tiny near-noise Δv), so its per-dim R² is noisy (`puck_vy` goes slightly negative at high capacity) and `R²_all` droops as capacity grows (big models overfit the tiny puck signal). This does not touch the conclusion — the actuated pusher dims are flat and definitive — but it is why the "all dims" panel (fig1 left) is not monotone.
 
 ## Figures (`figures/arity_full_v1/`)
 

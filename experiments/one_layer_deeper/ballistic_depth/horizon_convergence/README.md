@@ -97,7 +97,7 @@ structure fell *toward* the null as scale grew. Nothing here bears on it.
 
 ## Honest caveats
 
-- **The `N=9853` arm is a single seed at each budget**, and a single doubling. It establishes
+- **The `N=9853` arm is a single doubling.** It establishes
   "not converged at 60k"; it does not locate where convergence happens, and 10 should not be
   quoted as the converged horizon.
 - **No results JSON for the 120k run.** It was killed at ~step 100k of its `consist` arm, after

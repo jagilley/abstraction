@@ -12,7 +12,7 @@ untouched; its world, floors and bit-identity design), [`../teacher_slot/`](../t
 [`absorption_blinds_the_evaluator`](../../../../ideas/absorption_blinds_the_evaluator.md).
 **Runs**: `tn0`/`tn_calib` (Gate 0, 2026-08-29→30), `g1a`+calib (Gate 1 wave 1), `g2a`/`g2c`
 (wave 2 + fix round), `g1g` (offline checkpoint analytics), 2026-08-30→31; ~29 GPU-h total.
-**Single seed on every treatment; ranks, signs, trajectories and floor-multiples are the claims.**
+**Ranks, signs, trajectories and floor-multiples are the claims.**
 One orchestrated conversation; every gate built end-to-end by one delegated implementer agent.
 
 ## The question
@@ -202,8 +202,8 @@ re-specced in a separate conversation.
 
 ## Caveats
 
-- Single seed, one world, one key level/node/loudness, weak-form scaffold regime — inherited
-  from the donor. A seed pair is licensed the moment a cell here is cited externally.
+- One world, one key level/node/loudness, weak-form scaffold regime — inherited
+  from the donor.
 - The 1G quiet-interval nulls admit absorption tails: every event excess there is a lower bound.
 - `g1a`'s own panel never rebinds `pn_leaf` after a drift, so its post-drift panel rows read
   pre-drift sequences (1G re-read each epoch on its own grammar; wave-2's epoch-turn fix

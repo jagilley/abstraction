@@ -272,8 +272,7 @@ off-style, which `crystallize` measured exactly (the modal span off-grammar whil
 contributing realization was on-grammar), so selection-not-averaging reappears on day one.
 
 **How we would know it lied.** Instruments, none of them an oracle, as revised after `critic/`
-scored the first draft's four exactly on RHM (2026-08-22; `cals_s0`, `cr_s0`, `calc_s0`, single
-seed):
+scored the first draft's four exactly on RHM (2026-08-22; `cals_s0`, `cr_s0`, `calc_s0`):
 
 - **Self-manufactured damage, the one that works.** Corrupt a held-out exemplar without touching
   any rule (`ear.grader.manufacture_damage`), require pass ≤ 0.10 on it and ≥ 0.90 on clean
@@ -369,7 +368,7 @@ narrows unless demand is varied from outside. The long-run shape is an external 
 the agent's next-level yield that augments, and a teacher that keeps varying the demand.
 
 **Closed label-free** (2026-08-22, `endo_yield/`[^private],
-`ey0`, single seed). The learner's own NLL at the positions that close the level one above the
+`ey0`). The learner's own NLL at the positions that close the level one above the
 keyed one (a fact of the grammar's shape, no labels) drives the same merge at 1500, pre-rotation,
 with a condition sequence identical to the labelled probe's: at 1.5% of budget under the neutral
 condition, and free under the arm's own consumed condition. The 2×2 (keyed span vs next level) ×
@@ -484,8 +483,8 @@ to treat as falsifiers.
 Nothing has been run on images. Every component named here has support somewhere in the repo: the
 vocabulary machinery and both re-ingestion ports on RHM, the compile-op taxonomy and the seam law
 on the arm, the verbal teacher in `teacher_slot`, and since 2026-08-22 a learned grade of record
-driving the loop (`critic/`) and a label-free one-level-up gauge (`endo_yield/`), both single
-seed with READMEs pending. The assembly on images does not, and the grader in particular has only
+driving the loop (`critic/`) and a label-free one-level-up gauge (`endo_yield/`), both
+with READMEs pending. The assembly on images does not, and the grader in particular has only
 ever operated with the exact grade logged beside it, never without.
 That is the same epistemic position [practice_manufactures_its_own_credit](practice_manufactures_its_own_credit.md)
 §10 recorded for the arc before its first round, and the same sequencing applies: one node,
@@ -493,7 +492,7 @@ forked verbatim, gated bit-for-bit, numbers brought back for discussion before a
 
 ## 11. What we ran (2026-08-25): the substrate description — [`canvas/plant`](../experiments/canvas/plant/README.md)
 
-**Status**: the first node on canvas, single seed, discussed with Jasper before this section
+**Status**: the first node on canvas, discussed with Jasper before this section
 was written. Not a practice loop. What it did to the sections above, in one place:
 
 - **§3a / §9 risk 1 ("the alphabet may not factor") — measured, with a mechanism.** On the GLSL

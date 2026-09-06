@@ -306,8 +306,7 @@ python3 rhm/practice/setlist/analyze_setlist.py --tag sl_s0 --fetch --figures
 set the DGP draw and the substrate, defaulted to `ratchet`'s (`0`/`0`/`1`) so every prior run
 reproduces. **`--demand-seed` is a separate stream**, so the audience's motion is independent of
 every arm's randomness and of the DGP draw. A replicate varies the triple together as
-`seed = k, rule_seed = k, train_seed = k + 1` (`recital`'s convention). Single seed by default;
-absolute error levels are not comparable across rule draws, so orderings, signs and recovery
+`seed = k, rule_seed = k, train_seed = k + 1` (`recital`'s convention). Absolute error levels are not comparable across rule draws, so orderings, signs and recovery
 fractions are the reported quantities.
 
 ## Inherited, not copied

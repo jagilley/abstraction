@@ -305,7 +305,7 @@ width-2 pre-commit and overestimated by 64%); priced cost per cycle is **not** c
 
 ## Approved design for the main run
 
-`depth 6, m=2, max_macro_level=3`, ladder `1:25,2:12,3:6,4:3,5:1`, single seed, commit policy
+`depth 6, m=2, max_macro_level=3`, ladder `1:25,2:12,3:6,4:3,5:1`, commit policy
 fixed across arms (certify-else-provisional-at-boundary). Six arms — `never_base` is cut as a
 full arm, its depth-necessity role moving to a pre-loop calibration ladder plus the in-arm
 width-ladder instrument:

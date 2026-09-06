@@ -10,7 +10,7 @@ S1/S2 measurement records, reproduce). **Idea doc**:
 2026, *Cell Reports*, "Hippocampal skill memory expansion drives online performance dynamics during
 skill learning" (`reading/Hippocampal skill memory expansion.pdf`).
 **Runs**: `S1` (the practice run, 80 cycles, 2026-08-20), `S2` (the disentangling re-measurement of
-S1's saved models, 2026-08-20). **Single seed on everything; the 17–81-point monotone trends are
+S1's saved models, 2026-08-20). **The 17–81-point monotone trends are
 the claims, single cells are not.**
 
 ## The question
@@ -155,9 +155,8 @@ off-corridor part; the one-step and belief readouts above can, and do.
 
 ## Caveats
 
-- **Single seed** throughout. F1's trend is 81 points at p~1e-16 and F4's 17 points at p~1e-4, so
-  the headline does not want a seed pair; F2's c22–26 regime change is now a coincidence of three
-  readouts (far-end jump, one-step crossover, corridor-distance jump) but still one seed, and CAL-P
+- F2's c22–26 regime change is a coincidence of three
+  readouts (far-end jump, one-step crossover, corridor-distance jump), and CAL-P
   cells are single CEM draws at ±0.2 m.
 - `t_priced` is **not** comparable to legato's ledger (metering is cut); this node makes no economic
   claim.

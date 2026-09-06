@@ -11,8 +11,8 @@ the hand-written comparator, the measured floors, and the logged corpus the fit 
 had no upward direction) · [`../census/`](../census/README.md) +
 [`../assay/`](../assay/FILES.md) (the yoke and stream-twin mechanics; the stream floor).
 **Runs**: `ma_smoke` (mechanics), `ma_s0` (main, 5 arms, 2.08 GPU-h), `ma_s1` (stream-displaced
-twins, 0.91 GPU-h), 2026-08-28. **Single seed on every treatment; ranks, signs, and multiples
-of measured floors are the claims** — and this node measured its own displacement floors for
+twins, 0.91 GPU-h), 2026-08-28. **Ranks, signs, and multiples of measured floors are the
+claims** — and this node measured its own displacement floors for
 its two headline arms, which demote one of its own cells below. One orchestrated conversation;
 built end-to-end by one delegated implementer agent.
 
@@ -53,7 +53,7 @@ value judge" — a judge that integrates a lifetime of logged experience — and
 learned here is the **value of states**, not yet the value of acting: the corpus holds 6 commit
 events, and nothing in this node estimates action values.
 
-Arms (single seed, the donors' seed family, A1's era caps 60/50/15/12/9): `anchor` (schedule
+Arms (the donors' seed family, A1's era caps 60/50/15/12/9): `anchor` (schedule
 replica; cross-tag replay carrier), `outer_yield` (A1's thermostat, in-tag), `learned_yield`
 (the treatment), `learned_task` (the negative control — identical class, inputs, fitting,
 exploration; within-level reward), `yoked_learned` (clock replay of the treatment). `ma_s1`
@@ -119,7 +119,7 @@ identity asserted in-job and again at merge).
   matching later commits with fatter ones is the census/assay "arrival dominates" claim,
   produced this time by an endogenous loop's own choice — and the L4-observation acceleration
   after the early L2 commit is the first sighting of the crank compounding upward through
-  timing alone. Suggestive, not certified; single seed.
+  timing alone. Suggestive, not certified.
 - **(d) The across-run form is the biologically natural one** (Jasper's framing): a
   slow-timescale learner is, almost by definition, one that integrates a lifetime of episodes
   rather than exploring within one. Whether something hippocampus-like — parallel candidate
@@ -128,9 +128,8 @@ identity asserted in-job and again at merge).
 
 ## Caveats
 
-- **Single seed throughout.** `ma_s1` displaces stream position only (`--seed 0`, substrate
-  asserted identical twice): it can demote or support orderings, never promote a cell to
-  seed-replicated. Its floors are measured on these two arms specifically and differ from
+- **`ma_s1` displaces stream position only** (`--seed 0`, substrate asserted identical
+  twice): it can demote or support orderings. Its floors are measured on these two arms specifically and differ from
   census finding 7's pooled 0.087; where they disagree, the in-node number is the narrower
   claim.
 - **The action-value gap.** 6 logged commit events; the learned object is the value of states.

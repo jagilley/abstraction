@@ -94,7 +94,7 @@ drifted-world data under-samples R1 (off-policy) and can grade worse than stale.
 
 Single task family; scripted (frozen) trial behavior — reward annealing comes from benchmark habituation,
 not closed-loop improvement; one slow clock (d_r fixed); unit-area kernels are *the* capacity convention
-(unit-peak would gift broad windows); sweep's behavioral column is 1 seed and range-limited.
+(unit-peak would gift broad windows); sweep's behavioral column is range-limited.
 
 ## Figures & reproduce
 

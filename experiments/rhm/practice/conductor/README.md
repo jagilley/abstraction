@@ -11,8 +11,8 @@ replay reference; with `cs_s0`/`as_s1` the source of the offline floors) ·
 method; the shadow panel) · [`../census/`](../census/README.md) (the yoke mechanic; the stream
 floor) · [`../spiral/`](../spiral/README.md) (the three clocks; the battery).
 **Runs**: `cd_gf`, `cd_smoke`, `cd_ef` (gates + floor calibration, 1.50 GPU-h), `cd_s0` (main,
-6 arms, 2.48 GPU-h), 2026-08-27→28. **Single seed on every treatment; ranks, signs, and
-multiples of measured floors are the claims.** One orchestrated conversation; built end-to-end
+6 arms, 2.48 GPU-h), 2026-08-27→28. **Ranks, signs, and multiples of measured floors are the
+claims.** One orchestrated conversation; built end-to-end
 by one delegated implementer agent.
 
 ## The question
@@ -126,7 +126,7 @@ its caps to termination — a readout, not a hang.
 
 ## Caveats
 
-- **Single seed, one rule draw, one ladder.** Era-5 Δ +0.251 clears the earning-family floor
+- **One rule draw, one ladder.** Era-5 Δ +0.251 clears the earning-family floor
   2.9× but sits below the given-family era-5 displacement (0.344); a stream-displaced twin of
   `outer_yield` (machinery in the fork) is the named cheap check if this cell becomes
   load-bearing.

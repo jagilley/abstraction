@@ -3,8 +3,7 @@
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md)
 **Substrate**: [`../../RHM_SCULPTING_README.md`](../../RHM_SCULPTING_README.md) Stage 3d
 **Idea**: [`ideas/revision_not_surprisal.md`](../../../../ideas/revision_not_surprisal.md) §5
-**Date**: 2026-08-08 · **Status**: Step 1 positive, Step 2 null, closeout **kills the line**. Single
-seed throughout.
+**Date**: 2026-08-08 · **Status**: Step 1 positive, Step 2 null, closeout **kills the line**.
 
 ## Why this substrate
 

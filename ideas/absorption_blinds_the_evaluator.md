@@ -47,7 +47,7 @@ ported between edges without checking which edge they were measured on: everythi
 measured on a two-node edge where the adapter is the content reader's own gradient plasticity and
 the evaluator is a thermostat-grade op rule.
 
-## §3 Evidence (tuning, single seed, one world; floors as measured there)
+## §3 Evidence (tuning, one world; floors as measured there)
 
 - **The wall, directly.** The reader absorbs 86% of a +0.65-nat rotation shock in 50 steps, and
   the absorption accelerates across events (fourwall: 250 → 100 → 50 steps). Online event

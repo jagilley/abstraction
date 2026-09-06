@@ -8,8 +8,8 @@ what was asked, 2026-08-20) · **Files**: [`FILES.md`](FILES.md) · **Substrate 
 [`two_timescale_value_loop`](../../../../ideas/two_timescale_value_loop.md) ·
 [`heterogeneous_graders`](../../../../ideas/heterogeneous_graders.md) §3 (Rung B's bet).
 **Runs**: `tsd_gate`/`tsd_gate2`/`tsdA`/`tsdB` (decision + yield, 2026-08-20), `b1` (verbal,
-2026-08-20), `hr_s0` (handle, 2026-08-20). **Single seed on every treatment; ranks, signs,
-trajectories, and floor-multiples are the claims.** One orchestrated conversation; each rung was
+2026-08-20), `hr_s0` (handle, 2026-08-20). **Ranks, signs, trajectories, and floor-multiples
+are the claims.** One orchestrated conversation; each rung was
 built end-to-end by a delegated implementer agent and the machinery details below summarize their
 work rather than receiving separate writeups.
 
@@ -206,7 +206,7 @@ slot carries."
 
 ## Caveats
 
-Single seed on every treatment; terminal spreads among merged arms (±0.004 nats, d4 ±0.09) are at
+Terminal spreads among merged arms (±0.004 nats, d4 ±0.09) are at
 or under fwlm's floors and unrankable. One world, one key level/node, one rotation family. B1:
 n=3 sessions/cell on one trajectory family; the reasoner is a Claude-family model reading a
 Claude-built (though programmatically blinded and counterbalanced) vignette; per-sample decisions

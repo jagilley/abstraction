@@ -9,7 +9,7 @@ sibling**: [`../../merge/`](../../merge/README.md) (`mg_s0`: paced rotation lice
 **Idea docs**: [`recurrence_manufactures_confounds`](../../../../../ideas/recurrence_manufactures_confounds.md)
 (§§2–9; §9 names the exposure this node was built to make well-posed) and
 [`practice_manufactures_its_own_credit`](../../../../../ideas/practice_manufactures_its_own_credit.md) (§18).
-**Runs**: `fwlm0` (necessity) and `fwlm1` (sufficiency), 2026-08-18, single seed; **rank orderings,
+**Runs**: `fwlm0` (necessity) and `fwlm1` (sufficiency), 2026-08-18; **rank orderings,
 signs, and multiples of the measured floors are the reported quantities.**
 
 ## The question
@@ -163,8 +163,8 @@ came free. Retire-as-delete is a property of the medium, not a hyperparameter.
 
 ## Caveats
 
-- **Single seed on every treatment arm**; the dead pair is the only replicate and supplies the
-  floors (0.0012 seed / 0.0039 placebo). Terminal differences of ±0.004 among merged arms and
+- **The dead pair is the only replicate and supplies the floors**
+  (0.0012 seed / 0.0039 placebo). Terminal differences of ±0.004 among merged arms and
   `no_wall` are unrankable; the claims ride on trajectories, integrals, transients, and 10×+ floor
   multiples. The per-arm-worker design removes stream-position noise from every cross-arm contrast.
 - **The timing axis brackets, it does not locate** (1000/8000/13000; no `merge_4000`), and

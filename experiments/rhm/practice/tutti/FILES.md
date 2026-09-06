@@ -141,7 +141,7 @@ Fetched copies, figures and `reduction.txt` under `figures/<tag>/`; the banked r
 | `_preflight` (×3) | interface + gates C, T, I, D and **X**, toy sizes. Pass 1 tripped X-4's own over-strong precedence assert (a cap-forced advance coinciding with a boundary commit — the donor's behaviour, not the split's); the gate now scopes to gauge-driven actions | **ALL PASS** (`results/preflight2.log`, `preflight3.log`) |
 | `tu_gf` | G-F: in-process fork-vs-`caesura.py` replay at `max_macro_level=4`, **plus gate Q-11** | **PASS — 0.000e+00** (`results/gf.log`) |
 | `tu_smoke` | 3 arms at `--quick`, `--question-k 2048`. The pair `tu_pf_off` / `tu_y_exo` is one bit apart (port off vs on) and measures **the port's marginal cost: +0.1 s/cycle**; `tu_s_endo` adds +0.3 (port + endo selector + the second policy step). The dose read is NOT informative at this scale (`n_mined` = 1 on every readable cycle) and moves to the main run, as `an_smoke`'s lesson says | clean, **1050 s = 0.29 GPU-h** |
-| `tu_s0` | the main run: 8 arms, `ca_s0`'s ladder/caps/floors, one seed, `--tol-dsil 0.0046 --question-k 2048` | clean, **4.43 GPU-h** of arm time (13.1–14.7 s/cycle; 131/184/141/117/117/160/126/164 cycles). Record `figures/tu_s0_reduction.txt` |
+| `tu_s0` | the main run: 8 arms, `ca_s0`'s ladder/caps/floors, `--tol-dsil 0.0046 --question-k 2048` | clean, **4.43 GPU-h** of arm time (13.1–14.7 s/cycle; 131/184/141/117/117/160/126/164 cycles). Record `figures/tu_s0_reduction.txt` |
 
 ## Reproduce
 

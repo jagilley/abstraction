@@ -280,7 +280,7 @@ reducibility tap recovers ~4% of what relevance recovers.
 
 ## 7. What this establishes — and what it does not
 
-**Establishes** (single seed; every number is one draw):
+**Establishes** (every number is one draw):
 
 1. A move-indexed belief update, teacher set, and disagreement instrument that reduce exactly to the
    published block-indexed ones at `max_level=1`, gated three ways, with back-compat anchors matching

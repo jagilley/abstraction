@@ -46,7 +46,7 @@ The first online loop ([../online_value_loop/README.md](../online_value_loop/REA
 
 **The experiment.** Composes #4d/#4e's capacity-competition substrate (puck force field = value-irrelevant capacity sink; `push_rot` φ conflict; context-latent `f(s,u,z)→Δs(8)`; CEM-MPC control) with #1's drift *sequence*. The new ingredient: the value-**irrelevant** subspace **drifts too** (`puck_phase` θ rotates each drift — a backward-compatible knob added to `../pusher_env.py`). A **veridical** FM (matches all 8 dims) must re-learn the drifting puck every drift; a **value-carved** FM (drops the puck via the goal-reaching value's support = pusher dims [0,1,4,5], the 4d/4e hand-derived mask, frozen) tracks only φ. Per **guidance.md #3**, log re-adaptation at **both** FM and CONTROL level.
 
-**Result — a clean, informative null (capacity boundary h∈{24,32,64}, single seed each; consistent with 4d's multi-seed frontier):**
+**Result — a clean, informative null (capacity boundary h∈{24,32,64}; consistent with 4d's multi-seed frontier):**
 
 - **The carving mechanism works at every capacity**: carved puck-R² **−50 to −67** (drops the drifting puck), veridical **+0.2 to +0.4** (spends capacity tracking it).
 - **The value-relevant FM benefit is CAPACITY-GATED**: few-shot pusher-vel R² gap (carved−veridical) = **+0.06 at h=32**, →**−0.02 at h=64** (the 4d frontier, now under drift). It appears only where capacity binds.

@@ -2,7 +2,7 @@
 
 **Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [performance_error_is_the_bridge](../../../ideas/performance_error_is_the_bridge.md) §8 **Experiment 2** (the Gadagkar playback control; §12 named it the most informative remaining test)
 **Code**: `agency_gate.py` · File index: [FILES.md](FILES.md)
-**Status**: done, **single seed** (justified below). **Date**: 2026-08-11.
+**Status**: done. **Date**: 2026-08-11.
 
 ## One-liner
 
@@ -56,9 +56,8 @@ target steps, 211 distorted — physics untouched, so sensory sequences stay exa
 
 ## Caveats
 
-Single seed 0: the discriminating quantities are 1–2 orders beyond their standard errors and the mechanism
-is structural (the total arity gap on actuated dims), so extra seeds would assert a seed-sensitivity we
-don't hold. Single task family; distortions applied on the value slice only; the doc's literal FM₂≡FM₁
+The discriminating quantities are 1–2 orders beyond their standard errors and the mechanism
+is structural (the total arity gap on actuated dims). Single task family; distortions applied on the value slice only; the doc's literal FM₂≡FM₁
 PLAYBACK variant was also computed (trivially silent, δ RMS 0.0002).
 
 ## Figures & reproduce

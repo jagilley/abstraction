@@ -7,7 +7,7 @@
 **Files & machinery**: [FILES.md](FILES.md) — arms, gates, calibration record, Gate 0 in full, the
 coverage-is-not-the-objective machinery note, and everything inherited from
 [`../ratchet/`](../ratchet/README.md) / [`../setlist/`](../setlist/FILES.md).
-**Dates**: 2026-08-17 (all four tags). **Seeds**: single seed, one rule draw; **rank orderings and
+**Dates**: 2026-08-17 (all four tags). **Scope**: one rule draw; **rank orderings and
 signs are the reported quantities** — and this node *measured* why (see Caveats: stream-position
 sensitivity).
 
@@ -238,13 +238,13 @@ failure at ~zero price, later merging *dominates* earlier on the lifetime integr
 rational stickiness as measured economics), and the within-level ledger votes against merging at
 all — the op and its justification must both come from outside. One correction on the record:
 round 1's `wall_fast` penalty was ~8× a checkpoint-grid artifact (corrected net +0.019), aligning
-the endogenous reader with `mg_s0`'s substitutes-on-task-error. Single seed; per-arm workers with
+the endogenous reader with `mg_s0`'s substitutes-on-task-error. Per-arm workers with
 identical seeds remove this node's stream-position confound, so cross-arm contrasts are licensed
 there.
 
 ## Caveats
 
-- **Single seed throughout; ranks and signs only.** And this node sharpened the arc's noise
+- **Ranks and signs only.** And this node sharpened the arc's noise
   model: **stream-position sensitivity exceeds the ±0.034 error floor in adoption timing and
   migration depth** — identical `wall_rekey` config adopted at c5 (fw_s3, arm #1) vs c40 (fw_s2,
   arm #3) and saturated migration at 0.596 vs 0.932, purely from torch-global-RNG arm ordering.

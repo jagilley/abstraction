@@ -9,8 +9,8 @@ byte-reproducible).
 **suspect**. **What it licenses**: [`../acappella/SPEC.md`](../acappella/SPEC.md), the model-free
 re-port.
 **Runs**: `d1` (10 arms) · `d2` (7) · `d3` (8) · `d3b` (7 × 2 operators) on offbook's piece; `t0`
-(3 × 3 ladder) · `p0` (8 strategies × 8 Δ × 2 operators) on the new piece. 2026-08-26 → 08-27,
-single seed throughout; bit-identity controls across rounds are the claims. One orchestrated
+(3 × 3 ladder) · `p0` (8 strategies × 8 Δ × 2 operators) on the new piece. 2026-08-26 → 08-27;
+bit-identity controls across rounds are the claims. One orchestrated
 conversation, two implementer agents.
 **Attribution**: the "we shouldn't have run this with an FM" diagnosis is Jasper's; the rounds
 below are what it took to see it.
@@ -97,7 +97,7 @@ against an incumbent with no predictor. `offbook/README.md` carries a suspect ba
 
 ## Caveats
 
-Single seed on every run; 24 shared eval geometries; means and medians disagree in places (all
+24 shared eval geometries; means and medians disagree in places (all
 reported). `d3`'s pass margin is 3.0%; `p0`'s naive miss is 0.9% — both are "at the bar", and
 neither survives the predicting incumbent. The adapted-FM × efference-copy cell on offbook's piece
 was not run. The predictor uses the same model the planner uses, so their qualities are not

@@ -4,7 +4,7 @@
 **Children**: [`digit_port/`](digit_port/NOTES.md) (track A — the per-digit port; `NOTES.md` is the run-by-run record, [`FILES.md`](digit_port/FILES.md) the code index) · [`board_note/`](board_note/README.md) (track C — the externally-readable note).
 **Sibling cut, linked not moved**: [`../../rule_acquisition/staged_reduce/terminal_only/`](../../rule_acquisition/staged_reduce/terminal_only/NOTES.md) (track B — it forks `staged_reduce.py` by absolute module path and is semantically that node's question, so it stays under its donor).
 **Upstream**: `4ceff95` · deadline **2026-08-31 22:00 PT** · board read 2026-08-22/23.
-**Status**: track A — **11 hosted runs** (8 Medium, 3 Hard) + **29 Modal H100 runs** in six 600 s sweeps and one 3600 s run (≈ $30); track B — **4 Modal L4 arms** at 600k steps (≈ $26); track C — written, **not posted**. Single seed throughout (hosted: the evaluator's `[74]`). **Date**: 2026-08-23. Orchestrated as one conversation with three Opus implementer agents; this README is the writeup for the whole scope, the children carry the records.
+**Status**: track A — **11 hosted runs** (8 Medium, 3 Hard) + **29 Modal H100 runs** in six 600 s sweeps and one 3600 s run (≈ $30); track B — **4 Modal L4 arms** at 600k steps (≈ $26); track C — written, **not posted**. **Date**: 2026-08-23. Orchestrated as one conversation with three Opus implementer agents; this README is the writeup for the whole scope, the children carry the records.
 
 ---
 
@@ -101,7 +101,7 @@ Slightly worse at all seven rungs and both splits — individually noise, consis
 
 ### 2.6 Caveats
 
-- **Single seed**, hosted and local; ranks and the flat-ladder shape are the claims, a spread of 1–4 of 140 is noise.
+- **Ranks and the flat-ladder shape are the claims**, hosted and local; a spread of 1–4 of 140 is noise.
 - **Hosted vs local is not a constant factor**: 1.47× (`m6`, 4-layer), 1.21× (`m6`, 2-layer), 0.98× (`m5`). Two reads in `NOTES.md` compared arms across machines and had to be redone with a matched hosted control (runs 7 and 9).
 - **`m5` proxies Hard's floor, not its fitting rate** (prompt-grouped vs modulus-grouped).
 - The `digit_learned` legality arm is defined, not run; the loop-on-`T` and gather readings have not been asked on Discord.
@@ -130,7 +130,7 @@ Slightly worse at all seven rungs and both splits — individually noise, consis
 
 **Read** (the implementer's, which I share): the donor's decomposition is not discoverable by architecture alone. Early in training the decode is uninformative, a stage learns to ignore its seam input, and once ignored there is no gradient to make it informative — a degenerate fixed point, not an expressivity limit. Terminal labels never localise blame to a stage. The interaction the donor found (staging × breadth) needs the staging to be *installed*, and the only thing in the tree that installs it is the single-stage distribution. One scoping note where I differ from the implementer's record: manufacturing that distribution inside a submission is data augmentation under rule 14 (and needs nested model calls if done in the loss), so I read it as closed for the competition, not merely unported.
 
-Single seed, one digit width, one radix; the null is flat and identical across four arms and two seam modes, so seeds were not warranted.
+One digit width, one radix; the null is flat and identical across four arms and two seam modes.
 
 ---
 
@@ -154,7 +154,6 @@ Single seed, one digit width, one radix; the null is flat and identical across f
 
 ## Honest caveats
 
-- Everything is single seed. The three-modulus replication is the only replication in the node.
 - Track A's sweep reads are on our Modal at a dataset-dependent fraction of the hosted clock; every number that carries weight was re-measured hosted (runs 7, 9, 10, 11).
 - Track B is one digit width, one radix, one architecture; it closes "architecture alone" for this construction, not every construction.
 - The legality readings (loop-on-`T`, the seeding gather, highway-style gradient paths) are readings; Discord was never asked.

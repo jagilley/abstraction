@@ -52,7 +52,7 @@ agent chooses among {library units at each level} ∪ {the live plan}.
    reactive MPC stays where it belongs — as the `never` reference arm.
 2. **Pre-commit, every arm plays the donor reactive path** (`legato.World.traverse` with a reactive
    routing). This is legato's `sched_late` property: every arm runs a bit-identical stream up to
-   its first commit, which is what makes a single seed readable. `traverse_route` engages only once
+   its first commit. `traverse_route` engages only once
    the library is non-empty.
 3. **Slots are fit once by k-means over CONTENT and frozen.** A growing library would otherwise
    re-partition every commit and π's logits, the span head's conditioning and the trust series
@@ -981,7 +981,7 @@ library builds are free by construction (they only read pools already paid for).
 best-scoring content in the round (`fresh`) is also the cheapest to build, and the most expensive
 arm (`sel`, 74% of the ledger) is the second-worst on `seg_tape`.
 
-**Caveats.** Single seed; the eval is 24 shared geometries; the spread across all ten content arms
+**Caveats.** The eval is 24 shared geometries; the spread across all ten content arms
 at Δ = 0 is 0.183–0.327 (≈1.8×) and there is no in-run replicate to size the uniform-draw sampling
 noise against, so the small steps (≤0.03) in the contrast table should be read as ranks at best.
 Mean and median disagree in sign for some arms (`d0` `seg_tape` 0.2682/0.1912 vs `sel`
@@ -1224,7 +1224,7 @@ per-cell pools `nest` already paid for.
 
 #### 5. Caveats
 
-Single seed; 24 shared eval geometries; the criterion is on the mean and mean/median disagree in
+24 shared eval geometries; the criterion is on the mean and mean/median disagree in
 places (`nest` chain 0.1864/0.1527, `nest_key` chain 0.1455/0.1392 — both *lower* on the median).
 **The forward model is frozen** at its post-warm state through the nesting while legato adapted its
 over 90 cycles; that is what keeps `reactive`/`live_seg`/`ref_stale` bit-identical to round 4, and
@@ -1442,7 +1442,7 @@ GPU time but no priced environment steps or feedback events. `nest` build 23,545
 plans — the nesting practice is the only priced planning), `sel` build 22,986 s (44%), harvests
 `perf` 2,426 s / `route` 602 s.
 
-**Caveats.** Single seed; 24 shared eval geometries; the criterion is on the mean and `nest`'s
+**Caveats.** 24 shared eval geometries; the criterion is on the mean and `nest`'s
 medians are lower throughout (chain 0.0960 at Δ = 0, 0.1161 at Δ = 8), so the PASS is not a
 median-vs-mean artifact in the favourable direction. The Δ = 8 pass sits 3.0% inside the guard, and
 the Δ = 4 row fails only on the middle term (`live_seg` > `reactive`), not on the chain. `nest_u`
@@ -1527,7 +1527,7 @@ is **untested**. What is measured: under the frozen FM, efference copy improves 
 **Ledger.** Agent priced time **51,984 s** — identical to `d2` and `d3`, since the second sweep is
 experimenter instrumentation (`who="instrument"`); instrument steps rise 163,392 → 314,352.
 
-**Caveats.** Single seed; 24 shared eval geometries; the criterion is on the mean. The predictor
+**Caveats.** 24 shared eval geometries; the criterion is on the mean. The predictor
 uses the *same* forward model the agent plans with, so its quality and the planner's are not
 separable here — the natural next question, and the one Jasper is redirecting to.
 

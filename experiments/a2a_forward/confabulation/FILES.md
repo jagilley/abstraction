@@ -47,7 +47,7 @@ this is the complete listing.
 
 | Folder | Summary |
 |---|---|
-| [`component_control/`](component_control/README.md) | **Test 1b — is the advantage about the residual, or about having the state?** Varies which function of `a_j` is reported (`PRED` = `FM(a_i)`, `AJ` = the whole state) against `IMPL` = the residual, with identical machinery. The best I/O observer reaches ~0.87 / ~0.84 of the achievable headroom on `PRED` / `AJ` and only 0.19–0.26 on `IMPL`, so the forward-model decomposition is load-bearing for Finding 1 and not only for the steering test. Also: a tokens-only observer nearly solves `PRED` at 1L/64D while staying near the floor on `IMPL` at every capacity. Weaker on the continuous targets, where the separation from `AJ` depends on the headroom normalization. Language only, single seed, two of the four instrument capacities |
+| [`component_control/`](component_control/README.md) | **Test 1b — is the advantage about the residual, or about having the state?** Varies which function of `a_j` is reported (`PRED` = `FM(a_i)`, `AJ` = the whole state) against `IMPL` = the residual, with identical machinery. The best I/O observer reaches ~0.87 / ~0.84 of the achievable headroom on `PRED` / `AJ` and only 0.19–0.26 on `IMPL`, so the forward-model decomposition is load-bearing for Finding 1 and not only for the steering test. Also: a tokens-only observer nearly solves `PRED` at 1L/64D while staying near the floor on `IMPL` at every capacity. Weaker on the continuous targets, where the separation from `AJ` depends on the headroom normalization. Language only, two of the four instrument capacities |
 
 ## Related, outside this folder
 

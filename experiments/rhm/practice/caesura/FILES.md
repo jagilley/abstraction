@@ -140,7 +140,7 @@ Fetched copies, figures and `reduction.txt` under `figures/<tag>/`.
 |---|---|---|
 | `_preflight` | interface + gates C, T, I and **D**, toy sizes | **ALL PASS** (`results/preflight3.log`); two earlier passes caught the detector's missing `None` guard and then the deadlock |
 | `ca_gf` | G-F: in-process fork-vs-`intonation.py` replay at `max_macro_level=4` | **PASS — 0.000e+00** (`results/gf.log`) |
-| `ca_s0` | the main run: 4 arms, A3's ladder/caps/floors, one seed, `--tol-dsil 0.00321442` | clean, **10,150 s = 2.82 GPU-h**; `dsil_sched` 201 cycles / 15.6 s-cyc, `dsil_yield` 131 / 14.8, `dsil_read` 176 / 15.9, `dsil_and` 114 / 13.8. Record `figures/ca_s0_reduction.txt` |
+| `ca_s0` | the main run: 4 arms, A3's ladder/caps/floors, `--tol-dsil 0.00321442` | clean, **10,150 s = 2.82 GPU-h**; `dsil_sched` 201 cycles / 15.6 s-cyc, `dsil_yield` 131 / 14.8, `dsil_read` 176 / 15.9, `dsil_and` 114 / 13.8. Record `figures/ca_s0_reduction.txt` |
 
 ## Reproduce
 

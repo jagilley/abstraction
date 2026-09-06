@@ -8,7 +8,7 @@
 this joint writeup is their findings record)
 **Status**: written up 2026-08-16 (interpretation discussed with Jasper throughout, same day).
 Two rounds × (offline calibration + GPU admissibility gate + bit-identical fidelity replay +
-main run). **Single seed**; both rounds implemented by one Opus subagent session.
+main run). Both rounds implemented by one Opus subagent session.
 **Dates**: 2026-08-16.
 
 ## One-liner
@@ -196,7 +196,7 @@ Each species of news moved exactly one organ and left the other flat, in both di
 
 ## Caveats
 
-Single seed throughout — per `recital`'s methodology export, **rank orderings are the currency**
+Per `recital`'s methodology export, **rank orderings are the currency**
 and single-run fractions carry ±0.15; the claims above rest on ranks, on contrasts ≥8× the
 measured stream noise, and on a dissociation that spans two independent runs, but a seed pair on
 both main runs is the obvious next hardening. The dose reading of `transpose` (drift too small

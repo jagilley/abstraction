@@ -5,7 +5,7 @@
 **Sibling / predecessor**: [`../../rhm/conditional_revision/`](../../rhm/conditional_revision/README.md)
 — the same question on RHM. Its README's tracking appendix is what set this cut's design.
 **Date**: 2026-08-09 · **Status**: substrate built and self-tested; Gates 0, A, B1–B3, D, E run.
-Single seed (42), one reader (`Llama-3.2-1B`, frozen), one regime.
+One reader (`Llama-3.2-1B`, frozen), one regime.
 
 ## Goal
 
@@ -251,7 +251,7 @@ degenerate for any state-based readout.
 
 ## What this establishes, and what it does not
 
-**Establishes** (single seed, one reader, one regime):
+**Establishes** (one reader, one regime):
 
 - On a language substrate with an exact oracle, oracle surprisal can be pinned at AUC 0.500 by
   construction while belief revision varies — the reducible/irreducible split is realisable in English,
@@ -281,7 +281,7 @@ degenerate for any state-based readout.
   contains the distinction and the readout does not; whether that gap closes with scale is the single
   most informative untested question, and it is RHM's *"belief depth is the binding constraint"*
   restated.
-- Seed robustness. Single seed throughout; the sign-reversal table is the result most worth replicating.
+- The sign-reversal table is the result most worth replicating.
 - Anything about naturalistic text. Chronicle is fluent but templated, and the frame degeneracy in
   B2/B2b/B3 is a direct consequence of that.
 

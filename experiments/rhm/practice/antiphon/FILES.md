@@ -167,7 +167,7 @@ two are separable levers on one quantity, which is why the arms below are all sc
 
 ## 3. The arms, and what each control pins
 
-Five arms, one seed, all on **`anchor_long`'s configuration** (schedule pacer,
+Five arms, all on **`anchor_long`'s configuration** (schedule pacer,
 `CRESCENDO_LADDER` ≡ `CRESCENDO_CAPS` = 60/50/70/12/9, `max_macro_level=4`,
 `commit_max_level` unset), so **lifetime is identical at 201 cycles by construction** and no
 deep-era comparison can have been bought with time. They differ in **one thing**: the function
@@ -646,7 +646,7 @@ menu reads are cheaper than the ~13% estimate. The one arm that ran *slower* tha
 `an_s1`'s loop arm at 10.68 s/cycle, which is the pacer's own recert and shadow-audition cost at
 every rung it holds, not the port's.
 
-Single seed; ranks, signs and multiples of measured floors are the claims.
+Ranks, signs and multiples of measured floors are the claims.
 
 ## Children
 

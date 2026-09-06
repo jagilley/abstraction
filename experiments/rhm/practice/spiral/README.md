@@ -11,7 +11,7 @@ diagnosed apparatus negative; this round satisfies its recorded re-run recipe).
 [`cerebellar_abstraction_ratchet`](../../../../ideas/cerebellar_abstraction_ratchet.md) §2–§4.
 **Runs**: `pa0` (Phase A: gates + descent feasibility, 0.40 GPU-h), `sp_s0` (Phase B: 7 arms ×
 116 cycles, 4.31 GPU-h), plus `fid_d4`/`fid_d4b` donor-fidelity gates and smokes, 2026-08-22→23.
-**Single seed on every treatment; ranks, signs, and multiples of measured floors are the claims.**
+**Ranks, signs, and multiples of measured floors are the claims.**
 One orchestrated conversation; both phases built end-to-end by one delegated implementer agent
 (machinery details in `FILES.md`).
 
@@ -136,7 +136,7 @@ after every addition); `fid` ≡ `given` over all 116 cycles; every pre-treatmen
 
 ## Caveats
 
-- **Single seed, one rule draw, one damage ladder.** The consumption-era rank gaps (finding 5)
+- **One rule draw, one damage ladder.** The consumption-era rank gaps (finding 5)
   are large multiples of the depth-4 stream-noise floor (±0.034) and carry the claims; the L2
   cert-cycle deltas (1–2 cycles) and the `spiral`-vs-`spiral_route` era-5 gap do not.
 - `given_native`'s era-4 recovered fraction is 1.048: the "floor" is an exact-DP rollout over

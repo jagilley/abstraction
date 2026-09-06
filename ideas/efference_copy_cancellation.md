@@ -9,7 +9,7 @@
 
 Our forward-model loop currently **adds** the FM's prediction to the residual stream (`h + gate·p` — *summation*, a side-channel) and computes the novelty residual `r = actual − p` off to the side as a loss/probe target. It should instead **subtract** the prediction and propagate the residual (`f(h − gate·p) + p` — *cancellation*, the forward path): the efference-copy / predictive-coding wiring. Summation treats the FM as **optional help**, which produces *entangled* dependency, a runaway gate, and rollout drift. Cancellation treats the FM as a **permanent, modular component**: it makes the novelty residual the tensor the model actually computes on (giving the separable self-model that feedforward otherwise has no home for), adds a restoring force that self-corrects drift, and self-regulates the gate by forecast quality.
 
-## Experimental status (2026-07-13, looped ViT — single seed, Fashion-MNIST)
+## Experimental status (2026-07-13, looped ViT — Fashion-MNIST)
 
 Built cancellation in as a **one-flag strict generalization** on the looped ViT (`inject_mode=cancel`: `s_{t+1} = G(s_t − gate·inj) + gate·inj`, zero-init gate → identical to the plain loop at init), everything else held fixed against the summation baseline (whose re-run reproduces the [LOOPED](../experiments/a2a_forward/LOOPED_README.md) headline exactly). Full writeup: [CANCELLATION_README.md](../experiments/a2a_forward/CANCELLATION_README.md).
 

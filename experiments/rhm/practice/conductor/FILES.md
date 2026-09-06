@@ -134,7 +134,7 @@ it answers the two questions that size the round.
 identically zero through era 1 — this replay is silent about era 1 for the yield read, which is
 the gap the panel exists to close; the L4 row is shown beside it as the proxy.
 
-## Arms (single seed, seed family = the donors')
+## Arms (seed family = the donors')
 
 All routing-only (`prop_k=4`, no span port), all with the recert, all on the anchor's torch
 stream — so **every loop arm is bit-identical to the anchor until its own first action**, which

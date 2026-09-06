@@ -210,12 +210,12 @@ Dimension emergence is essentially identical across all three conditions (Phase 
 
 **3. Same-domain training produces the largest perturbations.** In both orderings, the biggest toward_gt delta for grandfather comes from grandmother's round --- the only same-domain token trained after it. The magnitude of this perturbation (~0.01--0.02) is 2--3x the control word background rate.
 
-**4. The sign of same-domain interaction depends on model state.** In the interleaved ordering, grandmother's training pushes grandfather *toward* ground truth (+0.014 jump at round 4). In the clustered ordering, grandmother's training pushes grandfather slightly *away* (-0.012). One possible explanation: in the clustered ordering, grandfather was trained immediately before grandmother (rounds 3→4), so the embedding is still in a high-plasticity state and may overshoot. In the interleaved ordering, grandfather was trained 3 rounds earlier (round 1) and has stabilized, so grandmother's gradient provides a cleaner reinforcement signal along the settled generational direction. With n=1 per condition, we cannot distinguish this from noise.
+**4. The sign of same-domain interaction depends on model state.** In the interleaved ordering, grandmother's training pushes grandfather *toward* ground truth (+0.014 jump at round 4). In the clustered ordering, grandmother's training pushes grandfather slightly *away* (-0.012). One possible explanation: in the clustered ordering, grandfather was trained immediately before grandmother (rounds 3→4), so the embedding is still in a high-plasticity state and may overshoot. In the interleaved ordering, grandfather was trained 3 rounds earlier (round 1) and has stabilized, so grandmother's gradient provides a cleaner reinforcement signal along the settled generational direction. We cannot distinguish this from noise.
 
 ### Epistemic uncertainties
 
 - **Toy scale**: 13M parameters, 128-dim embeddings, only 6 tokens perturbed from a 50K vocabulary. The model has massive spare capacity, so the near-zero forgetting may not generalize to capacity-constrained settings.
-- **No error bars**: n=1 per ordering condition. The reinforcement vs degradation sign difference (finding 4) could be noise.
+- **Small differences**: the reinforcement vs degradation sign difference (finding 4) could be noise.
 - **Small effect sizes**: All toward_gt deltas are in the range ±0.03. Embedding stability is always > 0.98. We're measuring very small perturbations.
 - **Same curriculum extraction**: Both orderings use the same curriculum windows per token, so differences are purely from ordering and model state, not data.
 

@@ -1,6 +1,6 @@
 # The component control — is the advantage about the residual, or about having the state?
 
-**Status**: done, single seed, language substrate only. **Positive**: the I/O observer reaches
+**Status**: done, language substrate only. **Positive**: the I/O observer reaches
 ~0.87 of the achievable headroom on the theory-visible component and ~0.84 on the whole state,
 but only ~0.19–0.26 on the residual. The forward-model decomposition is load-bearing for
 Finding 1, not only for Finding 3.
@@ -143,7 +143,7 @@ inputs are all instrument-independent.
 
 ## Limitations
 
-- **Single seed, single substrate, CL arm only.** The parent's CL/OL null makes the arm choice
+- **Single substrate, CL arm only.** The parent's CL/OL null makes the arm choice
   low-stakes here, but it is untested.
 - **Language only.** The RHM sibling has a 6-block predicted span against language's 2, i.e. a
   much longer reconstruction route, and the parent battery's cross-substrate agreement is load-

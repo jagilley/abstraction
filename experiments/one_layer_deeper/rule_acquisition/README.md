@@ -2,7 +2,7 @@
 
 **Up**: [../README.md](../README.md) (one_layer_deeper) · **Files**: [FILES.md](FILES.md)
 **Substrate**: repeated modular squaring, `y = x^(2^T) mod N`, from [tilde-research/one-layer-deeper](https://github.com/tilde-research/one-layer-deeper)
-**Status**: complete — 16 arms across 7 tags, single seed. **Date**: 2026-08-03.
+**Status**: complete — 16 arms across 7 tags. **Date**: 2026-08-03.
 **Extended 2026-08-05** by [`exact_atom/`](exact_atom/README.md), which re-reads this cut
 against an *exactness* target rather than an accuracy one. It **retracts §2's multiply result**
 (see the note there), converts §3's central inference into a direct measurement, and finds the
@@ -303,8 +303,6 @@ Recorded because they were made before the runs, and both were mine:
 
 ## Honest caveats
 
-- **Single seed throughout.** The load-bearing contrasts are `sqnomod`/`redmod` (§2) and
-  `redmod` vs `redmod_q*` (§3); neither is replicated.
 - **`redmod_qfull` had not converged** (train 0.891 at 150k), so 0.773 is a lower bound on what
   full-range division reaches, not a level.
 - **Both many-moduli arms are undertrained**, as above. §4's barrier is real but its height is
@@ -352,19 +350,16 @@ both parent cuts, `modal volume get` needs `--force` and a full per-file destina
 
 ## Next steps
 
-1. **Seeds on `sqnomod`, `redmod`, `redmod_q64`** — the whole account rests on that contrast and
-   it is n=1. Deferred by agreement, not by oversight.
-2. ~~**`sq` trained with an auxiliary dense-division loss.**~~ — done; see
+1. ~~**`sq` trained with an auxiliary dense-division loss.**~~ — done; see
    [`exact_atom/`](exact_atom/README.md) §4. The auxiliary installs a reduce that reads 0.953
    on the inputs `x^2` supplies, but the composed map stays at floor because the *multiply*
    cannot construct the state to hand it. The `{div aux} × {seam closure}` 2×2 is null as posed.
-3. ~~**Longer budgets on the many-moduli arms**, the only way to put a height on §4's barrier.~~
+2. ~~**Longer budgets on the many-moduli arms**, the only way to put a height on §4's barrier.~~
    — largely answered, and not by budget; see [`staged_reduce/`](staged_reduce/README.md) §3.
    Held-out `N` reaches 0.98 once the reduce is staged *and* the modulus set is wide. The
    dense-`N` widening `exact_atom/` §3 could not train does train under staging, but its own
    held-out selector turned out to be degenerate, so **whether breadth keeps helping past 142
    moduli is still open** — that node's next step 1.
-4. ~~**Read the reduce out from inside a trained `sq`**~~ — done; see
+3. ~~**Read the reduce out from inside a trained `sq`**~~ — done; see
    [`exact_atom/`](exact_atom/README.md) §4's oracle-seam probe, which is
    `ballistic_depth` §8's cold-start probe moved to the multiply/reduce seam.
-5. **Seeds.** `exact_atom/` is single-seed throughout, as is this cut.

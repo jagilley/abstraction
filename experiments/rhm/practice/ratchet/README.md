@@ -11,7 +11,7 @@ seam-state shift) ·
 (the depth-laddered damage schedule, and the 3.51× the level *action* space bought when handed over)
 **Status**: written up 2026-08-14 (interpretation discussed with Jasper 2026-08-14). Seven runs: a
 gate, a ladder calibration, three substrate calibrations, a perception diagnostic, and the main
-5-arm run. Single seed throughout. File index: [FILES.md](FILES.md).
+5-arm run. File index: [FILES.md](FILES.md).
 
 ## One-liner
 
@@ -27,7 +27,7 @@ the unit by 1.75× and the refusal costs it the era.
 
 ## Findings
 
-Single seed. Margins are stated against measured noise floors, and the one claim that does not
+Margins are stated against measured noise floors, and the one claim that does not
 survive the main run is retracted in place.
 
 1. **Earning the vocabulary recovers most of being given it.** The earned-vs-given fraction
@@ -381,7 +381,7 @@ recall against the DGP's own vocabulary).
 
 ## Caveats
 
-- **Single seed**, one rule draw, one (v, s, L, m) setting, one damage ladder. The earned-vs-given
+- **One rule draw**, one (v, s, L, m) setting, one damage ladder. The earned-vs-given
   fractions and the poison result are large relative to the measured noise; the compounding *rate*
   ordering is not, and is reported as unresolved.
 - **The level-3 audition is mis-levelled**, by construction: the macro is auditioned on era-k damage

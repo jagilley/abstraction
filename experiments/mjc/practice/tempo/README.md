@@ -15,7 +15,7 @@ verbatim; the design turns were his.
 **Runs**: 2026-09-05 → 06, three nodes, 23 tags, all seed 0, all on 16 CPUs (one L4 for the two
 learned heads), no run over an hour. Every treatment gate-checked bit-for-bit against its donor
 (`acappella/b1` → `prestissimo/a1g` → `accelerando/t1` → `rubato/k1`, each reproduced at
-0.000e+00 through the next node's code). **Single seed throughout; ranks, signs, wedges and
+0.000e+00 through the next node's code). **Ranks, signs, wedges and
 bit-identity twins are the claims.**
 **Attribution**: the mapping this whole node tests — *an RHM level is an automatic execution
 span*, and being able to execute a long motor chunk without checking in is the level jump — is
@@ -313,7 +313,7 @@ should make the best ρ independent of the read interval; it is not, at three of
 
 ## Caveats
 
-- Single seed on every run; the claims are ranks, signs, wedges across tempi and levels, and
+- The claims are ranks, signs, wedges across tempi and levels, and
   bit-identity twins, with every treatment gate-checked against its donor.
 - The band is ½ of the mean leg at every tempo; pass fractions at ⅓ and ¼ are reported everywhere
   and do not change any ordering, but the fastest tempo is where the absolute width bites and it is

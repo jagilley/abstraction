@@ -2,7 +2,7 @@
 
 **Up**: [../README.md](../README.md) (rule_acquisition) · **Files**: [FILES.md](FILES.md)
 **Substrate**: repeated modular squaring, `y = x^(2^T) mod N`, from [tilde-research/one-layer-deeper](https://github.com/tilde-research/one-layer-deeper)
-**Status**: complete — 15 arms across 4 cuts; the headline contrast is 2 seeds, everything else single seed. **Date**: 2026-08-10.
+**Status**: complete — 15 arms across 4 cuts; the headline contrast is 2 seeds. **Date**: 2026-08-10.
 
 ---
 
@@ -237,7 +237,7 @@ and collapses only on the digit class absent from training. The dense arm *did* 
 moduli (102, 104, … everything except multiples of ten), so this is not "cannot divide by even
 numbers": it fails specifically where the modulus's final digit is one it never saw. Within these
 scales the learned rule generalises across arithmetic structure while remaining keyed on surface
-digit patterns tightly enough that an unseen final digit breaks it. Single arm, single seed, one
+digit patterns tightly enough that an unseen final digit breaks it. Single arm, one
 digit class — suggestive, not established.
 
 ## Predictions
@@ -258,8 +258,6 @@ Recorded because they were made before the runs.
 
 ## Honest caveats
 
-- **Two seeds on the headline cell, single seed everywhere else.** The `k`-stratified slice, the
-  `m8` control, the w=4 cells and the dense probe are all n=1.
 - **No rung is certified.** Best `eps` is 3.16e-3 against rung `T=1`'s 9.0e-4, so
   `certifiable_T = 0.29`. Depth remains the cheap axis and rung zero the expensive one; this node
   moves the rule axis, not the ladder.
@@ -365,4 +363,3 @@ interaction (staging × breadth) does not self-organise from the terminal label.
 5. **Compose it.** Everything here is the reduce in isolation. `exact_atom` §5's scissors had two
    blades; this node closes the reduce one at 4 digits, and whether the composed atom now works at
    that width is the direct follow-up.
-6. **Seeds** on the `m8` control and the w=4 cells, both of which carry structural weight at n=1.

@@ -20,7 +20,7 @@ head and parity gate `intonation` un-gates) ·
 (`continuo`'s guards and observer-twin discipline).
 **Runs**: `tc_s0` (2.85 GPU-h), `au_s1/fit` §9 (CPU), `continuo` pass 1 + follow-up chain (CPU),
 `in_s0` (3.01), `ca_s0` (2.82), `ma_s0` (3.38), plus smokes/probes ≈ 1.1 — **≈ 13.2 GPU-h**,
-2026-08-29→31. **Single seed on every treatment; ranks, signs, and multiples of measured floors
+2026-08-29→31. **Ranks, signs, and multiples of measured floors
 are the claims.** One orchestrating conversation; four delegated implementer agents.
 **Attribution**: the two-δ diagnosis and the live-executor pivot arrived from Jasper via a
 second agent's research pass (2026-08-31), verified here against the record before anything was
@@ -149,11 +149,10 @@ spelling; no learned FM, no oracle: the reference is the learner's own committed
   bare negative.
 - **(b) The within-level type law may be about currency, not level.** The within-level *ledger*
   refuses crossings optimally (`teacher_slot`); within-level *δ-silence* paced them better than
-  the one-level-up yield gauge (finding 5). If this holds beyond one seed, "a within-level
+  the one-level-up yield gauge (finding 5). If this holds more generally, "a within-level
   signal cannot price the crossing" sharpens to "an **outcome-currency** within-level signal
   cannot" — execution-currency signals speak to *when* the current rung is compiled, which is
-  its own kind of crossing information. Single seed; held loosely; the seed pair is deferred
-  by decision (verification by later runs).
+  its own kind of crossing information. Held loosely; verification deferred to later runs.
 - **(c) No privacy claim anywhere in this round.** δ_perf is computable from public quantities
   by design and `continuo`'s advantage outside the per-datum cell is a novelty tag; the one
   place a self-side quantity uniquely survived its controls is the re-encode grid's per-datum
@@ -170,8 +169,7 @@ spelling; no learned FM, no oracle: the reference is the learner's own committed
 
 ## Caveats
 
-- **Single seed, one substrate, throughout**; seed pairs deliberately deferred to later runs
-  (Jasper, 2026-08-31). `caesura` is un-yoked by design and its deep-era deltas conflate
+- **One substrate throughout.** `caesura` is un-yoked by design and its deep-era deltas conflate
   pacing with practice time (the schedule arm bounds this); `dsil_and`'s rung loss is one
   event; `dsil_read`'s L2 is a bootstrap, not a δ-silence commit.
 - The four L4 corridors are trivial (`e` ≡ 0.0000 exactly), so all live performance error is

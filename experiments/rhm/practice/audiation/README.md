@@ -19,8 +19,7 @@ prior form of finding 2) ·
 **Design exchange**: `conversations/955af184-f31a-4ada-9361-716c7662f284.md` lines 1670–1745 —
 where E1's hypothesis was revised before any code existed: **E1 tests agency, not privacy.**
 **Runs**: `au_smoke`/`au_s0` (E1: instrumented anchor, 0.56 GPU-h), `au_smoke_pd`/`au_s1`
-(E1b: per-datum arm, 0.92 GPU-h both arms), 2026-08-29; all fits CPU-only, no GPU. **Single
-seed on every treatment; ranks, signs, and the wiring-vs-finding separation are the claims.**
+(E1b: per-datum arm, 0.92 GPU-h both arms), 2026-08-29; all fits CPU-only, no GPU. **Ranks, signs, and the wiring-vs-finding separation are the claims.**
 One orchestrated conversation; two delegated implementer agents (instrument, analysis), each
 resumed for the E1b extension.
 
@@ -138,7 +137,7 @@ invariant on the π/value steps.
    dimension-matched twin holding the same information in the learner's own frozen encoding
    (0.036). The rungs are unstable (adding the action *lowers* the observer; the half-data
    control goes negative) and a one-hot-`x` vs fp16-`z` encoding asymmetry is unexcluded, so
-   this cell is flagged, not claimed. (ii) *The arms' clocks* (single seed): `perdatum`
+   this cell is flagged, not claimed. (ii) *The arms' clocks*: `perdatum`
    commits L3 seven cycles earlier with a smaller table (8 vs 12 entries), fewer next-level
    observations (L3/L4 at support 51/55 vs 62/68), and π ends less consolidated (macro mass
    0.374 vs 0.484) — recorded for Track F.
@@ -168,11 +167,11 @@ invariant on the π/value steps.
   knowable and by whom — finding 8(i), pending the symmetric re-encode check.
 - **(d) The consolidation observation** (finding 8(ii)) reads as pooled/replayed credit being
   load-bearing for π's concentration — if it holds, "trust formation needs pooling" is a
-  Track F instrument question, not an E question. Single seed; suggestive only.
+  Track F instrument question, not an E question. Suggestive only.
 
 ## Caveats
 
-- **Single seed, one arm per condition, one substrate.** Ranks and signs; the wiring/finding
+- **One arm per condition, one substrate.** Ranks and signs; the wiring/finding
   separations (Q1↔Q2, the dropped tautological target, the `delta_u` label) are design facts,
   not statistics.
 - **The datum definition carries slack**: "the agent's own move" is the argmax-scored child

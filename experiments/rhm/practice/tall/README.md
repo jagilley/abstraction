@@ -8,7 +8,7 @@ to break) · [`../ear/`](../ear/README.md), [`../ratchet/`](../ratchet/README.md
 imported unmodified)
 **Status**: closed 2026-08-16 (Jasper's call after the densification gate). One gates run, one
 feasibility probe, one era-sizing calibration, one voided main run, one densification test.
-Single seed. File index: [FILES.md](FILES.md) — which carries the full measured record
+File index: [FILES.md](FILES.md) — which carries the full measured record
 (inadmissibility tables, gate results, calibrations, the re-run recipe); this README is the
 narrative and the verdicts.
 
@@ -136,7 +136,7 @@ python3 rhm/practice/tall/analyze_tall.py --tag tl_s0 --fetch --figures
 
 ## Caveats
 
-- Single seed, one rule draw, and a loop that never reached its operating regime — every
+- One rule draw, and a loop that never reached its operating regime — every
   number from `tl_s0` except the two structural findings is a statement about a broken regime.
 - The chunk-rent observation is conditional on `fit_width`/`g_budget` pricing; a different
   budget-allocation rule could change the sign again.

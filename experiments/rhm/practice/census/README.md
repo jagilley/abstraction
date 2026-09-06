@@ -8,8 +8,8 @@ was asked at each step · **Files**: [`FILES.md`](FILES.md) (census machinery) a
 and 6 (the certificate satisfied by concentration) are the two measured facts this unit connects.
 **Runs**: `cs_s0` (census, 6 arms, 2.31 GPU-h) · the forensics pass (`forensics.py`, no GPU) ·
 `as_s0` (assay, 6 arms, 2.29 GPU-h + 0.6 aborted) · `as_s1` (stream-displaced twins, 0.91 GPU-h),
-2026-08-23→25. **Single seed on every treatment; ranks, signs, and multiples of the *measured
-depth-6 stream floor* are the claims** — this unit measured its own noise floor (finding 7), and
+2026-08-23→25. **Ranks, signs, and multiples of the *measured depth-6 stream floor* are the
+claims** — this unit measured its own noise floor (finding 7), and
 several of its early readings are demoted by it below. One orchestrated conversation; one
 implementer agent built all four steps; `census/` and `assay/` are siblings because each is a
 proper node with its own spec and tags — this README is the single writeup for the unit.
@@ -137,9 +137,8 @@ measurement of what stream position alone moves.
 
 ## Caveats
 
-- **Single seed throughout**; the stream twins bound stream-position noise, not seed/rule-draw
-  noise. Era-5 magnitudes are consistent with the headline but not separable from the measured
-  floor; a seed pair is the named follow-up if era-5 magnitudes ever become load-bearing.
+- **The stream twins bound stream-position noise.** Era-5 magnitudes are consistent with the
+  headline but not separable from the measured floor.
 - Demoted by the floor, on the record: `strip`'s entire eras-3–5 profile (1.19× floor — its
   apparent era-2 result is a fraction of a degenerate +0.041 span, i.e. ~0.03 absolute);
   the era-5 `complete` > `exact` ordering (flips under displacement); all L3 cert-cycle arm

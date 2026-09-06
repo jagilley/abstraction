@@ -21,7 +21,7 @@ app/image/volume.
 |---|---|
 | `cut1` | **The main cut** — 5 arms, 3 seeds, eval to T=28, checkpointed. 26 train / 7 held-out moduli. |
 | `reproj_cut1` | Test-time re-projection over `cut1`'s checkpoints, 3 seeds. The oracle ceiling is 0.894–0.903 across arms whose closure spans 0.15→0.97 — README §2. |
-| `cov0.02` / `cov0.30` / `cov0.50` | **The coverage sweep** — the `p` manipulation, with `cut1` supplying the 0.90 point. `p ≈ coverage` (0.982 / 0.894 / 0.473) while the raw horizon stays flat at 9.5–11.9. Single seed. |
+| `cov0.02` / `cov0.30` / `cov0.50` | **The coverage sweep** — the `p` manipulation, with `cut1` supplying the 0.90 point. `p ≈ coverage` (0.982 / 0.894 / 0.473) while the raw horizon stays flat at 9.5–11.9. |
 | `grok_d1_wd1` / `grok_d1_wd01` / `grok_d16_wd1` | **The grokking probe** — 8 moduli, 50% of bases held out, constant LR, 500k steps. No phase transition at any setting; held-out accuracy sits at the analytic no-reduction floor — README §3. |
 | `cap_m8` … `cap_m47`, `arity_m8` / `arity_m16` | Capacity and arity sweeps over train-modulus count × operator width. Horizons 8.6–11.6 across 7× state count — the basis for the retraction in README §5. |
 | `probe_wide` / `probe_mid` / `probe_narrow` | 4-digit modulus bands at 15k steps. All at chance; **abandoned before the 60k budget that makes 3-digit work was known**, so they do not establish that 4 digits is infeasible. |

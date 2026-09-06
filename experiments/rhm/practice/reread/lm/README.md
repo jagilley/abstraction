@@ -7,7 +7,7 @@ re-scope) · **Files**: [`FILES.md`](FILES.md) (machinery, gates, calibration re
 [`meta_learning_under_metered_data`](../../../../../ideas/meta_learning_under_metered_data.md)'s
 2026-08-17 caveat block — data value is indexed by the reader's current vocabulary, so a
 full-loop learner has effectively unlimited training data over a fixed archive.
-**Run**: `lm0`, 5 arms × 81.9M tokens, single seed, 2026-08-17.
+**Run**: `lm0`, 5 arms × 81.9M tokens, 2026-08-17.
 
 ## The question
 
@@ -87,7 +87,7 @@ over-committing to the memorised corpus while the residual stream keeps the stru
 - **The wall is bracketed, not located** (one arm above, one below; a ~4M-token arm would pin it).
 - The probe protocol switch is a measured, arm-dependent artefact; all cross-checkpoint claims
   here use full-protocol pairs only (see [`FILES.md`](FILES.md)).
-- Single seed; one DGP setting (v16/s2/L6/m4); one model size. Corpus size, not RHM depth, is
+- One DGP setting (v16/s2/L6/m4); one model size. Corpus size, not RHM depth, is
   the swept coordinate; the level index ℓ carries the depth axis.
 
 ## Reproduce

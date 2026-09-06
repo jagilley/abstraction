@@ -115,7 +115,7 @@ python3 -m rhm.residual_decomposition.trajectory.analyze_trajectory --summary su
 
 ## Caveats
 
-- **One substrate, one seed** (m2-distinct, rule_seed=0). Every arm shares the same base training runs, so the 7/7 dissociation is 7 measurements of two training trajectories by different observers — not 7 independent trainings. It establishes observer-robustness, not seed-robustness.
+- **One substrate** (m2-distinct, rule_seed=0). Every arm shares the same base training runs, so the 7/7 dissociation is 7 measurements of two training trajectories by different observers — not 7 independent trainings. It establishes observer-robustness, not seed-robustness.
 - **The published-vs-measured comparison is shape-only** (differing `act_rank` conventions).
 - **The capacity trend in descent magnitude is a trend, not a mechanism.** The bound-relative reading is offered as an interpretation, not a result.
 - **`fmreg:3.0`, the arm with the largest published descent (63.5 → 42.9), was not re-cut** — only `fmreg:1.0`. Adding it is one command and would test whether descent magnitude tracks λ under the trusted instrument.

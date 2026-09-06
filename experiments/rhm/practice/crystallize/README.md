@@ -11,7 +11,7 @@ this forks) · [`directed_sculpting/full_loop/level_moves/`](../../directed_scul
 (the level-indexed action space and hierarchical damage, ported here off the channel layout)
 **Status**: written up 2026-08-14 (interpretation discussed with Jasper 2026-08-14). Seven runs:
 a self-check, two headroom calibrations, two descent calibrations, the main 5-arm run, and a
-plant precheck. Single seed throughout. File index: [FILES.md](FILES.md).
+plant precheck. File index: [FILES.md](FILES.md).
 
 ## One-liner
 
@@ -26,7 +26,7 @@ metering noise floor**.
 
 ## Findings
 
-Single seed; margins are stated against the measured noise floors, and the two places where a claim
+Margins are stated against the measured noise floors, and the two places where a claim
 does not survive its own noise are marked.
 
 1. **State-conditioned commitment dominates state-independent commitment, 6/6 commit states.** A
@@ -332,7 +332,7 @@ DP-oracle references), `fig2_priced.png` (cumulative priced time × mean error),
 
 ## Caveats
 
-- **Single seed**, one rule draw, one (v, s, L, m) setting. The 1.8–3.0× library-vs-single margin and
+- **One rule draw**, one (v, s, L, m) setting. The 1.8–3.0× library-vs-single margin and
   the 3.6–5.0× averaging margin are large relative to the draw noise; the timing comparisons are not,
   and are reported as unresolved rather than null.
 - **`n_cand = 32` leaves sd ≈ 0.07 on library audition.** This is the binding limit on every

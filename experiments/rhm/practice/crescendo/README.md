@@ -14,7 +14,7 @@ whether the thin frozen L3 is benign or a foreclosure "is not measurable at this
 is unearnable at any affordable budget").
 **Runs**: `cr3_gf`, `cr3_smoke` (gates), `cr3_s0` (main, 5 arms, 2.66 GPU-h), `cr3_s1`
 (stream-displaced twins of the signature pair, 1.09 GPU-h), 2026-08-28→29; node total 5.00
-GPU-h. **Single seed; ranks, signs, and multiples of measured floors are the claims** — and
+GPU-h. **Ranks, signs, and multiples of measured floors are the claims** — and
 the signature cell is read against this node's own measured displacement floors as well as
 the pooled ones. One orchestrated conversation; built end-to-end by one delegated implementer
 agent.
@@ -43,7 +43,7 @@ thermostat replayed on the donors' own L4 series first quiets at c_in_era3 17–
 3's cap at 70); and the **L5 gauge's degeneracy** (1–2 distinct tuples per run), so the L4
 commit is paced on the L4 stream's own quieting.
 
-Five arms, one seed, ladder `60/50/70/12/9`: `anchor_long` (the schedule at the caps — the
+Five arms, ladder `60/50/70/12/9`: `anchor_long` (the schedule at the caps — the
 budget-matched comparator), `outer_yield_m4` (A1's thermostat, permitted L4 — the treatment),
 **`ceiling_m3`** (the round's control: a clock yoke of the treatment carrying one extra bit,
 `commit_max_level=3` — verified to bind only on the level it names and to move nothing while
@@ -120,7 +120,7 @@ yoked to the *displaced* treatment's realized actions), so the signature exists 
 - **(c) The wall above is named and priced.** The next rung's ceiling is set by this rung's
   frozen recall squared; extension is the measured lever, which moves Track F3's index ops
   from housekeeping to load-bearing for any further climb.
-- **(d) Scope, kept loud**: one rung, one seed (two stream draws bound draw-luck, not
+- **(d) Scope, kept loud**: one rung (two stream draws bound draw-luck, not
   world-luck); the demand ladder is still the teacher's — the loop paces within an exogenous
   curriculum, so §1.3's "semi-autonomous" stands; and whether the range extends *again* (L5
   needs an L4 book the r² wall currently caps near zero) is the next round's question, not
@@ -128,7 +128,7 @@ yoked to the *displaced* treatment's realized actions), so the signature exists 
 
 ## Caveats
 
-- **Single seed throughout.** `cr3_s1` displaces stream position only; the in-node floors it
+- **`cr3_s1` displaces stream position only**; the in-node floors it
   measures are per-arm and per-era (§9 of the reduction), and where they disagree with census
   finding 7's pooled values the in-node number is the narrower claim. One flagged artifact:
   `ceiling_m3`'s era-5 in-node floor reads 0.000 because both draws' last-3-cycle windows

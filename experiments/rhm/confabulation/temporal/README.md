@@ -5,7 +5,7 @@
 **Lineage**: [../../conditional_revision/README.md](../../conditional_revision/README.md) — the temporal FM idiom, the exact BP oracle, and the atom-aware matching discipline, all imported rather than reimplemented
 **Code**: [`temporal_confabulation.py`](temporal_confabulation.py) · **Files**: [FILES.md](FILES.md)
 **Status**: OL (`ntp_aux`) complete across the full instrument sweep. `cr_base` complete at the
-default instrument capacity, remaining capacities still running. CL (`ntp_aux_cl`) unrun. Single seed.
+default instrument capacity, remaining capacities still running. CL (`ntp_aux_cl`) unrun.
 
 ## One-line arc
 
@@ -229,7 +229,7 @@ Two things this arm settles about the choice of substrate:
 
 ## What this establishes, and what it does not
 
-**Establishes** (single seed, one regime, two substrates):
+**Establishes** (one regime, two substrates):
 
 - Privileged access to the FM residual is **not specific to the depth axis**. Shifting the
   conditioning gap by one token leaves a positive, capacity-swept, guard-cleared first-person

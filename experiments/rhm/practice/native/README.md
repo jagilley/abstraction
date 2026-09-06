@@ -13,7 +13,7 @@ claim under test: a multi-step operation becomes a single primitive).
 `ratchet/` and `teacher_slot/` untouched. **Measured negative built against**:
 [`../teacher_slot/handle/`](../teacher_slot/README.md) (finding 5 there).
 **Runs**: `np_s0` (Port 1, 12 arms), `sp_s0` (Port 2, 5 arms), `nf_s0` (composition + ablation,
-7 arms), 2026-08-20→21, plus selfchecks and smokes. **Single seed on every treatment; ranks, signs,
+7 arms), 2026-08-20→21, plus selfchecks and smokes. **Ranks, signs,
 and multiples of the measured floors (0.001–0.027 in-tag) are the claims.** One orchestrated
 conversation; each port was built end-to-end by a delegated implementer agent and the machinery
 details below summarize their work (children carry `FILES.md` records, no READMEs by policy).
@@ -99,7 +99,7 @@ is tallied beside the ledger, never folded in.
    counterfactual at era 3: **12–16% fewer block-infills** than the DP path at identical ledger
    price. `span_true` era 3 lands at 0.318 vs `given`'s 0.346 (earned-vs-given 1.087);
    `span_mined`'s era 3 runs +0.037 over its twin — above floor, unresolved (its A_true moved
-   +0.100 at L3, so the plant itself drifted in that arm; single seed). (`sp_s0`)
+   +0.100 at L3, so the plant itself drifted in that arm). (`sp_s0`)
 5. **After consolidation the table is an address book: deleting it costs performance ~nothing and
    growth everything it can structurally cost — the SPEC's headline prediction, measured in both
    directions.** End-of-run battery on the final trained state, cost-matched at 57.0 g/solve:
@@ -165,7 +165,7 @@ is tallied beside the ledger, never folded in.
 
 ## Caveats
 
-- **Single seed**, one rule draw, one damage ladder, k explored only at {1, 2, 4, n_moves} and
+- **One rule draw**, one damage ladder, k explored only at {1, 2, 4, n_moves} and
   span_lam/span_lr/τ unswept. k = 8 was left off the base ladder for a measured reason (the root
   encode tips `never_base`'s width at G = 58, which would confound the matched control).
 - **Level-3 corridors mostly did not reach parity in-run**, so "fully native" is an L2 statement

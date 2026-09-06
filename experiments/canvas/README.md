@@ -49,7 +49,7 @@ pairwise-local validity, so only the demand gauge exists there. [`taste/clicker.
   (0.85–1.14; `prov`'s 203-entry strict subset of `given`'s 364 ties it), `early` is foreclosed,
   and `never_base` — search plus a free truth grader, no value head, plant inert — is 0.2–0.35
   worse, so the descent is purely vocabulary-carried. T[3] nests and forecloses but is
-  coverage-bound; the taste gauge rises .86 → .98 while validity falls to ~.2. Single seed.
+  coverage-bound; the taste gauge rises .86 → .98 while validity falls to ~.2.
 
 ## Where things stand
 

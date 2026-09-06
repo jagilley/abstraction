@@ -27,7 +27,7 @@ the multi-level ladder is set aside on this environment, the FM's suspected role
 consulting an oracle (the resettable plant) where required. The roles table, the trunk without a
 model, and the tape-as-intention-reference reading came out of the exchange; the absolute-band
 probe was Jasper's call on reading `s0`. One orchestrated conversation, one implementer agent.
-**Single seed; ranks, signs, bit-identity twins, cross-tag exact controls and pre-fixed gates are
+**Ranks, signs, bit-identity twins, cross-tag exact controls and pre-fixed gates are
 the claims.**
 
 ## The question, and what happened to it

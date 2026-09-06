@@ -179,7 +179,7 @@ Results JSON: exps 1–2 on the **jagilley** `rhm-scaling-data` volume (`rhm_sub
 
 ## Caveats
 
-- **Single rule-seed** throughout (per repo convention; no reason to suspect seed-sensitivity for these directional claims). Cut-2a is single-seed *per m*.
+- **Single rule-seed** throughout (per repo convention).
 - Exp 2's level-focus is tested only as **token-loss reweighting** — the correct test for *that* hypothesis. Cut-2a is the direct-target version, with the *privileged* oracle latent target (the clean mechanism gate); the *non-privileged* (EMA / own-lifted-latent) direct target remains untested — but cut-2a shows the concentration *mechanism* itself doesn't buy specialization on a shared grammar, so the non-privileged version is deferred behind the cut-3 DGP change.
 - The aligned-batching confound in Exp 2 is handled by the β=0 arm; the confound-free weighting conclusion is the *within-aligned* β sweep.
 - **Cut-2a magnitude confound (not direction):** `aux_A`'s aux target draws from ~50k A-sequences vs `aux_all`'s 200k, so part of `aux_A`'s deficit is fewer distinct examples; the clean control is an equal-count A-pool. It can't rescue the hypothesis — there is no advantage even at m=4 (ceiling, plentiful data), and the *direction* (concentration ≤ broad) is exactly what the two-way transfer mechanism predicts. Still worth running before hardening the magnitude.

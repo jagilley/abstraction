@@ -3,7 +3,7 @@
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md) · **Design doc**: [SPEC.md](SPEC.md)
 **Idea**: [`ideas/revision_not_surprisal.md`](../../../../ideas/revision_not_surprisal.md) §8
 **Incumbent being compared against**: [`../../RHM_FM_REGULARIZER_README.md`](../../RHM_FM_REGULARIZER_README.md)
-**Date**: 2026-08-08 · **Status**: run. Single seed, one regime (m2), one axis (self-knowledge).
+**Date**: 2026-08-08 · **Status**: run. One regime (m2), one axis (self-knowledge).
 The epistemic-content readouts this cut was ultimately *about* were **not** computed — see
 [What this does not establish](#what-this-does-not-establish).
 **Followed up 2026-08-09**: [`../aleatoric_fraction/`](../aleatoric_fraction/README.md) sizes the prize
@@ -178,7 +178,7 @@ motivated it.
   explaining it. The two arms differ in more than the conditioning gap.
 - **No curriculum.** One fixed corpus throughout. Whether any of these dynamics survive a setting where
   new compressible-but-unlearned structure keeps arriving is not addressed here.
-- **Single seed, one regime, one model size**, throughout.
+- **One regime, one model size**, throughout.
 - The gauge reading of Finding 1 is a mechanism *consistent with* the data, not one isolated by an
   intervention. A scale-invariant form of the objective would test it directly and was not run.
 

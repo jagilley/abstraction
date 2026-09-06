@@ -4,7 +4,7 @@
 **Up**: [../README.md](../README.md) — the temporal confabulation test, whose harness this keeps and whose report channel it drops
 **Lineage**: [`../../../conditional_revision/`](../../../conditional_revision/README.md) — the Gate-0 temporal FM idiom, the exact BP oracle, Gate B's atom-aware matching, [SPEC.md](../../../conditional_revision/SPEC.md)'s never-run **Gate C**, and [`aleatoric_fraction/`](../../../conditional_revision/aleatoric_fraction/README.md)'s exact A/E split
 **Code**: [`temporal_epistemics.py`](temporal_epistemics.py) · **Files**: [FILES.md](FILES.md)
-**Status**: both arms complete (`ntp_aux` and `cr_base`), full instrument × readout sweep, single seed.
+**Status**: both arms complete (`ntp_aux` and `cr_base`), full instrument × readout sweep.
 CL deliberately unrun.
 
 ## One-line arc
@@ -320,7 +320,7 @@ not directly comparable, and the per-position form is the one a per-position dec
 
 ## What this establishes, and what it does not
 
-**Establishes** (single seed, one regime, two substrates, 4 readout × 4 instrument capacities):
+**Establishes** (one regime, two substrates, 4 readout × 4 instrument capacities):
 
 - `Δ` decodes oracle belief revision at least as well as `r` everywhere we looked; the pre-registered
   concentration effect is not present, and the residual is mildly lossy relative to the raw update.

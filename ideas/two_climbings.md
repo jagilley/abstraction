@@ -271,7 +271,7 @@ after arrival) and whether targeted rehearsal of a *received* vocabulary moves i
   moves eras-3–5 recovered fractions by up to 0.087 in the `exact` family and 0.083/0.148/0.344
   in the `given` family). Fractions, shallow-era orderings, and cert-cycle orderings are
   demoted; ranks and signs in the deep eras are the currency. Most numbers in this doc are
-  depth-4 single-seed ranks and signs; none of the argument rests on a fraction.
+  depth-4 ranks and signs; none of the argument rests on a fraction.
 - **A sighting, not a finding** (`census` finding 8, uninterpreted there): `given_c1` executes
   macros 2.4× more than any commit-time arm and observes the *fewest* distinct L4-shaped tuples
   (279–318 vs 482–542), stable under displacement. Trust concentrates trajectories — the

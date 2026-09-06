@@ -3,7 +3,7 @@
 **Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [../../../ideas/physical_control_substrate.md](../../../ideas/physical_control_substrate.md)
 **Cousins**: the a2a residual story ([REACHING_INTERNAL](../../a2a_forward/reaching/REACHING_INTERNAL_README.md)), [RHM sculpting](../../rhm/RHM_SCULPTING_README.md)
 **Code**: `contact_residual.py` (env: [`../pusher_env.py`](../pusher_env.py)) · File index: [FILES.md](FILES.md)
-**Status**: done, single seed. **Date**: 2026-07-16.
+**Status**: done. **Date**: 2026-07-16.
 **Builds on this**: [`arity_torque/`](../arity_torque/README.md) (Cut #2 evaluates arity on *free-flight* transitions precisely because contact is this cut's regime)
 
 ---
@@ -12,7 +12,7 @@
 
 **Apparatus**: 125K transitions (500 eps × 250 steps); train/test split by episode (no leakage). A small MLP FM `10→256×3→8` predicts normalized `Δs`, trained with **Huber loss** (δ=1.0). Regime label = **any contact** (`ncon>0`, incl. walls) vs genuine free flight.
 
-## Result (single seed, 17.8% contact in test)
+## Result (17.8% contact in test)
 
 | axis | metric | finding |
 |---|---|---|
@@ -35,7 +35,6 @@ An onset-aligned event-triggered average (573 impacts) shows the residual **spik
 
 ## Caveats
 
-- Single seed (fine per our RL-free convention; the effect is large and was stable across 6 config iterations during setup).
 - **eff-rank does NOT support "contact residual is lower-rank."** Contact eff-rank (3.60) is *higher* than free (2.52) — the free residual is near-degenerate (rank ~1, a small systematic error), while contact spreads across the 4 velocity dims. The honest structure story is the per-dim figure (velocity-localized), not a rank comparison. (We'd already retired "residual rank ∝ DGP complexity" as too many-variabled anyway.)
 
 ## Figures (`figures/full_v1/`)

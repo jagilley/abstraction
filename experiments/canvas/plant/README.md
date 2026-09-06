@@ -11,7 +11,7 @@ twin, the tail re-analysis, the adjacency-support grader) · **Files**: [`FILES.
 **Runs**: `q0` + `pl0` (GLSL library, 92 min on one L4) · `twq_*` + `tw_aligned` / `tw_misaligned`
 (tiles twin, 95 min each, 2-wide) · `oracle_run`, `panel_dump`, `panel_tokens` (replays against
 saved weights, ≤ 3 min each) · `twosided.py`, `tailgrade.py`, `adjacency.py` (offline), all
-2026-08-25. **Single seed on every run; ranks, signs and the aligned–misaligned contrast are the
+2026-08-25. **Ranks, signs and the aligned–misaligned contrast are the
 claims.** One orchestrated conversation; two implementer agents (the second picked up after the
 first lost its session at the tail re-analysis).
 
@@ -252,7 +252,7 @@ one-sided / two-sided:
 
 ## Caveats
 
-- **Single seed, one library, one tile geometry, one panel.** Ranks, signs and the
+- **One library, one tile geometry, one panel.** Ranks, signs and the
   aligned–misaligned contrast are the currency; no number here is a benchmark.
 - **The aligned/misaligned manipulation is one variable but not one difficulty** (finding 8).
 - **Both readers are homogeneous** (`heterogeneous_graders` §9): the gA/gB pair catches sampling

@@ -8,7 +8,7 @@ read its caveats before trusting any single number) · **Parent idea**:
 [`meta_learning_under_metered_data`](../../../../ideas/meta_learning_under_metered_data.md)
 (reframes i–iii). **Sibling**: [`../fourwall/`](../fourwall/README.md) — an independently-built
 narrowed slice of the same spec (index-news and the whittling ops), machinery unshared.
-**Runs**: `mg_s0` (round 1) and `sp_s0` + `sp_s0c` (round 2), 2026-08-17, single seed; rank
+**Runs**: `mg_s0` (round 1) and `sp_s0` + `sp_s0c` (round 2), 2026-08-17; rank
 orderings and signs are the reported quantities.
 
 ## Round 1 (`mg_s0`) — enumeration vs merge, and the unmetered monolith
@@ -114,7 +114,7 @@ regardless of rotation rate), and **a competence-coupled question distribution m
 holes and forecloses the next level past a sharp coupling threshold** (round 2). Scope worth
 stating plainly: this world is small enough that exogenous full coverage was *available*; in
 domains where it is not, the coupled regime is the reachable one — an argument, not a
-measurement. Single seed throughout; the belief-level integration belongs to the idea docs, not
+measurement. The belief-level integration belongs to the idea docs, not
 this node.
 
 ## Reproduce

@@ -70,7 +70,7 @@ runs `dp_features` and `head.emit` on every held-out row of every slot every cyc
 
 ## Arms
 
-Single seed. Every arm is a **clock yoke** of `perf_log`, so all five are lifetime-,
+Every arm is a **clock yoke** of `perf_log`, so all five are lifetime-,
 era-boundary- and commit-cycle-identical and differ in exactly one knob.
 
 | arm | consumes δ_perf | role |
@@ -233,7 +233,7 @@ Fetched copies, figures and `reduction.txt` under `figures/<tag>/`.
 | `_preflight` | interface + gates C, T and **I**, toy sizes, nine arms (`perf_given` added because a loop arm cannot commit on a forty-step substrate, so no slot would ever be minted and the firing path would go untested) | **ALL PASS**; three donor lines that assumed the full arm sweep guarded (`anchor_long`, `anchor`, and gate C's block). `results/preflight3.log` |
 | `in_gf` | G-F: in-process fork-vs-`tacet.py` replay at `max_macro_level=4` | **PASS — 0.000e+00** vs a 0.000e+00 donor self-replay control, commits equal, both donor arms. `results/gf.log` |
 | `in_smoke` | three arms end-to-end at `--quick`; mechanics, the 2×2's non-degeneracy, and the s/cycle measurement | clean, 1709 s = 0.47 GPU-h. Misfire rate 0.04–0.20 at forced-open parity; all four 2×2 cells live |
-| `in_s0` | the main run: 5 arms, A3's ladder/caps/floors, one seed | clean, **10,829 s = 3.01 GPU-h**, 15.3–15.8 s/cycle, all five arms 131 cycles, commits at c49/c72/**c104** and advances at 58/88/114/122/131 in **every** arm. Full record `figures/in_s0_reduction.txt` (§0–§8, §A/§C/§E, §G/§G2/§H, **§P1–§P6**) |
+| `in_s0` | the main run: 5 arms, A3's ladder/caps/floors | clean, **10,829 s = 3.01 GPU-h**, 15.3–15.8 s/cycle, all five arms 131 cycles, commits at c49/c72/**c104** and advances at 58/88/114/122/131 in **every** arm. Full record `figures/in_s0_reduction.txt` (§0–§8, §A/§C/§E, §G/§G2/§H, **§P1–§P6**) |
 
 Two facts from `in_s0` that belong in the machinery record rather than in a results discussion,
 because they are properties of the instrument:
@@ -319,7 +319,7 @@ cap either way, which is the categorical half of their result).
 | tag | what | outcome |
 |---|---|---|
 | `ma_probe` | Phase A: `mperf_log` alone, real configuration, era 1 only — the regime criterion and the commit-path risk | **981 s = 0.27 GPU-h**; 52 cycles at 6.8 s/cycle; L2 commit c43, 13 entries, recall 0.643 |
-| `ma_s0` | the metered main run: 5 arms (`mperf_log, mperf_gain, mperf_gate, mout_gate, mperf_rawx`), A3's ladder/caps/floors, one seed | clean, **12,184 s = 3.38 GPU-h**, 14.9–15.1 s/cycle, all five arms **153** cycles, commits at c43/c83/c115 and advances at 53/94/132/144/153 in every arm. Record `figures/ma_s0_reduction.txt` |
+| `ma_s0` | the metered main run: 5 arms (`mperf_log, mperf_gain, mperf_gate, mout_gate, mperf_rawx`), A3's ladder/caps/floors | clean, **12,184 s = 3.38 GPU-h**, 14.9–15.1 s/cycle, all five arms **153** cycles, commits at c43/c83/c115 and advances at 53/94/132/144/153 in every arm. Record `figures/ma_s0_reduction.txt` |
 
 Preflight coverage for round A's own code needed two more true-table arms for the reason
 `perf_given` existed in round 2 — a loop arm cannot arm on a forty-step substrate, so neither

@@ -11,7 +11,7 @@ a second substrate) · idea docs:
 [revision_not_surprisal](../../../ideas/revision_not_surprisal.md) §4 (the identity extended here),
 [practice_manufactures_its_own_credit](../../../ideas/practice_manufactures_its_own_credit.md) §18–§19
 **Status**: written up 2026-08-17 (runs 2026-08-16→17; interpretation discussed with Jasper
-throughout). **Single seed**; the Half-2 noise floor is a paired stream-position calibration, not a
+throughout). The Half-2 noise floor is a paired stream-position calibration, not a
 replication. Implemented by one Opus subagent session from the SPEC.
 
 ## One-liner
@@ -146,7 +146,7 @@ as an estimate, not a bound.)
 
 ## Caveats
 
-Single seed throughout; the noise floor is a paired calibration, not a replication. One substrate,
+The noise floor is a paired calibration, not a replication. One substrate,
 one drift magnitude, one window length (the evidence-density threshold is bracketed at 7–56
 draws, not located). The lo ceiling is soft (per-component split approximate). The
 bottom-up-sharpening mechanism (finding 8) and the narrowness effect (finding 9) are unattributed.

@@ -14,7 +14,7 @@ ported back: state-conditioned commitment 1.8–3.0×) · [`../../arm_substrate/
 fully native to that convention)
 **Status**: written up 2026-08-20 (interpretation discussed with Jasper throughout). Four runs:
 `g0` (admissibility gates, 4 worlds), `f0` (the op comparison), `f1b` (timing × maintenance),
-`f1c` (the live-content op). Single seed each; `f1c`'s `never` reproduces `f1b`'s **bit-exactly**
+`f1c` (the live-content op). `f1c`'s `never` reproduces `f1b`'s **bit-exactly**
 (max |Δ| = 0.00e+00 over 32 probes). File index: [FILES.md](FILES.md). **Dates**: 2026-08-19 → 08-20.
 
 ## One-liner
@@ -52,7 +52,7 @@ zero.
   yet: an undersized planner does not merely shrink the FM-quality axis — at the b26 world the
   stale→ceiling gap **inverts sign** (−0.0037 at 256/4 vs +0.1088 at 1024/8).
 
-## The gates (`g0`, four worlds, single seed)
+## The gates (`g0`, four worlds)
 
 | gate | b14 (settled world) | verdict |
 |---|---|---|
@@ -145,7 +145,7 @@ cheap-and-good before any price vector can reach it.
 ## Findings
 
 1. **Boundaries carry information on the redundant arm, and the information is postural** —
-   invisible in tip space, 4.0× exploitable by a per-state oracle, R² = 0.82 predictable. (G1; 1 seed)
+   invisible in tip space, 4.0× exploitable by a per-state oracle, R² = 0.82 predictable. (G1)
 2. **State-conditioned commitment reproduces where it was born** (1.34×, 41% of the oracle gap) —
    and the keying basis is the hard part: isotropic partition > supervised linear key, which does
    not transfer across competence (0.82 → 0.196). (f0)

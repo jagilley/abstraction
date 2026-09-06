@@ -3,7 +3,7 @@
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md)
 **Idea**: [ideas/efference_copy_cancellation.md](../../../../ideas/efference_copy_cancellation.md) ·
 **Prior run**: [a2a_forward/CANCELLATION_README.md](../../../a2a_forward/CANCELLATION_README.md) (looped ViT)
-**Date**: 2026-08-04 · **Status**: single seed, one caveat outstanding (see *What would settle it*).
+**Date**: 2026-08-04 · **Status**: one caveat outstanding (see *What would settle it*).
 
 ## Goal
 

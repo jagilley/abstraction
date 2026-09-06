@@ -150,7 +150,7 @@ committed skill is **demand-tracking, not truth-tracking**, evaluative rather th
 Pre-commit certification stays demoted (third consecutive frontier refusal); post-commit
 verification is rehabilitated **currency-specifically**. The conditioning gap matures into a
 type system — one organ per currency of change (dense learning ↔ truth; repair/metering ↔
-interface; evaluative re-selection ↔ demand; the teacher ↔ level). Single seed; ranks are the
+interface; evaluative re-selection ↔ demand; the teacher ↔ level). Ranks are the
 claim.
 
 ### [`reread/`](reread/README.md) — is a fixed archive renewable as the vocabulary climbs? (2026-08-17)
@@ -169,7 +169,7 @@ and a 6.4×-re-read corpus is **fully renewable at zero token penalty** (two ind
 instruments) — bounded by a corpus-size wall below which re-reading is *capped*, not slowed
 (**~10× distinct corpus per half level of achievable depth**). Side finding with legs: archive
 depth-mix is a curriculum — a deep-only archive mines a worse-than-random L2 that structurally
-forecloses L3 ([`recital`](recital/README.md)'s bottom-heavy law on the data side). Single seed.
+forecloses L3 ([`recital`](recital/README.md)'s bottom-heavy law on the data side).
 
 ### [`merge/`](merge/README.md) — the merge op, enumeration vs merge, and self-play's holes (2026-08-17)
 
@@ -191,8 +191,8 @@ second-worst on coverage, with holes 30–70× starved, positive tail excess, an
 next level representable; a yoked placement-matched, strictly-narrower exogenous control
 reproduces only 22% of the loss — **the damage is the competence coupling's collapse dynamics,
 not narrowness** — and the onset is a cliff between β=1.5 and β=2. Self-grading inflation
-(`own−world`) turned out to be a narrowness artifact (correction on the record). Single seed;
-ranks and signs are the claims.
+(`own−world`) turned out to be a narrowness artifact (correction on the record).
+Ranks and signs are the claims.
 
 ### [`fourwall/`](fourwall/README.md) — the spurious index: scaffold, debt, merge, re-key, retire (2026-08-17)
 
@@ -215,8 +215,8 @@ replacement** (rational stickiness under a consumption-graded gate; a coverage-g
 it in forever — the seam law's evaluator coordinate applied to the index), the earned quotient is
 **capped by the unit vocabulary** (ARI ~0.5–0.6; the address ladder is funded by the action
 ladder), no spontaneous binding formed (available ≠ taken), and tear-down preceded stress in every
-round that had the op. Single seed; ranks are the claim; the node also measured stream-position
-sensitivity exceeding the ±0.034 floor in adoption timing, which is the seed pair's named job.
+round that had the op. Ranks are the claim; the node also measured stream-position
+sensitivity exceeding the ±0.034 floor in adoption timing.
 
 **Update (2026-08-18, [`fourwall/lm/`](fourwall/lm/README.md))**: the endogenous twin — the same
 shape asked of a real NTP reader against exact BP oracles (`reread/lm`'s pattern), then the missing
@@ -256,7 +256,7 @@ priors that fill it. Sideline: giving the ratchet's earned macros real vocabular
 the inert plant move *negatively*, dose-ordered by engagement — a gradient path buys
 interference, not the hoped-for plant learning. Two corrections queued for the fwlm ledger
 (the `wall` lifetime integral was grid-inflated; never-merge's advantage is larger than
-published). Single seed; one world; A-m and B2 queued.
+published). One world; A-m and B2 queued.
 
 ### [`native/`](native/README.md) — the port back: consolidating the earned vocabulary into planner and executor (2026-08-20→21)
 
@@ -280,7 +280,7 @@ the arc's first expertise-psychology readout), and native L2 routing *raises* L3
 (|T3| +3.4, committed recall 0.571 vs 0.500). The inversion: a natively-routed *bad* table is
 **better** than a frozen one in every era — π, trained on selected trajectories, starves the bogus
 address to ~0.03 mass (6× fewer calls) where enumeration is forced to keep paying for it —
-selection-before-regression is also a quarantine. Single seed; ranks, signs and floor-multiples
+selection-before-regression is also a quarantine. Ranks, signs and floor-multiples
 are the claims.
 
 ### [`spiral/`](spiral/README.md) — the live re-earning spiral on the depth-6 substrate (2026-08-22→23)
@@ -304,7 +304,7 @@ enumeration's priced time (earned ≥ given, natively); beyond it the complete v
 away by +0.3–0.4 recovered fraction — the measured value of coverage past the demand it was
 earned on. The address book survives live (table deletion ~free, corridor deletion not); the
 both-ports arm underperforms routing-alone in consumption (native's unresolved cell, now a
-two-node pattern). Single seed; ranks, signs, floor-multiples are the claims.
+two-node pattern). Ranks, signs, floor-multiples are the claims.
 
 ### [`census/`](census/README.md) + [`assay/`](assay/README.md) — amount × truth × arrival, crossed: arrival wins (2026-08-23→25)
 
@@ -327,8 +327,8 @@ in the from-birth arm vs ≤0.28/0.33 in every late-arrival arm, robust under di
 Gate-later is dead (criterion epiphenomenal, hold free); the gauge blindness recursed (an
 audition under present demand cannot price future coverage); and the unit measured the depth-6
 stream floor itself, demoting fractions, shallow-era orderings, and all L3 cert-cycle arm
-readings across three rounds. Use is only earnable: content transfers, trust does not. Single
-seed; the stream twins bound stream noise, not seed noise.
+readings across three rounds. Use is only earnable: content transfers, trust does not. The stream
+twins bound stream noise.
 
 ### [`conductor/`](conductor/README.md) — A1: the composition; the outer loop drives the crank (2026-08-27→28)
 
@@ -350,7 +350,7 @@ NLL never arms at all (an absorbing action has no second condition to cancel pla
 excess form licenses one commit and saturates), and both yoked clocks are **bit-identical** to
 their gauge arms — census finding 4 generalized to the full action set: the criterion's whole
 contribution is the cycle numbers it writes, which is exactly the part only a gauge can write
-endogenously. Single seed; ranks, signs, floor-multiples are the claims; arms are not
+endogenously. Ranks, signs, floor-multiples are the claims; arms are not
 lifetime-matched (pacing is what the loop owns and pays for).
 
 ### [`maestro/`](maestro/README.md) — A2: learn the rule (2026-08-28)
@@ -373,7 +373,7 @@ certificate and **never takes L3 while its own input reads the yield gauge at 2+
 Stream-displaced twins then police the node's own cells: each gauge-driven arm's era-5 win
 over the schedule survives displacement above the floor (2.3–3.8×), the era-5
 learned-vs-thermostat ordering flips sign and is demoted, and era 4 is the cell where
-learning's edge holds on both draws. Single seed; the twins bound stream position, not seed;
+learning's edge holds on both draws. The twins bound stream position;
 6 logged commit events mean the learned object is the value of states, not of acting.
 
 ### [`crescendo/`](crescendo/README.md) — A3: the signature (2026-08-28→29)
@@ -393,7 +393,7 @@ the one-bit ceiling the value clock reads **+0.388/+0.427 at era 4** (clearing e
 deep-era gap, with π's L4 mass rising monotonically post-commit on both draws while every
 L4-forbidden arm sits at exactly 0.000. The r² wall above is real and arithmetic (frozen
 recall² predicted buildable L4 to ±2) and extension is the measured lever, putting Track F3's
-index ops on the critical path of any further climb. One rung, single seed, exogenous demand
+index ops on the critical path of any further climb. One rung, exogenous demand
 ladder — §1.3's "semi-autonomous" stands.
 
 ### [`tuning/`](tuning/README.md) — typing the news, and the absorption wall (2026-08-29→31)
@@ -425,7 +425,7 @@ later at 1091 charged step-equivalents. The dissociation holds across all 14 pol
 [`absorption_blinds_the_evaluator`](../../../ideas/absorption_blinds_the_evaluator.md): stream
 evidence decays at the adapter's learning rate; the surviving ledgers are the adaptation itself
 and standing counterfactual state — Gate 3 (endogenise) deliberately re-specced rather than run.
-Single seed; ranks, signs, floor-multiples are the claims.
+Ranks, signs, floor-multiples are the claims.
 
 ### [`two_deltas/`](two_deltas/README.md) — Track E′ round 2: performance error vs outcome surprise (2026-08-29→31)
 
@@ -452,7 +452,7 @@ but never pays). The 2×2 the arc could never produce is populated everywhere (h
 3.4× as-intended successes; 13–22% of solves ill-executed), `audiation` 8(i)'s observer
 inversion dissolves under the symmetric grid (the per-datum self scalars are the only
 surviving source), and `continuo`'s residual bit is a novelty tag except under per-datum
-credit (p = 0.011 vs 0.125, matched ridge rung). Single seed throughout; full record and the
+credit (p = 0.011 vs 0.125, matched ridge rung). Full record and the
 within-level-currency question it raises: [two_deltas/README.md](two_deltas/README.md).
 
 ### [`quartet/`](quartet/README.md) — four instruments for the unification node (2026-08-31)

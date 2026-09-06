@@ -24,18 +24,18 @@ each failure mode measured on the way is a finding in its own right.
 
 ## Findings
 
-Seed status marked per claim; the full tables live in the per-run sections below.
+The full tables live in the per-run sections below.
 
-1. **The δ-silence certificate works as the compile trigger** (1 seed; robust across the (c, W)
-   counterfactual grid). It fired at genuine mastery (0.0760, at the ceiling reference) where
+1. **The δ-silence certificate works as the compile trigger** (robust across the (c, W)
+counterfactual grid). It fired at genuine mastery (0.0760, at the ceiling reference) where
    scheduled arms committed mid-descent content 1.5–1.8× worse. (§E-gate)
 2. **Compilation is selection + commitment, not distillation-by-regression.** Averaging valid
    command sequences destroys them (2.1×) and BC's regression-to-the-mean compounds it (a further
    1.5×), while *any single good realisation* — one CEM plan, one executed trace replayed from
    foreign start states — commits at the replaced controller's level. s0-width, per-trace open-loop
    inconsistency and net capacity were each exonerated by direct probe. The songbird resonance:
-   crystallisation keeps a rendition; it does not average the babble. (§discriminator; 1 seed, large
-   margins)
+   crystallisation keeps a rendition; it does not average the babble. (§discriminator; large
+margins)
 3. **Selection must rank candidates by expected performance under the *consumption* distribution.**
    Two failure modes, both measured: the **winner's curse** (ranking by a candidate's own realised
    outcome selects the least transferable one — fixed by scoring uniformly-drawn candidates on
@@ -48,7 +48,7 @@ Seed status marked per claim; the full tables live in the per-run sections below
 4. **Assembly is self-facilitating at seams and self-taxing at benchmarks.** A committed upstream
    hands over 3.7× cleaner boundary states (it was selected for accuracy) — but each commit resets
    the downstream benchmark (certification c15 → c41), so assembly cost is dominated by
-   re-estimation, not learning. (§E-4; 1 seed for the timing, mechanism located in the trace)
+   re-estimation, not learning. (§E-4; mechanism located in the trace)
 5. **Sequential assembly compounds.** Each committed unit sets the boundary condition for every
    downstream commit: an ~11% difference at segment 1 amplified to ~43% by segment 3, and across
    seeds downstream anchored-level variance is 4–9× upstream. This is why arm comparisons on
@@ -58,7 +58,7 @@ Seed status marked per claim; the full tables live in the per-run sections below
    Open-loop drilling produces a *worse* candidate pool (score_med 0.137 vs 0.072) and a 55% worse
    unit at matched selection rules — closed-loop traces are the better commitment candidates here.
    Sloppy practice under the corrected op commits a ~30–56% worse unit (weak-form poison) with none
-   of the 5×/off-manifold cascade the BC op produced in `eg_s0`. (§E-3b; 1 seed)
+   of the 5×/off-manifold cascade the BC op produced in `eg_s0`. (§E-3b)
 7. **Committed units do not degrade, and fusion is vacuous — for the same substrate reason.**
    Post-commit drift is exactly 0.0000 for every unit in every seed: a committed chain is
    state-independent and deterministic here, so degradation (and any accuracy cost of removing

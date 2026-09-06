@@ -3,8 +3,7 @@
 **Up**: [../README.md](../README.md) (one_layer_deeper) · **Files**: [FILES.md](FILES.md)
 **Upstream**: [tilde-research/one-layer-deeper](https://github.com/tilde-research/one-layer-deeper) at **`4ceff95`** (Aug 14) · competition deadline **Mon 2026-08-31 22:00 PT**
 **Status**: harness complete; port at v3; **15 hosted runs** (4 Easy, 9 Medium, 2 Hard) on the
-organizers' H100s, all saved under `results/hosted/`. Single seed throughout (the evaluator's
-`[74]`). **Date**: 2026-08-22.
+organizers' H100s, all saved under `results/hosted/`. **Date**: 2026-08-22.
 
 ---
 
@@ -256,8 +255,8 @@ never grounding `Enc`) was removed and the fix verified. Two further readings, o
 weight the counts support: (a) closure v2's collapse on held-out depth (126 → 8/500) was v2's
 mid-fit ramp, not the consistency idea — v3 restores 95/500; (b) v3 is the only arm above the
 OOD-`N` floor at `T=1` (3 vs 2) and ≥ every other arm on the first five OOD-`N` rungs, the same
-direction as the Hard closure arm's 4 vs 0 on `ood_n_t` — two or three examples out of 256, single
-seed, two datasets agreeing; not a result, noted.
+direction as the Hard closure arm's 4 vs 0 on `ood_n_t` — two or three examples out of 256,
+two datasets agreeing; not a result, noted.
 
 ### 4.4 Easy `e5` sanity (60 s, ~500–1000 steps, nothing memorises)
 

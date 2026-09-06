@@ -144,7 +144,7 @@ Numbers live in `figures/reduction.txt` §§1–4. The four load-bearing ones:
   1/2/3/5/10 so the log's size-sensitivity is on the record (L3 at `as_s0/exact`: 81 / 52 / 35 /
   21 / 10) — but the membership does not exist on disk at any other threshold. A machinery
   limit, not a measured invariance.
-- Single seed everywhere; `wd_s1`'s rehearsal is not compute-matched (~2× practice compute).
+- `wd_s1`'s rehearsal is not compute-matched (~2× practice compute).
 - `n_self` divergence in `wd_s1` appears only in the last ~10 cycles (`f3`, middle panel) —
   right-censored, like every other deep-era statistic in this lineage.
 - `beam` (practice rollouts) and `probe` (metering rollouts) agree to < 0.01 everywhere; only
@@ -449,7 +449,7 @@ size-mismatched cycles and counts them.
 
 ### Caveats specific to this round
 
-- **Still single seed, still no floor.** The only handle is `wd_s1`'s unrehearsed L2 (n = 3);
+- **Still no floor.** The only handle is `wd_s1`'s unrehearsed L2 (n = 3);
   `ap_s0` is a bit-identical replay of `wd_s1`, so it adds **no** independent noise handle —
   every floor-multiple above is the same n = 3 handle the offline pass used. No floor for π
   mass, and none for any provenance statistic, exists anywhere in the arc.
@@ -627,7 +627,7 @@ would use. Whether it should be preferred on principle is exactly the question t
 version's failure raises (the `exact` family receives L2 by surgery too, which is why the strict
 form was chosen first), and that is a question for Jasper, not a call to make here.
 
-**Caveats.** Single seed; one arm; no control arm, so nothing about *value* or *trust* is
+**Caveats.** One arm; no control arm, so nothing about *value* or *trust* is
 readable from `pp_s0` — only the dose and the source decomposition. The dose ledger is exact
 (counts, not estimates). Figure: `figures/pp1_dose.png`.
 

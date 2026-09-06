@@ -6,7 +6,6 @@ without a distance axis, which is why this cut exists
 **Re-scopes a published number in**: [`../local_loss/README.md`](../local_loss/README.md) (Finding 4's `syn/str`)
 **Idea**: [`ideas/revision_not_surprisal.md`](../../../../ideas/revision_not_surprisal.md) §8
 **Date**: 2026-08-09 · **Status**: run. Forward passes only on cached checkpoints; nothing is trained.
-Single seed per substrate; the ten `local_loss` arms share a seed.
 
 ## Goal
 
@@ -168,7 +167,7 @@ upper reference arm, which is a real limitation of what follows.
 
 ## What this establishes, and what it does not
 
-**Establishes** (single seed per substrate, one regime each):
+**Establishes** (one regime each):
 
 - On the frozen m4 base at λ=0, closed-constituent synonym identity decays from +0.858 at `w=0` to +0.079
   by `w=8` and chance by `w=16`, against a rising exact Bayes ceiling of 0.97–0.99 — so the representation
@@ -190,7 +189,6 @@ upper reference arm, which is a real limitation of what follows.
 - Anything with a positive control. There is no NTP-required-at-distance arm, for the structural reason
   above, so the curve is pinned at the chance end and the Bayes end but has no "content the model must
   keep" reference.
-- Seed robustness. Single seed per substrate; the ten arms share a seed.
 - That the m4 base's behaviour transfers to m2 or vice versa. The curve is m4; the arm comparison is m2.
 
 Visible position-parity structure in `relLeaf` (`w=4, 8` above `w=3, 6`) was pooled over rather than

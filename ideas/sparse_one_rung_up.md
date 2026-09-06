@@ -182,7 +182,7 @@ two clocks that abundance keeps collinear (`woodshed`: exposure and clock are co
 This is the sharpest instance yet of the meter making a second organ necessary rather than
 nice: nothing Track A's loop reads is on the trust clock, and the instruments that are — the
 trust-formation rate, the use record, a plateau read of the learner's own use — are all command
-face. Recorded as a reading of one run, single seed; the fix it implies (a pacer whose clock is
+face. Recorded as a reading of one run; the fix it implies (a pacer whose clock is
 the command face's) is the matched-row ladder's question, not its result.
 
 ## §6 Reread and limited data
@@ -257,7 +257,7 @@ Questions, not predictions, per repo norms.
 
 ## What this does not establish
 
-Everything here except §5's table is argued from existing single-seed nodes, not measured. No
+Everything here except §5's table is argued from existing nodes, not measured. No
 practice loop has run off RHM without the accompanist confound, so the portability of the
 output-face counter is an argument from its inputs, and the necessity of the FM on generic
 domains is an argument from what RHM supplied for free. The (domain, level) claim in §2 is a

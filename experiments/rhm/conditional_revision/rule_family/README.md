@@ -28,7 +28,6 @@ than structured tasks, fixed by natural-language grounding — is the published 
 R128/RHM_META_LEARNING collapse and of this repo's "grounding is the pivot."
 **Date**: 2026-08-09/10 · **Status**: Gate −1, Gate 0 (+ 36k retrain), diagnostics, retention
 (parts 1–2), and Gate 1 all run. Gate 2 not run — its pre-registered precondition was not met.
-Single seed throughout.
 
 ## Goal
 
@@ -187,7 +186,7 @@ artifact by construction), is preserved in NOTES §9 for a future substrate or a
 
 ## What this establishes, and what it does not
 
-**Establishes** (single seed, one regime, one model scale):
+**Establishes** (one regime, one model scale):
 
 - A rule-family RHM supports genuine in-context rule inference — the first positive ICL reading on
   this substrate — at 0.645 of an exact oracle ceiling (lower bound), with the oracle's shape, and

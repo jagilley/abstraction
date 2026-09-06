@@ -244,7 +244,7 @@ per-modulus-split artefact — see the child below.*
 
 The surviving barrier is the **rule** axis: held-out `N` is at or below floor at 8 moduli even
 where held-out problems read 0.982, and reaches only 0.058 (3.8× floor) at 142 moduli, both arms
-undertrained. Single seed throughout; two pre-registered predictions failed.
+undertrained. Two pre-registered predictions failed.
 
 Its child [`exact_atom/`](rule_acquisition/exact_atom/README.md) re-reads the atom against the
 **exactness** target Hard gates on. Under `ballistic_depth` §9's re-projection at `k=1`, rung `T`
@@ -308,7 +308,7 @@ seen modulus with 90% of units seen, control / closure-v2 / closure-v3 read **2 
 fresh `x` at `T=1` against a floor of 4. Two port defects explain the earlier hosted nulls and are
 recorded (a soft rung-selector that could not memorise; a clock-gated aux ramp that froze an
 un-memorised model). The only whisper is v3 sitting just above the OOD-`N` floor on two datasets —
-counts of 2–4, single seed, noted not claimed. Best leaderboard position: rank 31 of 109 via one
+counts of 2–4, noted not claimed. Best leaderboard position: rank 31 of 109 via one
 correct example. Next-step possibilities — a digit-arithmetic architecture aimed at the floor tier,
 an ablation back toward cut1 to find what was load-bearing for fresh-`x`, epochs-vs-updates levers —
 are in the node.

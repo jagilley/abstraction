@@ -442,7 +442,7 @@ thumb on the scale in its disfavour.
 - **The `root` drift arm was measuring task difficulty, not damage** (§4) and should not be read.
 - **The migration result is small and single-instrument** (§6), and its cross-run comparison is confounded by a
   simultaneous drive change.
-- The ladder is now 3-seeded and the climb sweep is 3-seeded; §4's original 4-arm climb is single-seed.
+- The ladder and the climb sweep are both 3-seeded.
 - **`own`-world grading remains favourable by construction** even after the entropy fix (the arm just fitted
   that world); `base` and `novel` are the fair columns and are the ones quoted.
 - **L=4, not the L=5 the port was specced for.** L=5 was run through `env_check` and agrees on every DGP-level

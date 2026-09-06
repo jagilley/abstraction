@@ -144,7 +144,7 @@ is read.
 the intervention that moves closure 6×.
 
 The coverage sweep manipulates `p` instead of inferring it, by varying what fraction of each
-modulus's units are training bases (everything else fixed, 1 seed):
+modulus's units are training bases (everything else fixed):
 
 | coverage | `fold` horizon | `fold_cyc` horizon | closure@1 (`fold`) | **oracle `p`** | self @T=28 |
 |---|---|---|---|---|---|
@@ -223,7 +223,7 @@ horizons it is not monotone and not outside noise:
 | reachable states | 857 | 857 | 1918 | 1918 | 3121 | 5903 |
 | **horizon** | 11.1 | 9.9 | 11.2 | 11.6 | 10.6 | 8.6 |
 
-8.6–11.6 across a 7× range in state count and 8× in operator width, single seed, against the
+8.6–11.6 across a 7× range in state count and 8× in operator width, against the
 fixed-`N` cut's documented ±2 nondeterminism. **T=10 sat on the steep part of a sigmoid**, where
 a ~3-depth shift reads as a 0.7 accuracy swing. The horizon metric exists to prevent exactly
 this. What is supported is *invariance*, not decline — and more width made the 8-modulus case
@@ -231,8 +231,7 @@ mildly worse (11.1 → 9.9), the same direction as `ballistic_depth`'s iso-compu
 
 ## Honest caveats
 
-- **The coverage sweep is single-seed**, as is the arity sweep. `cut1` and the re-projection cut
-  are 3 seeds each, with tight spreads (`fold` horizon 10/10/10).
+- **`cut1` and the re-projection cut are 3 seeds each**, with tight spreads (`fold` horizon 10/10/10).
 - **The cycle weight was transferred, not re-swept.** §7 of the prior cut found the fixed-`N`
   optimum at w≈10 with a collapse by w=30; we used w=3 on a different DGP. Whether the small
   10→12 gain would grow at a re-swept weight is untested. Given §2's finding that the cycle term
@@ -240,7 +239,7 @@ mildly worse (11.1 → 9.9), the same direction as `ballistic_depth`'s iso-compu
 - **4-digit moduli were abandoned after failing at 15k steps**, before the 60k-step budget that
   makes 3-digit work was known. They may well be learnable; this was not re-tested, so "3-digit
   is required" is *not* established — only that 3-digit sufficed.
-- **`p ≈ coverage` is measured at three points on one axis**, one seed each, all at 26 moduli.
+- **`p ≈ coverage` is measured at three points on one axis**, all at 26 moduli.
 - **Nothing here tests the actual benchmark.** No submission was built, `T` is deliberately
   withheld from the recurrent arms' prompt (upstream always supplies it), and the answer encoding
   is fixed-width — so "depth extrapolation" here is a strictly harder object than upstream's.
@@ -305,8 +304,7 @@ produced stale/partial local results during this cut. Always pass `--force` and 
 1. **Raise `p` and `closure` together.** §2 moved each alone. Nothing here tests a run with high
    coverage *and* the cycle term at a re-swept weight, which is where the fixed-`N` result would
    predict the horizon finally moves.
-2. **Seeds on the coverage sweep**, which currently carries the cut's central manipulation on n=1.
-3. **Re-test 4-digit moduli at 60k steps.** The abandonment was made on a budget now known to be
+2. **Re-test 4-digit moduli at 60k steps.** The abandonment was made on a budget now known to be
    too small.
-4. **A substrate where the rule changes per step.** P6's failure suggests the arity axis needs a
+3. **A substrate where the rule changes per step.** P6's failure suggests the arity axis needs a
    *non-static* rule to bite, which is the condition under which `mjc`/RHM found it decisive.

@@ -105,7 +105,7 @@ end-state lift by level, gift vs earned).
 - **The two clocks are different questions.** A gifted arm's tau = 0 is cycle 1, when the trunk
   is untrained; an earned arm's is cycle 18–129, when it is not. Early-tau *rates* across the
   two families are not like for like; §2b's calendar view is the other half.
-- **Single seed everywhere.** The stream-displaced twins (`ma_s1`, `cr3_s1`, `as_s1`) bound
+- **The stream-displaced twins** (`ma_s1`, `cr3_s1`, `as_s1`) bound
   draw-luck only. `census` finding 7's floors are error-rate floors and do not transfer to
   mass; **no floor for mass has been measured**, and the displaced pairs are the only handle.
 - The exposure column exists only where `entry` recording was on; `census`'s gifted arms have
@@ -239,8 +239,7 @@ working as designed.
 ## The in-tag noise handle
 
 Rehearsal targets L3 only, so the spread of the three `exact` arms at **L2** is what
-trajectory divergence alone produces in this instrument. It is not a measured floor (single
-seed, n = 3) but it is the only same-tag reference the round contains, and
+trajectory divergence alone produces in this instrument. It is not a measured floor (n = 3) but it is the only same-tag reference the round contains, and
 `analyze_woodshed.py` prints it beside the L3 spread at the end of section (2). **No floor for
 π mass has been measured anywhere in the arc** — this remains the instrument's largest gap.
 

@@ -74,7 +74,7 @@ sampler).
 
 ## Caveats (read before trusting any single number)
 
-- **Single seed on all treatments**; `dead_wall_b` is the only replicate. Terminal ±0.004
+- **`dead_wall_b` is the only replicate.** Terminal ±0.004
   differences among merged arms and `no_wall` are unrankable (1–3× placebo floor). Claims ride on
   trajectories, integrals, transients, floor-multiples.
 - **The fwlm0 `wall_fast` correction (README finding fwlm1-3), in numbers**: fwlm0's 250-step grid

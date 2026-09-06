@@ -2,7 +2,7 @@
 
 **Up**: [../README.md](../README.md) (mjc) · **Idea doc**: [ideas/two_timescale_value_loop.md](../../../ideas/two_timescale_value_loop.md) (§"Meta-RL two-timescale"; §interface point 3 — ensemble-disagreement as the online reducibility proxy) · **Drive selection**: [../../a2a_forward/reaching/CURIOSITY_CONTROL_README.md](../../a2a_forward/reaching/CURIOSITY_CONTROL_README.md) Step 0 (chose the disagreement magnitude)
 **Parent**: [Cut #3](../dynamics_shift/README.md) `dynamics_shift.py` — reward-free re-adaptation from *undirected* collection · **Sibling**: [../value_shaping/README.md](../value_shaping/README.md) (the learning-layer control)
-**Code**: `directed_readapt.py` (lives in this folder); file index: [FILES.md](FILES.md) · **Status**: two negatives, both well-understood — **global shift → null** (single seed), **localized shift → drive fails** (3 seeds). **Date**: 2026-07-18.
+**Code**: `directed_readapt.py` (lives in this folder); file index: [FILES.md](FILES.md) · **Status**: two negatives, both well-understood — **global shift → null**, **localized shift → drive fails** (3 seeds). **Date**: 2026-07-18.
 **Builds on this**: [`meta_adapt/`](../meta_adapt/README.md) (this cut's two negatives are what motivate its phenomenon-first pivot) · [`curiosity_control/`](../curiosity_control/README.md) (extends the confident-prior blindness found here to a *drifting* frontier)
 
 ---
@@ -66,6 +66,6 @@ Knobs are auto-exposed CLI flags (`--patch-force-y`, `--patch-center-x`, `--patc
 `fig1_recovery_curve` (planning dist vs #reward-free transitions, directed vs undirected) · `fig2_transitions_to_recover` (headline bar) · `fig3_r2_recovery` (global FM fidelity) · **`fig4_inpatch_recovery`** (patch mode: in-patch R² recovery + the patch-visitation bar — the diagnostic that exposes the disagreement-blindness).
 
 ## Caveats
-- Exp 1 single seed (fine — the null is structural); Exp 2 three seeds. All single rule/dynamics-seed per convention.
+- Exp 2 three seeds. All single rule/dynamics-seed per convention.
 - `directed_readapt.py` is retained as the **diagnostic record** for the two negatives + the reusable localized-shift substrate (`patch`), not a positive result.
 - The disagreement arm's failure is on a *confident-prior shift*; it does **not** refute disagreement as a drive in its native regime (novel-region exploration with irreducible noise present, where Step 0 selected it).

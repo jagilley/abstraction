@@ -498,7 +498,7 @@ has not converged by step 18k, so the self-generated target teaches while the mo
 and the degenerate solution satisfies it perfectly.
 
 **Repairing the schedule confirms the diagnosis and does not restore the advantage** — at 60k
-steps, single seed, wide operator:
+steps, wide operator:
 
 | cycle w | warmup | ID | T=7 | horizon | closure@1 | closure@20 |
 |---|---|---|---|---|---|---|

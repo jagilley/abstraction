@@ -192,7 +192,7 @@ cycle as **when the gate first bound**.
 | `_preflight` | interface + gates C and T, toy sizes. First pass ran 13 arms and failed only on a *donor* line (`ok["obs_gy_agree"]`, the one place in `preflight` that assumed the full arm sweep) **after every gate had already passed** — guarded. Second pass re-ran the six gate arms after the `margin` definition was changed to the mean-over-unchosen form | `results/preflight.log`, `results/preflight2.log`, `results/preflight3.log` — **ALL PASS** |
 | `tc_gf` | G-F: in-process fork-vs-`crescendo.py` replay at `max_macro_level=4` | **PASS**, 0.000e+00 vs a 0.000e+00 self-replay control; `results/gf.log` |
 | `tc_smoke` | three arms end-to-end at `--quick` (baseline, one gate, the relaxed diet); mechanics only | clean; DONE in 1286 s (0.36 GPU-h) |
-| `tc_s0` | the main run: 6 arms, A3's ladder/caps/floors, one seed | clean; **10,278 s = 2.85 GPU-h**, 9.8–10.0 s/cycle, all six arms 162 cycles, commits at c49/c92/c129 in every arm, 0 empty-table cancellations. Full record `figures/tc_s0/reduction.txt` (§0–§9, §A–§E, §G, §G2, §H, §I) |
+| `tc_s0` | the main run: 6 arms, A3's ladder/caps/floors | clean; **10,278 s = 2.85 GPU-h**, 9.8–10.0 s/cycle, all six arms 162 cycles, commits at c49/c92/c129 in every arm, 0 empty-table cancellations. Full record `figures/tc_s0/reduction.txt` (§0–§9, §A–§E, §G, §G2, §H, §I) |
 
 Volume `rhm-scaling-data:/data/rhm_practice_tacet/<tag>/`; fetched copies, figures and
 `reduction.txt` under `figures/<tag>/`.

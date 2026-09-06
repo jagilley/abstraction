@@ -90,7 +90,7 @@ would be a different treatment.
 
 ## Arms
 
-Single seed. Abundance (`in_s0`'s configuration verbatim). Every arm is a **clock yoke** of
+Abundance (`in_s0`'s configuration verbatim). Every arm is a **clock yoke** of
 `os_log`, so all six are lifetime-, era-boundary- and commit-cycle-identical and differ in
 exactly one knob. All six twin onto `enum_live`'s stream (`anchor_long`'s), as the donor's do.
 
@@ -186,7 +186,7 @@ Fetched copies, figures and `reduction.txt` under `figures/<tag>/`.
 |---|---|---|
 | `_preflight` | interface + gates C, T, I and **O**, toy sizes, 8 arms (`perf_given_rho` added for the reason `perf_given` exists in the donor) | **ALL PASS**. O-1 on `perf_given_rho`: 27 937 rows, 1 028 updates, 1 645 benchmarked → realised ρ 0.0589 at declared 0.04 (the one-row floor binding at 27.2 rows/update, exactly as designed). The four `os_*` loop arms minted no slot at preflight scale, as expected. `results/preflight.log` |
 | `os_gf` | G-F: in-process fork-vs-`intonation.py` replay on the **metered** arms at `max_macro_level=4` | **PASS — 0.000e+00** on both arms (`perf_given` = meter alone, `perf_given_g` = meter + δ gain) against a 0.000e+00 donor self-replay control, commits equal, and **98 070 head rows fired** so the gate is not vacuous. `results/gf.log` |
-| `os_s0` | the main run: 6 arms (2 rung-invariant comparators + 4 rungs), A3's ladder/caps/floors, abundance, one seed | clean, **12 023 s = 3.34 GPU-h** (+ ~0.7 lost to one preemption), 14.3–14.5 s/cycle, all six arms **131** cycles, commits at c49/c72/**c104** and advances at 58/88/114/122/131 in every arm — `in_s0`'s clock exactly. All gates PASS; in-tag twin gate 0.000e+00 for all five yoked arms over c1–c48. Record `figures/os_s0_reduction.txt` (§0–§8, §A/§C/§E, §G/§G2/§H, §P1–§P6, **§R1–§R2**) |
+| `os_s0` | the main run: 6 arms (2 rung-invariant comparators + 4 rungs), A3's ladder/caps/floors, abundance | clean, **12 023 s = 3.34 GPU-h** (+ ~0.7 lost to one preemption), 14.3–14.5 s/cycle, all six arms **131** cycles, commits at c49/c72/**c104** and advances at 58/88/114/122/131 in every arm — `in_s0`'s clock exactly. All gates PASS; in-tag twin gate 0.000e+00 for all five yoked arms over c1–c48. Record `figures/os_s0_reduction.txt` (§0–§8, §A/§C/§E, §G/§G2/§H, §P1–§P6, **§R1–§R2**) |
 
 **A free full-scale cross-tag identity, stronger than the smoke G-F.** Because ρ = 1 draws no
 RNG, the identity rung is not merely *like* the donor's abundance reference — it *is* it. Over
@@ -260,6 +260,6 @@ python3 rhm/practice/ostinato/analyze_ostinato.py --tag os_s0 --gf-tag os_gf --f
 - The ladder's arms are **clock-yoked**, so pacing is pinned to `os_log`'s optimum; reduction
   §H replays A1's thermostat on each arm's own logged L4 at-support series and reports when
   each arm's *own* gauge would have fired.
-- Single seed. Ranks, signs and multiples of measured floors are the claims.
+- Ranks, signs and multiples of measured floors are the claims.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

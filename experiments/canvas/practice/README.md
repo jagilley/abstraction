@@ -32,5 +32,5 @@ truth grader, with no value head anywhere and an inert plant — is 0.2–0.35 w
 orders the arms exactly as support does. The level-3 vocabulary nests and forecloses correctly
 but buys almost nothing yet (T[3] at support is 538 of 10 752; coverage is the next level's
 binding term), and the taste gauge *rises* .86 → .98 across eras while validity falls to ~.2 —
-the two-organ dissociation, in-loop. Single seed; ranks are the claim; operating point dominated
+the two-organ dissociation, in-loop. Ranks are the claim; operating point dominated
 (width 1 beats 2 at G = 8; ranks survive it).

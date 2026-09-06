@@ -186,7 +186,7 @@ anticipate it from upstream — which is, on reflection, the same thing commitme
 
 ### F4 — the crossover: live content wins inside the composition horizon, measured chains win beyond it
 
-*Single seed (`L1`).* A seed pair (`L1_s1`/`L1_s2`) was launched 2026-08-20 and **cancelled ~15 min
+A seed pair (`L1_s1`/`L1_s2`) was launched 2026-08-20 and **cancelled ~15 min
 in by Jasper (GPU budget)** — apps stopped, no partial results consumed; the launch config is in the
 Gotchas section's reproduce line if a future hardening pass wants it. Per `recital`'s methodology
 export, ranks are the claim; the within-run triangulation is that signs and ordering are identical
@@ -225,7 +225,7 @@ committed arms share the schedule.
 
 ### F5 — the lower level's library funds the upper level's addressable variation
 
-*Single seed (`L1`); the seed pair was cancelled (see F4's note).* F1 measured launch-time keying of a whole chain at
+F1 measured launch-time keying of a whole chain at
 **1.03×** held-out and called it near-inert. In the closed loop it bought **1.34×**
 (`phrase_frozen` 0.1026 vs `phrase_chain_fixed` 0.1374) — F1's audition estimate understated it by
 roughly an order of magnitude in effect size.

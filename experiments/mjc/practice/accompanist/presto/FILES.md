@@ -191,8 +191,7 @@ control loop is a slow movement.
    `e_reactive − e_live_seg`), the guard margin (`ref_play −` the best of the three) in metres and
    as a fraction of the guard, and the chain's own distance to the guard. The verdict rule itself
    is unchanged and stays pre-fixed.
-12. **Single seed 0 on every cell**, as everywhere in this arc. The claims are ranks, signs and
-   bit-identity assertions, not point estimates.
+12. **The claims are ranks, signs and bit-identity assertions**, not point estimates.
 
 ## Code files
 
@@ -514,7 +513,7 @@ absent here, and the `d2` residual it was meant to address does not apply to thi
   decision 6 diagnosed but does not remove it.
 - **Non-monotonicity worth flagging**: naive `seg_tape` at Δ = 1 (0.1405) is worse than at Δ = 2
   (0.1269), and the naive incumbent's chosen lookahead flips 12 → 30 → 6 → 30 across the sweep.
-  Both are inside the run-to-run scatter of 24 evaluation geometries at a single seed.
+  Both are inside the run-to-run scatter of 24 evaluation geometries.
 - **Ledger**: agent-side 35,200 env steps / 18,800 feedback events / 16,800 plans /
   1.272e9 FM rollout-steps / `t_priced` 2,584 s — i.e. the practice and the nested build.
   Instrument-side 1,083,600 steps / 160,104 fb / 62,184 plans: the whole sweep, the anchors and

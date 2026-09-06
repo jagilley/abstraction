@@ -1,7 +1,7 @@
 # Minting against a non-mirror verifier: a support oracle is not a density oracle
 
 **Status**: built and run. Headline contrast is **3 seeds, paired within seed**; the regime
-diagnostics and the two failed-dose runs are single-seed and are reported as design evidence, not
+diagnostics and the two failed-dose runs are reported as design evidence, not
 results. **Date**: 2026-07-30.
 **Up**: [../README.md](../README.md) (rhm) · **Files**: [FILES.md](FILES.md)
 **Idea doc**: [`ideas/breadth_as_grader_heterogeneity.md`](../../../ideas/breadth_as_grader_heterogeneity.md)
@@ -233,17 +233,17 @@ the *type* contrasts in §4a, not by that collapse.
    redundancy-vs-heterogeneity falsifier is **not** answered here. It also has the highest support
    expansion of any arm (0.497), so the composite does what it was designed to do at the pool level
    and the probes cannot see it. More seeds, or a regime where location matters more, would settle it.
-6. **The peer/verifier crossover, seen once and not replicated.** In the single-seed quota-1024 runs
+6. **The peer/verifier crossover, seen once and not replicated.** In the quota-1024 runs
    the support-expansion ordering **inverted** with validity rate: at m=3 (validity 14%) `verifier`
    0.42–0.54 ≫ `peer` 0.13; at m=2 (validity 48%) `peer` 0.12 ≫ `verifier` 0.02, with
    `verifier ≈ random`. The suggested reading — the verifier gates *legality*, the peer gates
-   *location*, and legality stops binding once it is cheap — is a hypothesis from two single-seed
-   cells, not a result.
+   *location*, and legality stops binding once it is cheap — is a hypothesis from two
+cells, not a result.
 
 ## 7. What this does not establish
 
 - **The breadth axis of §7 was never testable on this substrate.** `broad_static` is *below*
-  `narrow_static` on the depth probes at m=3 (Δd5 −0.062, Δd6 −0.030, single seed), and the breadth
+  `narrow_static` on the depth probes at m=3 (Δd5 −0.062, Δd6 −0.030), and the breadth
   gap appears only in val NTP. The cause is structural, not statistical: the probe is *fitted on the
   probe set*, so when deep structure is carried by shared rules the probe decodes it **even for roots
   the model never saw**. Root-restriction cannot produce a depth-probe deficit in homogeneous RHM —
@@ -256,8 +256,6 @@ the *type* contrasts in §4a, not by that collapse.
 - **§4 of the idea doc is untested.** This tests §5 (grader type), as the doc itself says §7 does.
   "Distance ⇒ decorrelated blind spots" remains asserted; the `peer` arm was built to measure it and
   the depth probes could not resolve it.
-- **Single-seed everywhere except §4.** The regime scorecard, both dose runs, the m=2 arm set, the
-  yield sweeps and the peer/verifier crossover are all one seed.
 - **One rule seed** throughout, per repo convention.
 - **The verifier is privileged.** It is the exact generative process — the same class of privileged
   access this repo criticises elsewhere. It makes the type contrast clean and the absolute recovery

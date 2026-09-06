@@ -685,8 +685,7 @@ currency it stores, at admissible loudness (level-2 drift and σ=2.5 both destro
 change — dense learning ↔ truth, repair/metering ↔ interface (the mjc bridge arc, in
 retrospect), evaluative re-selection ↔ demand, the teacher ↔ level (the currency §§16–17 proved
 undefined from below). The monolith corollary sharpens accordingly: a training regime whose
-world drifts in one currency needs one organ, and is right to. Single seed; ranks are the claim;
-the seed pair is the named hardening.
+world drifts in one currency needs one organ, and is right to. Ranks are the claim.
 
 ---
 
@@ -728,8 +727,7 @@ controller-level seam law** (lookahead across a seam you will not control is mon
 harmful — re-grounding supersedes anticipating); and a methodology export — the cost function of
 a multi-segment piece has a two-sided failure mode (ignore waypoints / ignore handoffs), each side
 crippling a different arm of exactly this comparison, so **calibrate to preserve the measurement
-axis under a criterion neutral across granularities**. Single seed throughout (a seed pair was
-cancelled on GPU budget); ranks are the claim, with two-horizon sign consistency and the
+axis under a criterion neutral across granularities**. Ranks are the claim, with two-horizon sign consistency and the
 double-sided fusion control as the triangulation.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

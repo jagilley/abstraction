@@ -9,7 +9,7 @@ with `s = 4`), [`rhm/practice/ear/`](../../../rhm/practice/ear/README.md) (`prac
 **Idea docs**: [`style_practice_substrate`](../../../../ideas/style_practice_substrate.md) §8 node 1,
 [`practice_manufactures_its_own_credit`](../../../../ideas/practice_manufactures_its_own_credit.md).
 **Runs**: `smoke0`, `cal0`, `cal1` (calibration), **`cr_s0`** (main: 6 arms × 3 eras × 24 cycles,
-seed 0, 1147 s on one L4), 2026-08-26. **Single seed; ranks, signs and in-tag contrasts are the
+seed 0, 1147 s on one L4), 2026-08-26. **Ranks, signs and in-tag contrasts are the
 claims.** One orchestrated conversation, one Opus implementer.
 
 ## The question
@@ -117,7 +117,7 @@ resolution and carries no information (single-tile repairability is 1.00 — the
 
 ## Caveats
 
-- **Single seed, one tileset, one panel.** Ranks and signs are the currency.
+- **One tileset, one panel.** Ranks and signs are the currency.
 - **The operating point is dominated**: at G = 8 the width ladder is inverted for every arm
   (w1 < w2 < w4 in error; `never_base` L3 .701 / .826 / .910) because `steps = G / width` and
   conditioning is what the budget buys on a masked model. All arms were metered at width 2, so

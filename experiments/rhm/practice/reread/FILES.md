@@ -71,7 +71,7 @@ declared grounding budget G=58, move budget 4, practice beam width 16, `max_macr
 `n_arch = 192`, `chunk = 64` (3 cycles per pass), `n_passes = 9`, commits at passes 3 and 6
 (three passes per vocabulary stage), `mine_support = 3`, `mine_cap = 0`, `mine_from = chosen`,
 `n_rt = 256` per damage depth, `n_score = 256` per level, `n_rand = 3`, `gen_lr = 1e-4`,
-`gen_steps = 20`, `n_grad = 4`, `value_lr_online = 3e-5`. Single seed.
+`gen_steps = 20`, `n_grad = 4`, `value_lr_online = 3e-5`.
 
 Cells: 3 mixes (`mixed`, `deep`, `shallow`) × 5 arms (`reread`, `fresh`, `dense_reread`,
 `dense_fresh`, `given_reread`), plus the `shallow__fid_ratchet` fidelity cell = 16.

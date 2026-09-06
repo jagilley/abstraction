@@ -121,7 +121,7 @@ This *improves* the interpretation. The residual is **essentially equally DGP-st
 2. **Test 2 (channel ablation) is a weak discriminator here.** Under `shuffle_r`, ENT falls 0.917 → 0.458 and WORLD 0.510 → 0.299, not just IMPL (0.776 → 0.213). At cosine ~0.88 the residual is a large fraction of `a_j`, so shuffling it is a big generic perturbation that degrades everything. The ordering is right; the test should not carry weight.
 3. **ENT is the cautionary case, and it is worth keeping.** Margin +0.267 with advantage −0.035 — a large confabulator gap and *no* introspective advantage. **Margin alone is not evidence of introspection**; only the advantage separates. That the battery distinguishes them is a point in its favour.
 4. **The report head is trained.** This is a claim about the report's causal grounding, not its spontaneity. Use ≠ report ≠ awareness.
-5. **Single seed**, one rule seed, one DGP regime.
+5. **One rule seed**, one DGP regime.
 6. The introspection, if granted, arguably belongs to the composite (M + FM) rather than to M alone — which matches the cerebellar analogy but should be said rather than elided.
 7. OL requires ~8× larger perturbations for the same KL (eps ≈ 15 vs 1.8), so OL and CL steering magnitudes are not directly comparable; only the within-condition residual/prediction ratio is.
 
@@ -170,6 +170,5 @@ Results: `/data/rhm_confabulation/v16_s2_L6_m4_distinct/{cl,ol}_results.json`, `
 2. **A token report channel.** The head is currently an auxiliary MLP; emitting the report through M's own LM head over a reserved report vocabulary would make it a *report* rather than a probe.
 3. **Language.** RHM's residual is a deep inference-depth gap; language's is diffuse and full-rank. Whether the observer ladder stays flat there is the generalization test.
 4. **Drop Test 2 or sharpen it** — e.g. steer-based ablation at matched perturbation norm, rather than wholesale substitution.
-5. **Seeds.** Everything here is n=1.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

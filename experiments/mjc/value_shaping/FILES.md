@@ -22,7 +22,7 @@ shares it); the shared dependencies [`../pusher_env.py`](../pusher_env.py) and
 
 | Directory | Content |
 |---|---|
-| `valshape_full_v1/` | The headline run (70K transitions, single seed): `fig1_capacity_frontier` (pusher-vel + puck-slide R² vs capacity, unshaped vs shaped), **`fig2_lambda_frontier`** (the re-allocation tradeoff as `λ_puck`→0), `fig3_perdim` (per-group fidelity, unshaped vs shaped). `results.json` alongside. |
+| `valshape_full_v1/` | The headline run (70K transitions): `fig1_capacity_frontier` (pusher-vel + puck-slide R² vs capacity, unshaped vs shaped), **`fig2_lambda_frontier`** (the re-allocation tradeoff as `λ_puck`→0), `fig3_perdim` (per-group fidelity, unshaped vs shaped). `results.json` alongside. |
 | `valshape_smoke/` | Smoke-test output from the `--quick` configuration (21K transitions); kept for debugging — it is also where the fragile "teeth" (capacity efficiency under data scarcity) show up, so it is *evidence*, not just a smoke. |
 
 ## Modal volume layout (`mujoco-control-data`)

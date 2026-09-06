@@ -75,7 +75,7 @@ weak kind.
 > (is mining yield over a fixed archive vocabulary-gated or novelty-gated?) and
 > [`rhm/practice/merge/SPEC.md`](../experiments/rhm/practice/merge/SPEC.md)
 > (invariance-by-enumeration vs invariance-by-merge, with an unmetered dense arm).
-> **[Run, same day — all four reframes survived contact, each sharpened**; single seed, discussed
+> **[Run, same day — all four reframes survived contact, each sharpened**; discussed
 > with Jasper before this note. (i) measured directly: task error identical under rotation while
 > next-level representability differs 12-vs-67 ([`merge`](../experiments/rhm/practice/merge/README.md)
 > round 1). (ii) relocated: the cost lands on the *fractured index* (unpaid confound-debt), not

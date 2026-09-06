@@ -2,7 +2,7 @@
 
 **Up**: [../README.md](../README.md) · **Files**: [FILES.md](FILES.md) · **Child**: [cancellation/README.md](cancellation/README.md)
 **Design doc**: [DESIGN.md](DESIGN.md) · **Idea**: [ideas/the_forecast_needs_a_lead.md](../../../ideas/the_forecast_needs_a_lead.md)
-**Date**: 2026-08-04/05 · **Status**: one positive measurement, one null. Single seed.
+**Date**: 2026-08-04/05 · **Status**: one positive measurement, one null.
 
 ## Goal
 
@@ -98,7 +98,7 @@ nothing. This is nonetheless the first direct measurement against
   through the exogenous channel.
 - **`res` expanded participation ratio (5.02 → 6.90) where `res_shuffled` did not (+0.36).** The only
   res-vs-shuffled separation anywhere in the cut, and it is on the dimensionality axis rather than the
-  depth axis. **Unreplicated and not trusted**: single seed, on a rank-shaped instrument this repo has
+  depth axis. **Not trusted**: on a rank-shaped instrument this repo has
   found weak three times, and non-monotone across arms (`res_orth`, a blend of `res` and `nll`, is the
   *most* contractive at −1.05 rather than intermediate). Recorded, not interpreted. Seed replication
   was launched and cancelled to save compute.

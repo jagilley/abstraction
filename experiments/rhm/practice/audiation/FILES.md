@@ -399,7 +399,7 @@ flight every checkpoint and again offline.
   exactly to the cycle-boundary snapshot difference at the shared probe states; the maintenance
   share is a **4.8% median** (p95 10.2%) of the boundary revision, so the revision tables see
   ~95% of what a cycle does to the readouts.
-- **The arms' own clocks** (secondary readout, single seed): `perdatum` commits L2 one cycle
+- **The arms' own clocks** (secondary readout): `perdatum` commits L2 one cycle
   later (c19 vs c18) and L3 **seven cycles earlier** (c62 vs c69); ends with a larger L2 table
   (12 vs 11) and a **smaller L3 table (8 vs 12)**; fewer next-level observations (L3/L4 at
   support 51/55 vs 62/68); mean solved/cycle 213.6 vs 236.2; era-mean `e` 0.503/0.639/0.719/

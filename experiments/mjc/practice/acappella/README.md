@@ -16,7 +16,7 @@ de-confound; it runs beside the spine and blocks nothing.
 forward model anywhere** — nothing in this folder imports, trains, or evaluates an `f(s,u)`.
 **Attribution**: the no-FM constraint and the re-site decision are Jasper's (2026-08-27); the
 pre-fixed halt that forced the re-site fired exactly as the SPEC committed it to.
-**Single seed on every run; ranks, signs, bit-identity gates and pre-fixed criteria are the
+**Ranks, signs, bit-identity gates and pre-fixed criteria are the
 claims.** One orchestrated conversation, one implementer agent.
 
 ## The question, and what happened to it
@@ -94,7 +94,7 @@ express. Both halves are the de-confound Track M asked for.
    information on this piece is marginal (matched spread ratios 1.07–1.13), as the SPEC's
    held-loosely anticipated, while per-state keying still buys 1.22–2.35× over the best fixed
    slot. `frac_chain` is nonzero (0.09–0.39 across arms/Δ) — the first chain consumption in the
-   mjc arc, read lightly at one seed. (`a0` A-S/A-B, `b1`)
+   mjc arc, read lightly. (`a0` A-S/A-B, `b1`)
 
 ## Interpretation (discussed with Jasper 2026-08-27 — argued, not measured)
 
@@ -111,7 +111,7 @@ depth.
 
 ## Caveats
 
-- **Single seed on every run**; 24 shared eval geometries; the b1 sweep uses n_eval = 32.
+- 24 shared eval geometries; the b1 sweep uses n_eval = 32.
 - **The reflex gain grid hits edges** at Δ ∈ {3, 4, 6} (kp min) and {12, 16} (kp min and kd max).
   The Δ = 8 fit is interior, so the sustained-niche point is clean; the fragile Δ\* = 4 margin
   (+0.0054) could plausibly flip with a wider grid, and the Δ = 16 gap (7×) could not. The Δ = 3

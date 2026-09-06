@@ -13,17 +13,17 @@ Four runs from one session, all consuming the bridge signal
 δ = (b(s)−e)·σ((g−g₀)/θ) as a per-sample gain on forward-model plasticity. Three live under this
 node; the fourth lives under `bridge_assembly/` because it is that node's runner with swept knobs.
 
-| run | location | what varies | seeds |
-|---|---|---|---|
-| difficulty sweep | [`../bridge_assembly/difficulty_sweep/`](../bridge_assembly/difficulty_sweep/) | recovery difficulty, b's clock, the frontier's clock, the aleatoric decoy | 31 runs analysed |
-| estimability | [`estimability/`](estimability/) | temporal concentration of practice at fixed per-context sample count | 3 + 3 + 2 + 1 |
-| priced plasticity | [`priced_plasticity/`](priced_plasticity/) | FM capacity, replay, total plasticity spend | 1 (+ interior grid) |
-| aleatoric flip | [`aleatoric_flip/`](aleatoric_flip/) | flip amplitude on a mastered region | 1 (+ calibration) |
+| run | location | what varies |
+|---|---|---|
+| difficulty sweep | [`../bridge_assembly/difficulty_sweep/`](../bridge_assembly/difficulty_sweep/) | recovery difficulty, b's clock, the frontier's clock, the aleatoric decoy |
+| estimability | [`estimability/`](estimability/) | temporal concentration of practice at fixed per-context sample count |
+| priced plasticity | [`priced_plasticity/`](priced_plasticity/) | FM capacity, replay, total plasticity spend |
+| aleatoric flip | [`aleatoric_flip/`](aleatoric_flip/) | flip amplitude on a mastered region |
 
 A fifth run, added 2026-08-12, is **not** a δ-consumption run and does not share the substrate
 below — it is the first node in this arc with *sequence* structure:
 
-| run | location | what varies | seeds |
+| run | location | what varies | status |
 |---|---|---|---|
 | étude arc | [`etude/`](etude/) | compilation of mastered segments into committed ballistic units: the δ-silence gate, the compile op itself, and sequential assembly | **written up** — sequential assembly with seam-matched selection dominates never-compiling on both axes, 3/3 seeds |
 
@@ -32,12 +32,12 @@ Two further nodes (2026-08-19 → 08-20) port the RHM practice arc back to this 
 settled (state-conditioned commitment, the three-coordinate seam law, certificate demotion,
 typed maintenance):
 
-| run | location | what varies | seeds |
+| run | location | what varies | status |
 |---|---|---|---|
-| fingering | [`fingering/`](fingering/README.md) | the compile-op taxonomy on a boundary that carries information: frozen (fixed/keyed/regressed/averaged) vs **live** content under committed routing, timing × maintenance, priced deliberation | **written up** — 1 seed/run; f1c's `never` bit-reproduces f1b's |
-| legato | [`legato/`](legato/README.md) | committed **span** vs the model's composition horizon: segment vs phrase granularity × live vs measured content, with a fusion control | **written up** — 1 seed (seed pair cancelled, GPU budget); ranks + two-horizon signs + double-sided control |
-| span | [`span/`](span/README.md) | the composition horizon **as a trajectory**: legato's practice loop with nothing committed, the FM snapshotted every cycle, imagination horizon × executed span of one live phrase plan against a flat `e_react`; plus a re-measurement of the saved models (on/off-corridor accuracy, the exploitation gap, a per-snapshot CAL-P sweep) | **written up** — 1 seed; 17–81-point monotone trends are the claims |
-| offbook | [`offbook/`](offbook/README.md) | **the port back** on this substrate: seam-time audition (enumeration) vs π-routing vs both ports, the address-book battery and poison twin — then three canary rounds (credit currency, exposure placement, reflex-loop delay) on why the chain level is never adopted | **written up; SUSPECT** (2026-08-27, see `accompanist/`) — 1 seed/run, bit-identity twins + cross-tag exact controls |
+| fingering | [`fingering/`](fingering/README.md) | the compile-op taxonomy on a boundary that carries information: frozen (fixed/keyed/regressed/averaged) vs **live** content under committed routing, timing × maintenance, priced deliberation | **written up** — f1c's `never` bit-reproduces f1b's |
+| legato | [`legato/`](legato/README.md) | committed **span** vs the model's composition horizon: segment vs phrase granularity × live vs measured content, with a fusion control | **written up** — ranks + two-horizon signs + double-sided control |
+| span | [`span/`](span/README.md) | the composition horizon **as a trajectory**: legato's practice loop with nothing committed, the FM snapshotted every cycle, imagination horizon × executed span of one live phrase plan against a flat `e_react`; plus a re-measurement of the saved models (on/off-corridor accuracy, the exploitation gap, a per-snapshot CAL-P sweep) | **written up** — 17–81-point monotone trends are the claims |
+| offbook | [`offbook/`](offbook/README.md) | **the port back** on this substrate: seam-time audition (enumeration) vs π-routing vs both ports, the address-book battery and poison twin — then three canary rounds (credit currency, exposure placement, reflex-loop delay) on why the chain level is never adopted | **written up; SUSPECT** (2026-08-27, see `accompanist/`) — bit-identity twins + cross-tag exact controls |
 | accompanist | [`accompanist/`](accompanist/README.md) | the follow-up to offbook: library construction (`d1`–`d3`: content ladder, legato's nesting, the model adapting) and the delay operator (`d3b`, `presto/`: naive vs efference copy) on offbook's piece and on a fast 120 ms-segment piece | **written up** — the pivot: the incumbent's free forward model, not the piece, is what refuses the deep unit |
 | acappella | [`acappella/`](acappella/README.md) | the re-port with **no forward model anywhere**: a priced real-rollout incumbent under a declared budget on `etude/`'s substrate, then (amendment) the feedback/delay axis — reflex vs keyed/auditioned library under an unbridgeable observation delay | **written up** — the grounding economy halts at its own pre-fixed gate (0/15 search cells beat the reflex); re-sited on feedback, a model-free **segment-span niche opens at 192 ms** |
 | solo | [`solo/`](solo/README.md) | **re-internalization with no forward model** at acappella's niche (Δ = 8): a behaviour-cloned reflex as the trunk, offbook's Port 1 (π over member slots) and Port 2 (span head, parity measured on the plant), the address-book battery, the primitive legal at every seam, δ_perf against the tape as intention reference logged; then a probe replacing the relative imitation filter with two pre-fixed absolute bands | **written up** — routing, corridor and address book all port at segment span; adoption tracks the meter (feel at Δ = 0, memory at Δ = 8); learning buys a 4× grounding cut and a 10× tighter quarantine, **not error** — the construction prior is the best selector and the bands starve π |
@@ -177,9 +177,7 @@ Arms include `fixed` at five lrs, `delta`, `delta:unit` (allocation only, spend 
 eff_lr matched to `fixed@3e-4` at 3.000e-04), `delta:tauon`, `raw_err`, and a `:raw_adam:ewma:r4:h256:L3`
 stack reproducing the parent configuration.
 
-Seeds: 1 (`pp_s0` + `pp_int_s0` + `cal_s0`). Seeds 1–2 were launched and **deliberately stopped
-mid-run** (Jasper's call); their Modal apps were stopped and no partial results entered any
-analysis. `analyze_priced.py --seeds` exists and is tested if they are ever run.
+Tags: `pp_s0` + `pp_int_s0` + `cal_s0`.
 
 Numbers: `data/pp_s0.json`, `data/pp_int_s0.json`, `data/cal_s0.json`, `data/summary.json`.
 
@@ -205,7 +203,7 @@ flipped-region identity, at mask weights m ∈ {0, 0.5}, bounding what exact reg
 `delta`, `delta:unit`, `delta:tauon`; `raw_err`; `disag` (ensemble disagreement) in shared/boot/expd
 variants; `conj` (δ × disagreement). f0 duplicates of the key arms.
 
-Seeds: 1 (`af_s0`), plus the calibration sweep (`afcal_s0`). No README was written by the
+Tags: `af_s0`, plus the calibration sweep (`afcal_s0`). No README was written by the
 implementing agent; `analyze_flip.py` regenerates all readouts from `data/af_s0.json`.
 
 ### étude arc — [`etude/`](etude/README.md) (2026-08-12 → 08-14, written up)
@@ -256,8 +254,8 @@ composition error*. Chunks extend committed execution past the model's reach rat
 planning inside it — §2(b) measured. Plus: a seam cannot be pre-handled (launch keying near-inert
 in audition, lookahead monotonically harmful) yet the closed-loop keying gain is 1.34× because
 **the segment-level library manufactures the phrase pool's diversity** — `recital`'s level-(k+1)
-law on a physical plant. Single seed (seed pair cancelled — GPU budget); `never` still dominates
-raw error; steady-state per-traversal economics favor the fused chain on both axes. Full tables
+law on a physical plant. `never` still dominates raw error; steady-state per-traversal
+economics favor the fused chain on both axes. Full tables
 and the F1–F5 findings record: [`legato/README.md`](legato/README.md).
 
 ### span — the composition horizon as a trajectory (2026-08-20, written up)
@@ -277,7 +275,7 @@ sharpening-on / degrading-off — one-step FM error halves on the corridor and d
 trajectory (ratio 0.78 → 2.05, p=2.6e-4), and the model's promised far-seam arrival stays ~0.07 m
 at every cycle while the truth walks to ~1 m. A live chunk is a model's promise off-distribution
 and practice worsens it; the human chunk is measured content — legato F4 from the model's side, and
-the seam law's state coordinate in miniature. Single seed. [`span/README.md`](span/README.md).
+the seam law's state coordinate in miniature. [`span/README.md`](span/README.md).
 
 ### offbook — the port back: routing consolidates, trust tracks exposure, the chain level is refused by the task's economics (2026-08-25 → 08-26, written up)
 
@@ -320,7 +318,7 @@ model through the delay (efference copy, a Δ-step rollout) and it recovers 6–
 owns every playable delay on both pieces — every Δ inside the model's horizon is bridged by the
 model. On RHM the incumbent's search was real and priced; on this substrate it has been free
 imagination since `fingering/`, and `etude/` — the one node where chunks won — is the one where the
-model was the bottleneck. Single seed throughout; bit-identity controls across rounds. Full record:
+model was the bottleneck. Bit-identity controls across rounds. Full record:
 [`accompanist/README.md`](accompanist/README.md). Next: [`acappella/SPEC.md`](acappella/SPEC.md).
 
 ### acappella — the model-free port: the grounding halt, and the feedback niche (2026-08-27, written up)
@@ -341,7 +339,7 @@ removed. The chain question is structurally out of this piece's reach (chains de
 from rest — exactly delay-invariant, pre-flagged), and the audition is the most delay-fragile
 selector in the system (calibration 1.00 → 1.77; the chain-capable arm selects chains least where
 they pay most). B2 (trust at Δ=8) and the presto fast-piece escalation are queued with explicit
-licensing conditions, not run. Single seed; bit-identity gates against `etude/` and across tags.
+licensing conditions, not run. Bit-identity gates against `etude/` and across tags.
 Full record: [`acappella/README.md`](acappella/README.md).
 
 ### solo — re-internalization with no forward model: the three signatures port at segment span; learning buys cost, not error (2026-09-04 → 05, written up)
@@ -363,8 +361,8 @@ prior (0.0955), climb, and settle at 0.12 against the donor's 8-tape 0.0838, and
 replaced the relative imitation filter with two pre-fixed absolute bands starved π (pass 0.05 and
 0.01) and left the untrained arm at the prior — the best routed error in either run. The certifier
 throughout is the body through the resettable plant: content by held-out replay, trust by
-body-graded self-imitation, internalization by plant-measured parity; timing has none. Single
-seed; fourteen-check bit-identity against `acappella/b1`, twins at 0.000e+00 over 120 cycles.
+body-graded self-imitation, internalization by plant-measured parity; timing has none.
+Fourteen-check bit-identity against `acappella/b1`, twins at 0.000e+00 over 120 cycles.
 Full record: [`solo/README.md`](solo/README.md).
 
 ### tempo — levels as execution span on the plant: delay, tempo, and the factored program (2026-09-05 → 06, written up)
@@ -391,7 +389,7 @@ Bounds: no executor reaches the verbatim tape at the deep rung; nothing plays th
 48 ms notes; on this plant the within-level judge is constant by construction and the next-level
 gauge never plateaus, so the crank ran as a cap schedule. Every retraction en route (gain-grid floor,
 delayed lead-in, true-vs-observed posture, resampler aliasing, drag identifiability) was produced by
-a pre-registered check. Single seed throughout; 23 tags; each node gated bit-for-bit against its
+a pre-registered check. 23 tags; each node gated bit-for-bit against its
 donor's run of record. Full record: [`tempo/README.md`](tempo/README.md).
 
 ## Reproduce

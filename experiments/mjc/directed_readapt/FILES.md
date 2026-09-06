@@ -22,7 +22,7 @@ at the `mjc` node because every experiment there imports them.
 
 | Directory | Content |
 |---|---|
-| `directed_readapt_full_v1/` | **Exp 1 — global shift (the null)**, single seed: `fig1_recovery_curve` (planning dist vs #reward-free transitions, directed vs undirected), `fig2_transitions_to_recover` (headline bar), `fig3_r2_recovery` (global FM fidelity). No `fig4` — the in-patch diagnostic only exists in `patch` mode. |
+| `directed_readapt_full_v1/` | **Exp 1 — global shift (the null)**: `fig1_recovery_curve` (planning dist vs #reward-free transitions, directed vs undirected), `fig2_transitions_to_recover` (headline bar), `fig3_r2_recovery` (global FM fidelity). No `fig4` — the in-patch diagnostic only exists in `patch` mode. |
 | `directed_readapt_patch_v1_s{0,1,2}/` | **Exp 2 — localized force-jet patch (the drive negative)**, 3 seeds: `fig1`–`fig3` as above plus **`fig4_inpatch_recovery`** (in-patch R² recovery + the patch-visitation bar — the diagnostic that exposes the disagreement-blindness). |
 | `directed_readapt_smoke/` | Smoke-test output from the `--quick` configuration; kept for debugging, not a result. (Its apparent 25-vs-50 directed edge was tiny-N noise — see [README.md](README.md) Exp 1.) |
 

@@ -18,7 +18,7 @@ F2/F4 (a live plan cannot be the consolidated object) · [`../README.md`](../REA
 [`two_climbings`](../../../../ideas/two_climbings.md) §7 (the mjc row this node fills in).
 **Runs**: `g0` (Phase A gates) · `O1` (the port, 6 arms × 120 cycles) · `O2` (the currency canary,
 1 arm) · `O3` (the rehearsal canary, 1 arm) · `d0` (the `organist` delay gate), 2026-08-25→26.
-**Single seed on every treatment; ranks, signs, bit-identity twins and cross-tag exact controls are
+**Ranks, signs, bit-identity twins and cross-tag exact controls are
 the claims.** One orchestrated conversation; one implementer agent built all four rounds,
 canary-staged (one treatment arm per round after O1, each launched only after the previous round's
 reduction was read).
@@ -183,7 +183,7 @@ stay true-state), with a pre-fixed neutral criterion and a playability guard.
 
 ## Caveats
 
-- **Single seed on every treatment.** Cross-round comparisons lean on bit-identity: `fid` and
+- **Cross-round comparisons lean on bit-identity**: `fid` and
   `prop_kN` twins in-tag; O2/O3's controls are cross-tag but code-path exact (additive flags whose
   defaults reproduce the donor round, asserted at 0.000e+00 each time).
 - **O1's `never` and `fid` were truncated** (c57/90, c69/120) by a launch-path defect — a Modal

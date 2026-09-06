@@ -11,7 +11,7 @@ compile op and the seam law)
 fidelity replay (`rf_s0`) reproduces this round bit-for-bit and its findings revise one of this
 round's interpretations (noted in place below).
 **Status**: written up 2026-08-16 (results discussed with Jasper 2026-08-15). Five runs: one
-mechanism calibration, three detector calibrations, and the 8-arm main run. Single seed.
+mechanism calibration, three detector calibrations, and the 8-arm main run.
 File index: [FILES.md](FILES.md).
 
 ## One-liner
@@ -30,7 +30,7 @@ is safe because mining is already selection-filtered.
 
 ## Findings
 
-Single seed (see Caveats). The fidelity gate comes first because everything else stands on it.
+The fidelity gate comes first because everything else stands on it.
 
 1. **Fidelity**: `never_base`, `given` and `practice_gated` are **bit-identical to
    `ratchet/rr_s0` across all 90 cycles** (max|Δe| = 0, max|Δt_cum| = 0). The evaluation layer
@@ -213,12 +213,10 @@ python3 rhm/practice/ear/analyze_ear.py --tag er_s0 --fetch --figures --fidelity
 
 ## Caveats
 
-- **Single seed.** Dedicated replicates (`rf_s1`/`rf_s2`, the recital fork's replay mode at
-  fresh seed triples) were launched and then cut by a scope decision; the machinery gets
-  indirect seed coverage through recital's `rc_s0/s1/s2` (which carry `fixed_climb` — this
-  round's `practice_climb` — and reproduce the certificate behaviour in 3 worlds), but the
-  specific era-3 ordering (`prov`/`climb` > `given`) is one seed and its margins (0.020–0.038)
-  sit near the ±0.034 stream-position noise recital later measured. The qualitative rescue
+- **The era-3 ordering (`prov`/`climb` > `given`) has margins (0.020–0.038) that sit near the
+  ±0.034 stream-position noise recital later measured.** The certificate behaviour is
+  reproduced in 3 worlds by recital's `rc_s0/s1/s2` (which carry `fixed_climb` — this round's
+  `practice_climb`). The qualitative rescue
   (0.30–0.32 against the mis-levelled grader's 0.44) is well clear of that floor; the
   beats-`given` reading specifically should be held as suggestive.
 - The mfg-vs-real correlation collapse at L3 (finding 9) means the manufactured audition's

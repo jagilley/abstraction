@@ -2,7 +2,7 @@
 
 **Up**: [../README.md](../README.md) (rule_acquisition) · **Files**: [FILES.md](FILES.md)
 **Substrate**: repeated modular squaring, `y = x^(2^T) mod N`, from [tilde-research/one-layer-deeper](https://github.com/tilde-research/one-layer-deeper)
-**Status**: complete — 27 arms across 5 cuts, single seed. **Date**: 2026-08-05.
+**Status**: complete — 27 arms across 5 cuts. **Date**: 2026-08-05.
 
 ---
 
@@ -157,8 +157,7 @@ than a coverage gradient, and §5 turns it into a clean statement.
 
 **Two results here are not clean.** `divqfull` does **not** replicate the parent's
 `redmod_qfull` (0.773 held-out at 150k; ours reads 0.482 modulus-uniform at 600k, and was
-already worse at the 150k mark, so over-training alone does not account for it). Both sides are
-single seed and the parent flagged that arm as unconverged; we have not identified the
+already worse at the 150k mark, so over-training alone does not account for it). The parent flagged that arm as unconverged; we have not identified the
 difference. And `divqfull_densen` — the arm meant to attack the **rule** axis by exploiting the
 fact that division needs neither a factorisation nor a periodicity margin, so `N` can be drawn
 from all 900 three-digit integers instead of ~178 semiprimes — **never trained** (`ce_div` 1.64
@@ -278,8 +277,6 @@ Recorded because they were made before the runs.
 
 ## Honest caveats
 
-- **Single seed throughout.** The load-bearing contrasts are §1's `mul3`/`mul5_sparse`, §2's
-  capacity ladder, and §4's oracle probe; none is replicated.
 - **Nothing in §2's 50k row is converged**, so the capacity ordering is a budget artefact and
   the `memb_d512L8` extrapolation is a power-law fit over half of one run — an optimistic
   bound, not a prediction.

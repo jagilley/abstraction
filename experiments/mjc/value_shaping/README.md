@@ -4,7 +4,7 @@
 **Spec it came from**: [../../a2a_forward/reaching/CURIOSITY_CONTROL_README.md](../../a2a_forward/reaching/CURIOSITY_CONTROL_README.md) (the MuJoCo redirection — bare-state disc-4 on the pusher, puck = value-irrelevant distractor)
 **Cousin / the meta sequel**: [Cut #3](../dynamics_shift/README.md) `dynamics_shift.py` — reward-free re-adaptation, the substrate for the non-stationary (meta) experiments this one is a control for.
 **Code**: `value_shaping.py` (lives in this folder). File index: [FILES.md](FILES.md).
-**Status**: single seed, **stationary**. Robust core (re-allocation) + a fragile bonus (the "teeth"). **Date**: 2026-07-18.
+**Status**: **stationary**. Robust core (re-allocation) + a fragile bonus (the "teeth"). **Date**: 2026-07-18.
 **Builds on this**: [`directed_readapt/`](../directed_readapt/README.md) (its sibling — the learning-layer control beside the collection-layer question) · [`meta_adapt/`](../meta_adapt/README.md) (Cut #4d fuses this per-dim re-allocation with the context latent) · [`arm_substrate/`](../arm_substrate/README.md) (replaces this cut's *manufactured* capacity competition with competition intrinsic to the plant)
 
 ---
@@ -35,7 +35,7 @@ The naïve design (a heavy, frequently-hit puck) **failed**, and the failures ar
 3. **Fix: a deterministic nonlinear *multi-mode force field*** on the puck (`../pusher_env.py`, applied via `qfrc_applied` at runtime — **additive, XML byte-identical when off, so Cuts #1–3 stay reproducible**). Multi-mode **decouples** the two properties a single mode conflates through its wavenumber: *smooth* (bounded frequency ⇒ fine-step-reducible, a big FM fits it to high R²) yet *complex* (a sum of modes ⇒ a small FM cannot — genuine capacity hunger). `#modes` is the capacity-hunger lever; max-`k` is the aliasing lever.
 4. **Both bodies must be capacity-hungry.** The pusher's dynamics are **command-dominated** (the actuator does most of the work), so with the field on the puck only, the easy pusher never competes for capacity. Putting a *distinct-phase* field on the pusher too makes the value-relevant task capacity-hungry, so freed capacity can actually buy pusher fidelity.
 
-## Results (full run, `full_v1`, 70K transitions, single seed)
+## Results (full run, `full_v1`, 70K transitions)
 
 **Robust — the re-allocation is real:**
 - The unshaped FM spends genuine, **capacity-hungry** effort on the value-irrelevant puck field: puck-slide R² climbs `0.45 (h8) → 0.74 (h32)` — it needs h≥16–32 to fit, so it is **not free**. It is **reducible** (ceiling 0.74) against a clean **irreducible foil**: the contact impulse sits at R² ≈ 0 at every capacity (the noisy-TV control, physically present).
@@ -50,7 +50,7 @@ The naïve design (a heavy, frequently-hit puck) **failed**, and the failures ar
 
 - **Establishes** (learning layer, stationary): the value→FM interface exists and re-allocates capacity away from a costly, reducible, value-irrelevant factor — on real continuous physics, with a physically-present irreducible foil. This is the *mechanism*, characterized in isolation.
 - **Does not establish**: any *meta* result. It is single-loop and stationary by construction. The "value **causes** the shaping (not hand-λ)" upgrade (a planner-co-trained arm) and the capacity-efficiency teeth were **deprioritized** in favor of the non-stationary meta pivot, because value-shaping is learning-layer and the goal lives one rung up.
-- **Caveats**: single seed; the teeth are fragile (above); `λ=0` hand-zeros the puck loss (the caused-by-value arm that would remove this tautology is not built here).
+- **Caveats**: the teeth are fragile (above); `λ=0` hand-zeros the puck loss (the caused-by-value arm that would remove this tautology is not built here).
 
 ## Reproduce
 

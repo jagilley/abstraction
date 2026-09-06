@@ -4,7 +4,7 @@
 **Sibling**: [`../synonym_retention/README.md`](../synonym_retention/README.md) — the same question with a
 distance axis, which is the axis this cut lacks
 **Idea**: [`ideas/revision_not_surprisal.md`](../../../../ideas/revision_not_surprisal.md) §8
-**Date**: 2026-08-08 · **Status**: run. Single seed, one regime (m4), one checkpoint, frozen — nothing is
+**Date**: 2026-08-08 · **Status**: run. One regime (m4), one checkpoint, frozen — nothing is
 trained here.
 
 ## Goal
@@ -216,7 +216,7 @@ dependence, so it is the ε=0 point of a rate–distortion curve `A(ε)` and the
 
 ## What this establishes, and what it does not
 
-**Establishes** (single seed, one regime, one checkpoint):
+**Establishes** (one regime, one checkpoint):
 
 - The temporal conditioning gap gives the residual a large genuine aleatoric component — 0.665 of the
   ideal arity-1 residual's variance at the tightest reading, against 0 by construction for the depth

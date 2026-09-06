@@ -21,8 +21,7 @@ pacer; `an_m0`, the port at the strongly-metered knob) · [`../antiphon/trap/`](
 credit > exposure cell every value reading here leans on).
 **Runs**: `an_s2` 1.67 GPU-h · `tu_gf`/`tu_smoke`/`tu_s0` ≈ 5.0 · `tr_gf`/`tr_smoke`/`tr_s0`
 ≈ 3.6 · `an_gf_m`/`an_m_probe`/`an_m0` ≈ 4.1 · two CPU-only passes (the sizing; the trap's
-offline premise check) — **≈ 14.4 GPU-h, 2026-09-01→02**, single seed on every treatment,
-every fork gated bit-identical at 0.000e+00 with its knobs off (twelve such gates in the round,
+offline premise check) — **≈ 14.4 GPU-h, 2026-09-01→02**, every fork gated bit-identical at 0.000e+00 with its knobs off (twelve such gates in the round,
 listed in §Gates). Ranks, signs, and multiples of measured floors are the claims.
 **Attribution**: the framing questions are Jasper's (the corruption-payoff purpose; the
 one-level-up hypothesis; the metered-regime question — "were we leaning hard enough into the
@@ -196,7 +195,7 @@ executor, `--tol-dsil 0.0046`, K = 2048 in every arm.
   quiet on L3, so **L3 was never frozen**; L4 was committed at c101 over the live L3 set, which
   held 28 keys at support against the yield arm's frozen 10. That is `crescendo` finding 4's
   extension effect obtained by two independent clocks whose ordering skipped a freeze. One skip
-  event, one seed; every loop arm spent 13.6–42.8% less priced time than the ceiling, so its
+event; every loop arm spent 13.6–42.8% less priced time than the ceiling, so its
   positives are conservative.
 - **The selector at a matched clock.** Endo selection against its exact yoke under the split is
   worth **+0.075 / +0.179 / +0.055** at eras 3–5 (era 4 at 6× the in-node floor) — the first
@@ -285,7 +284,7 @@ twinned floor and labelled as such.
 
 ## Caveats
 
-- Single seed on every treatment; `tu_s0`'s mirror result rests on one skip event, and its
+- `tu_s0`'s mirror result rests on one skip event, and its
   clean completion is a yoke of the mirror (same clock, no gauge). The live-executor discord on
   the endo judge under the yield pacer (era 5, −0.415 on a short arm vs +0.885 on the exact-DP
   stack) is unresolved.

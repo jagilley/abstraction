@@ -10,7 +10,7 @@
 **Sibling / predecessor**: [`../endogenous_teacher/`](../endogenous_teacher/README.md) — this is the
 measurement that cut needed before its interventions.
 **Date**: 2026-08-07/08 · **Status**: Gate 0, the instrument self-check, Gate A and Gate B all run.
-Gate C (matched FM pair + capacity invariance) not run. Single seed throughout.
+Gate C (matched FM pair + capacity invariance) not run.
 
 ## Goal
 
@@ -230,7 +230,7 @@ masking it — which is why the guarded multi-column table is reported rather th
 
 ## What this establishes, and what it does not
 
-**Establishes** (single seed, one regime):
+**Establishes** (one regime):
 
 - The conditioning gap is the operative variable for giving the residual an aleatoric component, and
   the axis change is not confounded with the training protocol.
@@ -280,7 +280,7 @@ every budget — an aleatoric filter can only pay when the learner is variance-l
 *training* term rather than a measurement, against the incumbent depth version
 ([`RHM_FM_REGULARIZER`](../RHM_FM_REGULARIZER_README.md)) as a matched control — the idea doc's §8 asks
 whether an exogenous conditioning gap changes what a local loss does to the model. Three results, all
-at m2 and a single seed. **The raw local-loss term is ~90% gauge**: in both arms it falls 19× while
+at m2. **The raw local-loss term is ~90% gauge**: in both arms it falls 19× while
 scale-free predictability moves only 1.6–1.9×, and the collapse is prompt (during the λ ramp, while the
 task is still being learned) rather than a saturation artifact — the incumbent's rank-based headline is
 scale-invariant and unaffected. **The temporal target compresses more, not less** (39.4% FM-free act
@@ -392,7 +392,7 @@ Results land on the `rhm-scaling-data` volume (**`chromatic` workspace**) under
 # Appendix — the tracking analysis: an instrument audit of Gates A and B
 
 **Appended**: 2026-08-08 · **Code**: [`tracking/tracking.py`](tracking/tracking.py) · **Status**: run,
-single seed, same regime and same cached checkpoint as everything above. Nothing in `gates_ab.py`
+same regime and same cached checkpoint as everything above. Nothing in `gates_ab.py`
 changed; `oracle.py` gained one default-off kwarg (`return_chain_marginals`) and its self-test still
 passes at 2.2e-16 / 3.3e-15.
 **Reading**: Petersen, van Mier, Fiez & Raichle (1998), *The effects of practice on the functional
@@ -558,7 +558,7 @@ unknowability.
   is **not** what the classification tracks: flagged cells are mostly continuation (d1 30/45, d2 24/30,
   d3 34/38, all of d4–d6), and `|excess|` is *smaller* at boundaries than continuations (d1 0.0348 vs
   0.0766). §3 above is the boundary effect stated on its own terms.
-- Single seed, one regime, inherited throughout.
+- One regime, inherited throughout.
 
 ## Reproduction
 

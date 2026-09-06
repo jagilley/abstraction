@@ -1,6 +1,6 @@
 # The Confabulation Test (language)
 
-**Status**: done, single seed. **Positive on the core dissociation, null on loop-necessity** —
+**Status**: done. **Positive on the core dissociation, null on loop-necessity** —
 and the loop-necessity null *disagrees with the RHM sibling*, which is unresolved (see
 [Cross-substrate disagreement](#cross-substrate-disagreement-with-rhm)).
 
@@ -290,8 +290,6 @@ Candidate explanations, in the order we would test them:
 - The introspection, if that is the word, belongs to the **composite** (M + FM), not to M alone.
   That matches the biology — cerebellar forward models are a separate structure — but it should
   be said rather than elided.
-- **Single seed.** Given Result 2 is a null carrying real interpretive weight, it deserves a
-  second seed before being leaned on.
 
 ## Next steps
 

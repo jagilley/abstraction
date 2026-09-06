@@ -8,7 +8,7 @@ horizon; substrate and machinery donor) · [`../etude/`](../etude/README.md) §E
 assembly, seam-matched score sets, and the fusion-vacuity finding this node overturns)
 **Status**: written up 2026-08-20 (interpretation discussed with Jasper throughout). Three gate
 runs (`l0`, `l1` repair, `l2` seam-cost calibration) + the main run `L1` (6 arms, 90 cycles).
-**Single seed**; a seed pair (`L1_s1`/`L1_s2`) was launched and cancelled ~15 min in by Jasper
+A seed pair (`L1_s1`/`L1_s2`) was launched and cancelled ~15 min in by Jasper
 (GPU budget) — the triangulation on record is ranks (per `recital`'s methodology export), sign
 consistency at two horizons (c75 and c90), and a double-sided fusion control. File index:
 [FILES.md](FILES.md) (which carries the standing findings F1–F5). **Dates**: 2026-08-20.
@@ -136,8 +136,8 @@ library collapsed (segment commits 4/3/4 distinct picks at oracle gains 3.36/3.2
 - **F3** — there is no controller-level seam law: lookahead weight across a seam you will not
   control is monotonically harmful; re-grounding supersedes anticipating.
 - **F4** — the crossover: live content wins inside the composition horizon, frozen measured chains
-  win beyond it; fusion is free for measured content and 2.2× for live plans. (Single seed; ranks
-  are the claim; two-horizon sign consistency + the double-sided control are the triangulation.)
+  win beyond it; fusion is free for measured content and 2.2× for live plans. (Ranks
+are the claim; two-horizon sign consistency + the double-sided control are the triangulation.)
 - **F5** — the lower level's library funds the upper level's addressable variation
   (audition-estimated 1.03× vs closed-loop 1.34×).
 

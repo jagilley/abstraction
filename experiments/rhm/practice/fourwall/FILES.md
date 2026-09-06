@@ -366,7 +366,7 @@ Narrowed from [`../merge/SPEC.md`](../merge/SPEC.md) to one lever and one questi
 built** (all named as follow-ups, not as oversights): drift-rate sweeps; paced-vs-sudden
 rotation (sudden only); contamination arms whose programs read `w`; the loudness sweep over
 which frozen features bind; the unmetered dense learner under free i.i.d. variation (that arm is
-the SPEC's own addition and needs a different harness). Single seed, one rule draw, one
+the SPEC's own addition and needs a different harness). One rule draw, one
 (v, s, L, m) setting, one damage cell.
 
 ## Runs on disk
@@ -458,8 +458,8 @@ python3 rhm/practice/fourwall/analyze_fourwall.py --tag fw_s1 --fetch --figures
 
 `--seed` sets damage draws, the metering set, mining and probe RNG; `--rule-seed` /
 `--train-seed` set the DGP draw and the substrate, defaulted to `ratchet`'s (`0`/`0`/`1`) so the
-substrate is the arc's. Single seed by default; absolute error levels are not comparable across
-rule draws, so orderings and signs are the reported quantities.
+substrate is the arc's. Absolute error levels are not comparable across rule draws, so
+orderings and signs are the reported quantities.
 
 ## Inherited, not copied
 

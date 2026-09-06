@@ -383,7 +383,7 @@ supplies `setup.json`), printing the world-determinism check; overlaid figures w
 3. **The `given` baseline compresses at both ends.** `given`'s per-entry error spans 0.040–0.469
    and is worst exactly on the rare entries, so "excess over `given`" has a floor on the head and
    a ceiling on the tail. Tail-excess numbers under ~0.06 should not be read.
-4. **Single seed**: per-entry SE ≈ √(0.25/224) ≈ **0.033**, so any individual per-entry excess
+4. **Sampling noise**: per-entry SE ≈ √(0.25/224) ≈ **0.033**, so any individual per-entry excess
    below ~0.06 is noise; the 19-entry aggregate columns carry ≈ 0.008.
 
 Volume: `/data/rhm_practice_selfplay/<tag>/<arm>/results.json` + `setup.json`; fetched copies in
@@ -393,8 +393,7 @@ Volume: `/data/rhm_practice_selfplay/<tag>/<arm>/results.json` + `setup.json`; f
 
 `--seed` sets damage draws, mining and probe RNG; `--rule-seed` / `--train-seed` set the DGP
 draw and the substrate, defaulted to `ratchet`'s (`0`/`0`/`1`). `--demand-seed` is a separate
-stream, so the venues' motion is independent of every arm's randomness. Single seed by default;
-absolute error levels are not comparable across rule draws, so **rank orderings, signs and
+stream, so the venues' motion is independent of every arm's randomness. Absolute error levels are not comparable across rule draws, so **rank orderings, signs and
 transfer costs are the reported quantities**.
 
 ## Inherited, not copied
