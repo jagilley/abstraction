@@ -41,6 +41,7 @@ typed maintenance):
 | accompanist | [`accompanist/`](accompanist/README.md) | the follow-up to offbook: library construction (`d1`–`d3`: content ladder, legato's nesting, the model adapting) and the delay operator (`d3b`, `presto/`: naive vs efference copy) on offbook's piece and on a fast 120 ms-segment piece | **written up** — the pivot: the incumbent's free forward model, not the piece, is what refuses the deep unit |
 | acappella | [`acappella/`](acappella/README.md) | the re-port with **no forward model anywhere**: a priced real-rollout incumbent under a declared budget on `etude/`'s substrate, then (amendment) the feedback/delay axis — reflex vs keyed/auditioned library under an unbridgeable observation delay | **written up** — the grounding economy halts at its own pre-fixed gate (0/15 search cells beat the reflex); re-sited on feedback, a model-free **segment-span niche opens at 192 ms** |
 | solo | [`solo/`](solo/README.md) | **re-internalization with no forward model** at acappella's niche (Δ = 8): a behaviour-cloned reflex as the trunk, offbook's Port 1 (π over member slots) and Port 2 (span head, parity measured on the plant), the address-book battery, the primitive legal at every seam, δ_perf against the tape as intention reference logged; then a probe replacing the relative imitation filter with two pre-fixed absolute bands | **written up** — routing, corridor and address book all port at segment span; adoption tracks the meter (feel at Δ = 0, memory at Δ = 8); learning buys a 4× grounding cut and a 10× tighter quarantine, **not error** — the construction prior is the best selector and the bands starve π |
+| tempo | [`tempo/`](tempo/README.md) | **levels as execution span on the plant** — a four-rung ladder under delay on the donor body (`prestissimo/`), then a fast body (τ = 30 ms) at a fixed human delay with **tempo** as the era knob, a force-level program and the crank (`accelerando/`), then the **factored program**: a path on phase through an executor that knows the body — exact, learned from slow practice, and corrected online against its forecast (`rubato/`) | **written up** (super-writeup over three implementer nodes) — tempo alone opens the ladder on a fast body (10× over the re-fit reflex at 48 ms notes on 1 read vs 16; the segment rung's first niche); a chunk stored as forces transfers to no tempo, a chunk stored as a path transfers three octaves through a body model (in band L2–4 at 2×, L3–4 at 4×, L4 at 8×; 0.30–0.55× the reflex on one read); a body model learned from two slow tempi keeps 7 of 9 cells; correction against its forecast lifts the 5% command-accuracy bar to 20% at one launch read; no executor reaches the verbatim tape at the deep rung |
 
 ## Shared substrate
 
@@ -366,6 +367,33 @@ body-graded self-imitation, internalization by plant-measured parity; timing has
 seed; fourteen-check bit-identity against `acappella/b1`, twins at 0.000e+00 over 120 cycles.
 Full record: [`solo/README.md`](solo/README.md).
 
+### tempo — levels as execution span on the plant: delay, tempo, and the factored program (2026-09-05 → 06, written up)
+
+**Goal**: build the motor instance of the RHM level ladder under Jasper's mapping — level ℓ is a
+unit executed open-loop over 2^(ℓ−1) segments from one feedback event, nested `T[ℓ] ⊆ T[ℓ−1]×T[ℓ−1]`
+— and find what a level buys on a plant. Three implementer nodes under one super-writeup:
+`tempo/prestissimo/`[^private] (the ladder under delay on the donor body),
+`tempo/accelerando/`[^private] (a fast body, tempo as the era ladder, the
+force-level program, the crank), `tempo/rubato/`[^private] (the kinematic program
+through a body model: ceiling, learned, corrected).
+
+**Headline**: the regime for chunking is a band of three timescales, body lag < note < delay, and on
+the donor body it is empty at every tempo; on a body fast enough (τ = 30 ms) at a fixed 120 ms delay,
+**tempo alone opens the ladder** — a stored whole-figure unit beats a per-tempo re-fit reflex 10× at
+48 ms notes on one read against sixteen, and the segment rung has a niche of its own for the first
+time. A chunk stored as **forces** is the arc's best executor exactly where it practiced and transfers
+to no tempo at any step; a chunk stored as a **path**, played through an executor that knows the body,
+transfers three octaves (in band L2–4 at 2×, L3–4 at 4×, L4 at 8×; 0.30 / 0.35 / 0.55× the reflex on
+one read), a body model **learned from the learner's own slow practice at two tempi** keeps 7 of the
+perfect model's 9 cells, and **correction against its forecast** lifts the 5% command-accuracy bar
+every open-loop executor was bounded by to 20%, at one launch read per span at the source tempo.
+Bounds: no executor reaches the verbatim tape at the deep rung; nothing plays the figure in band at
+48 ms notes; on this plant the within-level judge is constant by construction and the next-level
+gauge never plateaus, so the crank ran as a cap schedule. Every retraction en route (gain-grid floor,
+delayed lead-in, true-vs-observed posture, resampler aliasing, drag identifiability) was produced by
+a pre-registered check. Single seed throughout; 23 tags; each node gated bit-for-bit against its
+donor's run of record. Full record: [`tempo/README.md`](tempo/README.md).
+
 ## Reproduce
 
 ```bash
@@ -411,3 +439,5 @@ Modal volume (`mujoco-control-data`): `/data/bridge_assembly/dsw_<cell>_s<seed>/
 [`priced_plasticity/FILES.md`](priced_plasticity/FILES.md) ·
 [`aleatoric_flip/FILES.md`](aleatoric_flip/FILES.md) ·
 [`../bridge_assembly/difficulty_sweep/FILES.md`](../bridge_assembly/difficulty_sweep/FILES.md)
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
