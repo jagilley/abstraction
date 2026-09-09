@@ -538,6 +538,10 @@ world), while under the grammar's own parent-feature key every level is 16 rules
 op is on the critical path as a level-size lever, specced as `enharmonic/`[^private],
 with its endogenous form — the merge licensed by the learner's own value system, where the
 within-level ledger refuses — specced as `enharmonic/temperament/`[^private].
+Beside both, the substrate fork `inflection/`[^private] (spec, 2026-09-09) gives
+the bottom layer a context-dependent rendering rule and a grader that marks spelling, so the
+execution currency includes the word for the first time — the RHM twin of
+`mjc/practice/tempo`'s factoring, and the reader's first job on the practice stack.
 Full record: [tutti/README.md](tutti/README.md).
 
 ## Reproduce
