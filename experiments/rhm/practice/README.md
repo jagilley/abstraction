@@ -535,7 +535,9 @@ the null) and exposes a solve tax every selector pays, but starves π's trust ta
 ladder sized for abundance, so the reward side is untested. And the second extension is a
 **change of key**: arrival, not the r² wall, stops L5 (~100× the observations at any admissible
 world), while under the grammar's own parent-feature key every level is 16 rules — the merge
-op is on the critical path as a level-size lever, specced as `enharmonic/`[^private].
+op is on the critical path as a level-size lever, specced as `enharmonic/`[^private],
+with its endogenous form — the merge licensed by the learner's own value system, where the
+within-level ledger refuses — specced as `enharmonic/temperament/`[^private].
 Full record: [tutti/README.md](tutti/README.md).
 
 ## Reproduce
