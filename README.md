@@ -38,3 +38,13 @@ To the first question, I would say "no", and I find the fact that the answer is 
 To the second question, I would say "yes", and I don't think many would disagree. Whatever it is that makes training a transformer on exabytes of pure language more useful than training a transformer on exabytes of pure images seems like it ought to be downstream of the language data itself, and the model representations required to be a good next token predictor over it.
 
 Biological learners seem to be [capable of building abstractions over non-linguistic data](https://pmc.ncbi.nlm.nih.gov/articles/PMC13540421/), and the language data which makes LLMs so powerful comes from biological learners. So it seems like the default position ought to be that non-language data *can* be fertile ground for frontier research, until proven otherwise.
+
+**What's the research strategy?**
+
+This work is generally guided by investigating how the human/mammalian brain works, and building models that functionally approximate its biology and how it handles various realistic tasks.
+
+**What's the relationship between abstractions and superintelligence?**
+
+I define "superintelligence" as  capabilities which are nontrivially in excess of those of current AI models. My belief is that abstraction creation is an acute deficit in current model capabilities. Therefore, "superintelligence" is one word you could use to refer to this research program.
+
+That being said, it's pretty robustly established that biological learners - even some which are surprisingly phylogenetically distant to humans - do not have this same deficit. So I would argue that intelligence is likely better thought of as a vector than a scalar.
