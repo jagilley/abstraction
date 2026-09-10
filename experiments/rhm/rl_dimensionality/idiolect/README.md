@@ -1,6 +1,6 @@
 # Idiolect drift: what reward optimization does to the coordinate the verifier can't see (2026-08-28)
 
-**Parent**: [../README.md](../README.md) · **Code**: `idiolect_drift.py` (measurement + Modal sweep), `aggregate_idiolect.py` (tables) · **Results**: `idiolect_results_seed43.json` (complete), `idiolect_results_full.json` (first sweep, before the seed-43 arm)
+**Parent**: [../README.md](../README.md) · **Code**: `idiolect_drift.py` (measurement + Modal sweep), `aggregate_idiolect.py` (tables) · **Results**: `idiolect_results_seed43.json` (complete), `idiolect_results_full.json` (first sweep, before the seed-43 arm) · **Runnable**: [`idiolect_colab.ipynb`](idiolect_colab.ipynb) — self-contained Colab, scaled-down live replica plus the full-scale results embedded
 
 ## Goal
 
