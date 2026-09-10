@@ -1,0 +1,507 @@
+================================================================================================
+ENHARMONIC — en_s1   (reduction; numbers, not interpretation)
+================================================================================================
+reduced by: python3 rhm/practice/enharmonic/analyze_enharmonic.py --tag en_s1 --bank en_s0:flat,en_s0:given_cat_tok,en_s0:given_cat_min --yoke-tag en_s1   (from experiments/)
+era caps [60, 50, 70, 12, 9] = 201 cycles/arm scheduled; setup 616s; max_macro_level 5; mine_support 3; seed 0
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+quotient/merge knobs: {'tol_yield_l5': 0.2197, 'tol_yield_l6': 0.1836, 'merge_every': 8, 'merge_n_pairs': 1, 'merge_margin': 0.0, 'quot_spell_cap': 4}
+banked arms reduced alongside this tag: flat (from en_s0), given_cat_min (from en_s0), given_cat_tok (from en_s0)
+clock-yoke tag for section [Y]: en_s1
+
+[A] THE ARMS — lifetime, loop actions, and what was committed
+                 arm  cycles     t_cum(g)                 commits (level@cycle, entries)  advances
+                flat      93   22,105,856                                      L2@c48:13         5
+                     quotient=None spell_cap=None oracle_reads=None drops=None ties=None
+         flat_yk_min     114   27,214,995                    L2@c14:11 L4@c87:3 L5@c99:1         5
+                     quotient=None spell_cap=None oracle_reads=None drops=None ties=None
+         flat_yk_tok     176   42,435,782                             L2@c12:11 L4@c95:1         5
+                     quotient=None spell_cap=None oracle_reads=None drops=None ties=None
+       given_cat_min     114   27,217,414                 L2@c14:16 L4@c87:144 L5@c99:32         5
+                     quotient=gen spell_cap=4 oracle_reads=36724 drops=5013 ties=18783
+       given_cat_tok     176   42,437,395                            L2@c12:16 L4@c95:64         5
+                     quotient=tok spell_cap=4 oracle_reads=46958 drops=6635 ties=0
+
+[B] L5 — the rung the node exists for
+                 arm  L5 committed  |T5| at support (last)  L5 obs@sup3  L6 obs@sup3  read_level (era 4/5)
+                flat            no                       0            0            0                   [6]
+         flat_yk_min       YES c99                       1            1            1                   [6]
+         flat_yk_tok            no                       1            3            1                   [6]
+       given_cat_min       YES c99                       5           15           16                   [6]
+       given_cat_tok            no                       7           37           34                   [6]
+
+[C] THE SIGNATURE — the value clock in the consumption eras, against `flat`
+    [figured_bass] `ungate_l5` arms: the knob moves no loop action but is NOT
+    stream-neutral — the first non-empty L5 audition moves from c156 to c91 and
+    draws on the shared torch stream; `e` diverges from the anchor at c92. Read an
+    `ung5`-vs-anchor era-4/5 gap as an RNG shift, not a performance effect.
+                 arm  era  cycles   e (mean)   e (last)  succ (mean)  vs flat (e)
+                flat    4       6     0.9423     0.9453       0.0577      +0.0000
+                flat    5       9     0.9702     0.9609       0.0298      +0.0000
+         flat_yk_min    4      12     0.7357     0.6693       0.2643      -0.2066
+         flat_yk_min    5       9     0.7746     0.7266       0.2254      -0.1956
+         flat_yk_tok    4      12     0.5193     0.4870       0.4807      -0.4230
+         flat_yk_tok    5       9     0.7161     0.6771       0.2839      -0.2541
+       given_cat_min    4      12     0.6827     0.6016       0.3173      -0.2595
+       given_cat_min    5       9     0.7416     0.6901       0.2584      -0.2286
+       given_cat_tok    4      12     0.5414     0.5104       0.4586      -0.4008
+       given_cat_tok    5       9     0.6942     0.6510       0.3058      -0.2760
+
+[D] pi's PER-SLOT MASS at the last cycle (the routed policy over macro slots)
+                flat {"loss": 2.794057846069336, "acc": 0.203125, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 712, "fallback": false, "n_prop": 49152, "n
+         flat_yk_min {"loss": 2.8837196826934814, "acc": 0.203125, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 1520, "fallback": false, "n_prop": 49152, 
+         flat_yk_tok {"loss": 2.676084041595459, "acc": 0.30859375, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 3048, "fallback": false, "n_prop": 49152,
+       given_cat_min {"loss": 2.7619619369506836, "acc": 0.21875, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 1752, "fallback": false, "n_prop": 49152, "
+       given_cat_tok {"loss": 2.528989315032959, "acc": 0.34375, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 2896, "fallback": false, "n_prop": 49152, "n
+
+[E] THE DELETION BATTERY — the growth columns
+     [en_s3] CAVEAT ON `built`: it builds each level over `operative(ell-1)` — the
+     ARM'S OWN committed-or-live lower table — in EVERY condition, so under
+     `b_table` its lower table is undeleted and `b_table == a_full` on `built` is an
+     identity of the probe, not a finding (inherited from `tutti`/`native`, whose
+     own comment calls it the structural half). `built_fresh`, new this round,
+     builds each level over the CONDITION'S OWN fresh chain (`base_table` at the
+     bottom, each level feeding the next; a dead level kills the chain above it).
+     The informative half has always been `at_support`, which is table-free.
+                flat
+              a_full era0: e=0.5026041666666667 solved=191  L2[sup 13 obs 191 built 13] L3[sup 20 obs 191 built 16] L4[sup 2 obs 191 built 1] L5[sup 0 obs 191 built 0]
+              a_full era1: e=0.59375 solved=156  L2[sup 9 obs 156 built 9] L3[sup 19 obs 156 built 14] L4[sup 2 obs 156 built 2] L5[sup 0 obs 156 built 0]
+              a_full era2: e=0.7734375 solved=87  L2[sup 7 obs 87 built 7] L3[sup 11 obs 87 built 11] L4[sup 1 obs 87 built 1] L5[sup 0 obs 87 built 0]
+              a_full era3: e=0.8932291666666666 solved=41  L2[sup 5 obs 41 built 5] L3[sup 4 obs 41 built 4] L4[sup 0 obs 41 built 0] L5[sup 0 obs 41 built 0]
+              a_full era4: e=0.9609375 solved=15  L2[sup 1 obs 15 built 1] L3[sup 0 obs 15 built 0] L4[sup 0 obs 15 built 0] L5[sup 0 obs 15 built 0]
+             b_table era0: e=0.5026041666666667 solved=191  L2[sup 13 obs 191 built 13] L3[sup 20 obs 191 built 16] L4[sup 2 obs 191 built 1] L5[sup 0 obs 191 built 0]
+             b_table era1: e=0.59375 solved=156  L2[sup 9 obs 156 built 9] L3[sup 19 obs 156 built 14] L4[sup 2 obs 156 built 2] L5[sup 0 obs 156 built 0]
+             b_table era2: e=0.7734375 solved=87  L2[sup 7 obs 87 built 7] L3[sup 11 obs 87 built 11] L4[sup 1 obs 87 built 1] L5[sup 0 obs 87 built 0]
+             b_table era3: e=0.8932291666666666 solved=41  L2[sup 5 obs 41 built 5] L3[sup 4 obs 41 built 4] L4[sup 0 obs 41 built 0] L5[sup 0 obs 41 built 0]
+             b_table era4: e=0.9609375 solved=15  L2[sup 1 obs 15 built 1] L3[sup 0 obs 15 built 0] L4[sup 0 obs 15 built 0] L5[sup 0 obs 15 built 0]
+              b_span era0: e=0.5052083333333333 solved=190  L2[sup 13 obs 190 built 13] L3[sup 26 obs 190 built 20] L4[sup 2 obs 190 built 1] L5[sup 0 obs 190 built 0]
+              b_span era1: e=0.6197916666666667 solved=146  L2[sup 11 obs 146 built 11] L3[sup 15 obs 146 built 13] L4[sup 1 obs 146 built 1] L5[sup 0 obs 146 built 0]
+              b_span era2: e=0.8359375 solved=63  L2[sup 7 obs 63 built 7] L3[sup 7 obs 63 built 7] L4[sup 1 obs 63 built 1] L5[sup 0 obs 63 built 0]
+              b_span era3: e=0.9427083333333334 solved=22  L2[sup 3 obs 22 built 3] L3[sup 1 obs 22 built 1] L4[sup 0 obs 22 built 0] L5[sup 0 obs 22 built 0]
+              b_span era4: e=0.9817708333333334 solved=7  L2[sup 0 obs 7 built 0] L3[sup 0 obs 7 built 0] L4[sup 0 obs 7 built 0] L5[sup 0 obs 7 built 0]
+             c_prims era0: e=0.7890625 solved=81  L2[sup 7 obs 81 built 7] L3[sup 9 obs 81 built 7] L4[sup 3 obs 81 built 1] L5[sup 0 obs 81 built 0]
+             c_prims era1: e=0.8072916666666666 solved=74  L2[sup 7 obs 74 built 7] L3[sup 6 obs 74 built 5] L4[sup 1 obs 74 built 1] L5[sup 0 obs 74 built 0]
+             c_prims era2: e=0.8359375 solved=63  L2[sup 5 obs 63 built 5] L3[sup 6 obs 63 built 5] L4[sup 2 obs 63 built 1] L5[sup 0 obs 63 built 0]
+             c_prims era3: e=0.8828125 solved=45  L2[sup 3 obs 45 built 3] L3[sup 3 obs 45 built 3] L4[sup 1 obs 45 built 1] L5[sup 0 obs 45 built 0]
+             c_prims era4: e=0.9375 solved=24  L2[sup 3 obs 24 built 3] L3[sup 0 obs 24 built 0] L4[sup 0 obs 24 built 0] L5[sup 0 obs 24 built 0]
+        _parity_at_end: {'2:0': 0.9794921875, '2:1': 0.9647247461250668, '2:2': 0.9507119386637459, '2:3': 0.94840
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+         flat_yk_min
+              a_full era0: e=0.4296875 solved=219  L2[sup 10 obs 219 built 10] L3[sup 16 obs 219 built 11] L4[sup 3 obs 219 built 1] L5[sup 1 obs 219 built 1]
+              a_full era1: e=0.45572916666666663 solved=209  L2[sup 7 obs 209 built 7] L3[sup 13 obs 209 built 9] L4[sup 1 obs 209 built 1] L5[sup 1 obs 209 built 1]
+              a_full era2: e=0.5078125 solved=189  L2[sup 6 obs 189 built 6] L3[sup 8 obs 189 built 7] L4[sup 3 obs 189 built 1] L5[sup 1 obs 189 built 1]
+              a_full era3: e=0.5963541666666667 solved=155  L2[sup 4 obs 155 built 4] L3[sup 2 obs 155 built 2] L4[sup 1 obs 155 built 1] L5[sup 1 obs 155 built 1]
+              a_full era4: e=0.7265625 solved=105  L2[sup 5 obs 105 built 5] L3[sup 2 obs 105 built 1] L4[sup 1 obs 105 built 1] L5[sup 1 obs 105 built 1]
+             b_table era0: e=0.4296875 solved=219  L2[sup 10 obs 219 built 10] L3[sup 16 obs 219 built 11] L4[sup 3 obs 219 built 1] L5[sup 1 obs 219 built 1]
+             b_table era1: e=0.45572916666666663 solved=209  L2[sup 7 obs 209 built 7] L3[sup 13 obs 209 built 9] L4[sup 1 obs 209 built 1] L5[sup 1 obs 209 built 1]
+             b_table era2: e=0.5078125 solved=189  L2[sup 6 obs 189 built 6] L3[sup 8 obs 189 built 7] L4[sup 3 obs 189 built 1] L5[sup 1 obs 189 built 1]
+             b_table era3: e=0.5963541666666667 solved=155  L2[sup 4 obs 155 built 4] L3[sup 2 obs 155 built 2] L4[sup 1 obs 155 built 1] L5[sup 1 obs 155 built 1]
+             b_table era4: e=0.7265625 solved=105  L2[sup 5 obs 105 built 5] L3[sup 2 obs 105 built 1] L4[sup 1 obs 105 built 1] L5[sup 1 obs 105 built 1]
+              b_span era0: e=0.5598958333333333 solved=169  L2[sup 10 obs 169 built 10] L3[sup 21 obs 169 built 14] L4[sup 2 obs 169 built 1] L5[sup 0 obs 169 built 0]
+              b_span era1: e=0.7109375 solved=111  L2[sup 9 obs 111 built 9] L3[sup 12 obs 111 built 7] L4[sup 0 obs 111 built 0] L5[sup 0 obs 111 built 0]
+              b_span era2: e=0.8645833333333334 solved=52  L2[sup 6 obs 52 built 6] L3[sup 6 obs 52 built 5] L4[sup 0 obs 52 built 0] L5[sup 0 obs 52 built 0]
+              b_span era3: e=0.9713541666666666 solved=11  L2[sup 2 obs 11 built 2] L3[sup 1 obs 11 built 1] L4[sup 0 obs 11 built 0] L5[sup 0 obs 11 built 0]
+              b_span era4: e=0.9765625 solved=9  L2[sup 1 obs 9 built 1] L3[sup 0 obs 9 built 0] L4[sup 0 obs 9 built 0] L5[sup 0 obs 9 built 0]
+             c_prims era0: e=0.48177083333333337 solved=199  L2[sup 6 obs 199 built 6] L3[sup 5 obs 199 built 5] L4[sup 2 obs 199 built 1] L5[sup 2 obs 199 built 1]
+             c_prims era1: e=0.4453125 solved=213  L2[sup 6 obs 213 built 6] L3[sup 12 obs 213 built 9] L4[sup 3 obs 213 built 2] L5[sup 1 obs 213 built 1]
+             c_prims era2: e=0.46614583333333337 solved=205  L2[sup 7 obs 205 built 7] L3[sup 8 obs 205 built 8] L4[sup 1 obs 205 built 1] L5[sup 1 obs 205 built 1]
+             c_prims era3: e=0.5052083333333333 solved=190  L2[sup 4 obs 190 built 4] L3[sup 4 obs 190 built 4] L4[sup 1 obs 190 built 1] L5[sup 1 obs 190 built 1]
+             c_prims era4: e=0.6484375 solved=135  L2[sup 12 obs 135 built 12] L3[sup 9 obs 135 built 3] L4[sup 1 obs 135 built 1] L5[sup 1 obs 135 built 1]
+        _parity_at_end: {'2:0': 0.9267578125, '2:1': 0.9697265625, '2:2': 0.89013671875, '2:3': 0.984375, '2:4': 0
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+         flat_yk_tok
+              a_full era0: e=0.36979166666666663 solved=242  L2[sup 9 obs 242 built 9] L3[sup 12 obs 242 built 10] L4[sup 1 obs 242 built 1] L5[sup 2 obs 242 built 1]
+              a_full era1: e=0.42708333333333337 solved=220  L2[sup 8 obs 220 built 8] L3[sup 10 obs 220 built 9] L4[sup 1 obs 220 built 1] L5[sup 1 obs 220 built 1]
+              a_full era2: e=0.4453125 solved=213  L2[sup 6 obs 213 built 6] L3[sup 7 obs 213 built 6] L4[sup 1 obs 213 built 1] L5[sup 1 obs 213 built 1]
+              a_full era3: e=0.48958333333333337 solved=196  L2[sup 1 obs 196 built 1] L3[sup 1 obs 196 built 1] L4[sup 1 obs 196 built 1] L5[sup 1 obs 196 built 1]
+              a_full era4: e=0.6770833333333333 solved=124  L2[sup 12 obs 124 built 12] L3[sup 5 obs 124 built 2] L4[sup 1 obs 124 built 1] L5[sup 1 obs 124 built 1]
+             b_table era0: e=0.36979166666666663 solved=242  L2[sup 9 obs 242 built 9] L3[sup 12 obs 242 built 10] L4[sup 1 obs 242 built 1] L5[sup 2 obs 242 built 1]
+             b_table era1: e=0.42708333333333337 solved=220  L2[sup 8 obs 220 built 8] L3[sup 10 obs 220 built 9] L4[sup 1 obs 220 built 1] L5[sup 1 obs 220 built 1]
+             b_table era2: e=0.4453125 solved=213  L2[sup 6 obs 213 built 6] L3[sup 7 obs 213 built 6] L4[sup 1 obs 213 built 1] L5[sup 1 obs 213 built 1]
+             b_table era3: e=0.48958333333333337 solved=196  L2[sup 1 obs 196 built 1] L3[sup 1 obs 196 built 1] L4[sup 1 obs 196 built 1] L5[sup 1 obs 196 built 1]
+             b_table era4: e=0.6770833333333333 solved=124  L2[sup 12 obs 124 built 12] L3[sup 5 obs 124 built 2] L4[sup 1 obs 124 built 1] L5[sup 1 obs 124 built 1]
+              b_span era0: e=0.5598958333333333 solved=169  L2[sup 10 obs 169 built 10] L3[sup 18 obs 169 built 12] L4[sup 2 obs 169 built 1] L5[sup 0 obs 169 built 0]
+              b_span era1: e=0.7291666666666667 solved=104  L2[sup 11 obs 104 built 11] L3[sup 10 obs 104 built 5] L4[sup 2 obs 104 built 1] L5[sup 0 obs 104 built 0]
+              b_span era2: e=0.8723958333333334 solved=49  L2[sup 7 obs 49 built 7] L3[sup 8 obs 49 built 6] L4[sup 0 obs 49 built 0] L5[sup 0 obs 49 built 0]
+              b_span era3: e=0.9765625 solved=9  L2[sup 1 obs 9 built 1] L3[sup 1 obs 9 built 1] L4[sup 0 obs 9 built 0] L5[sup 0 obs 9 built 0]
+              b_span era4: e=0.9869791666666666 solved=5  L2[sup 0 obs 5 built 0] L3[sup 0 obs 5 built 0] L4[sup 0 obs 5 built 0] L5[sup 0 obs 5 built 0]
+             c_prims era0: e=0.5052083333333333 solved=190  L2[sup 3 obs 190 built 3] L3[sup 3 obs 190 built 2] L4[sup 1 obs 190 built 1] L5[sup 2 obs 190 built 1]
+             c_prims era1: e=0.42447916666666663 solved=221  L2[sup 5 obs 221 built 5] L3[sup 9 obs 221 built 6] L4[sup 1 obs 221 built 1] L5[sup 1 obs 221 built 1]
+             c_prims era2: e=0.5208333333333333 solved=184  L2[sup 3 obs 184 built 3] L3[sup 3 obs 184 built 3] L4[sup 2 obs 184 built 2] L5[sup 1 obs 184 built 1]
+             c_prims era3: e=0.5234375 solved=183  L2[sup 2 obs 183 built 2] L3[sup 1 obs 183 built 1] L4[sup 1 obs 183 built 1] L5[sup 2 obs 183 built 1]
+             c_prims era4: e=0.6302083333333333 solved=142  L2[sup 10 obs 142 built 10] L3[sup 9 obs 142 built 4] L4[sup 1 obs 142 built 1] L5[sup 1 obs 142 built 1]
+        _parity_at_end: {'2:0': 0.9873046875, '2:1': 0.98779296875, '2:2': 0.9296875, '2:3': 0.97802734375, '2:4':
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+       given_cat_min
+              a_full era0: e=0.45833333333333337 solved=208  L2[sup 9 obs 208 built 15] L3[sup 10 obs 208 built 64] L4[sup 8 obs 208 built 96] L5[sup 8 obs 208 built 64]
+              a_full era1: e=0.46875 solved=204  L2[sup 8 obs 204 built 13] L3[sup 9 obs 204 built 68] L4[sup 7 obs 204 built 80] L5[sup 8 obs 204 built 64]
+              a_full era2: e=0.53125 solved=180  L2[sup 8 obs 180 built 14] L3[sup 7 obs 180 built 60] L4[sup 6 obs 180 built 80] L5[sup 6 obs 180 built 48]
+              a_full era3: e=0.5755208333333333 solved=163  L2[sup 3 obs 163 built 5] L3[sup 3 obs 163 built 20] L4[sup 2 obs 163 built 32] L5[sup 5 obs 163 built 32]
+              a_full era4: e=0.6901041666666667 solved=119  L2[sup 10 obs 119 built 16] L3[sup 5 obs 119 built 28] L4[sup 2 obs 119 built 32] L5[sup 3 obs 119 built 32]
+             b_table era0: e=0.45833333333333337 solved=208  L2[sup 9 obs 208 built 15] L3[sup 10 obs 208 built 64] L4[sup 8 obs 208 built 96] L5[sup 8 obs 208 built 64]
+             b_table era1: e=0.46875 solved=204  L2[sup 8 obs 204 built 13] L3[sup 9 obs 204 built 68] L4[sup 7 obs 204 built 80] L5[sup 8 obs 204 built 64]
+             b_table era2: e=0.53125 solved=180  L2[sup 8 obs 180 built 14] L3[sup 7 obs 180 built 60] L4[sup 6 obs 180 built 80] L5[sup 6 obs 180 built 48]
+             b_table era3: e=0.5755208333333333 solved=163  L2[sup 3 obs 163 built 5] L3[sup 3 obs 163 built 20] L4[sup 2 obs 163 built 32] L5[sup 5 obs 163 built 32]
+             b_table era4: e=0.6901041666666667 solved=119  L2[sup 10 obs 119 built 16] L3[sup 5 obs 119 built 28] L4[sup 2 obs 119 built 32] L5[sup 3 obs 119 built 32]
+              b_span era0: e=0.5807291666666667 solved=161  L2[sup 11 obs 161 built 17] L3[sup 13 obs 161 built 64] L4[sup 8 obs 161 built 96] L5[sup 6 obs 161 built 64]
+              b_span era1: e=0.7291666666666667 solved=104  L2[sup 9 obs 104 built 15] L3[sup 10 obs 104 built 68] L4[sup 6 obs 104 built 64] L5[sup 3 obs 104 built 32]
+              b_span era2: e=0.8619791666666666 solved=53  L2[sup 7 obs 53 built 12] L3[sup 6 obs 53 built 52] L4[sup 6 obs 53 built 80] L5[sup 3 obs 53 built 32]
+              b_span era3: e=0.9713541666666666 solved=11  L2[sup 1 obs 11 built 2] L3[sup 1 obs 11 built 4] L4[sup 1 obs 11 built 16] L5[sup 0 obs 11 built 0]
+              b_span era4: e=0.984375 solved=6  L2[sup 0 obs 6 built 0] L3[sup 0 obs 6 built 0] L4[sup 0 obs 6 built 0] L5[sup 0 obs 6 built 0]
+             c_prims era0: e=0.5026041666666667 solved=191  L2[sup 4 obs 191 built 7] L3[sup 6 obs 191 built 52] L4[sup 4 obs 191 built 48] L5[sup 6 obs 191 built 48]
+             c_prims era1: e=0.4921875 solved=195  L2[sup 7 obs 195 built 12] L3[sup 7 obs 195 built 60] L4[sup 4 obs 195 built 48] L5[sup 5 obs 195 built 48]
+             c_prims era2: e=0.4921875 solved=195  L2[sup 6 obs 195 built 10] L3[sup 6 obs 195 built 52] L4[sup 4 obs 195 built 64] L5[sup 6 obs 195 built 48]
+             c_prims era3: e=0.5546875 solved=171  L2[sup 4 obs 171 built 7] L3[sup 3 obs 171 built 20] L4[sup 3 obs 171 built 48] L5[sup 6 obs 171 built 48]
+             c_prims era4: e=0.6145833333333333 solved=148  L2[sup 9 obs 148 built 13] L3[sup 6 obs 148 built 28] L4[sup 3 obs 148 built 48] L5[sup 4 obs 148 built 48]
+        _parity_at_end: {'2:0': 0.978515625, '2:1': 0.96142578125, '2:2': 0.96435546875, '2:3': 0.96240234375, '2:
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+       given_cat_tok
+              a_full era0: e=0.38541666666666663 solved=236  L2[sup 8 obs 236 built 14] L3[sup 12 obs 236 built 60] L4[sup 13 obs 236 built 144] L5[sup 10 obs 236 built 32]
+              a_full era1: e=0.390625 solved=234  L2[sup 8 obs 234 built 14] L3[sup 10 obs 234 built 66] L4[sup 10 obs 234 built 128] L5[sup 10 obs 234 built 48]
+              a_full era2: e=0.45052083333333337 solved=211  L2[sup 7 obs 211 built 12] L3[sup 8 obs 211 built 56] L4[sup 8 obs 211 built 96] L5[sup 11 obs 211 built 48]
+              a_full era3: e=0.484375 solved=198  L2[sup 3 obs 198 built 6] L3[sup 2 obs 198 built 20] L4[sup 2 obs 198 built 16] L5[sup 7 obs 198 built 32]
+              a_full era4: e=0.6510416666666667 solved=134  L2[sup 11 obs 134 built 17] L3[sup 7 obs 134 built 32] L4[sup 3 obs 134 built 48] L5[sup 4 obs 134 built 32]
+             b_table era0: e=0.38541666666666663 solved=236  L2[sup 8 obs 236 built 14] L3[sup 12 obs 236 built 60] L4[sup 13 obs 236 built 144] L5[sup 10 obs 236 built 32]
+             b_table era1: e=0.390625 solved=234  L2[sup 8 obs 234 built 14] L3[sup 10 obs 234 built 66] L4[sup 10 obs 234 built 128] L5[sup 10 obs 234 built 48]
+             b_table era2: e=0.45052083333333337 solved=211  L2[sup 7 obs 211 built 12] L3[sup 8 obs 211 built 56] L4[sup 8 obs 211 built 96] L5[sup 11 obs 211 built 48]
+             b_table era3: e=0.484375 solved=198  L2[sup 3 obs 198 built 6] L3[sup 2 obs 198 built 20] L4[sup 2 obs 198 built 16] L5[sup 7 obs 198 built 32]
+             b_table era4: e=0.6510416666666667 solved=134  L2[sup 11 obs 134 built 17] L3[sup 7 obs 134 built 32] L4[sup 3 obs 134 built 48] L5[sup 4 obs 134 built 32]
+              b_span era0: e=0.5625 solved=168  L2[sup 10 obs 168 built 16] L3[sup 14 obs 168 built 60] L4[sup 13 obs 168 built 128] L5[sup 7 obs 168 built 0]
+              b_span era1: e=0.7109375 solved=111  L2[sup 10 obs 111 built 16] L3[sup 11 obs 111 built 70] L4[sup 10 obs 111 built 96] L5[sup 7 obs 111 built 0]
+              b_span era2: e=0.8776041666666666 solved=47  L2[sup 5 obs 47 built 9] L3[sup 6 obs 47 built 44] L4[sup 4 obs 47 built 48] L5[sup 1 obs 47 built 0]
+              b_span era3: e=0.984375 solved=6  L2[sup 1 obs 6 built 2] L3[sup 1 obs 6 built 4] L4[sup 0 obs 6 built 0] L5[sup 0 obs 6 built 0]
+              b_span era4: e=0.984375 solved=6  L2[sup 0 obs 6 built 0] L3[sup 0 obs 6 built 0] L4[sup 0 obs 6 built 0] L5[sup 0 obs 6 built 0]
+             c_prims era0: e=0.5026041666666667 solved=191  L2[sup 5 obs 191 built 8] L3[sup 6 obs 191 built 38] L4[sup 6 obs 191 built 48] L5[sup 7 obs 191 built 32]
+             c_prims era1: e=0.46614583333333337 solved=205  L2[sup 6 obs 205 built 10] L3[sup 8 obs 205 built 48] L4[sup 9 obs 205 built 96] L5[sup 6 obs 205 built 48]
+             c_prims era2: e=0.5104166666666667 solved=188  L2[sup 7 obs 188 built 12] L3[sup 6 obs 188 built 44] L4[sup 6 obs 188 built 64] L5[sup 10 obs 188 built 48]
+             c_prims era3: e=0.5052083333333333 solved=190  L2[sup 4 obs 190 built 7] L3[sup 3 obs 190 built 16] L4[sup 4 obs 190 built 48] L5[sup 6 obs 190 built 32]
+             c_prims era4: e=0.6197916666666667 solved=146  L2[sup 11 obs 146 built 17] L3[sup 8 obs 146 built 40] L4[sup 3 obs 146 built 48] L5[sup 4 obs 146 built 32]
+        _parity_at_end: {'2:0': 0.9873046875, '2:1': 0.98779296875, '2:2': 0.98095703125, '2:3': 0.96142578125, '2
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+
+[E2] THE BATTERY'S TABLE-FREE HALF — at-support keys per condition per era, L5
+     first (the rung the node exists for) and L2-L4 beside it. This is the column
+     [E]'s caveat says to read: it is mined from the condition's OWN chosen
+     trajectories and no table enters it.
+                  flat
+        L5    a_full  at_support/era [0, 0, 0, 0, 0]
+        L5   b_table  at_support/era [0, 0, 0, 0, 0]
+        L5    b_span  at_support/era [0, 0, 0, 0, 0]
+        L5   c_prims  at_support/era [0, 0, 0, 0, 0]
+        L4    a_full  at_support/era [2, 2, 1, 0, 0]
+        L4   b_table  at_support/era [2, 2, 1, 0, 0]
+        L4    b_span  at_support/era [2, 1, 1, 0, 0]
+        L4   c_prims  at_support/era [3, 1, 2, 1, 0]
+        L3    a_full  at_support/era [20, 19, 11, 4, 0]
+        L3   b_table  at_support/era [20, 19, 11, 4, 0]
+        L3    b_span  at_support/era [26, 15, 7, 1, 0]
+        L3   c_prims  at_support/era [9, 6, 6, 3, 0]
+        L2    a_full  at_support/era [13, 9, 7, 5, 1]
+        L2   b_table  at_support/era [13, 9, 7, 5, 1]
+        L2    b_span  at_support/era [13, 11, 7, 3, 0]
+        L2   c_prims  at_support/era [7, 7, 5, 3, 3]
+           flat_yk_min
+        L5    a_full  at_support/era [1, 1, 1, 1, 1]
+        L5   b_table  at_support/era [1, 1, 1, 1, 1]
+        L5    b_span  at_support/era [0, 0, 0, 0, 0]
+        L5   c_prims  at_support/era [2, 1, 1, 1, 1]
+        L4    a_full  at_support/era [3, 1, 3, 1, 1]
+        L4   b_table  at_support/era [3, 1, 3, 1, 1]
+        L4    b_span  at_support/era [2, 0, 0, 0, 0]
+        L4   c_prims  at_support/era [2, 3, 1, 1, 1]
+        L3    a_full  at_support/era [16, 13, 8, 2, 2]
+        L3   b_table  at_support/era [16, 13, 8, 2, 2]
+        L3    b_span  at_support/era [21, 12, 6, 1, 0]
+        L3   c_prims  at_support/era [5, 12, 8, 4, 9]
+        L2    a_full  at_support/era [10, 7, 6, 4, 5]
+        L2   b_table  at_support/era [10, 7, 6, 4, 5]
+        L2    b_span  at_support/era [10, 9, 6, 2, 1]
+        L2   c_prims  at_support/era [6, 6, 7, 4, 12]
+           flat_yk_tok
+        L5    a_full  at_support/era [2, 1, 1, 1, 1]
+        L5   b_table  at_support/era [2, 1, 1, 1, 1]
+        L5    b_span  at_support/era [0, 0, 0, 0, 0]
+        L5   c_prims  at_support/era [2, 1, 1, 2, 1]
+        L4    a_full  at_support/era [1, 1, 1, 1, 1]
+        L4   b_table  at_support/era [1, 1, 1, 1, 1]
+        L4    b_span  at_support/era [2, 2, 0, 0, 0]
+        L4   c_prims  at_support/era [1, 1, 2, 1, 1]
+        L3    a_full  at_support/era [12, 10, 7, 1, 5]
+        L3   b_table  at_support/era [12, 10, 7, 1, 5]
+        L3    b_span  at_support/era [18, 10, 8, 1, 0]
+        L3   c_prims  at_support/era [3, 9, 3, 1, 9]
+        L2    a_full  at_support/era [9, 8, 6, 1, 12]
+        L2   b_table  at_support/era [9, 8, 6, 1, 12]
+        L2    b_span  at_support/era [10, 11, 7, 1, 0]
+        L2   c_prims  at_support/era [3, 5, 3, 2, 10]
+         given_cat_min
+        L5    a_full  at_support/era [8, 8, 6, 5, 3]
+        L5   b_table  at_support/era [8, 8, 6, 5, 3]
+        L5    b_span  at_support/era [6, 3, 3, 0, 0]
+        L5   c_prims  at_support/era [6, 5, 6, 6, 4]
+        L4    a_full  at_support/era [8, 7, 6, 2, 2]
+        L4   b_table  at_support/era [8, 7, 6, 2, 2]
+        L4    b_span  at_support/era [8, 6, 6, 1, 0]
+        L4   c_prims  at_support/era [4, 4, 4, 3, 3]
+        L3    a_full  at_support/era [10, 9, 7, 3, 5]
+        L3   b_table  at_support/era [10, 9, 7, 3, 5]
+        L3    b_span  at_support/era [13, 10, 6, 1, 0]
+        L3   c_prims  at_support/era [6, 7, 6, 3, 6]
+        L2    a_full  at_support/era [9, 8, 8, 3, 10]
+        L2   b_table  at_support/era [9, 8, 8, 3, 10]
+        L2    b_span  at_support/era [11, 9, 7, 1, 0]
+        L2   c_prims  at_support/era [4, 7, 6, 4, 9]
+         given_cat_tok
+        L5    a_full  at_support/era [10, 10, 11, 7, 4]
+        L5   b_table  at_support/era [10, 10, 11, 7, 4]
+        L5    b_span  at_support/era [7, 7, 1, 0, 0]
+        L5   c_prims  at_support/era [7, 6, 10, 6, 4]
+        L4    a_full  at_support/era [13, 10, 8, 2, 3]
+        L4   b_table  at_support/era [13, 10, 8, 2, 3]
+        L4    b_span  at_support/era [13, 10, 4, 0, 0]
+        L4   c_prims  at_support/era [6, 9, 6, 4, 3]
+        L3    a_full  at_support/era [12, 10, 8, 2, 7]
+        L3   b_table  at_support/era [12, 10, 8, 2, 7]
+        L3    b_span  at_support/era [14, 11, 6, 1, 0]
+        L3   c_prims  at_support/era [6, 8, 6, 3, 8]
+        L2    a_full  at_support/era [8, 8, 7, 3, 11]
+        L2   b_table  at_support/era [8, 8, 7, 3, 11]
+        L2    b_span  at_support/era [10, 10, 5, 1, 0]
+        L2   c_prims  at_support/era [5, 6, 7, 4, 11]
+
+[F] PRECISION IN BOTH SPACES, per committed level
+                 arm  lvl   rows  true (feature)  prec_feature  true (token)  prec_token  recall_feature
+                flat    2     13               9        0.6923             —           —          0.6429
+         flat_yk_min    2     11               8        0.7273             —           —          0.5714
+         flat_yk_min    4      3               1        0.3333             —           —          0.0012
+         flat_yk_min    5      1               1        1.0000             —           —          0.0000
+         flat_yk_tok    2     11               8        0.7273             —           —          0.5714
+         flat_yk_tok    4      1               1        1.0000             —           —          0.0012
+       given_cat_min    2     16              10        0.6250             —           —          0.7143
+       given_cat_min    4    144              17        0.1181             —           —          0.0208
+       given_cat_min    5     32               6        0.1875             —           —          0.0000
+       given_cat_tok    2     16              10        0.6250             —           —          0.7143
+       given_cat_tok    4     64              16        0.2500             —           —          0.0196
+    (token-space precision needs the committed ROWS; see [F2])
+
+[F2] TOKEN SPACE. `sizing/SIZING.md` section 6: 68-96% of what `true_mask` calls
+     junk are legal PROGRAMS, so feature-space precision understates. What is exact
+     from the compact log differs by arm, and the difference is stated rather than
+     papered over:
+       flat            the committed ROWS are the miner's own keys, so both
+                       precisions are exact.
+       given_cat_*     the committed rows are a CROSS-PRODUCT the log does not
+                       carry; what IS exact is the KEY-level legality — the
+                       fraction of committed class-pair keys whose `class_step` is
+                       non-empty, i.e. whose spellings compose to a legal program at
+                       all. The row-weighted number needs a per-commit row dump,
+                       which is now in the fork for Q2 and was not here.
+
+                 arm  lvl      n  prec_feature  prec_token   unit  classes held  of alphabet
+                flat    2     16        0.6875      0.8750    row             9            9
+         flat_yk_min    2     18        0.6111      0.7778    row             9            9
+         flat_yk_min    4     24        0.3750      0.9583    row             5           13
+         flat_yk_min    5      1        1.0000      1.0000    row             1           22
+         flat_yk_tok    2     18        0.6111      0.7778    row             9            9
+         flat_yk_tok    4     14        0.2143      0.8571    row             5           13
+       given_cat_min    2     13             —      0.6923    key             8            9
+       given_cat_min    4     12             —      0.6667    key             5           13
+       given_cat_min    5      5             —      1.0000    key             5           22
+       given_cat_tok    2     13             —      0.8462    key             9            9
+       given_cat_tok    4     15             —      1.0000    key             9           13
+
+[G] THE L4 BOOK'S CLASS COVERAGE — what the L5 build could look up
+    (per cycle, off `log["quot"][c]["build"]`.  DENOMINATOR: a SUPPLIED quotient
+     ('tok'/'min') is keyed by the fixed token-class alphabet, 13 L4 classes and 73
+     legal L5 class pairs, so `lower classes` is out of 13.  An ENDOGENOUS quotient
+     has no fixed alphabet: its ids are learned union-find representatives over the
+     raw rows it has actually seen, so the only honest denominator is the RAW CLASS
+     COUNT — `n_lower_rows`, the distinct flat lower rows the map partitions, one
+     class each before any merge.  Both are printed per row below.)
+                flat (flat — no quotient; its L4 book is graded in [F2])
+         flat_yk_min (flat — no quotient; its L4 book is graded in [F2])
+         flat_yk_tok (flat — no quotient; its L4 book is graded in [F2])
+       given_cat_min  quotient=gen  denominator=token-class alphabet
+          build  cycles         keys@sup     keys built        entries    lower classes     of (raw)  of (alphabet)   cap binds
+             L2     114            0..13          0..13          0..20             7..7         8..8              7        0..0
+             L3      88            0..12          0..10          0..88             1..6        2..16              9        0..0
+             L4      52            0..11           0..9         0..144             1..6        8..88             11       0..16
+             L5      53             0..5           0..3          0..48             3..4      16..144             13        0..6
+       given_cat_tok  quotient=tok  denominator=token-class alphabet
+          build  cycles         keys@sup     keys built        entries    lower classes     of (raw)  of (alphabet)   cap binds
+             L2     176            0..13          0..13          0..20             7..7         8..8              7        0..0
+             L3      96            0..17          0..14          0..87             1..7        2..16              9        0..0
+             L4      61            0..13          0..10         0..160             1..7        8..87             11       0..23
+             L5      91             0..7           0..2          0..32             1..3       16..64             13        0..4
+
+[G2] THE L4 BOOK AT ITS COMMIT — cycle and class coverage, side by side
+     A quotiented arm reads `n_lower_classes` off the first L5 build after the
+     commit; a FLAT arm's committed rows are its own at-support keys filtered by the
+     ratchet, replayed here, and their token classes counted the same way.
+     DENOMINATOR, as in [G]: a supplied quotient and a flat arm are counted out of
+     the 13-class L4 token alphabet; an ENDOGENOUS arm is counted out of its RAW
+     CLASS COUNT (the distinct flat L4 rows its learned map partitions).
+                   arm    key  L4 commit   rows  L4 classes at commit         of   L4 classes, live miner at end
+                  flat   flat     (none)
+           flat_yk_min   flat        c87      3                     3     13 tok                               3
+           flat_yk_tok   flat        c95      1                     1     13 tok                               4
+         given_cat_min  class        c87    144                     4     13 tok                               5
+         given_cat_tok  class        c95     64                     3     13 tok                               9
+
+[M] MERGE EVENTS — every proposal, taken or refused
+     WHAT `e_keep`/`e_merge` EXECUTED IN en_s2b (code facts, that round's file):
+       * the ledger audition calls `audition_macro` (l.4009-4015), whose body is
+         `MC.apply_any` (l.4013 -> `ratchet/macros.py` l.232-246): `macro_features`'
+         max-sum DP over the macro's OWN TABLE, then `canon[feats]` scattered in.
+         The perf executor `ex` is threaded only into `beam_moves*` (l.1576, 1784,
+         4563, 4829, 5194) and is never passed here, so no span head fires and no
+         slot is resolved in either audition.
+       * `e_keep` grades `tbl_m = operative(ml)`; `e_merge` grades `tbl_try =
+         miners[ml].build(operative(ml-1), support)` (l.4317-4326), taken after
+         `quot.merge(ml, ca, cb)` + `miners[ml].rekey()` (l.4319-4320).
+         `ClassMiner.rekey` re-keys with `id_of(x, self.level - 1)` = the level-
+         (ml-1) map, which a level-ml merge does not touch; and `operative(ell)`
+         (l.4524-4532) returns that same `miners[ell].build(...)` expression at any
+         level that is not frozen.  So at a LIVE level `tbl_try` is `tbl_m` row for
+         row and the two auditions grade the identical table; at a FROZEN level they
+         differ only by the live drift since the commit.  The level a level-ml merge
+         does change is ml+1, whose miners are re-keyed in the TAKE branch (l.4367-
+         4370) and which no audition here grades.
+       * `n_entries_after` is `miners[ml].build(...)` after the take (l.4371/4381),
+         the live rebuild at the merged level, not a table the merge re-shaped.
+
+[M2] THE RATE — what the probe scored, what the op took, and the alias ceiling
+     `n_pairs` is every pair the probe SCORED at that proposal; `groups` is every
+     alias group the closure found and `taken` how many the licence took. There is
+     no selection cap, so nothing is left on the table by the OP — only by the
+     licence.  (FIRST PASS, `en_s2b` and earlier: one pair per proposal, and its
+     `n_candidates` column is `len(picks)` capped at 1, not the size of the offer.)
+                   arm  proposals  groups  taken  refused  empty  pairs scored  cycles  takes/100cyc
+
+     THE ALIAS CEILING AT L2 (offline, exact, and the only level whose ROWS the
+     compact log carries — the keys there are flat pairs).  `sizing/SIZING.md` 5(a):
+     a forced-transfer probe resolves the TOKEN CLASS and nothing else, and at the
+     L2 mining node two class pairs collapse further ({0}=={0,3}, {2}=={7}), so the
+     exact-alias relation on rows is `same demand group`.  `merges available` is
+     rows - groups: the number of merge OPS that would collapse the book onto its
+     own demand partition.  L3/L4 rows are cross-products this section does not
+     rebuild; `alias_audit.py` does rebuild them (exactly, wherever the spelling cap
+     never bound) and carries the same ceiling per proposal at every level.
+                   arm   cycle       what  rows  tok classes  demand groups  alias pairs  merges avail  L2 taken
+
+[M3] THE LEDGER AUDITION AT l+1, SPLIT BY PAIR TYPE
+     Type is read off the members' TOKEN CLASSES: `equal` (one class), `subset`
+     (some member's class strictly inside another's), `disjoint` (some pair shares
+     no feature), `overlap` otherwise. `x_differ` is the fraction of audition
+     instances on which the kept and merged tables write a DIFFERENT state and
+     `succ_differ` the fraction on which the grade flips: with `x_differ == 0` an
+     `e_merge == e_keep` is the DP's argmax surviving the merge, not a measurement
+     of it.
+
+[M4] MERGE PRECISION — was a taken group actually one class?
+     DEMAND partition (what a forced-transfer probe can resolve): the token class
+     with the node's own collapses from `sizing/SIZING.md` 5(a) applied, and every
+     dead-or-junk row folded into one all-fail cell — that is the ceiling, and a
+     merge inside one demand cell is one no probe could refuse.
+     FEATURE partition (`true_mask`'s space, the arc's historical report): the
+     level's own true parent map, `quotient.py`'s `gen` mode. A row with no true
+     parent has no feature class and is counted separately rather than as a miss.
+                   arm  taken  DEMAND: one cell  precision  FEATURE: one class  precision  no feature class
+
+[Y] THE CLOCK YOKES — realised against planned (gate X-5's check, post hoc)
+           flat_yk_min <- given_cat_min
+        advances  planned [37, 43, 93, 105, 114]
+                  realised [37, 43, 93, 105, 114]   MATCH=True
+        commits   planned [14, 87, 99]
+                  realised [14, 87, 99]   MATCH=True
+        cancelled (empty flat build): []
+        lifetime  source 114 cycles / 27,217,414g   yoke 114 cycles / 27,214,995g
+        installed source [(2, 14, 16), (4, 87, 144), (5, 99, 32)]
+                  yoke   [(2, 14, 11), (4, 87, 3), (5, 99, 1)]
+        era4: yoke e 0.7357 (12 cyc) vs source 0.6827 (12 cyc)   delta -0.0530
+        era5: yoke e 0.7746 (9 cyc) vs source 0.7416 (9 cyc)   delta -0.0330
+           flat_yk_tok <- given_cat_tok
+        advances  planned [35, 85, 155, 167, 176]
+                  realised [35, 85, 155, 167, 176]   MATCH=True
+        commits   planned [12, 95]
+                  realised [12, 95]   MATCH=True
+        cancelled (empty flat build): []
+        lifetime  source 176 cycles / 42,437,395g   yoke 176 cycles / 42,435,782g
+        installed source [(2, 12, 16), (4, 95, 64)]
+                  yoke   [(2, 12, 11), (4, 95, 1)]
+        era4: yoke e 0.5193 (12 cyc) vs source 0.5414 (12 cyc)   delta +0.0221
+        era5: yoke e 0.7161 (9 cyc) vs source 0.6942 (9 cyc)   delta -0.0220
+
+[H] THE BILL
+                 arm    t_cum (g)  oracle reads  slot record cycles    slot mass  merge events
+                flat   22,105,856          None                  42      497,752             0
+         flat_yk_min   27,214,995          None                  97    2,835,490             0
+         flat_yk_tok   42,435,782          None                 158    5,885,077             0
+       given_cat_min   27,217,414         36724                  98    2,868,008             0
+       given_cat_tok   42,437,395         46958                 159    6,874,605             0
+
+[O] THE OPEN INVENTORY — operative vs committed, per cycle past the L4 commit
+    `committed` = the rows the commit froze.  `operative` = the rows the DP
+    actually maxed over that cycle.  With the open bit OFF they are equal by
+    construction and the arm prints one row.  `lower cls` is the number of L4
+    classes the operative L4 book holds a row of, out of the 13-class token
+    alphabet — the constraint the whole node is about.
+                  flat (no `log["open"]` — banked before the open bit; see [G]/[G2])
+           flat_yk_min (no `log["open"]` — banked before the open bit; see [G]/[G2])
+           flat_yk_tok (no `log["open"]` — banked before the open bit; see [G]/[G2])
+         given_cat_min (no `log["open"]` — banked before the open bit; see [G]/[G2])
+         given_cat_tok (no `log["open"]` — banked before the open bit; see [G]/[G2])
+
+[O2] THE RATCHET'S BITE — level-l keys at support the operative level-(l-1) book
+     cannot look up.  This is what an open inventory is FOR: `figured_bass`'s
+     offline replay found the frozen L4 book blocking 5 of `given_cat_tok`'s 7 L5
+     keys at support at the end of `en_s0`, and the live one blocking 2.
+                    arm  level   cycle  keys@sup  blocked  lower cls  lower rows
+
+[O3] THE CORRIDOR ACROSS THE COMMIT — 20 cycles either side of the L4 commit
+     `parity` = mean over slots of `log["span"][c]["parity"]` (exact-match rate
+     of the head's execution against the DP's intention).  `misfire` =
+     n_misfire / max(n_fired, 1) off the meter's row.  `churn` = cycles on which
+     the set of OPEN slots changed.  `n_open` = mean open slots.
+     WHAT THIS WINDOW CAN AND CANNOT SAY ABOUT THE OPEN BIT. An arm that never
+     committed L4 is anchored on its L2 commit, and in `fb_s0` the open arms are
+     BIT-IDENTICAL to their frozen twins through c31 — the operative table first
+     exceeds the committed one at c31 and `e` first differs at c32 — so a window
+     that ends at c31 (L2@c12 + 20) is entirely inside the identical stretch. Rows
+     that agree to the digit there are reporting that fact and NOTHING about the
+     open bit. Read the per-slot b(s) series instead, and see the note in [C].
+     THE ANCHOR EVENT is the L4 commit where there is one and the arm's FIRST
+     commit otherwise, named in the `at` column — an arm that never committed L4
+     still adopted a level, and 'can the executor adopt a level whose content keeps
+     moving under it' is asked of whatever level it did adopt.
+                    arm       at  window   cyc   parity  misfire  churn  n_open        e
+                   flat   L2@c48  before    20        —        —      0       —   0.4414
+                   flat   L2@c48   after    20   0.7330   0.1835      3   12.75   0.5798
+            flat_yk_min   L4@c87  before    20   0.9604   0.0401      0   16.00   0.7500
+            flat_yk_min   L4@c87   after    20   0.9720   0.0225      3   19.85   0.7115
+            flat_yk_tok   L4@c95  before    20   0.9613   0.0405      0   16.00   0.6897
+            flat_yk_tok   L4@c95   after    20   0.9733   0.0207      1   19.60   0.6423
+          given_cat_min   L4@c87  before    20   0.9566   0.0387      0   16.00   0.7410
+          given_cat_min   L4@c87   after    20   0.9644   0.0242      9   19.60   0.6767
+          given_cat_tok   L4@c95  before    20   0.9531   0.0428      0   16.00   0.6607
+          given_cat_tok   L4@c95   after    20   0.9684   0.0267      1   19.60   0.6471
+
+[Y2] THE YOKE REPLAY — realised against the plan the arm was handed
+     `plan` is `config["yoke_plan"]`, i.e. what the source's realised actions were
+     at hand-off; `realised` is this arm's own uncancelled `loop_actions`.
+
+     flat_yk_min  (open_inventory=None ungate_l5=None, 114 cycles)
+        plan     ( 8): [('advance', 37), ('advance', 43), ('advance', 93), ('advance', 105), ('advance', 114), ('commit', 14), ('commit', 87), ('commit', 99)]
+        realised ( 8): [('advance', 37), ('advance', 43), ('advance', 93), ('advance', 105), ('advance', 114), ('commit', 14), ('commit', 87), ('commit', 99)]
+        MATCH=True
+        cancelled (reported, not asserted): none
+        L2@c14: installed 11 rows (live build=None, by_clock=None, open=None)
+        L4@c87: installed 3 rows (live build=None, by_clock=None, open=None)
+        L5@c99: installed 1 rows (live build=None, by_clock=None, open=None)
+
+     flat_yk_tok  (open_inventory=None ungate_l5=None, 176 cycles)
+        plan     ( 7): [('advance', 35), ('advance', 85), ('advance', 155), ('advance', 167), ('advance', 176), ('commit', 12), ('commit', 95)]
+        realised ( 7): [('advance', 35), ('advance', 85), ('advance', 155), ('advance', 167), ('advance', 176), ('commit', 12), ('commit', 95)]
+        MATCH=True
+        cancelled (reported, not asserted): none
+        L2@c12: installed 11 rows (live build=None, by_clock=None, open=None)
+        L4@c95: installed 1 rows (live build=None, by_clock=None, open=None)

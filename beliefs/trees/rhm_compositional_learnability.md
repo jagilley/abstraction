@@ -1,13 +1,13 @@
 # Compositional Learnability in the Random Hierarchy Model
 
 *Domain: controlled-DGP experiments (RHM), compositional learning under self-supervision*
-*Last updated: 2026-06-29*
+*Last updated: 2026-09-10*
 
 
 ## In the Random Hierarchy Model, deep compositional structure is recoverable and representable, but how deeply plain next-token prediction learns it is gated by the data-generating process, not by model capacity
 *Confidence: strong*
 
-- The RHM is a tree-structured DGP with known ground-truth latents, so per-level recovery, an optimal-inference ceiling (belief propagation), and privileged supervision are all directly computable — the transparency that makes every claim below testable — [deep-composition arc](../../experiments/rhm/RHM_DEEP_COMPOSITION_README.md)
+- The RHM is a tree-structured DGP with known ground-truth latents, so per-level recovery, an optimal-inference ceiling (belief propagation), and privileged supervision are all directly computable — the transparency that makes every claim below testable. The latent label is known *generatively*; on rule draws that carry collisions it is not always identifiable from the surface, which sets what any evidence-based grader can measure (see the identifiability child) — [deep-composition arc](../../experiments/rhm/RHM_DEEP_COMPOSITION_README.md)
 - A standard 8L/256D causal transformer, probed for the true latent ancestor at each hierarchy level, lands far below the recoverable ceiling at high levels under plain NTP — that gap is the phenomenon these beliefs explain — [occupancy-frontier sweep](../../experiments/rhm/rhm_occupancy_frontier.py)
 
 
@@ -35,3 +35,14 @@
 - Lowering occupancy at fixed m does not deepen the frontier, so curriculum-over-occupancy (varying v) is ruled out as a route to deeper composition — [occupancy-frontier sweep](../../experiments/rhm/rhm_occupancy_frontier.py)
 - Curriculum over m — train where NTP reaches the root (m=2), transfer toward the regime where it cannot (m=4) — is the live, untested constructive route to deep composition at hard m — same source
 - v16m2 is a substrate where plain NTP fully encodes the hierarchy to the ceiling, making it the intended testbed for whether a forward self-model's residual becomes hierarchy-legible (the A2A amplifier-vs-source question) — same source
+
+
+### What is identifiable from the surface is the token class, not the generative feature — and the coordinate a learner keys on, not the grammar, sets how big a level it has to fill
+*Confidence: strong for the structure (gate-verified arithmetic on the DGP plus a 397/397 exactness check); the collision numbers are one rule draw*
+
+- The true categories are a **cover, not a partition**: `generate_rules_distinct` lets two features share a child tuple, so at `rule_seed = 0` the same flat tuple carries several parents — 2 / 8 / 128 / 37,120 multiply-parented keys at L2–L5, holding 23–34% of the true observation mass at every mining node — [enharmonic sizing §1](../../experiments/rhm/practice/enharmonic/sizing/SIZING.md)
+- The identifiable object is the **token class**: the set of level-`l` features a row's canonical rendering is a legal derivation of. It is single-valued, contains the parent-feature set (0 subset violations at L2–L5), and is closed under the DP's own composition step — the alphabet 7 / 9 / 11 / 13 / 22 / 42 at L1–L6 is a fixed point verified both ways — so a level restates as `C[l+1] ⊆ C[l] × C[l]`. Note it *grows* with level rather than saturating at `v`, because ambiguity sets proliferate — same source §2
+- A forced-transfer probe measures the token class **exactly and nothing else**: 397/397 groups of rows sharing a class had bit-identical success profiles over 4,096 instances, across 59 arms and three levels, at 4–130 gradings per committed book. Its resolution ceiling is a property of the demand at the probe's node, not of the sample count (identical at N = 512 and N = 4,096) — same source §5
+- The level-size explosion belongs to the **index, not the grammar**: |T5| = 205,824 and |T6| = 1.3e10 under the flat-tuple key against 73 and 306 legal class pairs under the class key — a 2,820× and 4.3e7× shrink, which is the difference between a level that cannot arrive at a run's observation budget and one that does — same source §2–3
+- Measurement consequence for anything graded against the generative label on a collision-carrying draw: a feature-space oracle mislabels legal programs as junk (68–95% of committed junk rows at L2–L4). Collision-free draws exist at the same (v, s, m, depth) — seeds 6 and 10 — at which the cover is a partition and the channel is empty, so this is a property of the draw, not of the RHM — [tutti sizing](../../experiments/rhm/practice/tutti/sizing/SIZING.md)
+- Scope: measured on the practice arc's mining/vocabulary learner, where the key is an explicit index into a committed table. Whether the same coordinate effect governs an NTP transformer probed for latent ancestors is untested.

@@ -1,0 +1,996 @@
+=== tutti (the unification node: both currencies, and the selector, in one loop) — tag if_q1 ===
+ladder [('L1n25', 50), ('L2n12', 45), ('L3n6', 55)] = 150 cycles/arm scheduled; caps [50, 45, 55] = 150; setup 614s; stale buffer 0.1366 -> 0.1649
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+
+==============================================================================
+(0) GATES
+==============================================================================
+  CROSS-TAG REPLAY (A3's TREATMENT, WHOLE LIFE — this round's baseline IS that arm): cr3_s0/outer_yield_m4 not fetched locally — skipped
+  CROSS-TAG REPLAY (A1's thermostat through the earning eras — the chain back to A2): ma_s0/outer_yield not fetched locally — skipped
+  G-F smoke scale (in-process vs maestro.py, panel ON, maxl=3): max|fork - donor| = 0.000e+00, self-replay control = 0.000e+00, commits equal = True  -> PASS
+
+  IN-TAG TWIN GATE (each arm vs canon, to the first action by EITHER; canon's own first commit is c6).
+  [tacet] NOTE: every arm here is treated from c1, so a non-zero delta below is the
+  round's variable — read it as WHEN THE GATE FIRST BOUND, not as a failure.
+    given_rule     c1-c5    (first action c6 (schedule)) max|delta| = 1.440e+02  -> differs
+    leaf           c1-c5    (first action c6 (schedule)) max|delta| = 2.290e+02  -> differs
+    fit_rule       c1-c5    (first action c6 (schedule)) max|delta| = 1.760e+02  -> differs
+    fit_index      c1-c5    (first action c6 (schedule)) max|delta| = 2.100e+02  -> differs
+
+  OBSERVATION PANEL vs the donor's G-Y miner (level 4, every cycle):
+    canon            agree=True over 135 cycles
+    given_rule       agree=True over 92 cycles
+    leaf             agree=True over 82 cycles
+    fit_rule         agree=True over 150 cycles
+    fit_index        agree=True over 113 cycles
+
+  POLICY GATE (offline, no GPU): ALL PASS (21 checks)
+
+  ENDO READ: LABEL-FREE BY CONSTRUCTION: PASS — positions depend only on ['era.level', 'era.node', 's', 'depth']; none of ['truth', 'rules', 'inverse_maps', 'committed', 'canon', 'true_mask', 'grade'] appears in the read's code
+    era 1 cell L1n25 blocks [25, 26] -> parent L2n12 blocks [24, 26]
+    era 2 cell L2n12 blocks [24, 26] -> parent L3n6 blocks [24, 28]
+    era 3 cell L3n6 blocks [24, 28] -> parent L4n3 blocks [24, 32]
+
+  DEAD ZONES: measured, not defaulted: PASS, matches floors.json = None
+    {'tol_ledger': 0.02944712566990095, 'tol_yield_l3': 0.46127129019246205, 'tol_yield_l4': 0.5166900731510206, 'tol_endo': 0.01091575129919287}
+    provenance: cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)
+
+  ENDO PRICE (measured on the run's own GPU): one read over 256 sequences = 1.3 ms = 262 grounding-equivalents; charged 267g
+
+==============================================================================
+(1) THE ACTION TRACE — what the loop did, and when
+==============================================================================
+  arm                 policy    read cycles  commits  advances  chosen  capped  rode cap
+  canon                quiet   yield    135        1         3       2       2      True
+  given_rule           quiet   yield     92        2         3       4       1     False
+  leaf                 quiet   yield     82        2         3       5       0     False
+  fit_rule             quiet   yield    150        1         3       1       3      True
+  fit_index            quiet   yield    113        1         3       2       2     False
+
+  PER-ARM ACTIONS (cycle, kind, level, why, and the statistic at that instant)
+
+    canon  eras: e1 c1-35 (35c), e2 c36-80 (45c), e3 c81-135 (55c)
+      c6    era1 commit   L2  why=quiet  V=   0.3750 tol=  0.4613 V/tol=    0.81
+      c35   era1 advance  L-  why=quiet  V=   0.2344 tol=  0.4613 V/tol=    0.51
+      c80   era2 advance  L-  why=cap    V=   0.8751 tol=  0.5167 V/tol=    1.69
+      c135  era3 advance  L-  why=cap    V=   0.1190 tol=  0.5167 V/tol=    0.23
+
+    given_rule  eras: e1 c1-35 (35c), e2 c36-80 (45c), e3 c81-92 (12c)
+      c25   era1 commit   L2  why=quiet  V=   0.4525 tol=  0.4613 V/tol=    0.98
+      c35   era1 advance  L-  why=quiet  V=   0.4141 tol=  0.4613 V/tol=    0.90
+      c62   era2 commit   L3  why=quiet  V=   0.3998 tol=  0.5167 V/tol=    0.77
+      c80   era2 advance  L-  why=cap    V=   1.0346 tol=  0.5167 V/tol=    2.00
+      c92   era3 advance  L-  why=quiet  V=   0.4199 tol=  0.5167 V/tol=    0.81
+
+    leaf  eras: e1 c1-45 (45c), e2 c46-68 (23c), e3 c69-82 (14c)
+      c25   era1 commit   L2  why=quiet  V=   0.3588 tol=  0.4613 V/tol=    0.78
+      c45   era1 advance  L-  why=quiet  V=   0.4590 tol=  0.4613 V/tol=    1.00
+      c53   era2 commit   L3  why=quiet  V=   0.3125 tol=  0.5167 V/tol=    0.60
+      c68   era2 advance  L-  why=quiet  V=   0.4458 tol=  0.5167 V/tol=    0.86
+      c82   era3 advance  L-  why=quiet  V=   0.5093 tol=  0.5167 V/tol=    0.99
+
+    fit_rule  eras: e1 c1-50 (50c), e2 c51-95 (45c), e3 c96-150 (55c)
+      c38   era1 commit   L2  why=quiet  V=   0.4182 tol=  0.4613 V/tol=    0.91
+      c50   era1 advance  L-  why=cap    V=   0.9668 tol=  0.4613 V/tol=    2.10
+      c95   era2 advance  L-  why=cap    V=   1.1872 tol=  0.5167 V/tol=    2.30
+      c150  era3 advance  L-  why=cap    V=   1.0095 tol=  0.5167 V/tol=    1.95
+
+    fit_index  eras: e1 c1-50 (50c), e2 c51-95 (45c), e3 c96-113 (18c)
+      c50   era1 advance  L-  why=cap    V=   0.6010 tol=  0.4613 V/tol=    1.30
+      c67   era2 commit   L3  why=quiet  V=   0.4464 tol=  0.5167 V/tol=    0.86
+      c95   era2 advance  L-  why=cap    V=   1.9157 tol=  0.5167 V/tol=    3.71
+      c113  era3 advance  L-  why=quiet  V=   0.3961 tol=  0.5167 V/tol=    0.77
+
+  COMMIT CYCLES AND WHAT WAS COMMITTED
+  arm              lvl  cycle  era  prov  entries  recall    prec  cert@    driver
+  canon              2      6    1 False        5   0.214   0.600   None      loop
+  given_rule         2     25    1 False       14   0.714   0.714     16      loop
+  given_rule         3     62    2 False       11   0.125   0.636   None      loop
+  leaf               2     25    1 False       19   0.786   0.579   None      loop
+  leaf               3     53    2 False        6   0.036   0.333   None      loop
+  fit_rule           2     38    1 False       19   0.857   0.632     20      loop
+  fit_index          3     67    2 False       18   0.107   0.333   None      loop
+
+==============================================================================
+(1b) THE LEARNED POLICY'S OWN RECORD — the mixtures, the fit, the action diff
+==============================================================================
+  THE FITTED MIXTURES (unit-norm weights on each gauge's paired-interval slope,
+  IN FLOOR UNITS; the bucket is `will_commit` = would a firing install a table).
+  A1's thermostat is the point (0, 1, 0) with theta = 1 in this same class.
+    arm/reward        bucket           ledger         yield   endo_excess    theta
+    learned_yield   installs          +0.2106       +0.9440       +0.2540   1.2085
+    learned_yield   advances          +0.0495       +0.8506       +0.5235   1.0980
+    learned_task    installs          -0.7806       +0.2146       +0.5871   1.4253
+    learned_task    advances          -0.4221       +0.1367       +0.8962   0.7083
+
+  THE ACTION DIFF — learned vs the hand-written thermostat, IN THIS TAG
+  (both ran live on their own trajectories, so this is a difference between two
+   runs and not a counterfactual; the pre-GPU replay is in fit.json.)
+
+  WHAT THE LEARNED POLICY READ AT EACH OF ITS OWN ACTIONS
+
+==============================================================================
+(2) GAUGE vs YOKE — the mandatory timing control (census finding 4)
+==============================================================================
+  The yoke replays the gauge arm's realised action cycles by clock and reads
+  nothing. A divergence would mean the reads are not inert; identity means the
+  criterion contributed nothing beyond a cycle number, which is a finding, and the
+  priced-time column is then what the read cost for a trajectory a clock reproduces.
+  [tacet] In this tag the yokes ARE the treatments (each carries one gate knob), so
+  a non-zero delta below is the round's variable and `first divergence` reads as
+  WHEN THE GATE FIRST BOUND. What must still hold is commits/advances EQUAL — that
+  is what makes the arms lifetime- and pacing-identical.
+  (no yoked arms in this tag)
+
+==============================================================================
+(3) THE THREE CLOCKS: certificate, coverage, value
+==============================================================================
+  CLOCK 1 — the SHADOW certificate (read-only in every arm, incl. the driven ones)
+  arm               L2 fired  L3 fired  L2 c2cert  L3 c2cert  commit L2  commit L3
+  canon                   34        78         33         23          6       None
+  given_rule              16        67         15         26         25         62
+  leaf                    26        68         25         21         25         53
+  fit_rule                20        66         19         14         38       None
+  fit_index               19        72         18         20       None         67
+
+  CLOCK 2 — COVERAGE: end-of-run committed table per level
+  arm              lvl  frozen n   recall    prec  live n  live rec  live prec
+  canon              2         5    0.214   0.600       8     0.357      0.625
+  canon              3         -        -       -       4     0.054      0.750
+  canon              4         -        -       -       -         -          -
+  given_rule         2        14    0.714   0.714      19     0.929      0.684
+  given_rule         3        11    0.125   0.636      20     0.250      0.700
+  given_rule         4         -        -       -       -         -          -
+  leaf               2        19    0.786   0.579      21     0.857      0.571
+  leaf               3         6    0.036   0.333      22     0.089      0.227
+  leaf               4         -        -       -       -         -          -
+  fit_rule           2        19    0.857   0.632      20     0.929      0.650
+  fit_rule           3         -        -       -      51     0.429      0.471
+  fit_rule           4         -        -       -       -         -          -
+  fit_index          2         -        -       -      20     0.929      0.650
+  fit_index          3        18    0.107   0.333      37     0.321      0.486
+  fit_index          4         -        -       -       -         -          -
+
+  CLOCK 3 — VALUE: recovered fraction per era (e, and (stale-e)/(stale-floor))
+  arm                          era1             era2             era3
+  canon               0.898 /+0.027    0.912 /+0.034    0.938 /+0.031
+  given_rule          0.701 /+0.286    0.786 /+0.253    0.885 /+0.159
+  leaf                0.558 /+0.473    0.744 /+0.324    0.819 /+0.319
+  fit_rule            0.550 /+0.484    0.719 /+0.368    0.760 /+0.461
+  fit_index           0.503 /+0.545    0.689 /+0.419    0.723 /+0.549
+  stale                     0.919            0.932            0.951
+  floor                     0.156            0.352            0.536
+
+  DELTA TO CANON, per era, in recovered fraction
+  Read against the MEASURED depth-6 stream floor (census finding 7): 0.087 in the
+  earning family and 0.083/0.148/0.344 in the given family for eras 3/4/5. Ranks
+  and signs in the deep eras are the currency; fractions are not.
+  arm                   era1      era2      era3
+  given_rule           0.258     0.218     0.128
+  leaf                 0.446     0.290     0.287
+  fit_rule             0.456     0.333     0.430
+  fit_index            0.518     0.384     0.518
+
+==============================================================================
+(4) pi PER-LEVEL MASS, ARGMAX SHARE, AND MACRO EXPANSIONS, per arm per era
+==============================================================================
+
+  L2 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3
+  canon                0.540     0.547     0.593
+  given_rule           0.032     0.116     0.134
+  leaf                 0.099     0.177     0.150
+  fit_rule             0.070     0.232     0.378
+  fit_index                -     0.000     0.000
+
+  L3 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3
+  canon                0.000     0.000     0.000
+  given_rule           0.000     0.018     0.043
+  leaf                 0.000     0.042     0.091
+  fit_rule             0.000     0.000     0.000
+  fit_index                -     0.110     0.253
+
+  L4 proposal mass p_macro_all (last probe of each era)
+  arm                   era1      era2      era3
+  canon                0.000     0.000     0.000
+  given_rule           0.000     0.000     0.000
+  leaf                 0.000     0.000     0.000
+  fit_rule             0.000     0.000     0.000
+  fit_index                -     0.000     0.000
+
+  L2 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3
+  canon                0.557     0.602     0.716
+  given_rule           0.000     0.003     0.018
+  leaf                 0.000     0.003     0.005
+  fit_rule             0.000     0.096     0.341
+  fit_index                -     0.000     0.000
+
+  L3 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3
+  canon                0.000     0.000     0.000
+  given_rule           0.000     0.000     0.000
+  leaf                 0.000     0.000     0.036
+  fit_rule             0.000     0.000     0.000
+  fit_index                -     0.008     0.214
+
+  L4 argmax share frac_argmax (last probe of each era)
+  arm                   era1      era2      era3
+  canon                0.000     0.000     0.000
+  given_rule           0.000     0.000     0.000
+  leaf                 0.000     0.000     0.000
+  fit_rule             0.000     0.000     0.000
+  fit_index                -     0.000     0.000
+
+  MACRO EXPANSIONS the beam ran (blocks.mat_dp, per-cycle mean by era)
+  arm                     era1        era2        era3
+  canon                  17604           0           0
+  given_rule             14616        7440           0
+  leaf                   11368       14750           0
+  fit_rule               10154           0           0
+  fit_index                  0        7624           0
+
+==============================================================================
+(5) THE LEDGER — what each arm read, and what it cost
+==============================================================================
+  ear's convention: the learner's own experience is free, a counterfactual read is
+  priced, and instruments logged in every arm are free. Only the POLICY's input
+  stream is charged, and the charge lands in `counts['ground']` -> `t_cum`, which
+  nothing in the cycle loop reads.
+  arm                     read  n reads  priced  spend(g)    t_cum end   t_cum+read  read % of
+  canon                  yield        0       0         0     32713779     32713779     0.000%
+  given_rule             yield        0       0         0     23662598     23662598     0.000%
+  leaf                   yield        0       0         0     20500384     20500384     0.000%
+  fit_rule               yield        0       0         0     36052371     36052371     0.000%
+  fit_index              yield        0       0         0     26596474     26596474     0.000%
+
+==============================================================================
+(6) THE MEASURED FLOORS, RE-DERIVED IN-TAG on the schedule arm
+==============================================================================
+  reference arm: canon (135 cycles, 3 windows dropped at era boundaries / commits); span=1 W=4
+  gauge         n_win      sd(N)    mean(N)  v_tol=sd/2    mean(D)  D/floor   governed by
+  ledger          116    0.01518   +0.00150     0.00759   +0.00109     0.14       0.02945
+  yield           116    0.39096   +0.01293     0.19548   +0.15733     0.80L3 0.4613/L4 0.5167
+  endo            116    0.03315   +0.00065     0.01658   -0.00077    -0.05       0.01092
+  endo_cell       116    0.05168   -0.00138     0.02584   -0.00155    -0.06          None
+  endo_excess     116    0.03986   +0.00203     0.01993   +0.00078     0.04          None
+  dsil            113    0.00498   +0.00060     0.00249   +0.00146     0.59       0.00460   (from c9: the gauge does not exist before a slot opens)
+
+  >>> THE ENDO DEAD ZONE, measured on if_q1/canon: v_tol = 0.0165766
+      pass it to the main run as  --tol-endo 0.0165766
+
+==============================================================================
+(7) THE SHADOW PANEL — every gauge replayed through the same rule, in every arm
+==============================================================================
+  Counterfactual: what each gauge WOULD have licensed in each arm, per era, if it
+  had been the driven read. Exact only up to the arm's first action (after that the
+  arm's own trajectory is the one the gauge was measured on), so `first_action` is
+  printed beside it and a shadow decision must never be read as a measured one.
+
+    canon  (first action c6)
+      ledger       e1[35c armed@5 quiet@7]  e2[45c armed@None quiet@None]  e3[55c armed@None quiet@None]
+      yield        e1[35c armed@5 quiet@6]  e2[45c armed@79 quiet@None]  e3[55c armed@None quiet@None]
+      endo         e1[35c armed@32 quiet@33]  e2[45c armed@None quiet@None]  e3[55c armed@94 quiet@97]
+      endo_cell    e1[35c armed@19 quiet@20]  e2[45c armed@59 quiet@60]  e3[55c armed@95 quiet@97]
+      endo_excess  e1[35c armed@5 quiet@11]  e2[45c armed@40 quiet@42]  e3[55c armed@None quiet@None]
+
+    given_rule  (first action c25)
+      ledger       e1[35c armed@5 quiet@9]  e2[45c armed@None quiet@None]  e3[12c armed@None quiet@None]
+      yield        e1[35c armed@5 quiet@25]  e2[45c armed@47 quiet@62]  e3[12c armed@85 quiet@92]
+      endo         e1[35c armed@None quiet@None]  e2[45c armed@None quiet@None]  e3[12c armed@None quiet@None]
+      endo_cell    e1[35c armed@26 quiet@28]  e2[45c armed@72 quiet@74]  e3[12c armed@None quiet@None]
+      endo_excess  e1[35c armed@5 quiet@11]  e2[45c armed@40 quiet@41]  e3[12c armed@88 quiet@90]
+
+    leaf  (first action c25)
+      ledger       e1[45c armed@5 quiet@10]  e2[23c armed@None quiet@None]  e3[14c armed@None quiet@None]
+      yield        e1[45c armed@5 quiet@25]  e2[23c armed@50 quiet@53]  e3[14c armed@73 quiet@82]
+      endo         e1[45c armed@None quiet@None]  e2[23c armed@None quiet@None]  e3[14c armed@None quiet@None]
+      endo_cell    e1[45c armed@29 quiet@30]  e2[23c armed@60 quiet@65]  e3[14c armed@None quiet@None]
+      endo_excess  e1[45c armed@5 quiet@9]  e2[23c armed@50 quiet@57]  e3[14c armed@None quiet@None]
+
+    fit_rule  (first action c38)
+      ledger       e1[50c armed@5 quiet@10]  e2[45c armed@None quiet@None]  e3[55c armed@None quiet@None]
+      yield        e1[50c armed@5 quiet@38]  e2[45c armed@55 quiet@None]  e3[55c armed@100 quiet@None]
+      endo         e1[50c armed@None quiet@None]  e2[45c armed@None quiet@None]  e3[55c armed@None quiet@None]
+      endo_cell    e1[50c armed@35 quiet@38]  e2[45c armed@None quiet@None]  e3[55c armed@145 quiet@146]
+      endo_excess  e1[50c armed@5 quiet@9]  e2[45c armed@None quiet@None]  e3[55c armed@None quiet@None]
+
+    fit_index  (first action c50)
+      ledger       e1[50c armed@5 quiet@10]  e2[45c armed@None quiet@None]  e3[18c armed@None quiet@None]
+      yield        e1[50c armed@5 quiet@None]  e2[45c armed@55 quiet@67]  e3[18c armed@100 quiet@113]
+      endo         e1[50c armed@None quiet@None]  e2[45c armed@None quiet@None]  e3[18c armed@None quiet@None]
+      endo_cell    e1[50c armed@35 quiet@37]  e2[45c armed@None quiet@None]  e3[18c armed@None quiet@None]
+      endo_excess  e1[50c armed@5 quiet@9]  e2[45c armed@72 quiet@76]  e3[18c armed@100 quiet@101]
+
+==============================================================================
+(8) THE ADDRESS-BOOK BATTERY, plant guard, certificates, cost
+==============================================================================
+  END-OF-RUN BATTERY: e per condition (last era), and the next-level currency split
+  arm                  cond  e(last era)  g/solve  solved  T3@sup  T3built  T4@sup  T4built
+  canon              a_full        0.940    463.0      23       1        0       -        -
+  canon             b_table        0.940    463.0      23       1        0       -        -
+  canon              b_span        0.930    463.0      27       1        0       -        -
+  canon             c_prims        0.974    463.0      10       1        1       -        -
+  given_rule         a_full        0.880    463.0      46       6        6       -        -
+  given_rule        b_table        0.880    463.0      46       6        6       -        -
+  given_rule         b_span        0.932    463.0      26       2        2       -        -
+  given_rule        c_prims        0.901    463.0      38       5        5       -        -
+  leaf               a_full        0.823    463.0      68       6        6       -        -
+  leaf              b_table        0.823    463.0      68       6        6       -        -
+  leaf               b_span        0.940    463.0      23       1        1       -        -
+  leaf              c_prims        0.823    463.0      68       5        5       -        -
+  fit_rule           a_full        0.776    463.0      86      11       11       -        -
+  fit_rule          b_table        0.776    463.0      86      11       11       -        -
+  fit_rule           b_span        0.898    463.0      39       5        5       -        -
+  fit_rule          c_prims        0.828    463.0      66       8        8       -        -
+  fit_index          a_full        0.706    463.0     113       7        7       -        -
+  fit_index         b_table        0.706    463.0     113       7        7       -        -
+  fit_index          b_span        0.904    463.0      37       4        4       -        -
+  fit_index         c_prims        0.849    463.0      58       5        5       -        -
+
+  G-Y / OBSERVATION PANEL: distinct next-level tuples at support, end of each era
+  canon            L3/L4 at support 3:       7/2    11/10    12/18
+  given_rule       L3/L4 at support 3:     34/16    47/44    48/50
+  leaf             L3/L4 at support 3:     39/15    45/30    47/40
+  fit_rule         L3/L4 at support 3:     48/23    61/75   66/133
+  fit_index        L3/L4 at support 3:     48/21    55/71    58/84
+
+  PLANT GUARD, CERTIFICATES, COST
+  canon            parse 0.694-0.742  infill 0.877-0.918  cert L2 c34 L3 c78  recerts   9    14.9 s/cycle
+  given_rule       parse 0.673-0.750  infill 0.871-0.932  cert L2 c16 L3 c67  recerts  11    14.5 s/cycle
+  leaf             parse 0.728-0.764  infill 0.883-0.922  cert L2 c26 L3 c68  recerts   6    15.4 s/cycle
+  fit_rule         parse 0.696-0.757  infill 0.879-0.926  cert L2 c20 L3 c66  recerts   9    13.4 s/cycle
+  fit_index        parse 0.726-0.756  infill 0.893-0.932  cert L2 c19 L3 c72  recerts   3    11.2 s/cycle
+
+  TOTAL 8545s = 2.37 GPU-h
+
+==============================================================================
+(A) THE CROSSING: the L4 commit, and the r**2 ceiling it was drawn from
+==============================================================================
+  The DGP's levels, as DISTINCT flat tuples (the recall denominator): L2 14, L3 56, L4 816.
+  `T4 subset T3xT3`: an L4 entry exists only if BOTH of its 4-tuple halves are rows
+  of the operative L3 table, so a frozen L3 of recall r caps L4 near r**2.
+
+  arm               L4 commit c_in_era  entries   recall    prec  buildable  of which true  share taken
+  canon                  None     None        -        -       -          0              0            -
+  given_rule             None     None        -        -       -          0              0            -
+  leaf                   None     None        -        -       -          2              1            -
+  fit_rule               None     None        -        -       -          0              0            -
+  fit_index              None     None        -        -       -          0              0            -
+
+  `buildable` = distinct L4 tuples at support 3 in the arm's own observation
+  panel whose two halves are both rows of its FROZEN L3, at the cycle named. It is
+  the honest ceiling for that arm's L4 commit; `share taken` is what it took of it.
+  A cancelled commit (the empty-table guard) appears in the action trace, not here.
+
+==============================================================================
+(C) THE GAUGE AT THE FRONTIER: what paced the L4 commit, and the L5 alternative
+==============================================================================
+  Driven read: `yield` = -(distinct level-`read_level` tuples at support).
+  `read_level` = min(active+1, gy_level=4), so at era 3 (active=4) it is the level
+  BEING EARNED, not one above it. Floors that governed the run: L3 0.46127129019246205, L4 0.5166900731510206.
+
+  read_level actually used, per era (logged per cycle)
+  arm                  era1     era2     era3
+  canon                   3        4        4
+  given_rule              3        4        4
+  leaf                    3        4        4
+  fit_rule                3        4        4
+  fit_index               3        4        4
+
+  THE OBSERVATION PANEL, end of run: distinct tuples at support, per level.
+  Levels 5 and 6 are logged UNCHARGED in every arm and were never driven — Phase 0
+  measured them degenerate (max 1-2 over an entire run, first non-zero at c89-124),
+  which is the reason the L4 commit is paced on the L4 stream's own quieting.
+  arm                   L3      L4      L5      L6  L5 first>0
+  canon                 12      18       0       0        None
+  given_rule            48      50       0       0        None
+  leaf                  47      40       0       0        None
+  fit_rule              66     133       0       0        None
+  fit_index             58      84       1       0          69
+
+  THE L4 AT-SUPPORT SERIES over era 3 (the series the commit was read on):
+  per-era first -> last, and the mean per-cycle increment against the L4 floor.
+  arm               era     n   first    last   d/cycle  x floor
+  canon               1    35       0       2     0.059    0.114
+  canon               2    45       2      10     0.182    0.352
+  canon               3    55      10      18     0.148    0.287
+  given_rule          1    35       0      16     0.471    0.911
+  given_rule          2    45      16      44     0.636    1.232
+  given_rule          3    12      44      50     0.545    1.056
+  leaf                1    45       0      15     0.341    0.660
+  leaf                2    23      16      30     0.636    1.232
+  leaf                3    14      30      40     0.769    1.489
+  fit_rule            1    50       0      23     0.469    0.908
+  fit_rule            2    45      23      75     1.182    2.287
+  fit_rule            3    55      75     133     1.074    2.079
+  fit_index           1    50       0      21     0.429    0.829
+  fit_index           2    45      21      71     1.136    2.199
+  fit_index           3    18      72      84     0.706    1.366
+
+==============================================================================
+(E) EXTENSION: the r**2-wall bypass
+==============================================================================
+  Phase 0 measured the wall binds and that extension is the lever: buildable L4 over
+  the FROZEN L3 vs over the LIVE L3 was 15 vs 25 (cd_s0/outer_yield), 13 vs 26
+  (ma_s0/learned_yield), 8 vs 13 (anchor) — i.e. extension roughly doubles the
+  ceiling an L4 commit is drawn from.
+
+  arm               lvl  events   cands  admitted  final n  final recall  final prec
+  canon               2       0       0         0        5        0.2143       0.600
+  given_rule          2       0       0         0       14        0.7143       0.714
+  given_rule          3       0       0         0       11        0.1250       0.636
+  leaf                2       0       0         0       19        0.7857       0.579
+  leaf                3       0       0         0        6        0.0357       0.333
+  fit_rule            2       0       0         0       19        0.8571       0.632
+  fit_index           3       0       0         0       18        0.1071       0.333
+
+  and what the treatment vs the extension arm actually held at L4:
+  arm               frozen L3  buildable L4  L4 entries  L4 true
+  canon                     0             0           -        0
+
+==============================================================================
+(G) THE GATE: what each arm refused, and what the refusal was made of
+==============================================================================
+  gate_frac = 0.5 of SOLVED TIPS kept on the pi channel; the
+  mining cap (8) is untouched, so mining volume is matched and
+  only its content moves. The value buffer is UNGATED in every arm (delta is the
+  residual of the value head's own forecast).
+
+  PER-ARM TOTALS over the whole run
+  arm                   mode  sol tips    kept  kept %   pi rows   mined  pbuf end fallbacks
+  canon                 None      3842       0    0.0%     96272     184     60000         8
+  given_rule            None     10800       0    0.0%     86400     501     60000         0
+  leaf                  None     17780       0    0.0%    142240     582     60000         0
+  fit_rule              None     30878       0    0.0%    247024    1119     60000         0
+  fit_index             None     30412       0    0.0%    243296     870     60000         0
+  `kept` is 0 in an arm with no gate: the gate log records the FEATURES in every arm
+  and the SELECTION only where a mode is set — an ungated arm keeps everything the
+  grade admitted, i.e. `sol tips`.
+
+  pi ROWS ENTERING THE REPLAY BUFFER, per era (the diet's volume)
+  arm                   era1      era2      era3
+  canon                42464     26944     26864
+  given_rule           50336     29808      6256
+  leaf                102992     25448     13800
+  fit_rule            126624     58256     62144
+  fit_index           147408     70424     25464
+
+  WHAT THE GATE KEPT vs WHAT IT DROPPED (mean over the run, gated arms only)
+  arm               delta kept  delta dropped      gap  margin kept  margin all
+
+  THE FEATURES THEMSELVES, in every arm (per-instance, whole run)
+  delta_ans = grade - sigmoid(v) at the answer the beam gave; margin = the
+  deliberation state (top1 - top2 over the instance's tip value scores).
+  `margin` is the GATED form (chosen minus the mean of the unchosen); `m2` is the
+  textbook top1-top2 margin, logged but not gated on — `m2=0 frac` is how often it
+  is exactly zero (a duplicate runner-up), which is why the gate reads the mean form.
+  arm              solve rate  d|solved  d|failed    sd d   margin  sd marg  m2=0 frac  corr(d,-m)
+  canon                0.0216    0.4640   -0.3292  0.3369   0.0555   0.0779     0.3775      0.2958
+  given_rule           0.1077    0.6586   -0.3395  0.4678   0.0366   0.0703     0.5929      0.2589
+  leaf                 0.1919    0.6051   -0.4587  0.5499   0.0498   0.0774     0.5074      0.1728
+  fit_rule             0.1879    0.6308   -0.3707  0.5253   0.0366   0.0662     0.6175      0.2217
+  fit_index            0.2544    0.6190   -0.3900  0.5661   0.0292   0.0688     0.7436      0.1945
+
+  THE COUNTERFACTUAL GATES, per arm, on that arm's OWN logged features
+  Of the solved instances each cycle, take the top half by each rule and report the
+  mean pairwise JACCARD overlap between the rules' selections. This is what a gate
+  arm's mining reorder could at most have moved, computed in every arm including
+  the ungated baseline — a gate whose selection is the same set as another's cannot
+  produce a different table.
+  arm                  dhi/dlo     dhi/dlb     dhi/rnd     dlo/dlb     dlo/rnd     dlb/rnd
+  canon                  0.000       0.405       0.342       0.509       0.476       0.355
+  given_rule             0.000       0.393       0.321       0.307       0.379       0.360
+  leaf                   0.000       0.380       0.311       0.309       0.363       0.361
+  fit_rule               0.000       0.379       0.336       0.300       0.334       0.289
+  fit_index              0.000       0.328       0.316       0.338       0.352       0.329
+
+==============================================================================
+(G2) TABLE CONTENT: reconstruction, truth, and overlap between arms
+==============================================================================
+  Each arm's committed table replayed entry-for-entry from its own logged key
+  stream (Phase 0's gate B-1 machinery). `recon == n` is the reconstruction check.
+
+  L2  (the DGP has 14 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  canon                    6     5      5     3      0.600   0.2143
+  given_rule              25    14     14    10      0.714   0.7143
+  leaf                    25    19     19    11      0.579   0.7857
+  fit_rule                38    19     19    12      0.632   0.8571
+
+    pairwise JACCARD of the committed L2 entry sets
+                              canon     given_rule           leaf       fit_rule
+    canon                     1.000          0.267          0.263          0.263
+    given_rule                0.267          1.000          0.737          0.737
+    leaf                      0.263          0.737          1.000          0.900
+    fit_rule                  0.263          0.737          0.900          1.000
+
+  L3  (the DGP has 56 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+  given_rule              62    11     11     7      0.636   0.1250
+  leaf                    53     6      6     2      0.333   0.0357
+  fit_index               67    18      0     0        nan   0.0000
+
+    pairwise JACCARD of the committed L3 entry sets
+                         given_rule           leaf      fit_index
+    given_rule                1.000          0.133          0.000
+    leaf                      0.133          1.000          0.000
+    fit_index                 0.000          0.000          0.000
+
+  L4  (the DGP has 816 distinct true tuples)
+  arm               commit c     n  recon  true  precision   recall
+
+  A gate that changes what the learner learns from can only change the table
+  through the entries it mined; identical sets here mean the gate moved trust
+  (section 4) and pacing (section H) but not the address book.
+
+==============================================================================
+(H) THE PACING COUNTERFACTUAL: when each arm's own gauge would have fired
+==============================================================================
+  A1's thermostat, unchanged (span 1, W 4, burn 4, alpha 0.5), floors L3 0.461271 / L4 0.516690, replayed from era-3 start on each arm's own
+  logged panel. The BASELINE's realised L4 commit cycle is what every yoked arm
+  actually did, so the column to read is `would fire` against it.
+
+  arm               era3 c0    n  would fire (c)  c_in_era3  vs baseline   all firings (c_in_era3)
+  canon                  81   55            None       None         None                        []
+  given_rule             81   12              92         12         None                      [12]
+  leaf                   69   14              82         14         None                      [14]
+  fit_rule               96   55            None       None         None                        []
+  fit_index              96   18             113         18         None                      [18]
+
+  the baseline's REALISED L4 commit: cNone. Every gate arm replayed it by clock,
+  which is what makes section (3)'s era table a content comparison.
+
+==============================================================================
+(P1) THE METER — a live, fallible executor, and delta_perf's own components
+==============================================================================
+  `tau_fire` is the FIRING threshold; `span_tau` (0.95) still governs the parity
+  RECORD, so `opened_below_tau` counts slot-openings the donor's gate would have
+  refused. `misfire` is a row whose emitted span did not exactly match what
+  `apply_any` would have written on the same observation.
+
+  arm             tau_f     fired  misfire    rate  slots  open@f  open@.95      g0   theta  calib@c  degen med g act
+  canon            0.50  14496146   448297  0.0309     16      16        15  0.2500  0.0625        9  False    0.5000
+  given_rule       0.50    361754    28354  0.0784     24      24         7  0.0000  0.0010       32   True    0.0000
+  leaf             0.50    411068    43898  0.1068     24      24         4  0.2500  0.0625       32  False    0.5000
+  fit_rule         0.50   1843953   117740  0.0639     16      16         9  0.0000  0.0010       44   True    0.0000
+  fit_index        0.50    296220    37066  0.1251      8       8         2  0.1250  0.0312       76  False    0.2500
+
+  PER MACRO SLOT (the syllable), summed over the run:
+  arm canon (the metered arm with the most executions).
+     slot     rows    fired   mean e   exact   mean g   mean d      b-e    b(s)  parity
+      2:0  1259922  1259922   0.0197   0.968   0.5566  -0.0013   0.0024  0.0100   0.997
+      2:1   599799   599799   0.0163   0.974   0.6053  -0.0006   0.0031  0.0049   0.991
+      2:2  1010514  1010514   0.0195   0.970   0.5160  -0.0025   0.0023  0.0147   0.965
+      2:3   517625   517625   0.0111   0.978   0.4872  -0.0014   0.0022  0.0027   0.981
+      2:4  1029923  1029923   0.0195   0.968   0.5916  -0.0008   0.0036  0.0119   0.979
+      2:5  1212308  1212308   0.0164   0.975   0.5053  -0.0031   0.0021  0.0239   0.962
+      2:6   400576   400576   0.0251   0.960   0.5955  -0.0019   0.0045  0.0072   0.985
+      2:7  1095296  1095296   0.0129   0.975   0.5811  -0.0002   0.0024  0.0036   0.991
+      2:8   303118   303118   0.0205   0.967   0.6268   0.0023   0.0063  0.0031   0.908
+      2:9  1006399  1006399   0.0214   0.969   0.5749   0.0011   0.0065  0.0069   0.985
+     2:10   982475   982475   0.0192   0.968   0.4351  -0.0019   0.0045  0.0055   0.993
+     2:11   446461   446461   0.0166   0.968   0.5459  -0.0020   0.0020  0.0016   0.998
+     2:12  1974637  1974637   0.0236   0.960   0.3475  -0.0061   0.0049  0.0129   0.991
+     2:13   877245   877245   0.0223   0.965   0.4317  -0.0020   0.0062  0.0077   0.975
+     2:14   223956   223956   0.0209   0.967   0.5719   0.0019   0.0059  0.0170   0.986
+     2:15  1555892  1555892   0.0132   0.974   0.5726  -0.0018   0.0013  0.0065   0.983
+
+  ACT vs PLAYBACK (Gadagkar's control, on this substrate).
+  ACT     rows the head REALIZED: e measured against what `apply_any` would have
+          written, agency g > 0 (the slot command explains part of the span).
+  PLAYBK  the SAME head, the SAME contexts, but the DP realized the move: the parity
+          read computes the head's would-be error on every held-out row of every
+          slot each cycle. No efference copy for the head's output, so g == 0 by
+          construction and the CENTERED gate closes. `b - e` is the ungated signal;
+          if it fires in both columns and delta only in ACT, the gate is carrying
+          the discrimination (S13(a)'s dissection).
+
+  arm               e ACT  e PLAYBK   b-e ACT  b-e PLAY  delta ACT delta PLAY   g ACT
+  canon            0.0186    0.0232    0.0035    0.0011    -0.0019     0.0000  0.5145
+  given_rule       0.0571    0.0747    0.0103    0.0063    -0.0076     0.0031  0.2139
+  leaf             0.0710    0.0920    0.0073    0.0055    -0.0380     0.0001  0.1910
+  fit_rule         0.0459    0.0818    0.0149   -0.0013    -0.0054    -0.0006  0.1449
+  fit_index        0.0758    0.1160    0.0098   -0.0052    -0.0184    -0.0001  0.2369
+
+  (PLAYBK's delta column is the ungated `b - e_shadow` multiplied by the gate's
+   value AT g = 0, which is what the mechanism would assign those rows. Playback
+   rows are never scored IN-RUN: the head did not execute them, so no credit is
+   assigned at all — the exclusion is structural, not a threshold.)
+
+  THE AGENCY VARIABLE'S OWN DISTRIBUTION, from the raw per-row sample (ACT rows):
+  arm              n rows   g == 0    g > 0  mean g|g>0   e|g==0    e|g>0
+  canon             24256   0.2421   0.7579      0.7177   0.0009   0.0344
+  given_rule        11829   0.5443   0.4557      0.5445   0.0017   0.1973
+  leaf               9911   0.5879   0.4121      0.5343   0.0015   0.2648
+  fit_rule          20794   0.6843   0.3157      0.5407   0.0011   0.2789
+  fit_index          7550   0.2919   0.7081      0.4038   0.0006   0.1649
+
+==============================================================================
+(P2) THE 2x2: EXECUTED-AS-INTENDED x SOLVED
+==============================================================================
+  Per surviving trajectory. `int` = every head execution on it exactly matched its
+  intention; `bad` = at least one did not; `none` = the head executed nothing on it
+  (no performance to grade — kept apart, never folded into `int`).
+  `bad+solved` is THE LUCKY SUCCESS: an ill-executed trajectory the grade rewards.
+  `int+failed` is THE HONEST FAILURE: well executed, task not solved — the cell the
+  grade-only rule discards entirely.
+
+  --- canon ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         498       17305          67        7544         647        9779    2836025   209548  0.1611 -0.6174
+     2        1040       38353         180        5874         100         533    5246242   132719  0.0599 -0.6937
+     3        1145       49844         131        4644          34         522    6413879   106030  0.0352 -0.6931
+   ALL        2683      105502         378       18062         781       10834
+       P(solve | as intended) = 0.0248   P(solve | NOT as intended) = 0.0205   lucky-success share of solves = 0.1235
+  --- given_rule ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         177        1784          71        1836        6044       25928       9413     2425  0.2167 -0.4987
+     2        2882       30027         610        8613         234        3714     185410    15412  0.1150 -0.6395
+     3         642        8681         103        2407          37         418     166931    10517  0.1082 -0.6653
+   ALL        3701       40492         784       12856        6315       30060
+       P(solve | as intended) = 0.0837   P(solve | NOT as intended) = 0.0575   lucky-success share of solves = 0.1748
+  --- leaf ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1        1807        6101         737        4436       10330       22669      35557     8224  0.1034 -0.5523
+     2        1997       13097         548        4357         636        2917     128904    14037  0.0487 -0.6222
+     3        1371        8927         267        3409          87         275     246607    21637  0.0467 -0.5785
+   ALL        5175       28125        1552       12202       11053       25861
+       P(solve | as intended) = 0.1554   P(solve | NOT as intended) = 0.1128   lucky-success share of solves = 0.2307
+  --- fit_rule ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1         841        3006         490        3342       14497       29024      18457     5632  0.3308 -0.3059
+     2        5452       27027        1336        9862         494        1909     321393    24637  0.1027 -0.6459
+     3        5992       36210        1500       10403         276        1939    1504103    87471  0.0699 -0.7285
+   ALL       12285       66243        3326       23607       15267       32872
+       P(solve | as intended) = 0.1564   P(solve | NOT as intended) = 0.1235   lucky-success share of solves = 0.2131
+  --- fit_index ---
+   era  int_solved  int_failed  bad_solved  bad_failed  non_solved  non_failed  exec rows  misfire   d int   d bad
+     1           0           0           0           0       18426       32774          0        0       -       -
+     2        2050       10176         723        5617        6030       21484      62975    11464  0.1582 -0.4400
+     3        2282        9911         538        3631         363        1707     233245    25602  0.0961 -0.5283
+   ALL        4332       20087        1261        9248       24819       55965
+       P(solve | as intended) = 0.1774   P(solve | NOT as intended) = 0.1200   lucky-success share of solves = 0.2255
+
+  WHAT GOT MINED, BY CELL (at the beam's own answer — the mined unit), per arm:
+  arm               mined  as intended  NOT as int  no exec   mean d   ans-2x2 (int_s/int_f/bad_s/bad_f/non_s/non_f)
+  canon               184          128          17       39  -0.0312   128/6585/17/1208/42/660
+  given_rule          501          208          50      243   0.0020   212/2547/50/916/372/1791
+  leaf                582          228          86      268  -0.0589   291/1735/104/918/612/1588
+  fit_rule           1119          574         179      366  -0.0481   675/4120/211/1709/918/1967
+  fit_index           870          194          59      617  -0.0053   251/1289/82/660/1507/3443
+
+==============================================================================
+(P5) THE BENCHMARK TIMESCALE — delta recomputed offline across alpha
+==============================================================================
+  arm canon; per-cycle per-slot means, 135 cycles.
+     alpha  eff. window  frac b>e  mean b-e   sd(b-e)  slots
+     0.005        200.0    0.9555   0.11110   0.06914     16
+     0.020         50.0    0.9615   0.05637   0.05073     16
+     0.050         20.0    0.8506   0.02497   0.03940     16
+     0.100         10.0    0.7391   0.01258   0.03017     16
+     0.300          3.3    0.6232   0.00421   0.02014     16
+     1.000          1.0    0.5182   0.00127   0.01857     16
+  (`eff. window` is 1/alpha in units of the update — here one CYCLE per slot, so
+   the in-run benchmark, which updates per macro CALL, is faster than any row here;
+   the in-run alpha is printed in each arm's config as `perf_alpha`.)
+
+==============================================================================
+(P6) THE TWO UNPRICED COLUMNS, PRICED — never folded into `t`
+==============================================================================
+  arm             n_misfire  t_misfire       t_cum   % of t     blk_ref   blk_head     blk_dp
+  canon              448297      22415    32713779   0.0685    28992292   14496146    1232310
+  given_rule          28354       1418    23662598   0.0060      817210     361754    2362422
+  leaf                43898       2195    20500384   0.0107     1008918     411068    2379616
+  fit_rule           117740       5887    36052371   0.0163     3687906    1843953    1015432
+  fit_index           37066       1853    26596474   0.0070     1184880     296220    1372296
+  Pricing misfires would move the ledger by 0.016-0.032% — below every floor in the
+  tag, so the choice is behaviourally inert and is recorded as a convention, not a
+  result. `blk_ref` exceeds `blk_head` by the span factor: the meter consumes the
+  DP's block evidence that the head's own execution does not.
+
+==============================================================================
+(D) delta-SILENCE: the gauge, the commits it paced, and what it deferred
+==============================================================================
+  `dsil` = mean b(s) over the OPEN slots — the per-macro-slot benchmark the meter
+  already maintains, in the panel's error convention. It is None until a slot opens,
+  so it CANNOT pace the L2 commit: at the cycle level l is committed the level-l
+  slots do not exist, and the gauge only ever speaks about levels <= l-1.
+
+  arm             read 1st dsil c  dsil min  dsil last  max open           commits (lvl@c)                  advances
+  canon          yield          9   0.00670    0.00876        16                  [(2, 6)]             [35, 80, 135]
+  given_rule     yield         31   0.04395    0.05121        24        [(2, 25), (3, 62)]              [35, 80, 92]
+  leaf           yield         31   0.04410    0.05225        24        [(2, 25), (3, 53)]              [45, 68, 82]
+  fit_rule       yield         42   0.02806    0.03122        16                 [(2, 38)]             [50, 95, 150]
+  fit_index      yield         74   0.04198    0.04198         8                 [(3, 67)]             [50, 95, 113]
+
+  COMMIT CYCLES against the comparator (A1's yield thermostat) and the schedule:
+
+  THE VETO'S LEDGER (`dsil_and` only): every cycle the yield thermostat licensed
+  a commit and delta-silence was consulted.
+
+  THE ERA TABLE, against the measured floors (this tag is NOT yoked — the
+  question IS the pacing — so lifetimes differ and the deep-era deltas conflate
+  pacing with practice time; `dsil_sched` is the lifetime ceiling by construction.
+  arm                        era1              era2              era3   cycles
+  canon            0.8984 [ 0.03]    0.9123 [ 0.03]    0.9375 [ 0.03]      135
+  given_rule       0.7014 [ 0.29]    0.7856 [ 0.25]    0.8845 [ 0.16]       92
+  leaf             0.5582 [ 0.47]    0.7439 [ 0.32]    0.8186 [ 0.32]       82
+  fit_rule         0.5503 [ 0.48]    0.7188 [ 0.37]    0.7595 [ 0.46]      150
+  fit_index        0.5035 [ 0.54]    0.6892 [ 0.42]    0.7231 [ 0.55]      113
+
+==============================================================================
+(0T) THE CROSS-TAG REPLAYS — the round's load-bearing gate
+==============================================================================
+  [warn] the donor tag  is not fetched locally (/home/user/research/experiments/rhm/practice/caesura/figures/) — the cross-tag gates cannot run. Fetch it with
+      modal volume get rhm-scaling-data /rhm_practice_caesura/ /home/user/research/experiments/rhm/practice/caesura/figures/ 
+
+==============================================================================
+(1T) THE PORT'S CONTROLS — quota, volume, priced budget, selection compute
+==============================================================================
+  arm            mode      K   cyc  quota_ok      d*   d*menu     dev  vol_ok   mined         t_cum
+  canon           exo   2048   135     1.000   2.643    2.638  +0.004   0.011     184      32713779
+  given_rule      exo   2048    92     1.000   2.289    2.299  -0.010   0.297     501      23662598
+  leaf            exo   2048    82     1.000   2.191    2.209  -0.018   0.634     582      20500384
+  fit_rule        exo   2048   150     1.000   2.559    2.549  +0.010   0.767    1119      36052371
+  fit_index       exo   2048   113     1.000   2.280    2.282  -0.002   0.841     870      26596474
+
+  priced budget spread across arms: 43.14% (20500384 .. 36052371). NOTE this tag's arms are NOT lifetime-matched on the pacing axis by design, so t_cum is compared WITHIN a lifetime pair (a yoke and its source) and reported, not asserted, across pacers.
+
+==============================================================================
+(2T) THE DOSE — P(delivered key == designed key), per era, on a fallible executor
+==============================================================================
+  arm            pooled     era1     era2     era3   credit  deliv_true
+  canon           0.256    0.479    0.308    0.056    0.390       0.544
+  given_rule      0.413    0.657    0.305    0.095    0.371       0.699
+  leaf            0.426    0.624    0.253    0.073    0.323       0.535
+  fit_rule        0.357    0.683    0.325    0.086    0.230       0.512
+  fit_index       0.465    0.736    0.319    0.075    0.249       0.568
+
+  `an_s0` (exact-DP executor) for comparison: pooled 0.165-0.222, era 1 0.37-0.54,
+  era 2 0.14-0.18, era 3 0.03-0.05, ~0 in the consumption eras (no clean half).
+  The eras 4-5 collapse is THE LEVEL CAP, NOT DEPTH: structural grip is exactly
+  (s-1)/s at every era where the MINED LEVEL TRACKS THE ERA, and under
+  max_macro_level=4 eras 4-5 stop tracking — the damage cell swallows the whole span,
+  there is no clean half, and every selector falls through to a quota-legal index
+  order. Same cap, same collapse, as `antiphon`. Not a fact about deep eras.
+  A LOWER era-1 dose here is the fallible executor's own signature and bounds how
+  much of the selector's designed lever actually reaches the miner.
+
+==============================================================================
+(3T) THE DIVISION OF LABOR — commit owner x advance owner x selector
+==============================================================================
+  arm           commit    adv   sel  cyc   L2   L3   L4                    advances
+  canon              ?      ?   exo  135    6    -    -               [35, 80, 135]
+  given_rule         ?      ?   exo   92   25   62    -                [35, 80, 92]
+  leaf               ?      ?   exo   82   25   53    -                [45, 68, 82]
+  fit_rule           ?      ?   exo  150   38    -    -               [50, 95, 150]
+  fit_index          ?      ?   exo  113    -   67    -               [50, 95, 113]
+
+  VALUE: recovered fraction per era
+  arm               era1      era2      era3
+  canon            0.027     0.034     0.031
+  given_rule       0.286     0.253     0.159
+  leaf             0.473     0.324     0.319
+  fit_rule         0.484     0.368     0.461
+  fit_index        0.545     0.419     0.549
+
+  DELTA TO tu_y_exo (outcome currency owns both), per era, in recovered fraction
+  Floors (census finding 7, depth 6): earning family 0.087; given family
+  0.083 / 0.148 / 0.344 at eras 3/4/5. Ranks and signs are the currency.
+  arm               era1      era2      era3
+  canon            0.000     0.000     0.000
+  given_rule       0.258     0.218     0.128
+  leaf             0.446     0.290     0.287
+  fit_rule         0.456     0.333     0.430
+  fit_index        0.518     0.384     0.518
+
+==============================================================================
+(4T) THE SELECTOR, PER PACER — free-paced and lifetime-clean
+==============================================================================
+
+  The comparison ACROSS rows is the interaction: does what selection buys depend
+  on who paces? `antiphon` measured deep-era value ~ fully interaction between
+  selection and the pacer on the exact-DP executor (+0.279/+0.273 at eras 4/5 over
+  additive). NOTE: this tag carries no schedule-paced selector arm, so `antiphon`'s
+  ADDITIVE decomposition (composed - sum of singles) is not computable here; what
+  is reported is the pacer-conditional marginal, free-paced and lifetime-clean.
+
+==============================================================================
+(5T) THE SPLIT'S TRACE, and the reset counterfactual
+==============================================================================
+  (no split arm in this tag)
+
+==============================================================================
+(7T) THE FLOOR COUNTERFACTUAL — A1's rule on each arm's own logged series,
+     at the governing floor 0.0046 and at the donor's 0.00321442
+==============================================================================
+  arm          dsil live  fires@gov  first  fires@donor  first  differ  yield fires  first    realised commits
+  canon                9         15     21           14     22       1            2      6            [(2, 6)]
+  given_rule          31         17     52           12     53       5            4     25  [(2, 25), (3, 62)]
+  leaf                31          5     64           13     64       8            5     25  [(2, 25), (3, 53)]
+  fit_rule            42         28     59           25     59       3            1     38           [(2, 38)]
+  fit_index           74         11     88            8     88       3            2     67           [(3, 67)]
+
+  READ: `fires@gov` vs `fires@donor` is the FLOOR held against itself on ONE
+  series. Where the two columns agree, the dead-zone change is not what decided
+  this arm's crossings; where they differ, `differ` counts the cycles whose quiet
+  verdict the floor alone flips. `yield fires` is the comparison gauge at floors
+  that did not move between the two tags.
+    canon: verdict flips at [21]
+    given_rule: verdict flips at [52, 54, 55, 57, 75]
+    leaf: verdict flips at [75, 76, 77, 78, 79, 80, 81, 82]
+    fit_rule: verdict flips at [75, 77, 78]
+    fit_index: verdict flips at [91, 109, 113]
+
+  the donor's own arm, same read: ca_s0/dsil_read fires@gov 4 (first 43), fires@donor 4 (first 46), verdict differs on 6 cycles [43, 44, 45, 71, 85, 97]; realised commits [(2, 18), (3, 71), (4, 97)]
+
+==============================================================================
+(8T) THE PRICED CLOCK — value at matched cumulative spend vs the ceiling
+==============================================================================
+  [warn] /dsil_sched not on disk — the priced comparison needs it
+
+==============================================================================
+(1I) THE TRANSFER PROBE — meaning and spelling in every register, by level
+==============================================================================
+
+  canon
+    L1 c35   rho   *0   1   2  *3   4   5   6  *7
+             e     0.80  0.97  0.92  0.91  0.97  0.98  0.94  0.97
+             e_sp  0.00  0.05  0.05  0.04  0.05  0.18  0.21  0.20
+             wrtn  0.00  0.21  0.19  0.20  0.20  0.73  1.00  1.00
+    L2 c80   rho   *0   1   2  *3   4   5   6  *7
+             e     0.80  0.91  0.98  0.92  0.92  0.98  0.97  0.94
+             e_sp  0.00  0.05  0.06  0.05  0.06  0.15  0.24  0.21
+             wrtn  0.00  0.22  0.24  0.20  0.26  0.69  1.00  1.00
+    L3 c135  rho   *0   1   2  *3   4   5   6  *7
+             e     0.98  0.95  1.00  1.00  0.98  0.95  0.98  0.98
+             e_sp  0.00  0.04  0.05  0.04  0.06  0.15  0.23  0.24
+             wrtn  0.00  0.19  0.18  0.19  0.21  0.67  1.00  1.00
+
+  given_rule
+    L1 c35   rho   *0   1   2  *3   4   5   6  *7
+             e     0.44  0.97  0.86  0.88  0.86  0.53  0.64  0.69
+             e_sp  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
+             wrtn  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
+    L2 c80   rho   *0   1   2  *3   4   5   6  *7
+             e     0.55  0.95  0.94  0.94  0.92  0.52  0.70  0.73
+             e_sp  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
+             wrtn  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
+    L3 c92   rho   *0   1   2  *3   4   5   6  *7
+             e     0.94  0.97  1.00  0.97  1.00  0.86  0.81  0.86
+             e_sp  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
+             wrtn  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
+
+  leaf
+    L1 c45   rho   *0   1   2  *3   4   5   6  *7
+             e     0.55  0.69  0.59  0.47  0.53  0.52  0.52  0.59
+             e_sp  0.01  0.00  0.00  0.00  0.01  0.03  0.04  0.05
+             wrtn  0.09  0.00  0.00  0.00  0.09  0.47  0.53  0.55
+    L2 c68   rho   *0   1   2  *3   4   5   6  *7
+             e     0.72  0.70  0.72  0.69  0.67  0.61  0.69  0.73
+             e_sp  0.00  0.00  0.00  0.00  0.01  0.05  0.04  0.04
+             wrtn  0.07  0.00  0.00  0.00  0.10  0.56  0.46  0.47
+    L3 c82   rho   *0   1   2  *3   4   5   6  *7
+             e     0.88  0.80  0.83  0.80  0.86  0.81  0.83  0.91
+             e_sp  0.00  0.00  0.00  0.00  0.01  0.06  0.07  0.07
+             wrtn  0.07  0.00  0.00  0.00  0.08  0.58  0.51  0.57
+
+  fit_rule
+    L1 c50   rho   *0   1   2  *3   4   5   6  *7
+             e     0.44  0.84  0.77  0.66  0.56  0.53  0.67  0.58
+             e_sp  0.00  0.01  0.00  0.00  0.01  0.01  0.00  0.00
+             wrtn  0.00  0.08  0.00  0.00  0.07  0.15  0.00  0.00
+    L2 c95   rho   *0   1   2  *3   4   5   6  *7
+             e     0.64  0.80  0.67  0.69  0.86  0.61  0.81  0.66
+             e_sp  0.00  0.01  0.00  0.00  0.00  0.04  0.00  0.00
+             wrtn  0.00  0.11  0.00  0.00  0.08  0.54  0.00  0.00
+    L3 c150  rho   *0   1   2  *3   4   5   6  *7
+             e     0.84  0.92  0.84  0.91  0.89  0.80  0.73  0.73
+             e_sp  0.00  0.01  0.00  0.00  0.01  0.04  0.00  0.00
+             wrtn  0.00  0.08  0.00  0.00  0.07  0.35  0.00  0.00
+
+  fit_index
+    L1 c50   rho   *0   1   2  *3   4   5   6  *7
+             e     0.42  0.72  0.45  0.44  0.48  0.50  0.56  0.55
+             e_sp  0.00  0.00  0.00  0.00  0.00  0.03  0.02  0.00
+             wrtn  0.00  0.00  0.00  0.00  0.05  0.50  0.41  0.00
+    L2 c95   rho   *0   1   2  *3   4   5   6  *7
+             e     0.67  0.72  0.69  0.62  0.67  0.41  0.69  0.67
+             e_sp  0.00  0.00  0.00  0.00  0.00  0.05  0.04  0.00
+             wrtn  0.00  0.00  0.00  0.00  0.03  0.59  0.57  0.00
+    L3 c113  rho   *0   1   2  *3   4   5   6  *7
+             e     0.80  0.73  0.77  0.81  0.72  0.73  0.73  0.89
+             e_sp  0.00  0.00  0.00  0.00  0.01  0.07  0.08  0.00
+             wrtn  0.00  0.00  0.00  0.00  0.08  0.55  0.63  0.00
+
+  (* = practised. `e` is MEANING (1 - possible-set success), `e_sp` SPELLING —
+   two numbers, never one. A held-out register whose column ALIASES a practised
+   one is a null control and must transfer for free; the genuinely new columns
+   are the test. `gates_cpu`'s E-3 prints which is which for this table.)
+
+==============================================================================
+(2I) IDENTIFIABILITY — recovered K against the true K, by cycle
+==============================================================================
+
+  fit_rule   (theta_true [1, 1, 6, 4, 5, 5, 5, 1])
+    cycle    n      loss   acc_all  acc_prac  acc_held  det_theta  monotone
+    1      224      0.3930    0.469     0.625     0.375      0.000  True
+    13     8214     0.1303    0.719     0.833     0.650      0.250  True
+    25     17193    0.1145    0.734     0.833     0.675      0.250  True
+    37     26139    0.1062    0.766     0.833     0.725      0.250  True
+    49     30225    0.1104    0.766     0.833     0.725      0.125  True
+    61     33776    0.1074    0.734     0.833     0.675      0.000  True
+    73     36944    0.1055    0.781     0.833     0.750      0.250  True
+    85     40496    0.1032    0.734     0.833     0.675      0.000  True
+    97     43632    0.1050    0.734     0.833     0.675      0.000  True
+    109    46672    0.1047    0.734     0.833     0.675      0.000  True
+    121    49744    0.1040    0.734     0.833     0.675      0.000  True
+    133    52912    0.1030    0.734     0.833     0.675      0.000  True
+    145    56144    0.1036    0.750     0.833     0.700      0.125  True
+    150    57680    0.1004    0.766     0.875     0.700      0.125  True
+    theta_hat (last) [2, 4, 2, 6, 3, 6, 5, 3]
+    acc by register  1.00  0.62  0.62  0.62  0.62  0.62  1.00  1.00
+
+  fit_index   (theta_true [1, 1, 6, 4, 5, 5, 5, 1])
+    cycle    n      loss   acc_all  acc_prac  acc_held  det_theta  monotone
+    1      224      0.3088    0.469     0.792     0.275      0.000  True
+    10     5498     0.1063    0.594     0.833     0.450      0.250  False
+    19     12941    0.1139    0.656     0.875     0.525      0.250  True
+    28     18822    0.1036    0.562     0.833     0.400      0.125  True
+    37     25693    0.1065    0.562     0.833     0.400      0.125  True
+    46     33039    0.1040    0.609     0.833     0.475      0.250  False
+    55     38472    0.1052    0.609     0.833     0.475      0.250  False
+    64     43176    0.1048    0.656     0.875     0.525      0.250  True
+    73     46664    0.1047    0.562     0.833     0.400      0.125  True
+    82     48872    0.1074    0.562     0.833     0.400      0.125  True
+    91     51496    0.1033    0.562     0.833     0.400      0.125  True
+    100    54888    0.1013    0.562     0.833     0.400      0.125  True
+    109    57320    0.0974    0.562     0.833     0.400      0.125  True
+    113    58824    0.0980    0.562     0.833     0.400      0.125  True
+    theta_hat (last) [1, 7, 1, 7, 1, 7, 7, 7]
+    acc by register  1.00  0.50  0.50  0.50  0.38  0.25  0.38  1.00
+
+  (`acc_heldout` is the number the sizing lane's §2 ceiling bounds: 0.81 for the
+   SCALAR register at C=3 practised, ~0.60 for the ONE-HOT. `det_theta` is the
+   fraction of features whose switch point is recovered exactly.)
+
+==============================================================================
+(3I) SPELLING BESIDE MEANING — the two numbers, over the run
+==============================================================================
+  arm            cycles       e(end)    e_sp(end)   e_sp(written, life)   blk_render
+  canon          135          0.9401       0.0932               0.3959            0
+  given_rule     92           0.8802       0.0000               0.0000            0
+  leaf           82           0.8229       0.0199               0.2372      4658994
+  fit_rule       150          0.7760       0.0000               0.0180      6618881
+  fit_index      113          0.7057       0.0000               0.0198      5231489
+
+  (`e` is the donor's metered MEANING error and is what every pacer, gauge and
+   certificate in the file reads. `e_sp` is grader-side over all on-grammar blocks;
+   `e_sp(written)` is the renderer's own tally over the blocks it WROTE — the SPEC's
+   definition. `blk_render` is the learned organ's execution ledger, never in `t`.
+   `n_unbound` must be 0 in every ruled arm.)
+
+==============================================================================
+(4I) THE ORGANS' OWN RECORDS — `leaf`'s side table, and the reader by register
+==============================================================================
+
+  leaf: side table 84 keys over 19163 observations; distinct spellings/chunk mean 1.488 max 5 (31 keys with >1); on_rule_frac  0.774
+    fallback (per-feature majority spelling) [1, 0, 1, 0, 1, 0, 0, 0]
+
+  (THE BLOW-UP READOUT. Under a REGISTER rule a chunk has at most one spelling per
+   register it was met in, so the multiplication is bounded by the number of
+   PRACTISED registers and not by m^span — a property of this family that an
+   agreement rule would not have. `on_rule_frac` measures the harvest's own closed
+   loop: `mine_src` rows are mostly world-spelled, and this says how mostly.)
+
+  READ ACCURACY BY REGISTER (the sizing lane's open item 1)
+    canon (c135)
+      rho        *0   1   2  *3   4   5   6  *7
+      read_acc   1.00  1.00  1.00  1.00  0.99  0.96  1.00  1.00
+      parse_acc  0.72  0.76  0.75  0.75  0.69  0.61  0.71  0.72
+
+  (* = practised. The reader is frozen and was pretrained on data whose per-feature
+   spelling frequencies are context-dependent; if a held-out register's parse
+   degrades that is a finding about the reader, not a bug to fix.)

@@ -13,7 +13,7 @@ CPU) · [`../antiphon/`](../antiphon/FILES.md) §3/§3a (`an_s2`, the endogenous
 pacer; `an_m0`, the port at the strongly-metered knob) · [`../antiphon/trap/`](../antiphon/trap/DESIGN.md)
 (`tr_s0`, worthless answers installed in the menu) · this node's own [`FILES.md`](FILES.md) and
 [`DESIGN.md`](DESIGN.md) (`tu_s0`, both currencies and the selector in one loop) ·
-`../enharmonic/SPEC.md`[^private] (the next rung, specced from the sizing).
+[`../enharmonic/SPEC.md`](../enharmonic/SPEC.md) (the next rung, specced from the sizing).
 **Direct donors** (untouched): [`../caesura/`](../caesura/FILES.md) (`tutti.py` forks it; the
 δ-silence pacer and the live executor via `intonation`) · [`../antiphon/`](../antiphon/README.md)
 (the question port; `questions.py` imported, never forked) · [`../crescendo/`](../crescendo/README.md)
@@ -279,7 +279,7 @@ twinned floor and labelled as such.
   and the climb is constant-cost. The practice learner's keys are surface tuples; climbing past
   L4 means discovering that several of its tuples are one thing. That is the merge op of
   `recurrence_manufactures_confounds` §5, the quotient whose limit that doc calls a belief,
-  specced as `../enharmonic/`[^private] with the sizing's facts as its premises
+  specced as [`../enharmonic/`](../enharmonic/SPEC.md) with the sizing's facts as its premises
   and the mirror loop as the loop it sits under.
 
 ## Caveats
@@ -342,5 +342,3 @@ does L5 arrive at the existing budget) · the L5 sibling tag on the collision-fr
 fallback · an `/add-belief` pass for the band-pass judge and the mirror assignment, read
 against `heterogeneous_graders` and `recurrence` §5/§7 · a ROADMAP §7.3 append recording the
 owners of the loop's actions and the change-of-key reframe of F3 (needs Jasper's permission).
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

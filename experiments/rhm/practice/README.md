@@ -535,14 +535,50 @@ the null) and exposes a solve tax every selector pays, but starves π's trust ta
 ladder sized for abundance, so the reward side is untested. And the second extension is a
 **change of key**: arrival, not the r² wall, stops L5 (~100× the observations at any admissible
 world), while under the grammar's own parent-feature key every level is 16 rules — the merge
-op is on the critical path as a level-size lever, specced as `enharmonic/`[^private],
+op is on the critical path as a level-size lever, specced as [`enharmonic/`](enharmonic/SPEC.md),
 with its endogenous form — the merge licensed by the learner's own value system, where the
 within-level ledger refuses — specced as `enharmonic/temperament/`[^private].
-Beside both, the substrate fork `inflection/`[^private] (spec, 2026-09-09) gives
-the bottom layer a context-dependent rendering rule and a grader that marks spelling, so the
-execution currency includes the word for the first time — the RHM twin of
-`mjc/practice/tempo`'s factoring, and the reader's first job on the practice stack.
+Beside both, the substrate fork [`inflection/`](inflection/README.md) (Q0 sized, Q1–Q3 run,
+2026-09-09→10; [spec](inflection/SPEC.md)) gives the bottom layer a context-dependent rendering
+rule and a grader that marks spelling, so the execution currency includes the word for the
+first time — the RHM twin of `mjc/practice/tempo`'s factoring. The read so far: fitted
+renderers spell at ≈ 0.02 error where tape-keyed chunks and synonym-0 sit at 0.42–0.48, the
+scalar-register head transfers to unpractised registers where a one-hot one falls back to one
+column, transfer is decided by whether the rule lies in the renderer's class; the reader's first
+job on the practice stack arrived as the bottom map's two collisions; and on a matched clock
+with the setup rendered as the world spells, correct spelling is worth ≈ 0.08 in meaning error
+through the learner's own planner rather than the grader; and the curriculum ladder is finding 6's
+twin — a per-feature switch point is identifiable only once an interior register is practised.
+With a word to hear, trust is still habit (π's mass is use count), and δ-silence as advance owner
+is not scale-free: charging `e` with a larger-amplitude spelling error makes its fixed dead zone
+fire early, on scale rather than on convergence.
 Full record: [tutti/README.md](tutti/README.md).
+
+### [`enharmonic/`](enharmonic/README.md) — the quotient: re-keying by category, and earning the key (2026-09-09→11)
+
+**Goal**: key the macro table by *category* instead of spelling — first supplied from the oracle,
+then earned by the learner's own merges — and see whether the crank reaches the rung the flat key
+cannot afford (`tutti/sizing`: L5 unreachable by ~100× under the flat key, 16 rules per level
+under the grammar's own). `temperament` sharpened the earned form into a test of the type law;
+`figured_bass` asked what a commit should freeze once the key is a category.
+
+**Finding**: **the second extension is a change of key, and the key is earnable.** The identifiable
+category is the *token class* (the feature set a key's canonical rendering can derive; 73 legal L5
+class pairs against 205,824 flat keys), a forced-transfer probe measures it exactly, and keyed on
+it L5 *arrives* (37 keys at support against the flat key's identically-zero gauge). The learner
+earns the same partition at precision 1.000 for under a third of a percent of its budget — once the
+probe is allowed to see the rows the beam never uses (argmax latching starves exact aliases, so
+the use record is anti-informative as criterion *and* as selector) — and adopts L4 with better
+class coverage than the supplied quotient had at its own commit. Two premises fell: a merge of
+entries is within-level *invisible*, not negative (entries in one class are interchangeable and
+the executor never used the loser; `fourwall`'s negative was merging contexts), and no
+instantaneous next-level gauge sees its value at the frontier — the working licence is a cost
+check at the level a merge changes. What stops L5 is the clock three ways (the L4 book freezes on
+era 3's narrow stream; the committable L5 miner starts at era 4; an open inventory re-paces the
+loop through δ-silence), and a richer all-legal book performs *worse* at matched clocks with
+slightly worse frontier choices — the executor's expansion choice, `inflection`'s question from
+this side. Also: the arc's committed-row precisions were mostly the inverse map's collisions, and
+the battery's growth column never measured regrowth. ≈43 GPU-h.
 
 ## Reproduce
 
