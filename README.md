@@ -4,10 +4,11 @@ This is a live research repo built to research the following observation:
 
 > here is a very specific sense in which current LLMs are not AGI. If you define “general” as “capable of representing a general assortment of inputs”, then they are general. But if you define “general” as “capable of learning a general assortment of data-limited domains”, then they are not general, because they cannot endogeneously explore and learn complex domains.
 
-Supervised learning learns robustly from external data, but can't mint its own knowledge. RL learns everything for itself, but can't navigate great complexity. The process of creating new abstractions requires a synthesis of both.
+Supervised learning learns robustly from external data, but can't mint its own knowledge. RL learns everything for itself, but learns with specific regard to a verifier, and thus can't navigate great complexity. The process of creating new abstractions requires a synthesis of both.
 
 Other forms this problem statement may take:
 - Sample efficiency ("how do you learn more from limited data?")
+- Continual learning ("how can the things you know today influence the way in which you learn new things tomorrow?")
 - Interpretability ("how do you judge the quality of your own thoughts before you have supervision on them?")
 - Taste/style/originality ("how do you create abstractions which are both endogeneous and coherent?")
 
@@ -20,6 +21,8 @@ Here is a selection of relevant experimental lines:
 - `experiments/a2a_forward` is our main experiment for training forward self-models for decomposing activations
 - `experiments/mjc` is a place we run MuJoCo experiments for motor learning
 - `experiments/canvas` is a compositional image substrate: a tile grammar rendered to swatches
+
+All experiments are implemented and written up by Claudes; human authorship lives at the epistemic and conceptual level.
 
 ## FAQs
 
@@ -34,4 +37,4 @@ To the first question, I would say "no", and I find the fact that the answer is 
 
 To the second question, I would say "yes", and I don't think many would disagree. Whatever it is that makes training a transformer on exabytes of pure language more useful than training a transformer on exabytes of pure images seems like it ought to be downstream of the language data itself, and the model representations required to be a good next token predictor over it.
 
-Biological learners seem to be [capable of building abstractions over non-linguistic data](cite_some_paper_here), and the language data which makes LLMs so powerful comes from biological learners. So it seems like the default position ought to be that non-language data *can* be fertile ground for frontier research, until proven otherwise.
+Biological learners seem to be [capable of building abstractions over non-linguistic data](https://pmc.ncbi.nlm.nih.gov/articles/PMC13540421/), and the language data which makes LLMs so powerful comes from biological learners. So it seems like the default position ought to be that non-language data *can* be fertile ground for frontier research, until proven otherwise.
