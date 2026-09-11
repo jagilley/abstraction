@@ -3108,6 +3108,49 @@ ARMS = {
                      "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
                              "question_mode": "exo", "quotient": "tok",
                              "open_inventory": True}},
+    # ---------------------------------------------------------------------------------------
+    # [en_s6] THE COMPOSED ARMS: `temperament`'s merge on the live book past the commit, with
+    # `figured_bass`'s two knobs on. No arm has carried `merge_mode` and `open_inventory`
+    # together before (fb_open.patch's own audit says so), and the composition is the point:
+    # with the inventory open a merge at level l changes what the executor RUNS at l+1 from the
+    # next cycle on, not only what a future commit could freeze.
+    #
+    # ORDER, and it is the question the composition raises. Within a cycle the once-per-cycle
+    # `_rebuild_ms(rearm=True)` runs FIRST (block g0, before `port_spec`), and `_try_merge`
+    # runs LAST but one (block g3.5, after the recert, before the advance). So a merge taken on
+    # cycle c lands AFTER everything that consumes `ms` on cycle c: the beams, the auditions
+    # and the recert all still run the pre-merge tables, and the FIRST `operative()` call that
+    # sees the merged map is the rebuild at the top of cycle c+1. The merge's effect on the
+    # executor is therefore deferred by exactly one cycle, and never splits a cycle in two.
+    # `operative()` keys by `quot` — `ClassMiner.build` maps every lower row through
+    # `self.quot.id_of` — so the rebuilt move set IS built under the merged map, which is what
+    # makes the composition mean anything.
+    "endo_ledger_open_ung5_yk": {"vocab": "earned", "commit": "loop", "prop_k": 4,
+                     "span": True, "recert": True,
+                     # clock-yoked to the BANKED `en_s4:endo_ledger` (L2@c48, L3@c97, L4@c179
+                     # and its five advances), so pacing is not a variable and the only
+                     # differences from that arm are the two knobs and the merges they enable.
+                     "loop": {"kind": "yoke", "of": "endo_ledger"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo", "merge_mode": "ledger",
+                             "open_inventory": True, "ungate_l5": True}},
+    # SELF-PACED, with the loop's re-arm addressed (`_rebuild_ms`'s class-coverage hook). This
+    # is the arm `fb_s0`'s 66-cycle life is the negative for; whether the hook holds the loop on
+    # the caps or lets it advance is the readout, and every re-arm is logged with its cause.
+    "endo_ledger_open_ung5": {"vocab": "earned", "commit": "loop", "prop_k": 4,
+                     "span": True, "recert": True,
+                     "loop": {"kind": "quiet", "read": "dsil"},
+                     "loop_commit": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "exo",
+                             "merge_mode": "ledger",
+                             "open_inventory": True, "ungate_l5": True}},
+    # THE FLAT KEY on the composed arm's realised clock — the lifetime-matched comparator.
+    "flat_yk_endo_ledger_open_ung5": {"vocab": "earned", "commit": "loop", "prop_k": 4,
+                     "span": True, "recert": True,
+                     "loop": {"kind": "yoke", "of": "endo_ledger_open_ung5"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo"}},
     "given_cat_tok_open_ung5_yk": {"vocab": "earned", "commit": "loop", "prop_k": 4,
                      "span": True, "recert": True,
                      "loop": {"kind": "yoke", "of": "given_cat_tok"},
@@ -3148,6 +3191,29 @@ ARMS = {
     # Moving the top-up to c8 puts it AFTER the L2 commit, which is the situation the whole
     # node is about, and makes the departure a code-path property rather than an outcome
     # (the schedule forces it). Gate E-8b.
+    # [en_s6] THE TWO IDENTITY TWINS OF THE COMPOSITION.
+    #   `en_pf_cmp_mergeoff`  open + ungated with the MERGE KNOB OFF, on the endogenous
+    #       (singleton) map. It must walk `fb_s0`'s `given_cat_tok_open_ung5` path: one rebuild
+    #       per cycle, E-8 never firing, the ungated L5 miner accruing every cycle, and NO
+    #       merge events at all — the composition adds nothing until the merge knob is on.
+    #   `en_pf_cmp_openoff`   the merge with the OPEN BIT OFF: `en_s4`'s `endo_ledger` path.
+    #       No rebuild ever runs, the operative table of an adopted level is the frozen one,
+    #       and the merge block still proposes.
+    "en_pf_cmp_mergeoff": {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo",
+                             "open_inventory": True, "ungate_l5": True}},
+    "en_pf_cmp_openoff": {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo", "merge_mode": "ledger",
+                             "open_inventory": False, "ungate_l5": False}},
+    "en_pf_cmp_on": {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo", "merge_mode": "ledger",
+                             "open_inventory": True, "ungate_l5": True}},
     "en_pf_open_late": {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
                      "recert": True,
                      "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
@@ -3399,7 +3465,12 @@ TWIN = {
     "en_pf_open_off": "enum_live", "en_pf_open": "enum_live", "en_pf_ung5": "enum_live",
     "en_pf_open_ung5": "enum_live", "en_pf_openflat": "enum_live",
     "en_pf_open_late": "enum_live",
+    "en_pf_cmp_mergeoff": "enum_live", "en_pf_cmp_openoff": "enum_live",   # [en_s6]
+    "en_pf_cmp_on": "enum_live",
     "given_cat_tok_open_yk": "enum_live",
+    # [en_s6] the composed arms
+    "endo_ledger_open_ung5_yk": "enum_live", "endo_ledger_open_ung5": "enum_live",
+    "flat_yk_endo_ledger_open_ung5": "enum_live",
     "given_cat_tok_open_ung5_yk": "enum_live",
 }
 STREAM = {"never_base": 0, "given": 1, "practice_gated": 2, "practice_early": 3,
@@ -4347,6 +4418,7 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
     # empty and fell back to the frozen table (see `operative`).
     _open_inv = bool(cfg.get("open_inventory")) and spec.get("vocab") == "earned"
     _ungate_l5 = bool(cfg.get("ungate_l5"))
+    _open_cov, _open_rearms = {}, []          # [en_s6] the re-arm hook's state and its log
     _open_stat = {"open_inventory": bool(_open_inv), "ungate_l5": bool(_ungate_l5),
                   "n_rebuild": 0, "n_empty_fallback": 0, "n_cycles_moved": 0,
                   "rows_frozen": {}, "rows_operative": {}}
@@ -4505,7 +4577,7 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
         """[figured_bass] the levels the executor has ADOPTED, in `build_ms`'s own order."""
         return [q for q in sorted(committed) if committed[q] is not None]
 
-    def _rebuild_ms():
+    def _rebuild_ms(rearm=False):
         """[figured_bass] THE MOVE SET, rebuilt from `operative` rather than from `committed`.
 
         The open bit's one side effect on the executor. With it on, the operative table of an
@@ -4525,6 +4597,36 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
         tabs = ({q: operative(q) for q in _adopted()} if _open_inv else committed)
         ms = build_ms(base_ms, tabs, s, depth, device)
         bind_slots(ms)
+        # [en_s6] THE OPEN BIT'S RE-ARM. `fb_s0`'s self-paced open arm died at 66 cycles: with
+        # the inventory open the operative book moves every cycle, so the thermostat's "moved
+        # then quiet" never re-arms on a commit that no longer freezes anything. The regime
+        # change under the open bit is not the commit, it is a change in what the book can
+        # SPELL — a token class entering an adopted level's book, or a merge taking one out.
+        # A new SPELLING of a class the book already holds is not one: the DP could already
+        # reach that class, and re-arming on it would reset the latch on ordinary mining.
+        # Fired only from the once-per-cycle rebuild (`rearm=True`), never from the commit or
+        # extend sites, which re-arm through their own actions. Class coverage is a class
+        # notion, so an arm with no quotient does not carry it and does not re-arm here.
+        if rearm and _open_inv and quot is not None:
+            for q_ in _adopted():
+                cov = frozenset(
+                    quot.id_of(tuple(int(z) for z in r_), q_) for r_ in tabs[q_]["flat"])
+                prev = _open_cov.get(q_)
+                if prev is not None and cov != prev:
+                    _add, _rem = cov - prev, prev - cov
+                    why = ("class_added" if _add and not _rem else
+                           "class_removed" if _rem and not _add else "both")
+                    _open_rearms.append(
+                        {"cycle": int(cyc), "level": int(q_), "cause": why,
+                         "n_added": len(_add), "n_removed": len(_rem),
+                         "n_before": len(prev), "n_after": len(cov),
+                         "n_rows": int(tabs[q_]["child"].shape[0])})
+                    _acted_all("open_regime", cyc,
+                               why=f"L{q_} coverage {len(prev)}->{len(cov)} ({why})")
+                    print(f"[open]   arm={arm} c{cyc} L{q_} RE-ARM: class coverage "
+                          f"{len(prev)}->{len(cov)} ({why}, +{len(_add)}/-{len(_rem)}), "
+                          f"rows={int(tabs[q_]['child'].shape[0])}", flush=True)
+                _open_cov[q_] = cov
         if _open_inv:
             _open_stat["n_rebuild"] += 1
             _rf = {str(q): int(committed[q]["child"].shape[0]) for q in _adopted()}
@@ -5510,7 +5612,7 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             # level plus ~20 small host->device copies; it draws no RNG and changes no count.
             # Off: not executed, and `ms` is whatever the last commit built (the donor).
             if _open_inv and _adopted():
-                ms = _rebuild_ms()
+                ms = _rebuild_ms(rearm=True)      # [en_s6] the only re-arming call site
             # THE FILTER SWITCHES ON after `prop_warmup` cycles of the run. Until then the head
             # trains on the beam's trajectories but never gates, so (i) the arm is bit-identical
             # to its twin through the warmup and (ii) the filter never gates from a random init.
@@ -7254,6 +7356,8 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                  # counted the way the quotient's are.
                  "exp_rec": bool(cfg.get("exp_rec", True)),
                  "exp_reads": int(_EXP_REC["reads"]),
+                 # [en_s6] every re-arm the open bit's class-coverage hook fired, with cause
+                 "open_rearms": _open_rearms,
                  # [figured_bass] what the two bits were and what they did, at arm level, so
                  # "was this arm open" is one lookup rather than a scan of the per-cycle log.
                  "open_inventory": bool(_open_inv), "ungate_l5": bool(_ungate_l5),
@@ -9377,6 +9481,7 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
                  # alone, both, and the flat open path (a different build function behind the
                  # same branch).
                  "en_pf_open_off", "en_pf_open", "en_pf_ung5", "en_pf_open_ung5",
+                 "en_pf_cmp_mergeoff", "en_pf_cmp_openoff", "en_pf_cmp_on",   # [en_s6]
                  "en_pf_openflat", "en_pf_open_late",
                  "flat", "given_cat_tok", "given_cat_min",
                  # [tutti] the unification arms: the split's two policy objects, the
@@ -10391,6 +10496,51 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
             f"en_pf_tok: E-9b FAILED — the committable L5 miner accrued at c{_moved[0]}, "
             f"before era 4 and with `ungate_l5` off, so the era gate this node is about is "
             f"not where it is thought to be")
+
+    # E-10 [en_s6] THE COMPOSITION'S TWO IDENTITY GATES.
+    #   (a) MERGE OFF: open + ungated on the singleton map must walk `figured_bass`'s own path
+    #       — one `_rebuild_ms` per cycle, E-8's in-run assertion never firing (it would have
+    #       raised), the ungated L5 miner accruing, and zero merge events. That is E-7's idiom:
+    #       with the new knob off, the arm is the one that came before it.
+    #   (b) OPEN OFF: the merge with the open bit off must walk `en_s4`'s path — no rebuild
+    #       ever, `n_cycles_moved` zero, and the merge block still proposing. The FULL bit-for-
+    #       bit identity against `en_s4:endo_ledger` is a cross-tag comparison at run scale and
+    #       needs that arm re-run in-tag; it is NOT gated here, and the reduction says so.
+    #   (c) BOTH ON: the composed path must actually compose — rebuilds every cycle AND merge
+    #       proposals, with the re-arm hook reachable.
+    for _lbl, _want in (("en_pf_cmp_mergeoff", "merge_off"), ("en_pf_cmp_openoff", "open_off"),
+                        ("en_pf_cmp_on", "both_on")):
+        if not _ran(_lbl):
+            continue
+        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+        _op = _r.get("open_stat") or {}
+        _me = [e for e in (_r.get("merge_events") or []) if e.get("kind") == "merge_proposal"]
+        _ncyc = len(_r["log"]["cycle"])
+        _X[f"E-10 {_lbl}"] = {
+            "case": _want, "n_cycles": _ncyc,
+            "open_inventory": _op.get("open_inventory"), "ungate_l5": _op.get("ungate_l5"),
+            "n_rebuild": _op.get("n_rebuild"), "n_cycles_moved": _op.get("n_cycles_moved"),
+            "n_merge_proposals": len(_me),
+            "n_rearms": len(_r.get("open_rearms") or []),
+            "rearm_causes": sorted({q["cause"] for q in (_r.get("open_rearms") or [])}),
+            "merge_mode": _r.get("merge_mode")}
+        if _want == "merge_off":
+            assert _op.get("open_inventory") and _op.get("ungate_l5"), f"{_lbl}: knobs off"
+            assert not _me, (f"{_lbl}: the merge knob is off and the block still proposed "
+                             f"({len(_me)} proposals) — the composition is not inert in the "
+                             f"direction it claims")
+            assert int(_op.get("n_rebuild") or 0) > 0, (
+                f"{_lbl}: the open bit is on and `_rebuild_ms` never ran")
+        elif _want == "open_off":
+            assert not _op.get("open_inventory"), f"{_lbl}: the open bit is not off"
+            assert int(_op.get("n_rebuild") or 0) == 0, (
+                f"{_lbl}: the open bit is OFF and `_rebuild_ms` ran {_op.get('n_rebuild')} "
+                f"times — `en_s4`'s path is not being walked")
+            assert _me, (f"{_lbl}: the merge block never proposed, so the open-off case is "
+                         f"vacuous")
+        else:
+            assert _op.get("open_inventory") and _me and int(_op.get("n_rebuild") or 0) > 0, (
+                f"{_lbl}: the composed path does not compose ({_X[f'E-10 {_lbl}']})")
 
     # X-2  INERTNESS. With `loop_commit` absent the arm is the donor: `tu_pf_off` must carry no
     #      split record, no `c_*` trace columns, and must be bit-identical to `dsil_yield`'s

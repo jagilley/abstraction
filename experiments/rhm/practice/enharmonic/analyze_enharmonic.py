@@ -66,8 +66,9 @@ def main():
         if not os.path.isfile(bp):
             print(f"    (bank {spec} not found locally — skipped)")
             continue
-        arms.append((barm, json.load(open(bp))))
-        prov[barm] = btag
+        _nm = barm if barm not in dict(arms) else f"{barm}@{btag}"
+        arms.append((_nm, json.load(open(bp))))
+        prov[_nm] = btag
     arms = sorted(arms, key=lambda kv: (kv[0] != "flat", kv[0]))
     rules = generate_rules_distinct(V, S, DEPTH, M, seed=0)
     canon = np.ascontiguousarray(rules[DEPTH - 1][:, 0, :])
@@ -854,6 +855,9 @@ def main():
                   # [en_s5] `figured_bass`'s open-inventory arm is a yoke of `given_cat_tok`,
                   # so it belongs in this table too — same clock, one bit different.
                   "given_cat_tok_open_yk": "given_cat_tok",
+                  # [en_s6] the composed arms
+                  "endo_ledger_open_ung5_yk": "endo_ledger",
+                  "flat_yk_endo_ledger_open_ung5": "endo_ledger_open_ung5",
                   "given_cat_tok_open_ung5_yk": "given_cat_tok"}
         srcs = dict(arms)
         for yarm in sorted(os.listdir(yroot)):

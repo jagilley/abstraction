@@ -214,6 +214,35 @@ set of features that repair the instance.
    were mostly the inverse map's collisions; the battery's growth column never measured regrowth
    under deletion.
 
+## Addendum — the composed arm (`en_s6`, 4.1 GPU-h, 2026-09-11)
+
+Facts, reading pending discussion. `temperament`'s merge (ledger licence at ℓ+1, every class
+probed) with `figured_bass`'s `open_inventory` and `ungate_l5`, on the banked `endo_ledger`'s
+clock (`_yk`) and self-paced with the loop re-arming on class-coverage changes; `endo_ledger`
+re-run in-tag as the identity check (32 of 36 series bit-identical to `en_s4`, zero value
+differences elsewhere, `t_cum` to the digit; the in-tag yoke plan equals the banked one).
+
+- **The re-arm hook fixed the open arm's lifetime completely** — 201 cycles on the ladder's own
+  era spans against `fb_s0`'s 66 — by holding the loop on the caps: it fired 20–26 times per
+  arm, mostly `class_added` (ordinary mining widening the book), and the loop never quieted.
+- **The composed book is bigger and the merges more aggressive**: the yoked arm installed 13 /
+  61 / 148 rows where its closed source installed 13 / 42 / 100, the L4 operative book grew to
+  218 past the commit, and it took 24 merge groups against the closed arm's 15 (L4 classes 154 →
+  98 against 100 → 42). Merge precision unchanged in kind; the ledger's keep case was `table` on
+  every resolved group (the `absent` branch again never fired).
+- **No arm committed L5.** The composed arm's L5 keys at support top out at 5 (self-paced 2;
+  closed 1) where the supplied-quotient open arm on the same clock reached 37: the gap between a
+  learned and a given class map at L5 is unchanged by the composition. The binding constraint is
+  now the probe's row cap (`merge_max_rows = 64` against 150–218 L4 classes), the third throttle
+  in the family rate → use filter → cap.
+- **On the same clock the composed arm is worse than its closed source in both consumption
+  eras** (era 4 +0.025, era 5 +0.087), as the open book was in `fb_s1`; the self-paced arm ties
+  its flat yoke. The ungated L5 miner makes the L5 slot live from era 1 and halves the choice
+  instrument's containment there (0.888 → 0.499 at 5n1 in era 3, the L5 book being live and
+  mostly wrong then); at 4n3 the composed arms choose slightly better than the closed one.
+- `alias_audit.py` is approximate for open arms (it reconstructs the committed book, which the
+  open bit abolishes); the closed arm's rows are exact.
+
 ## What this does not show
 
 Matched-clock era-4/5 error gaps between near-identical arms reach 0.08 in this round (the two
