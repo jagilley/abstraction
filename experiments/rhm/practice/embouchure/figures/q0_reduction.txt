@@ -1,0 +1,274 @@
+==============================================================================
+Q0 (iii) — THE READ-BACK CHECK
+==============================================================================
+  rule_seed_0: 14 legal codes, 2 collisions -> exact-reader read-back is the identity: False
+      code 12: [[1, 1], [4, 1]]
+      code 39: [[2, 0], [7, 0]]
+  rule_seed_6: 16 legal codes, 0 collisions -> exact-reader read-back is the identity: True
+
+  tag         arm              cyc uncap  rows==min(nsol*32,512) readback_acc harvest==nsol*32
+  if_q1c_yk   canon_s            —  no spell_rows (arm has no rendering organ; the channel is n)
+  if_q1c_yk   given_rule_s       —  no spell_rows (arm has no rendering organ; the channel is n)
+  if_q1c_yk   leaf_s           140   107                  0.2000     0.885341                —
+  if_q1c_yk   fit_rule_s       140    94                  1.0000     1.000000           0.9929
+  if_q1c_yk   fit_index_s      140    89                  1.0000     1.000000           0.9929
+  if_q3_e     m_given_rule       —  no spell_rows (arm has no rendering organ; the channel is n)
+  if_q3_e     m_fit_rule       137   106                  1.0000     1.000000           0.9927
+  if_q3_e     m_leaf           140   101                  0.2786     0.877734                —
+  if_q3_e_sp  m_fit_rule_sp    140   104                  1.0000     1.000000           0.9929
+  if_q3_e_sp  m_leaf_sp         62    24                  0.6129     0.883081                —
+  if_q3_f2    leaf_s           140   107                  0.2000     0.885341                —
+  if_q3_f2    canon_s            —  no spell_rows (arm has no rendering organ; the channel is n)
+  if_q3_f2    given_rule_s       —  no spell_rows (arm has no rendering organ; the channel is n)
+
+  misspelled own writes: do they read back to the intended feature?
+  tag         arm             miss rows cells    drop P(fail|misspelled) P(fail|on-rule)  enrich
+  if_q1c_yk   leaf_s               4912    16  0.1147             0.1953          0.1030    1.90
+  if_q1c_yk   fit_rule_s             97    12  0.0000             0.0627         -0.0001       —
+  if_q1c_yk   fit_index_s            68    10  0.0000             0.0000          0.0000       —
+  if_q3_e     m_fit_rule             97    12  0.0000             0.0000          0.0000       —
+  if_q3_e     m_leaf               4422    15  0.1223             0.2638          0.1022    2.58
+  if_q3_e_sp  m_fit_rule_sp          97    12  0.0000             0.0000          0.0000       —
+  if_q3_e_sp  m_leaf_sp            2393    13  0.1169             0.2545          0.0993    2.56
+  if_q3_f2    leaf_s               4912    16  0.1147             0.1953          0.1030    1.90
+
+  tag         arm             era  reader-rows misspell  exact-map e_sp_prac
+  if_q1c_yk   leaf_s            1               0.10545              0.11841
+  if_q1c_yk   leaf_s            2               0.10688              0.12424
+  if_q1c_yk   leaf_s            3               0.13442              0.13302
+  if_q1c_yk   fit_rule_s        1               0.00501              0.00594
+  if_q1c_yk   fit_rule_s        2               0.00000              0.00000
+  if_q1c_yk   fit_rule_s        3               0.00000              0.00000
+  if_q1c_yk   fit_index_s       1               0.00349              0.00363
+  if_q1c_yk   fit_index_s       2               0.00000              0.00000
+  if_q1c_yk   fit_index_s       3               0.00000              0.00000
+  if_q3_e     m_fit_rule        1               0.00547              0.00643
+  if_q3_e     m_fit_rule        2               0.00000              0.00000
+  if_q3_e     m_fit_rule        3               0.00000              0.00000
+  if_q3_e     m_leaf            1               0.09379              0.11556
+  if_q3_e     m_leaf            2               0.11712              0.12191
+  if_q3_e     m_leaf            3               0.11031              0.13221
+  if_q3_e_sp  m_fit_rule_sp     1               0.00505              0.00594
+  if_q3_e_sp  m_fit_rule_sp     2               0.00000              0.00000
+  if_q3_e_sp  m_fit_rule_sp     3               0.00000              0.00000
+  if_q3_e_sp  m_leaf_sp         1               0.09379              0.11556
+  if_q3_e_sp  m_leaf_sp         2               0.10008              0.10897
+  if_q3_e_sp  m_leaf_sp         3               0.11448              0.11147
+  if_q3_f2    leaf_s            1               0.10545              0.11841
+  if_q3_f2    leaf_s            2               0.10688              0.12424
+  if_q3_f2    leaf_s            3               0.13442              0.13302
+
+==============================================================================
+Q0 (ii) — VOLUME: own written blocks vs harvested surface blocks, per cycle
+==============================================================================
+  tag         arm             era  n_sol surface/cyc  e_sp_prac  wr_err own blk/inst  own/cyc surf/own
+  if_q1c_yk   canon_s           1   24.1         773    0.12125  0.4827         8.04      514     1.50
+  if_q1c_yk   canon_s           2   10.7         341    0.12247  0.4521         8.67      555     0.62
+  if_q1c_yk   canon_s           3    9.8         314    0.13227  0.4581         9.24      591     0.53
+  if_q1c_yk   given_rule_s      1   25.6         818    0.00000  0.0000            —        —        —
+  if_q1c_yk   given_rule_s      2   11.7         375    0.00000  0.0000            —        —        —
+  if_q1c_yk   given_rule_s      3   13.7         439    0.00000  0.0000            —        —        —
+  if_q1c_yk   leaf_s            1   27.1         869    0.11841  0.4446         8.52      545     1.59
+  if_q1c_yk   leaf_s            2    8.7         278    0.12424  0.4140         9.60      615     0.45
+  if_q1c_yk   leaf_s            3    8.3         265    0.13302  0.4083        10.42      667     0.40
+  if_q1c_yk   fit_rule_s        1   25.9         827    0.00594  0.0179        10.61      679     1.22
+  if_q1c_yk   fit_rule_s        2   11.5         369    0.00000  0.0000            —        —        —
+  if_q1c_yk   fit_rule_s        3   15.1         484    0.00000  0.0000            —        —        —
+  if_q1c_yk   fit_index_s       1   26.1         837    0.00363  0.0121         9.58      613     1.36
+  if_q1c_yk   fit_index_s       2   11.5         368    0.00000  0.0000            —        —        —
+  if_q1c_yk   fit_index_s       3   15.2         487    0.00000  0.0000            —        —        —
+  if_q3_e     m_given_rule      1   30.6         978    0.00000  0.0000            —        —        —
+  if_q3_e     m_given_rule      2    9.6         309    0.00000  0.0000            —        —        —
+  if_q3_e     m_given_rule      3   12.0         384    0.00000  0.0000            —        —        —
+  if_q3_e     m_fit_rule        1   26.3         842    0.00643  0.0194        10.61      679     1.24
+  if_q3_e     m_fit_rule        2   12.3         394    0.00000  0.0000            —        —        —
+  if_q3_e     m_fit_rule        3    9.3         299    0.00000  0.0000            —        —        —
+  if_q3_e     m_leaf            1   40.0        1280    0.11556  0.4443         8.32      533     2.40
+  if_q3_e     m_leaf            2    7.7         247    0.12191  0.4050         9.63      616     0.40
+  if_q3_e     m_leaf            3    8.2         261    0.13221  0.4200        10.07      645     0.41
+  if_q3_e_sp  m_fit_rule_sp     1   25.5         816    0.00594  0.0179        10.61      679     1.20
+  if_q3_e_sp  m_fit_rule_sp     2   12.6         402    0.00000  0.0000            —        —        —
+  if_q3_e_sp  m_fit_rule_sp     3   10.8         346    0.00000  0.0000            —        —        —
+  if_q3_e_sp  m_leaf_sp         1   40.0        1280    0.11556  0.4443         8.32      533     2.40
+  if_q3_e_sp  m_leaf_sp         2   10.3         331    0.10897  0.4291         8.13      520     0.64
+  if_q3_e_sp  m_leaf_sp         3    5.3         170    0.11147  0.4197         8.50      544     0.31
+  if_q3_f2    leaf_s            1   27.1         869    0.11841  0.4446         8.52      545     1.59
+  if_q3_f2    leaf_s            2    8.7         278    0.12424  0.4140         9.60      615     0.45
+  if_q3_f2    leaf_s            3    8.3         265    0.13302  0.4083        10.42      667     0.40
+  if_q3_f2    canon_s           1   24.1         773    0.12125  0.4827         8.04      514     1.50
+  if_q3_f2    canon_s           2   10.7         341    0.12247  0.4521         8.67      555     0.62
+  if_q3_f2    canon_s           3    9.8         314    0.13227  0.4581         9.24      591     0.53
+  if_q3_f2    given_rule_s      1   25.6         818    0.00000  0.0000            —        —        —
+  if_q3_f2    given_rule_s      2   11.7         375    0.00000  0.0000            —        —        —
+  if_q3_f2    given_rule_s      3   13.7         439    0.00000  0.0000            —        —        —
+
+  if_q1c_yk   leaf_s          registers visited [0, 3, 7]  rows by register [12981, 0, 0, 14689, 0, 0, 0, 15212]
+  if_q1c_yk   fit_rule_s      registers visited [0, 3, 7]  rows by register [20025, 0, 0, 21547, 0, 0, 0, 19356]
+  if_q1c_yk   fit_index_s     registers visited [0, 3, 7]  rows by register [20306, 0, 0, 20700, 0, 0, 0, 19538]
+  if_q3_e     m_fit_rule      registers visited [0, 3, 7]  rows by register [16903, 0, 0, 18388, 0, 0, 0, 16325]
+  if_q3_e     m_leaf          registers visited [0, 3, 7]  rows by register [14748, 0, 0, 13568, 0, 0, 0, 14151]
+  if_q3_e_sp  m_fit_rule_sp   registers visited [0, 3, 7]  rows by register [17624, 0, 0, 19812, 0, 0, 0, 18116]
+  if_q3_e_sp  m_leaf_sp       registers visited [0, 3, 7]  rows by register [8423, 0, 0, 9005, 0, 0, 0, 7520]
+  if_q3_f2    leaf_s          registers visited [0, 3, 7]  rows by register [12981, 0, 0, 14689, 0, 0, 0, 15212]
+
+  own-write fraction of the graded configuration's blocks: mean 0.2812 over 18 (arm, era) cells [0.2512, 0.3257]
+
+==============================================================================
+Q0 (i) — `own_verdict` fitted offline from `spell_rows`, beside banked `surface`
+==============================================================================
+
+  if_q1c_yk/fit_rule_s — own_verdict (full logged rows)
+     cyc   n_buf acc_prac acc_held det_th  mono  theta_hat
+       1     512   0.8333   0.7500  0.375  True  [1, 1, 8, 8, 7, 8, 8, 1]
+       2    1024   1.0000   0.7750  0.250  True  [1, 1, 7, 6, 6, 7, 7, 2]
+       5    2560   1.0000   0.8500  0.375  True  [2, 2, 6, 6, 5, 5, 6, 2]
+      10    5120   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      20   10240   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      40   19360   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      60   26688   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      85   35840   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     100   41760   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     120   51040   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     140   60928   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+    END    60928   1.0000   0.8750  0.375  [2, 2, 5, 5, 5, 5, 5, 2]
+
+  if_q1c_yk/fit_rule_s — own_verdict (subsampled to own-write volume)  (volume_frac 0.2812)
+     cyc   n_buf acc_prac acc_held det_th  mono  theta_hat
+       1     144   0.7500   0.6750  0.000  True  [0, 0, 8, 6, 7, 8, 8, 6]
+       2     288   0.9167   0.7250  0.125  True  [1, 2, 7, 6, 6, 8, 8, 3]
+       5     720   1.0000   0.8750  0.375  True  [2, 2, 6, 5, 5, 5, 6, 2]
+      10    1440   1.0000   0.8500  0.250  True  [2, 2, 6, 5, 5, 6, 6, 2]
+      20    2880   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      40    5445   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      60    7506   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      85   10080   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     100   11745   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     120   14355   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     140   17136   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+    END    17136   1.0000   0.8750  0.375  [2, 2, 5, 5, 5, 5, 5, 2]
+
+  if_q1c_yk/fit_rule_s — own_verdict (misspelled rows only = certainly own writes)
+     cyc   n_buf acc_prac acc_held det_th  mono  theta_hat
+       1      68   0.4583   0.6250  0.000  True  [0, 0, 0, 0, 0, 0, 0, 0]
+       2      97   0.4583   0.6250  0.000  True  [0, 0, 0, 0, 0, 0, 0, 0]
+       5      97   0.5000   0.6250  0.125  True  [0, 1, 0, 0, 0, 0, 0, 0]
+      10      97   0.5417   0.6000  0.125  True  [0, 2, 0, 0, 0, 0, 0, 1]
+      20      97   0.5417   0.5750  0.000  True  [0, 2, 0, 0, 0, 0, 0, 2]
+      40      97   0.5417   0.5750  0.000  True  [0, 2, 0, 0, 0, 0, 0, 2]
+      60      97   0.5417   0.5750  0.000  True  [0, 2, 0, 0, 0, 0, 0, 2]
+      85      97   0.5417   0.5750  0.000  True  [0, 2, 0, 0, 0, 0, 0, 2]
+     100      97   0.5417   0.5750  0.000  True  [0, 2, 0, 0, 0, 0, 0, 2]
+     120      97   0.5417   0.5750  0.000  True  [0, 2, 0, 0, 0, 0, 0, 2]
+     140      97   0.6250   0.5750  0.000  True  [0, 2, 1, 1, 0, 0, 0, 2]
+    END       97   0.6250   0.5750  0.000  [0, 2, 1, 1, 0, 0, 0, 2]
+
+  if_q1c_yk/leaf_s — own_verdict (full logged rows)
+     cyc   n_buf acc_prac acc_held det_th  mono  theta_hat
+       1     512   0.8333   0.7500  0.375  True  [1, 1, 8, 8, 7, 8, 8, 1]
+       2    1024   1.0000   0.7500  0.125  True  [2, 2, 6, 6, 6, 7, 7, 2]
+       5    2560   1.0000   0.8250  0.125  True  [2, 2, 5, 5, 5, 6, 6, 2]
+      10    5120   1.0000   0.8250  0.125  True  [2, 2, 5, 5, 5, 6, 6, 2]
+      20    9424   1.0000   0.8250  0.125  True  [2, 2, 5, 5, 5, 6, 6, 2]
+      40   18852   1.0000   0.8500  0.250  True  [2, 2, 5, 5, 5, 5, 6, 2]
+      60   24426   1.0000   0.8500  0.250  True  [2, 2, 5, 5, 5, 5, 6, 2]
+      85   29967   1.0000   0.8500  0.250  True  [2, 2, 5, 5, 5, 5, 6, 2]
+     100   32957   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     120   37543   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     140   42882   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+    END    42882   1.0000   0.8750  0.375  [2, 2, 5, 5, 5, 5, 5, 2]
+
+  if_q1c_yk/leaf_s — own_verdict (subsampled to own-write volume)  (volume_frac 0.2812)
+     cyc   n_buf acc_prac acc_held det_th  mono  theta_hat
+       1     144   0.7500   0.6750  0.000  True  [0, 0, 8, 6, 7, 8, 8, 6]
+       2     288   0.9583   0.7000  0.000  True  [2, 2, 7, 6, 6, 7, 8, 3]
+       5     720   1.0000   0.8000  0.125  True  [2, 2, 5, 5, 5, 6, 6, 3]
+      10    1440   1.0000   0.8250  0.125  True  [2, 2, 5, 5, 5, 6, 6, 2]
+      20    2651   1.0000   0.8250  0.125  True  [2, 2, 5, 5, 5, 6, 6, 2]
+      40    5303   1.0000   0.8500  0.250  True  [2, 2, 5, 5, 5, 5, 6, 2]
+      60    6870   1.0000   0.8500  0.250  True  [2, 2, 5, 5, 5, 5, 6, 2]
+      85    8428   1.0000   0.8500  0.250  True  [2, 2, 5, 5, 5, 5, 6, 2]
+     100    9268   1.0000   0.8500  0.250  True  [2, 2, 5, 5, 5, 5, 6, 2]
+     120   10557   1.0000   0.8500  0.250  True  [2, 2, 5, 5, 5, 5, 6, 2]
+     140   12058   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+    END    12058   1.0000   0.8750  0.375  [2, 2, 5, 5, 5, 5, 5, 2]
+
+  if_q1c_yk/leaf_s — own_verdict (misspelled rows only = certainly own writes)
+     cyc   n_buf acc_prac acc_held det_th  mono  theta_hat
+       1      68   0.4583   0.6250  0.000  True  [0, 0, 0, 0, 0, 0, 0, 0]
+       2     125   0.4583   0.6250  0.000  True  [0, 0, 0, 0, 0, 0, 0, 0]
+       5     281   0.4583   0.6250  0.000  True  [0, 0, 0, 0, 0, 0, 0, 0]
+      10     509   0.4583   0.6250  0.000  True  [0, 0, 0, 0, 0, 0, 0, 0]
+      20     942   0.5000   0.6000  0.000  True  [0, 2, 0, 0, 0, 0, 0, 0]
+      40    1988   0.5417   0.6000  0.125  True  [0, 2, 0, 0, 0, 0, 0, 1]
+      60    2558   0.5417   0.6000  0.125  True  [0, 2, 0, 0, 0, 0, 0, 1]
+      85    3176   0.6250   0.5750  0.125  True  [1, 2, 0, 0, 1, 0, 0, 2]
+     100    3521   0.6250   0.6000  0.125  True  [1, 2, 0, 0, 2, 0, 0, 2]
+     120    4121   0.6250   0.5750  0.000  True  [2, 2, 0, 0, 2, 0, 0, 2]
+     140    4912   0.8333   0.6000  0.000  True  [2, 2, 1, 1, 4, 1, 1, 2]
+    END     4912   0.8333   0.6000  0.000  [2, 2, 1, 1, 4, 1, 1, 2]
+
+  if_q1c_yk/fit_rule_s — surface (banked)
+     cyc   n_buf acc_prac acc_held det_th  mono  theta_hat
+       1    1024   0.7500   0.7500  0.125  True  [1, 0, 7, 8, 8, 8, 8, 0]
+       2    1984   1.0000   0.8250  0.375  True  [1, 2, 6, 7, 6, 6, 6, 1]
+       5    5696   1.0000   0.8500  0.375  True  [2, 2, 6, 6, 5, 6, 5, 2]
+      10   11808   1.0000   0.8500  0.375  True  [2, 2, 5, 6, 5, 5, 5, 2]
+      20   23488   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      40   33088   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      60   40480   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+      85   49695   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     100   55711   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     120   65279   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+     140   76319   1.0000   0.8750  0.375  True  [2, 2, 5, 5, 5, 5, 5, 2]
+    END    76319   1.0000   0.8750  0.375  [2, 2, 5, 5, 5, 5, 5, 2]
+
+  if_q1c_yk/fit_index_s — surface (banked)
+     cyc   n_buf acc_prac acc_held det_th  mono  theta_hat
+       1    1024   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+       2    2176   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+       5    5696   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+      10   12032   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+      20   23616   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+      40   33472   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+      60   40256   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+      85   50047   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+     100   56127   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+     120   65567   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+     140   76831   1.0000   0.7500  0.375  True  [1, 1, 7, 7, 7, 7, 7, 1]
+    END    76831   1.0000   0.7500  0.375  [1, 1, 7, 7, 7, 7, 7, 1]
+
+  harness noise: first cycle at the endpoint, four fit seeds (`if_q1c_yk/fit_rule_s` rows)
+    full logged rows     seed+0  acc_held_end 0.8750  first cycle at endpoint 9  theta_hat [2, 2, 5, 5, 5, 5, 5, 2]
+    full logged rows     seed+1  acc_held_end 0.8750  first cycle at endpoint 8  theta_hat [2, 2, 5, 5, 5, 5, 5, 2]
+    full logged rows     seed+2  acc_held_end 0.8750  first cycle at endpoint 10  theta_hat [2, 2, 5, 5, 5, 5, 5, 2]
+    full logged rows     seed+3  acc_held_end 0.8750  first cycle at endpoint 14  theta_hat [2, 2, 5, 5, 5, 5, 5, 2]
+    own-write volume     seed+0  acc_held_end 0.8750  first cycle at endpoint 15  theta_hat [2, 2, 5, 5, 5, 5, 5, 2]
+    own-write volume     seed+1  acc_held_end 0.8750  first cycle at endpoint 11  theta_hat [2, 2, 5, 5, 5, 5, 5, 2]
+    own-write volume     seed+2  acc_held_end 0.8750  first cycle at endpoint 17  theta_hat [2, 2, 5, 5, 5, 5, 5, 2]
+    own-write volume     seed+3  acc_held_end 0.8750  first cycle at endpoint 16  theta_hat [2, 2, 5, 5, 5, 5, 5, 2]
+
+==============================================================================
+Q0 (iv) — identifiability at own-write volume (SIZING.md §2's method)
+==============================================================================
+  practised [0, 3, 7]  held out [1, 2, 4, 5, 6]
+  ceiling with ALL 24 practised cells observed (this subset, this theta draw):
+     additive_scalar  det 0.4750  acc 0.7875
+     table / one-hot  det 0.0000  acc 0.5000
+  first cycle all 24 practised cells observed: surface 1, own-write volume 1
+     cyc cells(surf)    det    acc | cells(own)    det    acc
+       1          24  0.475  0.787 |         24  0.475  0.787
+       2          24  0.475  0.787 |         24  0.475  0.787
+       3          24  0.475  0.787 |         24  0.475  0.787
+       4          24  0.475  0.787 |         24  0.475  0.787
+       5          24  0.475  0.787 |         24  0.475  0.787
+       6          24  0.475  0.787 |         24  0.475  0.787
+       7          24  0.475  0.787 |         24  0.475  0.787
+       8          24  0.475  0.787 |         24  0.475  0.787
+       9          24  0.475  0.787 |         24  0.475  0.787
+      10          24  0.475  0.787 |         24  0.475  0.787
+      11          24  0.475  0.787 |         24  0.475  0.787
+      12          24  0.475  0.787 |         24  0.475  0.787
+       1          24  0.475  0.787 |         24  0.475  0.787
+      11          24  0.475  0.787 |         24  0.475  0.787
+
+[phase0] wrote /home/user/research/experiments/rhm/practice/embouchure/phase0.json

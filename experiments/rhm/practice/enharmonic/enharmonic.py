@@ -3145,6 +3145,23 @@ ARMS = {
                              "dsil_bootstrap": True, "question_mode": "exo",
                              "merge_mode": "ledger",
                              "open_inventory": True, "ungate_l5": True}},
+    # [en_s9] THE SAME ARM WITH THE RE-ARM ADDRESSED TO THE ADVANCE OWNER ONLY. Identical to
+    # `endo_ledger_open_ung5` in every other respect — same loop, same split, same two knobs,
+    # same merge licence, same self-pacing — so the tag's one variable is WHICH CLOCK the
+    # class-coverage hook speaks to. Named for the knob (`_ra`) because that is the only thing
+    # that distinguishes it from the arm it is a twin of. NOTE that the knob acts at EVERY
+    # re-arm from the first one, not only at the late ones `en_s8` read: the trajectory may
+    # diverge from `en_s8`'s composed arm long before c185, and the first cycle of divergence
+    # is a reading of this arm, not a defect of it.
+    "endo_ledger_open_ung5_ra": {"vocab": "earned", "commit": "loop", "prop_k": 4,
+                     "span": True, "recert": True,
+                     "loop": {"kind": "quiet", "read": "dsil"},
+                     "loop_commit": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "dsil_bootstrap": True, "question_mode": "exo",
+                             "merge_mode": "ledger",
+                             "open_inventory": True, "ungate_l5": True,
+                             "rearm_advance_only": True}},
     # THE FLAT KEY on the composed arm's realised clock — the lifetime-matched comparator.
     "flat_yk_endo_ledger_open_ung5": {"vocab": "earned", "commit": "loop", "prop_k": 4,
                      "span": True, "recert": True,
@@ -3214,6 +3231,49 @@ ARMS = {
                      "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
                              "question_mode": "exo", "merge_mode": "ledger",
                              "open_inventory": True, "ungate_l5": True}},
+    # [en_s9] THE RE-ARM ADDRESSEE'S TWO TWINS: `en_pf_cmp_on` with BOTH POLICY OBJECTS BUILT.
+    #
+    # The knob's whole content is WHICH OF TWO POLICY OBJECTS the class-coverage hook calls
+    # `acted` on, so a twin that carries only one cannot gate it: every composed preflight arm
+    # above names no `loop_commit`, `loop_c` is None in all of them, and `_acted_all` IS
+    # `loop.acted` there — the knob would be inert by construction and the gate would pass
+    # without testing anything. Worse, in those arms `loop` is a `SchedulePolicy`, whose
+    # `acted` is the base class's no-op, so the hook has never yet re-armed ANYTHING in
+    # preflight (E-10's `n_rearms: 7` counts hook FIRINGS, not resets). These two twins fix
+    # both halves: an explicit `loop` (a QuietPolicy on `dsil`, the composed arm's own advance
+    # read) and an explicit `loop_commit` (a QuietPolicy on `yield`, its own commit read), so
+    # the split's two objects exist, are stepped every cycle their gauge is defined, and are
+    # distinguishable in the record.
+    #
+    # THE COMMIT RULE STAYS `delta_prov`, deliberately, and it is the reason these are twins of
+    # `en_pf_cmp_on` rather than of the production arm. What the hook needs in order to fire at
+    # all is an ADOPTED LEVEL, and a thermostat cannot be asked to arm on a forty-step
+    # substrate — the same fact that makes `tu_pf_split`/`tu_pf_q` hold the true tables. Under
+    # `delta_prov` the commits are the ones `en_pf_cmp_on` already takes (7 hook firings in 27
+    # cycles), while `loop_c` is built and stepped exactly as in a split arm, which is all the
+    # `if` at the hook reads. NOTE that `dsil_bootstrap` is NOT named here: its branch is
+    # guarded on `commit == "loop"` and would be inert, and an inert knob in an arm spec reads
+    # as a claim that it is doing something.
+    #
+    # `_ra_on` carries the knob, `_ra_off` is the same arm with it named and set False, so the
+    # default-resolution path (absent vs explicitly False) is exercised the way E-7 exercises
+    # the other two knobs.
+    "en_pf_ra_on":  {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "dsil"},
+                     "loop_commit": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo", "merge_mode": "ledger",
+                             "open_inventory": True, "ungate_l5": True,
+                             "rearm_advance_only": True}},
+    "en_pf_ra_off": {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
+                     "recert": True,
+                     "loop": {"kind": "quiet", "read": "dsil"},
+                     "loop_commit": {"kind": "quiet", "read": "yield"},
+                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                             "question_mode": "exo", "merge_mode": "ledger",
+                             "open_inventory": True, "ungate_l5": True,
+                             "rearm_advance_only": False}},
     "en_pf_open_late": {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
                      "recert": True,
                      "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
@@ -3467,9 +3527,11 @@ TWIN = {
     "en_pf_open_late": "enum_live",
     "en_pf_cmp_mergeoff": "enum_live", "en_pf_cmp_openoff": "enum_live",   # [en_s6]
     "en_pf_cmp_on": "enum_live",
+    "en_pf_ra_on": "enum_live", "en_pf_ra_off": "enum_live",               # [en_s9]
     "given_cat_tok_open_yk": "enum_live",
     # [en_s6] the composed arms
     "endo_ledger_open_ung5_yk": "enum_live", "endo_ledger_open_ung5": "enum_live",
+    "endo_ledger_open_ung5_ra": "enum_live",                            # [en_s9]
     "flat_yk_endo_ledger_open_ung5": "enum_live",
     "given_cat_tok_open_ung5_yk": "enum_live",
 }
@@ -4264,7 +4326,8 @@ def exp_rec_take():
     out = {}
     for (lvl, node), acc in _EXP_REC["acc"].items():
         a = [int(z) for z in acc.tolist()]
-        out[f"{lvl}n{node}"] = {"calls": a[0], "contains": a[1], "succ": a[2]}
+        out[f"{lvl}n{node}"] = {"calls": a[0], "contains": a[1], "succ": a[2],
+                                "contains_rep": (a[3] if len(a) > 3 else None)}
     exp_rec_reset()
     return out
 
@@ -4288,9 +4351,18 @@ def _tok_mask(move):
     return got
 
 
-def _exp_add(move, best, demand, succ):
+def _exp_add(move, best, demand, succ, repair=None):
     """One `index_add`-shaped accumulation on device; `succ` is already on the host because the
-    grader is numpy."""
+    grader is numpy.
+
+    [en_s7] TWO REFERENCES, side by side. `contains` is against the CLEAN LATENT — the one
+    feature the derivation actually carries at that node. `contains_rep` is against the set of
+    features that REPAIR the instance there (`fourwall.consistent_features`), which is the
+    weaker and more honest question: the DP is not obliged to reproduce the derivation, only to
+    write something the grader accepts. The two differ exactly where the node is ambiguous, and
+    `sizing/SIZING.md` section 5(a) says that is most of it. `repair` is an (n, v) bool mask
+    precomputed once per (era, cell) — the audition pool is fixed per era — so this costs no
+    extra grader call per macro call."""
     import torch
     if best is None or demand is None:
         return
@@ -4298,15 +4370,22 @@ def _exp_add(move, best, demand, succ):
     d = demand.to(b.device)[:b.numel()]
     if d.numel() != b.numel():
         return
-    hit = _tok_mask(move)[b, d].long().sum()
+    tm = _tok_mask(move)
+    hit = tm[b, d].long().sum()
+    rep = 0
+    if repair is not None:
+        r_ = repair.to(b.device)[:b.numel()]
+        if r_.shape[0] == b.numel():
+            rep = (tm[b] & r_).any(dim=1).long().sum()
     key = (int(move["level"]), int(move["node"]))
     acc = _EXP_REC["acc"].get(key)
     if acc is None:
-        acc = torch.zeros(3, dtype=torch.long, device=b.device)
+        acc = torch.zeros(4, dtype=torch.long, device=b.device)
         _EXP_REC["acc"][key] = acc
     acc[0] += b.numel()
     acc[1] += hit
     acc[2] += int(succ.sum())
+    acc[3] += rep
 
 
 def macro_features_pick(generator, x, move, s, v):
@@ -4376,7 +4455,7 @@ def expansion_recorder_check(v=8, s=2, depth=6, m=2, level=3, node=2, n=64, rule
 
 
 def audition_macro(generator, x0, roots_np, move, rules_t, canon, depth, v, m, s, rules,
-                   demand=None):
+                   demand=None, repair=None):
     """The macro's own audition: ONE action on held-out instances of the current era, graded
     by terminal possible-set success. This is the committable content — the quantity the
     unit-LP certificate watches."""
@@ -4387,7 +4466,7 @@ def audition_macro(generator, x0, roots_np, move, rules_t, canon, depth, v, m, s
         xf = MC.apply_any(generator, x0, move, rules_t, canon, depth, v, m, s)
     succ, dres = grade(xf.cpu().numpy(), roots_np, rules, s)
     if best is not None:
-        _exp_add(move, best, demand, succ)
+        _exp_add(move, best, demand, succ, repair=repair)
     return {"e": 1.0 - float(succ.mean()), "dres": float(dres.mean())}
 
 
@@ -4418,8 +4497,14 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
     # empty and fell back to the frozen table (see `operative`).
     _open_inv = bool(cfg.get("open_inventory")) and spec.get("vocab") == "earned"
     _ungate_l5 = bool(cfg.get("ungate_l5"))
+    # [en_s9] the re-arm hook's ADDRESSEE, resolved here beside the other two knobs. Unlike
+    # them it is not restricted to `vocab == "earned"`: the hook it guards already carries that
+    # restriction through `_open_inv`, so a `given` arm naming it is inert for the same reason
+    # `open_inventory` is, and the resolution stays a plain read of the flag.
+    _rearm_adv_only = bool(cfg.get("rearm_advance_only"))
     _open_cov, _open_rearms = {}, []          # [en_s6] the re-arm hook's state and its log
     _open_stat = {"open_inventory": bool(_open_inv), "ungate_l5": bool(_ungate_l5),
+                  "rearm_advance_only": bool(_rearm_adv_only),          # [en_s9]
                   "n_rebuild": 0, "n_empty_fallback": 0, "n_cycles_moved": 0,
                   "rows_frozen": {}, "rows_operative": {}}
 
@@ -4616,16 +4701,47 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                     _add, _rem = cov - prev, prev - cov
                     why = ("class_added" if _add and not _rem else
                            "class_removed" if _rem and not _add else "both")
-                    _open_rearms.append(
-                        {"cycle": int(cyc), "level": int(q_), "cause": why,
-                         "n_added": len(_add), "n_removed": len(_rem),
-                         "n_before": len(prev), "n_after": len(cov),
-                         "n_rows": int(tabs[q_]["child"].shape[0])})
-                    _acted_all("open_regime", cyc,
-                               why=f"L{q_} coverage {len(prev)}->{len(cov)} ({why})")
+                    _rr = {"cycle": int(cyc), "level": int(q_), "cause": why,
+                           "n_added": len(_add), "n_removed": len(_rem),
+                           "n_before": len(prev), "n_after": len(cov),
+                           "n_rows": int(tabs[q_]["child"].shape[0])}
+                    # [en_s9] WHO HEARS IT. Off (the default) this is `_acted_all` character
+                    # for character -- `en_s6`/`en_s7`/`en_s8`'s call. On, the ADVANCE owner
+                    # alone: a change in what the book can spell is a regime change for the
+                    # executor's delta-silence, and the argument that it is one for the yield
+                    # gauge is exactly what `en_s8` puts in doubt (the commit owner had a moved
+                    # latch and 1.36x-floor read at c185 and lost both to an L4 coverage change
+                    # at c186). The merge take path re-arms BOTH regardless -- that is a
+                    # different action with its own argument and is untouched here.
+                    if _rearm_adv_only:
+                        loop.acted("open_regime", cyc,
+                                   why=f"L{q_} coverage {len(prev)}->{len(cov)} ({why})")
+                    else:
+                        _acted_all("open_regime", cyc,
+                                   why=f"L{q_} coverage {len(prev)}->{len(cov)} ({why})")
+                    # what the two clocks looked like the instant after, read off the policy
+                    # objects themselves -- the gate's evidence that the knob acted on ONE of
+                    # them, and the reduction's per-re-arm record of what it cost the other.
+                    _rr.update({
+                        "adv_only": bool(_rearm_adv_only),
+                        "adv_n_since": getattr(loop, "n_since", None),
+                        "adv_reset": getattr(loop, "last_reset", None),
+                        "adv_moved": getattr(loop, "moved", None),
+                        "com_n_since": None if loop_c is None else getattr(loop_c, "n_since",
+                                                                          None),
+                        "com_reset": None if loop_c is None else getattr(loop_c, "last_reset",
+                                                                         None),
+                        "com_moved": None if loop_c is None else getattr(loop_c, "moved",
+                                                                         None),
+                        "com_V": None if loop_c is None else getattr(loop_c, "V", None)})
+                    _open_rearms.append(_rr)
                     print(f"[open]   arm={arm} c{cyc} L{q_} RE-ARM: class coverage "
                           f"{len(prev)}->{len(cov)} ({why}, +{len(_add)}/-{len(_rem)}), "
-                          f"rows={int(tabs[q_]['child'].shape[0])}", flush=True)
+                          f"rows={int(tabs[q_]['child'].shape[0])}, "
+                          f"re-armed={'advance only' if _rearm_adv_only else 'both'}"
+                          + ("" if loop_c is None else
+                             f" | commit n_since={_rr['com_n_since']} "
+                             f"moved={_rr['com_moved']}"), flush=True)
                 _open_cov[q_] = cov
         if _open_inv:
             _open_stat["n_rebuild"] += 1
@@ -4669,23 +4785,53 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
         return int(left) * int(cfg.get("mine_cap") or 0)
 
     def _try_merge(cyc, c_in_era, era, era_i, active):
-        """[enharmonic Q2] THE MERGE, in its own scope.
+        """[en_s8] THE SWEEP: every level that HAS an operative table with rows, bottom-up.
 
-        `nonlocal ms` is the only name it rebinds; `committed`, `miners`, `obs_miners`, `quot`,
-        `counts`, `log`, `events` and `merge_events` are mutated in place. Returns nothing and
-        is called only when `merge_mode` is set, so a Q1 arm never enters it.
+        `en_s2`..`en_s7` probed one level per proposal, `min(active - 1, maxl)` — the level the
+        era was earning. That is not where the partition is: at c188 the L4 book carried 154
+        classes while L2 and L3 had long since stopped moving, and a level the loop had skipped
+        was never probed at all. Here the proposal sweeps every level with rows.
+
+        BOTTOM-UP, and it is the whole reason the sweep is ordered rather than a set: a merge at
+        level l re-keys `miners[l+1]` (that is what the take branch does), so probing l before
+        l+1 means l+1 is probed against the map l just installed. Top-down would probe l+1
+        under a map about to change and act on evidence one cycle stale within the same
+        proposal.
+
+        Each level gets its OWN `merge_proposal` record, so the per-level columns the reduction
+        reads are unchanged; a `merge_sweep` record beside them lists which levels had rows and
+        which were probed, which is what gate E-6 asserts against.
         """
         nonlocal ms
-        # `active` is NOT clamped to `max_macro_level` — at era 5 it is 6 — so `ml` has
-        # to be. Unclamped it reached `operative(maxl + 1)`, which at maxl=4 is a
-        # `KeyError` on `committed[5]` and at maxl=5 is far worse: `operative(5)` returns
-        # the committed L5 table, 205,824 rows, and `pair_losses` is O(R^2) — 2.1e10
-        # pairs. That is the three-hour hang preflight caught at c24 of era 5, and the
-        # same line is both faces of it.
-        ml = min(int(active) - 1, int(maxl))
-        if not (2 <= ml <= maxl and ml in committed
-                and c_in_era % int(cfg["merge_every"]) == 0):
+        if c_in_era % int(cfg["merge_every"]) != 0:
             return
+        with_rows, probed = [], []
+        for _ml in range(2, int(maxl) + 1):
+            _t = operative(_ml)
+            if _t is not None and _t["child"].shape[0] >= 2:
+                with_rows.append(int(_ml))
+        for _ml in with_rows:                     # ascending == bottom-up
+            _merge_at(_ml, cyc, c_in_era, era, era_i, active)
+            probed.append(int(_ml))
+        _sw = {"kind": "merge_sweep", "arm": arm, "cycle": int(cyc), "era": era_i + 1,
+               "active": int(active), "levels_with_rows": with_rows, "levels_probed": probed}
+        merge_events.append(_sw)
+        events.append(_sw)
+        print(f"[merge]  arm={arm} c{cyc} SWEEP levels_with_rows={with_rows} "
+              f"probed={probed}", flush=True)
+
+    def _merge_at(ml, cyc, c_in_era, era, era_i, active):
+        """[enharmonic Q2] THE MERGE AT ONE LEVEL, in its own scope.
+
+        `nonlocal ms` is the only name it rebinds; `committed`, `miners`, `obs_miners`, `quot`,
+        `counts`, `log`, `events` and `merge_events` are mutated in place.
+
+        `ml` is handed in by the sweep and is already range-checked. The clamp that used to
+        live here (`min(active - 1, maxl)`) is why: unclamped it reached `operative(maxl + 1)`,
+        a `KeyError` at maxl=4 and at maxl=5 a three-hour hang on a 205,824-row table with
+        `pair_losses` at O(R^2). The sweep never offers a level outside 2..maxl.
+        """
+        nonlocal ms
         # THE OPERATIVE TABLE, frozen or live — not `committed[ml]`. `en_s0` measured that a
         # mirror-loop arm routinely SKIPS a level (`given_cat_tok` committed L2 at c12 and L4
         # at c95 over an L3 that was never frozen), and `Miner.build` one rung up reads
@@ -5092,8 +5238,18 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 merge_events.append(mrec)
                 events.append(mrec)
 
+            # [en_s8] PER LEVEL, not per cycle. `merge_events` accumulates across the sweep,
+            # so filtering on `cycle` alone counted every level probed EARLIER in the same
+            # proposal: the composed arm's c118 L4 row read `taken 9` when its own two groups
+            # were 2 and L3's seven had already been counted. Every per-group verdict and every
+            # `classes before->after` was right; only this counter carried over. The sweep
+            # total is kept beside it as `groups_taken_cum` because the `merge_sweep` record
+            # does not carry one.
             _mine = [e for e in merge_events
-                     if e.get("kind") == "merge" and e.get("cycle") == cyc]
+                     if e.get("kind") == "merge" and e.get("cycle") == cyc
+                     and e.get("level") == ml]
+            _sweep_so_far = [e for e in merge_events
+                             if e.get("kind") == "merge" and e.get("cycle") == cyc]
             prec.update({"n_classes_after": _n_classes(),
                          "n_entries_next_after": _next_entries(),
                          "groups_taken": sum(1 for e in _mine if e.get("taken")),
@@ -5101,7 +5257,9 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                                                if not e.get("taken") and not e.get("skipped")),
                          "groups_skipped": sum(1 for e in _mine if e.get("skipped")),
                          "groups_undefined": sum(1 for e in _mine
-                                                 if e.get("ledger_undefined"))})
+                                                 if e.get("ledger_undefined")),
+                         "groups_taken_cum": sum(1 for e in _sweep_so_far
+                                                 if e.get("taken"))})
         merge_events.append(prec)
         events.append(prec)
         print(f"[merge]  arm={arm} c{cyc} L{ml} done groups={prec.get('n_groups')} "
@@ -5405,6 +5563,31 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             feats = tbl[tuple(kids[:, :, i] for i in range(s))]
         _EXP_REC["reads"] += int(B)
         return feats[:, int(node)]
+
+    def repair_at(era_i_, level, node):
+        """[en_s7] (n, v) — which level-`level` features, written at `node`, REPAIR each
+        instance of the era's shadow pool. `fourwall.consistent_features` verbatim.
+
+        A PER-ERA PRECOMPUTE, which is what makes it affordable: the audition pool is fixed per
+        era, so this is `v * n_score` gradings once per (era, cell) — 8 x 256 = 2,048 — and not
+        one grader call per macro call. Counted in the instrument's own oracle bill
+        (`_EXP_REC["reads"]`) and NOT in `counts["ground"]`, for the reason the rest of the
+        instrument is contained that way: nothing in the loop consumes it."""
+        from rhm.practice.fourwall import wall as W      # [en_s7] local: instrument only
+        if not _EXP_REC["on"]:
+            return None
+        key = ("rep", int(era_i_), int(level), int(node))
+        got = _demand_cache.get(key)
+        if got is None:
+            if not (0 <= int(node) < s ** (depth - int(level))):
+                return None
+            r_np, x_np = shadow[era_i_][0], shadow[era_i_][1].cpu().numpy()
+            mask, n_grad = W.consistent_features(rules, x_np, r_np, int(node), int(level), s,
+                                                 canon_np, v)
+            _EXP_REC["reads"] += int(n_grad)
+            got = torch.from_numpy(np.ascontiguousarray(mask)).to(device)
+            _demand_cache[key] = got
+        return got
 
     def demand_at(era_i_, level, node):
         """The demanded feature vector for the era's shadow pool at that cell, cached."""
@@ -6229,7 +6412,8 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                     mv = MC.to_device(MC.make_macro(ell, node, s, tbl), device)
                     cell["cand"] = audition_macro(
                         generator, sx, sr_np, mv, rules_t, canon, depth, v, m, s, rules,
-                        demand=demand_at(era_i, mv["level"], mv["node"]))["e"]
+                        demand=demand_at(era_i, mv["level"], mv["node"]),
+                        repair=repair_at(era_i, mv["level"], mv["node"]))["e"]
                     cell.update({f"tab_{k}": val for k, val in
                                  MC.grade_table(tbl, shared["truth"][ell]).items()})
                     if ell == active and committed.get(ell) is None:
@@ -6240,7 +6424,8 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 mvt = MC.to_device(MC.make_macro(ell, node, s, shared["truth"][ell]), device)
                 cell["true"] = audition_macro(
                     generator, sx, sr_np, mvt, rules_t, canon, depth, v, m, s, rules,
-                    demand=demand_at(era_i, mvt["level"], mvt["node"]))["e"]
+                    demand=demand_at(era_i, mvt["level"], mvt["node"]),
+                        repair=repair_at(era_i, mvt["level"], mvt["node"]))["e"]
                 # MATCHED-SIZE RANDOM CONTROL (oracle instrument, unpriced). `cal_ladder`
                 # measured that a k-entry table's audition has huge entry-IDENTITY variance at
                 # small k (L3 k=4 spans 0.10-0.97 over uniform draws). If mining recovered a
@@ -6258,7 +6443,8 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                         mvr = MC.to_device(MC.make_macro(ell, node, s, sub), device)
                         es.append(audition_macro(
                             generator, sx, sr_np, mvr, rules_t, canon, depth, v, m, s, rules,
-                            demand=demand_at(era_i, mvr["level"], mvr["node"]))["e"])
+                            demand=demand_at(era_i, mvr["level"], mvr["node"]),
+                        repair=repair_at(era_i, mvr["level"], mvr["node"]))["e"])
                     cell["rand_k"] = float(np.mean(es))
                     cell["rand_k_sd"] = float(np.std(es))
                 if committed[ell] is not None and spec["vocab"] == "earned":
@@ -6268,7 +6454,8 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                     mvc = MC.to_device(MC.make_macro(ell, node, s, committed[ell]), device)
                     cell["held"] = audition_macro(
                         generator, sx, sr_np, mvc, rules_t, canon, depth, v, m, s, rules,
-                        demand=demand_at(era_i, mvc["level"], mvc["node"]))["e"]
+                        demand=demand_at(era_i, mvc["level"], mvc["node"]),
+                        repair=repair_at(era_i, mvc["level"], mvc["node"]))["e"]
                     live = miners[ell].build(MC.base_table(v) if ell == 2
                                              else miners[ell - 1].build(MC.base_table(v),
                                                                         cfg["mine_support"]),
@@ -6277,7 +6464,8 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                         mvl = MC.to_device(MC.make_macro(ell, node, s, live), device)
                         cell["live"] = audition_macro(
                             generator, sx, sr_np, mvl, rules_t, canon, depth, v, m, s, rules,
-                            demand=demand_at(era_i, mvl["level"], mvl["node"]))["e"]
+                            demand=demand_at(era_i, mvl["level"], mvl["node"]),
+                        repair=repair_at(era_i, mvl["level"], mvl["node"]))["e"]
                         cell["live_entries"] = int(live["child"].shape[0])
                 aud[str(ell)] = cell
 
@@ -6568,7 +6756,8 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 aud_oracle = audition_macro(
                     generator, shadow[era_i][1], shadow[era_i][0], mv_o, rules_t, canon,
                     depth, v, m, s, rules,
-                    demand=demand_at(era_i, mv_o["level"], mv_o["node"]))["e"]
+                    demand=demand_at(era_i, mv_o["level"], mv_o["node"]),
+                        repair=repair_at(era_i, mv_o["level"], mv_o["node"]))["e"]
                 w_before, ms_len_before = int(width), len(ms)
                 committed[active] = tbl
                 # [figured_bass] `_rebuild_ms` IS `build_ms(base_ms, committed, ...)` +
@@ -7759,6 +7948,20 @@ def _d6_cfg(**kw):
                #                   cycle, so this makes that same stream committable rather than
                #                   introducing a new one (gate E-9).
                open_inventory=False, ungate_l5=False,
+               # [en_s9] WHICH POLICY THE OPEN BIT'S RE-ARM SPEAKS TO. The class-coverage hook
+               # in `_rebuild_ms` calls `_acted_all`, which is BOTH policies -- the donor's
+               # rule that every regime change re-arms every clock. On a split arm that means
+               # a coverage change re-arms the COMMIT owner too, and `en_s8`'s composed arm
+               # shows what that costs: the L5 yield read moved at c185 (1.36x its floor), the
+               # hook fired at c186 on an L4 coverage change, and the commit policy went back
+               # into BURN with `moved` cleared -- four cycles lost and the latch gone, with
+               # three quiet-valued reads at c190-192 that could no longer license anything.
+               # With this ON the hook calls `loop.acted` ONLY: the advance owner still treats
+               # a change in what the book can SPELL as a regime change, and the commit owner
+               # keeps counting on the gauge it reads. OFF is `en_s6`/`en_s7`/`en_s8` character
+               # for character (the call site is one `if`), and the flag is a per-ARM property
+               # in the file's idiom -- an arm IS how its clocks re-arm.
+               rearm_advance_only=False,
                yoke_from_tag="")            # [enharmonic] a banked tag a clock yoke reads from
     # [census] Phase 0 R6's ladder: the gate is at L2, so era 1 is what must be long enough to
     # contain its firing (latest all-arm L2 firing in the replay was c40, against era 1's old
@@ -8034,6 +8237,12 @@ def enharmonic_run(                                        # [enharmonic]
     # [en_s5] which currency the yield licence reads: "mass" (arrival, `en_s3`/`en_s4`) or
     # "buildable" (arrival AND the operative book's class coverage, this round's change).
     merge_gauge: str = "mass",
+    # [en_s8] the forced-transfer probe's instance pool. 256 through `en_s7`; the sweep
+    # multiplies the ROW count by the number of live levels, so this is the knob that keeps the
+    # probe's priced share under the round's ~2% line. `sizing/SIZING.md`'s fixed point for the
+    # probe's verdict is 32-64 instances, so dropping it to 128 stays well above where the
+    # verdict stabilises.
+    merge_n_probe: int = 256,
     tol_build_l3: float = 0.0, tol_build_l4: float = 0.0,
     tol_build_l5: float = 0.0, tol_build_l6: float = 0.0,
     # [enharmonic] the tag a clock yoke reads its source's realised actions from, so a yoke of
@@ -8177,6 +8386,7 @@ def enharmonic_run(                                        # [enharmonic]
                   merge_max_rows=merge_max_rows,                          # [enharmonic Q2]
                   merge_use_frac=merge_use_frac,                          # [en_s4]
                   merge_gauge=merge_gauge,                                # [en_s5]
+                  merge_n_probe=merge_n_probe,                            # [en_s8]
                   tol_build_l3=tol_build_l3, tol_build_l4=tol_build_l4,   # [en_s5]
                   tol_build_l5=tol_build_l5, tol_build_l6=tol_build_l6,   # [en_s5]
                   entry_rec_cap=entry_rec_cap, yoke_from_tag=yoke_from_tag,  # [enharmonic]
@@ -9324,6 +9534,8 @@ def gates_d6_remote(max_level: int = 3, n: int = 64, budget: int = 3):
 @app.function(image=image, volumes={DATA_DIR: volume}, gpu="L4", timeout=10800, memory=32768)
 def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
               max_macro_level: int = 5, budget: int = 2, arms: str = "",
+              # [en_s7] the probe's row cap, so the E-6 twin can gate the raised value
+              merge_max_rows: int = 64,
               # [en_s3] EVERY SWEEP GETS ITS OWN OUTDIR. `_ran(arm)` reads `results.json` out
               # of the preflight dir to decide whether an arm has run, and with one shared dir
               # a stale row from an earlier sweep passes for a fresh one -- which happened
@@ -9368,6 +9580,7 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
                   # the sweep hit Modal's 3600s function timeout. The block still runs many
                   # times per arm, which is all a code-path check needs.
                   merge_every=2, merge_n_probe=32, merge_tol=0.30,
+                  merge_max_rows=int(merge_max_rows),                   # [en_s7]
                   # [en_s5] the preflight's merge twins read the BUILDABLE gauge, so E-6's
                   # non-vacuity assertion is exercised here and not in the main run.
                   merge_gauge="expected",
@@ -9482,6 +9695,10 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
                  # same branch).
                  "en_pf_open_off", "en_pf_open", "en_pf_ung5", "en_pf_open_ung5",
                  "en_pf_cmp_mergeoff", "en_pf_cmp_openoff", "en_pf_cmp_on",   # [en_s6]
+                 # [en_s9] the re-arm addressee's twins, immediately after the composed twin
+                 # they are `loop_commit` and one knob away from. Both build BOTH policy
+                 # objects, because the knob is about which of the two hears the hook.
+                 "en_pf_ra_on", "en_pf_ra_off",
                  "en_pf_openflat", "en_pf_open_late",
                  "flat", "given_cat_tok", "given_cat_min",
                  # [tutti] the unification arms: the split's two policy objects, the
@@ -10169,7 +10386,11 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
     #      asserting one would be pre-registering it. What is asserted is that the op was
     #      REACHED, that every proposal carries the full record the parent spec's hardest norm
     #      demands (licence, loss, rise, floor, frozen), and that the priced probe was charged.
-    for _lbl in ("en_pf_merge_y", "en_pf_merge_l", "en_pf_merge_f"):
+    # [en_s7] the COMPOSED twin joins the loop: this round's arms carry merge + open + ungated
+    # at a raised `merge_max_rows`, and E-6's probed-class assertion is exactly the gate on that
+    # cap (`n_probed_rows == min(n_classes_before, cap)`), so it has to cover the shape that
+    # runs rather than only the closed merge twins.
+    for _lbl in ("en_pf_merge_y", "en_pf_merge_l", "en_pf_merge_f", "en_pf_cmp_on"):
         if not _ran(_lbl):
             continue
         _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
@@ -10180,15 +10401,17 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
         # refused, classes and the level above before and after), the group events because
         # they are where the licence lives.
         _me = [e for e in _all if e.get("kind") == "merge_proposal"]
-        _gr = [e for e in _all if e.get("kind") == "merge"]
+        _gr = [e for e in _all if e.get("kind") == "merge"]   # `merge_sweep` is neither
         _cand = [e for e in _gr if "loss" in e and not e.get("skipped")]
         _took = [e for e in _gr if e.get("taken")]
         _X[f"E-6 {_lbl}"] = {
             "merge_mode": _r.get("merge_mode"), "merge_cfg": _r.get("merge_cfg"),
             "n_proposals": len(_me), "n_groups": len(_gr), "n_with_a_candidate": len(_cand),
             "n_taken": len(_took),
-            "levels": sorted({e["level"] for e in _all}),
-            "frozen_flags": sorted({bool(e.get("frozen")) for e in _all}),
+            # [en_s8] `_all` now also carries `merge_sweep` records, which have no level and
+            # no frozen flag — the per-level columns read the proposal and group records.
+            "levels": sorted({e["level"] for e in _me + _gr}),
+            "frozen_flags": sorted({bool(e.get("frozen")) for e in _me + _gr}),
             "gradings_total": int(sum(e.get("gradings") or 0 for e in _me)),
             "group_sizes": sorted({int(e.get("group_size") or 0) for e in _gr}),
             "n_chained_groups": sum(1 for e in _gr if e.get("chained")),
@@ -10216,6 +10439,35 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
             for _k in ("n_pairs", "n_groups", "groups_taken", "groups_refused",
                        "n_classes_before", "n_classes_after"):
                 assert _k in _e, f"{_lbl}: a merge PROPOSAL is missing {_k!r}"
+            # [en_s8] and the counters are THIS LEVEL'S. Under the sweep `merge_events` holds
+            # every level probed earlier in the same proposal, so a count filtered on cycle
+            # alone carries over and can exceed the level's own group count.
+            assert int(_e["groups_taken"]) <= int(_e["n_groups"]), (
+                f"{_lbl}: c{_e['cycle']} L{_e['level']} reports {_e['groups_taken']} taken of "
+                f"{_e['n_groups']} groups — the counter is carrying over from another level "
+                f"of the same sweep")
+            assert (int(_e["groups_taken"]) + int(_e["groups_refused"])
+                    + int(_e.get("groups_skipped") or 0)) <= int(_e["n_groups"]), (
+                f"{_lbl}: c{_e['cycle']} L{_e['level']} taken+refused+skipped exceeds "
+                f"n_groups ({_e['groups_taken']}+{_e['groups_refused']}+"
+                f"{_e.get('groups_skipped')} > {_e['n_groups']})")
+        # [en_s8] THE SWEEP PROBED EVERY LEVEL THAT HAD ROWS. One `merge_sweep` record per
+        # proposal, listing the levels with an operative table of >= 2 rows and the levels the
+        # sweep actually visited; they must be equal, and ascending, or a level's partition
+        # went unprobed (or was probed before the level below re-keyed it).
+        _sweeps = [e for e in _all if e.get("kind") == "merge_sweep"]
+        if _sweeps:
+            _X[f"E-6 {_lbl}"]["n_sweeps"] = len(_sweeps)
+            _X[f"E-6 {_lbl}"]["levels_per_sweep"] = sorted(
+                {tuple(e["levels_probed"]) for e in _sweeps})
+            for _e in _sweeps:
+                assert _e["levels_probed"] == _e["levels_with_rows"], (
+                    f"{_lbl}: c{_e['cycle']} swept {_e['levels_probed']} but "
+                    f"{_e['levels_with_rows']} had rows — a level's partition went unprobed")
+                assert _e["levels_probed"] == sorted(_e["levels_probed"]), (
+                    f"{_lbl}: c{_e['cycle']} swept {_e['levels_probed']} out of order — the "
+                    f"sweep must be bottom-up so a level's merges re-key the level above "
+                    f"before it is probed")
         # [en_s4] WITH THE USE FILTER OFF, EVERY CLASS IS PROBED. The whole point of the
         # round: one representative per class over the whole operative book, `merge_max_rows`
         # the only cap. Asserted per proposal, and the cap's binding is reported.
@@ -10523,7 +10775,13 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
             "n_merge_proposals": len(_me),
             "n_rearms": len(_r.get("open_rearms") or []),
             "rearm_causes": sorted({q["cause"] for q in (_r.get("open_rearms") or [])}),
+            # [en_s9] the new knob is OFF in all three composed twins, so this block is the
+            # default path and its records are the ones `en_s6`/`en_s7`/`en_s8` were gated on.
+            "rearm_advance_only": _op.get("rearm_advance_only"),
             "merge_mode": _r.get("merge_mode")}
+        assert not _op.get("rearm_advance_only"), (
+            f"{_lbl}: `rearm_advance_only` resolved TRUE in an arm that never names it — the "
+            f"default is not off and E-10's records are no longer the composed path's")
         if _want == "merge_off":
             assert _op.get("open_inventory") and _op.get("ungate_l5"), f"{_lbl}: knobs off"
             assert not _me, (f"{_lbl}: the merge knob is off and the block still proposed "
@@ -10541,6 +10799,96 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
         else:
             assert _op.get("open_inventory") and _me and int(_op.get("n_rebuild") or 0) > 0, (
                 f"{_lbl}: the composed path does not compose ({_X[f'E-10 {_lbl}']})")
+
+    # E-11 [en_s9] WHICH CLOCK THE OPEN BIT'S RE-ARM SPEAKS TO. The knob's whole content is
+    #      one `if` at the hook, so the gate is that the `if` picks the right addressee and
+    #      that the other policy's state SURVIVES. `reset` writes `last_reset` to
+    #      "<kind>@c<cycle>[:why]" and clears `n_since`, `moved` and `V` together, so the
+    #      commit owner "was not re-armed by the hook" is readable two ways off one record:
+    #      its last reset is not this hook's, and it happened at an EARLIER cycle than the
+    #      firing. The second form is the one that survives preflight's cadence — most toy-
+    #      scale coverage changes are the previous cycle's merge, which re-arms both policies
+    #      through the merge path (a different action, untouched by this knob), so the commit
+    #      owner will often be legitimately at `n_since == 0` when the hook fires and a
+    #      counter-only test would read as vacuous when it is not.
+    #
+    #      Both twins carry BOTH policy objects (see their definitions): with `loop_c` None
+    #      the knob is inert by construction, so a missing `com_reset` fails the gate rather
+    #      than passing it quietly.
+    def _reset_cycle(txt):
+        """the cycle stamped into a policy's `last_reset`, or None if it carries none.
+        Parsed by hand rather than by regex so this gate adds no import to the run file."""
+        _t = str(txt or "")
+        if "@c" not in _t:
+            return None
+        _d = ""
+        for _ch in _t.split("@c", 1)[1]:
+            if not _ch.isdigit():
+                break
+            _d += _ch
+        return int(_d) if _d else None
+
+    for _lbl, _want in (("en_pf_ra_on", True), ("en_pf_ra_off", False)):
+        if not _ran(_lbl):
+            continue
+        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
+        _op = _r.get("open_stat") or {}
+        _ra = list(_r.get("open_rearms") or [])
+
+        def _live(q):
+            """the commit owner still holds a statistic the hook would have cleared"""
+            return bool(int(q.get("com_n_since") or 0) > 0 or q.get("com_moved")
+                        or q.get("com_V") is not None)
+
+        def _survived(q):
+            """...or its last reset predates this firing, which is the same claim"""
+            _rc = _reset_cycle(q.get("com_reset"))
+            return bool(_live(q) or (_rc is not None and _rc < int(q["cycle"])))
+
+        _X[f"E-11 {_lbl}"] = {
+            "rearm_advance_only": _op.get("rearm_advance_only"),
+            "open_inventory": _op.get("open_inventory"), "merge_mode": _r.get("merge_mode"),
+            "split": bool(_r.get("split")), "n_rearms": len(_ra),
+            "rearm_cycles": [q["cycle"] for q in _ra],
+            "adv_reset": [q.get("adv_reset") for q in _ra][:8],
+            "com_reset": [q.get("com_reset") for q in _ra][:8],
+            "com_n_since": [q.get("com_n_since") for q in _ra],
+            "com_moved": [q.get("com_moved") for q in _ra],
+            "n_commit_owner_survived": sum(1 for q in _ra if _survived(q)),
+            "n_commit_owner_live": sum(1 for q in _ra if _live(q))}
+        assert bool(_op.get("rearm_advance_only")) is _want, (
+            f"{_lbl}: the knob resolved to {_op.get('rearm_advance_only')!r}, wanted {_want} "
+            f"— the arm's cfg and the run's resolution disagree")
+        assert _ra, (f"{_lbl}: the class-coverage hook never fired in {len(_r['log']['cycle'])} "
+                     f"cycles, so the knob is untested and this gate is vacuous")
+        for q in _ra:
+            assert bool(q.get("adv_only")) is _want, f"{_lbl}: re-arm record {q}"
+            assert q.get("com_reset") is not None, (
+                f"{_lbl}: no commit policy object — an arm with no `loop_commit` cannot gate "
+                f"this knob, because `_acted_all` IS `loop.acted` when `loop_c` is None")
+            assert int(q.get("adv_n_since") or 0) == 0 and str(
+                q.get("adv_reset") or "").startswith("open_regime") and _reset_cycle(
+                    q.get("adv_reset")) == int(q["cycle"]), (
+                f"{_lbl}: the ADVANCE owner was not re-armed by the hook at c{q['cycle']} "
+                f"(n_since={q.get('adv_n_since')}, last_reset={q.get('adv_reset')!r})")
+            if _want:
+                assert not str(q.get("com_reset")).startswith("open_regime"), (
+                    f"{_lbl}: the knob is ON and the COMMIT owner was re-armed anyway at "
+                    f"c{q['cycle']} (last_reset={q.get('com_reset')!r})")
+            else:
+                assert (str(q.get("com_reset")).startswith("open_regime")
+                        and _reset_cycle(q.get("com_reset")) == int(q["cycle"])
+                        and not _live(q)), (
+                    f"{_lbl}: the knob is OFF and the COMMIT owner was NOT re-armed at "
+                    f"c{q['cycle']} — the default path is not `_acted_all` "
+                    f"(last_reset={q.get('com_reset')!r}, n_since={q.get('com_n_since')}, "
+                    f"moved={q.get('com_moved')}, V={q.get('com_V')})")
+        if _want:
+            assert any(_survived(q) for q in _ra), (
+                f"{_lbl}: the knob is ON and at none of the {len(_ra)} firings did the commit "
+                f"owner carry state from before the hook — every one of them coincided with a "
+                f"reset from some OTHER action, so nothing was measured and this gate is "
+                f"vacuous rather than passing ({_X[f'E-11 {_lbl}']})")
 
     # X-2  INERTNESS. With `loop_commit` absent the arm is the donor: `tu_pf_off` must carry no
     #      split record, no `c_*` trace columns, and must be bit-identical to `dsil_yield`'s

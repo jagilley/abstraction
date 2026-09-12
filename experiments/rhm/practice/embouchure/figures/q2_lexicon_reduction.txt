@@ -1,0 +1,69 @@
+==============================================================================
+Q2.0 (1) — THE CANDIDATE MERGES: which shared form is ambiguous UNDER THE RULE
+==============================================================================
+  theta = [1, 1, 6, 4, 5, 5, 5, 1]; practised [0, 3, 7]; 112 legal merges of 16 (feature, synonym) pairs
+  closed form agrees with the enumeration on all 112: True
+  merges that are NEVER ambiguous under the rule (surface-only, not what Q2 asks for): 34 of 112
+
+  the twelve richest, by ambiguous PRACTISED registers:
+                      pair     theta n_amb prac held  registers
+         (f0,k1) = (f1,k1)    [1, 1]     7    2    5  [1, 2, 3, 4, 5, 6, 7]
+         (f0,k1) = (f7,k1)    [1, 1]     7    2    5  [1, 2, 3, 4, 5, 6, 7]
+         (f1,k1) = (f7,k1)    [1, 1]     7    2    5  [1, 2, 3, 4, 5, 6, 7]
+         (f2,k0) = (f4,k0)    [6, 5]     5    2    3  [0, 1, 2, 3, 4]
+         (f2,k0) = (f5,k0)    [6, 5]     5    2    3  [0, 1, 2, 3, 4]
+         (f2,k0) = (f6,k0)    [6, 5]     5    2    3  [0, 1, 2, 3, 4]
+         (f4,k0) = (f5,k0)    [5, 5]     5    2    3  [0, 1, 2, 3, 4]
+         (f4,k0) = (f6,k0)    [5, 5]     5    2    3  [0, 1, 2, 3, 4]
+         (f5,k0) = (f6,k0)    [5, 5]     5    2    3  [0, 1, 2, 3, 4]
+         (f2,k0) = (f3,k0)    [6, 4]     4    2    2  [0, 1, 2, 3]
+         (f3,k0) = (f4,k0)    [4, 5]     4    2    2  [0, 1, 2, 3]
+         (f3,k0) = (f5,k0)    [4, 5]     4    2    2  [0, 1, 2, 3]
+
+  the disjoint greedy order used for the ladder (8 available):
+    H= 1  (f0,k1)=(f1,k1)  n_amb 7 (prac 2, held 5) at [1, 2, 3, 4, 5, 6, 7]
+    H= 2  (f2,k0)=(f4,k0)  n_amb 5 (prac 2, held 3) at [0, 1, 2, 3, 4]
+    H= 3  (f5,k0)=(f6,k0)  n_amb 5 (prac 2, held 3) at [0, 1, 2, 3, 4]
+    H= 4  (f3,k1)=(f7,k1)  n_amb 4 (prac 1, held 3) at [4, 5, 6, 7]
+    H= 5  (f4,k1)=(f5,k1)  n_amb 3 (prac 1, held 2) at [5, 6, 7]
+    H= 6  (f2,k1)=(f6,k1)  n_amb 2 (prac 1, held 1) at [6, 7]
+    H= 7  (f0,k0)=(f1,k0)  n_amb 1 (prac 1, held 0) at [0]
+    H= 8  (f3,k0)=(f7,k0)  n_amb 1 (prac 1, held 0) at [0]
+
+==============================================================================
+Q2.0 (2)+(3)+(4) — THE LADDER
+==============================================================================
+   H forms shared root_ok root_set root_amb  L1_set  L1_amb  L1ambP on_gram  recall   d*L1   d*L2   d*L3
+   0    16      0  1.0000   1.3945   0.3398  1.0000  0.0000  0.0000  1.0000  1.0000  1.336  2.342  3.365
+   1    15      1  1.0000   1.3945   0.3398  1.1783  0.1783  0.1293  1.0000  0.8772  1.303  2.258  3.182
+   2    14      2  1.0000   1.3945   0.3398  1.3069  0.3069  0.2552  1.0000  0.7692  1.303  2.141  3.135
+   3    13      3  1.0000   1.4180   0.3477  1.5420  0.5420  0.5086  1.0000  0.6383  1.264  1.904  2.762
+   4    12      4  1.0000   1.4180   0.3477  1.7060  0.7060  0.6160  1.0000  0.5116  1.230  1.842  2.611
+   5    11      5  1.0000   1.4180   0.3477  1.8154  0.8154  0.7136  1.0000  0.4000  1.258  1.857  2.592
+   6    10      6  1.0000   1.4180   0.3477  1.9000  0.9000  0.8051  1.0000  0.3158  1.281  1.865  2.574
+   7     9      7  1.0000   1.4180   0.3477  1.9277  0.9277  0.8824  1.0000  0.2703  1.312  1.883  2.576
+   8     8      8  1.0000   1.4180   0.3477  2.0000  1.0000  1.0000  1.0000  0.2222  1.246  1.795  2.463
+
+  LAST-WRITER-WINS at each homophone (the owner the arc's exact parse keeps):
+    code  12: (f0,k1) and (f1,k1)  ->  keeps f=1
+    code  33: (f2,k0) and (f4,k0)  ->  keeps f=4
+    code  28: (f5,k0) and (f6,k0)  ->  keeps f=6
+    code  19: (f3,k1) and (f7,k1)  ->  keeps f=7
+    code   5: (f4,k1) and (f5,k1)  ->  keeps f=5
+    code  40: (f2,k1) and (f6,k1)  ->  keeps f=6
+    code  26: (f0,k0) and (f1,k0)  ->  keeps f=1
+    code  41: (f3,k0) and (f7,k0)  ->  keeps f=7
+
+  THE WRITER'S SIDE by register, at the densest rung (H=8):
+    live (form, register) cells 36, recallable 8 (0.2222), ambiguous 28
+    rho practised recallable ambiguous
+      0      True          0         4
+      1     False          2         3
+      2     False          2         3
+      3      True          2         3
+      4     False          0         4
+      5     False          2         3
+      6     False          0         4
+      7      True          0         4
+
+[q2.0] wrote /home/user/research/experiments/rhm/practice/embouchure/phase0_q2.json

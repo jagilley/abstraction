@@ -1,0 +1,89 @@
+============================================================================================================
+ALIAS AUDIT — en_s9: what was there to merge, and what the probe saw of it
+============================================================================================================
+  `exist`  pairs of SURVIVING learner classes whose representatives share a token
+           class — the merges that are structurally available at that proposal.
+  `scored` how many of those the probe actually scored (both sides in the probed
+           set, both repairing something). `<=tol` / `>tol` split them by loss.
+  `ex(tok)` counts pairs sharing a TOKEN class; `ex(dmd)` pairs sharing a DEMAND
+  cell, which is the coarser set the probe can actually resolve as one and the set
+  a loss of 0 corresponds to. `scored`/`<=tol`/`>tol` are over `ex(dmd)`;
+  `all<=tol` is every scored pair within tol, whatever its type.
+  `ex(dmd) > 0` with `scored == 0` is (b): the use filter never showed the pair to
+  the probe. `ex(dmd) == 0` is (a). `scored > 0` with `<=tol == 0` is (c).
+
+  AN OPEN-INVENTORY ARM IS APPROXIMATE HERE, AND NOT A LITTLE. This rebuild
+  assumes the operative book of an adopted level IS the book its commit froze
+  -- which is exactly what open_inventory abolishes: there the commit freezes
+  the KEY and the book is the live build, moving every cycle. So for an open
+  arm the rows/cls/probed/scored columns reconstruct a book the arm did not
+  run, and every row is flagged [MISMATCH]. The committed-book coverage lines
+  above each table are exact in all cases. The arm is printed rather than
+  skipped so its structural columns (token classes, demand cells) are on the
+  record.
+
+========================================================================================================
+endo_ledger_open_ung5_ra   tol=0.2  use_frac=1.0  n_probe=128  max_rows=256  max n_class_capped over all builds = 50   (>0 -> THE SPELLING CAP BOUND: the rebuilt book is an approximation and the mismatches below are that, not a finding)
+    committed L2@c48: 13 rows, 13 classes, 8 of 9 token classes, 8 demand cells
+    committed L3@c100: 39 rows, 39 classes, 5 of 11 token classes, 6 demand cells
+    committed L4@c151: 100 rows, 84 classes, 6 of 13 token classes, 6 demand cells
+    committed L5@c186: 24 rows, 24 classes, 3 of 22 token classes, 3 demand cells
+   cycle  L  rows  cls  tok  dmd  probed  pairs  ex(tok)  ex(dmd)  scored  <=tol  >tol  all<=tol    loss of the scored existing pairs                        why
+  c    8  2    10   10    7    7      10     36        2        3       3      3     0         3        min 0.000 med 0.000 max 0.000               3 within tol
+  c   16  2    11   11    7    7      11     45        3        4       4      4     0         4        min 0.000 med 0.000 max 0.000               4 within tol
+  c   24  2    13   13    8    8      13     66        5        6       6      6     0         6        min 0.000 med 0.000 max 0.000               6 within tol
+  c   32  2    13   13    8    8      13     66        5        6       6      6     0         6        min 0.000 med 0.000 max 0.000               6 within tol
+  c   40  2    13   13    8    8      13     66        5        6       6      6     0         6        min 0.000 med 0.000 max 0.000               6 within tol
+  c   48  2    13   13    8    8      13     55        5        6       6      6     0         6        min 0.000 med 0.000 max 0.000               6 within tol
+  c   56  2    13   13    8    8      13     66        5        6       6      6     0         6        min 0.000 med 0.000 max 0.000               6 within tol
+  c   68  2    13   13    8    8      13     66        5        6       6      6     0         6        min 0.000 med 0.000 max 0.000               6 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c   68  3     8    8    4    5       8     15        2        2       2      2     0         2        min 0.000 med 0.000 max 0.000               2 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c   76  2    13   11    7    8      11     45        4        4       4      4     0         4        min 0.000 med 0.000 max 0.000               4 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c   76  3    16   16    5    6      16    105       16       16      16     16     0        16        min 0.000 med 0.000 max 0.000              16 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c   84  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c   84  3    36   36    5    6      36    561      136      136     136    136     0       136        min 0.000 med 0.000 max 0.000             136 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c   92  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c   92  3    27   27    4    5      27    325       85       85      85     85     0        85        min 0.000 med 0.000 max 0.000              85 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  100  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=True pairs=True]
+  c  100  3    39   39    5    6      39    630      142      142     142    142     0       142        min 0.000 med 0.000 max 0.000             142 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  108  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  108  3    39   39    5    6      39    630      142      142     142    142     0       142        min 0.000 med 0.000 max 0.000             142 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  118  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  118  3    39   39    5    6      39    630      142      142     142    142     0       142        min 0.000 med 0.000 max 0.000             142 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  118  4     2    2    2    2       2      1        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  126  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  126  3    39    8    5    6       8     10        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  126  4    60   58    4    4      58   1653      405      405     405    405     0       405        min 0.000 med 0.000 max 0.000             405 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  126  5     1    1    1    1       1      0        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  134  2    13    8    7    8       8     15        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  134  3    39    8    5    6       8     10        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  134  4   100   97    6    6      97   4656      762      762     762    762     0       762        min 0.000 med 0.000 max 0.000             762 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  134  5     1    1    1    1       1      0        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  142  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  142  3    39    8    5    6       8     10        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  142  4   100   84    6    6      84   3486      577      577     577    577     0       577        min 0.000 med 0.000 max 0.000             577 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  142  5     1    1    1    1       1      0        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  150  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  150  3    39    8    5    6       8     10        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  150  4   100   84    6    6      84   3486      577      577     577    577     0       577        min 0.000 med 0.000 max 0.000             577 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  150  5     7    7    2    2       7     21        9        9       9      9     0         9        min 0.000 med 0.000 max 0.000               9 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  158  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  158  3    39    8    5    6       8     10        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  158  4   100   84    6    6      84   3486      577      577     577    577     0       577        min 0.000 med 0.000 max 0.000             577 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  158  5     7    7    2    2       7     21        9        9       9      9     0         9        min 0.000 med 0.000 max 0.000               9 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  166  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  166  3    39    8    5    6       8     10        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  166  4   100   84    6    6      84   3486      577      577     577    577     0       577        min 0.000 med 0.000 max 0.000             577 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  166  5     7    7    2    2       7     21        9        9       9      9     0         9        min 0.000 med 0.000 max 0.000               9 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  174  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  174  3    39    8    5    6       8     10        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  174  4   100   84    6    6      84   3486      577      577     577    577     0       577        min 0.000 med 0.000 max 0.000             577 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  174  5     4    4    3    3       4      6        1        1       1      1     0         1        min 0.000 med 0.000 max 0.000               1 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  188  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=True]
+  c  188  3    39    8    5    6       8     10        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  188  4   100   77    6    6      77   2926      506      506     506    506     0       506        min 0.000 med 0.000 max 0.000             506 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  188  5    24   24    3    3      24    276      132      132     132    132     0       132        min 0.000 med 0.000 max 0.000             132 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  200  2    13    8    7    8       8     21        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  200  3    39    8    5    6       8     10        0        0       0      0     0         0                                    —  (a) nothing left to merge  [MISMATCH rows=False probed=False pairs=False]
+  c  200  4   100   77    6    6      77   2926      506      506     506    506     0       506        min 0.000 med 0.000 max 0.000             506 within tol  [MISMATCH rows=False probed=False pairs=False]
+  c  200  5    24   24    3    3      24    276      132      132     132    132     0       132        min 0.000 med 0.000 max 0.000             132 within tol  [MISMATCH rows=False probed=False pairs=False]

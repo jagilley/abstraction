@@ -554,7 +554,7 @@ is not scale-free: charging `e` with a larger-amplitude spelling error makes its
 fire early, on scale rather than on convergence.
 Full record: [tutti/README.md](tutti/README.md).
 
-### [`enharmonic/`](enharmonic/README.md) — the quotient: re-keying by category, and earning the key (2026-09-09→11)
+### [`enharmonic/`](enharmonic/README.md) — the quotient: re-keying by category, and earning the key (2026-09-09→12)
 
 **Goal**: key the macro table by *category* instead of spelling — first supplied from the oracle,
 then earned by the learner's own merges — and see whether the crank reaches the rung the flat key
@@ -578,7 +578,13 @@ era 3's narrow stream; the committable L5 miner starts at era 4; an open invento
 loop through δ-silence), and a richer all-legal book performs *worse* at matched clocks with
 slightly worse frontier choices — the executor's expansion choice, `inflection`'s question from
 this side. Also: the arc's committed-row precisions were mostly the inverse map's collisions, and
-the battery's growth column never measured regrowth. ≈43 GPU-h.
+the battery's growth column never measured regrowth. Three runs after (`en_s7`→`en_s9`) moved
+the wall twice: sweeping the merge over every live level with an ungated level above lets the
+learner collapse its L4 partition *before* the L4 commit (the closed arm's book must freeze
+unmerged because the licence at ℓ+1 is undefined while the gated table is empty), and taking the
+class-coverage re-arm hook off the commit latch then yields **the first endogenous L5 commit**
+(c186) — a thin book, eight class keys at the spelling cap, the first to audition worse than the
+oracle, with no consumption-era value visible in fifteen cycles. ≈49 GPU-h.
 
 ## Reproduce
 

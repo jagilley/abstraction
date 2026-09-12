@@ -1,0 +1,1639 @@
+================================================================================================
+ENHARMONIC — en_s9   (reduction; numbers, not interpretation)
+================================================================================================
+reduced by: python3 rhm/practice/enharmonic/analyze_enharmonic.py --tag en_s9 --bank en_s8:endo_ledger_open_ung5,en_s8:endo_ledger,fb_s1:given_cat_tok_open_ung5_yk,en_s6:flat_yk_endo_ledger_open_ung5   (from experiments/)
+era caps [60, 50, 70, 12, 9] = 201 cycles/arm scheduled; setup 617s; max_macro_level 5; mine_support 3; seed 0
+floors that governed the run: {'ledger': 0.02944712566990095, 'yield_L3': 0.46127129019246205, 'yield_L4': 0.5166900731510206, 'endo': 0.01091575129919287, 'provenance': "cd_ef/anchor, full config, 116 cycles, null-ABBA span 1 W 4, era boundaries and commit cycles dropped; cross-checked against floors.py's offline derivation on as_s0+cs_s0+as_s1 (574 windows/series)"}
+quotient/merge knobs: {'tol_yield_l5': 0.2197, 'tol_yield_l6': 0.1836, 'merge_every': 8, 'merge_n_pairs': 1, 'merge_margin': 0.0, 'merge_max_rows': 256, 'quot_spell_cap': 4}
+banked arms reduced alongside this tag: endo_ledger (from en_s8), endo_ledger_open_ung5 (from en_s8), flat_yk_endo_ledger_open_ung5 (from en_s6), given_cat_tok_open_ung5_yk (from fb_s1)
+
+[A] THE ARMS — lifetime, loop actions, and what was committed
+                 arm  cycles     t_cum(g)                 commits (level@cycle, entries)  advances
+         endo_ledger     201   50,919,424                L2@c48:13 L3@c97:42 L4@c179:100         5
+                     quotient=endo spell_cap=4 oracle_reads=47880 drops=0 ties=0
+    endo_ledger_open_ung5     201   51,002,432               L2@c48:13 L3@c100:61 L4@c151:136         5
+                     quotient=endo spell_cap=4 oracle_reads=51672 drops=0 ties=0
+    endo_ledger_open_ung5_ra     201   51,208,256   L2@c48:13 L3@c100:61 L4@c151:136 L5@c186:128         5
+                     quotient=endo spell_cap=4 oracle_reads=50418 drops=0 ties=0
+    flat_yk_endo_ledger_open_ung5     201   50,266,688                           L2@c48:13 L3@c100:23         5
+                     quotient=None spell_cap=None oracle_reads=None drops=None ties=None
+    given_cat_tok_open_ung5_yk     176   42,437,664                            L2@c12:16 L4@c95:88         5
+                     quotient=tok spell_cap=4 oracle_reads=47528 drops=7338 ties=0
+
+[B] L5 — the rung the node exists for
+    [en_s8] READ `L5 committed` ON A YOKED ARM AS A PROPERTY OF THE REPLAY, NOT A
+    FINDING: a clock yoke replays its source's commit cycles and can commit at no
+    other, so an arm yoked to a source that never committed L5 could not have
+    committed L5 whatever its book held. `en_s6`'s and `en_s7`'s composed arms are
+    both yoked to `en_s4:endo_ledger`, which did not commit L5. Only a SELF-PACED
+    arm's row answers the question.
+                 arm  L5 committed  |T5| at support (last)  L5 obs@sup3  L6 obs@sup3  read_level (era 4/5)
+         endo_ledger            no                       2            4            0                   [6]
+    endo_ledger_open_ung5            no                      19           19            2                   [6]
+    endo_ledger_open_ung5_ra      YES c186                      17           17            3                   [6]
+    flat_yk_endo_ledger_open_ung5            no                       0            2            0                   [6]
+    given_cat_tok_open_ung5_yk            no                      37           37           34                   [6]
+
+[C] THE SIGNATURE — the value clock in the consumption eras, against `flat`
+    [figured_bass] `ungate_l5` arms: the knob moves no loop action but is NOT
+    stream-neutral — the first non-empty L5 audition moves from c156 to c91 and
+    draws on the shared torch stream; `e` diverges from the anchor at c92. Read an
+    `ung5`-vs-anchor era-4/5 gap as an RNG shift, not a performance effect.
+    (no `flat` arm in this tag and none banked — the `vs flat` column is blank)
+                 arm  era  cycles   e (mean)   e (last)  succ (mean)  vs flat (e)
+         endo_ledger    4      12     0.6506     0.6250       0.3494         +nan
+         endo_ledger    5       9     0.7480     0.7031       0.2520         +nan
+    endo_ledger_open_ung5    4      12     0.6684     0.6536       0.3316         +nan
+    endo_ledger_open_ung5    5       9     0.7671     0.6927       0.2329         +nan
+    endo_ledger_open_ung5_ra    4      12     0.6708     0.6224       0.3292         +nan
+    endo_ledger_open_ung5_ra    5       9     0.7731     0.6979       0.2269         +nan
+    flat_yk_endo_ledger_open_ung5    4      12     0.7650     0.7422       0.2350         +nan
+    flat_yk_endo_ledger_open_ung5    5       9     0.8984     0.8854       0.1016         +nan
+    given_cat_tok_open_ung5_yk    4      12     0.5801     0.5417       0.4199         +nan
+    given_cat_tok_open_ung5_yk    5       9     0.7416     0.7318       0.2584         +nan
+
+[D] pi's PER-SLOT MASS at the last cycle (the routed policy over macro slots)
+         endo_ledger {"loss": 2.6735050678253174, "acc": 0.2578125, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 1496, "fallback": false, "n_prop": 49152,
+    endo_ledger_open_ung5 {"loss": 2.6542253494262695, "acc": 0.296875, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 2872, "fallback": false, "n_prop": 49152, 
+    endo_ledger_open_ung5_ra {"loss": 2.7146575450897217, "acc": 0.23828125, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 2344, "fallback": false, "n_prop": 49152
+    flat_yk_endo_ledger_open_ung5 {"loss": 2.7169344425201416, "acc": 0.23046875, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 952, "fallback": false, "n_prop": 49152,
+    given_cat_tok_open_ung5_yk {"loss": 2.592677354812622, "acc": 0.3125, "n": 60000, "k": 4, "k_eff": 4, "filter_on": true, "n_pairs": 2768, "fallback": false, "n_prop": 49152, "n_
+
+[E] THE DELETION BATTERY — the growth columns
+     [en_s3] CAVEAT ON `built`: it builds each level over `operative(ell-1)` — the
+     ARM'S OWN committed-or-live lower table — in EVERY condition, so under
+     `b_table` its lower table is undeleted and `b_table == a_full` on `built` is an
+     identity of the probe, not a finding (inherited from `tutti`/`native`, whose
+     own comment calls it the structural half). `built_fresh`, new this round,
+     builds each level over the CONDITION'S OWN fresh chain (`base_table` at the
+     bottom, each level feeding the next; a dead level kills the chain above it).
+     The informative half has always been `at_support`, which is table-free.
+         endo_ledger
+              a_full era0: e=0.3984375 solved=231  L2[sup 10 obs 231 built 10 fresh 10] L3[sup 13 obs 231 built 39 fresh 24] L4[sup 12 obs 231 built 80 fresh 29] L5[sup 3 obs 231 built 48 fresh 9]
+              a_full era1: e=0.46354166666666663 solved=206  L2[sup 10 obs 206 built 10 fresh 10] L3[sup 8 obs 206 built 34 fresh 26] L4[sup 13 obs 206 built 80 fresh 64] L5[sup 2 obs 206 built 32 fresh 4]
+              a_full era2: e=0.45052083333333337 solved=211  L2[sup 6 obs 211 built 6 fresh 6] L3[sup 7 obs 211 built 25 fresh 8] L4[sup 17 obs 211 built 80 fresh 9] L5[sup 1 obs 211 built 16 fresh 1]
+              a_full era3: e=0.5651041666666667 solved=167  L2[sup 5 obs 167 built 5 fresh 5] L3[sup 5 obs 167 built 22 fresh 11] L4[sup 4 obs 167 built 32 fresh 1] L5[sup 1 obs 167 built 16 fresh 1]
+              a_full era4: e=0.703125 solved=114  L2[sup 12 obs 114 built 12 fresh 12] L3[sup 11 obs 114 built 24 fresh 20] L4[sup 6 obs 114 built 48 fresh 1] L5[sup 4 obs 114 built 48 fresh 1]
+             b_table era0: e=0.3984375 solved=231  L2[sup 10 obs 231 built 10 fresh 10] L3[sup 13 obs 231 built 39 fresh 24] L4[sup 12 obs 231 built 80 fresh 29] L5[sup 3 obs 231 built 48 fresh 9]
+             b_table era1: e=0.46354166666666663 solved=206  L2[sup 10 obs 206 built 10 fresh 10] L3[sup 8 obs 206 built 34 fresh 26] L4[sup 13 obs 206 built 80 fresh 64] L5[sup 2 obs 206 built 32 fresh 4]
+             b_table era2: e=0.45052083333333337 solved=211  L2[sup 6 obs 211 built 6 fresh 6] L3[sup 7 obs 211 built 25 fresh 8] L4[sup 17 obs 211 built 80 fresh 9] L5[sup 1 obs 211 built 16 fresh 1]
+             b_table era3: e=0.5651041666666667 solved=167  L2[sup 5 obs 167 built 5 fresh 5] L3[sup 5 obs 167 built 22 fresh 11] L4[sup 4 obs 167 built 32 fresh 1] L5[sup 1 obs 167 built 16 fresh 1]
+             b_table era4: e=0.703125 solved=114  L2[sup 12 obs 114 built 12 fresh 12] L3[sup 11 obs 114 built 24 fresh 20] L4[sup 6 obs 114 built 48 fresh 1] L5[sup 4 obs 114 built 48 fresh 1]
+              b_span era0: e=0.4453125 solved=213  L2[sup 12 obs 213 built 12 fresh 12] L3[sup 21 obs 213 built 44 fresh 37] L4[sup 19 obs 213 built 96 fresh 69] L5[sup 0 obs 213 built 0 fresh 0]
+              b_span era1: e=0.6119791666666667 solved=149  L2[sup 11 obs 149 built 11 fresh 11] L3[sup 15 obs 149 built 37 fresh 27] L4[sup 7 obs 149 built 40 fresh 20] L5[sup 0 obs 149 built 0 fresh 0]
+              b_span era2: e=0.8671875 solved=51  L2[sup 6 obs 51 built 6 fresh 6] L3[sup 7 obs 51 built 31 fresh 13] L4[sup 3 obs 51 built 24 fresh 16] L5[sup 0 obs 51 built 0 fresh 0]
+              b_span era3: e=0.953125 solved=18  L2[sup 1 obs 18 built 1 fresh 1] L3[sup 2 obs 18 built 10 fresh 1] L4[sup 0 obs 18 built 0 fresh 0] L5[sup 0 obs 18 built 0 fresh 0]
+              b_span era4: e=0.9739583333333334 solved=10  L2[sup 0 obs 10 built 0 fresh 0] L3[sup 0 obs 10 built 0 fresh 0] L4[sup 0 obs 10 built 0 fresh 0] L5[sup 0 obs 10 built 0 fresh 0]
+             c_prims era0: e=0.5364583333333333 solved=178  L2[sup 4 obs 178 built 4 fresh 4] L3[sup 7 obs 178 built 21 fresh 3] L4[sup 7 obs 178 built 64 fresh 2] L5[sup 4 obs 178 built 48 fresh 2]
+             c_prims era1: e=0.5208333333333333 solved=184  L2[sup 4 obs 184 built 4 fresh 4] L3[sup 4 obs 184 built 18 fresh 4] L4[sup 9 obs 184 built 72 fresh 3] L5[sup 3 obs 184 built 32 fresh 3]
+             c_prims era2: e=0.5390625 solved=177  L2[sup 5 obs 177 built 5 fresh 5] L3[sup 4 obs 177 built 18 fresh 8] L4[sup 10 obs 177 built 80 fresh 20] L5[sup 3 obs 177 built 48 fresh 3]
+             c_prims era3: e=0.5963541666666667 solved=155  L2[sup 5 obs 155 built 5 fresh 5] L3[sup 4 obs 155 built 18 fresh 7] L4[sup 5 obs 155 built 48 fresh 1] L5[sup 2 obs 155 built 32 fresh 1]
+             c_prims era4: e=0.6302083333333333 solved=142  L2[sup 13 obs 142 built 13 fresh 13] L3[sup 12 obs 142 built 30 fresh 21] L4[sup 6 obs 142 built 48 fresh 1] L5[sup 4 obs 142 built 48 fresh 1]
+        _parity_at_end: {'2:0': 0.98876953125, '2:1': 0.990234375, '2:2': 0.97119140625, '2:3': 0.96533203125, '2:
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+    endo_ledger_open_ung5
+              a_full era0: e=0.38541666666666663 solved=236  L2[sup 9 obs 236 built 9 fresh 9] L3[sup 14 obs 236 built 69 fresh 30] L4[sup 13 obs 236 built 120 fresh 57] L5[sup 3 obs 236 built 48 fresh 9]
+              a_full era1: e=0.41666666666666663 solved=224  L2[sup 8 obs 224 built 8 fresh 8] L3[sup 9 obs 224 built 57 fresh 13] L4[sup 11 obs 224 built 148 fresh 20] L5[sup 3 obs 224 built 48 fresh 5]
+              a_full era2: e=0.44010416666666663 solved=215  L2[sup 6 obs 215 built 6 fresh 6] L3[sup 6 obs 215 built 45 fresh 7] L4[sup 12 obs 215 built 124 fresh 9] L5[sup 2 obs 215 built 32 fresh 5]
+              a_full era3: e=0.5520833333333333 solved=172  L2[sup 7 obs 172 built 7 fresh 7] L3[sup 6 obs 172 built 48 fresh 10] L4[sup 7 obs 172 built 112 fresh 13] L5[sup 2 obs 172 built 32 fresh 5]
+              a_full era4: e=0.6927083333333333 solved=118  L2[sup 10 obs 118 built 10 fresh 10] L3[sup 7 obs 118 built 42 fresh 10] L4[sup 6 obs 118 built 44 fresh 1] L5[sup 2 obs 118 built 32 fresh 1]
+             b_table era0: e=0.38541666666666663 solved=236  L2[sup 9 obs 236 built 9 fresh 9] L3[sup 14 obs 236 built 69 fresh 30] L4[sup 13 obs 236 built 120 fresh 57] L5[sup 3 obs 236 built 48 fresh 9]
+             b_table era1: e=0.41666666666666663 solved=224  L2[sup 8 obs 224 built 8 fresh 8] L3[sup 9 obs 224 built 57 fresh 13] L4[sup 11 obs 224 built 148 fresh 20] L5[sup 3 obs 224 built 48 fresh 5]
+             b_table era2: e=0.44010416666666663 solved=215  L2[sup 6 obs 215 built 6 fresh 6] L3[sup 6 obs 215 built 45 fresh 7] L4[sup 12 obs 215 built 124 fresh 9] L5[sup 2 obs 215 built 32 fresh 5]
+             b_table era3: e=0.5520833333333333 solved=172  L2[sup 7 obs 172 built 7 fresh 7] L3[sup 6 obs 172 built 48 fresh 10] L4[sup 7 obs 172 built 112 fresh 13] L5[sup 2 obs 172 built 32 fresh 5]
+             b_table era4: e=0.6927083333333333 solved=118  L2[sup 10 obs 118 built 10 fresh 10] L3[sup 7 obs 118 built 42 fresh 10] L4[sup 6 obs 118 built 44 fresh 1] L5[sup 2 obs 118 built 32 fresh 1]
+              b_span era0: e=0.46614583333333337 solved=205  L2[sup 11 obs 205 built 11 fresh 11] L3[sup 21 obs 205 built 93 fresh 38] L4[sup 21 obs 205 built 180 fresh 88] L5[sup 0 obs 205 built 0 fresh 0]
+              b_span era1: e=0.6458333333333333 solved=136  L2[sup 10 obs 136 built 10 fresh 10] L3[sup 16 obs 136 built 87 fresh 25] L4[sup 11 obs 136 built 128 fresh 36] L5[sup 0 obs 136 built 0 fresh 0]
+              b_span era2: e=0.8671875 solved=51  L2[sup 6 obs 51 built 6 fresh 6] L3[sup 7 obs 51 built 56 fresh 9] L4[sup 3 obs 51 built 44 fresh 1] L5[sup 0 obs 51 built 0 fresh 0]
+              b_span era3: e=0.9635416666666666 solved=14  L2[sup 1 obs 14 built 1 fresh 1] L3[sup 2 obs 14 built 20 fresh 1] L4[sup 0 obs 14 built 0 fresh 0] L5[sup 0 obs 14 built 0 fresh 0]
+              b_span era4: e=0.984375 solved=6  L2[sup 0 obs 6 built 0 fresh 0] L3[sup 0 obs 6 built 0 fresh 0] L4[sup 0 obs 6 built 0 fresh 0] L5[sup 0 obs 6 built 0 fresh 0]
+             c_prims era0: e=0.5364583333333333 solved=178  L2[sup 5 obs 178 built 5 fresh 5] L3[sup 5 obs 178 built 36 fresh 11] L4[sup 6 obs 178 built 76 fresh 17] L5[sup 4 obs 178 built 64 fresh 5]
+             c_prims era1: e=0.4765625 solved=201  L2[sup 6 obs 201 built 6 fresh 6] L3[sup 6 obs 201 built 45 fresh 7] L4[sup 9 obs 201 built 136 fresh 9] L5[sup 2 obs 201 built 32 fresh 5]
+             c_prims era2: e=0.49739583333333337 solved=193  L2[sup 7 obs 193 built 7 fresh 7] L3[sup 4 obs 193 built 28 fresh 12] L4[sup 8 obs 193 built 92 fresh 32] L5[sup 2 obs 193 built 32 fresh 5]
+             c_prims era3: e=0.5703125 solved=165  L2[sup 7 obs 165 built 7 fresh 7] L3[sup 5 obs 165 built 32 fresh 12] L4[sup 8 obs 165 built 96 fresh 32] L5[sup 2 obs 165 built 32 fresh 5]
+             c_prims era4: e=0.5494791666666667 solved=173  L2[sup 13 obs 173 built 13 fresh 13] L3[sup 9 obs 173 built 38 fresh 31] L4[sup 7 obs 173 built 56 fresh 33] L5[sup 3 obs 173 built 48 fresh 5]
+        _parity_at_end: {'2:0': 0.91650390625, '2:1': 0.990234375, '2:2': 0.9384765625, '2:3': 0.95849609375, '2:4
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+    endo_ledger_open_ung5_ra
+              a_full era0: e=0.4140625 solved=225  L2[sup 10 obs 225 built 10 fresh 10] L3[sup 11 obs 225 built 78 fresh 34] L4[sup 12 obs 225 built 136 fresh 57] L5[sup 2 obs 225 built 32 fresh 5]
+              a_full era1: e=0.42708333333333337 solved=220  L2[sup 8 obs 220 built 8 fresh 8] L3[sup 8 obs 220 built 58 fresh 21] L4[sup 11 obs 220 built 148 fresh 29] L5[sup 2 obs 220 built 32 fresh 5]
+              a_full era2: e=0.47135416666666663 solved=203  L2[sup 6 obs 203 built 6 fresh 6] L3[sup 5 obs 203 built 32 fresh 7] L4[sup 9 obs 203 built 104 fresh 9] L5[sup 2 obs 203 built 32 fresh 5]
+              a_full era3: e=0.609375 solved=150  L2[sup 6 obs 150 built 6 fresh 6] L3[sup 6 obs 150 built 40 fresh 11] L4[sup 4 obs 150 built 48 fresh 1] L5[sup 2 obs 150 built 32 fresh 1]
+              a_full era4: e=0.6979166666666667 solved=116  L2[sup 10 obs 116 built 10 fresh 10] L3[sup 8 obs 116 built 46 fresh 22] L4[sup 5 obs 116 built 48 fresh 1] L5[sup 1 obs 116 built 16 fresh 1]
+             b_table era0: e=0.4140625 solved=225  L2[sup 10 obs 225 built 10 fresh 10] L3[sup 11 obs 225 built 78 fresh 34] L4[sup 12 obs 225 built 136 fresh 57] L5[sup 2 obs 225 built 32 fresh 5]
+             b_table era1: e=0.42708333333333337 solved=220  L2[sup 8 obs 220 built 8 fresh 8] L3[sup 8 obs 220 built 58 fresh 21] L4[sup 11 obs 220 built 148 fresh 29] L5[sup 2 obs 220 built 32 fresh 5]
+             b_table era2: e=0.47135416666666663 solved=203  L2[sup 6 obs 203 built 6 fresh 6] L3[sup 5 obs 203 built 32 fresh 7] L4[sup 9 obs 203 built 104 fresh 9] L5[sup 2 obs 203 built 32 fresh 5]
+             b_table era3: e=0.609375 solved=150  L2[sup 6 obs 150 built 6 fresh 6] L3[sup 6 obs 150 built 40 fresh 11] L4[sup 4 obs 150 built 48 fresh 1] L5[sup 2 obs 150 built 32 fresh 1]
+             b_table era4: e=0.6979166666666667 solved=116  L2[sup 10 obs 116 built 10 fresh 10] L3[sup 8 obs 116 built 46 fresh 22] L4[sup 5 obs 116 built 48 fresh 1] L5[sup 1 obs 116 built 16 fresh 1]
+              b_span era0: e=0.49479166666666663 solved=194  L2[sup 11 obs 194 built 11 fresh 11] L3[sup 19 obs 194 built 89 fresh 36] L4[sup 16 obs 194 built 164 fresh 72] L5[sup 0 obs 194 built 0 fresh 0]
+              b_span era1: e=0.6432291666666667 solved=137  L2[sup 11 obs 137 built 11 fresh 11] L3[sup 16 obs 137 built 83 fresh 33] L4[sup 11 obs 137 built 100 fresh 45] L5[sup 0 obs 137 built 0 fresh 0]
+              b_span era2: e=0.875 solved=48  L2[sup 6 obs 48 built 6 fresh 6] L3[sup 7 obs 48 built 56 fresh 10] L4[sup 4 obs 48 built 60 fresh 13] L5[sup 0 obs 48 built 0 fresh 0]
+              b_span era3: e=0.9713541666666666 solved=11  L2[sup 1 obs 11 built 1 fresh 1] L3[sup 2 obs 11 built 20 fresh 1] L4[sup 0 obs 11 built 0 fresh 0] L5[sup 0 obs 11 built 0 fresh 0]
+              b_span era4: e=0.9921875 solved=3  L2[sup 0 obs 3 built 0 fresh 0] L3[sup 0 obs 3 built 0 fresh 0] L4[sup 0 obs 3 built 0 fresh 0] L5[sup 0 obs 3 built 0 fresh 0]
+             c_prims era0: e=0.5494791666666667 solved=173  L2[sup 4 obs 173 built 4 fresh 4] L3[sup 5 obs 173 built 44 fresh 4] L4[sup 6 obs 173 built 92 fresh 3] L5[sup 4 obs 173 built 48 fresh 3]
+             c_prims era1: e=0.5130208333333333 solved=187  L2[sup 5 obs 187 built 5 fresh 5] L3[sup 5 obs 187 built 36 fresh 11] L4[sup 7 obs 187 built 104 fresh 1] L5[sup 5 obs 187 built 36 fresh 1]
+             c_prims era2: e=0.5130208333333333 solved=187  L2[sup 7 obs 187 built 7 fresh 7] L3[sup 5 obs 187 built 32 fresh 12] L4[sup 7 obs 187 built 104 fresh 32] L5[sup 2 obs 187 built 32 fresh 5]
+             c_prims era3: e=0.5677083333333333 solved=166  L2[sup 5 obs 166 built 5 fresh 5] L3[sup 4 obs 166 built 28 fresh 7] L4[sup 3 obs 166 built 48 fresh 1] L5[sup 4 obs 166 built 32 fresh 1]
+             c_prims era4: e=0.5859375 solved=159  L2[sup 12 obs 159 built 12 fresh 12] L3[sup 10 obs 159 built 54 fresh 25] L4[sup 7 obs 159 built 52 fresh 21] L5[sup 5 obs 159 built 48 fresh 5]
+        _parity_at_end: {'2:0': 0.95556640625, '2:1': 0.98681640625, '2:2': 0.984375, '2:3': 0.9150390625, '2:4': 
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+    flat_yk_endo_ledger_open_ung5
+              a_full era0: e=0.43229166666666663 solved=218  L2[sup 12 obs 218 built 12 fresh 12] L3[sup 16 obs 218 built 14 fresh 13] L4[sup 7 obs 218 built 3 fresh 4] L5[sup 0 obs 218 built 0 fresh 0]
+              a_full era1: e=0.5130208333333333 solved=187  L2[sup 8 obs 187 built 8 fresh 8] L3[sup 13 obs 187 built 12 fresh 10] L4[sup 7 obs 187 built 1 fresh 2] L5[sup 0 obs 187 built 0 fresh 0]
+              a_full era2: e=0.5520833333333333 solved=172  L2[sup 9 obs 172 built 9 fresh 9] L3[sup 9 obs 172 built 8 fresh 6] L4[sup 11 obs 172 built 2 fresh 1] L5[sup 0 obs 172 built 0 fresh 0]
+              a_full era3: e=0.6848958333333333 solved=121  L2[sup 6 obs 121 built 6 fresh 6] L3[sup 10 obs 121 built 10 fresh 6] L4[sup 8 obs 121 built 3 fresh 1] L5[sup 0 obs 121 built 0 fresh 0]
+              a_full era4: e=0.8854166666666666 solved=44  L2[sup 4 obs 44 built 4 fresh 4] L3[sup 3 obs 44 built 1 fresh 2] L4[sup 0 obs 44 built 0 fresh 0] L5[sup 0 obs 44 built 0 fresh 0]
+             b_table era0: e=0.43229166666666663 solved=218  L2[sup 12 obs 218 built 12 fresh 12] L3[sup 16 obs 218 built 14 fresh 13] L4[sup 7 obs 218 built 3 fresh 4] L5[sup 0 obs 218 built 0 fresh 0]
+             b_table era1: e=0.5130208333333333 solved=187  L2[sup 8 obs 187 built 8 fresh 8] L3[sup 13 obs 187 built 12 fresh 10] L4[sup 7 obs 187 built 1 fresh 2] L5[sup 0 obs 187 built 0 fresh 0]
+             b_table era2: e=0.5520833333333333 solved=172  L2[sup 9 obs 172 built 9 fresh 9] L3[sup 9 obs 172 built 8 fresh 6] L4[sup 11 obs 172 built 2 fresh 1] L5[sup 0 obs 172 built 0 fresh 0]
+             b_table era3: e=0.6848958333333333 solved=121  L2[sup 6 obs 121 built 6 fresh 6] L3[sup 10 obs 121 built 10 fresh 6] L4[sup 8 obs 121 built 3 fresh 1] L5[sup 0 obs 121 built 0 fresh 0]
+             b_table era4: e=0.8854166666666666 solved=44  L2[sup 4 obs 44 built 4 fresh 4] L3[sup 3 obs 44 built 1 fresh 2] L4[sup 0 obs 44 built 0 fresh 0] L5[sup 0 obs 44 built 0 fresh 0]
+              b_span era0: e=0.48958333333333337 solved=196  L2[sup 11 obs 196 built 11 fresh 11] L3[sup 28 obs 196 built 21 fresh 17] L4[sup 2 obs 196 built 1 fresh 1] L5[sup 0 obs 196 built 0 fresh 0]
+              b_span era1: e=0.640625 solved=138  L2[sup 10 obs 138 built 10 fresh 10] L3[sup 16 obs 138 built 12 fresh 10] L4[sup 2 obs 138 built 0 fresh 0] L5[sup 0 obs 138 built 0 fresh 0]
+              b_span era2: e=0.8645833333333334 solved=52  L2[sup 6 obs 52 built 6 fresh 6] L3[sup 5 obs 52 built 5 fresh 3] L4[sup 0 obs 52 built 0 fresh 0] L5[sup 0 obs 52 built 0 fresh 0]
+              b_span era3: e=0.9505208333333334 solved=19  L2[sup 3 obs 19 built 3 fresh 3] L3[sup 1 obs 19 built 1 fresh 1] L4[sup 0 obs 19 built 0 fresh 0] L5[sup 0 obs 19 built 0 fresh 0]
+              b_span era4: e=0.984375 solved=6  L2[sup 0 obs 6 built 0 fresh 0] L3[sup 0 obs 6 built 0 fresh 0] L4[sup 0 obs 6 built 0 fresh 0] L5[sup 0 obs 6 built 0 fresh 0]
+             c_prims era0: e=0.6770833333333333 solved=124  L2[sup 5 obs 124 built 5 fresh 5] L3[sup 6 obs 124 built 6 fresh 6] L4[sup 10 obs 124 built 3 fresh 1] L5[sup 0 obs 124 built 0 fresh 0]
+             c_prims era1: e=0.640625 solved=138  L2[sup 5 obs 138 built 5 fresh 5] L3[sup 5 obs 138 built 5 fresh 4] L4[sup 10 obs 138 built 2 fresh 1] L5[sup 1 obs 138 built 1 fresh 1]
+             c_prims era2: e=0.5911458333333333 solved=157  L2[sup 8 obs 157 built 8 fresh 8] L3[sup 7 obs 157 built 7 fresh 5] L4[sup 8 obs 157 built 3 fresh 1] L5[sup 0 obs 157 built 0 fresh 0]
+             c_prims era3: e=0.6640625 solved=129  L2[sup 7 obs 129 built 7 fresh 7] L3[sup 7 obs 129 built 7 fresh 5] L4[sup 8 obs 129 built 2 fresh 1] L5[sup 2 obs 129 built 1 fresh 1]
+             c_prims era4: e=0.8307291666666666 solved=65  L2[sup 10 obs 65 built 10 fresh 10] L3[sup 9 obs 65 built 3 fresh 2] L4[sup 4 obs 65 built 3 fresh 1] L5[sup 0 obs 65 built 0 fresh 0]
+        _parity_at_end: {'2:0': 0.982421875, '2:1': 0.98583984375, '2:2': 0.9599609375, '2:3': 0.66845703125, '2:4
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+    given_cat_tok_open_ung5_yk
+              a_full era0: e=0.40104166666666663 solved=230  L2[sup 9 obs 230 built 15 fresh 15] L3[sup 11 obs 230 built 62 fresh 62] L4[sup 11 obs 230 built 160 fresh 104] L5[sup 13 obs 230 built 128 fresh 128]
+              a_full era1: e=0.42708333333333337 solved=220  L2[sup 7 obs 220 built 12 fresh 12] L3[sup 10 obs 220 built 53 fresh 32] L4[sup 9 obs 220 built 128 fresh 48] L5[sup 12 obs 220 built 128 fresh 48]
+              a_full era2: e=0.5052083333333333 solved=190  L2[sup 6 obs 190 built 10 fresh 10] L3[sup 6 obs 190 built 44 fresh 28] L4[sup 9 obs 190 built 128 fresh 48] L5[sup 13 obs 190 built 128 fresh 48]
+              a_full era3: e=0.5625 solved=168  L2[sup 1 obs 168 built 2 fresh 2] L3[sup 2 obs 168 built 12 fresh 4] L4[sup 3 obs 168 built 48 fresh 16] L5[sup 10 obs 168 built 112 fresh 16]
+              a_full era4: e=0.7317708333333333 solved=103  L2[sup 10 obs 103 built 16 fresh 16] L3[sup 7 obs 103 built 36 fresh 39] L4[sup 2 obs 103 built 32 fresh 16] L5[sup 4 obs 103 built 48 fresh 16]
+             b_table era0: e=0.40104166666666663 solved=230  L2[sup 9 obs 230 built 15 fresh 15] L3[sup 11 obs 230 built 62 fresh 62] L4[sup 11 obs 230 built 160 fresh 104] L5[sup 13 obs 230 built 128 fresh 128]
+             b_table era1: e=0.42708333333333337 solved=220  L2[sup 7 obs 220 built 12 fresh 12] L3[sup 10 obs 220 built 53 fresh 32] L4[sup 9 obs 220 built 128 fresh 48] L5[sup 12 obs 220 built 128 fresh 48]
+             b_table era2: e=0.5052083333333333 solved=190  L2[sup 6 obs 190 built 10 fresh 10] L3[sup 6 obs 190 built 44 fresh 28] L4[sup 9 obs 190 built 128 fresh 48] L5[sup 13 obs 190 built 128 fresh 48]
+             b_table era3: e=0.5625 solved=168  L2[sup 1 obs 168 built 2 fresh 2] L3[sup 2 obs 168 built 12 fresh 4] L4[sup 3 obs 168 built 48 fresh 16] L5[sup 10 obs 168 built 112 fresh 16]
+             b_table era4: e=0.7317708333333333 solved=103  L2[sup 10 obs 103 built 16 fresh 16] L3[sup 7 obs 103 built 36 fresh 39] L4[sup 2 obs 103 built 32 fresh 16] L5[sup 4 obs 103 built 48 fresh 16]
+              b_span era0: e=0.5442708333333333 solved=175  L2[sup 10 obs 175 built 16 fresh 16] L3[sup 13 obs 175 built 65 fresh 60] L4[sup 12 obs 175 built 176 fresh 96] L5[sup 6 obs 175 built 80 fresh 32]
+              b_span era1: e=0.671875 solved=126  L2[sup 10 obs 126 built 16 fresh 16] L3[sup 12 obs 126 built 77 fresh 72] L4[sup 10 obs 126 built 144 fresh 48] L5[sup 5 obs 126 built 48 fresh 0]
+              b_span era2: e=0.8697916666666666 solved=50  L2[sup 5 obs 50 built 9 fresh 9] L3[sup 6 obs 50 built 44 fresh 28] L4[sup 5 obs 50 built 64 fresh 32] L5[sup 1 obs 50 built 0 fresh 0]
+              b_span era3: e=0.9661458333333334 solved=13  L2[sup 1 obs 13 built 2 fresh 2] L3[sup 1 obs 13 built 4 fresh 4] L4[sup 0 obs 13 built 0 fresh 0] L5[sup 0 obs 13 built 0 fresh 0]
+              b_span era4: e=0.9869791666666666 solved=5  L2[sup 0 obs 5 built 0 fresh 0] L3[sup 0 obs 5 built 0 fresh 0] L4[sup 1 obs 5 built 16 fresh 0] L5[sup 0 obs 5 built 0 fresh 0]
+             c_prims era0: e=0.5390625 solved=177  L2[sup 5 obs 177 built 8 fresh 8] L3[sup 5 obs 177 built 38 fresh 16] L4[sup 5 obs 177 built 64 fresh 32] L5[sup 11 obs 177 built 128 fresh 16]
+             c_prims era1: e=0.5078125 solved=189  L2[sup 7 obs 189 built 12 fresh 12] L3[sup 9 obs 189 built 72 fresh 44] L4[sup 8 obs 189 built 112 fresh 64] L5[sup 9 obs 189 built 96 fresh 64]
+             c_prims era2: e=0.5520833333333333 solved=172  L2[sup 6 obs 172 built 10 fresh 10] L3[sup 6 obs 172 built 44 fresh 28] L4[sup 7 obs 172 built 96 fresh 48] L5[sup 11 obs 172 built 112 fresh 48]
+             c_prims era3: e=0.5963541666666667 solved=155  L2[sup 2 obs 155 built 3 fresh 3] L3[sup 3 obs 155 built 16 fresh 4] L4[sup 3 obs 155 built 48 fresh 16] L5[sup 8 obs 155 built 80 fresh 16]
+             c_prims era4: e=0.6901041666666667 solved=119  L2[sup 9 obs 119 built 13 fresh 13] L3[sup 6 obs 119 built 28 fresh 10] L4[sup 4 obs 119 built 64 fresh 16] L5[sup 5 obs 119 built 64 fresh 16]
+        _parity_at_end: {'2:0': 0.94482421875, '2:1': 0.9775390625, '2:2': 0.96435546875, '2:3': 0.9462890625, '2:
+        _open_at_end: {'2:0': True, '2:1': True, '2:2': True, '2:3': True, '2:4': True, '2:5': True, '2:6': True
+
+[E2] THE BATTERY'S TABLE-FREE HALF — at-support keys per condition per era, L5
+     first (the rung the node exists for) and L2-L4 beside it. This is the column
+     [E]'s caveat says to read: it is mined from the condition's OWN chosen
+     trajectories and no table enters it.
+           endo_ledger
+        L5    a_full  at_support/era [3, 2, 1, 1, 4]   built_fresh/era [9, 4, 1, 1, 1]
+        L5   b_table  at_support/era [3, 2, 1, 1, 4]   built_fresh/era [9, 4, 1, 1, 1]
+        L5    b_span  at_support/era [0, 0, 0, 0, 0]   built_fresh/era [0, 0, 0, 0, 0]
+        L5   c_prims  at_support/era [4, 3, 3, 2, 4]   built_fresh/era [2, 3, 3, 1, 1]
+        L4    a_full  at_support/era [12, 13, 17, 4, 6]   built_fresh/era [29, 64, 9, 1, 1]
+        L4   b_table  at_support/era [12, 13, 17, 4, 6]   built_fresh/era [29, 64, 9, 1, 1]
+        L4    b_span  at_support/era [19, 7, 3, 0, 0]   built_fresh/era [69, 20, 16, 0, 0]
+        L4   c_prims  at_support/era [7, 9, 10, 5, 6]   built_fresh/era [2, 3, 20, 1, 1]
+        L3    a_full  at_support/era [13, 8, 7, 5, 11]   built_fresh/era [24, 26, 8, 11, 20]
+        L3   b_table  at_support/era [13, 8, 7, 5, 11]   built_fresh/era [24, 26, 8, 11, 20]
+        L3    b_span  at_support/era [21, 15, 7, 2, 0]   built_fresh/era [37, 27, 13, 1, 0]
+        L3   c_prims  at_support/era [7, 4, 4, 4, 12]   built_fresh/era [3, 4, 8, 7, 21]
+        L2    a_full  at_support/era [10, 10, 6, 5, 12]   built_fresh/era [10, 10, 6, 5, 12]
+        L2   b_table  at_support/era [10, 10, 6, 5, 12]   built_fresh/era [10, 10, 6, 5, 12]
+        L2    b_span  at_support/era [12, 11, 6, 1, 0]   built_fresh/era [12, 11, 6, 1, 0]
+        L2   c_prims  at_support/era [4, 4, 5, 5, 13]   built_fresh/era [4, 4, 5, 5, 13]
+    endo_ledger_open_ung5
+        L5    a_full  at_support/era [3, 3, 2, 2, 2]   built_fresh/era [9, 5, 5, 5, 1]
+        L5   b_table  at_support/era [3, 3, 2, 2, 2]   built_fresh/era [9, 5, 5, 5, 1]
+        L5    b_span  at_support/era [0, 0, 0, 0, 0]   built_fresh/era [0, 0, 0, 0, 0]
+        L5   c_prims  at_support/era [4, 2, 2, 2, 3]   built_fresh/era [5, 5, 5, 5, 5]
+        L4    a_full  at_support/era [13, 11, 12, 7, 6]   built_fresh/era [57, 20, 9, 13, 1]
+        L4   b_table  at_support/era [13, 11, 12, 7, 6]   built_fresh/era [57, 20, 9, 13, 1]
+        L4    b_span  at_support/era [21, 11, 3, 0, 0]   built_fresh/era [88, 36, 1, 0, 0]
+        L4   c_prims  at_support/era [6, 9, 8, 8, 7]   built_fresh/era [17, 9, 32, 32, 33]
+        L3    a_full  at_support/era [14, 9, 6, 6, 7]   built_fresh/era [30, 13, 7, 10, 10]
+        L3   b_table  at_support/era [14, 9, 6, 6, 7]   built_fresh/era [30, 13, 7, 10, 10]
+        L3    b_span  at_support/era [21, 16, 7, 2, 0]   built_fresh/era [38, 25, 9, 1, 0]
+        L3   c_prims  at_support/era [5, 6, 4, 5, 9]   built_fresh/era [11, 7, 12, 12, 31]
+        L2    a_full  at_support/era [9, 8, 6, 7, 10]   built_fresh/era [9, 8, 6, 7, 10]
+        L2   b_table  at_support/era [9, 8, 6, 7, 10]   built_fresh/era [9, 8, 6, 7, 10]
+        L2    b_span  at_support/era [11, 10, 6, 1, 0]   built_fresh/era [11, 10, 6, 1, 0]
+        L2   c_prims  at_support/era [5, 6, 7, 7, 13]   built_fresh/era [5, 6, 7, 7, 13]
+    endo_ledger_open_ung5_ra
+        L5    a_full  at_support/era [2, 2, 2, 2, 1]   built_fresh/era [5, 5, 5, 1, 1]
+        L5   b_table  at_support/era [2, 2, 2, 2, 1]   built_fresh/era [5, 5, 5, 1, 1]
+        L5    b_span  at_support/era [0, 0, 0, 0, 0]   built_fresh/era [0, 0, 0, 0, 0]
+        L5   c_prims  at_support/era [4, 5, 2, 4, 5]   built_fresh/era [3, 1, 5, 1, 5]
+        L4    a_full  at_support/era [12, 11, 9, 4, 5]   built_fresh/era [57, 29, 9, 1, 1]
+        L4   b_table  at_support/era [12, 11, 9, 4, 5]   built_fresh/era [57, 29, 9, 1, 1]
+        L4    b_span  at_support/era [16, 11, 4, 0, 0]   built_fresh/era [72, 45, 13, 0, 0]
+        L4   c_prims  at_support/era [6, 7, 7, 3, 7]   built_fresh/era [3, 1, 32, 1, 21]
+        L3    a_full  at_support/era [11, 8, 5, 6, 8]   built_fresh/era [34, 21, 7, 11, 22]
+        L3   b_table  at_support/era [11, 8, 5, 6, 8]   built_fresh/era [34, 21, 7, 11, 22]
+        L3    b_span  at_support/era [19, 16, 7, 2, 0]   built_fresh/era [36, 33, 10, 1, 0]
+        L3   c_prims  at_support/era [5, 5, 5, 4, 10]   built_fresh/era [4, 11, 12, 7, 25]
+        L2    a_full  at_support/era [10, 8, 6, 6, 10]   built_fresh/era [10, 8, 6, 6, 10]
+        L2   b_table  at_support/era [10, 8, 6, 6, 10]   built_fresh/era [10, 8, 6, 6, 10]
+        L2    b_span  at_support/era [11, 11, 6, 1, 0]   built_fresh/era [11, 11, 6, 1, 0]
+        L2   c_prims  at_support/era [4, 5, 7, 5, 12]   built_fresh/era [4, 5, 7, 5, 12]
+    flat_yk_endo_ledger_open_ung5
+        L5    a_full  at_support/era [0, 0, 0, 0, 0]   built_fresh/era [0, 0, 0, 0, 0]
+        L5   b_table  at_support/era [0, 0, 0, 0, 0]   built_fresh/era [0, 0, 0, 0, 0]
+        L5    b_span  at_support/era [0, 0, 0, 0, 0]   built_fresh/era [0, 0, 0, 0, 0]
+        L5   c_prims  at_support/era [0, 1, 0, 2, 0]   built_fresh/era [0, 1, 0, 1, 0]
+        L4    a_full  at_support/era [7, 7, 11, 8, 0]   built_fresh/era [4, 2, 1, 1, 0]
+        L4   b_table  at_support/era [7, 7, 11, 8, 0]   built_fresh/era [4, 2, 1, 1, 0]
+        L4    b_span  at_support/era [2, 2, 0, 0, 0]   built_fresh/era [1, 0, 0, 0, 0]
+        L4   c_prims  at_support/era [10, 10, 8, 8, 4]   built_fresh/era [1, 1, 1, 1, 1]
+        L3    a_full  at_support/era [16, 13, 9, 10, 3]   built_fresh/era [13, 10, 6, 6, 2]
+        L3   b_table  at_support/era [16, 13, 9, 10, 3]   built_fresh/era [13, 10, 6, 6, 2]
+        L3    b_span  at_support/era [28, 16, 5, 1, 0]   built_fresh/era [17, 10, 3, 1, 0]
+        L3   c_prims  at_support/era [6, 5, 7, 7, 9]   built_fresh/era [6, 4, 5, 5, 2]
+        L2    a_full  at_support/era [12, 8, 9, 6, 4]   built_fresh/era [12, 8, 9, 6, 4]
+        L2   b_table  at_support/era [12, 8, 9, 6, 4]   built_fresh/era [12, 8, 9, 6, 4]
+        L2    b_span  at_support/era [11, 10, 6, 3, 0]   built_fresh/era [11, 10, 6, 3, 0]
+        L2   c_prims  at_support/era [5, 5, 8, 7, 10]   built_fresh/era [5, 5, 8, 7, 10]
+    given_cat_tok_open_ung5_yk
+        L5    a_full  at_support/era [13, 12, 13, 10, 4]   built_fresh/era [128, 48, 48, 16, 16]
+        L5   b_table  at_support/era [13, 12, 13, 10, 4]   built_fresh/era [128, 48, 48, 16, 16]
+        L5    b_span  at_support/era [6, 5, 1, 0, 0]   built_fresh/era [32, 0, 0, 0, 0]
+        L5   c_prims  at_support/era [11, 9, 11, 8, 5]   built_fresh/era [16, 64, 48, 16, 16]
+        L4    a_full  at_support/era [11, 9, 9, 3, 2]   built_fresh/era [104, 48, 48, 16, 16]
+        L4   b_table  at_support/era [11, 9, 9, 3, 2]   built_fresh/era [104, 48, 48, 16, 16]
+        L4    b_span  at_support/era [12, 10, 5, 0, 1]   built_fresh/era [96, 48, 32, 0, 0]
+        L4   c_prims  at_support/era [5, 8, 7, 3, 4]   built_fresh/era [32, 64, 48, 16, 16]
+        L3    a_full  at_support/era [11, 10, 6, 2, 7]   built_fresh/era [62, 32, 28, 4, 39]
+        L3   b_table  at_support/era [11, 10, 6, 2, 7]   built_fresh/era [62, 32, 28, 4, 39]
+        L3    b_span  at_support/era [13, 12, 6, 1, 0]   built_fresh/era [60, 72, 28, 4, 0]
+        L3   c_prims  at_support/era [5, 9, 6, 3, 6]   built_fresh/era [16, 44, 28, 4, 10]
+        L2    a_full  at_support/era [9, 7, 6, 1, 10]   built_fresh/era [15, 12, 10, 2, 16]
+        L2   b_table  at_support/era [9, 7, 6, 1, 10]   built_fresh/era [15, 12, 10, 2, 16]
+        L2    b_span  at_support/era [10, 10, 5, 1, 0]   built_fresh/era [16, 16, 9, 2, 0]
+        L2   c_prims  at_support/era [5, 7, 6, 2, 9]   built_fresh/era [8, 12, 10, 3, 13]
+
+[F] PRECISION IN BOTH SPACES, per committed level
+                 arm  lvl   rows  true (feature)  prec_feature  true (token)  prec_token  recall_feature
+         endo_ledger    2     13               9        0.6923             —           —          0.6429
+         endo_ledger    3     42              11        0.2619             —           —          0.1964
+         endo_ledger    4    100              16        0.1600             —           —          0.0196
+    endo_ledger_open_ung5    2     13               9        0.6923             —           —          0.6429
+    endo_ledger_open_ung5    3     61              24        0.3934             —           —          0.4286
+    endo_ledger_open_ung5    4    136              25        0.1838             —           —          0.0306
+    endo_ledger_open_ung5_ra    2     13               9        0.6923             —           —          0.6429
+    endo_ledger_open_ung5_ra    3     61              24        0.3934             —           —          0.4286
+    endo_ledger_open_ung5_ra    4    136              25        0.1838             —           —          0.0306
+    endo_ledger_open_ung5_ra    5    128              33        0.2578             —           —          0.0002
+    flat_yk_endo_ledger_open_ung5    2     13               9        0.6923             —           —          0.6429
+    flat_yk_endo_ledger_open_ung5    3     23               8        0.3478             —           —          0.1429
+    given_cat_tok_open_ung5_yk    2     16              10        0.6250             —           —          0.7143
+    given_cat_tok_open_ung5_yk    4     88              11        0.1250             —           —          0.0135
+    (token-space precision needs the committed ROWS; see [F2])
+
+[F2] TOKEN SPACE. `sizing/SIZING.md` section 6: 68-96% of what `true_mask` calls
+     junk are legal PROGRAMS, so feature-space precision understates. What is exact
+     from the compact log differs by arm, and the difference is stated rather than
+     papered over:
+       flat            the committed ROWS are the miner's own keys, so both
+                       precisions are exact.
+       given_cat_*     the committed rows are a CROSS-PRODUCT the log does not
+                       carry; what IS exact is the KEY-level legality — the
+                       fraction of committed class-pair keys whose `class_step` is
+                       non-empty, i.e. whose spellings compose to a legal program at
+                       all. The row-weighted number needs a per-commit row dump,
+                       which is now in the fork for Q2 and was not here.
+
+                 arm  lvl      n  prec_feature  prec_token   unit  classes held  of alphabet
+         endo_ledger    2     21             —      0.6190    key             9            9
+         endo_ledger    3     21             —      0.9048    key             8           11
+         endo_ledger    4     36             —      1.0000    key             7           13
+    endo_ledger_open_ung5    2     19             —      0.6842    key             9            9
+    endo_ledger_open_ung5    3     21             —      0.7619    key             8           11
+    endo_ledger_open_ung5    4     25             —      1.0000    key             9           13
+    endo_ledger_open_ung5_ra    2     19             —      0.6842    key             9            9
+    endo_ledger_open_ung5_ra    3     17             —      0.8235    key             7           11
+    endo_ledger_open_ung5_ra    4     28             —      1.0000    key             9           13
+    endo_ledger_open_ung5_ra    5     17             —      1.0000    key             9           22
+    flat_yk_endo_ledger_open_ung5    2     21        0.6190      0.7619    row             9            9
+    flat_yk_endo_ledger_open_ung5    3     51        0.3333      0.8235    row             8           11
+    given_cat_tok_open_ung5_yk    2     15             —      0.7333    key             9            9
+    given_cat_tok_open_ung5_yk    4     16             —      1.0000    key             9           13
+
+[G] THE L4 BOOK'S CLASS COVERAGE — what the L5 build could look up
+    (per cycle, off `log["quot"][c]["build"]`.  DENOMINATOR: a SUPPLIED quotient
+     ('tok'/'min') is keyed by the fixed token-class alphabet, 13 L4 classes and 73
+     legal L5 class pairs, so `lower classes` is out of 13.  An ENDOGENOUS quotient
+     has no fixed alphabet: its ids are learned union-find representatives over the
+     raw rows it has actually seen, so the only honest denominator is the RAW CLASS
+     COUNT — `n_lower_rows`, the distinct flat lower rows the map partitions, one
+     class each before any merge.  Both are printed per row below.)
+         endo_ledger  quotient=endo  denominator=raw class count (n_lower_rows)
+          build  cycles         keys@sup     keys built        entries    lower classes     of (raw)  of (alphabet)   cap binds
+             L2     201            0..21          0..21          0..21             8..8         8..8              —        0..0
+             L3     181            0..28          0..22          0..68            1..13        1..17              —        0..0
+             L4     121            0..50           0..8         0..100            1..42        1..42              —       0..55
+             L5      88             0..2           0..2          0..32           1..100       1..100              —        0..4
+    endo_ledger_open_ung5  quotient=endo  denominator=raw class count (n_lower_rows)
+          build  cycles         keys@sup     keys built        entries    lower classes     of (raw)  of (alphabet)   cap binds
+             L2     201            0..19          0..19          0..19             8..8         8..8              —        0..0
+             L3     200            0..28          0..23         0..109            1..14        1..19              —        0..0
+             L4     138            0..39          0..18         0..220            2..87       2..109              —       0..46
+             L5      89            1..19          1..12         1..192            1..65       1..220              —       0..24
+    endo_ledger_open_ung5_ra  quotient=endo  denominator=raw class count (n_lower_rows)
+          build  cycles         keys@sup     keys built        entries    lower classes     of (raw)  of (alphabet)   cap binds
+             L2     201            0..19          0..19          0..19             8..8         8..8              —        0..0
+             L3     200            0..25          0..21         0..101            1..14        1..19              —        0..4
+             L4     127            0..42          0..15         0..188            2..87        2..95              —       0..50
+             L5      78            1..16          1..12         1..192            1..65       1..188              —       0..24
+    flat_yk_endo_ledger_open_ung5 (flat — no quotient; its L4 book is graded in [F2])
+    given_cat_tok_open_ung5_yk  quotient=tok  denominator=token-class alphabet
+          build  cycles         keys@sup     keys built        entries    lower classes     of (raw)  of (alphabet)   cap binds
+             L2     176            0..15          0..15          0..22             7..7         8..8              7        0..0
+             L3     175            0..20          0..20          0..96             1..9        2..22              9        0..0
+             L4     141            0..16          0..15         0..240             1..9        2..96             11       0..27
+             L5      91           20..37          0..24         0..384             1..9      16..240             13       3..49
+
+[G2] THE L4 BOOK AT ITS COMMIT — cycle and class coverage, side by side
+     A quotiented arm reads `n_lower_classes` off the first L5 build after the
+     commit; a FLAT arm's committed rows are its own at-support keys filtered by the
+     ratchet, replayed here, and their token classes counted the same way.
+     DENOMINATOR, as in [G]: a supplied quotient and a flat arm are counted out of
+     the 13-class L4 token alphabet; an ENDOGENOUS arm is counted out of its RAW
+     CLASS COUNT (the distinct flat L4 rows its learned map partitions).
+                   arm    key  L4 commit   rows  L4 classes at commit         of   L4 classes, live miner at end
+           endo_ledger  class       c179    100                   100    100 raw                               7
+    endo_ledger_open_ung5  class       c151    136                    11    136 raw                               9
+    endo_ledger_open_ung5_ra  class       c151    136                    11    136 raw                               9
+    flat_yk_endo_ledger_open_ung5   flat     (none)
+    given_cat_tok_open_ung5_yk  class        c95     88                     5     13 tok                               9
+
+[M] MERGE EVENTS — every proposal, taken or refused
+     [en_s3] THIS TAG'S RECORDS ARE THE WHOLE-PARTITION SHAPE: one
+     `merge_proposal` per entry into the block (what the probe found and what
+     the op did with it) and one `merge` event per alias GROUP the closure
+     found. The ledger audition is at l+1 — the level a level-l merge actually
+     changes — and carries `x_differ`, the fraction of instances on which the
+     kept and merged tables write a DIFFERENT state. `x_differ == 0` with
+     `e_merge == e_keep` means the DP's winning entry survived the merge and
+     the equality says nothing about it; `x_differ > 0` with the errors equal
+     means the merge was neutral on the level above. The note below describes
+     `en_s2b`'s records and is kept for reading the banked tags.
+     WHAT `e_keep`/`e_merge` EXECUTED IN en_s2b (code facts, that round's file):
+       * the ledger audition calls `audition_macro` (l.4009-4015), whose body is
+         `MC.apply_any` (l.4013 -> `ratchet/macros.py` l.232-246): `macro_features`'
+         max-sum DP over the macro's OWN TABLE, then `canon[feats]` scattered in.
+         The perf executor `ex` is threaded only into `beam_moves*` (l.1576, 1784,
+         4563, 4829, 5194) and is never passed here, so no span head fires and no
+         slot is resolved in either audition.
+       * `e_keep` grades `tbl_m = operative(ml)`; `e_merge` grades `tbl_try =
+         miners[ml].build(operative(ml-1), support)` (l.4317-4326), taken after
+         `quot.merge(ml, ca, cb)` + `miners[ml].rekey()` (l.4319-4320).
+         `ClassMiner.rekey` re-keys with `id_of(x, self.level - 1)` = the level-
+         (ml-1) map, which a level-ml merge does not touch; and `operative(ell)`
+         (l.4524-4532) returns that same `miners[ell].build(...)` expression at any
+         level that is not frozen.  So at a LIVE level `tbl_try` is `tbl_m` row for
+         row and the two auditions grade the identical table; at a FROZEN level they
+         differ only by the live drift since the commit.  The level a level-ml merge
+         does change is ml+1, whose miners are re-keyed in the TAKE branch (l.4367-
+         4370) and which no audition here grades.
+       * `n_entries_after` is `miners[ml].build(...)` after the take (l.4371/4381),
+         the live rebuild at the merged level, not a table the merge re-shaped.
+           endo_ledger licence=ledger proposals=50 groups=116 taken=15 refused=101 skipped=0 probe gradings=170,240 (0.3343% of priced time)
+         cycle  L  froz  pairs  grp took  ref skip undef       classes          T(l+1)
+        c    8  2 False     36    3    0    3    0     3        10->10            0->0
+        c   16  2 False     45    4    0    4    0     4        11->11            0->0
+        c   24  2 False     66    4    0    4    0     4        13->13            0->0
+        c   32  2 False     66    4    0    4    0     4        13->13            0->0
+        c   40  2 False     66    4    0    4    0     4        13->13            0->0
+        c   48  2  True     55    4    0    4    0     4        13->13            0->0
+        c   56  2  True     66    4    0    4    0     4        13->13            0->0
+        c   68  2  True     66    4    3    1    0     0         13->9           8->32
+        c   68  3 False    496    5    0    5    0     5        32->32            0->0
+        c   76  2  True     28    1    1    0    0     0          9->8          34->36
+        c   76  3 False    561    5    0    5    0     5        36->36            0->0
+        c   84  2  True     21    0    0    0    0     0          8->8          36->36
+        c   84  3 False    561    5    0    5    0     5        36->36            0->0
+        c   92  2  True     21    0    0    0    0     0          8->8          40->40
+        c   92  3 False    666    5    0    5    0     5        40->40            0->0
+        c  100  2  True     21    0    0    0    0     0          8->8          42->42
+        c  100  3  True    666    5    0    5    0     5        42->42            0->0
+        c  108  2  True     21    0    0    0    0     0          8->8          46->46
+        c  108  3  True    666    5    0    5    0     5        42->42            0->0
+        c  118  2  True     21    0    0    0    0     0          8->8          55->55
+        c  118  3  True    666    5    4    1    0     0        42->18           2->36
+        c  118  4 False    630    3    0    3    0     3        36->36            0->0
+        c  126  2  True     21    0    0    0    0     0          8->8          55->55
+        c  126  3  True     78    1    0    1    0     0        18->18          36->36
+        c  126  4 False    630    3    0    3    0     3        36->36            0->0
+        c  134  2  True     15    0    0    0    0     0          8->8          55->55
+        c  134  3  True     78    1    1    0    0     0        18->10          48->56
+        c  134  4 False   1540    4    0    4    0     4        56->56            0->0
+        c  142  2  True     21    0    0    0    0     0          8->8          55->55
+        c  142  3  True     10    0    0    0    0     0        10->10          72->72
+        c  142  4 False   2556    5    0    5    0     5        72->72            0->0
+        c  150  2  True     21    0    0    0    0     0          8->8          55->55
+        c  150  3  True     10    0    0    0    0     0        10->10          96->96
+        c  150  4 False   4560    6    0    6    0     6        96->96            0->0
+        c  158  2  True     21    0    0    0    0     0          8->8          55->55
+        c  158  3  True     10    0    0    0    0     0        10->10          96->96
+        c  158  4 False   4560    6    0    6    0     6        96->96            0->0
+        c  166  2  True     21    0    0    0    0     0          8->8          55->55
+        c  166  3  True     10    0    0    0    0     0        10->10        100->100
+        c  166  4 False   4560    6    0    6    0     6      100->100            0->0
+        c  174  2  True     21    0    0    0    0     0          8->8          55->55
+        c  174  3  True     10    0    0    0    0     0        10->10        100->100
+        c  174  4 False   4560    6    0    6    0     6      100->100            0->0
+        c  188  2  True     21    0    0    0    0     0          8->8          55->55
+        c  188  3  True     10    0    0    0    0     0        10->10        100->100
+        c  188  4  True   4560    6    6    0    0     0       100->10           1->16
+        c  200  2  True     21    0    0    0    0     0          8->8          55->55
+        c  200  3  True     10    0    0    0    0     0        10->10        100->100
+        c  200  4  True     15    0    0    0    0     0        10->10          32->32
+        c  200  5 False    496    2    0    2    0     2        32->32      None->None
+        --- every GROUP, ALL CURRENCIES and their floors ---
+         cycle  L   g   n   loss  mass rise  mass flr    exp rise   exp flr  n_rem    build     entries  count   yld   ldg TAKEN
+        c    8  2   0   2  0.000   +0.10169   0.00537  +0.0000000   0.00537   1128 +0.03390        3->7   +1.0 False  None False
+        c    8  2   1   2  0.000   +0.05085   0.00537  +0.0000000   0.00537   1128 +0.05085        3->6   +1.0 False  None False
+        c    8  2   2   2  0.000   +0.13559   0.00537  +0.0000000   0.00537   1128 +0.13559        3->8   +2.0 False  None False
+        c   16  2   0   2  0.000   +0.07317   0.00537  +0.0000258   0.00537   1128 +0.07317      11->17   +0.0 False  None False
+        c   16  2   1   2  0.000   +0.08130   0.00537  +0.0000172   0.00537   1128 +0.03252      11->18   +2.0 False  None False
+        c   16  2   2   2  0.000   +0.05691   0.00537  +0.0000086   0.00537   1128 +0.05691      11->17   +1.0 False  None False
+        c   16  2   3   2  0.000   +0.03252   0.00537  +0.0000000   0.00537   1128 +0.03252      11->13   -2.0 False  None False
+        c   24  2   0   3  0.000   +0.08021   0.00537  +0.0004517   0.00537   1128 +0.06417      20->30   -3.0 False  None False
+        c   24  2   1   2  0.000   +0.04813   0.00537  +0.0000905   0.00537   1128 +0.03209      20->31   +1.0 False  None False
+        c   24  2   2   2  0.000   +0.02674   0.00537  +0.0002709   0.00537   1128 +0.02674      20->26   +0.0 False  None False
+        c   24  2   3   2  0.000   +0.01070   0.00537  +0.0000001   0.00537   1128 +0.01070      20->21   -3.0 False  None False
+        c   32  2   0   3  0.000   +0.06773   0.00537  +0.0022055   0.00537   1128 +0.05578      25->36   -4.0 False  None False
+        c   32  2   1   2  0.000   +0.02390   0.00537  +0.0004912   0.00537   1128 +0.00797      25->35   -1.0 False  None False
+        c   32  2   2   2  0.000   +0.01594   0.00537  +0.0009785   0.00537   1128 +0.01195      25->30   -1.0 False  None False
+        c   32  2   3   2  0.000   +0.00000   0.00537  +0.0000000   0.00537   1128 +0.00000      25->25   -4.0 False  None False
+        c   40  2   0   3  0.000   +0.04444   0.00537  +0.0024497   0.00537   1128 +0.02857      30->40   -7.0 False  None False
+        c   40  2   1   2  0.000   +0.01587   0.00537  +0.0012199   0.00537   1128 +0.00317      30->39   -2.0 False  None False
+        c   40  2   2   2  0.000   +0.02222   0.00537  +0.0020299   0.00537   1128 +0.00952      30->35   -1.0 False  None False
+        c   40  2   3   2  0.000   +0.00000   0.00537  -0.0000000   0.00537   1128 +0.00000      30->31   -4.0 False  None False
+        c   48  2   0   3  0.000   +0.04233   0.00537  +0.0032666   0.00537   1128 +0.02116      32->41   -7.0 False  None False
+        c   48  2   1   2  0.000   +0.01058   0.00537  +0.0021326   0.00537   1128 +0.00529      32->41   -3.0 False  None False
+        c   48  2   2   2  0.000   +0.01587   0.00537  +0.0021461   0.00537   1128 +0.00794      32->38   -2.0 False  None False
+        c   48  2   3   2  0.000   +0.00000   0.00537  +0.0000000   0.00537   1128 +0.00000      32->33   -4.0 False  None False
+        c   56  2   0   3  0.000   +0.02759   0.00537  +0.0037836   0.00537   1128 +0.01379      33->41   -9.0 False  None False
+        c   56  2   1   2  0.000   +0.01149   0.00537  +0.0018790   0.00537   1128 +0.00690      33->42   -3.0 False  None False
+        c   56  2   2   2  0.000   +0.01379   0.00537  +0.0024967   0.00537   1128 +0.00690      33->39   -2.0 False  None False
+        c   56  2   3   2  0.000   +0.00000   0.00537  +0.0000000   0.00537   1128 +0.00000      33->34   -4.0 False  None False
+        c   68  2   0   3  0.000   +0.02471   0.00537  +0.0055210   0.00537   1064 +0.01141      35->42  -10.0  True  True  True
+            L3 at-support around it: [49, 49, 49, 49, 49] | [34, 35, 35, 36, 36]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 97, 42)]
+        c   68  2   1   2  0.000   +0.01141   0.00537  +0.0016535   0.00537   1064 +0.00760      42->51   -1.0 False  True  True
+            L3 at-support around it: [49, 49, 49, 49, 49] | [34, 35, 35, 36, 36]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 97, 42)]
+        c   68  2   2   2  0.000   +0.01141   0.00537  +0.0016535   0.00537   1064 +0.00570      51->57   -3.0 False False False
+        c   68  2   3   2  0.000   +0.00190   0.00537  +0.0007602   0.00537   1064 +0.00190      51->54   -4.0 False  True  True
+            L3 at-support around it: [49, 49, 49, 49, 49] | [34, 35, 35, 36, 36]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 97, 42)]
+        c   68  3   0  11  0.000   +0.09316   0.00471  +0.0434518   0.00471    728 +0.01711       4->12   +8.0  True  None False
+        c   68  3   1   9  0.000   +0.10646   0.00471  +0.0554667   0.00471    728 +0.07034       4->34   +8.0  True  None False
+        c   68  3   2   6  0.000   +0.08365   0.00471  +0.0479365   0.00471    728 +0.01141       4->12   +7.0  True  None False
+        c   68  3   3   4  0.000   +0.00000   0.00471  +0.0000000   0.00471    728 +0.00000       4->25   +0.0 False  None False
+        c   68  3   4   2  0.000   +0.01331   0.00471  +0.0059170   0.00471    728 +0.00760        4->8   +2.0  True  None False
+        c   76  2   0   2  0.000   +0.01020   0.00537  +0.0034673   0.00537   1000 +0.00510      55->61   -2.0 False  True  True
+            L3 at-support around it: [36, 36, 37, 37, 37] | [36, 37, 37, 37, 37]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 97, 42)]
+        c   76  3   0  13  0.000   +0.12415   0.00471  +0.0575065   0.00471    728 +0.02551       5->17   +6.0  True  None False
+        c   76  3   1   9  0.000   +0.10204   0.00471  +0.0604510   0.00471    728 +0.06803       5->34   +7.0  True  None False
+        c   76  3   2   6  0.000   +0.09694   0.00471  +0.0475342   0.00471    728 +0.01190       5->13   +9.0  True  None False
+        c   76  3   3   4  0.000   +0.00000   0.00471  +0.0000000   0.00471    728 +0.00000       5->29   +0.0 False  None False
+        c   76  3   4   2  0.000   +0.01361   0.00471  +0.0049862   0.00471    728 +0.00850        5->9   +2.0  True  None False
+        c   84  3   0  13  0.000   +0.13210   0.00471  +0.0626803   0.00471    728 +0.03226       5->21   +6.0  True  None False
+        c   84  3   1   9  0.000   +0.10445   0.00471  +0.0615254   0.00471    728 +0.06912       5->38   +8.0  True  None False
+        c   84  3   2   6  0.000   +0.09985   0.00471  +0.0475420   0.00471    728 +0.01382       5->13   +8.0  True  None False
+        c   84  3   3   4  0.000   +0.00000   0.00471  +0.0000000   0.00471    728 +0.00000       5->29   +0.0 False  None False
+        c   84  3   4   2  0.000   +0.01229   0.00471  +0.0049104   0.00471    728 +0.00768        5->9   +2.0  True  None False
+        c   92  3   0  13  0.000   +0.13944   0.00471  +0.0726649   0.00471    728 +0.03239       8->24   +7.0  True  None False
+        c   92  3   1   9  0.000   +0.09859   0.00471  +0.0632006   0.00471    728 +0.06479       8->40   +7.0  True  None False
+        c   92  3   2   7  0.000   +0.02958   0.00471  +0.0164343   0.00471    728 +0.01831       8->49   +4.0  True  None False
+        c   92  3   3   6  0.000   +0.09718   0.00471  +0.0537579   0.00471    728 +0.01690       8->20   +7.0  True  None False
+        c   92  3   4   2  0.000   +0.00845   0.00471  +0.0061389   0.00471    728 +0.00423       8->11   +1.0  True  None False
+        c  100  3   0  13  0.000   +0.14527   0.00471  +0.0753352   0.00471    728 +0.02983      11->26   +7.0  True  None False
+        c  100  3   1   9  0.000   +0.10117   0.00471  +0.0670936   0.00471    728 +0.06226      11->46   +8.0  True  None False
+        c  100  3   2   7  0.000   +0.02724   0.00471  +0.0158908   0.00471    728 +0.01556      11->54   +3.0  True  None False
+        c  100  3   3   6  0.000   +0.09339   0.00471  +0.0565004   0.00471    728 +0.01297      11->22   +6.0  True  None False
+        c  100  3   4   2  0.000   +0.00778   0.00471  +0.0058853   0.00471    728 +0.00389      11->14   +1.0  True  None False
+        c  108  3   0  13  0.000   +0.13839   0.00471  +0.0803182   0.00471    728 +0.02768      13->27   +5.0  True  None False
+        c  108  3   1   9  0.000   +0.09627   0.00471  +0.0649688   0.00471    728 +0.06017      13->47   +7.0  True  None False
+        c  108  3   2   7  0.000   +0.02647   0.00471  +0.0162938   0.00471    728 +0.01805      13->59   +2.0  True  None False
+        c  108  3   3   6  0.000   +0.09025   0.00471  +0.0544167   0.00471    728 +0.01444      13->27   +4.0  True  None False
+        c  108  3   4   2  0.000   +0.00722   0.00471  +0.0071035   0.00471    728 +0.00361      13->16   +1.0  True  None False
+        c  118  3   0  13  0.000   +0.13245   0.00471  +0.0837204   0.00471    664 +0.02759      18->31   +3.0  True  True  True
+            L4 at-support around it: [64, 65, 69, 69, 69] | [76, 76, 77, 77, 78]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 179, 100)]
+        c  118  3   1   9  0.000   +0.08720   0.00471  +0.0633080   0.00471    664 +0.05408      31->62   +4.0  True False False
+        c  118  3   2   7  0.000   +0.02539   0.00471  +0.0171534   0.00471    664 +0.01435      31->82   +2.0  True  True  True
+            L4 at-support around it: [64, 65, 69, 69, 69] | [76, 76, 77, 77, 78]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 179, 100)]
+        c  118  3   3   6  0.000   +0.06843   0.00471  +0.0450268   0.00471    664 +0.00000      82->82   -3.0  True  True  True
+            L4 at-support around it: [64, 65, 69, 69, 69] | [76, 76, 77, 77, 78]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 179, 100)]
+        c  118  3   4   2  0.000   +0.01435   0.00471  +0.0079627   0.00471    664 +0.01104     82->100   +3.0  True  True  True
+            L4 at-support around it: [64, 65, 69, 69, 69] | [76, 76, 77, 77, 78]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 179, 100)]
+        c  118  4   0  16  0.000   +0.00000   0.00331  +0.0000000   0.00331    168 +0.00000       1->16   +0.0 False  None False
+        c  118  4   1  16  0.000   +0.00000   0.00331  +0.0000000   0.00331    168 +0.00000        1->1   +0.0 False  None False
+        c  118  4   2   4  0.000   +0.00000   0.00331  +0.0000000   0.00331    168 +0.00000        1->1   +0.0 False  None False
+        c  126  3   0   9  0.000   +0.07534   0.00471  +0.0560647   0.00471    600 +0.04025    104->124   -1.0  True False False
+        c  126  4   0  16  0.000   +0.00000   0.00310  +0.0000000   0.00310    168 +0.00000       1->16   +0.0 False  None False
+        c  126  4   1  16  0.000   +0.00000   0.00310  +0.0005771   0.00310    168 +0.00000        1->1   +0.0 False  None False
+        c  126  4   2   4  0.000   +0.00000   0.00310  +0.0000000   0.00310    168 +0.00000        1->1   +0.0 False  None False
+        c  134  3   0   9  0.000   +0.07454   0.00471  +0.0567416   0.00471    536 +0.03872    104->124   +0.0  True  True  True
+            L4 at-support around it: [80, 81, 83, 83, 83] | [83, 83, 83, 85, 85]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 179, 100)]
+        c  134  4   0  16  0.000   +0.00000   0.00290  +0.0005146   0.00290    168 +0.00000        1->1   +0.0 False  None False
+        c  134  4   1  16  0.000   +0.00000   0.00290  +0.0000000   0.00290    168 +0.00000       1->16   +0.0 False  None False
+        c  134  4   2  16  0.000   +0.00000   0.00290  +0.0005146   0.00290    168 +0.00000        1->1   +0.0 False  None False
+        c  134  4   3   8  0.000   +0.00000   0.00290  +0.0005146   0.00290    168 +0.00000        1->1   +0.0 False  None False
+        c  142  4   0  16  0.000   +0.00000   0.00273  +0.0000000   0.00273    168 +0.00000        1->1   +0.0 False  None False
+        c  142  4   1  16  0.000   +0.00000   0.00273  +0.0004617   0.00273    168 +0.00000        1->1   +0.0 False  None False
+        c  142  4   2  16  0.000   +0.00000   0.00273  +0.0000000   0.00273    168 +0.00000       1->16   +0.0 False  None False
+        c  142  4   3  16  0.000   +0.00000   0.00273  +0.0009234   0.00273    168 +0.00000        1->1   +0.0 False  None False
+        c  142  4   4   8  0.000   +0.00000   0.00273  +0.0004617   0.00273    168 +0.00000        1->1   +0.0 False  None False
+        c  150  4   0  16  0.000   +0.00000   0.00258  +0.0000000   0.00258    168 +0.00000        1->1   +0.0 False  None False
+        c  150  4   1  16  0.000   +0.00000   0.00258  +0.0000000   0.00258    168 +0.00000        1->1   +0.0 False  None False
+        c  150  4   2  16  0.000   +0.00000   0.00258  +0.0004165   0.00258    168 +0.00000        1->1   +0.0 False  None False
+        c  150  4   3  16  0.000   +0.00000   0.00258  +0.0004165   0.00258    168 +0.00000        1->1   +0.0 False  None False
+        c  150  4   4  16  0.000   +0.00000   0.00258  +0.0000000   0.00258    168 +0.00000       1->16   +0.0 False  None False
+        c  150  4   5  16  0.000   +0.00000   0.00258  +0.0008330   0.00258    168 +0.00000        1->1   +0.0 False  None False
+        c  158  4   0  16  0.000   +0.00000   0.00245  +0.0000000   0.00245    168 +0.00000        1->1   +0.0 False  None False
+        c  158  4   1  16  0.000   +0.00000   0.00245  +0.0000000   0.00245    168 +0.00000        1->1   +0.0 False  None False
+        c  158  4   2  16  0.000   +0.00000   0.00245  +0.0003782   0.00245    168 +0.00000        1->1   +0.0 False  None False
+        c  158  4   3  16  0.000   +0.00000   0.00245  +0.0003782   0.00245    168 +0.00000        1->1   +0.0 False  None False
+        c  158  4   4  16  0.000   +0.00245   0.00245  +0.0020517   0.00245    168 +0.00245       1->20   +1.0 False  None False
+        c  158  4   5  16  0.000   +0.00000   0.00245  +0.0007564   0.00245    168 +0.00000        1->1   +0.0 False  None False
+        c  166  4   0  16  0.000   +0.00000   0.00233  +0.0000000   0.00233    168 +0.00000        1->1   +0.0 False  None False
+        c  166  4   1  16  0.000   +0.00000   0.00233  +0.0000000   0.00233    168 +0.00000        1->1   +0.0 False  None False
+        c  166  4   2  16  0.000   +0.00000   0.00233  +0.0003444   0.00233    168 +0.00000        1->1   +0.0 False  None False
+        c  166  4   3  16  0.000   +0.00000   0.00233  +0.0003444   0.00233    168 +0.00000        1->1   +0.0 False  None False
+        c  166  4   4  16  0.000   +0.00466   0.00233  +0.0039332   0.00233    168 +0.00233       1->20   +2.0  True  None False
+        c  166  4   5  16  0.000   +0.00000   0.00233  +0.0006889   0.00233    168 +0.00000        1->1   +0.0 False  None False
+        c  174  4   0  16  0.000   +0.00000   0.00222  +0.0000000   0.00222    168 +0.00000        1->1   +0.0 False  None False
+        c  174  4   1  16  0.000   +0.00000   0.00222  +0.0000000   0.00222    168 +0.00000        1->1   +0.0 False  None False
+        c  174  4   2  16  0.000   +0.00000   0.00222  +0.0003150   0.00222    168 +0.00000        1->1   +0.0 False  None False
+        c  174  4   3  16  0.000   +0.00000   0.00222  +0.0003150   0.00222    168 +0.00000        1->1   +0.0 False  None False
+        c  174  4   4  16  0.000   +0.00592   0.00222  +0.0055601   0.00222    168 +0.00296       1->20   +2.0  True  None False
+        c  174  4   5  16  0.000   +0.00000   0.00222  +0.0012600   0.00222    168 +0.00000        1->1   +0.0 False  None False
+        c  188  4   0  16  0.000   +0.00000   0.00205  +0.0000000   0.00205    104 +0.00000        1->1   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 4, 4, 4]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  188  4   1  16  0.000   +0.00000   0.00205  +0.0000000   0.00205    104 +0.00000        1->1   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 4, 4, 4]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  188  4   2  16  0.000   +0.00000   0.00205  +0.0001776   0.00205    104 +0.00000        1->1   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 4, 4, 4]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  188  4   3  16  0.000   +0.00000   0.00205  +0.0003553   0.00205    104 +0.00000        1->1   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 4, 4, 4]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  188  4   4  16  0.000   +0.00410   0.00205  +0.0042661   0.00205    104 +0.00273       1->20   +1.0  True  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 4, 4, 4]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  188  4   5  16  0.000   +0.00068   0.00205  +0.0012144   0.00205    104 +0.00068      20->32   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 4, 4, 4]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  5   0  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        0->0   +0.0 False  None False
+        c  200  5   1  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        0->0   +0.0 False  None False
+    endo_ledger_open_ung5 licence=ledger proposals=58 groups=143 taken=40 refused=103 skipped=0 probe gradings=266,496 (0.5225% of priced time)
+         cycle  L  froz  pairs  grp took  ref skip undef       classes          T(l+1)
+        c    8  2 False     36    3    0    3    0     3        10->10            0->0
+        c   16  2 False     45    4    0    4    0     4        11->11            0->0
+        c   24  2 False     66    4    0    4    0     4        13->13            0->0
+        c   32  2 False     66    4    0    4    0     4        13->13            0->0
+        c   40  2 False     66    4    0    4    0     4        13->13            0->0
+        c   48  2  True     55    4    0    4    0     4        13->13            0->0
+        c   56  2  True     66    4    0    4    0     4        13->13            0->0
+        c   68  2  True     91    4    2    2    0     0        15->13           9->16
+        c   68  3 False     91    3    0    3    0     3        16->16            0->0
+        c   76  2  True     66    2    2    0    0     0         13->8          20->52
+        c   76  3 False   1176    6    0    6    0     6        52->52            0->0
+        c   84  2  True     28    1    0    1    0     0          9->9          52->52
+        c   84  3 False   1176    6    0    6    0     6        52->52            0->0
+        c   92  2  True     28    1    1    0    0     0          9->8          55->61
+        c   92  3 False   1540    6    0    6    0     6        61->61            0->0
+        c  100  2  True     21    0    0    0    0     0          8->8          61->61
+        c  100  3  True   1540    6    0    6    0     6        61->61            0->0
+        c  108  2  True     21    0    0    0    0     0          9->9          83->83
+        c  108  3  True   2415    7    0    7    0     7        83->83            0->0
+        c  118  2  True     21    0    0    0    0     0        10->10          87->87
+        c  118  3  True   2556    7    7    0    0     0        87->22           2->44
+        c  118  4 False    946    2    2    0    0     0         44->2           1->16
+        c  126  2  True     21    0    0    0    0     0        10->10          87->87
+        c  126  3  True     21    0    0    0    0     0        22->22          76->76
+        c  126  4 False    703    3    3    0    0     0         38->4          16->16
+        c  126  5 False    120    1    0    1    0     1        16->16      None->None
+        c  134  2  True     15    0    0    0    0     0        10->10          89->89
+        c  134  3  True     21    0    0    0    0     0        24->24        116->116
+        c  134  4 False   1326    4    4    0    0     0         52->6          16->16
+        c  134  5 False    120    1    0    1    0     1        16->16      None->None
+        c  142  2  True     21    0    0    0    0     0        10->10          89->89
+        c  142  3  True     21    0    0    0    0     0        24->24        136->136
+        c  142  4 False   1830    6    6    0    0     0        65->11          16->32
+        c  142  5 False    496    2    0    2    0     2        32->32      None->None
+        c  150  2  True     21    0    0    0    0     0        10->10          89->89
+        c  150  3  True     21    0    0    0    0     0        24->24        136->136
+        c  150  4 False     21    0    0    0    0     0        11->11          96->96
+        c  150  5 False   4560    5    0    5    0     5        96->96      None->None
+        c  158  2  True     21    0    0    0    0     0        10->10          89->89
+        c  158  3  True     21    0    0    0    0     0        24->24        148->148
+        c  158  4  True    276    3    3    0    0     0        28->11          96->96
+        c  158  5 False   4560    5    0    5    0     5        96->96      None->None
+        c  166  2  True     21    0    0    0    0     0        10->10          89->89
+        c  166  3  True     21    0    0    0    0     0        24->24        164->164
+        c  166  4  True    253    1    1    0    0     0        27->12         96->112
+        c  166  5 False   6216    5    0    5    0     5      112->112      None->None
+        c  174  2  True     21    0    0    0    0     0        10->10          89->89
+        c  174  3  True     21    0    0    0    0     0        24->24        164->164
+        c  174  4  True    231    4    4    0    0     0        26->12        112->128
+        c  174  5 False   8128    6    0    6    0     6      128->128      None->None
+        c  188  2  True     21    0    0    0    0     0        10->10          89->89
+        c  188  3  True     21    0    0    0    0     0        24->24        168->168
+        c  188  4  True     28    0    0    0    0     0        16->16        144->144
+        c  188  5 False  10296    6    0    6    0     6      144->144      None->None
+        c  200  2  True     21    0    0    0    0     0        10->10        101->101
+        c  200  3  True     55    1    1    0    0     0        36->33        188->200
+        c  200  4  True   1128    4    4    0    0     0        56->16        164->192
+        c  200  5 False  18336    8    0    8    0     8      192->192      None->None
+        --- every GROUP, ALL CURRENCIES and their floors ---
+         cycle  L   g   n   loss  mass rise  mass flr    exp rise   exp flr  n_rem    build     entries  count   yld   ldg TAKEN
+        c    8  2   0   2  0.000   +0.10169   0.00537  +0.0000000   0.00537   1128 +0.03390        3->7   +1.0 False  None False
+        c    8  2   1   2  0.000   +0.05085   0.00537  +0.0000000   0.00537   1128 +0.05085        3->6   +1.0 False  None False
+        c    8  2   2   2  0.000   +0.13559   0.00537  +0.0000000   0.00537   1128 +0.13559        3->8   +2.0 False  None False
+        c   16  2   0   2  0.000   +0.07317   0.00537  +0.0000258   0.00537   1128 +0.07317      11->17   +0.0 False  None False
+        c   16  2   1   2  0.000   +0.08130   0.00537  +0.0000172   0.00537   1128 +0.03252      11->18   +2.0 False  None False
+        c   16  2   2   2  0.000   +0.05691   0.00537  +0.0000086   0.00537   1128 +0.05691      11->17   +1.0 False  None False
+        c   16  2   3   2  0.000   +0.03252   0.00537  +0.0000000   0.00537   1128 +0.03252      11->13   -2.0 False  None False
+        c   24  2   0   3  0.000   +0.08021   0.00537  +0.0004517   0.00537   1128 +0.06417      20->30   -3.0 False  None False
+        c   24  2   1   2  0.000   +0.04813   0.00537  +0.0000905   0.00537   1128 +0.03209      20->31   +1.0 False  None False
+        c   24  2   2   2  0.000   +0.02674   0.00537  +0.0002709   0.00537   1128 +0.02674      20->26   +0.0 False  None False
+        c   24  2   3   2  0.000   +0.01070   0.00537  +0.0000001   0.00537   1128 +0.01070      20->21   -3.0 False  None False
+        c   32  2   0   3  0.000   +0.06773   0.00537  +0.0022055   0.00537   1128 +0.05578      25->36   -4.0 False  None False
+        c   32  2   1   2  0.000   +0.02390   0.00537  +0.0004912   0.00537   1128 +0.00797      25->35   -1.0 False  None False
+        c   32  2   2   2  0.000   +0.01594   0.00537  +0.0009785   0.00537   1128 +0.01195      25->30   -1.0 False  None False
+        c   32  2   3   2  0.000   +0.00000   0.00537  +0.0000000   0.00537   1128 +0.00000      25->25   -4.0 False  None False
+        c   40  2   0   3  0.000   +0.04444   0.00537  +0.0024497   0.00537   1128 +0.02857      30->40   -7.0 False  None False
+        c   40  2   1   2  0.000   +0.01587   0.00537  +0.0012199   0.00537   1128 +0.00317      30->39   -2.0 False  None False
+        c   40  2   2   2  0.000   +0.02222   0.00537  +0.0020299   0.00537   1128 +0.00952      30->35   -1.0 False  None False
+        c   40  2   3   2  0.000   +0.00000   0.00537  -0.0000000   0.00537   1128 +0.00000      30->31   -4.0 False  None False
+        c   48  2   0   3  0.000   +0.04233   0.00537  +0.0032666   0.00537   1128 +0.02116      32->41   -7.0 False  None False
+        c   48  2   1   2  0.000   +0.01058   0.00537  +0.0021326   0.00537   1128 +0.00529      32->41   -3.0 False  None False
+        c   48  2   2   2  0.000   +0.01587   0.00537  +0.0021461   0.00537   1128 +0.00794      32->38   -2.0 False  None False
+        c   48  2   3   2  0.000   +0.00000   0.00537  +0.0000000   0.00537   1128 +0.00000      32->33   -4.0 False  None False
+        c   56  2   0   3  0.000   +0.02759   0.00537  +0.0037836   0.00537   1128 +0.01379      33->41   -9.0 False  None False
+        c   56  2   1   2  0.000   +0.01149   0.00537  +0.0018790   0.00537   1128 +0.00690      33->42   -3.0 False  None False
+        c   56  2   2   2  0.000   +0.01379   0.00537  +0.0024967   0.00537   1128 +0.00690      33->39   -2.0 False  None False
+        c   56  2   3   2  0.000   +0.00000   0.00537  +0.0000000   0.00537   1128 +0.00000      33->34   -4.0 False  None False
+        c   68  2   0   4  0.000   +0.04183   0.00537  +0.0080012   0.00537   1064 +0.03042      38->55  -11.0  True False False
+        c   68  2   1   3  0.000   +0.00760   0.00537  +0.0030408   0.00537   1064 +0.00760      38->43   -5.0 False False False
+        c   68  2   2   2  0.000   +0.01141   0.00537  +0.0016535   0.00537   1064 +0.00760      38->47   -3.0 False  True  True
+            L3 at-support around it: [49, 49, 49, 49, 49] | [43, 43, 43, 44, 44]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   68  2   3   2  0.000   +0.01141   0.00537  +0.0016535   0.00537   1064 +0.00760      47->54   -3.0 False  True  True
+            L3 at-support around it: [49, 49, 49, 49, 49] | [43, 43, 43, 44, 44]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   68  3   0   6  0.000   +0.08365   0.00471  +0.0540344   0.00471    728 +0.00570        1->5   +7.0  True  None False
+        c   68  3   1   4  0.000   +0.00000   0.00471  +0.0000000   0.00471    728 +0.00000       1->16   +0.0 False  None False
+        c   68  3   2   3  0.000   +0.01711   0.00471  +0.0061558   0.00471    728 +0.00570        1->4   -1.0  True  None False
+        c   76  2   0   4  0.000   +0.03051   0.00537  +0.0088440   0.00537   1000 +0.02373      56->72  -11.0  True  True  True
+            L3 at-support around it: [44, 44, 45, 45, 46] | [31, 32, 32, 32, 32]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   76  2   1   3  0.000   +0.00678   0.00537  +0.0017917   0.00537   1000 +0.00678      72->84   -4.0 False  True  True
+            L3 at-support around it: [44, 44, 45, 45, 46] | [31, 32, 32, 32, 32]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   76  3   0  20  0.000   +0.16780   0.00471  +0.0842103   0.00471    728 +0.04576       8->24   +9.0  True  None False
+        c   76  3   1  12  0.000   +0.11525   0.00471  +0.0692104   0.00471    728 +0.07966       8->38   +5.0  True  None False
+        c   76  3   2   9  0.000   +0.11525   0.00471  +0.0615407   0.00471    728 +0.02203       8->24  +12.0  True  None False
+        c   76  3   3   4  0.000   +0.00000   0.00471  +0.0000000   0.00471    728 +0.00000       8->35   +0.0 False  None False
+        c   76  3   4   2  0.000   +0.01864   0.00471  +0.0044566   0.00471    728 +0.01356       8->16   +3.0 False  None False
+        c   76  3   5   2  0.000   +0.00508   0.00471  +0.0033072   0.00471    728 +0.00508       8->10   +1.0 False  None False
+        c   84  2   0   2  0.000   +0.00462   0.00537  +0.0010621   0.00537    936 +0.00462      88->96   -1.0 False False False
+        c   84  3   0  20  0.000   +0.18308   0.00471  +0.0870195   0.00471    728 +0.05231       8->24  +10.0  True  None False
+        c   84  3   1  12  0.000   +0.12308   0.00471  +0.0761300   0.00471    728 +0.08154       8->38   +7.0  True  None False
+        c   84  3   2   9  0.000   +0.12462   0.00471  +0.0573856   0.00471    728 +0.03538       8->32  +12.0  True  None False
+        c   84  3   3   4  0.000   +0.00000   0.00471  +0.0000000   0.00471    728 +0.00000       8->35   +0.0 False  None False
+        c   84  3   4   2  0.000   +0.01846   0.00471  +0.0055670   0.00471    728 +0.01385       8->16   +3.0  True  None False
+        c   84  3   5   2  0.000   +0.00462   0.00471  +0.0031925   0.00471    728 +0.00462       8->10   +1.0 False  None False
+        c   92  2   0   2  0.000   +0.00421   0.00537  +0.0011607   0.00537    872 +0.00421      88->96   -1.0 False  True  True
+            L3 at-support around it: [32, 32, 32, 32, 32] | [32, 32, 32, 32, 32]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   92  3   0  20  0.000   +0.17391   0.00471  +0.0896929   0.00471    728 +0.05049      13->29   +8.0  True  None False
+        c   92  3   1  12  0.000   +0.11360   0.00471  +0.0759937   0.00471    728 +0.08696      13->48   +5.0  True  None False
+        c   92  3   2  12  0.000   +0.13885   0.00471  +0.0658444   0.00471    728 +0.03366      13->37  +15.0  True  None False
+        c   92  3   3   5  0.000   +0.01403   0.00471  +0.0085325   0.00471    728 +0.00421      13->52   +2.0  True  None False
+        c   92  3   4   4  0.000   +0.01964   0.00471  +0.0075823   0.00471    728 +0.00561      13->17   +4.0  True  None False
+        c   92  3   5   3  0.000   +0.02805   0.00471  +0.0153869   0.00471    728 +0.02384      13->31   +3.0  True  None False
+        c  100  3   0  20  0.000   +0.18194   0.00471  +0.0988676   0.00471    728 +0.05032      14->29   +7.0  True  None False
+        c  100  3   1  12  0.000   +0.11871   0.00471  +0.0790546   0.00471    728 +0.08387      14->49   +7.0  True  None False
+        c  100  3   2  12  0.000   +0.13290   0.00471  +0.0679463   0.00471    728 +0.03355      14->41  +13.0  True  None False
+        c  100  3   3   5  0.000   +0.01677   0.00471  +0.0080298   0.00471    728 +0.00387      14->53   +3.0  True  None False
+        c  100  3   4   4  0.000   +0.01806   0.00471  +0.0074460   0.00471    728 +0.00516      14->18   +4.0  True  None False
+        c  100  3   5   3  0.000   +0.03097   0.00471  +0.0172273   0.00471    728 +0.02710      14->35   +4.0  True  None False
+        c  108  3   0  20  0.000   +0.17878   0.00471  +0.0996383   0.00471    728 +0.09178      22->59   +6.0  True  None False
+        c  108  3   1  12  0.000   +0.11681   0.00471  +0.0814636   0.00471    728 +0.08462      22->63   +7.0  True  None False
+        c  108  3   2  12  0.000   +0.13468   0.00471  +0.0708485   0.00471    728 +0.03576      22->53  +15.0  True  None False
+        c  108  3   3  12  0.000   +0.02503   0.00471  +0.0123842   0.00471    728 +0.00954      22->30   +5.0  True  None False
+        c  108  3   4   7  0.000   +0.03218   0.00471  +0.0165437   0.00471    728 +0.01788      22->83   +4.0  True  None False
+        c  108  3   5   4  0.000   +0.02145   0.00471  +0.0182752   0.00471    728 +0.00954      22->36   +5.0  True  None False
+        c  108  3   6   3  0.000   +0.02503   0.00471  +0.0167319   0.00471    728 +0.02145      22->43   +2.0  True  None False
+        c  118  3   0  20  0.000   +0.17582   0.00471  +0.1056290   0.00471    664 +0.10549      36->77   +5.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   1  12  0.000   +0.11099   0.00471  +0.0806483   0.00471    664 +0.08132     77->118   +7.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   2  12  0.000   +0.10110   0.00471  +0.0552180   0.00471    664 +0.00769    118->125   +6.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   3  12  0.000   +0.02418   0.00471  +0.0122273   0.00471    664 +0.01978    125->141   +5.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   4   7  0.000   +0.01758   0.00471  +0.0120169   0.00471    664 +0.00549    141->197   -2.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   5   6  0.000   +0.02637   0.00471  +0.0153817   0.00471    664 +0.00879    197->196   -7.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   6   3  0.000   +0.01209   0.00471  +0.0061137   0.00471    664 +0.00879    196->216   -4.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  4   0  28  0.000   +0.00000   0.00330  +0.0013218   0.00330    664 +0.00000        1->1   +0.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [1, 1, 1, 1, 1]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  4   1  16  0.000   +0.00000   0.00330  +0.0013218   0.00330    664 +0.00000       1->16   +0.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [1, 1, 1, 1, 1]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  126  4   0  16  0.000   +0.00000   0.00308  +0.0000000   0.00308    600 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  126  4   1  16  0.000   +0.00000   0.00308  +0.0011948   0.00308    600 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  126  4   2   5  0.000   +0.00308   0.00308  +0.0026904   0.00308    600 +0.00000      16->16   +1.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  126  5   0  16  0.000   +0.00000   0.00308  +0.0000000   0.00308      0 +0.00000        0->0   +0.0 False  None False
+        c  134  4   0  16  0.000   +0.00000   0.00289  +0.0000000   0.00289    536 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  134  4   1  13  0.000   +0.00000   0.00289  +0.0021175   0.00289    536 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  134  4   2  12  0.000   +0.00000   0.00289  +0.0000000   0.00289    536 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  134  4   3   9  0.000   +0.00000   0.00289  +0.0000000   0.00289    536 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  134  5   0  16  0.000   +0.00000   0.00289  +0.0000000   0.00289      0 +0.00000        0->0   +0.0 False  None False
+        c  142  4   0  16  0.000   +0.00000   0.00272  +0.0000000   0.00272    472 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  142  4   1  14  0.000   +0.00000   0.00272  +0.0027593   0.00272    472 +0.00000      16->16   +0.0  True  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  142  4   2   9  0.000   +0.00000   0.00272  +0.0000000   0.00272    472 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  142  4   3   9  0.000   +0.00000   0.00272  +0.0000000   0.00272    472 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  142  4   4   7  0.000   +0.00000   0.00272  +0.0000000   0.00272    472 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  142  4   5   5  0.000   +0.00272   0.00272  +0.0043752   0.00272    472 +0.00272      16->32   +1.0  True  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  142  5   0  16  0.000   +0.00000   0.00272  +0.0000000   0.00272      0 +0.00000        0->0   +0.0 False  None False
+        c  142  5   1  16  0.000   +0.00000   0.00272  +0.0000000   0.00272      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   0  32  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   1  16  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   2  16  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   3  16  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   4  16  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  158  4   0  13  0.000   +0.00000   0.00244  +0.0012892   0.00244    344 +0.00000      96->96   +0.0 False  True  True
+            L5 at-support around it: [7, 7, 7, 7, 7] | [7, 7, 7, 7, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  158  4   1   5  0.000   +0.00000   0.00244  +0.0000000   0.00244    344 +0.00000      96->96   +0.0 False  True  True
+            L5 at-support around it: [7, 7, 7, 7, 7] | [7, 7, 7, 7, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  158  4   2   2  0.000   +0.00081   0.00244  +0.0014318   0.00244    344 +0.00081      96->96   +0.0 False  True  True
+            L5 at-support around it: [7, 7, 7, 7, 7] | [7, 7, 7, 7, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  158  5   0  32  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  158  5   1  16  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  158  5   2  16  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  158  5   3  16  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  158  5   4  16  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  166  4   0  16  0.000   +0.00309   0.00232  +0.0035430   0.00232    280 +0.00309     96->112   +1.0  True  True  True
+            L5 at-support around it: [7, 7, 7, 7, 7] | [8, 8, 8, 8, 8]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  166  5   0  32  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  166  5   1  32  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  166  5   2  16  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  166  5   3  16  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  166  5   4  16  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  174  4   0   5  0.000   +0.00000   0.00221  +0.0000000   0.00221    216 +0.00000    112->112   +0.0 False  True  True
+            L5 at-support around it: [8, 8, 8, 8, 8] | [9, 9, 9, 9, 9]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  174  4   1   5  0.000   +0.00000   0.00221  +0.0000000   0.00221    216 +0.00000    112->112   +0.0 False  True  True
+            L5 at-support around it: [8, 8, 8, 8, 8] | [9, 9, 9, 9, 9]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  174  4   2   4  0.000   +0.00000   0.00221  +0.0000000   0.00221    216 +0.00000    112->112   +0.0 False  True  True
+            L5 at-support around it: [8, 8, 8, 8, 8] | [9, 9, 9, 9, 9]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  174  4   3   4  0.000   +0.00221   0.00221  +0.0021856   0.00221    216 +0.00221    112->128   +1.0 False  True  True
+            L5 at-support around it: [8, 8, 8, 8, 8] | [9, 9, 9, 9, 9]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  174  5   0  32  0.000   +0.00221   0.00221  +0.0022108   0.00221      0 +0.00221       0->16   +1.0 False  None False
+        c  174  5   1  32  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  174  5   2  16  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  174  5   3  16  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  174  5   4  16  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  174  5   5  16  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  188  5   0  48  0.000   +0.00136   0.00204  +0.0013624   0.00204      0 +0.00136       1->16   +0.0 False  None False
+        c  188  5   1  32  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  188  5   2  16  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  188  5   3  16  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  188  5   4  16  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  188  5   5  16  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  200  3   0   4  0.000   +0.00256   0.00471  +0.0025445   0.00471      8 +0.00256    272->304   -4.0 False  True  True
+            L4 at-support around it: [89, 89, 89, 89, 89] | [85]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  4   0  17  0.000   +0.00384   0.00192  +0.0038363   0.00192      8 +0.00000    164->164   +2.0  True  True  True
+            L5 at-support around it: [14, 15, 15, 15, 16] | [19]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  4   1  17  0.000   +0.00384   0.00192  +0.0038623   0.00192      8 +0.00384    164->196   +2.0  True  True  True
+            L5 at-support around it: [14, 15, 15, 15, 16] | [19]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  4   2   5  0.000   +0.00384   0.00192  +0.0038233   0.00192      8 +0.00384    196->192   -1.0  True  True  True
+            L5 at-support around it: [14, 15, 15, 15, 16] | [19]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  4   3   5  0.000   +0.00000   0.00192  +0.0000000   0.00192      8 +0.00000    192->192   +0.0 False  True  True
+            L5 at-support around it: [14, 15, 15, 15, 16] | [19]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  5   0  48  0.000   +0.00192   0.00192  +0.0019182   0.00192      0 +0.00192       2->16   -1.0 False  None False
+        c  200  5   1  32  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        2->2   +0.0 False  None False
+        c  200  5   2  32  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        2->2   +0.0 False  None False
+        c  200  5   3  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        2->2   +0.0 False  None False
+        c  200  5   4  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        2->2   +0.0 False  None False
+        c  200  5   5  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        2->2   +0.0 False  None False
+        c  200  5   6  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        2->2   +0.0 False  None False
+        c  200  5   7  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        2->2   +0.0 False  None False
+    endo_ledger_open_ung5_ra licence=ledger proposals=58 groups=149 taken=44 refused=105 skipped=0 probe gradings=266,112 (0.5197% of priced time)
+         cycle  L  froz  pairs  grp took  ref skip undef       classes          T(l+1)
+        c    8  2 False     36    3    0    3    0     3        10->10            0->0
+        c   16  2 False     45    4    0    4    0     4        11->11            0->0
+        c   24  2 False     66    4    0    4    0     4        13->13            0->0
+        c   32  2 False     66    4    0    4    0     4        13->13            0->0
+        c   40  2 False     66    4    0    4    0     4        13->13            0->0
+        c   48  2  True     55    4    0    4    0     4        13->13            0->0
+        c   56  2  True     66    4    0    4    0     4        13->13            0->0
+        c   68  2  True     91    4    2    2    0     0        15->13           9->16
+        c   68  3 False     91    3    0    3    0     3        16->16            0->0
+        c   76  2  True     66    2    2    0    0     0         13->8          20->52
+        c   76  3 False   1176    6    0    6    0     6        52->52            0->0
+        c   84  2  True     28    1    0    1    0     0          9->9          52->52
+        c   84  3 False   1176    6    0    6    0     6        52->52            0->0
+        c   92  2  True     28    1    1    0    0     0          9->8          55->61
+        c   92  3 False   1540    6    0    6    0     6        61->61            0->0
+        c  100  2  True     21    0    0    0    0     0          8->8          61->61
+        c  100  3  True   1540    6    0    6    0     6        61->61            0->0
+        c  108  2  True     21    0    0    0    0     0          9->9          83->83
+        c  108  3  True   2415    7    0    7    0     7        83->83            0->0
+        c  118  2  True     21    0    0    0    0     0        10->10          87->87
+        c  118  3  True   2556    7    7    0    0     0        87->22           2->44
+        c  118  4 False    946    2    2    0    0     0         44->2           1->16
+        c  126  2  True     21    0    0    0    0     0        10->10          87->87
+        c  126  3  True     21    0    0    0    0     0        22->22          76->76
+        c  126  4 False    703    3    3    0    0     0         38->4          16->16
+        c  126  5 False    120    1    0    1    0     1        16->16      None->None
+        c  134  2  True     15    0    0    0    0     0        10->10          89->89
+        c  134  3  True     21    0    0    0    0     0        24->24        116->116
+        c  134  4 False   1326    4    4    0    0     0         52->6          16->16
+        c  134  5 False    120    1    0    1    0     1        16->16      None->None
+        c  142  2  True     21    0    0    0    0     0        10->10          89->89
+        c  142  3  True     21    0    0    0    0     0        24->24        136->136
+        c  142  4 False   1830    6    6    0    0     0        65->11          16->32
+        c  142  5 False    496    2    0    2    0     2        32->32      None->None
+        c  150  2  True     21    0    0    0    0     0        10->10          89->89
+        c  150  3  True     21    0    0    0    0     0        24->24        136->136
+        c  150  4 False     21    0    0    0    0     0        11->11          96->96
+        c  150  5 False   4560    5    0    5    0     5        96->96      None->None
+        c  158  2  True     21    0    0    0    0     0        10->10          89->89
+        c  158  3  True     21    0    0    0    0     0        24->24        148->148
+        c  158  4  True    276    3    3    0    0     0        28->11          96->96
+        c  158  5 False   4560    5    0    5    0     5        96->96      None->None
+        c  166  2  True     21    0    0    0    0     0        10->10          89->89
+        c  166  3  True     21    0    0    0    0     0        24->24        164->164
+        c  166  4  True    253    1    1    0    0     0        27->12         96->112
+        c  166  5 False   6216    5    0    5    0     5      112->112      None->None
+        c  174  2  True     21    0    0    0    0     0        10->10          89->89
+        c  174  3  True     21    0    0    0    0     0        24->24        164->164
+        c  174  4  True    231    4    4    0    0     0        26->12        112->128
+        c  174  5 False   8128    6    0    6    0     6      128->128      None->None
+        c  188  2  True     21    0    0    0    0     0        10->10          89->89
+        c  188  3  True     21    0    0    0    0     0        24->24        184->184
+        c  188  4  True    378    2    2    0    0     0        36->17        144->144
+        c  188  5  True  10296    6    0    6    0     6      144->144      None->None
+        c  200  2  True     28    1    1    0    0     0        11->10         101->95
+        c  200  3  True    120    3    3    0    0     0        35->26        192->188
+        c  200  4  True    210    3    3    0    0     0        33->20        148->192
+        c  200  5  True  18336   10    0   10    0    10      192->192      None->None
+        --- every GROUP, ALL CURRENCIES and their floors ---
+         cycle  L   g   n   loss  mass rise  mass flr    exp rise   exp flr  n_rem    build     entries  count   yld   ldg TAKEN
+        c    8  2   0   2  0.000   +0.10169   0.00537  +0.0000000   0.00537   1128 +0.03390        3->7   +1.0 False  None False
+        c    8  2   1   2  0.000   +0.05085   0.00537  +0.0000000   0.00537   1128 +0.05085        3->6   +1.0 False  None False
+        c    8  2   2   2  0.000   +0.13559   0.00537  +0.0000000   0.00537   1128 +0.13559        3->8   +2.0 False  None False
+        c   16  2   0   2  0.000   +0.07317   0.00537  +0.0000258   0.00537   1128 +0.07317      11->17   +0.0 False  None False
+        c   16  2   1   2  0.000   +0.08130   0.00537  +0.0000172   0.00537   1128 +0.03252      11->18   +2.0 False  None False
+        c   16  2   2   2  0.000   +0.05691   0.00537  +0.0000086   0.00537   1128 +0.05691      11->17   +1.0 False  None False
+        c   16  2   3   2  0.000   +0.03252   0.00537  +0.0000000   0.00537   1128 +0.03252      11->13   -2.0 False  None False
+        c   24  2   0   3  0.000   +0.08021   0.00537  +0.0004517   0.00537   1128 +0.06417      20->30   -3.0 False  None False
+        c   24  2   1   2  0.000   +0.04813   0.00537  +0.0000905   0.00537   1128 +0.03209      20->31   +1.0 False  None False
+        c   24  2   2   2  0.000   +0.02674   0.00537  +0.0002709   0.00537   1128 +0.02674      20->26   +0.0 False  None False
+        c   24  2   3   2  0.000   +0.01070   0.00537  +0.0000001   0.00537   1128 +0.01070      20->21   -3.0 False  None False
+        c   32  2   0   3  0.000   +0.06773   0.00537  +0.0022055   0.00537   1128 +0.05578      25->36   -4.0 False  None False
+        c   32  2   1   2  0.000   +0.02390   0.00537  +0.0004912   0.00537   1128 +0.00797      25->35   -1.0 False  None False
+        c   32  2   2   2  0.000   +0.01594   0.00537  +0.0009785   0.00537   1128 +0.01195      25->30   -1.0 False  None False
+        c   32  2   3   2  0.000   +0.00000   0.00537  +0.0000000   0.00537   1128 +0.00000      25->25   -4.0 False  None False
+        c   40  2   0   3  0.000   +0.04444   0.00537  +0.0024497   0.00537   1128 +0.02857      30->40   -7.0 False  None False
+        c   40  2   1   2  0.000   +0.01587   0.00537  +0.0012199   0.00537   1128 +0.00317      30->39   -2.0 False  None False
+        c   40  2   2   2  0.000   +0.02222   0.00537  +0.0020299   0.00537   1128 +0.00952      30->35   -1.0 False  None False
+        c   40  2   3   2  0.000   +0.00000   0.00537  -0.0000000   0.00537   1128 +0.00000      30->31   -4.0 False  None False
+        c   48  2   0   3  0.000   +0.04233   0.00537  +0.0032666   0.00537   1128 +0.02116      32->41   -7.0 False  None False
+        c   48  2   1   2  0.000   +0.01058   0.00537  +0.0021326   0.00537   1128 +0.00529      32->41   -3.0 False  None False
+        c   48  2   2   2  0.000   +0.01587   0.00537  +0.0021461   0.00537   1128 +0.00794      32->38   -2.0 False  None False
+        c   48  2   3   2  0.000   +0.00000   0.00537  +0.0000000   0.00537   1128 +0.00000      32->33   -4.0 False  None False
+        c   56  2   0   3  0.000   +0.02759   0.00537  +0.0037836   0.00537   1128 +0.01379      33->41   -9.0 False  None False
+        c   56  2   1   2  0.000   +0.01149   0.00537  +0.0018790   0.00537   1128 +0.00690      33->42   -3.0 False  None False
+        c   56  2   2   2  0.000   +0.01379   0.00537  +0.0024967   0.00537   1128 +0.00690      33->39   -2.0 False  None False
+        c   56  2   3   2  0.000   +0.00000   0.00537  +0.0000000   0.00537   1128 +0.00000      33->34   -4.0 False  None False
+        c   68  2   0   4  0.000   +0.04183   0.00537  +0.0080012   0.00537   1064 +0.03042      38->55  -11.0  True False False
+        c   68  2   1   3  0.000   +0.00760   0.00537  +0.0030408   0.00537   1064 +0.00760      38->43   -5.0 False False False
+        c   68  2   2   2  0.000   +0.01141   0.00537  +0.0016535   0.00537   1064 +0.00760      38->47   -3.0 False  True  True
+            L3 at-support around it: [49, 49, 49, 49, 49] | [43, 43, 43, 44, 44]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   68  2   3   2  0.000   +0.01141   0.00537  +0.0016535   0.00537   1064 +0.00760      47->54   -3.0 False  True  True
+            L3 at-support around it: [49, 49, 49, 49, 49] | [43, 43, 43, 44, 44]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   68  3   0   6  0.000   +0.08365   0.00471  +0.0540344   0.00471    728 +0.00570        1->5   +7.0  True  None False
+        c   68  3   1   4  0.000   +0.00000   0.00471  +0.0000000   0.00471    728 +0.00000       1->16   +0.0 False  None False
+        c   68  3   2   3  0.000   +0.01711   0.00471  +0.0061558   0.00471    728 +0.00570        1->4   -1.0  True  None False
+        c   76  2   0   4  0.000   +0.03051   0.00537  +0.0088440   0.00537   1000 +0.02373      56->72  -11.0  True  True  True
+            L3 at-support around it: [44, 44, 45, 45, 46] | [31, 32, 32, 32, 32]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   76  2   1   3  0.000   +0.00678   0.00537  +0.0017917   0.00537   1000 +0.00678      72->84   -4.0 False  True  True
+            L3 at-support around it: [44, 44, 45, 45, 46] | [31, 32, 32, 32, 32]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   76  3   0  20  0.000   +0.16780   0.00471  +0.0842103   0.00471    728 +0.04576       8->24   +9.0  True  None False
+        c   76  3   1  12  0.000   +0.11525   0.00471  +0.0692104   0.00471    728 +0.07966       8->38   +5.0  True  None False
+        c   76  3   2   9  0.000   +0.11525   0.00471  +0.0615407   0.00471    728 +0.02203       8->24  +12.0  True  None False
+        c   76  3   3   4  0.000   +0.00000   0.00471  +0.0000000   0.00471    728 +0.00000       8->35   +0.0 False  None False
+        c   76  3   4   2  0.000   +0.01864   0.00471  +0.0044566   0.00471    728 +0.01356       8->16   +3.0 False  None False
+        c   76  3   5   2  0.000   +0.00508   0.00471  +0.0033072   0.00471    728 +0.00508       8->10   +1.0 False  None False
+        c   84  2   0   2  0.000   +0.00462   0.00537  +0.0010621   0.00537    936 +0.00462      88->96   -1.0 False False False
+        c   84  3   0  20  0.000   +0.18308   0.00471  +0.0870195   0.00471    728 +0.05231       8->24  +10.0  True  None False
+        c   84  3   1  12  0.000   +0.12308   0.00471  +0.0761300   0.00471    728 +0.08154       8->38   +7.0  True  None False
+        c   84  3   2   9  0.000   +0.12462   0.00471  +0.0573856   0.00471    728 +0.03538       8->32  +12.0  True  None False
+        c   84  3   3   4  0.000   +0.00000   0.00471  +0.0000000   0.00471    728 +0.00000       8->35   +0.0 False  None False
+        c   84  3   4   2  0.000   +0.01846   0.00471  +0.0055670   0.00471    728 +0.01385       8->16   +3.0  True  None False
+        c   84  3   5   2  0.000   +0.00462   0.00471  +0.0031925   0.00471    728 +0.00462       8->10   +1.0 False  None False
+        c   92  2   0   2  0.000   +0.00421   0.00537  +0.0011607   0.00537    872 +0.00421      88->96   -1.0 False  True  True
+            L3 at-support around it: [32, 32, 32, 32, 32] | [32, 32, 32, 32, 32]   latch next cycle n_since=1 moved=False
+            froze after it at: [(3, 100, 61)]
+        c   92  3   0  20  0.000   +0.17391   0.00471  +0.0896929   0.00471    728 +0.05049      13->29   +8.0  True  None False
+        c   92  3   1  12  0.000   +0.11360   0.00471  +0.0759937   0.00471    728 +0.08696      13->48   +5.0  True  None False
+        c   92  3   2  12  0.000   +0.13885   0.00471  +0.0658444   0.00471    728 +0.03366      13->37  +15.0  True  None False
+        c   92  3   3   5  0.000   +0.01403   0.00471  +0.0085325   0.00471    728 +0.00421      13->52   +2.0  True  None False
+        c   92  3   4   4  0.000   +0.01964   0.00471  +0.0075823   0.00471    728 +0.00561      13->17   +4.0  True  None False
+        c   92  3   5   3  0.000   +0.02805   0.00471  +0.0153869   0.00471    728 +0.02384      13->31   +3.0  True  None False
+        c  100  3   0  20  0.000   +0.18194   0.00471  +0.0988676   0.00471    728 +0.05032      14->29   +7.0  True  None False
+        c  100  3   1  12  0.000   +0.11871   0.00471  +0.0790546   0.00471    728 +0.08387      14->49   +7.0  True  None False
+        c  100  3   2  12  0.000   +0.13290   0.00471  +0.0679463   0.00471    728 +0.03355      14->41  +13.0  True  None False
+        c  100  3   3   5  0.000   +0.01677   0.00471  +0.0080298   0.00471    728 +0.00387      14->53   +3.0  True  None False
+        c  100  3   4   4  0.000   +0.01806   0.00471  +0.0074460   0.00471    728 +0.00516      14->18   +4.0  True  None False
+        c  100  3   5   3  0.000   +0.03097   0.00471  +0.0172273   0.00471    728 +0.02710      14->35   +4.0  True  None False
+        c  108  3   0  20  0.000   +0.17878   0.00471  +0.0996383   0.00471    728 +0.09178      22->59   +6.0  True  None False
+        c  108  3   1  12  0.000   +0.11681   0.00471  +0.0814636   0.00471    728 +0.08462      22->63   +7.0  True  None False
+        c  108  3   2  12  0.000   +0.13468   0.00471  +0.0708485   0.00471    728 +0.03576      22->53  +15.0  True  None False
+        c  108  3   3  12  0.000   +0.02503   0.00471  +0.0123842   0.00471    728 +0.00954      22->30   +5.0  True  None False
+        c  108  3   4   7  0.000   +0.03218   0.00471  +0.0165437   0.00471    728 +0.01788      22->83   +4.0  True  None False
+        c  108  3   5   4  0.000   +0.02145   0.00471  +0.0182752   0.00471    728 +0.00954      22->36   +5.0  True  None False
+        c  108  3   6   3  0.000   +0.02503   0.00471  +0.0167319   0.00471    728 +0.02145      22->43   +2.0  True  None False
+        c  118  3   0  20  0.000   +0.17582   0.00471  +0.1056290   0.00471    664 +0.10549      36->77   +5.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   1  12  0.000   +0.11099   0.00471  +0.0806483   0.00471    664 +0.08132     77->118   +7.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   2  12  0.000   +0.10110   0.00471  +0.0552180   0.00471    664 +0.00769    118->125   +6.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   3  12  0.000   +0.02418   0.00471  +0.0122273   0.00471    664 +0.01978    125->141   +5.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   4   7  0.000   +0.01758   0.00471  +0.0120169   0.00471    664 +0.00549    141->197   -2.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   5   6  0.000   +0.02637   0.00471  +0.0153817   0.00471    664 +0.00879    197->196   -7.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  3   6   3  0.000   +0.01209   0.00471  +0.0061137   0.00471    664 +0.00879    196->216   -4.0  True  True  True
+            L4 at-support around it: [63, 63, 65, 65, 65] | [75, 75, 75, 75, 75]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136)]
+        c  118  4   0  28  0.000   +0.00000   0.00330  +0.0013218   0.00330    664 +0.00000        1->1   +0.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [1, 1, 1, 1, 1]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  118  4   1  16  0.000   +0.00000   0.00330  +0.0013218   0.00330    664 +0.00000       1->16   +0.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [1, 1, 1, 1, 1]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  126  4   0  16  0.000   +0.00000   0.00308  +0.0000000   0.00308    600 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  126  4   1  16  0.000   +0.00000   0.00308  +0.0011948   0.00308    600 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  126  4   2   5  0.000   +0.00308   0.00308  +0.0026904   0.00308    600 +0.00000      16->16   +1.0 False  True  True
+            L5 at-support around it: [1, 1, 1, 1, 1] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  126  5   0  16  0.000   +0.00000   0.00308  +0.0000000   0.00308      0 +0.00000        0->0   +0.0 False  None False
+        c  134  4   0  16  0.000   +0.00000   0.00289  +0.0000000   0.00289    536 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  134  4   1  13  0.000   +0.00000   0.00289  +0.0021175   0.00289    536 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  134  4   2  12  0.000   +0.00000   0.00289  +0.0000000   0.00289    536 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  134  4   3   9  0.000   +0.00000   0.00289  +0.0000000   0.00289    536 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [2, 2, 2, 2, 2]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  134  5   0  16  0.000   +0.00000   0.00289  +0.0000000   0.00289      0 +0.00000        0->0   +0.0 False  None False
+        c  142  4   0  16  0.000   +0.00000   0.00272  +0.0000000   0.00272    472 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  142  4   1  14  0.000   +0.00000   0.00272  +0.0027593   0.00272    472 +0.00000      16->16   +0.0  True  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  142  4   2   9  0.000   +0.00000   0.00272  +0.0000000   0.00272    472 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  142  4   3   9  0.000   +0.00000   0.00272  +0.0000000   0.00272    472 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  142  4   4   7  0.000   +0.00000   0.00272  +0.0000000   0.00272    472 +0.00000      16->16   +0.0 False  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  142  4   5   5  0.000   +0.00272   0.00272  +0.0043752   0.00272    472 +0.00272      16->32   +1.0  True  True  True
+            L5 at-support around it: [2, 2, 2, 2, 2] | [4, 4, 5, 6, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(4, 151, 136), (5, 186, 128)]
+        c  142  5   0  16  0.000   +0.00000   0.00272  +0.0000000   0.00272      0 +0.00000        0->0   +0.0 False  None False
+        c  142  5   1  16  0.000   +0.00000   0.00272  +0.0000000   0.00272      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   0  32  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   1  16  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   2  16  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   3  16  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  150  5   4  16  0.000   +0.00000   0.00258  +0.0000000   0.00258      0 +0.00000        0->0   +0.0 False  None False
+        c  158  4   0  13  0.000   +0.00000   0.00244  +0.0012892   0.00244    344 +0.00000      96->96   +0.0 False  True  True
+            L5 at-support around it: [7, 7, 7, 7, 7] | [7, 7, 7, 7, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(5, 186, 128)]
+        c  158  4   1   5  0.000   +0.00000   0.00244  +0.0000000   0.00244    344 +0.00000      96->96   +0.0 False  True  True
+            L5 at-support around it: [7, 7, 7, 7, 7] | [7, 7, 7, 7, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(5, 186, 128)]
+        c  158  4   2   2  0.000   +0.00081   0.00244  +0.0014318   0.00244    344 +0.00081      96->96   +0.0 False  True  True
+            L5 at-support around it: [7, 7, 7, 7, 7] | [7, 7, 7, 7, 7]   latch next cycle n_since=1 moved=False
+            froze after it at: [(5, 186, 128)]
+        c  158  5   0  32  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  158  5   1  16  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  158  5   2  16  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  158  5   3  16  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  158  5   4  16  0.000   +0.00000   0.00244  +0.0000000   0.00244      0 +0.00000        0->0   +0.0 False  None False
+        c  166  4   0  16  0.000   +0.00309   0.00232  +0.0035430   0.00232    280 +0.00309     96->112   +1.0  True  True  True
+            L5 at-support around it: [7, 7, 7, 7, 7] | [8, 8, 8, 8, 8]   latch next cycle n_since=1 moved=False
+            froze after it at: [(5, 186, 128)]
+        c  166  5   0  32  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  166  5   1  32  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  166  5   2  16  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  166  5   3  16  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  166  5   4  16  0.000   +0.00000   0.00232  +0.0000000   0.00232      0 +0.00000        0->0   +0.0 False  None False
+        c  174  4   0   5  0.000   +0.00000   0.00221  +0.0000000   0.00221    216 +0.00000    112->112   +0.0 False  True  True
+            L5 at-support around it: [8, 8, 8, 8, 8] | [9, 9, 9, 9, 9]   latch next cycle n_since=1 moved=False
+            froze after it at: [(5, 186, 128)]
+        c  174  4   1   5  0.000   +0.00000   0.00221  +0.0000000   0.00221    216 +0.00000    112->112   +0.0 False  True  True
+            L5 at-support around it: [8, 8, 8, 8, 8] | [9, 9, 9, 9, 9]   latch next cycle n_since=1 moved=False
+            froze after it at: [(5, 186, 128)]
+        c  174  4   2   4  0.000   +0.00000   0.00221  +0.0000000   0.00221    216 +0.00000    112->112   +0.0 False  True  True
+            L5 at-support around it: [8, 8, 8, 8, 8] | [9, 9, 9, 9, 9]   latch next cycle n_since=1 moved=False
+            froze after it at: [(5, 186, 128)]
+        c  174  4   3   4  0.000   +0.00221   0.00221  +0.0021856   0.00221    216 +0.00221    112->128   +1.0 False  True  True
+            L5 at-support around it: [8, 8, 8, 8, 8] | [9, 9, 9, 9, 9]   latch next cycle n_since=1 moved=False
+            froze after it at: [(5, 186, 128)]
+        c  174  5   0  32  0.000   +0.00221   0.00221  +0.0022108   0.00221      0 +0.00221       0->16   +1.0 False  None False
+        c  174  5   1  32  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  174  5   2  16  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  174  5   3  16  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  174  5   4  16  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  174  5   5  16  0.000   +0.00000   0.00221  +0.0000000   0.00221      0 +0.00000        0->0   +0.0 False  None False
+        c  188  4   0  16  0.000   +0.00000   0.00204  +0.0001765   0.00204    104 +0.00000    144->144   +0.0 False  True  True
+            L5 at-support around it: [11, 12, 12, 12, 13] | [13, 13, 13, 13, 13]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  188  4   1   5  0.000   +0.00000   0.00204  +0.0000000   0.00204    104 +0.00000    144->144   +0.0 False  True  True
+            L5 at-support around it: [11, 12, 12, 12, 13] | [13, 13, 13, 13, 13]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  188  5   0  48  0.000   +0.00136   0.00204  +0.0013615   0.00204      0 +0.00136       1->16   +0.0 False  None False
+        c  188  5   1  32  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  188  5   2  16  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  188  5   3  16  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  188  5   4  16  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  188  5   5  16  0.000   +0.00000   0.00204  +0.0000000   0.00204      0 +0.00000        1->1   +0.0 False  None False
+        c  200  2   0   2  0.000   +0.00192   0.00537  +0.0019039   0.00537      8 +0.00192    115->109   -2.0 False  True  True
+            L3 at-support around it: [35, 35, 35, 35, 35] | [33]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  3   0   5  0.000   +0.00192   0.00471  +0.0019039   0.00471      8 +0.00192    264->256   -2.0 False  True  True
+            L4 at-support around it: [89, 89, 89, 89, 90] | [86]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  3   1   4  0.000   +0.00192   0.00471  +0.0019169   0.00471      8 +0.00064    256->256   +0.0 False  True  True
+            L4 at-support around it: [89, 89, 89, 89, 90] | [86]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  3   2   3  0.000   +0.00575   0.00471  +0.0057248   0.00471      8 +0.00000    256->240   -3.0  True  True  True
+            L4 at-support around it: [89, 89, 89, 89, 90] | [86]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  4   0   5  0.000   +0.00511   0.00192  +0.0050728   0.00192      8 +0.00511    148->160   +0.0  True  True  True
+            L5 at-support around it: [13, 13, 13, 14, 14] | [17]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  4   1   5  0.000   +0.00000   0.00192  +0.0000000   0.00192      8 +0.00000    160->160   +0.0 False  True  True
+            L5 at-support around it: [13, 13, 13, 14, 14] | [17]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  4   2   6  0.171   +0.00575   0.00192  +0.0057248   0.00192      8 +0.00575    160->192   +2.0  True  True  True
+            L5 at-support around it: [13, 13, 13, 14, 14] | [17]   latch next cycle n_since=1 moved=False
+            froze after it at: never
+        c  200  5   0  48  0.000   +0.00128   0.00192  +0.0012780   0.00192      0 +0.00128       3->20   -1.0 False  None False
+        c  200  5   1  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        3->3   +0.0 False  None False
+        c  200  5   2  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        3->3   +0.0 False  None False
+        c  200  5   3  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        3->3   +0.0 False  None False
+        c  200  5   4  16  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        3->3   +0.0 False  None False
+        c  200  5   5  16  0.000   +0.00128   0.00192  +0.0012780   0.00192      0 +0.00128        3->6   +0.0 False  None False
+        c  200  5   6  12  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        3->3   +0.0 False  None False
+        c  200  5   7   4  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        3->3   +0.0 False  None False
+        c  200  5   8   4  0.000   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        3->3   +0.0 False  None False
+        c  200  5   9  44  0.106   +0.00000   0.00192  +0.0000000   0.00192      0 +0.00000        3->3   +0.0 False  None False
+
+[M2] THE RATE — what the probe scored, what the op took, and the alias ceiling
+     `n_pairs` is every pair the probe SCORED at that proposal; `groups` is every
+     alias group the closure found and `taken` how many the licence took. There is
+     no selection cap, so nothing is left on the table by the OP — only by the
+     licence.  (FIRST PASS, `en_s2b` and earlier: one pair per proposal, and its
+     `n_candidates` column is `len(picks)` capped at 1, not the size of the offer.)
+                   arm  proposals  groups  taken  refused  empty  pairs scored  cycles  takes/100cyc
+           endo_ledger         50     116     15      101     22        33,957     201          7.46
+    endo_ledger_open_ung5         58     143     40      103     22        71,150     201         19.90
+    endo_ledger_open_ung5_ra         58     149     44      105     20        70,654     201         21.89
+
+     THE ALIAS CEILING AT L2 (offline, exact, and the only level whose ROWS the
+     compact log carries — the keys there are flat pairs).  `sizing/SIZING.md` 5(a):
+     a forced-transfer probe resolves the TOKEN CLASS and nothing else, and at the
+     L2 mining node two class pairs collapse further ({0}=={0,3}, {2}=={7}), so the
+     exact-alias relation on rows is `same demand group`.  `merges available` is
+     rows - groups: the number of merge OPS that would collapse the book onto its
+     own demand partition.  L3/L4 rows are cross-products this section does not
+     rebuild; `alias_audit.py` does rebuild them (exactly, wherever the spelling cap
+     never bound) and carries the same ceiling per proposal at every level.
+                   arm   cycle       what  rows  tok classes  demand groups  alias pairs  merges avail  L2 taken
+           endo_ledger     c48     commit    13            9              8            6             5         4
+           endo_ledger      c8   proposal    10            8              7            3             3         4
+           endo_ledger     c16   proposal    11            8              7            4             4         4
+           endo_ledger     c24   proposal    13            9              8            6             5         4
+           endo_ledger     c32   proposal    13            9              8            6             5         4
+           endo_ledger     c40   proposal    13            9              8            6             5         4
+           endo_ledger     c48   proposal    13            9              8            6             5         4
+           endo_ledger     c56   proposal    13            9              8            6             5         4
+           endo_ledger     c68   proposal    14           10              8            8             6         4
+           endo_ledger     c76   proposal    14           10              8            8             6         4
+           endo_ledger     c84   proposal    14           10              8            8             6         4
+           endo_ledger     c92   proposal    16           10              8           11             8         4
+           endo_ledger    c100   proposal    17           10              8           14             9         4
+           endo_ledger    c108   proposal    17           10              8           14             9         4
+           endo_ledger    c118   proposal    17           10              8           14             9         4
+           endo_ledger    c126   proposal    17           10              8           14             9         4
+           endo_ledger    c134   proposal    17           10              8           14             9         4
+           endo_ledger    c142   proposal    17           10              8           14             9         4
+           endo_ledger    c150   proposal    17           10              8           14             9         4
+           endo_ledger    c158   proposal    17           10              8           14             9         4
+           endo_ledger    c166   proposal    17           10              8           14             9         4
+           endo_ledger    c174   proposal    17           10              8           14             9         4
+           endo_ledger    c188   proposal    17           10              8           14             9         4
+           endo_ledger    c200   proposal    21           10              8           28            13         4
+    endo_ledger_open_ung5     c48     commit    13            9              8            6             5         5
+    endo_ledger_open_ung5      c8   proposal    10            8              7            3             3         5
+    endo_ledger_open_ung5     c16   proposal    11            8              7            4             4         5
+    endo_ledger_open_ung5     c24   proposal    13            9              8            6             5         5
+    endo_ledger_open_ung5     c32   proposal    13            9              8            6             5         5
+    endo_ledger_open_ung5     c40   proposal    13            9              8            6             5         5
+    endo_ledger_open_ung5     c48   proposal    13            9              8            6             5         5
+    endo_ledger_open_ung5     c56   proposal    13            9              8            6             5         5
+    endo_ledger_open_ung5     c68   proposal    15           10              8           11             7         5
+    endo_ledger_open_ung5     c76   proposal    15           10              8           11             7         5
+    endo_ledger_open_ung5     c84   proposal    16           10              8           14             8         5
+    endo_ledger_open_ung5     c92   proposal    16           10              8           14             8         5
+    endo_ledger_open_ung5    c100   proposal    16           10              8           14             8         5
+    endo_ledger_open_ung5    c108   proposal    17           10              8           15             9         5
+    endo_ledger_open_ung5    c118   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5    c126   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5    c134   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5    c142   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5    c150   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5    c158   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5    c166   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5    c174   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5    c188   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5    c200   proposal    18           10              8           17            10         5
+    endo_ledger_open_ung5_ra     c48     commit    13            9              8            6             5         6
+    endo_ledger_open_ung5_ra      c8   proposal    10            8              7            3             3         6
+    endo_ledger_open_ung5_ra     c16   proposal    11            8              7            4             4         6
+    endo_ledger_open_ung5_ra     c24   proposal    13            9              8            6             5         6
+    endo_ledger_open_ung5_ra     c32   proposal    13            9              8            6             5         6
+    endo_ledger_open_ung5_ra     c40   proposal    13            9              8            6             5         6
+    endo_ledger_open_ung5_ra     c48   proposal    13            9              8            6             5         6
+    endo_ledger_open_ung5_ra     c56   proposal    13            9              8            6             5         6
+    endo_ledger_open_ung5_ra     c68   proposal    15           10              8           11             7         6
+    endo_ledger_open_ung5_ra     c76   proposal    15           10              8           11             7         6
+    endo_ledger_open_ung5_ra     c84   proposal    16           10              8           14             8         6
+    endo_ledger_open_ung5_ra     c92   proposal    16           10              8           14             8         6
+    endo_ledger_open_ung5_ra    c100   proposal    16           10              8           14             8         6
+    endo_ledger_open_ung5_ra    c108   proposal    17           10              8           15             9         6
+    endo_ledger_open_ung5_ra    c118   proposal    18           10              8           17            10         6
+    endo_ledger_open_ung5_ra    c126   proposal    18           10              8           17            10         6
+    endo_ledger_open_ung5_ra    c134   proposal    18           10              8           17            10         6
+    endo_ledger_open_ung5_ra    c142   proposal    18           10              8           17            10         6
+    endo_ledger_open_ung5_ra    c150   proposal    18           10              8           17            10         6
+    endo_ledger_open_ung5_ra    c158   proposal    18           10              8           17            10         6
+    endo_ledger_open_ung5_ra    c166   proposal    18           10              8           17            10         6
+    endo_ledger_open_ung5_ra    c174   proposal    18           10              8           17            10         6
+    endo_ledger_open_ung5_ra    c188   proposal    18           10              8           17            10         6
+    endo_ledger_open_ung5_ra    c200   proposal    19           10              8           21            11         6
+
+[M3] THE LEDGER AUDITION AT l+1, SPLIT BY PAIR TYPE
+     Type is read off the members' TOKEN CLASSES: `equal` (one class), `subset`
+     (some member's class strictly inside another's), `disjoint` (some pair shares
+     no feature), `overlap` otherwise. `x_differ` is the fraction of audition
+     instances on which the kept and merged tables write a DIFFERENT state and
+     `succ_differ` the fraction on which the grade flips: with `x_differ == 0` an
+     `e_merge == e_keep` is the DP's argmax surviving the merge, not a measurement
+     of it.
+           endo_ledger resolved=18 undefined=98 ['both l+1=3 tables are empty (current key and merged)', 'both l+1=4 tables are empty (current key and merged)', 'both l+1=5 tables are empty (current key and merged)', 'l+1=6 is above max_macro_level=5']
+             type   n            e_keep           e_merge               delta          x_differ    succ_differ  taken
+            equal  16 0.3835[0.1602,0.6953] 0.3823[0.1602,0.6953] -0.0012[-0.0430,+0.0234] 0.0266[0.0000,0.1797] 0.0061[0.0000,0.0586]     14
+           subset   2 0.3262[0.3047,0.3477] 0.3281[0.3086,0.3477] +0.0020[+0.0000,+0.0039] 0.0410[0.0000,0.0820] 0.0020[0.0000,0.0039]      1
+        x_differ == 0 on 13 of 18 resolved auditions; e_merge == e_keep on 13 of 18
+           keep case    n  taken            e_keep           e_merge  repaired (succ_differ>0)
+               table   18     15 0.3772[0.1602,0.6953] 0.3763[0.1602,0.6953]             2 of 15 takes
+    endo_ledger_open_ung5 resolved=43 undefined=100 ['both l+1=3 tables are empty (current key and merged)', 'both l+1=4 tables are empty (current key and merged)', 'l+1=6 is above max_macro_level=5']
+             type   n            e_keep           e_merge               delta          x_differ    succ_differ  taken
+            equal  37 0.4936[0.1602,0.6875] 0.4938[0.1602,0.6875] +0.0002[-0.0117,+0.0195] 0.0046[0.0000,0.1055] 0.0017[0.0000,0.0430]     36
+           subset   2 0.2754[0.1602,0.3906] 0.2754[0.1602,0.3906] +0.0000[+0.0000,+0.0000] 0.0000[0.0000,0.0000] 0.0000[0.0000,0.0000]      2
+         disjoint   4 0.3652[0.3086,0.4141] 0.3594[0.2812,0.4180] -0.0059[-0.0273,+0.0039] 0.1035[0.0156,0.1953] 0.0234[0.0117,0.0586]      2
+        x_differ == 0 on 37 of 43 resolved auditions; e_merge == e_keep on 37 of 43
+           keep case    n  taken            e_keep           e_merge  repaired (succ_differ>0)
+               table   43     40 0.4715[0.1602,0.6875] 0.4711[0.1602,0.6875]             3 of 40 takes
+    endo_ledger_open_ung5_ra resolved=47 undefined=102 ['both l+1=3 tables are empty (current key and merged)', 'both l+1=4 tables are empty (current key and merged)', 'l+1=6 is above max_macro_level=5']
+             type   n            e_keep           e_merge               delta          x_differ    succ_differ  taken
+            equal  39 0.5266[0.1602,0.6875] 0.5268[0.1602,0.6875] +0.0002[-0.0117,+0.0195] 0.0053[0.0000,0.1055] 0.0016[0.0000,0.0430]     38
+           subset   3 0.4154[0.1602,0.6953] 0.4154[0.1602,0.6953] +0.0000[+0.0000,+0.0000] 0.0000[0.0000,0.0000] 0.0000[0.0000,0.0000]      3
+         disjoint   5 0.4266[0.3086,0.6719] 0.4219[0.2812,0.6719] -0.0047[-0.0273,+0.0039] 0.0828[0.0000,0.1953] 0.0187[0.0000,0.0586]      3
+        x_differ == 0 on 39 of 47 resolved auditions; e_merge == e_keep on 41 of 47
+           keep case    n  taken            e_keep           e_merge  repaired (succ_differ>0)
+               table   47     44 0.5089[0.1602,0.6953] 0.5086[0.1602,0.6953]             3 of 44 takes
+
+[M4] MERGE PRECISION — was a taken group actually one class?
+     DEMAND partition (what a forced-transfer probe can resolve): the token class
+     with the node's own collapses from `sizing/SIZING.md` 5(a) applied, and every
+     dead-or-junk row folded into one all-fail cell — that is the ceiling, and a
+     merge inside one demand cell is one no probe could refuse.
+     FEATURE partition (`true_mask`'s space, the arc's historical report): the
+     level's own true parent map, `quotient.py`'s `gen` mode. A row with no true
+     parent has no feature class and is counted separately rather than as a miss.
+                   arm  taken  DEMAND: one cell  precision  FEATURE: one class  precision  no feature class
+           endo_ledger     15                15      1.000                  15      1.000                 0
+    endo_ledger_open_ung5     40                40      1.000                  37      0.925                 0
+    endo_ledger_open_ung5_ra     44                43      0.977                  40      0.909                 0
+
+[X] THE EXPANSION CHOICE — did the row the DP picked admit what the instance asked
+     Per macro call on the AUDITION DP path (every `audition_macro` the fork makes:
+     the commit audition's candidate/true/random/held/live cells, the shadow oracle
+     audition and the merge ledger's), the chosen row's TOKEN CLASS against the
+     feature the instance actually demands at that (level, node) — the clean
+     derivation's latent there. `contains` is the share of calls whose chosen class
+     holds the demanded feature; `succ` is the share that then graded as a repair.
+     Oracle-contained (every read counted in `exp_reads`) and inert to the run
+     (gate E-7; G-F 0.000e+00 with it on).
+               endo_ledger  exp_reads=356,239  cells=['2n12', '2n8', '3n4', '3n6', '4n2', '4n3', '5n1']
+        `contains` is against the CLEAN LATENT; `rep` against the set of
+        features that REPAIR the instance at that node (consistent_features),
+        which is the weaker question the grader actually asks.
+            cell  era    calls   contains    rate        rep    rate     succ    rate
+            2n12    1   82,176     42,964   0.523     60,477   0.736   58,103   0.707
+            2n12    2   89,600     52,034   0.581     68,612   0.766   68,193   0.761
+            2n12    3  125,440     40,087   0.320     19,633   0.157   19,629   0.156
+            2n12    4   21,504      5,096   0.237        700   0.033      700   0.033
+             2n8    5   16,128      3,167   0.196        217   0.013      217   0.013
+             3n4    5   16,128      2,484   0.154        340   0.021      340   0.021
+             3n6    1   15,360      6,762   0.440      9,460   0.616    9,453   0.615
+             3n6    2   68,864     30,914   0.449     42,246   0.613   42,096   0.611
+             3n6    3  125,440     47,428   0.378     72,402   0.577   72,402   0.577
+             3n6    4   21,504      5,805   0.270      3,397   0.158    3,397   0.158
+             4n2    5   13,824      5,748   0.416      1,419   0.103    1,413   0.102
+             4n3    1   15,360     11,986   0.780     12,312   0.802   12,312   0.802
+             4n3    2   12,800      9,591   0.749      9,717   0.759    9,717   0.759
+             4n3    3   87,040     48,481   0.557     50,705   0.583   48,798   0.561
+             4n3    4   18,432     12,065   0.655     12,873   0.698   12,774   0.693
+             5n1    1   15,360     12,400   0.807     10,549   0.687    7,383   0.481
+             5n1    2   12,800     11,371   0.888      8,627   0.674    6,206   0.485
+             5n1    3   17,920     15,906   0.888     10,418   0.581    6,622   0.370
+             5n1    4   14,336      7,014   0.489      6,427   0.448    4,785   0.334
+             5n1    5   11,520      6,896   0.599      5,882   0.511    4,631   0.402
+     endo_ledger_open_ung5  exp_reads=381,838  cells=['2n12', '2n8', '3n4', '3n6', '4n2', '4n3', '5n1']
+        `contains` is against the CLEAN LATENT; `rep` against the set of
+        features that REPAIR the instance at that node (consistent_features),
+        which is the weaker question the grader actually asks.
+            cell  era    calls   contains    rate        rep    rate     succ    rate
+            2n12    1   82,176     42,964   0.523     60,477   0.736   58,103   0.707
+            2n12    2   89,600     48,407   0.540     63,144   0.705   62,463   0.697
+            2n12    3  125,440     34,391   0.274     15,719   0.125   15,719   0.125
+            2n12    4   21,504      6,165   0.287        519   0.024      519   0.024
+             2n8    5   16,128      3,298   0.204        189   0.012      189   0.012
+             3n4    5   16,128      2,895   0.180        382   0.024      382   0.024
+             3n6    1   15,360      6,762   0.440      9,460   0.616    9,453   0.615
+             3n6    2   66,304     28,601   0.431     38,035   0.574   37,999   0.573
+             3n6    3  125,440     48,831   0.389     57,761   0.460   57,533   0.459
+             3n6    4   21,504      5,189   0.241      2,958   0.138    2,877   0.134
+             4n2    5   13,824      4,961   0.359      1,854   0.134    1,816   0.131
+             4n3    1   15,360     11,986   0.780     12,312   0.802   12,312   0.802
+             4n3    2   12,800      9,837   0.769     10,034   0.784   10,034   0.784
+             4n3    3   95,232     57,464   0.603     59,715   0.627   58,310   0.612
+             4n3    4   18,432     12,296   0.667     13,188   0.715   13,081   0.710
+             5n1    1   15,360     12,400   0.807     10,549   0.687    7,383   0.481
+             5n1    2   12,800     11,699   0.914      8,118   0.634    5,605   0.438
+             5n1    3   87,552     51,508   0.588     44,312   0.506   31,326   0.358
+             5n1    4   15,360      9,598   0.625      9,152   0.596    7,301   0.475
+             5n1    5   11,520      7,617   0.661      6,968   0.605    5,617   0.488
+    endo_ledger_open_ung5_ra  exp_reads=382,722  cells=['2n12', '2n8', '3n4', '3n6', '4n2', '4n3', '5n1']
+        `contains` is against the CLEAN LATENT; `rep` against the set of
+        features that REPAIR the instance at that node (consistent_features),
+        which is the weaker question the grader actually asks.
+            cell  era    calls   contains    rate        rep    rate     succ    rate
+            2n12    1   82,176     42,964   0.523     60,477   0.736   58,103   0.707
+            2n12    2   89,600     48,407   0.540     63,144   0.705   62,463   0.697
+            2n12    3  125,440     34,391   0.274     15,719   0.125   15,719   0.125
+            2n12    4   21,504      6,136   0.285        510   0.024      510   0.024
+             2n8    5   16,128      3,533   0.219        189   0.012      189   0.012
+             3n4    5   16,128      3,310   0.205        365   0.023      365   0.023
+             3n6    1   15,360      6,762   0.440      9,460   0.616    9,453   0.615
+             3n6    2   66,304     28,601   0.431     38,035   0.574   37,999   0.573
+             3n6    3  125,440     48,831   0.389     57,761   0.460   57,533   0.459
+             3n6    4   21,504      5,260   0.245      2,958   0.138    2,877   0.134
+             4n2    5   13,824      5,606   0.406      1,470   0.106    1,434   0.104
+             4n3    1   15,360     11,986   0.780     12,312   0.802   12,312   0.802
+             4n3    2   12,800      9,837   0.769     10,034   0.784   10,034   0.784
+             4n3    3   95,232     57,464   0.603     59,715   0.627   58,310   0.612
+             4n3    4   18,432     12,341   0.670     13,232   0.718   13,111   0.711
+             5n1    1   15,360     12,400   0.807     10,549   0.687    7,383   0.481
+             5n1    2   12,800     11,699   0.914      8,118   0.634    5,605   0.438
+             5n1    3   87,552     51,508   0.588     44,312   0.506   31,326   0.358
+             5n1    4   17,152     11,060   0.645      9,983   0.582    7,945   0.463
+             5n1    5   13,824      9,769   0.707      7,643   0.553    6,125   0.443
+    flat_yk_endo_ledger_open_ung5  exp_reads=283,931  cells=['2n12', '2n8', '3n4', '3n6', '4n2', '4n3', '5n1']
+        `contains` is against the CLEAN LATENT; `rep` against the set of
+        features that REPAIR the instance at that node (consistent_features),
+        which is the weaker question the grader actually asks.
+            cell  era    calls   contains    rate        rep    rate     succ    rate
+            2n12    1   82,176     42,964   0.523          —       —   58,103   0.707
+            2n12    2   89,600     51,948   0.580          —       —   67,887   0.758
+            2n12    3  125,440     37,163   0.296          —       —   19,563   0.156
+            2n12    4   21,504      4,857   0.226          —       —      699   0.033
+             2n8    5   16,128      3,362   0.208          —       —      196   0.012
+             3n4    5   16,128      2,956   0.183          —       —      353   0.022
+             3n6    1   15,360      6,762   0.440          —       —    9,453   0.615
+             3n6    2   67,328     28,455   0.423          —       —   37,048   0.550
+             3n6    3  125,440     46,462   0.370          —       —   67,899   0.541
+             3n6    4   21,504      5,232   0.243          —       —    3,215   0.150
+             4n2    5   11,520      3,850   0.334          —       —    1,477   0.128
+             4n3    1   15,360     11,986   0.780          —       —   12,312   0.802
+             4n3    2   12,800      9,568   0.748          —       —    9,701   0.758
+             4n3    3   87,552     39,697   0.453          —       —   40,133   0.458
+             4n3    4   15,360      8,196   0.534          —       —    8,167   0.532
+             5n1    1   15,360     12,400   0.807          —       —    7,383   0.481
+             5n1    2   12,800     11,310   0.884          —       —    6,359   0.497
+             5n1    3   17,920     15,729   0.878          —       —    6,982   0.390
+             5n1    4    3,072      2,362   0.769          —       —    1,811   0.590
+             5n1    5    2,304      1,884   0.818          —       —    1,382   0.600
+
+[H] THE BILL
+                 arm    t_cum (g)  oracle reads  slot record cycles    slot mass  merge events
+         endo_ledger   50,919,424         47880                 150    6,100,356           189
+    endo_ledger_open_ung5   51,002,432         51672                 150    5,877,019           224
+    endo_ledger_open_ung5_ra   51,208,256         50418                 150    5,805,471           230
+    flat_yk_endo_ledger_open_ung5   50,266,688          None                 150    6,033,113             0
+    given_cat_tok_open_ung5_yk   42,437,664         47528                 159    7,244,547             0
+
+[O] THE OPEN INVENTORY — operative vs committed, per cycle past the L4 commit
+    `committed` = the rows the commit froze.  `operative` = the rows the DP
+    actually maxed over that cycle.  With the open bit OFF they are equal by
+    construction and the arm prints one row.  `lower cls` is the number of L4
+    classes the operative L4 book holds a row of, out of the 13-class token
+    alphabet — the constraint the whole node is about.
+
+    --- endo_ledger  open_inventory=False ungate_l5=False  L4 commit c179  rebuilds=0 moved=0 empty_fallback=0 ---
+         cycle      L2 com/op      L3 com/op      L4 com/op      L5 com/op  L4 lower cls   of
+           179          13/13          42/42        100/100         None/0           100   13
+           182          13/13          42/42        100/100         None/1           100   13
+           188          13/13          42/42        100/100        None/16            10   13
+           195          13/13          42/42        100/100        None/32            10   13
+           201          13/13          42/42        100/100        None/32            10   13
+
+    --- endo_ledger_open_ung5  open_inventory=True ungate_l5=True  L4 commit c151  rebuilds=156 moved=143 empty_fallback=0 ---
+         cycle      L2 com/op      L3 com/op      L4 com/op      L5 com/op  L4 lower cls   of
+           151          13/18          61/89        136/136        None/96            11   13
+           155          13/18          61/89        136/148        None/96            23   13
+           156          13/18          61/89        136/148        None/96            28   13
+           158          13/18          61/89        136/148        None/96            11   13
+           166          13/18          61/89        136/164       None/112            12   13
+           167          13/18          61/89        136/164       None/112            16   13
+           170          13/18          61/89        136/164       None/112            26   13
+           174          13/18          61/89        136/164       None/128            12   13
+           185          13/18          61/89        136/168       None/128            16   13
+           188          13/18          61/89        136/168       None/144            16   13
+           192          13/18          61/89        136/168       None/144            20   13
+           195          13/18          61/89        136/168       None/160            24   13
+           197          13/18          61/89        136/168       None/164            24   13
+           198          13/18          61/91        136/168       None/164            24   13
+           199          13/18          61/99        136/188       None/164            44   13
+           200          13/18         61/101        136/200       None/192            16   13
+           201          13/19         61/109        136/220       None/192            40   13
+
+    --- endo_ledger_open_ung5_ra  open_inventory=True ungate_l5=True  L4 commit c151  rebuilds=157 moved=144 empty_fallback=0 ---
+         cycle      L2 com/op      L3 com/op      L4 com/op      L5 com/op  L4 lower cls   of
+           151          13/18          61/89        136/136        None/96            11   13
+           155          13/18          61/89        136/148        None/96            23   13
+           156          13/18          61/89        136/148        None/96            28   13
+           158          13/18          61/89        136/148        None/96            11   13
+           166          13/18          61/89        136/164       None/112            12   13
+           167          13/18          61/89        136/164       None/112            16   13
+           170          13/18          61/89        136/164       None/112            26   13
+           174          13/18          61/89        136/164       None/128            12   13
+           185          13/18          61/89        136/168       None/128            16   13
+           186          13/18          61/89        136/168        128/128            16   13
+           187          13/18          61/89        136/184        128/128            36   13
+           188          13/18          61/89        136/184        128/144            17   13
+           193          13/18          61/89        136/184        128/148            25   13
+           194          13/18          61/89        136/184        128/148            29   13
+           196          13/18          61/93        136/184        128/148            29   13
+           197          13/18          61/93        136/188        128/148            33   13
+           198          13/19          61/99        136/192        128/148            37   13
+           199          13/19         61/101        136/192        128/148            29   13
+           200          13/19          61/95        136/188        128/192            20   13
+           201          13/19          61/95        136/200        128/192            32   13
+
+    --- flat_yk_endo_ledger_open_ung5  open_inventory=False ungate_l5=False  L4 commit (none)  rebuilds=0 moved=0 empty_fallback=0 ---
+         cycle      L2 com/op      L3 com/op      L4 com/op      L5 com/op  L4 lower cls   of
+             1         None/0         None/0         None/0         None/0          None   13
+             2         None/1         None/0         None/0         None/0          None   13
+             4         None/4         None/0         None/0         None/0          None   13
+             5         None/5         None/0         None/0         None/0          None   13
+             6         None/6         None/0         None/0         None/0          None   13
+             8        None/10         None/0         None/0         None/0          None   13
+            12        None/11         None/0         None/0         None/0          None   13
+            19        None/12         None/0         None/0         None/0          None   13
+            22        None/13         None/0         None/0         None/0          None   13
+            48          13/13         None/0         None/0         None/0          None   13
+            63          13/13         None/1         None/0         None/0          None   13
+            64          13/13         None/2         None/0         None/0          None   13
+            65          13/13         None/3         None/0         None/0          None   13
+            66          13/13         None/5         None/0         None/0          None   13
+            67          13/13         None/7         None/0         None/0          None   13
+            68          13/13         None/8         None/0         None/0          None   13
+            72          13/13         None/9         None/0         None/0          None   13
+            73          13/13        None/10         None/0         None/0          None   13
+            77          13/13        None/11         None/0         None/0          None   13
+            78          13/13        None/12         None/0         None/0          None   13
+            79          13/13        None/13         None/0         None/0          None   13
+            81          13/13        None/14         None/0         None/0          None   13
+            82          13/13        None/15         None/0         None/0          None   13
+            85          13/13        None/16         None/0         None/0          None   13
+            87          13/13        None/17         None/0         None/0          None   13
+            88          13/13        None/18         None/0         None/0          None   13
+            91          13/13        None/19         None/0         None/0          None   13
+            94          13/13        None/21         None/0         None/0          None   13
+            95          13/13        None/22         None/0         None/0          None   13
+            97          13/13        None/23         None/0         None/0          None   13
+           100          13/13          23/23         None/0         None/0          None   13
+           113          13/13          23/23         None/1         None/0          None   13
+           133          13/13          23/23         None/2         None/0          None   13
+           136          13/13          23/23         None/3         None/0          None   13
+           139          13/13          23/23         None/4         None/0          None   13
+           155          13/13          23/23         None/5         None/0          None   13
+           163          13/13          23/23         None/6         None/0          None   13
+           170          13/13          23/23         None/7         None/0          None   13
+           201          13/13          23/23         None/7         None/0          None   13
+
+    --- given_cat_tok_open_ung5_yk  open_inventory=True ungate_l5=True  L4 commit c95  rebuilds=166 moved=146 empty_fallback=0 ---
+         cycle      L2 com/op      L3 com/op      L4 com/op      L5 com/op  L4 lower cls   of
+            95          16/20        None/81          88/88        None/80             5   13
+            97          16/20        None/81          88/88        None/96             5   13
+           100          16/20        None/81         88/120       None/144             6   13
+           106          16/20        None/83         88/128       None/144             6   13
+           118          16/20        None/83         88/128       None/176             6   13
+           123          16/20        None/83         88/128       None/192             6   13
+           125          16/20        None/83         88/144       None/272             7   13
+           137          16/20        None/91         88/176       None/272             7   13
+           138          16/20        None/91         88/192       None/272             7   13
+           151          16/20        None/91         88/208       None/288             8   13
+           168          16/20        None/92         88/224       None/384             9   13
+           169          16/21        None/92         88/224       None/384             9   13
+           170          16/22        None/94         88/240       None/384             9   13
+           171          16/22        None/96         88/240       None/384             9   13
+           176          16/22        None/96         88/240       None/384             9   13
+
+[O2] THE RATCHET'S BITE — level-l keys at support the operative level-(l-1) book
+     cannot look up.  This is what an open inventory is FOR: `figured_bass`'s
+     offline replay found the frozen L4 book blocking 5 of `given_cat_tok`'s 7 L5
+     keys at support at the end of `en_s0`, and the live one blocking 2.
+                    arm  level   cycle  keys@sup  blocked  lower cls  lower rows
+            endo_ledger     L4     179        46       38         10          42   (commit)
+            endo_ledger     L4     190        48       40         10          42   (median)
+            endo_ledger     L4     201        50       42         10          42   (last)
+            endo_ledger     L5     179         0        0        100         100   (commit)
+            endo_ledger     L5     190         1        0         10         100   (median)
+            endo_ledger     L5     201         2        0         10         100   (last)
+     endo_ledger_open_ung5     L4     151        25       15         24          89   (commit)
+     endo_ledger_open_ung5     L4     176        35       23         24          89   (median)
+     endo_ledger_open_ung5     L4     201        37       20         41         109   (last)
+     endo_ledger_open_ung5     L5     151         7        1         11         136   (commit)
+     endo_ledger_open_ung5     L5     176         9        1         12         164   (median)
+     endo_ledger_open_ung5     L5     201        19        7         40         220   (last)
+     endo_ledger_open_ung5_ra     L4     151        25       15         24          89   (commit)
+     endo_ledger_open_ung5_ra     L4     176        35       23         24          89   (median)
+     endo_ledger_open_ung5_ra     L4     201        43       27         26          95   (last)
+     endo_ledger_open_ung5_ra     L5     151         7        1         11         136   (commit)
+     endo_ledger_open_ung5_ra     L5     176         9        1         12         164   (median)
+     endo_ledger_open_ung5_ra     L5     201        17        5         32         200   (last)
+     given_cat_tok_open_ung5_yk     L4      95         8        2          8          81   (commit)
+     given_cat_tok_open_ung5_yk     L4     136        12        3          8          83   (median)
+     given_cat_tok_open_ung5_yk     L4     176        16        1          9          96   (last)
+     given_cat_tok_open_ung5_yk     L5      95        23       18          5          88   (commit)
+     given_cat_tok_open_ung5_yk     L5     136        34       17          7         144   (median)
+     given_cat_tok_open_ung5_yk     L5     176        37       13          9         240   (last)
+
+[O3] THE CORRIDOR ACROSS THE COMMIT — 20 cycles either side of the L4 commit
+     `parity` = mean over slots of `log["span"][c]["parity"]` (exact-match rate
+     of the head's execution against the DP's intention).  `misfire` =
+     n_misfire / max(n_fired, 1) off the meter's row.  `churn` = cycles on which
+     the set of OPEN slots changed.  `n_open` = mean open slots.
+     WHAT THIS WINDOW CAN AND CANNOT SAY ABOUT THE OPEN BIT. An arm that never
+     committed L4 is anchored on its L2 commit, and in `fb_s0` the open arms are
+     BIT-IDENTICAL to their frozen twins through c31 — the operative table first
+     exceeds the committed one at c31 and `e` first differs at c32 — so a window
+     that ends at c31 (L2@c12 + 20) is entirely inside the identical stretch. Rows
+     that agree to the digit there are reporting that fact and NOTHING about the
+     open bit. Read the per-slot b(s) series instead, and see the note in [C].
+     THE ANCHOR EVENT is the L4 commit where there is one and the arm's FIRST
+     commit otherwise, named in the `at` column — an arm that never committed L4
+     still adopted a level, and 'can the executor adopt a level whose content keeps
+     moving under it' is asked of whatever level it did adopt.
+                    arm       at  window   cyc   parity  misfire  churn  n_open        e
+            endo_ledger  L4@c179  before    20   0.9437   0.0416      0   24.00   0.5405
+            endo_ledger  L4@c179   after    20   0.9538   0.0399      3   27.55   0.6686
+     endo_ledger_open_ung5  L4@c151  before    20   0.9082   0.0725      0   24.00   0.6128
+     endo_ledger_open_ung5  L4@c151   after    20   0.9192   0.0673      1   27.60   0.5395
+     endo_ledger_open_ung5_ra  L4@c151  before    20   0.9082   0.0725      0   24.00   0.6128
+     endo_ledger_open_ung5_ra  L4@c151   after    20   0.9192   0.0673      1   27.60   0.5395
+     flat_yk_endo_ledger_open_ung5   L2@c48  before    20        —        —      0       —   0.4414
+     flat_yk_endo_ledger_open_ung5   L2@c48   after    20   0.7330   0.1835      3   12.75   0.5798
+     given_cat_tok_open_ung5_yk   L4@c95  before    20   0.9455   0.0451      0   16.00   0.6676
+     given_cat_tok_open_ung5_yk   L4@c95   after    20   0.9512   0.0328      1   19.60   0.6270
+
+[Y2] THE YOKE REPLAY — realised against the plan the arm was handed
+     `plan` is `config["yoke_plan"]`, i.e. what the source's realised actions were
+     at hand-off; `realised` is this arm's own uncancelled `loop_actions`.
+
+     flat_yk_endo_ledger_open_ung5  (open_inventory=False ungate_l5=False, 201 cycles)
+        plan     ( 7): [('advance', 60), ('advance', 110), ('advance', 180), ('advance', 192), ('advance', 201), ('commit', 48), ('commit', 100)]
+        realised ( 7): [('advance', 60), ('advance', 110), ('advance', 180), ('advance', 192), ('advance', 201), ('commit', 48), ('commit', 100)]
+        MATCH=True
+        cancelled (reported, not asserted): none
+        L2@c48: installed 13 rows (live build=True, by_clock=True, open=False); operative after: 13 -> 13 over 154 cycles
+        L3@c100: installed 23 rows (live build=True, by_clock=True, open=False); operative after: 23 -> 23 over 102 cycles
+
+     given_cat_tok_open_ung5_yk  (open_inventory=True ungate_l5=True, 176 cycles)
+        plan     ( 7): [('advance', 35), ('advance', 85), ('advance', 155), ('advance', 167), ('advance', 176), ('commit', 12), ('commit', 95)]
+        realised ( 7): [('advance', 35), ('advance', 85), ('advance', 155), ('advance', 167), ('advance', 176), ('commit', 12), ('commit', 95)]
+        MATCH=True
+        cancelled (reported, not asserted): none
+        L2@c12: installed 16 rows (live build=True, by_clock=True, open=True); operative after: 16 -> 22 over 165 cycles
+        L4@c95: installed 88 rows (live build=True, by_clock=True, open=True); operative after: 88 -> 240 over 82 cycles

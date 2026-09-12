@@ -214,4 +214,9 @@ gauge; the un-yoked signature was the clock; the L4 book freezes at 3 of 13 clas
 
 **Third child specced (2026-09-10)**: `figured_bass/SPEC.md`[^private] — what a commit should freeze in category coordinates: the key, not the content. From Q1's mechanism (the L4 book frozen at its poorest) and `tutti`'s never-frozen L3.
 
+**Composed arm, probe reach, sweep, and latch landed (2026-09-11→12, `en_s6` → `en_s9`)**: the first
+endogenous L5 commit (`en_s9`, c186) once the merge sweeps every live level and the class-coverage
+re-arm hook leaves the commit latch alone; the adopted book is eight class keys at the spelling
+cap. Written up in [`README.md`](README.md) (addenda); open items in `QUEUE.md`.
+
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

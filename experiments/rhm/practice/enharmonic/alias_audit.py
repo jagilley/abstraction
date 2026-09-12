@@ -60,7 +60,11 @@ DEAD = {2: [], 3: [frozenset({1})], 4: [frozenset({7})]}
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", default="en_s3")
-    ap.add_argument("--arms", default="endo_ledger,endo_yield,endo_yield_force")
+    # [en_s8] no default arm list: a tag's arms are whatever it ran. The old default
+    # named `en_s2b`'s three and silently printed "not fetched locally" for two of them
+    # on every later tag, while leaving that tag's own composed arm out of the file.
+    ap.add_argument("--arms", default="",
+                    help="comma-separated; default is every arm directory in the tag")
     a = ap.parse_args()
     rules = generate_rules_distinct(V, S, DEPTH, M, seed=0)
     canon = np.ascontiguousarray(rules[DEPTH - 1][:, 0, :])
@@ -93,8 +97,23 @@ def main():
     print("  `all<=tol` is every scored pair within tol, whatever its type.")
     print("  `ex(dmd) > 0` with `scored == 0` is (b): the use filter never showed the pair to")
     print("  the probe. `ex(dmd) == 0` is (a). `scored > 0` with `<=tol == 0` is (c).")
+    print("")
+    print("  AN OPEN-INVENTORY ARM IS APPROXIMATE HERE, AND NOT A LITTLE. This rebuild")
+    print("  assumes the operative book of an adopted level IS the book its commit froze")
+    print("  -- which is exactly what open_inventory abolishes: there the commit freezes")
+    print("  the KEY and the book is the live build, moving every cycle. So for an open")
+    print("  arm the rows/cls/probed/scored columns reconstruct a book the arm did not")
+    print("  run, and every row is flagged [MISMATCH]. The committed-book coverage lines")
+    print("  above each table are exact in all cases. The arm is printed rather than")
+    print("  skipped so its structural columns (token classes, demand cells) are on the")
+    print("  record.")
 
-    for arm in [x.strip() for x in a.arms.split(",") if x.strip()]:
+    _arms = [x.strip() for x in a.arms.split(",") if x.strip()]
+    if not _arms:
+        _root = os.path.join(FIG, a.tag)
+        _arms = sorted(d for d in os.listdir(_root)
+                       if os.path.isfile(os.path.join(_root, d, "results.json")))
+    for arm in _arms:
         p = os.path.join(FIG, a.tag, arm, "results.json")
         if not os.path.isfile(p):
             print(f"\n{arm}: not fetched locally — skipped")

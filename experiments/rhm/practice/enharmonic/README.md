@@ -201,7 +201,7 @@ set of features that repair the instance.
    representability at a freeze the loop has not yet chosen. The working licence on this
    substrate is a cost check at the level the merge changes, with next-level arrival as the
    readout of value.
-4. **What stops L5 now is the clock, three ways**: the L4 book freezes on era 3's narrow
+4. **What stops L5 now is the clock, three ways** (revised by the `en_s7`→`en_s9` addendum below — the clock no longer stops it): the L4 book freezes on era 3's narrow
    stream; the committable L5 miner starts at era 4; opening the inventory re-paces the loop.
    In category coordinates the object to freeze and the schedule to mine are the open questions,
    not arrival.
@@ -243,6 +243,76 @@ differences elsewhere, `t_cum` to the digit; the in-tag yoke plan equals the ban
 - `alias_audit.py` is approximate for open arms (it reconstructs the committed book, which the
   open bit abolishes); the closed arm's rows are exact.
 
+## Addendum — the probe's reach and the commit latch (`en_s7` → `en_s9`, 5.8 GPU-h, 2026-09-11→12)
+
+Three runs after the composed arm, each one knob on the last, discussed before writing. `en_s7`
+raised the probe's row cap to cover the L4 book (`merge_max_rows` 64 → 256) on the yoked composed
+arm; `en_s8` made the merge sweep every level that has rows, bottom-up, on every proposal, on two
+self-paced arms (composed and closed); `en_s9` took the class-coverage re-arm hook off the commit
+latch (`rearm_advance_only`, default off, everything earlier bit-reproducible). Facts in
+`figures/en_s{7,8,9}_reduction.txt` and `_alias_audit.txt`; commands `results/RUN_en_s{7,8,9}.sh`.
+
+| arm | probe | commits | L4 partition first collapses | L5 keys at support (end) | L6 read (end) |
+|---|---|---|---|---|---|
+| `en_s7` composed, yoked | cap 256, active−1 only | L2 c48 · L3 c97 · L4 c179 (yoke) | c188, 154 → 8 (after the commit) | 8 | 0 |
+| `en_s8` composed, self-paced | sweep, cap 256, n_probe 128 | L2 c48 · L3 c100 · L4 c151 | **c118, 44 → 2 (before the commit)** | 19 | 2 |
+| `en_s8` closed, self-paced | same | L2 c48 · L3 c97 · L4 c179 (= `en_s4`) | c188, 100 → 10 (after) | 2 | 0 |
+| `en_s9` composed, hook off the latch | same as `en_s8` | L2 c48 · L3 c100 · L4 c151 · **L5 c186** | c118 (identical to `en_s8` through c185) | 17 | 3 |
+
+- **The probe was never the wall.** With the cap covering the book (`en_s7`), the L4 partition
+  collapses to its demand floor at the first proposal that sees all of it (154 → 8 classes in one
+  sweep, T5 built 2 → 64) — but at c188, nine cycles after the yoked L4 commit, and a clock yoke
+  can commit only at its source's cycles, so "no L5 commit" on a yoked arm is a property of the
+  replay (stated in every reduction's `[B]` from `en_s8` on).
+- **Why the closed arm's L4 book must freeze unmerged.** The ledger licence audits at ℓ+1 and is
+  undefined while that table is empty; the gated L5 miner does not build until L4 is committed;
+  so every L4 group is refused with "l+1 tables are empty" until the commit (`en_s8` closed:
+  720 alias pairs scored at loss 0.000 per proposal from c142 to c174, none licensed, then all
+  six groups taken at c188). This is the mechanism behind Q1's "the L4 book freezes at its
+  poorest". Two ingredients break it, both needed: an ungated ℓ+1 so the licence can speak, and
+  the sweep so the live level is probed at all. The closed arm under the sweep is the
+  "sweep without ungate" control: bit-identical in value to `en_s4`.
+- **The first endogenous arm whose L4 partition collapses before its L4 commit** (`en_s8`
+  composed, c118 against a commit at c151): its L5 miner keys over 11 classes at the commit
+  instead of 136 raw rows, L5 keys at support reach 19 (previous endogenous best 5; supplied
+  quotient 37), and the L6 read leaves zero for the first time. It did not commit L5. The commit
+  owner's trace says why: the L5 yield read moved at c185 (1.36× its floor, the first post-burn
+  read of era 4), the class-coverage re-arm fired at c186 and `_acted_all` reset both policies —
+  `moved` gone and burn restarted — the three reads left before the era cap were flat, and in
+  era 5 the hook fired every cycle. The hook added in `figured_bass` to hold the ladder was
+  also holding the commit.
+- **Taking the hook off the commit latch commits L5** (`en_s9`): identical to `en_s8`'s composed
+  arm through c185 in every per-cycle line; at c186 the re-arm leaves the commit owner alone
+  (`com_n_since 5, moved True`), the read comes in at 0.68× the floor, quiet fires, L5 adopts.
+  c186 is the only cycle of 201 on which a licence bit differs between the two arms; the knob
+  changed no action for 104 cycles before it (the owner's statistic first differs at c82).
+- **What was adopted is thin, and its value is not visible yet.** The L5 book is 128 rows =
+  8 class-pair keys × 16 spellings, every key at the spelling cap; token-space precision 1.000
+  on 17 at-support keys, 9 of 22 classes at the last cycle; feature-space precision 0.258. It is
+  the first commit that auditions *worse* than the oracle table (0.656 vs 0.598; L2/L3/L4 were
+  0.031/0.020/0.008 *better*, the gap closing monotonically). Era-4/5 error is within 0.006 of
+  the non-committing `en_s8` arm (both ≈0.09–0.13 under flat); fifteen post-commit cycles on one
+  divergent trajectory. The open bit acts at L5 for the first time (operative 128 → 192 rows);
+  L5 keys at support end *lower* than `en_s8`'s (17 vs 19); L6 reaches 3.
+- **One level up, the same shape.** In era 5 the L6 read moved (1.36× its floor at c197–c200) and
+  a merge take at c200 reset both latches — the take path re-arms both policies by the same
+  regime-change rule. Every L5 group in every sweep was refused because ℓ+1 = 6 is above
+  `max_macro_level`: the top level is probed and paid for and cannot act under the rule as
+  written. Merge budget 0.35–0.57% of priced time (projected 1.7%; partitions collapse on first
+  contact). Merge precision 43 of 44 takes inside one demand cell in `en_s9` — the first below
+  1.000 in the line.
+- Reporting fixes landed with these runs: the per-proposal merge counters were cumulative
+  across levels within a sweep (the reducer now derives them from group records, repairing the
+  banked tags); the alias audit defaults to every arm in a tag and states its open-arm caveat
+  in the file.
+
+**Reading, agreed 2026-09-12.** The wall moved twice. From "the L4 book freezes at its poorest" to
+"the clock refuses the commit", by the sweep with an ungated level above; then from the clock to
+the book, by taking the re-arm hook off the commit latch. Item 4 of *The update* is revised
+accordingly: the clock is no longer what stops L5. What remains is the content of the adopted L5
+book — eight class keys at a spelling cap that now binds at the level that matters — and the
+licence for the top level of the sweep.
+
 ## What this does not show
 
 Matched-clock era-4/5 error gaps between near-identical arms reach 0.08 in this round (the two
@@ -251,13 +321,15 @@ so the error readouts are not load-bearing; the structural ones — books, class
 adoption cycle, merge precision, choice accuracy — are consistent across every pass. The choice
 instrument sees the audition path, not the beam's own search states. Every number is on one
 rule draw (`rule_seed = 0`); seeds 6 and 10 are collision-free and would make the cover a
-partition. The ledger's "absent ℓ+1 table" branch and the merge on an open book past a commit
-(`endo_open`) were built and gated but never exercised by a run.
+partition. The ledger's "absent ℓ+1 table" branch was built and gated but never exercised by a run
+(the closed arm's pre-commit refusals in `en_s8` are the *undefined* case, both tables empty);
+the merge on an open book past a commit first ran in `en_s8`/`en_s9` (the L4 sweep at c200).
+The L5 book adopted in `en_s9` has fifteen post-commit cycles on one trajectory behind it.
 
 ## Reproduction
 
 From `experiments/`, profile `chromatic`: the commands of record are
-`enharmonic/results/RUN_en_s{0,1,2,2b,3,4,5}.sh` and `enharmonic/figured_bass/results/RUN_fb_s{0,1}.sh`;
+`enharmonic/results/RUN_en_s{0,1,2,2b,3,4,5,6,7,8,9}.sh` and `enharmonic/figured_bass/results/RUN_fb_s{0,1}.sh`;
 each carries the flags, floors and banked-arm provenance in its header. Offline:
 `PYTHONPATH=. python3 rhm/practice/enharmonic/sizing/phase0_cat.py`,
 `.../sizing/fork_arrival.py`, `.../figured_bass/sizing/phase0_open.py`,

@@ -179,6 +179,12 @@ def main():
 
     # ---- [B] L5 ------------------------------------------------------------------------- #
     print("\n[B] L5 — the rung the node exists for")
+    print("    [en_s8] READ `L5 committed` ON A YOKED ARM AS A PROPERTY OF THE REPLAY, NOT A")
+    print("    FINDING: a clock yoke replays its source's commit cycles and can commit at no")
+    print("    other, so an arm yoked to a source that never committed L5 could not have")
+    print("    committed L5 whatever its book held. `en_s6`'s and `en_s7`'s composed arms are")
+    print("    both yoked to `en_s4:endo_ledger`, which did not commit L5. Only a SELF-PACED")
+    print("    arm's row answers the question.")
     print(f"    {'arm':>16} {'L5 committed':>13} {'|T5| at support (last)':>23} "
           f"{'L5 obs@sup3':>12} {'L6 obs@sup3':>12} {'read_level (era 4/5)':>21}")
     for arm, r in arms:
@@ -510,11 +516,24 @@ def main():
             print(f"        {'cycle':>6} {'L':>2} {'froz':>5} {'pairs':>6} {'grp':>4} "
                   f"{'took':>4} {'ref':>4} {'skip':>4} {'undef':>5} {'classes':>13} "
                   f"{'T(l+1)':>15}")
+            # [en_s8] THE PER-LEVEL COUNTS ARE DERIVED FROM THE GROUP RECORDS, not read off
+            # the proposal. Under the sweep every level of a proposal shares a cycle, and the
+            # stored `groups_taken` was filtered on cycle alone, so it carried over from the
+            # levels probed earlier in the same sweep (c118 L4 read 9 for its own 2). The group
+            # records were always right; this recomputes from them, which also repairs the
+            # already-banked tags without re-running them.
+            def _lvl_counts(p):
+                g = [e for e in grps if e.get("cycle") == p["cycle"]
+                     and e.get("level") == p["level"]]
+                tk = sum(1 for e in g if e.get("taken"))
+                sk = sum(1 for e in g if e.get("skipped"))
+                return tk, len(g) - tk - sk, sk
             for p in props:
+                _tk, _rf, _sk = _lvl_counts(p)
                 print(f"        c{p['cycle']:>5} {p['level']:>2} "
                       f"{str(p.get('frozen'))[:5]:>5} {str(p.get('n_pairs')):>6} "
-                      f"{p.get('n_groups', 0):>4} {p.get('groups_taken', 0):>4} "
-                      f"{p.get('groups_refused', 0):>4} {p.get('groups_skipped', 0):>4} "
+                      f"{p.get('n_groups', 0):>4} {_tk:>4} "
+                      f"{_rf:>4} {_sk:>4} "
                       f"{p.get('groups_undefined', 0):>5} "
                       f"{str(p.get('n_classes_before')) + '->' + str(p.get('n_classes_after')):>13} "
                       f"{str(p.get('n_entries_next_before')) + '->' + str(p.get('n_entries_next_after')):>15}")
@@ -649,13 +668,16 @@ def main():
     print(f"    {'arm':>18} {'cycle':>7} {'what':>10} {'rows':>5} {'tok classes':>12} "
           f"{'demand groups':>14} {'alias pairs':>12} {'merges avail':>13} {'L2 taken':>9}")
     for arm, r in list(arms) + extra_arms:
-        me2 = [e for e in (r.get("merge_events") or []) if e["level"] == 2]
+        # [en_s8] `merge_sweep` records carry no level — the per-level views read the
+        # proposal and group records only.
+        me2 = [e for e in (r.get("merge_events") or [])
+               if e.get("kind") in ("merge", "merge_proposal") and e.get("level") == 2]
         if not me2:
             continue
         took2 = sum(1 for e in me2 if e.get("taken"))
         c2 = [e["cycle"] for e in r["events"] if e["kind"] == "commit" and e["level"] == 2]
         props2 = [e for e in (r.get("merge_events") or [])
-                  if e.get("kind") == "merge_proposal" and e["level"] == 2]
+                  if e.get("kind") == "merge_proposal" and e.get("level") == 2]
         # ONE ROW PER PROPOSAL: a whole-partition tag emits several `merge` events per cycle
         # and the book they all read is the same one.
         seen_c, cycs = set(), ([("commit", c2[0])] if c2 else [])
@@ -828,21 +850,29 @@ def main():
         eras_l = r["log"]["era"]
         cells = sorted({k for q in ex if q for k in q})
         print(f"    {arm:>22}  exp_reads={r.get('exp_reads'):,}  cells={cells}")
+        print("        `contains` is against the CLEAN LATENT; `rep` against the set of")
+        print("        features that REPAIR the instance at that node (consistent_features),")
+        print("        which is the weaker question the grader actually asks.")
         print(f"        {'cell':>8} {'era':>4} {'calls':>8} {'contains':>10} {'rate':>7} "
-              f"{'succ':>8} {'rate':>7}")
+              f"{'rep':>10} {'rate':>7} {'succ':>8} {'rate':>7}")
         for cell in cells:
             for era in sorted(set(eras_l)):
-                c = s_ = k = 0
+                c = s_ = k = rp = 0
+                has_rp = False
                 for i, q in enumerate(ex):
                     if not q or eras_l[i] != era or cell not in q:
                         continue
                     k += q[cell]["calls"]
                     c += q[cell]["contains"]
                     s_ += q[cell]["succ"]
+                    if q[cell].get("contains_rep") is not None:
+                        rp += q[cell]["contains_rep"]
+                        has_rp = True
                 if not k:
                     continue
                 print(f"        {cell:>8} {era:>4} {k:>8,} {c:>10,} {c / k:>7.3f} "
-                      f"{s_:>8,} {s_ / k:>7.3f}")
+                      + (f"{rp:>10,} {rp / k:>7.3f} " if has_rp else f"{'—':>10} {'—':>7} ")
+                      + f"{s_:>8,} {s_ / k:>7.3f}")
 
     # ---- [Y] the clock yokes ------------------------------------------------------------ #
     if a.yoke_tag:
