@@ -4,7 +4,7 @@ This is a live research repo built to research the following observation:
 
 > here is a very specific sense in which current LLMs are not AGI. If you define “general” as “capable of representing a general assortment of inputs”, then they are general. But if you define “general” as “capable of learning a general assortment of data-limited domains”, then they are not general, because they cannot endogeneously explore and learn complex domains.
 
-Supervised learning learns robustly from external data, but can't mint its own knowledge. RL learns everything for itself, but learns with specific regard to a verifier, and thus can't navigate great complexity. The process of creating new abstractions requires a synthesis of both.
+Supervised learning learns robustly from external data, but can't mint its own knowledge. RL learns everything for itself, but learns with specific regard to an external verifier, and thus can't navigate great complexity. The process of creating new abstractions requires a synthesis of both.
 
 Other forms this problem statement may take:
 - Sample efficiency ("how do you learn more from limited data?")
@@ -33,7 +33,7 @@ I think there are two questions bundled together here:
 1. Can non-LLM research currently be frontier-level useful?
 2. Do LLMs work the same way as other types of AI models, in a learning-theory sense?
 
-To the first question, I would say "no", and I find the fact that the answer is "no" to be thought-provoking. To my mind, this fact would seem to imply something about the data on which we train LLMs: *what is it about human-generated textual data that makes it uniquely useful*? I suspect the answer has something to do with the directness with which our language encodes the abstraction byproducts of our cognitive processes.
+To the first question, I would agree with the scaling-maximalist consensus that the answer is "no", and I find the fact that the answer is "no" to be thought-provoking. To my mind, this fact would seem to imply something about the data on which we train LLMs: *what is it about human-generated textual data that makes it uniquely useful*? I suspect the answer has something to do with the directness with which our language encodes the abstraction byproducts of our cognitive processes.
 
 To the second question, I would say "yes", and I don't think many would disagree. Whatever it is that makes training a transformer on exabytes of pure language more useful than training a transformer on exabytes of pure images seems like it ought to be downstream of the language data itself, and the model representations required to be a good next token predictor over it.
 

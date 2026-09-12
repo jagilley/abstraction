@@ -3,7 +3,7 @@
 Iterating fast on our ideas is the most important goal. This means:
 - We should run smoke tests on Modal itself (presumably without `--detach`) to take advantage of the fastest hardware
 - We should test the most principled version of our ideas
-- We should parallelize anything that can be parallelized if it'll help us iterate on our ideas faster. That said, frivolous parallelization wastes resources. We should only ever parallelize by a factor of maybe 4 or so; higher DoP is unlikely to be epistemically useful.
+- We should parallelize anything that can be parallelized if it'll help us iterate on our ideas faster. That said, frivolous parallelization wastes resources. We should only ever parallelize by a factor of maybe 4 or so; higher DoP is unlikely to be epistemically useful. Parallelizing separate arms/conditions of the same experiment is certainly allowed and encouraged. 
 - If there is a specific reason to believe that it's epistemically important to replicate results across multiple seeds, it's ok to do so. However:
     - We should always start by running and waiting for a single-seed version of the full experiment to verify that things work as intended and get a sense of the described effect
     - *If and only if*:
