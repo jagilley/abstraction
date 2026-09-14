@@ -1,7 +1,7 @@
 # enharmonic — FILES
 
 **Up**: [`../FILES.md`](../FILES.md) (practice). **Spec**: [`SPEC.md`](SPEC.md). **Q2 spec**:
-`temperament/SPEC.md`[^private]. Results are facts-only until discussed:
+[`temperament/SPEC.md`](temperament/SPEC.md). Results are facts-only until discussed:
 [`sizing/SIZING.md`](sizing/SIZING.md) and `figures/en_*_reduction.txt`.
 
 ## Code files
@@ -25,8 +25,6 @@
 | folder | what |
 |---|---|
 | [`sizing/`](sizing/SIZING.md) | Q0, offline: `phase0_cat.py` (the cover, the token class, the alias audit against a shuffled control, the forced-transfer budget, junk under transfer) and `fork_arrival.py` (the fork's own mining path simulated; the canonical re-rendering legality correction). Facts in `SIZING.md`. |
-| `figured_bass/`[^private] | Commit the key, not the content: Q0 offline (`sizing/`), the `open_inventory` / `ungate_l5` knobs in this node's fork (`fb_open.patch`), runs `fb_s0` (own clock) and `fb_s1` (the anchor's clock). Facts in `../figures/fb_s{0,1}_reduction.txt`; discussion pending. |
-| `temperament/`[^private] | Q2's spec (the endogenous quotient) and its conversation record. The Q2 arms live in this node's fork. |
+| [`figured_bass/`](figured_bass/FILES.md) | Commit the key, not the content: Q0 offline (`sizing/`), the `open_inventory` / `ungate_l5` knobs in this node's fork (`fb_open.patch`), runs `fb_s0` (own clock) and `fb_s1` (the anchor's clock). Facts in `../figures/fb_s{0,1}_reduction.txt`; discussion pending. |
+| [`temperament/`](temperament/SPEC.md) | Q2's spec (the endogenous quotient) and its conversation record. The Q2 arms live in this node's fork. |
 | `figures/` | Compact mirrors of `en_s0`, `en_s1`, `en_s2` (`given_cat_tok` only), `en_s2b`, `en_s3`–`en_s9`, `fb_s0`, `fb_s1`, their `*_reduction.txt`, and `en_s{3..9}_alias_audit.txt`. `en_smoke` is on the Modal volume only (`rhm-scaling-data:/data/rhm_practice_enharmonic/`). |
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

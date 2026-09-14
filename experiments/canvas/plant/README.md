@@ -1,9 +1,9 @@
 # plant — the canvas substrate description: the alphabet has to nest, and validity is a relation
 
 **Up**: [`../README.md`](../README.md) (canvas) · **Design records**: [`SPEC.md`](SPEC.md) (the
-GLSL-library plant, `pl0`), `tiles_twin/SPEC.md`[^private] (the aligned/misaligned
+GLSL-library plant, `pl0`), [`tiles_twin/SPEC.md`](tiles_twin/SPEC.md) (the aligned/misaligned
 twin, the tail re-analysis, the adjacency-support grader) · **Files**: [`FILES.md`](FILES.md),
-`tiles_twin/FILES.md`[^private]
+[`tiles_twin/FILES.md`](tiles_twin/FILES.md)
 **Idea doc**: [`style_practice_substrate`](../../../ideas/style_practice_substrate.md) §3a, §4, §5,
 §8–§10 (its §11 records what this node did to it) · **Grader donor**:
 `rhm/practice/critic/`[^private] · **Vocabulary reference**:
@@ -318,7 +318,7 @@ python -m canvas.plant.tiles_twin.adjacency --figures
 ```
 
 Gates, per-decision reasons and volume layouts: [`SPEC.md`](SPEC.md), [`FILES.md`](FILES.md),
-`tiles_twin/SPEC.md`[^private], `tiles_twin/FILES.md`[^private].
+[`tiles_twin/SPEC.md`](tiles_twin/SPEC.md), [`tiles_twin/FILES.md`](tiles_twin/FILES.md).
 
 ## Next steps (queued, not started)
 

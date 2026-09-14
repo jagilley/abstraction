@@ -48,3 +48,7 @@ This work is generally guided by investigating how the human/mammalian brain wor
 I define "superintelligence" as  capabilities which are nontrivially in excess of those of current AI models. My belief is that abstraction creation is an acute deficit in current model capabilities. Therefore, "superintelligence" is one word you could use to refer to this research program.
 
 That being said, it's pretty robustly established that biological learners - even some which are surprisingly phylogenetically distant to humans - do not have this same deficit. So I would argue that intelligence (super- or otherwise) is likely better thought of as a vector than a scalar.
+
+## Contact
+
+If you're interested in working together on superintelligence, please reach out! You can [DM me on Twitter](https://x.com/0xjasper) or email me at [my name] @ gmail.com.

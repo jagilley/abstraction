@@ -3,9 +3,9 @@
 **Up**: [`../README.md`](../README.md) (practice) · [`../../README.md`](../../README.md) (mjc)
 **Children** (each carries a `SPEC.md` — the orchestrator's prompt verbatim — and a `FILES.md` with
 every decision, gate, smoke, run record and retraction; no child README by policy):
-`prestissimo/`[^private] (the four-rung ladder on a fast piece under delay) ·
-`accelerando/`[^private] (a fast body, tempo as the era knob, the force-level program,
-the crank) · `rubato/`[^private] (the kinematic program through a body model: ceiling,
+[`prestissimo/`](prestissimo/FILES.md) (the four-rung ladder on a fast piece under delay) ·
+[`accelerando/`](accelerando/FILES.md) (a fast body, tempo as the era knob, the force-level program,
+the crank) · [`rubato/`](rubato/FILES.md) (the kinematic program through a body model: ceiling,
 learned cerebellum, online correction). **Files**: [`FILES.md`](FILES.md).
 **Conversation**: `conversation_2026-09-05.md`[^private] — Jasper's prompts
 verbatim; the design turns were his.

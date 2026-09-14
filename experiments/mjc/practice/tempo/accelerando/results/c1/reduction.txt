@@ -1,0 +1,69 @@
+====================================================================================================
+accelerando Phase 3 — tag c1   seed 0   wall 1915s   complete=True
+====================================================================================================
+SCOPE: a table is per tempo and the program is never executed, so a tempo advance is a CHANGE OF PIECE, not a level crossing. This run measures within-tempo pacing under one thermostat; it is not a test of a tempo ratchet.
+tempi [32, 16, 8, 4, 2]   levels 4   Delta fixed 5   cycles 80   mine_support 3   band 0.0611
+
+--- GATES ----------------------------------------------------------------------------------------
+P-F0  donor constants: 13 checked, 0 mismatched   pass=True
+P-T1  level-1 vocabulary reproduces t1: 40 checks, max|delta| = 0.000e+00   applicable=True   pass=True
+P-P   conductor's own offline policy gate: 12 checks   pass=True
+P-D   dead zones MEASURED by null-ABBA on this node's anchor series: {"ledger": 0.0, "yield": 0.929304}   pass=False
+        ledger  windows 48  sd(N) 0.0  sd(D) 0.0  sd(N)/sd(D) None  v_tol 0.0
+        yield   windows 48  sd(N) 1.8586089108075785  sd(D) 2.896638826822488  sd(N)/sd(D) 0.6416433051981174  v_tol 0.9293044554037893
+      DEGENERATE reads (floor exactly 0, NOT substituted): ['ledger']
+      A floor of exactly 0 means the anchor's own series for that read did not move at all over any admissible window — the gauge has no instrument noise because it has no signal. conductor's rule is that a defaulted floor is a chosen one, so such a read is NOT given a substitute: its arm is flagged `floor_degenerate` and its trace is read as 'this currency never armed in this tag', which is conductor's own verdict on its raw `endo` read (mean(D)/floor -0.14, it never armed anywhere).
+P-Y   yoked arms bit-identical to their gauge arms over 5 series: max|delta| = 0.000e+00   pass=True
+
+--- THE ACTION TRACES -----------------------------------------------------------------------------
+      arm            | cycles | commits | advances | capped | ended     | tables at end
+      anchor         |    80  |     5   |      3   |    0   | H=4   L=2 | H32:24/0/0 H16:23/1/0 H8:24/0/0 H4:3/0/0 H2:0/0/0
+      outer_yield    |    80  |     8   |      4   |   12   | H=2   L=3 | H32:24/0/0 H16:24/1/0 H8:24/0/0 H4:24/1/0 H2:24/2/0
+      outer_ledger   | NOT RUN — its read's measured dead zone is 0 (the gauge never moved above its own noise in the anchor series)
+      yoked_yield    |    80  |     8   |      4   |    2   | H=2   L=3 | H32:24/0/0 H16:24/1/0 H8:24/0/0 H4:24/1/0 H2:24/2/0
+      (tables column: mined slots at L2/L3/L4 per tempo; L1 is the shared vocabulary)
+
+      action cycles, in order:
+        anchor          c5:comL2(+24)  c9:adv->H16  c11:comL2(+23)  c26:comL3(+1)  c27:adv->H8  c32:comL2(+24)  c37:adv->H4  c38:comL2(+3)
+        outer_yield     c7:comL2(+24)*  c11:adv->H16*  c15:comL2(+24)*  c23:comL3(+1)*  c24:adv->H8*  c31:comL2(+24)*  c36:adv->H4*  c39:comL2(+24)*  c47:comL3(+1)*  c48:adv->H2*  c55:comL2(+24)*  c63:comL3(+2)*
+        yoked_yield     c7:comL2(+24)  c11:adv->H16  c15:comL2(+24)  c23:comL3(+1)*  c24:adv->H8  c31:comL2(+24)  c36:adv->H4  c39:comL2(+24)  c47:comL3(+1)  c48:adv->H2  c55:comL2(+24)  c63:comL3(+2)*
+      (* = the action was forced by the cap, not by the rule)
+
+--- THE THREE CLOCKS: what each arm was doing, per cycle ------------------------------------------
+      anchor
+        tempo       32     32     32     16     16     16     16      8      8      8      4      4      4      4      4      4      4      4      4      4
+        level        1      1      2      2      2      2      2      1      1      2      2      2      2      2      2      2      2      2      2      2
+        at_supp      2     39     52     29     51     81    102     11     78    104     13     47     61     68     77     80     83     83     83     83
+        e_piece  0.045  0.045  0.045  0.028  0.028  0.028  0.028  0.031  0.031  0.028  0.101  0.101  0.101  0.101  0.101  0.101  0.101  0.101  0.101  0.101
+        solved   0.458  0.583  0.375  0.958  0.875  0.875  0.958  1.000  1.000  1.000  1.000  1.000  1.000  0.958  1.000  1.000  1.000  1.000  1.000  1.000
+      outer_yield
+        tempo       32     32     32     16     16     16     16      8      8      8      4      4      4      2      2      2      2      2      2      2
+        level        1      1      2      1      2      2      3      1      2      2      2      2      3      1      2      2      3      3      3      3
+        at_supp      2     39     63     10     57     81     98     56     98    128     44     80     96     50     78    100    120    134    143    153
+        e_piece  0.045  0.045  0.045  0.037  0.028  0.028  0.028  0.031  0.028  0.028  0.099  0.099  0.099  0.045  0.045  0.045  0.045  0.045  0.045  0.045
+        solved   0.458  0.583  0.375  1.000  0.833  0.875  0.958  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000
+      yoked_yield
+        tempo       32     32     32     16     16     16     16      8      8      8      4      4      4      2      2      2      2      2      2      2
+        level        1      1      2      1      2      2      3      1      2      2      2      2      3      1      2      2      3      3      3      3
+        at_supp      2     39     63     10     57     81     98     56     98    128     44     80     96     50     78    100    120    134    143    153
+        e_piece  0.045  0.045  0.045  0.037  0.028  0.028  0.028  0.031  0.028  0.028  0.099  0.099  0.099  0.045  0.045  0.045  0.045  0.045  0.045  0.045
+        solved   0.458  0.583  0.375  1.000  0.833  0.875  0.958  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000
+
+--- THE ADDRESS-BOOK BATTERY, at each arm's final tempo -------------------------------------------
+      arm            | H  | table        | per-level e_piece (feedback events) | reflex
+      anchor         |  4 | {'L1': 56, 'L2': 3, 'L3': 0, 'L4': 0} | L1=0.0986(8)  L2=0.0839(5) | 0.0267(32)
+        can't-decompose at L2: L1 - L2 = +0.0147 at a feedback saving of 3 events (execution is identical by P-N; what the level changes is WHEN the second half was chosen)
+      outer_yield    |  2 | {'L1': 56, 'L2': 24, 'L3': 2, 'L4': 0} | L1=0.0453(8)  L2=0.0393(4)  L3=0.0215(3) | 0.0690(16)
+        can't-decompose at L2: L1 - L2 = +0.0059 at a feedback saving of 4 events (execution is identical by P-N; what the level changes is WHEN the second half was chosen)
+      yoked_yield    |  2 | {'L1': 56, 'L2': 24, 'L3': 2, 'L4': 0} | L1=0.0453(8)  L2=0.0393(4)  L3=0.0215(3) | 0.0690(16)
+        can't-decompose at L2: L1 - L2 = +0.0059 at a feedback saving of 4 events (execution is identical by P-N; what the level changes is WHEN the second half was chosen)
+
+--- the program instrument (logged, never executed) -----------------------------------------------
+      outer_yield     advance at c11: H32 -> H16 with level 2 committed
+      outer_yield     advance at c24: H16 -> H8 with level 3 committed
+      outer_yield     advance at c36: H8 -> H4 with level 2 committed
+      outer_yield     advance at c48: H4 -> H2 with level 3 committed
+      Decision 28. `p1` measured the program's parity gate at 0/90 and 0/54 open one and two rungs past its practiced set against the recording, and the arm that respects its deployable gate still 0.15-0.24 against a 0.0611 band. A ratchet commits content it will deploy; at every tempo that content is the recording.
+
+--- timings ---------------------------------------------------------------------------------------
+      t_l1=441s  t_anchor=495s  t_battery=6s

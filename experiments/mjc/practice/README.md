@@ -370,9 +370,9 @@ Full record: [`solo/README.md`](solo/README.md).
 **Goal**: build the motor instance of the RHM level ladder under Jasper's mapping — level ℓ is a
 unit executed open-loop over 2^(ℓ−1) segments from one feedback event, nested `T[ℓ] ⊆ T[ℓ−1]×T[ℓ−1]`
 — and find what a level buys on a plant. Three implementer nodes under one super-writeup:
-`tempo/prestissimo/`[^private] (the ladder under delay on the donor body),
-`tempo/accelerando/`[^private] (a fast body, tempo as the era ladder, the
-force-level program, the crank), `tempo/rubato/`[^private] (the kinematic program
+[`tempo/prestissimo/`](tempo/prestissimo/FILES.md) (the ladder under delay on the donor body),
+[`tempo/accelerando/`](tempo/accelerando/FILES.md) (a fast body, tempo as the era ladder, the
+force-level program, the crank), [`tempo/rubato/`](tempo/rubato/FILES.md) (the kinematic program
 through a body model: ceiling, learned, corrected).
 
 **Headline**: the regime for chunking is a band of three timescales, body lag < note < delay, and on
@@ -437,5 +437,3 @@ Modal volume (`mujoco-control-data`): `/data/bridge_assembly/dsw_<cell>_s<seed>/
 [`priced_plasticity/FILES.md`](priced_plasticity/FILES.md) ·
 [`aleatoric_flip/FILES.md`](aleatoric_flip/FILES.md) ·
 [`../bridge_assembly/difficulty_sweep/FILES.md`](../bridge_assembly/difficulty_sweep/FILES.md)
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

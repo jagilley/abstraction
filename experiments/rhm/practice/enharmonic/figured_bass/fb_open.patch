@@ -1,0 +1,843 @@
+# [figured_bass] THE OPEN-INVENTORY / UNGATED-L5 PATCH — the exact diff of record.
+#
+# Applied to `enharmonic/enharmonic.py` and `enharmonic/quotient.py` on 2026-09-10, after
+# `en_s3` had launched from the uploaded copy. Emitted here so the edit is reviewable as one
+# object and re-appliable if the file is ever rebased. Every addition is marked `# [figured_bass]`.
+#
+# WHAT IT ADDS, in one list:
+#   1. `open_inventory` (per-ARM cfg): a commit freezes the KEY, not the CONTENT.
+#      `committed[ell]` stays the ADOPTION flag; `operative(ell)` becomes the live build.
+#   2. `ungate_l5` (per-ARM cfg): the committable L5 miner observes every cycle, at the same
+#      node the observation panel already reads, instead of only from era 4.
+#   3. `_rebuild_ms()`: the move set re-materialised from `operative` rather than `committed`,
+#      once per cycle under the open bit, carrying the in-run FLAG-VS-TABLE assertion (E-8).
+#      `len(ms)`, every slot id, `move_age` and the priced width are unchanged by construction.
+#   4. Instrumentation: `ClassMiner.build`'s `picks` / `n_rows_in_class` and
+#      `ClassMiner.spell_top` (which together make an offline replay of any build EXACT --
+#      `figured_bass/sizing/SIZING.md` gate F-3 was the negative these close); a per-cycle
+#      `blocked` count (L5 keys at support the operative L4 book cannot look up); `log["open"]`,
+#      present in every arm including the flat ones; the operative table's row count, grade and
+#      true-mask beside the committed one's.
+#   5. Arms: given_cat_tok_open / _ung5 / _open_ung5, flat_open, flat_yk_open,
+#      flat_yk_open_ung5, and five preflight twins.
+#   6. Gates E-7 (knob-off identity at 0.000e+00), E-8 (the flag-vs-table audit), E-9 (the
+#      ungated L5 miner IS the observation panel's stream).
+#
+# THE FLAG-VS-TABLE AUDIT, enumerated. Every `committed[ell]` read in `run_arm`, classified:
+#   FLAG (unchanged, and deliberately so): the `operative` guard itself; the recert's
+#     `committed.get(era["level"]) is not None`; `_try_merge`'s `ml in committed` and
+#     `frozen_m`; the extend loop's `is None` skip; `log["vocab"]`'s presence test;
+#     `mint`'s call site; `commit_maxl`'s guard.
+#   TABLE, routed through `operative` by this patch: `build_ms` at the commit and at the
+#     extend admission (both via `_rebuild_ms`); the recert's counterfactual `ms_live`
+#     baseline; the per-cycle move set.
+#   TABLE, deliberately LEFT on `committed`, each for a stated reason:
+#     * the audition block's `mvc = make_macro(..., committed[ell])` -- this IS the "what
+#       freezing costs" counterfactual readout (`held`), measured and never acted on. Under
+#       the open bit it becomes "what freezing WOULD have cost", which is the arm's own
+#       control and the reason to leave it alone.
+#     * `log["entry"]["true_mask"]`, `log["committed_grade"]`, `log["vocab"]`, the recert's
+#       `n_frozen` -- records OF THE FROZEN SNAPSHOT, which keep their meaning across arms.
+#       Operative twins are ADDED beside them (`operative_mask`, `operative_grade`,
+#       `log["open"]["operative"]`, `n_operative`) rather than replacing them.
+#     * `refresh_upper` and the extend/retire mutation of `committed[lv_x]` -- reached only by
+#       `spec["extend"]` arms. No `fb_s0` arm carries `extend`, `surgery` or `merge_mode`;
+#       checked against the ARMS literal before launch and recorded in `results/RUN_fb_s0.sh`.
+#       (It routes through `_rebuild_ms` anyway, so it is correct if it is ever reached.)
+#     * `committed[ell] = shared["truth"][ell]` (the `given`/`true` vocabulary) -- `_open_inv`
+#       is resolved with `spec["vocab"] == "earned"` so a gifted table is never opened.
+#   The in-run half of this audit is E-8's assertion inside `_rebuild_ms`; this list is the
+#   half a machine cannot check.
+#
+--- /tmp/claude-0/-home-user-research/429fabe8-0531-5617-bd61-c3e1e312363c/scratchpad/pre/quotient.py	2026-09-10 05:59:03.961892980 +0000
++++ quotient.py	2026-09-10 05:59:27.269974167 +0000
+@@ -281,7 +281,23 @@
+                            "inventory_mean": (float(np.mean(inv)) if inv else 0.0),
+                            "n_class_capped": int(capped),
+                            "n_lower_classes": int(len(by_class)),
+-                           "n_lower_rows": int(len(lower_flat))}
++                           "n_lower_rows": int(len(lower_flat)),
++                           # [figured_bass] THE PICK, RECORDED. `pick()` ranks a class's lower
++                           # rows by `self.spell` before the `spell_cap` truncation, and those
++                           # counts were in no banked tag -- so `figured_bass/sizing`'s offline
+#
+# REVISION 2026-09-10 (sweep fb_pf1 -> fb_pf2): E-9's FIRST FORM WAS WRONG and the gate
+# caught it. Comparing the committable L5 miner's at-support LEVEL against the observation
+# panel's fails at preflight for a reason unrelated to the knob -- `preflight_seed_miner`
+# seeds `miners[2..maxl]` with half the true table before cycle 1 and tops them up at
+# `preflight_seed_topup_cycle`, and the panel is never seeded, so the two levels differ from
+# c1 by construction (47 vs 0 at L5). E-9 is now an INCREMENT check -- the L5 miner must
+# accrue exactly `log["n_mined"]` rows per cycle, and must accrue identically to the panel
+# -- with the two seeded cycles excluded and named, plus E-9b, the gated control (with the
+# bit OFF the L5 miner must accrue nothing before era 4). `obs_nobs` was added to carry the
+# panel's raw count. G-F, E-7 and E-8 all PASSED on fb_pf1 and are unaffected.
+#
+--- /tmp/claude-0/-home-user-research/429fabe8-0531-5617-bd61-c3e1e312363c/scratchpad/pre/quotient.py	2026-09-10 05:59:03.961892980 +0000
++++ quotient.py	2026-09-10 05:59:27.269974167 +0000
+@@ -281,7 +281,23 @@
+                            "inventory_mean": (float(np.mean(inv)) if inv else 0.0),
+                            "n_class_capped": int(capped),
+                            "n_lower_classes": int(len(by_class)),
+-                           "n_lower_rows": int(len(lower_flat))}
++                           "n_lower_rows": int(len(lower_flat)),
++                           # [figured_bass] THE PICK, RECORDED. `pick()` ranks a class's lower
++                           # rows by `self.spell` before the `spell_cap` truncation, and those
++                           # counts were in no banked tag -- so `figured_bass/sizing`'s offline
++                           # replay could reproduce a build's row COUNT and (under 'tok') its
++                           # class coverage exactly, but never its row IDENTITY (gate F-3).
++                           # These two fields close that for good and cost ~200 bytes a cycle:
++                           # `picks` is the surviving lower-row indices per class, which IS the
++                           # build up to the cross-product, and `n_rows_in_class` says where
++                           # the cap bit. Indices are into `lower_flat` (the width-filtered,
++                           # dedup'd lower rows), which a replay reconstructs itself. Keys are
++                           # `str(class id)` because an endogenous id is a tuple.
++                           "picks": {str(c_): [int(i) for i in pick(c_)[0]]
++                                     for c_ in sorted(by_class, key=str)},
++                           "n_rows_in_class": {str(c_): int(len(ix_))
++                                               for c_, ix_ in sorted(by_class.items(),
++                                                                     key=lambda kv: str(kv[0]))}}
+         child = np.array(rows, np.int64).reshape(len(rows), self.s)
+         return MC.make_table(self.level, child, lower, self.s)
+ 
+@@ -326,6 +342,24 @@
+         self.spell = sp
+         return before, len(self.counts)
+ 
++    def spell_top(self, k=8):
++        """[figured_bass] The `spell` ranking `build`'s `pick()` reads, in the form that makes
++        an offline replay of a build exact rather than bracketed.
++
++        `self.spell[c]` is a Counter over every half of class `c` this miner has observed; the
++        full map is far too big to log per cycle (thousands of distinct width-8 halves at L4),
++        and only its HEAD is ever consulted -- `pick()` takes the top `spell_cap` by
++        (-count, lower-row index) and index-orders the count-0 tail. `k` defaults to 8, twice
++        the production cap, so the ranking that decided a pick is on the record beside the pick
++        itself (`last_build["picks"]`). Keys are `str(class id)`; a spelling is a list of ints.
++        """
++        out = {}
++        for c, cnt in self.spell.items():
++            top = sorted(cnt.items(), key=lambda kv: (-kv[1], kv[0]))[:int(k)]
++            out[str(c)] = {"n_distinct": int(len(cnt)),
++                           "top": [[list(sp), int(n)] for sp, n in top]}
++        return out
++
+     def state(self):
+         """The donor's fields, plus a JSON-safe `keys_at_support` over CLASS PAIRS (the donor's
+         is over flat tuples) and the drop accounting. `_install_identity_miner` patches
+--- /tmp/claude-0/-home-user-research/429fabe8-0531-5617-bd61-c3e1e312363c/scratchpad/pre/enharmonic.py	2026-09-10 05:59:03.959491188 +0000
++++ enharmonic.py	2026-09-10 06:46:02.033910245 +0000
+@@ -3020,6 +3020,100 @@
+                      "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                              "question_mode": "exo"}},
+     # ---------------------------------------------------------------------------------------
++    # [figured_bass] THE THIRD CHILD'S ARMS — commit the key, not the content. Every one of
++    # these is `given_cat_tok` / `flat` VERBATIM plus one or both of the two bits; the loop,
++    # the ladder, the budget, the floors and the question port are untouched, so the only
++    # things that move are what a commit freezes and when L5 becomes committable. `en_s0`'s
++    # `given_cat_tok`, `en_s1`'s `flat_yk_tok` and `en_s0`'s `flat` are the BANKED anchors and
++    # are not re-run (`analyze_enharmonic.py --bank`).
++    # The offline sizing that set this design: `figured_bass/sizing/SIZING.md`.
++    # ---------------------------------------------------------------------------------------
++    # (a) the inventory left live. `en_s0`'s L4 book froze at 3 of 13 token classes at c95 and
++    #     stayed there for the remaining 82 cycles while the miner reached 9 — and at the end
++    #     5 of the 7 L5 keys at support named a class the frozen book did not hold.
++    "given_cat_tok_open": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "loop": {"kind": "quiet", "read": "dsil"},
++                     "loop_commit": {"kind": "quiet", "read": "yield"},
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "dsil_bootstrap": True, "question_mode": "exo",
++                             "quotient": "tok", "open_inventory": True}},
++    # (b) the L5 miner ungated, inventory still frozen. The sizing lane's design fact: the
++    #     first non-empty L5 build sat at c156 under EVERY freeze regime it replayed, because
++    #     the committable L5 miner is era-gated to era 4 — so this bit and (a) move different
++    #     things and the 2x2 is what separates them.
++    "given_cat_tok_ung5": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "loop": {"kind": "quiet", "read": "dsil"},
++                     "loop_commit": {"kind": "quiet", "read": "yield"},
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "dsil_bootstrap": True, "question_mode": "exo",
++                             "quotient": "tok", "ungate_l5": True}},
++    # (c) both.
++    "given_cat_tok_open_ung5": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "loop": {"kind": "quiet", "read": "dsil"},
++                     "loop_commit": {"kind": "quiet", "read": "yield"},
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "dsil_bootstrap": True, "question_mode": "exo",
++                             "quotient": "tok", "open_inventory": True, "ungate_l5": True}},
++    # (d) the same bit in FLAT coordinates, free-running on its own clock — `tutti` says a
++    #     live level helps there too, and the sizing lane measured the flat yokes' gain at
++    #     1 -> 7 rows (`tok` clock) and 3 -> 3 (`min` clock), so "it helps the class key more"
++    #     is a claim this arm exists to make falsifiable rather than assumed.
++    "flat_open":     {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "loop": {"kind": "quiet", "read": "dsil"},
++                     "loop_commit": {"kind": "quiet", "read": "yield"},
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "dsil_bootstrap": True, "question_mode": "exo",
++                             "open_inventory": True}},
++    # (e) the CLOCK YOKES. Each carries its source's knobs and differs from it in the KEY and
++    #     in nothing else — which is the only way "the open inventory helps the class key more
++    #     than the flat key" is a one-bit contrast rather than two.
++    "flat_yk_open":  {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "loop": {"kind": "yoke", "of": "given_cat_tok_open"},
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "question_mode": "exo", "open_inventory": True}},
++    "flat_yk_open_ung5": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "loop": {"kind": "yoke", "of": "given_cat_tok_open_ung5"},
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "question_mode": "exo", "open_inventory": True,
++                             "ungate_l5": True}},
++    # PREFLIGHT ONLY, on the arc's default commit policy for the reason the Q2 preflight arms
++    # give (a loop arm cannot arm on a forty-step substrate, so nothing would ever be committed
++    # and the open branch would go untested). `en_pf_open_off` is the KNOB-OFF TWIN: byte-for-
++    # byte `en_pf_tok` with both bits named and set False, so gate E-7 checks the DEFAULT
++    # RESOLUTION path — the one thing a `cfg.get` guard can silently get wrong — at 0.000e+00.
++    "en_pf_open_off": {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "question_mode": "exo", "quotient": "tok",
++                             "open_inventory": False, "ungate_l5": False}},
++    "en_pf_open":    {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "question_mode": "exo", "quotient": "tok",
++                             "open_inventory": True}},
++    "en_pf_ung5":    {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "question_mode": "exo", "quotient": "tok",
++                             "ungate_l5": True}},
++    "en_pf_open_ung5": {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "question_mode": "exo", "quotient": "tok",
++                             "open_inventory": True, "ungate_l5": True}},
++    # the FLAT open path has its own preflight twin: `operative` under `MC.Miner` rather than
++    # `ClassMiner`, which is a different build function behind the same branch.
++    "en_pf_openflat": {"vocab": "earned", "commit": "delta_prov", "prop_k": 4, "span": True,
++                     "recert": True,
++                     "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
++                             "question_mode": "exo", "open_inventory": True}},
++    # ---------------------------------------------------------------------------------------
+     # [enharmonic Q2] THE ENDOGENOUS ARMS. `given_cat_tok`'s loop, its ladder and its budget,
+     # with the SUPPLIED map replaced by the learner's own (`MG.LearnedQuotient`, singleton at
+     # c1 and therefore `flat` until the first merge) and one bit moved: WHAT LICENSES A MERGE.
+@@ -3248,6 +3342,16 @@
+     "en_pf_merge_y": "enum_live", "en_pf_merge_l": "enum_live", "en_pf_merge_f": "enum_live",
+     "en_pf_off": "enum_live", "en_pf_single": "enum_live", "en_pf_tok": "enum_live",
+     "en_pf_gen": "enum_live",
++    # [figured_bass] every arm of the third child takes the anchor's stream too, so each is
++    # BIT-IDENTICAL TO `given_cat_tok` / `flat` UNTIL ITS OWN FIRST COMMIT — before a commit
++    # there is nothing to freeze, so `open_inventory` cannot act, and `ungate_l5` only fills a
++    # miner nothing reads until L5 becomes active. That makes the pre-commit window a genuine
++    # in-tag twin gate for both bits.
++    "given_cat_tok_open": "enum_live", "given_cat_tok_ung5": "enum_live",
++    "given_cat_tok_open_ung5": "enum_live", "flat_open": "enum_live",
++    "flat_yk_open": "enum_live", "flat_yk_open_ung5": "enum_live",
++    "en_pf_open_off": "enum_live", "en_pf_open": "enum_live", "en_pf_ung5": "enum_live",
++    "en_pf_open_ung5": "enum_live", "en_pf_openflat": "enum_live",
+ }
+ STREAM = {"never_base": 0, "given": 1, "practice_gated": 2, "practice_early": 3,
+           "practice_late": 4,
+@@ -4034,6 +4138,18 @@
+         f"commit_max_level {commit_maxl} exceeds max_macro_level {maxl}: a level that is "
+         f"never mined cannot be committed")
+ 
++    # [figured_bass] THE OPEN BIT, resolved once. Restricted to `vocab == "earned"` at the
++    # point of resolution rather than inside `operative`, so a `given`/`true` arm that named
++    # the knob by accident is inert rather than quietly de-gifted, and so the restriction is
++    # in ONE place. `_open_stat` is the arm's own accounting of what the bit did: how many
++    # cycles rebuilt the move set, and how many times an adopted level's live build came back
++    # empty and fell back to the frozen table (see `operative`).
++    _open_inv = bool(cfg.get("open_inventory")) and spec.get("vocab") == "earned"
++    _ungate_l5 = bool(cfg.get("ungate_l5"))
++    _open_stat = {"open_inventory": bool(_open_inv), "ungate_l5": bool(_ungate_l5),
++                  "n_rebuild": 0, "n_empty_fallback": 0, "n_cycles_moved": 0,
++                  "rows_frozen": {}, "rows_operative": {}}
++
+     # [spiral] An optional cap on the beam width the declared budget buys, expressed as a
+     # REFERENCE BUDGET rather than as a number.
+     #
+@@ -4184,6 +4300,48 @@
+             if key in slots:
+                 slots[key]["move"] = mv
+ 
++    def _adopted():
++        """[figured_bass] the levels the executor has ADOPTED, in `build_ms`'s own order."""
++        return [q for q in sorted(committed) if committed[q] is not None]
++
++    def _rebuild_ms():
++        """[figured_bass] THE MOVE SET, rebuilt from `operative` rather than from `committed`.
++
++        The open bit's one side effect on the executor. With it on, the operative table of an
++        adopted level changes every cycle, so the macro MOVES have to be re-materialised or the
++        DP would keep maxing over the table that was frozen — `to_device` snapshots the whole
++        `lower` chain into device tensors at build time, so a stale move is stale all the way
++        down. What does NOT move: `build_ms` iterates the same levels and the same
++        `s ** (depth - level)` nodes, so `len(ms)`, every slot id (`SN.slot_index` is a pure
++        function of (level, node)), `move_age`'s keys and therefore the PRICED WIDTH
++        (`fit_width(len(ms), ...)`) are all untouched — the budget is held fixed across arms by
++        construction, not by matching. `make_macro` and `to_device` draw no RNG.
++
++        With the bit OFF this is `build_ms(base_ms, committed, ...)` character for character,
++        which is what the commit site called before, so gate E-7's identity runs through here.
++        """
++        nonlocal ms
++        tabs = ({q: operative(q) for q in _adopted()} if _open_inv else committed)
++        ms = build_ms(base_ms, tabs, s, depth, device)
++        bind_slots(ms)
++        if _open_inv:
++            _open_stat["n_rebuild"] += 1
++            _rf = {str(q): int(committed[q]["child"].shape[0]) for q in _adopted()}
++            _ro = {str(q): int(tabs[q]["child"].shape[0]) for q in _adopted()}
++            if _rf != _ro:
++                _open_stat["n_cycles_moved"] += 1
++            _open_stat["rows_frozen"], _open_stat["rows_operative"] = _rf, _ro
++            # THE FLAG-VS-TABLE AUDIT, asserted in run rather than reviewed once (gate E-8).
++            # Every macro move of an adopted level must carry the OPERATIVE table, not the
++            # frozen one. This is the invariant the whole node turns on, and it is cheap.
++            for mv in ms:
++                if mv.get("kind") != "macro" or committed.get(mv["level"]) is None:
++                    continue
++                assert mv["table"] is tabs[mv["level"]], (
++                    f"[figured_bass] E-8 FAILED in run: the level-{mv['level']} macro at node "
++                    f"{mv['node']} is carrying a table that is not `operative({mv['level']})` "
++                    f"— a table-valued read of `committed` escaped the open bit")
++        return ms
+ 
+     def _try_merge(cyc, c_in_era, era, era_i, active):
+         """[enharmonic Q2] THE MERGE, in its own scope.
+@@ -4566,6 +4724,13 @@
+     obs_levels = list(range(3, depth + 1)) if cfg.get("obs_panel") else []
+     obs_miners = {ell: QT.make_miner(ell, s, cfg, quot) for ell in obs_levels}   # [enharmonic]
+     obs_hist = {ell: [] for ell in obs_levels}
++    # [figured_bass] the panel's OBSERVATION COUNT beside its at-support count. `ungate_l5`
++    # claims the committable L5 miner is fed the panel's own stream; at-support counts are
++    # a derived level and cannot check that (at preflight the committable miners are SEEDED
++    # with half the true table and the panel is not, so the two levels differ from cycle 1
++    # by construction). `n_obs` is the raw count and the check is on its increments, which
++    # no seed can move. Gate E-9.
++    obs_nobs = {ell: [] for ell in obs_levels}
+     obs_gy_agree = []
+     # [spiral] PREFLIGHT-ONLY instrument, and it exists because the first preflight could not
+     # reach the transplanted commit path at all: a substrate trained for forty steps solves
+@@ -4639,12 +4804,37 @@
+     def operative(ell):
+         """The table macros at level `ell` would be built over: the committed one if this arm
+         has committed, else the live mined candidate. This is where the ratchet bites — once
+-        level l-1 is frozen, level l can only ever be built over what was frozen."""
++        level l-1 is frozen, level l can only ever be built over what was frozen.
++
++        [figured_bass] ...unless the commit froze only the KEY. A commit does three things at
++        once: (a) it mints the level's pi slots and starts the corridor head on it — the
++        executor ADOPTS the level; (b) it freezes the table the DP executes over; (c) it
++        freezes what the level above can be built from. Under `open_inventory` only (a)
++        survives. `committed[ell]` stays exactly what it was as a FLAG — "this level has been
++        adopted" — and is still what `mint`, the recert guard, the era gates and the loop's
++        latches read; what moves is the one TABLE-valued read, here, which becomes the frozen
++        partition applied to the live at-support keys.
++
++        Three properties this branch is written to keep:
++          * OFF IT IS THE DONOR'S TWO LINES. `open_inventory` absent or False and the `and`
++            short-circuits before anything new runs (gate E-7 asserts 0.000e+00 in run).
++          * EARNED ONLY. `vocab == "true"` arms set `committed[ell] = truth[ell]`; opening
++            those would throw the gift away and turn the ceiling arm into a mined arm.
++          * AN ADOPTED LEVEL STAYS SERVABLE. If the live build is momentarily empty the
++            committed table is returned instead and the fallback is counted, because a macro
++            whose table has no rows has no entry axis for `macro_features`' argmax and the
++            slot the corridor already adopted would go dead mid-run. This is the only place
++            the open bit is not literally "the live build", and it is on the record per arm.
++        """
+         if ell == 1:
+             return MC.base_table(v)
+-        if committed[ell] is not None:
++        if committed[ell] is not None and not _open_inv:
++            return committed[ell]
++        live = miners[ell].build(operative(ell - 1), cfg["mine_support"])
++        if committed[ell] is not None and int(live["child"].shape[0]) == 0:
++            _open_stat["n_empty_fallback"] += 1                  # [figured_bass]
+             return committed[ell]
+-        return miners[ell].build(operative(ell - 1), cfg["mine_support"])
++        return live
+ 
+     def port_for(mset):
+         """[spiral] the `plan` port and beam width for an ARBITRARY action set. `port_spec`
+@@ -4697,6 +4887,9 @@
+            "m_per_solve": [], "committed_grade": [], "gy": [], "entry": [],
+            # [enharmonic] the slot-resolved use record and the quotient's own accounting
+            "slot": [], "quot": [],
++           # [figured_bass] the open bit's channel, in EVERY arm (a flat arm logs no `quot`
++           # row at all — gate E-2 — and `flat_open` still has to be readable).
++           "open": [],
+            # [conductor] the decision trace and the shadow panel, per cycle, in every arm.
+            "loop": [], "panel": [],
+            # [tutti] the question port's per-cycle record: what was on the menu, what was
+@@ -4906,6 +5099,16 @@
+                     miners[ell].observe(np.concatenate([flat] * (cfg["mine_support"] + 1)))
+             counts = {"mat": 0, "ground": 0, "prop": 0}
+             ex.reset()
++            # [figured_bass] THE OPEN INVENTORY'S REFRESH, once per cycle and before anything
++            # reads `ms`. Placed here — after the miners of the PREVIOUS cycle have observed
++            # and before `port_spec()` — so every consumer in this cycle (the practice beam,
++            # the metering beam, the recert, the auditions, the battery at the end) sees one
++            # consistent inventory, and so the cycle a key reaches support is the cycle the
++            # executor can first spell it. Costs one pure-python `ClassMiner.build` per adopted
++            # level plus ~20 small host->device copies; it draws no RNG and changes no count.
++            # Off: not executed, and `ms` is whatever the last commit built (the donor).
++            if _open_inv and _adopted():
++                ms = _rebuild_ms()
+             # THE FILTER SWITCHES ON after `prop_warmup` cycles of the run. Until then the head
+             # trains on the beam's trajectories but never gates, so (i) the arm is bit-identical
+             # to its twin through the warmup and (ii) the filter never gates from a random init.
+@@ -5152,9 +5355,27 @@
+                 # so "did this question move a key that was not already banked" is answerable.
+                 _tgt = min(maxl, era["level"] + 1)
+                 _cnt_before = dict(miners[_tgt].counts) if qmode and _tgt in miners else None
+-                for ell in range(2, min(maxl, era["level"] + 1) + 1):
++                # [figured_bass] `ungate_l5` APPENDS LEVEL 5 to the gated range and changes
++                # nothing else — L2..L4 keep the donor's `era_level + 1` gate exactly, so the
++                # anchor's whole mining path is untouched and only the level this node is about
++                # moves. The stream is the same `pf` the OBSERVATION PANEL already reads at L5
++                # every cycle (`obs_miners`, below), at the same node arithmetic, so this makes
++                # that series COMMITTABLE rather than introducing a new one — which is what
++                # gate E-9 asserts, on the INCREMENT of `n_obs` against `log["n_mined"]` and
++                # against the panel's own `n_obs` (levels cannot be compared at preflight: the
++                # committable miners are seeded there and the panel is not).
++                # The range guard is the panel's, verbatim: the gated loop needs none because
++                # `ell <= era_level + 1` puts the node in range by construction, and an
++                # appended L5 does not.
++                _mine_levels = list(range(2, min(maxl, era["level"] + 1) + 1))
++                if _ungate_l5 and maxl >= 5 and 5 not in _mine_levels:
++                    _mine_levels.append(5)
++                for ell in _mine_levels:
+                     span = s ** (ell - 1)
+                     node = (era["node"] * s ** (era["level"] - 1)) // span
++                    if not (0 <= node < s ** (depth - ell)
++                            and (node + 1) * span <= pf.shape[1]):
++                        continue
+                     miners[ell].observe(pf[:, node * span:(node + 1) * span])
+                 # [tutti] DELIVERED DOSE vs DESIGN DOSE, and the delivery ledger's credit.
+                 # `wd_s0`'s lesson as an instrument: the question-posing machinery is measured
+@@ -5215,6 +5436,7 @@
+             for ell, mnr in obs_miners.items():
+                 obs_hist[ell].append(
+                     int(mnr.state()["n_at_support"][str(cfg["mine_support"])]))
++                obs_nobs[ell].append(int(mnr.n_obs))            # [figured_bass]
+             if gy_miner is not None and int(gy_miner.level) in obs_miners:
+                 obs_gy_agree.append(
+                     obs_hist[int(gy_miner.level)][-1]
+@@ -5838,7 +6060,12 @@
+                                             mv_o, rules_t, canon, depth, v, m, s, rules)["e"]
+                 w_before, ms_len_before = int(width), len(ms)
+                 committed[active] = tbl
+-                ms = build_ms(base_ms, committed, s, depth, device)
++                # [figured_bass] `_rebuild_ms` IS `build_ms(base_ms, committed, ...)` +
++                # `bind_slots` with the open bit off; with it on the level the executor has
++                # just adopted enters the move set as its OPERATIVE table rather than as the
++                # snapshot that was frozen, which is what "the commit adopts, it does not
++                # freeze" means at the executor.
++                ms = _rebuild_ms()
+                 mint(active, tbl)              # the corridor becomes the head's responsibility
+                 bind_slots(ms)
+                 if prop is not None:
+@@ -5947,9 +6174,21 @@
+                 rec = {"kind": "recert", "arm": arm, "era": era_i + 1, "level": rc_level,
+                        "cycle": cyc, "c_in_era": c_in_era, "e_frozen": pf_["e"],
+                        "n_frozen": int(committed[rc_level]["child"].shape[0]),
++                       # [figured_bass] `n_frozen` keeps its meaning — the row count of the
++                       # snapshot the commit took. Under the open bit that is NOT what `pol`
++                       # above executed over: `ms` carries the operative tables, so `e_frozen`
++                       # is the operative arm's error and this is its size. With the bit off
++                       # the two counts are equal by construction and the record is unchanged.
++                       "n_operative": int(operative(rc_level)["child"].shape[0]),
+                        "n_live": int(live["child"].shape[0]), "swapped": False}
+                 if live["child"].shape[0]:
+-                    ms_live = build_ms(base_ms, {**committed, rc_level: live}, s, depth, device)
++                    # [figured_bass] the counterfactual move set's BASELINE must be the one the
++                    # arm is actually running, or `e_live - e_frozen` would compare the live
++                    # level-`rc_level` table against a stale rest-of-the-vocabulary.
++                    _base_tabs = ({q: operative(q) for q in _adopted()} if _open_inv
++                                  else dict(committed))
++                    ms_live = build_ms(base_ms, {**_base_tabs, rc_level: live},
++                                       s, depth, device)
+                     pl_ = pol(xr, rr_, ms_live)
+                     counts["ground"] += pl_["counts"]["ground"]
+                     counts["mat"] += pl_["counts"]["mat"]
+@@ -6039,8 +6278,7 @@
+                         committed[lv_x] = MC.make_table(lv_x, np.asarray(kept, np.int64),
+                                                         lower_x, s)
+                         refresh_upper(committed, lv_x, s)
+-                        ms = build_ms(base_ms, committed, s, depth, device)
+-                        bind_slots(ms)
++                        ms = _rebuild_ms()          # [figured_bass] `build_ms`+`bind_slots`
+                         ev_x["n_after"] = int(committed[lv_x]["child"].shape[0])
+                         ev_x.update({f"tab_{k}": val for k, val in
+                                      MC.grade_table(committed[lv_x],
+@@ -6210,24 +6448,116 @@
+             # committed table alongside so the offline keying is a lookup, not a re-derivation.
+             _ENTRY_REC["on"] = False
+             ent = _rec_take(cap=cfg.get("entry_rec_cap"))       # [enharmonic]
++            # [figured_bass] `last_build` IS SAVED AND PUT BACK around everything below, and
++            # this is not defensive tidying. Every `operative(ell)` call in this logging block
++            # — the operative mask, the blocked-key instrument, the operative row counts — goes
++            # through `miners[ell].build(...)` for a level that has not committed, and
++            # `Miner.build`/`ClassMiner.build` ASSIGN `self.last_build`. Without the restore,
++            # `log["quot"][c]["build"]` would silently start reporting the instrument's build
++            # instead of the cycle's own on every cycle where the audition block did not run,
++            # and would no longer mean what it means in `en_s0`/`en_s2`. `build` assigns a
++            # fresh dict, so restoring the reference is exact. (`figured_bass/sizing` had to
++            # reason around exactly this staleness offline; the fix is to leave the field
++            # alone, not to redefine it.)
++            # THE ORACLE BILL is saved and put back for the same reason: `Quotient.id_of`
++            # counts every memo miss as a read, so an instrument that classifies a lower row
++            # would charge the arm for a consult the learner never made — and the bill is a
++            # reported quantity in this node. The memo cache is deliberately NOT rolled back;
++            # cache warmth changes no output, only `n_cached`, which is a diagnostic.
++            _lb_save = {ell: getattr(miners[ell], "last_build", None)
++                        for ell in range(2, maxl + 1)}
++            _or_save = (None if quot is None else
++                        (int(quot.n_read), int(quot.n_drop), int(quot.n_tie)))
+             tmask = {}
++            omask = {}          # [figured_bass]
++            ograde = {}         # [figured_bass]
+             for ell in range(2, maxl + 1):
+                 if committed.get(ell) is None:
+                     continue
+                 tset = {tuple(int(x) for x in r) for r in shared["truth"][ell]["flat"]}
+                 tmask[str(ell)] = [int(tuple(int(x) for x in r) in tset)
+                                    for r in committed[ell]["flat"]]
+-            log["entry"].append({"hist": ent, "true_mask": tmask})
++                # [figured_bass] THE OPERATIVE TWIN of the two records above, on exactly the
++                # levels `committed_grade` and `true_mask` already cover — so an open arm pays
++                # the same instrument cost as a frozen one and the two are comparable row for
++                # row. With the bit off `operative(ell) is committed[ell]` and both are the
++                # line above repeated; the reduction reads whichever the arm ran on. The
++                # expensive object here is `tset` (262k tuples at L5) and it is REUSED rather
++                # than rebuilt, which is why this sits inside the existing loop.
++                _opt = operative(ell)
++                omask[str(ell)] = [int(tuple(int(x) for x in r) in tset)
++                                   for r in _opt["flat"]]
++                ograde[str(ell)] = MC.grade_table(_opt, shared["truth"][ell])
++            log["entry"].append({"hist": ent, "true_mask": tmask,
++                                 "operative_mask": omask})       # [figured_bass]
+             # [enharmonic] the slot-resolved twin of the line above: the FIRED path's chosen
+             # entry per (phase, level, node), which is the record Q2's selector needs and no
+             # banked tag carries. Empty in every arm with `slot_rec` off.
+             _SLOT_REC["on"] = False
+             log["slot"].append(_slot_take())
++            _bld = ({} if quot is None else
++                    {str(ell): dict(_lb_save[ell] or {}) for ell in range(2, maxl + 1)})
++
++            def _blocked(ell):
++                """[figured_bass] THE RATCHET'S BITE, per cycle: how many of this level's
++                at-support keys the OPERATIVE level-(ell-1) book cannot look up, because it
++                holds no row of one of the halves' classes. `figured_bass/sizing/SIZING.md`
++                section 2 had to reconstruct this offline from `keys_at_support` and a replayed
++                build; it is the number the whole node turns on (the frozen L4 book blocked 5
++                of `given_cat_tok`'s 7 L5 keys at support, the live one 2), so it is logged
++                rather than re-derived. Cheap: one pure build chain and one class lookup per
++                distinct lower row."""
++                mnr = miners.get(ell)
++                if not isinstance(mnr, QT.ClassMiner):
++                    return None
++                lo = operative(ell - 1)
++                want = (s ** (ell - 1)) // s
++                have = set()
++                for row in lo["flat"]:
++                    r_ = tuple(int(z) for z in row)
++                    if len(r_) != want:
++                        continue
++                    c_ = mnr.quot.id_of(r_, ell - 1)
++                    if c_ is not None:
++                        have.add(c_)
++                sup_ = int(cfg["mine_support"])
++                ks_ = [k for k, c_ in mnr.counts.items() if c_ >= sup_]
++                nb_ = sum(1 for k in ks_ if not all(x in have for x in k))
++                return {"n_at_support": len(ks_), "n_blocked": int(nb_),
++                        "n_lower_classes": len(have),
++                        "n_lower_rows": int(len(lo["flat"]))}
++
++            _blk = {str(ell): _blocked(ell) for ell in range(3, maxl + 1)}
++            _oprows = {str(ell): int(operative(ell)["child"].shape[0])
++                       for ell in range(2, maxl + 1)}
++            for _ell, _lb in _lb_save.items():                 # [figured_bass] see above
++                if _lb is not None:
++                    miners[_ell].last_build = _lb
++            if _or_save is not None:                           # [figured_bass] see above
++                quot.n_read, quot.n_drop, quot.n_tie = _or_save
+             log["quot"].append(
+                 None if quot is None else
+-                {"oracle": quot.state(),
+-                 "build": {str(ell): dict(getattr(miners[ell], "last_build", {}) or {})
+-                           for ell in range(2, maxl + 1)}})
++                {"oracle": quot.state(), "build": _bld,
++                 # the `spell` ranking `pick()` reads, bounded (see `ClassMiner.spell_top`) —
++                 # with `build.picks` beside it an offline replay of any build is exact.
++                 "spell": {str(ell): miners[ell].spell_top(8)
++                           for ell in range(2, maxl + 1)
++                           if isinstance(miners[ell], QT.ClassMiner)},
++                 "blocked": _blk})
++            # [figured_bass] THE OPEN BIT'S OWN CHANNEL, present in EVERY arm including the
++            # flat ones — which is why it is not folded into `log["quot"]`: gate E-2 asserts a
++            # quotient-less arm logs NO quotient row at all, and `flat_open` / `flat_yk_open`
++            # need this record. `operative` vs `committed` per level is the executor's exposure
++            # (`figured_bass/sizing/SIZING.md` section 4) read in run instead of replayed.
++            log["open"].append(
++                {"stat": dict(_open_stat), "operative": _oprows,
++                 "committed": {str(ell): (None if committed[ell] is None
++                                          else int(committed[ell]["child"].shape[0]))
++                               for ell in range(2, maxl + 1)},
++                 # the operative table's grade, on exactly the levels `committed_grade` covers,
++                 # so "what the DP executed over" is gradeable beside "what was frozen"
++                 "operative_grade": ograde,
++                 "blocked": _blk})
+             log["gy"].append(gy_miner.state() if gy_miner is not None else None)
+             log["committed_grade"].append(
+                 {str(ell): (None if committed[ell] is None
+@@ -6492,6 +6822,10 @@
+                                    str(ell): int(getattr(miners[ell], "n_dropped", 0))
+                                    for ell in range(2, maxl + 1)}}),
+                  "slot_rec": bool(cfg.get("slot_rec", False)),
++                 # [figured_bass] what the two bits were and what they did, at arm level, so
++                 # "was this arm open" is one lookup rather than a scan of the per-cycle log.
++                 "open_inventory": bool(_open_inv), "ungate_l5": bool(_ungate_l5),
++                 "open_stat": dict(_open_stat),
+                  # [enharmonic Q2] every merge event, taken or refused, with what licensed it,
+                  # the loss, the rise, the floor and the table's grade at that instant -- the
+                  # parent spec's hardest norm.
+@@ -6502,6 +6836,7 @@
+                                if cfg.get("merge_mode") else None),
+                  "ledger": ledger.state(),
+                  "obs_hist": {str(k): q for k, q in obs_hist.items()},
++                 "obs_nobs": {str(k): q for k, q in obs_nobs.items()},  # [figured_bass]
+                  "obs_gy_agree": bool(all(obs_gy_agree)) if obs_gy_agree else None,
+                  "obs_gy_agree_n": len(obs_gy_agree),
+                  "era_caps": list(caps), "total_cap": int(total_cap)}
+@@ -6866,6 +7201,26 @@
+                merge_mode=None, merge_tol=0.20, merge_every=8, merge_n_probe=256,
+                merge_n_pairs=1, merge_use_frac=0.90, merge_margin=0.0, merge_force=None,
+                merge_max_rows=64,
++               # [figured_bass] THE TWO KNOBS OF THE THIRD CHILD, both off, both per-ARM
++               # properties (`ARMS[...]["cfg"]`) in the file's own idiom -- an arm IS what it
++               # freezes and what it mines, so neither is settable at run level. Present in
++               # every cfg this file builds so `cfg.get` never has to guess a default.
++               #
++               #   open_inventory  a commit freezes the KEY, not the CONTENT. `committed[ell]`
++               #                   still records that the level was ADOPTED -- every flag-shaped
++               #                   read of it is untouched -- but `operative(ell)` becomes the
++               #                   frozen partition applied to the live at-support keys, so the
++               #                   DP maxes over whatever inventory is held. Off: `operative` is
++               #                   the donor's two lines (gate E-7).
++               #   ungate_l5       the COMMITTABLE L5 miner observes every cycle instead of only
++               #                   when the era ladder reaches level 4. L5 only, so the L2-L4
++               #                   mining path is the donor's. `figured_bass/sizing/SIZING.md`
++               #                   section 2: the era gate, not the L4 book, set the cycle of
++               #                   the first non-empty L5 build in every regime it replayed --
++               #                   and the ungated OBSERVATION panel already reads L5 every
++               #                   cycle, so this makes that same stream committable rather than
++               #                   introducing a new one (gate E-9).
++               open_inventory=False, ungate_l5=False,
+                yoke_from_tag="")            # [enharmonic] a banked tag a clock yoke reads from
+     # [census] Phase 0 R6's ladder: the gate is at L2, so era 1 is what must be long enough to
+     # contain its firing (latest all-arm L2 firing in the replay was c40, against era 1's old
+@@ -7082,6 +7437,15 @@
+ # [enharmonic] Q1's three arms, in the order they run. `flat` leads, so the two treated arms
+ # are read against a comparator that is already on disk when they start.
+ ENH_ARMS = "flat,given_cat_tok,given_cat_min"
++# [figured_bass] the third child's tag, SOURCES BEFORE YOKES (`enharmonic_run` asserts a yoke's
++# source has already run in the same tag). `given_cat_tok`, `flat_yk_tok` and `flat` are the
++# banked anchors and are deliberately NOT here — the reduction reads them with `--bank`.
++FB_ARMS = ("given_cat_tok_open,given_cat_tok_ung5,given_cat_tok_open_ung5,"
++           "flat_open,flat_yk_open,flat_yk_open_ung5")
++# the preflight sweep for this node, in the order the gates read them: the knob-off twin first
++# (E-7's 0.000e+00 partner), then each bit alone, then both, then the flat open path.
++FB_PF_ARMS = ("en_pf_tok,en_pf_open_off,en_pf_open,en_pf_ung5,en_pf_open_ung5,"
++              "en_pf_openflat,en_pf_off")
+ # The in-tag pooled null-ABBA re-derivation of delta-silence's dead zone on `ca_s0`'s own logged
+ # `dsil` series (`phase0_tutti.py` prints it beside the donor's two numbers). NOT a default:
+ # it is passed explicitly on the command line, and this constant exists so the value the design
+@@ -8545,6 +8909,12 @@
+                  # observe, the cross-product build, the drop accounting and the slot-resolved
+                  # recorder all run at toy sizes before a paid setup.
+                  "en_pf_off", "en_pf_single", "en_pf_tok", "en_pf_gen",
++                 # [figured_bass] the third child's twins, immediately after the arm they are
++                 # a knob away from: the knob-off twin (E-7's 0.000e+00 partner), each bit
++                 # alone, both, and the flat open path (a different build function behind the
++                 # same branch).
++                 "en_pf_open_off", "en_pf_open", "en_pf_ung5", "en_pf_open_ung5",
++                 "en_pf_openflat",
+                  "flat", "given_cat_tok", "given_cat_min",
+                  # [tutti] the unification arms: the split's two policy objects, the
+                  # bootstrap under a split, the endogenous selector, the two-policy yoke and
+@@ -9307,6 +9677,166 @@
+             _X[f"E-6 {_lbl}"]["n_delta_nonzero"] = sum(
+                 1 for e in _res if abs(float(e["e_merge"]) - float(e["e_keep"])) > 1e-12)
+ 
++    # ---- [figured_bass] E-7 / E-8 / E-9 ------------------------------------------------ #
++    # E-7  KNOB-OFF IDENTITY, IN RUN. `en_pf_open_off` is `en_pf_tok` with both bits named and
++    #      set False. It must reproduce it exactly — same commits, same series — which is what
++    #      certifies that the branch is inert when it is off and, specifically, that the
++    #      DEFAULT RESOLUTION path (`cfg.get("open_inventory")` absent vs explicitly False) is
++    #      the same path. That is the one thing a `cfg.get` guard can silently get wrong, and
++    #      it is exactly the class of bug E-3 exists for one knob down.
++    if _ran("en_pf_tok") and _ran("en_pf_open_off"):
++        _a = json.load(open(f"{outdir}/en_pf_tok/results.json"))
++        _b = json.load(open(f"{outdir}/en_pf_open_off/results.json"))
++        _ev = lambda r: [(e["era"], e["level"], e["cycle"], e["n_entries"])
++                         for e in r["events"] if e["kind"] == "commit"]
++        _worst = 0.0
++        for _k in ("e", "succ", "t_cum", "n_moves", "n_solved", "n_mined"):
++            _x = np.asarray(_a["log"][_k], float); _y = np.asarray(_b["log"][_k], float)
++            _L = min(len(_x), len(_y))
++            if _L:
++                _worst = max(_worst, float(np.abs(_x[:_L] - _y[:_L]).max()))
++        _X["E-7 knob-off identity"] = {
++            "max_abs_series_delta": _worst, "commits_equal": bool(_ev(_a) == _ev(_b)),
++            "commits_tok": _ev(_a), "commits_open_off": _ev(_b),
++            "n_read_tok": (_a.get("quotient") or {}).get("n_read"),
++            "n_read_open_off": (_b.get("quotient") or {}).get("n_read"),
++            "n_rebuild": [(q["stat"]["n_rebuild"] if q else None)
++                          for q in _b["log"]["open"][-1:]]}
++        assert _ev(_a) == _ev(_b) and _worst == 0.0, (
++            f"E-7 FAILED: `open_inventory`/`ungate_l5` set False is not the same arm as the "
++            f"knobs absent (max delta {_worst:.3e}) — the guard resolves differently, or one "
++            f"of the new instruments perturbed the run")
++        assert (_a.get("quotient") or {}).get("n_read") \
++            == (_b.get("quotient") or {}).get("n_read"), \
++            "E-7 FAILED: the oracle BILL moved between the knob-absent and knob-off arms — " \
++            "the per-cycle `blocked`/`operative` instruments are charging the learner"
++        assert all((q["stat"]["n_rebuild"] == 0) for q in _b["log"]["open"] if q), \
++            "E-7 FAILED: the move set was rebuilt with the open bit off"
++
++    # E-8  THE FLAG-VS-TABLE AUDIT. The whole node turns on one distinction: `committed[ell]`
++    #      as a FLAG ("this level was adopted") must keep every reader it had, while
++    #      `committed[ell]` as a TABLE must be `operative(ell)` under the open bit. The
++    #      invariant is asserted IN RUN at the rebuild site (`_rebuild_ms`), so this gate's job
++    #      is to show the assertion was REACHED and that the operative table actually departed
++    #      from the frozen one — an audit that never fires is not an audit.
++    for _lbl in ("en_pf_open", "en_pf_open_ung5", "en_pf_openflat"):
++        if not _ran(_lbl):
++            continue
++        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
++        _op = [q for q in _r["log"]["open"] if q]
++        _adrows = [q for q in _op if any(x is not None for x in q["committed"].values())]
++        _diff = [q for q in _adrows
++                 if any(q["committed"][k] is not None
++                        and q["operative"].get(k) != q["committed"][k]
++                        for k in q["committed"])]
++        _last = _op[-1] if _op else {}
++        _X[f"E-8 {_lbl}"] = {
++            "n_cycles": len(_op), "n_cycles_with_an_adopted_level": len(_adrows),
++            "n_rebuild": (_last.get("stat") or {}).get("n_rebuild"),
++            "n_cycles_operative_differs_from_committed": len(_diff),
++            "n_empty_fallback": (_last.get("stat") or {}).get("n_empty_fallback"),
++            "rows_frozen_at_end": (_last.get("stat") or {}).get("rows_frozen"),
++            "rows_operative_at_end": (_last.get("stat") or {}).get("rows_operative"),
++            "commits": [(e["level"], e["cycle"], e["n_entries"])
++                        for e in _r["events"] if e["kind"] == "commit"]}
++        assert _adrows, (
++            f"{_lbl}: nothing was ever committed, so the open branch never ran and E-8's "
++            f"in-run assertion is vacuous — this arm exists on `delta_prov` for that reason")
++        assert int((_last.get("stat") or {}).get("n_rebuild") or 0) > 0, \
++            f"{_lbl}: the move set was never rebuilt though a level was adopted"
++        # NOT asserted: that the operative table DIFFERED on some cycle. At preflight sizes an
++        # arm can commit on the last cycle of a six-cycle era and never mine another key, and
++        # asserting a difference would be asserting an outcome. It is reported instead.
++
++    # E-9  THE UNGATED L5 MINER IS FED THE CYCLE'S OWN MINED ROWS, EVERY CYCLE. `ungate_l5`
++    #      appends L5 to the gated mining range at the node arithmetic the observation panel
++    #      already uses, so on every cycle the committable L5 miner must take in exactly the
++    #      rows that cycle mined — `log["n_mined"]`, which is `mine_src.shape[0]` and therefore
++    #      `pf.shape[0]`, the row count every level in the range observes.
++    #
++    #      THIS IS AN INCREMENT CHECK, and the first version of this gate was not. Comparing
++    #      the committable miner's at-support LEVEL against the panel's fails at preflight for
++    #      a reason that has nothing to do with the knob: `preflight_seed_miner` seeds
++    #      `miners[2..maxl]` with half the TRUE table before cycle 1 and tops them up at
++    #      `preflight_seed_topup_cycle`, and the panel is never seeded — so the two levels
++    #      differ from cycle 1 by construction (47 vs 0 at L5 on the first sweep). Increments
++    #      of `n_obs` are immune to that; the two seeded cycles are excluded and named.
++    for _lbl in ("en_pf_ung5", "en_pf_open_ung5"):
++        if not _ran(_lbl):
++            continue
++        _r = json.load(open(f"{outdir}/{_lbl}/results.json"))
++        _cyc = _r["log"]["cycle"]
++        _nm = _r["log"]["n_mined"]
++        _no = [((q or {}).get("5") or {}).get("n_obs") for q in _r["log"]["miner"]]
++        _top = int((_r.get("config") or {}).get("preflight_seed_topup_cycle") or 0)
++        _bad = []
++        for i in range(1, min(len(_cyc), len(_no), len(_nm))):
++            if _no[i] is None or _no[i - 1] is None or int(_cyc[i]) == _top:
++                continue
++            if int(_no[i]) - int(_no[i - 1]) != int(_nm[i]):
++                _bad.append((int(_cyc[i]), int(_no[i]) - int(_no[i - 1]), int(_nm[i])))
++        # the panel's own `n_obs`, where the arm carries it: with the bit on the two miners
++        # must ACCRUE identically (their absolute counts differ only by the preflight seed).
++        _pn = ((_r.get("obs_nobs") or {}).get("5") or [])
++        _pbad = []
++        for i in range(1, min(len(_cyc), len(_no), len(_pn))):
++            if _no[i] is None or _no[i - 1] is None or int(_cyc[i]) == _top:
++                continue
++            if int(_no[i]) - int(_no[i - 1]) != int(_pn[i]) - int(_pn[i - 1]):
++                _pbad.append(int(_cyc[i]))
++        _oh = (_r.get("obs_hist") or {}).get("5") or []
++        _g5 = [((q or {}).get("5") or {}).get("n_at_support", {}).get("3")
++               for q in _r["log"]["miner"]]
++        _L = min(len(_oh), len(_g5))
++        _X[f"E-9 {_lbl}"] = {
++            "n_cycles": len(_cyc), "seed_topup_cycle_excluded": _top,
++            "n_cycles_delta_ne_n_mined": len(_bad), "first_bad": (_bad[0] if _bad else None),
++            "n_cycles_delta_ne_panel_delta": len(_pbad),
++            "first_bad_vs_panel": (_pbad[0] if _pbad else None),
++            "miner5_n_obs_last": (_no[-1] if _no else None),
++            "panel5_n_obs_last": (_pn[-1] if _pn else None),
++            "miner5_at_support_last": (_g5[_L - 1] if _L else None),
++            "panel5_at_support_last": (_oh[_L - 1] if _L else None),
++            # REPORTED, not asserted: at preflight the committable miner carries the seed and
++            # the panel does not, so the two LEVELS are not expected to match here. In a run
++            # with `preflight_seed_miner` off they are, and the assertion below covers that.
++            "seeded": bool((_r.get("config") or {}).get("preflight_seed_miner"))}
++        assert not _bad, (
++            f"{_lbl}: E-9 FAILED — the ungated committable L5 miner did not take in the "
++            f"cycle's own mined rows: at c{_bad[0][0]} it accrued {_bad[0][1]} against "
++            f"`n_mined` {_bad[0][2]}. The appended level is reading a different node, a "
++            f"different subsample, or is being skipped by the range guard.")
++        assert not _pbad, (
++            f"{_lbl}: E-9 FAILED — the committable L5 miner and the observation panel's L5 "
++            f"miner do not accrue identically (first divergence c{_pbad[0]}); they are "
++            f"supposed to be the same stream made committable.")
++        if not _X[f"E-9 {_lbl}"]["seeded"]:
++            assert (_g5[_L - 1] == _oh[_L - 1]) if _L else True, (
++                f"{_lbl}: E-9 FAILED — unseeded, the two L5 miners' at-support counts differ "
++                f"({_g5[_L - 1]} vs {_oh[_L - 1]})")
++
++    # E-9b THE GATED CONTROL. With the bit OFF the committable L5 miner must accrue NOTHING
++    #      until the ladder reaches era 4 — otherwise `ungate_l5` is measuring nothing. This is
++    #      the half that makes E-9 a contrast rather than a tautology.
++    if _ran("en_pf_tok"):
++        _r = json.load(open(f"{outdir}/en_pf_tok/results.json"))
++        _cyc, _era = _r["log"]["cycle"], _r["log"]["era"]
++        _no = [((q or {}).get("5") or {}).get("n_obs") for q in _r["log"]["miner"]]
++        _top = int((_r.get("config") or {}).get("preflight_seed_topup_cycle") or 0)
++        _early = [i for i in range(1, min(len(_cyc), len(_no)))
++                  if _era[i] < 4 and int(_cyc[i]) != _top]
++        _moved = [int(_cyc[i]) for i in _early
++                  if _no[i] is not None and _no[i - 1] is not None
++                  and int(_no[i]) != int(_no[i - 1])]
++        _X["E-9b gated control (en_pf_tok)"] = {
++            "n_cycles_before_era4": len(_early), "n_cycles_L5_accrued": len(_moved),
++            "first": (_moved[0] if _moved else None),
++            "miner5_n_obs_last": (_no[-1] if _no else None)}
++        assert not _moved, (
++            f"en_pf_tok: E-9b FAILED — the committable L5 miner accrued at c{_moved[0]}, "
++            f"before era 4 and with `ungate_l5` off, so the era gate this node is about is "
++            f"not where it is thought to be")
++
+     # X-2  INERTNESS. With `loop_commit` absent the arm is the donor: `tu_pf_off` must carry no
+     #      split record, no `c_*` trace columns, and must be bit-identical to `dsil_yield`'s
+     #      shape of decision (same driven key, same policy kind).

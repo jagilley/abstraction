@@ -1,9 +1,9 @@
 # enharmonic — the quotient: re-keying the vocabulary by category, and earning the key
 
 **Up**: [`../README.md`](../README.md) (practice). **Spec**: [`SPEC.md`](SPEC.md) (2026-09-01) ·
-Q2: `temperament/SPEC.md`[^private] (2026-09-09) · the third child:
-`figured_bass/SPEC.md`[^private] (2026-09-10). **Files**: [`FILES.md`](FILES.md).
-**Facts**: [`sizing/SIZING.md`](sizing/SIZING.md), `figured_bass/sizing/SIZING.md`[^private],
+Q2: [`temperament/SPEC.md`](temperament/SPEC.md) (2026-09-09) · the third child:
+[`figured_bass/SPEC.md`](figured_bass/SPEC.md) (2026-09-10). **Files**: [`FILES.md`](FILES.md).
+**Facts**: [`sizing/SIZING.md`](sizing/SIZING.md), [`figured_bass/sizing/SIZING.md`](figured_bass/sizing/SIZING.md),
 `figures/en_s{0,1,2b,3,4,5}_reduction.txt`, `figures/fb_s{0,1}_reduction.txt`,
 `figures/en_s{3,4,5}_alias_audit.txt`. Written 2026-09-11 after discussion; the round ran
 2026-09-09 → 09-11, ≈43 GPU-h in total.
@@ -13,8 +13,8 @@ Q2: `temperament/SPEC.md`[^private] (2026-09-09) · the third child:
 | folder | what |
 |---|---|
 | [`sizing/`](sizing/SIZING.md) | Q0, offline: the cover, the token class, the alias audit, the forced-transfer budget, junk under transfer; the fork's own mining path simulated. |
-| `temperament/`[^private] | Q2's spec — the endogenous quotient as the one op with negative within-level and positive next-level value. Its arms live in this node's fork; four passes, `en_s2b` → `en_s5`. |
-| `figured_bass/`[^private] | Commit the key, not the content: what a commit should freeze in category coordinates. Q0 offline; `fb_s0` on its own clock, `fb_s1` on the anchor's. |
+| [`temperament/`](temperament/SPEC.md) | Q2's spec — the endogenous quotient as the one op with negative within-level and positive next-level value. Its arms live in this node's fork; four passes, `en_s2b` → `en_s5`. |
+| [`figured_bass/`](figured_bass/FILES.md) | Commit the key, not the content: what a commit should freeze in category coordinates. Q0 offline; `fb_s0` on its own clock, `fb_s1` on the anchor's. |
 
 ## The question
 
@@ -336,5 +336,3 @@ each carries the flags, floors and banked-arm provenance in its header. Offline:
 `.../alias_audit.py --tag <tag>`, `.../analyze_enharmonic.py --tag <tag> --bank TAG:ARM,...`.
 Gates: `enharmonic.py::fidelity_smoke`, `::preflight --outdir-tag <tag> --arms ...`,
 `quotient.py` (E-0), `merge.py` (M-0).
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

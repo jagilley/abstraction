@@ -5,7 +5,7 @@ This is a research monorepo consolidating several projects.
 ## Structure
 
 - `experiments/` - All experiments
-    - `experiments/a2a_forward` is our main experiment for training forward self-models for decomposing activations
+    - `experiments/a2a_forward` is a catch-all experiment for training forward self-models for decomposing activations
     - `experiments/rhm` is a controlled setup for generating language-like data with a known data generating process
     - `experiments/mjc` is a place we run MuJoCo experiments for motor learning
     - `experiments/canvas` is the image substrate of the practice arc: a tile grammar (`tiles.py`) rendered to swatches with the code grid aligned to the tile grid, inpainting as the piece, an adjacency-support truth gauge and a typicality taste gauge, and no agent-consumed oracle
@@ -20,7 +20,6 @@ This is a research monorepo consolidating several projects.
 - `glp/` — Generative Latent Prior project
 - `manim-videos/` — Animated video explainers (Manim CE, conda env: `manim`)
 - `org/` — Org-mode files for research and application tracking
-- `applications/` — Job/fellowship applications
 - `projects/` — Cross-project progress logs
 - `ROADMAP.md` - our working roadmap for the next steps in this line of work. (Don't edit without permission)
 - `ROADMAP_PROGRESS.md` and `QUEUE.md` - place where we put one-liners describing the progress we have made or will make towards the roadmap. Please edit these as appropriate unless instructed otherwise

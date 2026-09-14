@@ -537,7 +537,7 @@ ladder sized for abundance, so the reward side is untested. And the second exten
 world), while under the grammar's own parent-feature key every level is 16 rules — the merge
 op is on the critical path as a level-size lever, specced as [`enharmonic/`](enharmonic/SPEC.md),
 with its endogenous form — the merge licensed by the learner's own value system, where the
-within-level ledger refuses — specced as `enharmonic/temperament/`[^private].
+within-level ledger refuses — specced as [`enharmonic/temperament/`](enharmonic/temperament/SPEC.md).
 Beside both, the substrate fork [`inflection/`](inflection/README.md) (Q0 sized, Q1–Q3 run,
 2026-09-09→10; [spec](inflection/SPEC.md)) gives the bottom layer a context-dependent rendering
 rule and a grader that marks spelling, so the execution currency includes the word for the
@@ -611,5 +611,3 @@ Full commands, calibrations and volume layout: [`crystallize/README.md`](crystal
 seed-triple convention), [`tall/README.md`](tall/README.md),
 [`transpose/FILES.md`](transpose/FILES.md), [`setlist/FILES.md`](setlist/FILES.md)
 (joint findings: [`typed_gaps/README.md`](typed_gaps/README.md)).
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

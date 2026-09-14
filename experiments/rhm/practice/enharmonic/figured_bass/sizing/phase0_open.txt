@@ -1,0 +1,233 @@
+========================================================================================================
+FIGURED BASS — Q0: what the book would have held had the commit frozen only the key
+========================================================================================================
+offline, CPU-only.  Driven by the banked per-cycle `keys_at_support`; the open bit
+changes `operative()` only, so every open column is an ALL-ELSE-EQUAL replay on the
+banked observation stream, not a prediction of a run.
+world: v=8 s=2 depth=6 m=2 rule_seed=0 support=3 spell_cap=4
+token-class alphabet L1..L6: [7, 9, 11, 13, 22, 42]   legal class PAIRS L2..L6: [13, 28, 40, 73, 306]   (L5 pairs in min coordinates: 25)
+regimes: frozen = the run | open4 = only L4's inventory stays live | openAll = no
+         inventory is ever frozen.  L3 is live in ALL THREE: no arm committed L3.
+
+[0] THE ARMS' CLOCKS — and where the commit sits in them
+    the committable miners are era-gated to `era_level + 1`, so the L4 miner starts
+    at era 3 and the L5 miner at era 4.  That gate, not the freeze, is why an L5
+    key count is 0 before era 4.
+                 arm   key  cycles             era starts (era:cycle)                    commits
+       given_cat_tok   tok     176     1:c1 2:c36 3:c86 4:c156 5:c168              L2@c12 L4@c95
+       given_cat_min   gen     114      1:c1 2:c38 3:c44 4:c94 5:c106       L2@c14 L4@c87 L5@c99
+                flat  flat      93       1:c1 2:c61 3:c71 4:c79 5:c85                     L2@c48
+         flat_yk_tok  flat     176     1:c1 2:c36 3:c86 4:c156 5:c168              L2@c12 L4@c95
+         flat_yk_min  flat     114      1:c1 2:c38 3:c44 4:c94 5:c106       L2@c14 L4@c87 L5@c99
+
+[F-1] GATE — the replayed build reproduces the logged one, field for field
+      (all eight `last_build` fields, on every cycle where the log carries a genuine
+       live build, i.e. `n_lower_rows` > 0.  A committed level's entry is stale, and
+       the audition's `build(base_table(v))` counterfactual leaves a degenerate one;
+       both are skipped, and counted.)
+                   arm  level  checked   agree  skipped        mismatch cycles               fields
+         given_cat_tok     L2       11      11      165                      —                    —
+         given_cat_tok     L3       96      96       80                      —                    —
+         given_cat_tok     L4       58      58      118                      —                    —
+         given_cat_tok     L5       91      91       85                      —                    —
+         given_cat_min     L2       13      13      101                      —                    —
+         given_cat_min     L3       88      88       26                      —                    —
+         given_cat_min     L4       49      49       65                      —                    —
+         given_cat_min     L5       51      31       63          c48..c67 (20)      n_lower_classes
+
+      flat arms — the replayed committed table against the commit event's
+      `n_entries` (a flat arm logs no `last_build`):
+                  flat  L2@c48: 13/13
+           flat_yk_tok  L2@c12: 11/11 | L4@c95: 1/1
+           flat_yk_min  L2@c14: 11/11 | L4@c87: 3/3 | L5@c99: 1/1
+
+[F-2] GATE — is the answer pick-invariant?  class coverage and L5 lookup-ability
+      under pick=lo (index order), pick=hi (reversed) and cap-free (spell_cap off,
+      a strict upper bound), over EVERY cycle from the L4 commit to the end.
+                   arm                   quantity           lo           hi     cap-free  invariant
+         given_cat_tok                   own_last            9            9            9        yes
+         given_cat_tok                    own_max            9            9            9        yes
+         given_cat_tok                  look_last           52           52           52        yes
+         given_cat_tok                   look_max           52           52           52        yes
+         given_cat_min                   own_last            5            4            5         NO
+         given_cat_min                    own_max            5            4            5         NO
+         given_cat_min                  look_last           19           14           19         NO
+         given_cat_min                   look_max           19           14           19         NO
+
+[F-3] GATE — row IDENTITY.  The committed book's `true_mask` (per-row, in row
+      order) against the replay's.  This is where the unlogged `spell` ranking bites:
+      the count is right, the identity of the picked spellings is not.
+                   arm  level  n rows   true (replay lo/hi)  true (logged)  elementwise
+         given_cat_tok     L2      16               10 / 10             10        MATCH
+         given_cat_tok     L4      64                 9 / 1             16      differs
+         given_cat_min     L2      16               10 / 10             10        MATCH
+         given_cat_min     L4     144                21 / 4             17      differs
+         given_cat_min     L5      32                 0 / 0              6      differs
+                  flat     L2      13                 9 / 9              9        MATCH
+           flat_yk_tok  (no entry.json.gz in the compact mirror — skipped)
+           flat_yk_min  (no entry.json.gz in the compact mirror — skipped)
+
+========================================================================================================
+[1] THE LIVE INVENTORY'S CLASS COVERAGE — per cycle from the L4 commit to the end
+========================================================================================================
+    `own` = classes in the arm's own key ('tok': of the 13 L4 token classes; 'min':
+    of 8 min-labels).  `tok` = token classes of the same rows.  Rows printed only
+    where something moves.  L3 is live in every regime (never committed).
+
+    --- given_cat_tok  (key=tok, L4 commit c95, 176 cycles, era4 starts c156) ---
+     cycle  L4k@s  L3k@s ||  frozen rows  own  tok ||   open4 rows  own  tok || openAll rows  own  tok ||  L3 rows  own  tok
+        95      5     17 ||           64    3    3 ||           64    3    3 ||           64    3    3 ||       91    8    8
+        96      6     17 ||           64    3    3 ||           80    4    4 ||           80    4    4 ||       91    8    8
+        97      7     17 ||           64    3    3 ||           80    4    4 ||           96    4    4 ||       91    8    8
+        98      8     17 ||           64    3    3 ||           96    5    5 ||          112    5    5 ||       91    8    8
+       100      9     17 ||           64    3    3 ||          112    6    6 ||          128    6    6 ||       91    8    8
+       107     10     17 ||           64    3    3 ||          112    6    6 ||          144    6    6 ||       91    8    8
+       108     11     17 ||           64    3    3 ||          128    7    7 ||          160    7    7 ||       91    8    8
+       111     12     17 ||           64    3    3 ||          144    8    8 ||          176    8    8 ||       91    8    8
+       138     13     17 ||           64    3    3 ||          160    8    8 ||          192    8    8 ||       91    8    8
+       168     13     17 ||           64    3    3 ||          160    8    8 ||          192    8    8 ||       92    9    9
+       171     13     18 ||           64    3    3 ||          160    8    8 ||          192    8    8 ||       94    9    9
+       172     14     18 ||           64    3    3 ||          176    9    9 ||          208    9    9 ||       94    9    9
+       176     15     19 ||           64    3    3 ||          176    9    9 ||          224    9    9 ||       95    9    9
+
+    --- given_cat_min  (key=gen, L4 commit c87, 114 cycles, era4 starts c94) ---
+     cycle  L4k@s  L3k@s ||  frozen rows  own  tok ||   open4 rows  own  tok || openAll rows  own  tok ||  L3 rows  own  tok
+        87     11     12 ||          144    4    6 ||          144    4    6 ||          160    4    6 ||       90    7    8
+       106     11     12 ||          144    4    6 ||          144    4    6 ||          160    4    6 ||       92    8    9
+       107     11     13 ||          144    4    6 ||          144    4    6 ||          160    4    6 ||       94    8    9
+       110     11     14 ||          144    4    6 ||          144    4    6 ||          160    4    6 ||       98    8    9
+       111     11     15 ||          144    4    6 ||          144    4    6 ||          160    4    6 ||      102    8   10
+       112     12     15 ||          144    4    6 ||          160    5    7 ||          176    5    7 ||      102    8   10
+       114     12     15 ||          144    4    6 ||          160    5    7 ||          176    5    7 ||      102    8   10
+
+========================================================================================================
+[2] WHAT L5 COULD HAVE BUILT OVER IT
+========================================================================================================
+    `look` = legal L5 class pairs both of whose halves the L4 book holds a row of
+    (the `buildable()` idiom in class coordinates), of 73 in token
+    coordinates / 25 in min coordinates.  `L5k@s` = the COMMITTABLE L5
+    miner's own keys at support 3 (era-gated to era 4).  `obs5` = the ungated
+    observation panel's count (`obs_hist[5]`) — a different miner, same stream.
+    `built`/`rows` = the L5 build `ClassMiner.build` would return that cycle.
+
+    --- given_cat_tok  (key=tok, L4 commit c95) ---
+     cycle  L5k@s  obs5 ||   frozen look  built  rows ||    open4 look  built  rows ||  openAll look  built  rows
+        95      0    24 ||             6      0     0 ||             6      0     0 ||             6      0     0
+        96      0    25 ||             6      0     0 ||            11      0     0 ||            11      0     0
+        98      0    26 ||             6      0     0 ||            16      0     0 ||            16      0     0
+       100      0    26 ||             6      0     0 ||            24      0     0 ||            24      0     0
+       108      0    27 ||             6      0     0 ||            34      0     0 ||            34      0     0
+       111      0    27 ||             6      0     0 ||            43      0     0 ||            43      0     0
+       156      1    36 ||             6      1    16 ||            43      1    16 ||            43      1    16
+       157      2    36 ||             6      1    16 ||            43      2    32 ||            43      2    32
+       159      3    36 ||             6      1    16 ||            43      2    32 ||            43      2    32
+       161      4    36 ||             6      2    32 ||            43      3    48 ||            43      3    48
+       162      6    36 ||             6      2    32 ||            43      4    64 ||            43      4    64
+       168      7    37 ||             6      2    32 ||            43      4    64 ||            43      4    64
+       172      7    37 ||             6      2    32 ||            52      5    80 ||            52      5    80
+       176      7    37 ||             6      2    32 ||            52      5    80 ||            52      5    80
+    first cycle with a NON-EMPTY L5 build:  frozen=156   open4=156   openAll=156
+
+    --- given_cat_min  (key=gen, L4 commit c87) ---
+     cycle  L5k@s  obs5 ||   frozen look  built  rows ||    open4 look  built  rows ||  openAll look  built  rows
+        87      0    15 ||            14      0     0 ||            14      0     0 ||            14      0     0
+        95      2    15 ||            14      1    16 ||            14      1    16 ||            14      1    16
+        96      3    15 ||            14      2    32 ||            14      2    32 ||            14      2    32
+       104      4    15 ||            14      3    48 ||            14      3    48 ||            14      3    48
+       109      5    15 ||            14      3    48 ||            14      3    48 ||            14      3    48
+       112      5    15 ||            14      3    48 ||            19      4    64 ||            19      4    64
+       114      5    15 ||            14      3    48 ||            19      4    64 ||            19      4    64
+    first cycle with a NON-EMPTY L5 build:  frozen=95   open4=95   openAll=95
+
+========================================================================================================
+[3] THE FLAT KEY — the same replay where the key is the spelling
+========================================================================================================
+    A flat arm's book IS its at-support keys filtered by the ratchet, so the replay
+    is exact (F-3).  `tok` = the token classes those rows cover, which is what the
+    contrast with [1] is denominated in.  `L5` = rows an L5 flat build would return.
+
+    --- flat (en_s0)  L2 commit c48, L4 commit cNone, 93 cycles ---
+     cycle  L4k@s  L5k@s ||  frozen rows  tok  L5 ||   open4 rows  tok  L5 || openAll rows  tok  L5 | L3 rows
+        48      0      0 ||            0    0   0 ||            0    0   0 ||            0    0   0 |       0
+        79      1      0 ||            1    1   0 ||            1    1   0 ||            1    1   0 |      10
+        93      2      0 ||            1    1   0 ||            1    1   0 ||            1    1   0 |      17
+
+    --- flat_yk_tok (en_s1)  L2 commit c12, L4 commit c95, 176 cycles ---
+     cycle  L4k@s  L5k@s ||  frozen rows  tok  L5 ||   open4 rows  tok  L5 || openAll rows  tok  L5 | L3 rows
+        95      1      0 ||            1    1   0 ||            1    1   0 ||            1    1   0 |      30
+        98      3      0 ||            1    1   0 ||            2    2   0 ||            2    2   0 |      30
+       109      6      0 ||            1    1   0 ||            2    2   0 ||            3    3   0 |      31
+       117      8      0 ||            1    1   0 ||            3    3   0 ||            4    4   0 |      33
+       133     10      0 ||            1    1   0 ||            3    3   0 ||            5    4   0 |      34
+       148     13      0 ||            1    1   0 ||            3    3   0 ||            6    4   0 |      34
+       151     14      0 ||            1    1   0 ||            3    3   0 ||            7    4   0 |      34
+       156     14      1 ||            1    1   1 ||            3    3   1 ||            7    4   1 |      35
+       176     14      1 ||            1    1   1 ||            3    3   1 ||            7    4   1 |      40
+
+    --- flat_yk_min (en_s1)  L2 commit c14, L4 commit c87, 114 cycles ---
+     cycle  L4k@s  L5k@s ||  frozen rows  tok  L5 ||   open4 rows  tok  L5 || openAll rows  tok  L5 | L3 rows
+        87     21      0 ||            3    3   0 ||            3    3   0 ||            3    3   0 |      20
+        97     23      1 ||            3    3   1 ||            3    3   1 ||            3    3   1 |      21
+       114     24      1 ||            3    3   1 ||            3    3   1 ||            3    3   1 |      26
+
+========================================================================================================
+[4] THE EXECUTOR'S EXPOSURE — rows the DP maxes over, frozen vs live
+========================================================================================================
+    `macro_features`' max-sum DP runs over the operative table's ENTRIES; under a
+    class key each surviving key contributes up to spell_cap**s = 16 spellings, so
+    the expansion choice is the inventory.  Reported at the L4 commit, at the median
+    cycle after it, and at the last cycle.  `inv max/mean` and `cap` are the openAll
+    L4 build's own `inventory_max` / `inventory_mean` / `n_class_capped`.
+                 arm   key  cycle  frozen   open4  openAll  openAll/frozen  inv max  inv mean  cap binds  L5 rows (froz/openAll)
+       given_cat_tok   tok     95      64      64       64            1.00       16     16.00          9                   0 / 0
+       given_cat_tok   tok    136      64     144      176            2.75       16     16.00         21                   0 / 0
+       given_cat_tok   tok    176      64     176      224            3.50       16     16.00         26                 32 / 80
+       given_cat_min   gen     87     144     144      160            1.11       16     14.55         17                   0 / 0
+       given_cat_min   gen    101     144     144      160            1.11       16     14.55         17                 32 / 32
+       given_cat_min   gen    114     144     160      176            1.22       16     14.67         22                 48 / 64
+         flat_yk_tok  flat     95       1       1        1            1.00        —         —          —                   0 / 0
+         flat_yk_tok  flat    136       1       3        5            5.00        —         —          —                   0 / 0
+         flat_yk_tok  flat    176       1       3        7            7.00        —         —          —                   1 / 1
+         flat_yk_min  flat     87       3       3        3            1.00        —         —          —                   0 / 0
+         flat_yk_min  flat    101       3       3        3            1.00        —         —          —                   1 / 1
+         flat_yk_min  flat    114       3       3        3            1.00        —         —          —                   1 / 1
+
+    the same last cycle with `spell_cap` OFF — the full cross-product the class
+    key licenses, which is what the cap is holding back:
+                 arm  L4 rows (cap 4)  L4 rows (cap-free)  L5 rows (cap 4)  L5 rows (cap-free)
+       given_cat_tok              224                1693               80               19025
+       given_cat_min              176                2512               64              591936
+
+========================================================================================================
+[5] THE KEYS THEMSELVES — what the frozen book holds, what the live one does, and
+    which L5 keys name a class the frozen book lacks
+========================================================================================================
+    `legal` counts the at-support keys that are legal class pairs of the world (the
+    40 at L4 / 73 at L5 the closure enumerates); the rest are junk keys the miner
+    accrued.  Classes are printed as the feature sets they are.
+
+    given_cat_tok — at the L4 commit (c95, key=tok)
+      L4 keys at support 5 (5 legal, of 40 legal L4 class pairs)   |   L5 keys at support 0 (0 legal, of 73)
+      frozen book holds 3 token classes: {0,3,6} {1,5,7} {3}
+      live   book holds 3 token classes: {0,3,6} {1,5,7} {3}
+      L5 keys at support blocked by the FROZEN book: 0 of 0   |   by the LIVE book: 0
+
+    given_cat_tok — at the last cycle (c176, key=tok)
+      L4 keys at support 15 (15 legal, of 40 legal L4 class pairs)   |   L5 keys at support 7 (7 legal, of 73)
+      frozen book holds 3 token classes: {0,3,6} {1,5,7} {3}
+      live   book holds 9 token classes: {0} {0,3,6} {0,6} {1} {1,5,7} {2} {3} {3,6} {6}
+      L5 keys at support blocked by the FROZEN book: 5 of 7   |   by the LIVE book: 2
+
+    given_cat_min — at the L4 commit (c87, key=gen)
+      L4 keys at support 11   |   L5 keys at support 0
+      frozen book holds 6 token classes: {0} {0,3,6} {1} {1,5,7} {3} {6}
+      live   book holds 6 token classes: {0} {0,3,6} {1} {1,5,7} {3} {6}
+      L5 keys at support blocked by the FROZEN book: 0 of 0   |   by the LIVE book: 0
+
+    given_cat_min — at the last cycle (c114, key=gen)
+      L4 keys at support 12   |   L5 keys at support 5
+      frozen book holds 6 token classes: {0} {0,3,6} {1} {1,5,7} {3} {6}
+      live   book holds 7 token classes: {0} {0,3,6} {1} {1,5,7} {2} {3} {6}
+      L5 keys at support blocked by the FROZEN book: 2 of 5   |   by the LIVE book: 1
+
+wrote /home/user/research/experiments/rhm/practice/enharmonic/figured_bass/sizing/phase0_open.json

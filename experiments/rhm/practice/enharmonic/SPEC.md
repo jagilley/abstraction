@@ -200,7 +200,7 @@ hardest here: a merge is irreversible in the same sense a commit is (`ratchet`: 
 cycle early was worse than never), so the merge decision's *gauge* is the experiment, and every
 merge event should be logged with what licensed it.
 
-**Q2 specced (2026-09-09)**: `temperament/SPEC.md`[^private] — the endogenous
+**Q2 specced (2026-09-09)**: [`temperament/SPEC.md`](temperament/SPEC.md) — the endogenous
 quotient as the one op with negative within-level value and positive next-level value, hence the
 purest test of the type law; the flat key read as the undrained address book. Q0/Q1 above remain
 its prerequisites and ceiling.
@@ -212,7 +212,7 @@ the forced-transfer budget; junk under transfer) and `figures/en_s0_reduction.tx
 gauge; the un-yoked signature was the clock; the L4 book freezes at 3 of 13 classes). Index:
 [`FILES.md`](FILES.md). Second pass in `QUEUE.md`.
 
-**Third child specced (2026-09-10)**: `figured_bass/SPEC.md`[^private] — what a commit should freeze in category coordinates: the key, not the content. From Q1's mechanism (the L4 book frozen at its poorest) and `tutti`'s never-frozen L3.
+**Third child specced (2026-09-10)**: [`figured_bass/SPEC.md`](figured_bass/SPEC.md) — what a commit should freeze in category coordinates: the key, not the content. From Q1's mechanism (the L4 book frozen at its poorest) and `tutti`'s never-frozen L3.
 
 **Composed arm, probe reach, sweep, and latch landed (2026-09-11→12, `en_s6` → `en_s9`)**: the first
 endogenous L5 commit (`en_s9`, c186) once the merge sweeps every live level and the class-coverage

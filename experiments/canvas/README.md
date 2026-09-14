@@ -41,7 +41,7 @@ pairwise-local validity, so only the demand gauge exists there. [`taste/clicker.
   pairwise constraint on an aligned alphabet (AUC .30–.65) — validity is a *relation*, typicality
   a *property* — while a zero-forward **adjacency-support test** does (AUC .96–.99; rejects 96.6 %
   of the plant's oracle-invalid fills at the clean ceiling). Two organs, one per currency: support
-  for truth, typicality for taste. Child: `plant/tiles_twin/`[^private].
+  for truth, typicality for taste. Child: [`plant/tiles_twin/`](plant/tiles_twin/SPEC.md).
 - [`practice/`](practice/README.md) — **the practice arc on canvas** (2026-08-26). Node 1,
   [`ratchet/`](practice/ratchet/README.md): the RHM ratchet forked onto aligned tiles (T[2] ≈ tiles,
   T[3] ≈ motifs, inpainting depth ladder, G = 8 forwards/solve, support as the grade of record).
@@ -59,5 +59,3 @@ arc's headline reproduces on images with a stronger control. Queued next, in
 plant, with the port canvas makes natural (mint a tile token into the plant's own input stream)
 beside RHM's routing head — then **`spiral/`**, re-earning level 3 over the minted plant with
 exemplar count as the variable.
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

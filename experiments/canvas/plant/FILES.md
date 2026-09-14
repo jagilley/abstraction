@@ -10,7 +10,7 @@
 | [`codebook.py`](codebook.py) | The quantizer. `to_patches`/`from_patches` (the patch view, a bijection), GPU Lloyd `kmeans` with dead-centroid respawn, `assign`, `encode` (images → 16×16 code grid + per-swatch patch MSE), `psnr`. Decoder is a lookup, so the reported floor is the alphabet's and nothing else's. |
 | [`model.py`](model.py) | The any-order masked token model (`MaskedGrid`), shared by the plant and both graders. Mask sampler (`rect_mask` for the ladder, `train_mask` for the 75%-rect / 25%-scatter training mix), `train` with checkpoint callbacks, and `ladder_nll` — per-(style, mask-size) held-out NLL, the depth-ladder readout. |
 | [`sampler.py`](sampler.py) | Any-order (MaskGIT) decoding of a hole with a beam of `width` hypotheses over `steps` confidence-ordered reveals. Returns the completion **and its cost in forward passes** (`steps × width`) — the cost axis of the cost-to-depth curve. |
-| [`grader.py`](grader.py) | The grade of record, ported from `rhm/practice/critic/`. `score` (chain-rule mean per-token NLL over random reveal orders; `n_steps=1` is the cheap independent form), `tau_from`/`apply_tau` (the oracle-free q-quantile, bucketed per style × mask-size), `manufacture` (the seven candidate classes, none of which reads a program), `marginals`, `roc`, `pair_stats`. `score_tokens` is `score` un-averaged — the same NLLs per **token**, for the tail re-analysis in `tiles_twin/tailgrade.py`[^private]; `nanmean` of it reproduces `score` exactly. |
+| [`grader.py`](grader.py) | The grade of record, ported from `rhm/practice/critic/`. `score` (chain-rule mean per-token NLL over random reveal orders; `n_steps=1` is the cheap independent form), `tau_from`/`apply_tau` (the oracle-free q-quantile, bucketed per style × mask-size), `manufacture` (the seven candidate classes, none of which reads a program), `marginals`, `roc`, `pair_stats`. `score_tokens` is `score` un-averaged — the same NLLs per **token**, for the tail re-analysis in [`tiles_twin/tailgrade.py`](tiles_twin/tailgrade.py); `nanmean` of it reproduces `score` exactly. |
 | [`recur.py`](recur.py) | Recurrence structure of the code grid: `T[2]` = non-overlapping 2×2 code blocks, `T[3]` = 2×2 blocks *of those* with sub-support entries mapped to OOV — `macros.py`'s ratchet constraint applied to the corpus before any loop runs. Concentration readouts (distinct-per-occurrence, entropy, coverage, mass at support). |
 | [`plant.py`](plant.py) | The Modal module and the node itself. `unpack` (tar → volume), `quantize_ladder` (the floor vs K), `run` (plant + graders + all five readouts), `selfcheck` (the eight gates). Runnable end-to-end on CPU via `CANVAS_DATA` / `CANVAS_DEV` and `get_raw_f()`. |
 | [`analyze.py`](analyze.py) | **local only.** Fetches `run.json` / `quant_stats.json` / `strip.npz` off the volume and reduces them to the five figures under `figures/`. |
@@ -21,7 +21,7 @@
 
 | folder | summary |
 |---|---|
-| `tiles_twin/`[^private] | The aligned/misaligned tiles twin on `tiles.py` (one variable: crop offset), its oracle columns, and the grader re-analyses (`tailgrade.py`, `adjacency.py`). Written up in [`README.md`](README.md); design record in its `SPEC.md`, files in its `FILES.md`. |
+| [`tiles_twin/`](tiles_twin/SPEC.md) | The aligned/misaligned tiles twin on `tiles.py` (one variable: crop offset), its oracle columns, and the grader re-analyses (`tailgrade.py`, `adjacency.py`). Written up in [`README.md`](README.md); design record in its `SPEC.md`, files in its `FILES.md`. |
 
 ## Artifacts
 
@@ -49,5 +49,3 @@ App `canvas`, volume `canvas-data` (both from [`../shared.py`](../shared.py)), p
 /data/plant/<qtag>/             index.json, quant_stats.json, quant_K<K>.npz
 /data/plant/<tag>/              run.json, strip.npz, verdicts.npz, plant.pt, gA*.pt, gB.pt
 ```
-
-[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

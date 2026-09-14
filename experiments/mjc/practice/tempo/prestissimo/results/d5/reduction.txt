@@ -1,0 +1,301 @@
+=== prestissimo Phase A — the fast piece and its level ladder, tag d5, seed 0 (COMPLETE, 504s wall) ===
+no forward model anywhere; no learned component at all in Phase A; single seed
+
+--- gates ---
+P-F0 donor constants: 13 checked, 0 mismatched, pass=True
+P-F1 the fork on the DONOR square vs acappella b1: 14 checks, max|Δ| = 0.000e+00  gains_match=True  pass=True
+       aud_chain@0            0.000e+00
+       aud_chain@8            0.000e+00
+       build_chain            0.000e+00
+       build_seg              0.000e+00
+       key_chain@0            0.000e+00
+       key_chain@8            0.000e+00
+       key_seg@0              0.000e+00
+       key_seg@8              0.000e+00
+       lib_all@0              0.000e+00
+       lib_all@8              0.000e+00
+       lib_seg@0              0.000e+00
+       lib_seg@8              0.000e+00
+       reflex@0               0.000e+00
+       reflex@8               0.000e+00
+P-N  nesting: 168 level-(l>1) members spelled by their two parents (0 bad); weld == halves in sequence max|Δ| = 1.179e-07  pass=True
+P-A  the approach removed acappella finding 5's artifact: the deepest committed arm (key_L4) spreads 0.1904 (2.56×) over the Δ ladder  pass=True
+       key_L1: 1.29×  [0.1657, 0.1625, 0.1673, 0.1910, 0.1870, 0.1718, 0.1749, 0.2103, 0.1749]
+       key_L2: 2.16×  [0.1722, 0.1510, 0.1463, 0.2140, 0.2116, 0.1742, 0.1476, 0.1655, 0.3168]
+       key_L3: 2.30×  [0.1574, 0.2478, 0.2343, 0.1829, 0.1979, 0.1454, 0.1970, 0.1862, 0.3349]
+       key_L4: 2.56×  [0.1358, 0.2210, 0.2112, 0.1639, 0.1797, 0.1219, 0.1741, 0.1719, 0.3123]
+       aud_L1: 1.89×  [0.1296, 0.1541, 0.1913, 0.2242, 0.2450, 0.2300, 0.2038, 0.2091, 0.2265]
+       aud_L2: 1.57×  [0.1484, 0.1594, 0.1876, 0.2154, 0.2330, 0.2290, 0.1995, 0.2059, 0.1930]
+       aud_L3: 2.41×  [0.1566, 0.2044, 0.1950, 0.1662, 0.1782, 0.1241, 0.1654, 0.1696, 0.2989]
+       aud_L4: 2.52×  [0.1358, 0.2210, 0.2112, 0.1639, 0.1797, 0.1238, 0.1741, 0.1719, 0.3123]
+
+--- P-T: the tempo calibration (R × Δ on the reflex alone; rule fixed before the grid was read) ---
+     R     leg   v m/s    band      e@0      e@8     e@16   range  comp   dem
+ 0.080  0.0611    0.51  0.0305   0.0060   0.0448   0.0901   15.0×  True  True
+ 0.110  0.0840    0.70  0.0420   0.0125   0.0608   0.1225    9.8×  True  True
+ 0.140  0.1069    0.89  0.0534   0.0265   0.0796   0.1353    5.1×  True  True
+ 0.200  0.1527    1.27  0.0764   0.0675   0.1096   0.1815    2.7×  True  True
+ 0.280  0.2138    1.78  0.1069   0.1642   0.1936   0.2528    1.5× False  True
+rule: both guards; R* = the largest (fastest) R the incumbent can still play in-band  ->  R* = 0.200
+
+--- the piece: fast_R0.200_c5_H5 ---
+8 drilled segments × 5 steps (120 ms) + 3 approach segments; mean leg 0.1527 m; mean tip speed 1.27 m/s; 4 rungs
+legs   [0.1259, 0.1754, 0.1423, 0.1834, 0.1312, 0.1705, 0.1517, 0.1413]
+turns  [49.17, 29.85, 63.08, 35.23, 62.21, 22.7, 65.29, 32.47] deg
+band   0.0764 = max(½·leg 0.0764, ref_play scaled 0.0203)
+
+--- the reflex law, re-fit at every Δ on the CLEAN world (every advantage to the incumbent) ---
+  Δ    ms      kp     kd   clean e      edges
+  0     0    40.0   0.25    0.0726         kd
+  1    24     5.0   2.00    0.0808           
+  2    48     5.0   2.00    0.0769           
+  3    72    20.0   4.00    0.0514           
+  4    96     5.0   2.00    0.0368           
+  6   144    10.0   4.00    0.0730           
+  8   192     1.0   1.00    0.1098           
+ 12   288     0.5   1.00    0.1579    kp     
+ 16   384     0.5   0.50    0.2078    kp     
+
+--- the ladder, built statically (harvest gains frozen at the Δ=0 fit [40.0, 0.25]) ---
+slots per level: {'L1': 56, 'L2': 28, 'L3': 14, 'L4': 7}   30336 groundings/perf, 13724 s priced
+ lvl  seam   chosen   median    worst  pairs  distinct a/b
+   1     0   0.0427   0.0573   0.0675                     
+   1     1   0.0626   0.1180   0.1525                     
+   1     2   0.0870   0.0926   0.1415                     
+   1     3   0.1397   0.1552   0.1705                     
+   1     4   0.1575   0.1629   0.2265                     
+   1     5   0.1917   0.1973   0.2105                     
+   1     6   0.2629   0.2859   0.3625                     
+   1     7   0.3072   0.3130   0.4042                     
+   2     0   0.0488   0.0766   0.0941     36           3/5
+   2     2   0.1958   0.2053   0.2142     36           3/5
+   2     4   0.2147   0.2209   0.2290     36           3/2
+   2     6   0.1750   0.1887   0.2036     36           1/6
+   3     0   0.0471   0.0863   0.1662     36           1/6
+   3     4   0.2527   0.2661   0.2798     36           2/5
+   4     0   0.1331   0.1633   0.2213     36           1/6
+
+--- DECISION 17 · the HAND-OVER into drilled seam 0 (shared by every arm at a given cell) ---
+  app   Δ   |x−V0|     |v|   |v−v*|  read Δx  read Δv   read@    e_app
+  arm   0   0.0519   1.672    0.947   0.0000    0.000      15   0.0786
+  arm   1   0.0840   1.305    0.987   0.0313    0.004      14   0.0915
+  arm   2   0.0692   1.337    1.081   0.0654    0.131      13   0.0835
+  arm   3   0.0465   1.678    0.890   0.1158    0.372      12   0.0765
+  arm   4   0.0454   1.541    0.673   0.1479    0.570      11   0.0766
+  arm   6   0.1086   1.679    0.885   0.2489    1.327       9   0.1042
+  arm   8   0.0607   1.540    1.191   0.3047    0.259       7   0.0816
+  arm  12   0.0613   1.886    1.534   0.4168    1.201       3   0.0843
+  arm  16   0.1822   1.324    1.036   0.2831    1.328       0   0.1584   CLAMPED AT RESET
+ zero   0   0.0519   1.672    0.947   0.0000    0.000      15   0.0786
+ zero   1   0.0984   1.274    0.976   0.0306    0.003      14   0.0991
+ zero   2   0.0984   1.274    0.976   0.0612    0.006      13   0.0991
+ zero   3   0.0516   1.513    1.099   0.1109    0.063      12   0.0760
+ zero   4   0.0984   1.274    0.976   0.1223    0.011      11   0.0991
+ zero   6   0.0750   1.367    1.024   0.1990    0.029       9   0.0876
+ zero   8   0.1859   0.975    0.847   0.1802    0.101       7   0.1483
+ zero  12   0.1985   0.914    0.827   0.2422    0.312       3   0.1549
+ zero  16   0.2730   0.743    0.798   0.1925    0.745       0   0.2047   CLAMPED AT RESET
+(the read at drilled seam 0 is clamped at the traversal start whenever k0·H < Δ; here k0·H = 15)
+
+--- DECISION 19 · the closed-loop reflex against its OWN open-loop replay (pre-fixed reading: ratio ≤ 1.10 ⇒ the incumbent is a tape at that Δ) ---
+[arm] Δ0=11.74  Δ1=5.53  Δ2=5.03  Δ3=10.23  Δ4=6.76  Δ6=6.56  Δ8=3.33  Δ12=2.22  Δ16=1.79
+      cl: 0.0771  0.0799  0.0852  0.0563  0.0748  0.0989  0.1055  0.1331  0.1794
+      ol: 0.9050  0.4418  0.4283  0.5762  0.5056  0.6486  0.3516  0.2948  0.3206
+[zero] Δ0=11.74  Δ1=5.75  Δ2=5.82  Δ3=8.05  Δ4=5.97  Δ6=3.51  Δ8=2.48  Δ12=1.21  Δ16=1.12
+      cl: 0.0771  0.0774  0.0765  0.0698  0.0753  0.1270  0.1309  0.2436  0.2305
+      ol: 0.9050  0.4448  0.4455  0.5616  0.4499  0.4462  0.3248  0.2950  0.2578
+
+--- THE Δ SWEEP: piece error per level (drilled segments only), band 0.0764; * = inside the band ---
+
+[app=arm · key]  frozen posture key, 0 groundings
+  Δ    ms    reflex   refl_ol        L1        L2        L3        L4       all  best      m12      m23      m34
+  0     0   0.0771    0.9050    0.1657    0.1722    0.1574    0.1358    0.1828      4  -0.0065  +0.0148  +0.0216
+  1    24   0.0799    0.4418    0.1625    0.1510    0.2478    0.2210    0.1879      2  +0.0116  -0.0968  +0.0268
+  2    48   0.0852    0.4283    0.1673    0.1463    0.2343    0.2112    0.1712      2  +0.0210  -0.0879  +0.0231
+  3    72   0.0563*   0.5762    0.1910    0.2140    0.1829    0.1639    0.1998      4  -0.0230  +0.0311  +0.0189
+  4    96   0.0748*   0.5056    0.1870    0.2116    0.1979    0.1797    0.1846      4  -0.0246  +0.0137  +0.0182
+  6   144   0.0989    0.6486    0.1718    0.1742    0.1454    0.1219    0.1705      4  -0.0024  +0.0289  +0.0234
+  8   192   0.1055    0.3516    0.1749    0.1476    0.1970    0.1741    0.1735      2  +0.0273  -0.0493  +0.0229
+ 12   288   0.1331    0.2948    0.2103    0.1655    0.1862    0.1719    0.2103      2  +0.0447  -0.0207  +0.0143
+ 16   384   0.1794    0.3206    0.1749    0.3168    0.3349    0.3123    0.1829      1  -0.1418  -0.0181  +0.0226
+
+[app=arm · aud]  plant audition of every member
+  Δ    ms    reflex   refl_ol        L1        L2        L3        L4       all  best      m12      m23      m34
+  0     0   0.0771    0.9050    0.1296    0.1484    0.1566    0.1358    0.1342      1  -0.0188  -0.0082  +0.0208
+  1    24   0.0799    0.4418    0.1541    0.1594    0.2044    0.2210    0.1572      1  -0.0053  -0.0449  -0.0167
+  2    48   0.0852    0.4283    0.1913    0.1876    0.1950    0.2112    0.1785      2  +0.0037  -0.0074  -0.0162
+  3    72   0.0563*   0.5762    0.2242    0.2154    0.1662    0.1639    0.2192      4  +0.0088  +0.0492  +0.0023
+  4    96   0.0748*   0.5056    0.2450    0.2330    0.1782    0.1797    0.2379      3  +0.0120  +0.0548  -0.0015
+  6   144   0.0989    0.6486    0.2300    0.2290    0.1241    0.1238    0.2276      4  +0.0011  +0.1048  +0.0003
+  8   192   0.1055    0.3516    0.2038    0.1995    0.1654    0.1741    0.1973      3  +0.0043  +0.0341  -0.0087
+ 12   288   0.1331    0.2948    0.2091    0.2059    0.1696    0.1719    0.2046      3  +0.0032  +0.0363  -0.0023
+ 16   384   0.1794    0.3206    0.2265    0.1930    0.2989    0.3123    0.2048      2  +0.0335  -0.1059  -0.0134
+era ladder [app=arm] (smallest Δ at which level l fails the band and l+1 does not): {"key_era_2": null, "key_era_3": null, "key_era_4": null, "key_era_1": null, "aud_era_2": null, "aud_era_3": null, "aud_era_4": null, "aud_era_1": null}
+
+[app=zero · key]  frozen posture key, 0 groundings
+  Δ    ms    reflex   refl_ol        L1        L2        L3        L4       all  best      m12      m23      m34
+  0     0   0.0771    0.9050    0.1657    0.1722    0.1574    0.1358    0.1828      4  -0.0065  +0.0148  +0.0216
+  1    24   0.0774    0.4448    0.1542    0.1532    0.2652    0.2390    0.1539      2  +0.0009  -0.1120  +0.0262
+  2    48   0.0765    0.4455    0.1653    0.1533    0.2625    0.2390    0.1640      2  +0.0120  -0.1092  +0.0235
+  3    72   0.0698*   0.5616    0.2021    0.1577    0.1752    0.1396    0.2020      4  +0.0444  -0.0174  +0.0355
+  4    96   0.0753*   0.4499    0.2022    0.1535    0.2617    0.2390    0.2022      2  +0.0487  -0.1081  +0.0226
+  6   144   0.1270    0.4462    0.1719    0.1509    0.2251    0.2012    0.1720      2  +0.0210  -0.0742  +0.0239
+  8   192   0.1309    0.3248    0.2037    0.3572    0.3941    0.3715    0.2035      1  -0.1534  -0.0370  +0.0226
+ 12   288   0.2436    0.2950    0.2337    0.3996    0.4169    0.3943    0.2333      1  -0.1660  -0.0172  +0.0226
+ 16   384   0.2305    0.2578    0.3454    0.5025    0.5193    0.4967    0.3496      1  -0.1572  -0.0168  +0.0226
+
+[app=zero · aud]  plant audition of every member
+  Δ    ms    reflex   refl_ol        L1        L2        L3        L4       all  best      m12      m23      m34
+  0     0   0.0771    0.9050    0.1296    0.1484    0.1566    0.1358    0.1342      1  -0.0188  -0.0082  +0.0208
+  1    24   0.0774    0.4448    0.1405    0.1428    0.2217    0.2390    0.1514      1  -0.0023  -0.0789  -0.0173
+  2    48   0.0765    0.4455    0.1770    0.1885    0.2217    0.2390    0.1857      1  -0.0115  -0.0332  -0.0173
+  3    72   0.0698*   0.5616    0.2030    0.2028    0.1241    0.1396    0.1814      3  +0.0002  +0.0787  -0.0155
+  4    96   0.0753*   0.4499    0.2020    0.2009    0.2217    0.2390    0.1828      2  +0.0011  -0.0208  -0.0173
+  6   144   0.1270    0.4462    0.1965    0.2000    0.1843    0.2012    0.1974      3  -0.0034  +0.0157  -0.0169
+  8   192   0.1309    0.3248    0.2405    0.2385    0.3539    0.3715    0.2349      2  +0.0021  -0.1154  -0.0176
+ 12   288   0.2436    0.2950    0.2493    0.2436    0.3769    0.3943    0.2365      2  +0.0057  -0.1333  -0.0174
+ 16   384   0.2305    0.2578    0.3704    0.3452    0.4798    0.4967    0.3433      2  +0.0252  -0.1345  -0.0170
+era ladder [app=zero] (smallest Δ at which level l fails the band and l+1 does not): {"key_era_2": null, "key_era_3": null, "key_era_4": null, "key_era_1": null, "aud_era_2": null, "aud_era_3": null, "aud_era_4": null, "aud_era_1": null}
+
+--- feedback consumption per traversal, DRILLED ONLY (the approach's 15 fb/perf is shared and subtracted) ---
+  Δ       reflex       key_L1       key_L2       key_L3       key_L4
+  0         40.0          8.0          4.0          2.0          1.0
+  1         40.0          8.0          4.0          2.0          1.0
+  2         40.0          8.0          4.0          2.0          1.0
+  3         40.0          8.0          4.0          2.0          1.0
+  4         40.0          8.0          4.0          2.0          1.0
+  6         40.0          8.0          4.0          2.0          1.0
+  8         40.0          8.0          4.0          2.0          1.0
+ 12         40.0          8.0          4.0          2.0          1.0
+ 16         40.0          8.0          4.0          2.0          1.0
+
+--- pass fractions at the THREE band widths (per-performer mean drilled waypoint error; ½·leg = 0.0764 is the pre-fixed band, ⅓·leg = 0.0509, ¼·leg = 0.0382) ---
+[app=arm · key]    Δ | ½:    L1    L2    L3    L4 | ⅓:    L1    L2    L3    L4 | ¼:    L1    L2    L3    L4
+        0 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        1 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        2 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        3 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        4 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        6 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        8 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+       12 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+       16 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+[app=arm · aud]    Δ | ½:    L1    L2    L3    L4 | ⅓:    L1    L2    L3    L4 | ¼:    L1    L2    L3    L4
+        0 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        1 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        2 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        3 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        4 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        6 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        8 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+       12 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+       16 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+[app=zero · key]    Δ | ½:    L1    L2    L3    L4 | ⅓:    L1    L2    L3    L4 | ¼:    L1    L2    L3    L4
+        0 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        1 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        2 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        3 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        4 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        6 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        8 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+       12 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+       16 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+[app=zero · aud]    Δ | ½:    L1    L2    L3    L4 | ⅓:    L1    L2    L3    L4 | ¼:    L1    L2    L3    L4
+        0 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        1 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        2 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        3 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        4 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        6 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+        8 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+       12 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+       16 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00 |     0.00  0.00  0.00  0.00
+
+--- the do-nothing floor (presto's arm-neutral reference): arms ABOVE it are diverged, not degraded ---
+do-nothing floor at R = 0.2: 0.4579 (3.0 mean legs)
+      app= arm Δ= 0  above the floor: reflex_ol
+      app= arm Δ= 1  above the floor: —
+      app= arm Δ= 2  above the floor: —
+      app= arm Δ= 3  above the floor: reflex_ol
+      app= arm Δ= 4  above the floor: reflex_ol
+      app= arm Δ= 6  above the floor: reflex_ol
+      app= arm Δ= 8  above the floor: —
+      app= arm Δ=12  above the floor: —
+      app= arm Δ=16  above the floor: —
+      app=zero Δ= 0  above the floor: reflex_ol
+      app=zero Δ= 1  above the floor: —
+      app=zero Δ= 2  above the floor: —
+      app=zero Δ= 3  above the floor: reflex_ol
+      app=zero Δ= 4  above the floor: —
+      app=zero Δ= 6  above the floor: —
+      app=zero Δ= 8  above the floor: —
+      app=zero Δ=12  above the floor: —
+      app=zero Δ=16  above the floor: key_L2, key_L3, key_L4, aud_L3, aud_L4
+
+--- aud_all: which depth does a free selector choose, per Δ (acappella finding 6's instrument) ---
+  Δ  mean level   e_piece   f(L1)   f(L2)   f(L3)   f(L4)
+[app=arm]
+  0        1.06    0.1342   0.957   0.017   0.026   0.000
+  1        1.19    0.1572   0.763   0.237   0.000   0.000
+  2        1.36    0.1785   0.682   0.250   0.068   0.000
+  3        1.57    0.2192   0.545   0.212   0.242   0.000
+  4        1.56    0.2379   0.567   0.194   0.239   0.000
+  6        1.52    0.2276   0.638   0.135   0.227   0.000
+  8        2.33    0.1973   0.000   0.667   0.333   0.000
+ 12        1.98    0.2046   0.041   0.633   0.327   0.000
+ 16        1.33    0.2048   0.667   0.333   0.000   0.000
+[app=zero]
+  0        1.06    0.1342   0.957   0.017   0.026   0.000
+  1        1.21    0.1514   0.726   0.274   0.000   0.000
+  2        1.33    0.1857   0.667   0.333   0.000   0.000
+  3        1.58    0.1814   0.534   0.221   0.244   0.000
+  4        1.80    0.1828   0.426   0.311   0.262   0.000
+  6        2.33    0.1974   0.000   0.667   0.333   0.000
+  8        1.95    0.2349   0.077   0.654   0.269   0.000
+ 12        2.33    0.2365   0.000   0.667   0.333   0.000
+ 16        1.41    0.3433   0.562   0.438   0.000   0.000
+
+--- P-S: seam information under the delayed read (per-state oracle over each cell) ---
+  app   Δ  lvl  mean gain         range  argmins  mean oracle
+  arm   0    1     1.009×     1.00-1.06   2.5/6        0.1573
+  arm   0    2     1.013×     1.00-1.05   2.5/6        0.1519
+  arm   0    3     1.027×     1.00-1.05   3.5/6        0.1340
+  arm   0    4     1.000×     1.00-1.00   3.0/6        0.1369
+  arm   4    1     1.006×     1.00-1.04   1.2/6        0.1771
+  arm   4    2     1.065×     1.00-1.26   2.2/6        0.1702
+  arm   4    3     1.027×     1.00-1.05   1.5/6        0.1393
+  arm   4    4     1.000×     1.00-1.00   2.0/6        0.1805
+  arm   8    1     1.004×     1.00-1.02   2.9/6        0.1663
+  arm   8    2     1.003×     1.00-1.01   3.0/6        0.1609
+  arm   8    3     1.021×     1.00-1.04   3.0/6        0.1366
+  arm   8    4     1.003×     1.00-1.00   3.0/6        0.1738
+ zero   0    1     1.009×     1.00-1.06   2.5/6        0.1573
+ zero   0    2     1.013×     1.00-1.05   2.5/6        0.1519
+ zero   0    3     1.027×     1.00-1.05   3.5/6        0.1340
+ zero   0    4     1.000×     1.00-1.00   3.0/6        0.1369
+ zero   4    1     1.001×     1.00-1.00   1.8/6        0.1923
+ zero   4    2     1.002×     1.00-1.01   1.8/6        0.1867
+ zero   4    3     1.000×     1.00-1.00   1.0/6        0.1929
+ zero   4    4     1.000×     1.00-1.00   1.0/6        0.2375
+ zero   8    1     1.000×     1.00-1.00   1.2/6        0.1958
+ zero   8    2     1.001×     1.00-1.00   1.8/6        0.1928
+ zero   8    3     1.000×     1.00-1.00   1.5/6        0.2446
+ zero   8    4     1.000×     1.00-1.00   1.0/6        0.3692
+
+--- e_app: what the shared approach itself cost, per Δ ---
+  [arm] Δ0=0.0786  Δ1=0.0915  Δ2=0.0835  Δ3=0.0765  Δ4=0.0766  Δ6=0.1042  Δ8=0.0816  Δ12=0.0843  Δ16=0.1584
+  [zero] Δ0=0.0786  Δ1=0.0991  Δ2=0.0991  Δ3=0.0760  Δ4=0.0991  Δ6=0.0876  Δ8=0.1483  Δ12=0.1549  Δ16=0.2047
+
+piece: seg/τ = 0.60 (damping 5.0, terminal speed 2.00 m/s); étude's square is 1.63
+
+--- flags, unsmoothed ---
+  [gain_grid_edges] {'0': {'kp': False, 'kd': True}, '1': {'kp': False, 'kd': False}, '2': {'kp': False, 'kd': False}, '3': {'kp': False, 'kd': False}, '4': {'kp': False, 'kd': False}, '6': {'kp': False, 'kd': False}, '8': {'kp': False, 'kd': False}, '12': {'kp': True, 'kd': False}, '16': {'kp': True, 'kd': False}}
+  [library_built_once] Built at Delta = 0 with the harvest gains frozen at the Delta = 0 fit, then swept across Delta (acappella's discipline). The launch distribution at the first drilled seam DOES move with Delta, because the shared approach is played closed-loop by the reflex at the per-Delta re-fit gains; every arm inherits the same shift, and `e_app` is reported at every cell so the cost of the lead-in is on the record.
+  [approach] The approach uses the SAME per-Delta re-fit gains as the reflex arm — every advantage to the incumbent, applied to the shared lead-in, so it is arm-neutral. `e_app` per Delta says what the lead-in itself cost.
+  [cross_level_scoring] A decision across levels compares the MEAN over the span's waypoints (offbook's cross-level convention, carried from acappella so `aud_all` stays comparable). acappella finding 6 says this selector is the most delay-fragile thing in the system; `aud_all`'s `mean_level` per Delta is that instrument here.
+  [no_mining] Phase A builds every rung STATICALLY, by construction audition. Nothing is mined from the learner's own routed successes and there is no at_support here: that is Phase B.
+  [approach_instrument] DECISION 17. `app=zero` plays the shared approach at Delta = 0 while the drilled figure keeps the arm's Delta. The lead-in is already excluded from the comparison (presto decision 3 had it as a shared PRE-COMPUTED plan precisely so it was not a variable); under `app=arm` every committed arm launches the figure from a hand-over the delayed incumbent has already lost, which is acappella finding 5 traded for its mirror. Both columns are reported at every cell; `app=arm` is the arm of record. The read at drilled seam 0 is a SEPARATE matter and is clamped at the traversal start whenever k0*H < Delta (here 15 < 16), which the hand-over log reports as `clamped` per cell.
+  [damping_sweep] DECISION 18. `damping` is a plant knob. Any tag run at a damping other than the donor's 2.0 LEAVES THE DONOR PLANT: no cross-tag control against acappella, solo or etude applies to its treatment numbers, and none is claimed. P-F1 is unaffected — it builds the DONOR piece, which carries damping 2.0 whatever the treatment cell is — and must still pass at 0.000e+00 in every tag. The quantity the sweep is about is seg/tau = H*dt_ctrl/(m/c): 0.24 at (c=2,H=5), 0.48 at (2,10), 0.60 at (5,5), 1.20 at (10,5), against etude's 1.63. Terminal speed is gear/c, so a higher damping caps the tempo and the R rule re-selects.
+  [open_loop_reflex] DECISION 19. `reflex_ol` is an INSTRUMENT, not an arm: the re-fit reflex law evaluated ONCE at the drilled launch and played open-loop to the end. PRE-FIXED READING, stated before the grid: the closed-loop incumbent is called A TAPE at a Delta when the ratio ol/cl <= 1.10, i.e. the 40 feedback events it is charged for buy less than 10%. The continuous ratio is reported at every cell. The kp grid also gains two rungs below a0's floor (0.5, 1.0) so the re-fit's floor is measured rather than clipped; every cell reports the argmin restricted to kp >= 2.0 (a0's own grid) beside it.
+
+timings: P-F1 93s · P-T 84s · reflex cal 95s · library 33s · sweep 173s · total 504s
