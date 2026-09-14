@@ -34,7 +34,7 @@ whether the external macro store maps onto the hippocampus; the correction that 
 ought to be"; and the call to spec the tie-in. The readings that the flat key *is* the undrained
 buffer, that the merge is worse within-level and pays only one rung up, and that this makes it the
 purest test of the type law, came out of the exchange. Conversation record:
-`conversation_2026-09-09.md`[^private].
+`CONVERSATION.md`[^private].
 
 ## Why this node exists, in one paragraph
 

@@ -22,6 +22,6 @@ bit-for-bit against the previous node's run of record.
 
 | file | what |
 |---|---|
-| `conversation_2026-09-05.md`[^private] | The orchestrating conversation: Jasper's prompts verbatim, responses in summary — the mapping, the delay-vs-tempo question, the factoring hypothesis, the smoke-first rule. |
+| `CONVERSATION.md`[^private] | The orchestrating conversation: Jasper's prompts verbatim, responses in summary — the mapping, the delay-vs-tempo question, the factoring hypothesis, the smoke-first rule. |
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

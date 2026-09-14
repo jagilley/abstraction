@@ -7,7 +7,7 @@ every decision, gate, smoke, run record and retraction; no child README by polic
 [`accelerando/`](accelerando/FILES.md) (a fast body, tempo as the era knob, the force-level program,
 the crank) · [`rubato/`](rubato/FILES.md) (the kinematic program through a body model: ceiling,
 learned cerebellum, online correction). **Files**: [`FILES.md`](FILES.md).
-**Conversation**: `conversation_2026-09-05.md`[^private] — Jasper's prompts
+**Conversation**: `CONVERSATION.md`[^private] — Jasper's prompts
 verbatim; the design turns were his.
 **Roadmap**: `ROADMAP.md`[^private] §4.5 Track M, §2.2 (the two forward models),
 §7.1.3 (the FM's surviving seats). Progress entries dated 2026-09-05 → 06 in

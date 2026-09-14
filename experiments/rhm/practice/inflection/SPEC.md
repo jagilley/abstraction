@@ -39,11 +39,11 @@ dictionary on RHM explains part of the E′/F2 nulls; the instruction to verify 
 latest node rather than on the shared generator. A second agent, relayed by Jasper: the rendering
 rule gives the reader a job as well as the executor, since undoing morphology is parsing — the
 thin cortex of the anatomy discussion
-(`../enharmonic/temperament/conversation_2026-09-09.md`[^private])
+(`../enharmonic/temperament/CONVERSATION.md`[^private])
 and `reread/lm`'s climbing reader. Out of the exchange: the scope condition and its verification;
 the reading of `tempo` as inverse-direction transfer with the forward direction's contribution
 unisolated; register vs agreement; the graded grader; one morphology, two organs. Two Opus explore
-agents grounded the first response. Record: `conversation_2026-09-09.md`[^private].
+agents grounded the first response. Record: `CONVERSATION.md`[^private].
 
 ## Why this node exists
 

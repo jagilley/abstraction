@@ -12,7 +12,7 @@ inverse-by-search over a free forward model, and the biological framing (the inv
 on the animal's own attempts: feedback-error learning, DIVA's babbling, subsong) came out of the
 2026-09-10 discussion with Jasper after reading PRs #101 and #102; the decision to run the leaf
 lane first, the arm table and the name are the orchestrator's; the §8 argument this spec argues
-with is the inflection builder's. Record: `conversation_2026-09-10.md` beside this file (written
+with is the inflection builder's. Record: `CONVERSATION.md` beside this file (written
 at close-out).
 
 ---

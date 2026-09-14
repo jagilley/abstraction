@@ -4,7 +4,7 @@
 orchestrator's prompt verbatim, with its dated corrections and the Q2 revisions appended) ·
 **Machinery record**: [`FILES.md`](FILES.md) (every gate, run, flag and diagnostic, with the
 complete run table) · decisions in [`DESIGN.md`](DESIGN.md) §1–§12 · **Conversation**:
-`conversation_2026-09-10_to_12.md`[^private].
+`CONVERSATION.md`[^private].
 **Machinery donors** (untouched, forked): [`../inflection/`](../inflection/README.md)
 (`embouchure.py` forks `inflection.py`; every addition `# [embouchure]`-marked, every knob default
 off, the G-F replay against the donor at 0.000e+00 twelve times across the round) ·

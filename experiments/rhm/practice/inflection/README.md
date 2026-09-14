@@ -3,8 +3,7 @@
 **Up**: [`../README.md`](../README.md) (practice arc) · **Spec**: [`SPEC.md`](SPEC.md) ·
 **Machinery record**: [`FILES.md`](FILES.md) (every gate, run, flag and diagnostic; decisions in
 [`DESIGN.md`](DESIGN.md)) · **Offline sizing**: [`sizing/SIZING.md`](sizing/SIZING.md) ·
-**Conversations**: `conversation_2026-09-09.md`[^private] (the spec) ·
-`conversation_2026-09-10.md`[^private] (this round).
+**Conversations**: `CONVERSATION.md`[^private] (the spec, then this round).
 **Machinery donors** (all untouched, forked or imported): [`../tutti/`](../tutti/README.md)
 (`inflection.py` forks `tutti.py`; every addition `# [inflection]`-marked, every knob default off,
 G-F replay 0.000e+00) · [`../../rhm_sculpt_precheck.py`](../../rhm_sculpt_precheck.py) (the coin

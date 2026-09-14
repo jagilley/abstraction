@@ -4,10 +4,10 @@ Machinery record for the node, in [`../tutti/FILES.md`](../tutti/FILES.md)'s reg
 **No results are interpreted here** — facts, gate numbers and the touch-point map only. There
 is deliberately no `README.md` yet (repo norm: results are discussed before a writeup).
 
-**Conversations**: `conversation_2026-09-09.md`[^private] (the spec) · `conversation_2026-09-10.md`[^private] (Q0 → Q2, this record).
+**Conversations**: `CONVERSATION.md`[^private] (the spec, then Q0 → Q2, this record).
 **Up**: parent arc [`../README.md`](../README.md) · [`SPEC.md`](SPEC.md) (the question, the
 arms, the sequence, the five open decisions) · [`DESIGN.md`](DESIGN.md) (the decisions as
-taken, and the ones left open) · `conversation_2026-09-09.md`[^private]
+taken, and the ones left open) · `CONVERSATION.md`[^private]
 (how the idea was arrived at)
 **Direct donor** (untouched): [`../tutti/`](../tutti/FILES.md) — `tutti.py` is forked here;
 `tutti.py` is the in-process G-F reference.
