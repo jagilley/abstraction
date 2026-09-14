@@ -2,7 +2,8 @@
 
 **Up**: [`../README.md`](../README.md) (practice) · [`../../README.md`](../../README.md) (mjc)
 **Children** (each carries a `SPEC.md` — the orchestrator's prompt verbatim — and a `FILES.md` with
-every decision, gate, smoke, run record and retraction; no child README by policy):
+every decision, gate, smoke, run record and retraction; no child writeup by policy, and each child's
+`README.md` only points back here):
 [`prestissimo/`](prestissimo/FILES.md) (the four-rung ladder on a fast piece under delay) ·
 [`accelerando/`](accelerando/FILES.md) (a fast body, tempo as the era knob, the force-level program,
 the crank) · [`rubato/`](rubato/FILES.md) (the kinematic program through a body model: ceiling,
