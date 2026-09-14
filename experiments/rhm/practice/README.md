@@ -586,6 +586,31 @@ class-coverage re-arm hook off the commit latch then yields **the first endogeno
 (c186) — a thin book, eight class keys at the spelling cap, the first to audition worse than the
 oracle, with no consumption-era value visible in fifteen cycles. ≈49 GPU-h.
 
+### [`voicing/`](voicing/README.md) — the chooser at the class: a judge on the learner's own attempts, composed with the free forward model (2026-09-12→14)
+
+**Goal**: make the executor's realisation step — which spelling to write for a chosen chunk, the
+free max-sum over the book that `enharmonic` finding 5 and `embouchure` both ended on — an organ
+trained on the learner's own graded attempts, filed by the record of what it meant, and ask
+whether that turns arrival at L5 into value.
+
+**Finding**: **a judge trained by the grader's verdict on filed writes pays as a correction to
+the free forward model, not as a replacement.** A value head reading context and candidate
+content, combined with the surface model's prior at the choice, overrides it on a minority of
+calls and raises class accuracy against the repair set by ≈19% relative at the levels every seed
+reaches (≈31% when also fed priced counterfactual probes), lowering consumption-era error with an
+era-3 gap that reproduces to the third decimal across seeds; replacing the prior with the judge
+chooses worse. Two structural facts carried the round: the choice organ and the value organ must
+be separate objects (a calibration loss on the emission head empties it and closes the corridor),
+and babbling must live off-stream — any variation in the writes the next level is mined from
+costs that level's commit window, while priced substitutions into solved sentences that never
+enter the book buy counterfactual discrimination of 0.80, from chance, for half a percent of
+priced time. What the node cannot claim is a frontier effect: the composed chooser's L4/L5
+advantage was large on the one seed whose ladder reached L5 and absent on the only other seed
+that reached L4 — and the anchor (`en_s9`'s composed arm) reaches L5 at **one seed in four**,
+with the top-rung windows of 12 and 9 cycles deciding it, which makes the pacer's windows the
+lineage's critical path. Every fork bit-identical to its donor with the knobs off, every yoked
+replay exact at every seed, every gate shown to fail before being reported. ≈38 GPU-h.
+
 ## Reproduce
 
 ```bash
