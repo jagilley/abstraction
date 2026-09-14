@@ -48,12 +48,13 @@ this is the complete listing.
 | Folder | Summary |
 |---|---|
 | [`component_control/`](component_control/README.md) | **Test 1b — is the advantage about the residual, or about having the state?** Varies which function of `a_j` is reported (`PRED` = `FM(a_i)`, `AJ` = the whole state) against `IMPL` = the residual, with identical machinery. The best I/O observer reaches ~0.87 / ~0.84 of the achievable headroom on `PRED` / `AJ` and only 0.19–0.26 on `IMPL`, so the forward-model decomposition is load-bearing for Finding 1 and not only for the steering test. Also: a tokens-only observer nearly solves `PRED` at 1L/64D while staying near the floor on `IMPL` at every capacity. Weaker on the continuous targets, where the separation from `AJ` depends on the headroom normalization. Language only, two of the four instrument capacities |
+| [`../fsm_part3/`](../fsm_part3/README.md) | **Part 3 (2026-09-13/14): does the privilege extend past the current residual?** Three nodes that fork this battery: authorship (public, more legible from outside than inside), and dispositional targets on language and grammar (the residual's past is private where the computation is deep and behaviorally silent; behavior is public in every cut). Lives in its own folder because it spans both substrates; see its README and [`../fsm_part3/FILES.md`](../fsm_part3/FILES.md). |
 
 ## Related, outside this folder
 
 | Path | Relation |
 |---|---|
 | [ideas/confabulation_test.md](../../../ideas/confabulation_test.md) | The design doc this implements |
-| [experiments/rhm/rhm_confabulation.py](../../rhm/rhm_confabulation.py) | Sibling instantiation on RHM; source of the instrument-capacity sweep and the `ens_cos` gate |
+| [experiments/rhm/rhm_confabulation.py](../../rhm/confabulation/rhm_confabulation.py) | Sibling instantiation on RHM; source of the instrument-capacity sweep and the `ens_cos` gate |
 | [../stages.py](../stages.py) | `a2a_loop_train` — the wake recipe this forks |
 | [../README.md](../README.md) | Parent experiment; Run 6 (controlled retrain) and OOD_ROBUSTNESS (self-knowledge is computational, not epistemic) are the load-bearing priors |

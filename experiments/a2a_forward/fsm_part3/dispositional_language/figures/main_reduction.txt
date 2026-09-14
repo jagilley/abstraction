@@ -1,0 +1,205 @@
+================================================================================================
+DISPOSITIONAL SELF-KNOWLEDGE -- reduction  [tag=main]
+================================================================================================
+substrate     : 4L/4H/256D GPT, OL arm, 10000 steps on 10,000,000 FineWeb-Edu tokens
+gap / report  : post_block0 -> post_block2, report from post_block3
+checkpoints   : 16 log-spaced, [300, 379, 479, 605, 764, 965, 1220, 1541, 1947, 2460, 3107, 3926, 4959, 6265, 7915, 10000]
+held-out block: [8, 9, 10]  (steps [1947, 2460, 3107])
+report set    : N=2000 held-out sequences, same at every checkpoint; 80/20 sequence split
+instruments   : ['h16m0.5', 'h4m0.25'], ens_n=3, fresh_fm_steps=3000
+heads/obs     : 3000/3000 steps (matched exposure), observers 1:64,2:128,4:256, hist_lags=4
+wall / peak   : 182 min, 13.1 GB RSS
+
+------------------------------------------------------------------------------------------------
+1. JUNK-RESIDUAL GUARDS, per checkpoint
+   A saturated instrument counterfeits the whole result: M can report noise and no
+   observer can predict noise. ens_cos = do independent fresh FMs miss the SAME
+   thing (high = a real computational gap). eta2_norm = is |r| conditioned on the
+   syntactic type of the position. floor = the per-position instrument no-change
+   level, i.e. 1 - cos between two fresh FMs at the SAME checkpoint.
+------------------------------------------------------------------------------------------------
+  instrument h16m0.5  (11.7% of the predicted blocks, 184K params)
+     ck   step     val   FM cos     |r|  ens_cos   eta2_n  eta2_dir   floor
+      0    300   6.538   0.9973   0.825    0.609   0.0038   0.00082  0.4214
+      1    379   6.419   0.9962   0.953    0.623   0.0071   0.00080  0.4020
+      2    479   6.296   0.9945   1.140    0.636   0.0099   0.00081  0.3974
+      3    605   6.168   0.9923   1.345    0.650   0.0142   0.00089  0.3729
+      4    764   6.023   0.9896   1.544    0.670   0.0166   0.00109  0.3411
+      5    965   5.874   0.9872   1.691    0.704   0.0197   0.00105  0.3088
+      6   1220   5.728   0.9833   1.930    0.721   0.0162   0.00088  0.2886
+      7   1541   5.596   0.9774   2.213    0.744   0.0161   0.00085  0.2635
+      8   1947   5.471   0.9706   2.451    0.764   0.0183   0.00077  0.2436 <-- held out
+      9   2460   5.360   0.9635   2.763    0.778   0.0185   0.00088  0.2275 <-- held out
+     10   3107   5.265   0.9540   3.126    0.783   0.0197   0.00090  0.2205 <-- held out
+     11   3926   5.201   0.9475   3.374    0.811   0.0249   0.00078  0.1929
+     12   4959   5.156   0.9377   3.752    0.819   0.0272   0.00078  0.1847
+     13   6265   5.152   0.9268   4.231    0.834   0.0298   0.00073  0.1688
+     14   7915   5.185   0.9176   4.693    0.846   0.0280   0.00062  0.1573
+     15  10000   5.282   0.9074   5.266    0.861   0.0258   0.00063  0.1414
+
+  instrument h4m0.25  (5.9% of the predicted blocks, 93K params)
+     ck   step     val   FM cos     |r|  ens_cos   eta2_n  eta2_dir   floor
+      0    300   6.538   0.9932   1.325    0.704   0.0037   0.00122  0.3145
+      1    379   6.419   0.9898   1.571    0.709   0.0059   0.00183  0.3121
+      2    479   6.296   0.9856   1.861    0.744   0.0095   0.00171  0.2735
+      3    605   6.168   0.9806   2.164    0.774   0.0123   0.00200  0.2430
+      4    764   6.023   0.9744   2.446    0.805   0.0080   0.00218  0.2083
+      5    965   5.874   0.9697   2.618    0.797   0.0094   0.00201  0.2142
+      6   1220   5.728   0.9632   2.882    0.807   0.0082   0.00168  0.2022
+      7   1541   5.596   0.9544   3.151    0.826   0.0074   0.00172  0.1816
+      8   1947   5.471   0.9458   3.332    0.850   0.0130   0.00145  0.1571 <-- held out
+      9   2460   5.360   0.9360   3.660    0.861   0.0136   0.00134  0.1452 <-- held out
+     10   3107   5.265   0.9242   4.006    0.866   0.0130   0.00134  0.1385 <-- held out
+     11   3926   5.201   0.9146   4.283    0.880   0.0164   0.00137  0.1237
+     12   4959   5.156   0.9030   4.655    0.888   0.0174   0.00132  0.1148
+     13   6265   5.152   0.8918   5.108    0.896   0.0261   0.00112  0.1069
+     14   7915   5.185   0.8807   5.603    0.908   0.0230   0.00113  0.0944
+     15  10000   5.282   0.8703   6.179    0.911   0.0215   0.00112  0.0908
+
+  per-category Cohen's d on |r| at the final checkpoint, default instrument
+  (paper 2 published: sentence_start -0.85, after_punct -0.62, after_opener +0.62,
+   before_closer +0.84):
+    sentence_start=-0.77  after_punct=-0.05  after_opener=+0.58  before_closer=+0.38
+
+------------------------------------------------------------------------------------------------
+2. AUTOCORRELATION GATE  (committee_head Phase B: probe-able != learnable from a
+   given target). r1 = lag-1 Pearson across consecutive checkpoints over positions;
+   rho1 its rank version; btw = fraction of the target's variance that is a
+   per-position constant (high = the head can win by learning a static fact).
+------------------------------------------------------------------------------------------------
+  target                                      r1    rho1  btw/tot  n_ck
+  IMPL_PROSP_k1_h16m0.5                   +0.352  +0.351    0.116    15
+  IMPL_PROSPEXC_k1_h16m0.5                +0.278  +0.273    0.158    15
+  IMPL_PROSPFIX_k1_h16m0.5                +0.374  +0.363    0.056    15
+  IMPL_PROSP_k2_h16m0.5                   +0.388  +0.374    0.102    14
+  IMPL_PROSP_k4_h16m0.5                   +0.454  +0.434    0.136    12
+  IMPL_PROSPSM_h16m0.5                    +0.538  +0.524    0.155    12
+  IMPL_RETRO_w4_h16m0.5                   +0.881  +0.870    0.241    12
+  IMPL_PROSP_k1_h4m0.25                   +0.405  +0.407    0.138    15
+  IMPL_PROSPEXC_k1_h4m0.25                +0.282  +0.279    0.177    15
+  IMPL_PROSPFIX_k1_h4m0.25                +0.427  +0.419    0.086    15
+  IMPL_PROSP_k2_h4m0.25                   +0.448  +0.440    0.124    14
+  IMPL_PROSP_k4_h4m0.25                   +0.537  +0.523    0.157    12
+  IMPL_PROSPSM_h4m0.25                    +0.602  +0.595    0.178    12
+  IMPL_RETRO_w4_h4m0.25                   +0.896  +0.889    0.271    12
+  BEHAV_PROSP_k1                          -0.176  -0.183    0.062    15
+  BEHAV_PROSP_k2                          +0.428  +0.375    0.158    14
+  BEHAV_PROSP_k4                          +0.701  +0.637    0.347    12
+  BEHAV_PROSPSM                           +0.548  +0.480    0.294    12
+  BEHAV_RETRO_w4                          +0.794  +0.769    0.455    12
+
+------------------------------------------------------------------------------------------------
+3. THE HEADLINE: advantage per target per direction
+   All columns are held-out SEQUENCES at the HELD-OUT CHECKPOINT BLOCK (the strict
+   evaluation) unless marked (seq), which is held-out sequences at the training
+   checkpoints. Two advantage statistics are given, because the dispositional
+   setting admits a third-party observer paper 2's occurrent setting did not:
+   O_hist sees M's own output summary at checkpoints c, c-1, ..., c-4.
+   O_act (handed M's early activations) stays a ceiling and is never an advantage
+   comparator.
+------------------------------------------------------------------------------------------------
+   ADVio  = self - best single-snapshot O_io  (paper 2's statistic)
+   ADVpub = self - best THIRD-PARTY observer, i.e. max(O_io, O_hist). O_hist reads
+            only M's outputs, just over several snapshots, so for a dispositional
+            target it is a legitimate comparator; for paper 2's occurrent target it
+            would not have been. This is the conservative statistic here.
+   fracpub= (best third party - chance) / (self - chance): the fraction of the
+            self's above-chance score reachable from outside. 1.0 = fully public.
+            component_control's `frac`, with the self as ceiling (the self is far
+            from saturation on every dispositional target, so raw advantage alone
+            confounds privacy with how well the self can report the target at all).
+   Columns are held-out sequences @ HELD-OUT CHECKPOINTS unless marked (seq).
+------------------------------------------------------------------------------------------------
+  CATEGORICAL (within-checkpoint quartile class, 4-way accuracy)
+  target                           fam     direction  chance    self    O_io  O_hist   O_act |   ADVio  ADVpub  fracpub |  ADVio(seq)
+  IMPL_PROSP_k1_h16m0.5           IMPL   prospective   0.254   0.320   0.291   0.300   0.287 |  +0.029  +0.020    0.702 |      +0.031
+  BEHAV_PROSP_k1                 BEHAV   prospective   0.250   0.304   0.305   0.301   0.293 |  -0.001  -0.001    1.016 |      +0.001
+  IMPL_RETRO_w4_h16m0.5           IMPL retrospective   0.254   0.349   0.318   0.322   0.292 |  +0.030  +0.026    0.719 |      +0.035
+  BEHAV_RETRO_w4                 BEHAV retrospective   0.253   0.354   0.343   0.355   0.325 |  +0.011  -0.001    1.013 |      +0.003
+
+  CONTINUOUS (rank-loss head, Spearman rho within checkpoint; chance = 0)
+  target                           fam     direction  chance    self    O_io  O_hist   O_act |   ADVio  ADVpub  fracpub |  ADVio(seq)
+  IMPL_PROSP_k1_h16m0.5_RANK      IMPL   prospective   0.000   0.255   0.157   0.191   0.166 |  +0.098  +0.065    0.747 |      +0.072
+  BEHAV_PROSP_k1_RANK            BEHAV   prospective   0.000   0.054   0.055   0.059   0.039 |  -0.001  -0.005    1.093 |      +0.011
+  IMPL_RETRO_w4_h16m0.5_RANK      IMPL retrospective   0.000   0.341   0.219   0.270   0.227 |  +0.122  +0.071    0.792 |      +0.154
+  BEHAV_RETRO_w4_RANK            BEHAV retrospective   0.000   0.330   0.274   0.341   0.284 |  +0.056  -0.010    1.031 |      +0.066
+
+  the 2x2, as ADVpub (left) and fracpub (right):
+    categorical                    IMPL              BEHAV
+    prospective        +0.020 /  0.70    -0.001 /  1.02
+    retrospective      +0.026 /  0.72    -0.001 /  1.01
+
+    continuous                     IMPL              BEHAV
+    prospective        +0.065 /  0.75    -0.005 /  1.09
+    retrospective      +0.071 /  0.79    -0.010 /  1.03
+
+------------------------------------------------------------------------------------------------
+4. THE OBSERVER LADDER (strict column). A flat ladder says the I/O map has been
+   exhausted; a climbing one says the fact was within reach all along.
+------------------------------------------------------------------------------------------------
+  target                                  O_input 1L64D             O_io 1L64D         O_input 2L128D            O_io 2L128D         O_input 4L256D            O_io 4L256D           O_act 4L256D          O_hist 4L256D  O_io 4L256D_half_data
+  IMPL_PROSP_k1_h16m0.5                           0.274                  0.283                  0.275                  0.288                  0.275                  0.291                  0.287                  0.300                  0.279
+  BEHAV_PROSP_k1                                  0.257                  0.305                  0.278                  0.297                  0.285                  0.299                  0.293                  0.301                  0.287
+  IMPL_RETRO_w4_h16m0.5                           0.298                  0.318                  0.293                  0.302                  0.285                  0.298                  0.292                  0.322                  0.288
+  BEHAV_RETRO_w4                                  0.265                  0.343                  0.307                  0.334                  0.305                  0.318                  0.325                  0.355                  0.302
+
+  self-report head variants (strict column):
+  target                           MLP/ln_f    MLP/raw     linear
+  IMPL_PROSP_k1_h16m0.5               0.320      0.330      0.300
+  BEHAV_PROSP_k1                      0.304      0.303      0.297
+  IMPL_RETRO_w4_h16m0.5               0.349      0.356      0.321
+  BEHAV_RETRO_w4                      0.354      0.351      0.339
+
+------------------------------------------------------------------------------------------------
+5. THE THREE READINGS OF 'MY COMPUTATION REORGANIZED'  (strict column)
+   raw    = 1 - cos(r_c, r_c+k), two different fresh instruments
+   excess = raw minus the per-position instrument no-change floor at c
+   fixed  = the instrument trained at c, applied at c+k (one instrument, both ends)
+------------------------------------------------------------------------------------------------
+  reading                             chance    self    O_io  O_hist   ADVio  ADVpub  fracpub      r1
+  h16m0.5 / raw                        0.254   0.320   0.291   0.300  +0.029  +0.020    0.702  +0.352
+  h16m0.5 / excess over floor          0.256   0.339   0.322   0.338  +0.017  +0.000    0.998  +0.278
+  h16m0.5 / fixed instrument           0.256   0.364   0.345   0.362  +0.019  +0.001    0.987  +0.374
+  h4m0.25 / raw                        0.257   0.352   0.306   0.323  +0.046  +0.029    0.693  +0.405
+  h4m0.25 / excess over floor          0.256   0.343   0.319   0.337  +0.024  +0.006    0.936  +0.282
+
+------------------------------------------------------------------------------------------------
+6. EVERY LADDERED TARGET (strict column), sorted family then direction
+------------------------------------------------------------------------------------------------
+  target                                   fam    dir  chance    self    O_io  O_hist   O_act   ADVio  ADVpub  fracpub      r1
+  IMPL_PROSPEXC_k1_h16m0.5                IMPL  prosp   0.256   0.339   0.322   0.338   0.320  +0.017  +0.000    0.998  +0.278
+  IMPL_PROSPEXC_k1_h4m0.25                IMPL  prosp   0.256   0.343   0.319   0.337   0.316  +0.024  +0.006    0.936  +0.282
+  IMPL_PROSPFIX_k1_h16m0.5                IMPL  prosp   0.256   0.364   0.345   0.362   0.345  +0.019  +0.001    0.987  +0.374
+  IMPL_PROSPSM_h16m0.5                    IMPL  prosp   0.252   0.340   0.291   0.319   0.295  +0.049  +0.021    0.763  +0.538
+  IMPL_PROSP_k1_h16m0.5                   IMPL  prosp   0.254   0.320   0.291   0.300   0.287  +0.029  +0.020    0.702  +0.352
+  IMPL_PROSP_k1_h16m0.5_RANK              IMPL  prosp   0.000   0.255   0.157   0.191   0.166  +0.098  +0.065    0.747  +0.352
+  IMPL_PROSP_k1_h4m0.25                   IMPL  prosp   0.257   0.352   0.306   0.323   0.305  +0.046  +0.029    0.693  +0.405
+  IMPL_PROSP_k4_h16m0.5                   IMPL  prosp   0.252   0.325   0.288   0.306   0.292  +0.037  +0.020    0.731  +0.454
+  IMPL_AGE_w4_h16m0.5                     IMPL  retro   0.393   0.418   0.342   0.400   0.340  +0.076  +0.018    0.284    +nan
+  IMPL_RETRO_w4_h16m0.5                   IMPL  retro   0.254   0.349   0.318   0.322   0.292  +0.030  +0.026    0.719  +0.881
+  IMPL_RETRO_w4_h16m0.5_RANK              IMPL  retro   0.000   0.341   0.219   0.270   0.227  +0.122  +0.071    0.792  +0.881
+  IMPL_RETRO_w4_h4m0.25                   IMPL  retro   0.258   0.385   0.314   0.354   0.314  +0.070  +0.031    0.754  +0.896
+  BEHAV_PROSPSM                          BEHAV  prosp   0.251   0.318   0.309   0.322   0.294  +0.010  -0.004    1.059  +0.548
+  BEHAV_PROSP_k1                         BEHAV  prosp   0.250   0.304   0.305   0.301   0.293  -0.001  -0.001    1.016  -0.176
+  BEHAV_PROSP_k1_RANK                    BEHAV  prosp   0.000   0.054   0.055   0.059   0.039  -0.001  -0.005    1.093  -0.176
+  BEHAV_PROSP_k4                         BEHAV  prosp   0.252   0.324   0.306   0.327   0.287  +0.018  -0.003    1.039  +0.701
+  BEHAV_AGE_w4                           BEHAV  retro   0.341   0.372   0.334   0.375   0.323  +0.038  -0.002    1.072    +nan
+  BEHAV_RETRO_w4                         BEHAV  retro   0.253   0.354   0.343   0.355   0.325  +0.011  -0.001    1.013  +0.794
+  BEHAV_RETRO_w4_RANK                    BEHAV  retro   0.000   0.330   0.274   0.341   0.284  +0.056  -0.010    1.031  +0.794
+
+------------------------------------------------------------------------------------------------
+7. PAPER 2'S OCCURRENT BATTERY AT THE FINAL CHECKPOINT
+   The dissociation shown alive on THIS model, so the dispositional rows are read
+   against a known-good occurrent baseline rather than a different training run.
+   Published (paper 2, language): IMPL +0.272, IMPL_COS +0.318, BEHAV -0.067,
+   ENT -0.287, WORLD -0.009.
+------------------------------------------------------------------------------------------------
+  target          fact about  chance    self  bestOio      ADV    O_act  fracOio
+  IMPL        implementation   0.140   0.461    0.203   +0.258    0.202    0.198
+  IMPL_COS    implementation   0.000   0.581    0.224   +0.357    0.548    0.386
+  BEHAV              I/O map   0.773   0.758    0.789   -0.031    0.794    0.747
+  ENT                I/O map   0.255   0.662    0.948   -0.286    0.506    1.704
+  WORLD                input   0.896   0.982    0.992   -0.010    0.982    1.117
+  residual k-means separation = 0.174 (within 0.166, between -0.008)
+
+================================================================================================

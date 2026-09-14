@@ -1,0 +1,293 @@
+DISPOSITIONAL BATTERY -- reduction   tag=main_k3
+substrate ntp_aux_cl  v16_s2_L6_m4_distinct  8L/8H/256D
+checkpoints (16): [400, 519, 674, 875, 1135, 1474, 1913, 2483, 3222, 4183, 5429, 7046, 9146, 11871, 15409, 20000]
+horizon k = 3 checkpoint indices (geometric schedule: a backward window spans the same step ratio as a forward one)
+target checkpoints: [875, 1135, 1474, 1913, 2483, 3222, 4183, 5429, 7046, 9146]
+held-out checkpoint window: [1913, 2483, 3222]
+
+====================================================================================================
+1. HARNESS VALIDATION
+====================================================================================================
+  final-checkpoint val loss (this run):      nan   published reference for ntp_aux_cl: 2.3829
+
+  occurrent battery on THIS model's final checkpoint (paper 2's rows):
+    target      self  bestO_io  advantage    base   published advantage
+
+====================================================================================================
+2. INSTRUMENT GUARDS ALONG THE TRAJECTORY  (a saturated instrument counterfeits
+   the headline: read no IMPL number without these)
+====================================================================================================
+  instrument h16m1  (264K params)
+       step     cos     |r|  ens_cos  d6 eta2  d5 eta2  d4 eta2  rule d6
+        400   0.996   1.372    0.735    0.008    0.009    0.016    0.001
+        519   0.986   2.708    0.787    0.008    0.014    0.039    0.002
+        674   0.972   3.565    0.806    0.009    0.022    0.063    0.003
+        875   0.911   7.072    0.847    0.022    0.095    0.245    0.007
+       1135   0.884   9.683    0.860    0.043    0.196    0.355    0.016
+       1474   0.804  13.107    0.892    0.086    0.327    0.413    0.027
+       1913   0.744  14.541    0.912    0.133    0.397    0.396    0.028
+       2483   0.713  16.444    0.938    0.225    0.434    0.323    0.029
+       3222   0.730  16.147    0.937    0.260    0.450    0.289    0.028
+       4183   0.755  13.653    0.936    0.279    0.466    0.254    0.029
+       5429   0.806  11.620    0.925    0.292    0.470    0.241    0.030
+       7046   0.845   9.958    0.915    0.298    0.472    0.232    0.031
+       9146   0.862   9.382    0.911    0.302    0.465    0.222    0.031
+      11871   0.865   9.909    0.912    0.311    0.455    0.212    0.030
+      15409   0.867   9.431    0.909    0.320    0.440    0.193    0.028
+      20000   0.883   8.921    0.902    0.323    0.423    0.185    0.028
+
+  instrument h4m0.25  (67K params)
+       step     cos     |r|  ens_cos  d6 eta2  d5 eta2  d4 eta2  rule d6
+        400   0.990   2.057    0.744    0.009    0.010    0.020    0.001
+        519   0.974   3.684    0.801    0.009    0.018    0.057    0.002
+        674   0.953   4.687    0.824    0.010    0.033    0.105    0.003
+        875   0.865   8.806    0.891    0.023    0.112    0.318    0.009
+       1135   0.815  12.183    0.908    0.041    0.197    0.426    0.016
+       1474   0.736  15.090    0.942    0.081    0.315    0.431    0.027
+       1913   0.676  16.145    0.947    0.128    0.392    0.426    0.028
+       2483   0.669  17.561    0.958    0.212    0.429    0.349    0.029
+       3222   0.701  17.011    0.949    0.255    0.442    0.301    0.028
+       4183   0.727  14.449    0.951    0.267    0.459    0.286    0.029
+       5429   0.779  12.493    0.937    0.279    0.463    0.279    0.030
+       7046   0.818  10.899    0.930    0.285    0.467    0.269    0.030
+       9146   0.835  10.434    0.926    0.289    0.462    0.262    0.030
+      11871   0.837  11.051    0.926    0.300    0.455    0.248    0.029
+      15409   0.838  10.619    0.921    0.306    0.442    0.233    0.028
+      20000   0.854  10.176    0.911    0.310    0.426    0.221    0.028
+
+  reference band from the parent battery at the final checkpoint: cosine 0.85-0.90,
+  ens_cos 0.87-0.91, d6 eta2 0.31-0.33 (ntp_aux_cl).  Junk-regime signature: 
+  ens_cos 0.65 with d6 eta2 0.003 (the 300-step smoke artifact).
+
+====================================================================================================
+3. WHICH LEVELS HAVE DYNAMICS AT ALL  (mean per-position NLL by hierarchy level)
+====================================================================================================
+       step       L0       L1       L2       L3       L4       L5
+        400    1.375    2.705    2.845    2.906    2.880    2.887
+        519    1.383    2.830    2.873    2.970    2.953    2.926
+        674    1.373    2.788    2.869    2.959    2.930    2.942
+        875    1.583    2.877    2.926    2.961    2.937    2.965
+       1135    1.789    3.098    3.073    3.025    2.991    3.010
+       1474    2.004    3.184    3.180    3.059    2.936    3.007
+       1913    2.080    2.961    3.136    3.092    3.017    2.987
+       2483    2.192    2.840    3.084    3.070    3.063    3.028
+       3222    2.228    2.799    3.132    3.094    3.098    3.048
+       4183    2.116    2.612    3.063    3.055    3.088    3.108
+       5429    2.151    2.581    3.127    3.056    3.121    3.080
+       7046    2.072    2.443    3.143    3.068    3.153    3.088
+       9146    2.107    2.493    3.126    3.095    3.181    3.116
+      11871    2.006    2.546    3.158    3.149    3.194    3.149
+      15409    2.017    2.505    3.131    3.127    3.198    3.117
+      20000    2.005    2.434    3.078    3.122    3.215    3.164
+
+      delta   +0.630   -0.271   +0.233   +0.217   +0.335   +0.277
+
+====================================================================================================
+4. THE AUTOCORRELATION GATE  (run BEFORE any head: probe-able does not imply
+   learnable from a given target -- committee_head Phase B, lprog ac1 = +0.007)
+====================================================================================================
+  instrument h16m1
+    disjoint-window autocorrelation (lag k+1, no shared term) is the statistic
+    the horizon rule reads; lag 1 is shown for the record and is biased
+    negative at k=1 because adjacent windows share an endpoint with opposite sign.
+      k                  BEHAV_PRO                BEHAV_RETRO                  REORG_PRO                REORG_RETRO
+                   disjoint / lag1            disjoint / lag1            disjoint / lag1            disjoint / lag1
+      1            -0.052 / -0.267            -0.052 / -0.256            +0.314 / +0.374            +0.304 / +0.372
+      2            -0.108 / +0.276            -0.135 / +0.295            +0.238 / +0.410            +0.180 / +0.391
+      3            -0.151 / +0.436            -0.236 / +0.463            +0.190 / +0.458            +0.006 / +0.391
+      4            -0.180 / +0.504            -0.287 / +0.531            +0.124 / +0.486            -0.015 / +0.352
+
+    IMPL class persistence P(class_c == class_{c+k}) vs chance:
+      k=1: 0.607  (chance 0.167)
+      k=2: 0.532  (chance 0.155)
+      k=3: 0.470  (chance 0.144)
+      k=4: 0.429  (chance 0.138)
+    instrument reliability of the target:
+      IMPL class agreement (FM seed0 vs seed1, one codebook):   0.822
+      REORG REORG_PRO r(seed0, seed1) =  +0.941
+      REORG REORG_RETRO r(seed0, seed1) =  +0.923
+
+  instrument h4m0.25
+    disjoint-window autocorrelation (lag k+1, no shared term) is the statistic
+    the horizon rule reads; lag 1 is shown for the record and is biased
+    negative at k=1 because adjacent windows share an endpoint with opposite sign.
+      k                  BEHAV_PRO                BEHAV_RETRO                  REORG_PRO                REORG_RETRO
+                   disjoint / lag1            disjoint / lag1            disjoint / lag1            disjoint / lag1
+      1            -0.052 / -0.267            -0.052 / -0.256            +0.270 / +0.335            +0.265 / +0.341
+      2            -0.108 / +0.276            -0.135 / +0.295            +0.225 / +0.405            +0.151 / +0.375
+      3            -0.151 / +0.436            -0.236 / +0.463            +0.189 / +0.469            +0.003 / +0.384
+      4            -0.180 / +0.504            -0.287 / +0.531            +0.121 / +0.507            -0.033 / +0.367
+
+    IMPL class persistence P(class_c == class_{c+k}) vs chance:
+      k=1: 0.621  (chance 0.164)
+      k=2: 0.537  (chance 0.151)
+      k=3: 0.465  (chance 0.139)
+      k=4: 0.419  (chance 0.133)
+    instrument reliability of the target:
+      IMPL class agreement (FM seed0 vs seed1, one codebook):   0.856
+      REORG REORG_PRO r(seed0, seed1) =  +0.956
+      REORG REORG_RETRO r(seed0, seed1) =  +0.932
+
+====================================================================================================
+5. THE LEVEL / CHECKPOINT / POSITION CONFOUND IN THE TARGETS
+   (categorical targets are quantile-binned WITHIN (level, checkpoint), so the
+    bins carry no level or checkpoint information by construction; the pooled-
+    quantile variants are kept below for the record)
+====================================================================================================
+  instrument h16m1
+    IMPL_PRO_cls         base maj=0.273  level-conditional=0.282  checkpoint-conditional=0.290  position-conditional=0.354
+    IMPL_RETRO_cls       base maj=0.195  level-conditional=0.199  checkpoint-conditional=0.245  position-conditional=0.228
+    IMPL_NOW_cls         base maj=0.175  level-conditional=0.195  checkpoint-conditional=0.270  position-conditional=0.277
+    BEHAV_PRO            var share  level=0.013  position=0.019  checkpoint=0.023   | within-bin base=0.250 (position-conditional 0.288)  | pooled-bin base=0.250 (level-conditional 0.287)
+    BEHAV_RETRO          var share  level=0.020  position=0.028  checkpoint=0.049   | within-bin base=0.250 (position-conditional 0.282)  | pooled-bin base=0.250 (level-conditional 0.301)
+    REORG_PRO            var share  level=0.144  position=0.239  checkpoint=0.195   | within-bin base=0.250 (position-conditional 0.355)  | pooled-bin base=0.250 (level-conditional 0.330)
+    REORG_RETRO          var share  level=0.065  position=0.099  checkpoint=0.338   | within-bin base=0.250 (position-conditional 0.319)  | pooled-bin base=0.250 (level-conditional 0.300)
+    REORG_PRO_fresh      var share  level=0.135  position=0.216  checkpoint=0.289   | within-bin base=0.250 (position-conditional 0.356)  | pooled-bin base=0.251 (level-conditional 0.333)
+    REORG_RETRO_fresh    var share  level=0.072  position=0.094  checkpoint=0.408   | within-bin base=0.251 (position-conditional 0.307)  | pooled-bin base=0.250 (level-conditional 0.296)
+
+  instrument h4m0.25
+    IMPL_PRO_cls         base maj=0.251  level-conditional=0.261  checkpoint-conditional=0.274  position-conditional=0.331
+    IMPL_RETRO_cls       base maj=0.209  level-conditional=0.212  checkpoint-conditional=0.242  position-conditional=0.230
+    IMPL_NOW_cls         base maj=0.168  level-conditional=0.185  checkpoint-conditional=0.263  position-conditional=0.270
+    BEHAV_PRO            var share  level=0.013  position=0.019  checkpoint=0.023   | within-bin base=0.250 (position-conditional 0.288)  | pooled-bin base=0.250 (level-conditional 0.287)
+    BEHAV_RETRO          var share  level=0.020  position=0.028  checkpoint=0.049   | within-bin base=0.250 (position-conditional 0.282)  | pooled-bin base=0.250 (level-conditional 0.301)
+    REORG_PRO            var share  level=0.196  position=0.274  checkpoint=0.213   | within-bin base=0.251 (position-conditional 0.350)  | pooled-bin base=0.250 (level-conditional 0.344)
+    REORG_RETRO          var share  level=0.116  position=0.137  checkpoint=0.327   | within-bin base=0.251 (position-conditional 0.310)  | pooled-bin base=0.250 (level-conditional 0.327)
+    REORG_PRO_fresh      var share  level=0.181  position=0.230  checkpoint=0.294   | within-bin base=0.250 (position-conditional 0.340)  | pooled-bin base=0.251 (level-conditional 0.342)
+    REORG_RETRO_fresh    var share  level=0.113  position=0.129  checkpoint=0.407   | within-bin base=0.251 (position-conditional 0.308)  | pooled-bin base=0.251 (level-conditional 0.318)
+
+====================================================================================================
+6. HEADLINE -- ADVANTAGE PER TARGET PER DIRECTION
+   advantage = self-report - best capacity-matched O_io (tokens + M_c's logits)
+   held_seq  = held-out sequences at trained checkpoints
+   held_both = held-out sequences at a HELD-OUT checkpoint window
+====================================================================================================
+  cell             fact   time              self  confab  bestOio      ADV  ADV(ck)   O_hist    O_act    base  posbase
+  IMPL_PRO         IMPL   prospective      0.600   0.419    0.628   -0.028   -0.005    0.619    0.554   0.254    0.334
+  IMPL_RETRO       IMPL   retrospective    0.532   0.370    0.537   -0.005   -0.003    0.594    0.523   0.169    0.238
+  IMPL_NOW         IMPL   occurrent        0.787   0.467    0.696   +0.091   +0.137    0.690    0.586   0.186    0.277
+  REORG_PRO        IMPL   prospective      0.481   0.428    0.443   +0.038   +0.004    0.433    0.417   0.248    0.354
+  REORG_RETRO      IMPL   retrospective    0.505   0.423    0.454   +0.051   +0.006    0.468    0.410   0.249    0.347
+  BEHAV_PRO        BEHAV  prospective      0.369   0.348    0.369   +0.000   -0.016    0.335    0.311   0.250    0.291
+  BEHAV_RETRO      BEHAV  retrospective    0.384   0.353    0.387   -0.003   -0.025    0.408    0.311   0.251    0.285
+  ENT_NOW          BEHAV  occurrent        0.825   0.562    0.916   -0.091   -0.047    0.906    0.510   0.249    0.315
+  IMPL_PRO @h4m0.25 IMPL   prospective      0.595     nan    0.626   -0.031   -0.018    0.624    0.576   0.233    0.309
+  IMPL_RETRO @h4m0.25 IMPL   retrospective    0.562     nan    0.563   -0.002   +0.001    0.635    0.591   0.191    0.234
+
+====================================================================================================
+7. THE SAME, WITHIN HIERARCHY LEVEL  (age of acquisition ~ level, and level is an
+   input fact any observer reads off the token index)
+====================================================================================================
+  cell                    L0        L1        L2        L3        L4        L5
+  IMPL_PRO            -0.028    -0.037    -0.042    -0.015    +0.035    +0.059
+  IMPL_RETRO          -0.004    -0.018    -0.017    +0.026    +0.038    +0.042
+  IMPL_NOW            +0.075    +0.103    +0.111    +0.120    +0.116    +0.096
+  REORG_PRO           +0.038    +0.035    +0.014    +0.066    +0.086    +0.086
+  REORG_RETRO         +0.056    +0.037    +0.037    +0.066    +0.092    +0.088
+  BEHAV_PRO           -0.006    +0.003    +0.008    +0.011    +0.005    +0.009
+  BEHAV_RETRO         -0.010    +0.003    +0.007    +0.008    -0.003    -0.009
+  ENT_NOW             -0.090    -0.069    -0.099    -0.122    -0.143    -0.156
+  IMPL_PRO_h4m0.25    -0.038    -0.030    -0.043    -0.009    +0.042    +0.042
+  IMPL_RETRO_h4m0.25    -0.004    -0.019    -0.004    +0.050    +0.054    +0.051
+
+  self-report accuracy by level:
+  cell                    L0        L1        L2        L3        L4        L5
+  IMPL_PRO             0.647     0.540     0.508     0.577     0.670     0.766
+  IMPL_RETRO           0.548     0.521     0.501     0.492     0.541     0.596
+  IMPL_NOW             0.804     0.767     0.768     0.750     0.802     0.843
+  REORG_PRO            0.520     0.432     0.441     0.491     0.439     0.400
+  REORG_RETRO          0.537     0.471     0.482     0.483     0.436     0.421
+  BEHAV_PRO            0.398     0.367     0.320     0.301     0.297     0.287
+  BEHAV_RETRO          0.418     0.381     0.327     0.308     0.297     0.283
+  ENT_NOW              0.838     0.843     0.807     0.762     0.728     0.724
+
+====================================================================================================
+8. THE OBSERVER LADDER  (flat in capacity = access-limited, not resource-limited)
+====================================================================================================
+  IMPL_PRO   (self = 0.600)
+    O_input        0.332       nan       nan     0.310
+    O_io           0.544     0.610     0.628     0.622
+    O_io_half@8:256      0.558   (ckpt-held     0.605)
+    O_hist@8:256         0.619   (ckpt-held     0.639)
+    O_act@8:256          0.554   (ckpt-held     0.579)
+    O_acthist@8:256      0.536   (ckpt-held     0.564)
+
+  IMPL_RETRO   (self = 0.532)
+    O_input        0.237       nan       nan     0.213
+    O_io           0.453     0.509     0.537     0.535
+    O_io_half@8:256      0.483   (ckpt-held     0.271)
+    O_hist@8:256         0.594   (ckpt-held     0.413)
+    O_act@8:256          0.523   (ckpt-held     0.324)
+    O_acthist@8:256      0.533   (ckpt-held     0.348)
+
+  IMPL_NOW   (self = 0.787)
+    O_input        0.276       nan       nan     0.255
+    O_io           0.626     0.685     0.696     0.690
+    O_io_half@8:256      0.650   (ckpt-held     0.544)
+    O_hist@8:256         0.690   (ckpt-held     0.542)
+    O_act@8:256          0.586   (ckpt-held     0.389)
+    O_acthist@8:256      0.570   (ckpt-held     0.423)
+
+  REORG_PRO   (self = 0.481)
+    O_input        0.360       nan       nan     0.346
+    O_io           0.397     0.440     0.443     0.434
+    O_io_half@8:256      0.406   (ckpt-held     0.311)
+    O_hist@8:256         0.433   (ckpt-held     0.327)
+    O_act@8:256          0.417   (ckpt-held     0.314)
+    O_acthist@8:256      0.417   (ckpt-held     0.323)
+
+  REORG_RETRO   (self = 0.505)
+    O_input        0.349       nan       nan     0.324
+    O_io           0.406     0.448     0.454     0.447
+    O_io_half@8:256      0.416   (ckpt-held     0.284)
+    O_hist@8:256         0.468   (ckpt-held     0.312)
+    O_act@8:256          0.410   (ckpt-held     0.284)
+    O_acthist@8:256      0.409   (ckpt-held     0.280)
+
+  BEHAV_PRO   (self = 0.369)
+    O_input        0.300       nan       nan     0.281
+    O_io           0.352     0.369     0.340     0.333
+    O_io_half@8:256      0.324   (ckpt-held     0.293)
+    O_hist@8:256         0.335   (ckpt-held     0.295)
+    O_act@8:256          0.311   (ckpt-held     0.264)
+
+  BEHAV_RETRO   (self = 0.384)
+    O_input        0.294       nan       nan     0.279
+    O_io           0.366     0.387     0.363     0.352
+    O_io_half@8:256      0.341   (ckpt-held     0.306)
+    O_hist@8:256         0.408   (ckpt-held     0.384)
+    O_act@8:256          0.311   (ckpt-held     0.274)
+
+  ENT_NOW   (self = 0.825)
+    O_input        0.391       nan       nan     0.380
+    O_io           0.764     0.890     0.916     0.909
+    O_io_half@8:256      0.893   (ckpt-held     0.724)
+    O_hist@8:256         0.906   (ckpt-held     0.709)
+    O_act@8:256          0.510   (ckpt-held     0.389)
+
+  IMPL_PRO_h4m0.25   (self = 0.595)
+    O_input        0.303       nan       nan     0.292
+    O_io           0.529     0.608     0.622     0.626
+    O_io_half@8:256      0.556   (ckpt-held     0.600)
+    O_hist@8:256         0.624   (ckpt-held     0.627)
+    O_act@8:256          0.576   (ckpt-held     0.588)
+    O_acthist@8:256      0.561   (ckpt-held     0.571)
+
+  IMPL_RETRO_h4m0.25   (self = 0.562)
+    O_input        0.236       nan       nan     0.222
+    O_io           0.464     0.534     0.563     0.562
+    O_io_half@8:256      0.511   (ckpt-held     0.319)
+    O_hist@8:256         0.635   (ckpt-held     0.471)
+    O_act@8:256          0.591   (ckpt-held     0.402)
+    O_acthist@8:256      0.605   (ckpt-held     0.411)
+
+====================================================================================================
+9. CONTINUOUS READOUT  (Spearman rho against the within-(level,checkpoint)
+   z-scored target; secondary to the categorical battery)
+====================================================================================================
+  cell                 self     O_io   O_hist    O_act      ADV
+  REORG_PRO           0.629    0.535    0.532    0.500   +0.094
+  REORG_RETRO         0.686    0.571    0.619    0.488   +0.115
+  BEHAV_PRO           0.303    0.239    0.238    0.152   +0.064
+  BEHAV_RETRO         0.355    0.291    0.395    0.162   +0.064
+

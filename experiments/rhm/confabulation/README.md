@@ -1,5 +1,6 @@
 # The Confabulation Test — does a self-report track the implementation or a self-theory? (2026-07-22)
 
+**Continued**: [`../../a2a_forward/fsm_part3/`](../../a2a_forward/fsm_part3/README.md) (2026-09-13/14) runs this battery across a checkpointed wake with dispositional targets, read within hierarchy level, on both arms; its grammar child forks this harness.
 **Design doc**: [ideas/confabulation_test.md](../../../ideas/confabulation_test.md) (pre-registered before the runs)
 **Parent experiment**: [../README.md](../README.md) (the RHM scaling / residual-structure program)
 **Substrate**: [../RHM_LATENT_LOOP_README.md](../RHM_LATENT_LOOP_README.md) — this experiment forks its `ntp_aux{,_cl}` wake recipe verbatim

@@ -1,0 +1,173 @@
+====================================================================================================
+AUTHORSHIP  --  reduction of tag 'main'
+====================================================================================================
+  M: 4L/4H/256D  arm=ol  10000 wake steps  val(standalone)=5.3204
+  report site post_block3   N=3000 seqs   prefix=24   spans=[8, 12, 16, 24, 32]   observers=1:64,2:128,4:256 (2000 steps)
+  seed=42  instrument=16:0.5  ens_n=3  impl_k=8
+
+----------------------------------------------------------------------------------------------------
+SET DESCRIPTIVES  (the public signal, before anyone is trained)
+----------------------------------------------------------------------------------------------------
+  set            mode    temp  chance  mine_frac  logp(mine)  logp(corpus)  AUC(surprisal)  topk_mass
+  mix_t1         mix     1.00   0.500      0.500      -4.072        -5.914           0.622      0.769
+  whole_t1       whole   1.00   0.500      0.500      -4.087        -5.291           0.581      0.772
+  mix_t0.7       mix     0.70   0.514      0.514      -2.532        -5.927           0.747      0.771
+
+====================================================================================================
+SET mix_t1   (mode=mix  temperature=1.0)
+====================================================================================================
+
+  --- target MINE   (chance 0.500) ---
+      SELF_mlp (per-position MLP on the report site) = 0.533
+      SELF_seq    1L64D                       = 0.520
+      SELF_seq   2L128D                       = 0.513
+      SELF_seq   4L256D                       = 0.523
+      rung                       1L64D    2L128D    4L256D     (blank = not run at that capacity)
+      O_input  (tokens)          0.508     0.502     0.504
+      O_lik    (likelihood only)     0.693     0.757     0.736
+      O_io     (tokens+dist+lik)     0.604     0.679     0.718
+      O_io_nolik (parent's)  0.502   [top capacity only]
+      O_act    (ceiling)     0.522   [top capacity only]
+      O_io half data         0.641
+      LIK_pos (no aggreg.)   0.602
+      >> best self = 0.533   best O_io = 0.718   best third party (any rung) = 0.757   O_act = 0.522
+      >> ADVANTAGE vs O_io = -0.185      ADVANTAGE vs best third party = -0.224
+      ablations (SELF_mlp): full=0.533  shuffle_r=0.524  shuffle_p=0.502  zero_r=0.529  zero_p=0.502   confab=0.532 margin=+0.001
+      SELF_mlp AUC = 0.546
+
+  --- target IMPL   (chance 0.136) ---
+      SELF_mlp (per-position MLP on the report site) = 0.461
+      SELF_seq    1L64D                       = 0.398
+      SELF_seq   2L128D                       = 0.371
+      SELF_seq   4L256D                       = 0.328
+      rung                       1L64D    2L128D    4L256D     (blank = not run at that capacity)
+      O_input  (tokens)          0.173     0.167     0.154
+      O_lik    (likelihood only)                              
+      O_io     (tokens+dist+lik)     0.191     0.189     0.177
+      O_io_nolik (parent's)  0.173   [top capacity only]
+      O_act    (ceiling)     0.187   [top capacity only]
+      O_io half data         0.168
+      >> best self = 0.461   best O_io = 0.191   best third party (any rung) = 0.191   O_act = 0.187
+      >> ADVANTAGE vs O_io = +0.270      ADVANTAGE vs best third party = +0.270
+      ablations (SELF_mlp): full=0.461  shuffle_r=0.186  shuffle_p=0.345  zero_r=0.216  zero_p=0.428   confab=0.309 margin=+0.152
+
+  --- target IMPL_COS   (chance 0.000) ---
+      SELF_mlp (per-position MLP on the report site) = 0.583
+      SELF_seq    1L64D                       = 0.372
+      SELF_seq   2L128D                       = 0.472
+      SELF_seq   4L256D                       = 0.608
+      rung                       1L64D    2L128D    4L256D     (blank = not run at that capacity)
+      O_input  (tokens)          0.098     0.146     0.208
+      O_lik    (likelihood only)                              
+      O_io     (tokens+dist+lik)     0.101     0.156     0.234
+      O_io_nolik (parent's)  0.231   [top capacity only]
+      O_act    (ceiling)     0.509   [top capacity only]
+      O_io half data         0.165
+      >> best self = 0.608   best O_io = 0.234   best third party (any rung) = 0.234   O_act = 0.509
+      >> ADVANTAGE vs O_io = +0.374      ADVANTAGE vs best third party = +0.374
+      ablations (SELF_mlp): full=0.583  shuffle_r=0.095  shuffle_p=0.501  zero_r=0.128  zero_p=0.628   confab=0.325 margin=+0.258
+
+  AUC (position-level, test split):  SELF_mlp=0.546  O_input=0.503  O_lik=0.810  O_io=0.791  SELF_seq=0.532  LIK_pos=0.636  raw_surprisal=0.622
+
+  INSTRUMENT GUARDS  (16:0.5, 167K = 10.6% of the predicted blocks)
+    fwd_cosine=0.9072  |r|=5.262  ens_cos=0.861   <-- ens_cos is the junk-residual gate
+    eta2_norm=0.0259  eta2_dir=0.0006  eta2_vec=0.0006
+    |r| Cohen's d vs the published table:  sent_start=-0.76(pub -0.85)  after_punct=-0.06(pub -0.62)  after_opener=+0.59(pub +0.62)  before_closer=+0.35(pub +0.84)
+    residual cluster quality: within=0.165 between=-0.007 separation=0.172
+
+====================================================================================================
+SET whole_t1   (mode=whole  temperature=1.0)
+====================================================================================================
+
+  --- target MINE   (chance 0.500) ---
+      SELF_mlp (per-position MLP on the report site) = 0.567
+      SELF_seq   4L256D                       = 0.606
+      rung                       1L64D    2L128D    4L256D     (blank = not run at that capacity)
+      O_input  (tokens)                              0.608
+      O_lik    (likelihood only)                         0.938
+      O_io     (tokens+dist+lik)                         0.927
+      O_io_nolik (parent's)  0.533   [top capacity only]
+      O_act    (ceiling)     0.574   [top capacity only]
+      O_io half data         0.904
+      LIK_pos (no aggreg.)   0.579
+      >> best self = 0.606   best O_io = 0.927   best third party (any rung) = 0.938   O_act = 0.574
+      >> ADVANTAGE vs O_io = -0.321      ADVANTAGE vs best third party = -0.332
+      SELF_mlp AUC = 0.594
+
+  AUC (position-level, test split):  SELF_mlp=0.594  O_input=0.642  O_lik=0.978  O_io=0.963  SELF_seq=0.639  LIK_pos=0.606  raw_surprisal=0.581
+
+====================================================================================================
+SET mix_t0.7   (mode=mix  temperature=0.7)
+====================================================================================================
+
+  --- target MINE   (chance 0.514) ---
+      SELF_mlp (per-position MLP on the report site) = 0.619
+      SELF_seq   4L256D                       = 0.634
+      rung                       1L64D    2L128D    4L256D     (blank = not run at that capacity)
+      O_input  (tokens)                              0.596
+      O_lik    (likelihood only)                         0.931
+      O_io     (tokens+dist+lik)                         0.908
+      O_io_nolik (parent's)  0.547   [top capacity only]
+      O_act    (ceiling)     0.646   [top capacity only]
+      O_io half data         0.873
+      LIK_pos (no aggreg.)   0.738
+      >> best self = 0.634   best O_io = 0.908   best third party (any rung) = 0.931   O_act = 0.646
+      >> ADVANTAGE vs O_io = -0.274      ADVANTAGE vs best third party = -0.297
+      SELF_mlp AUC = 0.664
+
+  AUC (position-level, test split):  SELF_mlp=0.664  O_input=0.637  O_lik=0.982  O_io=0.969  SELF_seq=0.689  LIK_pos=0.797  raw_surprisal=0.747
+
+====================================================================================================
+FROM THE SAVED PER-POSITION PREDICTIONS
+====================================================================================================
+
+  mix_t1:  span-level AUC (mean predicted probability per span)
+      SELF_mlp   group-AUC=0.623   pos-AUC=0.546   (n_groups=3677)
+      SELF_seq   group-AUC=0.567   pos-AUC=0.532   (n_groups=3677)
+      O_input    group-AUC=0.504   pos-AUC=0.503   (n_groups=3677)
+      O_lik      group-AUC=0.863   pos-AUC=0.810   (n_groups=3677)
+      O_io       group-AUC=0.872   pos-AUC=0.791   (n_groups=3677)
+      LIK_pos    group-AUC=0.923   pos-AUC=0.636   (n_groups=3677)
+  mix_t1:  position-level AUC by offset within span (0 = first token of a span)
+      contestant         0      1-3      4-7     8-15    16-31   32-200        n
+      SELF_mlp       0.539    0.549    0.553    0.545    0.543         
+      SELF_seq       0.542    0.534    0.529    0.535    0.527         
+      O_input        0.506    0.512    0.495    0.501    0.507         
+      O_lik          0.796    0.795    0.838    0.826    0.810         
+      O_io           0.810    0.796    0.830    0.792    0.770         
+      LIK_pos        0.858    0.659    0.629    0.606    0.606         
+      n               3677    10920    14100    18632    14471        0
+
+  whole_t1:  sequence-level AUC (mean predicted probability per sequence)
+      SELF_mlp   group-AUC=0.743   pos-AUC=0.594   (n_groups=600)
+      SELF_seq   group-AUC=0.640   pos-AUC=0.639   (n_groups=600)
+      O_input    group-AUC=0.645   pos-AUC=0.642   (n_groups=600)
+      O_lik      group-AUC=0.979   pos-AUC=0.978   (n_groups=600)
+      O_io       group-AUC=0.963   pos-AUC=0.963   (n_groups=600)
+      LIK_pos    group-AUC=0.990   pos-AUC=0.606   (n_groups=600)
+  whole_t1:  position-level AUC by offset within span (0 = first token of a span)
+      contestant         0      1-3      4-7     8-15    16-31   32-200        n
+      SELF_mlp       0.530    0.541    0.567    0.568    0.587    0.604
+      SELF_seq       0.639    0.639    0.641    0.639    0.639    0.639
+      O_input        0.637    0.639    0.646    0.644    0.642    0.642
+      O_lik          0.979    0.977    0.977    0.977    0.978    0.978
+      O_io           0.966    0.964    0.962    0.964    0.962    0.963
+      LIK_pos        0.592    0.625    0.621    0.603    0.603    0.606
+      n                600     1800     2400     4800     9600    42600
+
+  mix_t0.7:  span-level AUC (mean predicted probability per span)
+      SELF_mlp   group-AUC=0.818   pos-AUC=0.664   (n_groups=3652)
+      SELF_seq   group-AUC=0.761   pos-AUC=0.689   (n_groups=3652)
+      O_input    group-AUC=0.672   pos-AUC=0.637   (n_groups=3652)
+      O_lik      group-AUC=0.987   pos-AUC=0.982   (n_groups=3652)
+      O_io       group-AUC=0.983   pos-AUC=0.969   (n_groups=3652)
+      LIK_pos    group-AUC=0.998   pos-AUC=0.797   (n_groups=3652)
+  mix_t0.7:  position-level AUC by offset within span (0 = first token of a span)
+      contestant         0      1-3      4-7     8-15    16-31   32-200        n
+      SELF_mlp       0.585    0.624    0.661    0.680    0.694         
+      SELF_seq       0.634    0.639    0.700    0.717    0.694         
+      O_input        0.607    0.609    0.640    0.642    0.657         
+      O_lik          0.972    0.973    0.991    0.988    0.982         
+      O_io           0.964    0.960    0.982    0.978    0.967         
+      LIK_pos        0.931    0.818    0.792    0.780    0.772         
+      n               3652    10832    13969    18862    14485        0

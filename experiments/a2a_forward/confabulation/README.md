@@ -4,8 +4,9 @@
 and the loop-necessity null *disagrees with the RHM sibling*, which is unresolved (see
 [Cross-substrate disagreement](#cross-substrate-disagreement-with-rhm)).
 
+**Continued**: [`../fsm_part3/`](../fsm_part3/README.md) (2026-09-13/14) points this battery at authorship and at dispositional targets across a checkpointed wake; the children fork this harness and import its helpers unchanged.
 **Design doc / pre-registration**: [ideas/confabulation_test.md](../../../ideas/confabulation_test.md)
-**Sibling instantiation**: [experiments/rhm/rhm_confabulation.py](../../rhm/rhm_confabulation.py) (RHM)
+**Sibling instantiation**: [experiments/rhm/rhm_confabulation.py](../../rhm/confabulation/rhm_confabulation.py) (RHM)
 **Substrate**: [a2a_forward/stages.py](../stages.py)`::a2a_loop_train` — forks that wake recipe
 (same GPT, `TransformerForwardModel`, `CerebellarGate`, lrs, FineWeb-Edu tokens) in the Run-6
 controlled-retrain shape, and adds the report battery on top.
