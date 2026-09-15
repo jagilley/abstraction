@@ -17,6 +17,11 @@ Sections:
   [M] the corridor under a moved write, with the shift split by path
   [N] the composed choice: how often the critic moved the write off the DP's row  [Q3]
   [O] babbling off-stream: the probe's counts, what it graded, and its share of the bill [Q3]
+  [J1] the SHADOW readouts against the MLP critic, on the same held-out rows       [overtone S1]
+  [J2] the ZERO-VERDICT scores and the critic's out-of-fold beyond-prior increment [overtone S2]
+  [J3] where the probe budget went: uniform against disagreement                   [overtone S3]
+  [R]  gate R-1 at full scale: the shadow-carrying arm against the banked Q3b cell [overtone]
+  [Z2] the same repair accuracy and moved share POOLED BY LEVEL, treated minus banked [overtone]
   [Y] the clock yokes: realised against planned, gate Y-1's check post hoc               [Q3b]
   [Z] THE L4/L5 PANEL: every readout the round turns on, at the cells it turns on        [Q3b]
   [S] THE SEED TABLE: per seed, what the ladder did and WHY each advance fired          [Q3d]
@@ -397,8 +402,8 @@ def main():
     o("    would read that candidate-set difference as discrimination. Both columns carry")
     o("    their own denominator and base rate.")
     o("")
-    for arm in arms:
-        log = R[arm]["log"]
+    for arm in list(arms) + list(B):
+        log = (R.get(arm) or B[arm])["log"]
         per = collections.defaultdict(list)
         for i, v in enumerate(log["vo"]):
             if not v:
@@ -428,6 +433,226 @@ def main():
             o(f"      {k:5} {len(rows):>6}  {rows[-1][1]:>7} {rows[-1][2]:>10.3f}  {fil}   "
               f"{(pn or 0):>7} "
               + (f"{pb:>10.3f}" if pb is not None else f"{'-':>10}") + f"  {prb}")
+        o("")
+
+    # ------------------------------------------------- [J1] the shadow readouts [overtone]
+    o("=" * 100)
+    o("[J1] THE SHADOW READOUTS — the same rows, the same diet, a different readout  [S1]")
+    o("=" * 100)
+    o("    `lin` is Linear(dim,1) over the critic's OWN state (slot embedding + the per-offset")
+    o("    reads of `pooled`); `dir` is Linear(dim,1) over `pooled.mean` and the candidate's")
+    o("    content only, no slot — the shape a residual-stream correctness probe has. Both are")
+    o("    trained on the critic's own batch, scored on the critic's own held-out split, and")
+    o("    never consulted by any chooser (gate R-1: the arm carrying them is bit-identical to")
+    o("    the banked `voi3b_comp_pr_yk` on every behaviour series).")
+    o("")
+    o("    THE COMPARISON IS WITHIN A ROW. Each line is one slot at one arm: the MLP critic and")
+    o("    its two twins on the SAME held-out rows, so the denominators are shared and the only")
+    o("    difference is the readout. Medians are over the run's reads; `last` is the last read.")
+    o("")
+    for arm in list(arms) + list(B):
+        log = (R.get(arm) or B[arm])["log"]
+        rows = collections.defaultdict(list)
+        for v in log["vo"]:
+            if not v:
+                continue
+            for k, q in (v.get("critic") or {}).items():
+                if q.get("sh_auc") or (q.get("probe_x") or {}).get("sh_auc"):
+                    rows[k].append(q)
+        if not rows:
+            o(f"    {arm}: no shadow readout.")
+            continue
+        o(f"    {arm}:")
+        o("      slot   reads  n(last)   FILED  mlp/lin/dir (med)      (last)          "
+          "PROBE  mlp/lin/dir (med)      (last)")
+        pool = collections.defaultdict(list)
+        for k in sorted(rows, key=lambda z: (int(z.split(":")[0]), int(z.split(":")[1]))):
+            qs = rows[k]
+
+            def _col(getter, name):
+                vals = [getter(q) for q in qs]
+                vals = [x.get(name) for x in vals if x] if name else vals
+                vals = [x for x in vals if x is not None]
+                return vals
+
+            fm = _col(lambda q: q.get("auc"), None)
+            fl = _col(lambda q: q.get("sh_auc"), "lin")
+            fd = _col(lambda q: q.get("sh_auc"), "dir")
+            pm = _col(lambda q: q.get("probe_auc"), None)
+            pl = _col(lambda q: (q.get("probe_x") or {}).get("sh_auc"), "lin")
+            pd = _col(lambda q: (q.get("probe_x") or {}).get("sh_auc"), "dir")
+            for nm, vals in (("f_mlp", fm), ("f_lin", fl), ("f_dir", fd),
+                             ("p_mlp", pm), ("p_lin", pl), ("p_dir", pd)):
+                pool[nm] += vals
+
+            def _fmt(a, b, c):
+                if not (a and b and c):
+                    return "      -              -        "
+                return (f"{np.median(a):.3f}/{np.median(b):.3f}/{np.median(c):.3f}  "
+                        f"{a[-1]:.3f}/{b[-1]:.3f}/{c[-1]:.3f}")
+            o(f"      {k:5} {len(qs):>6}  {qs[-1].get('n'):>7}   {_fmt(fm, fl, fd)}   "
+              f"{_fmt(pm, pl, pd)}")
+        o("      POOLED over every read at every slot (medians):")
+        o("        FILED  mlp " + (f"{np.median(pool['f_mlp']):.3f}" if pool['f_mlp'] else "-")
+          + "  lin " + (f"{np.median(pool['f_lin']):.3f}" if pool['f_lin'] else "-")
+          + "  dir " + (f"{np.median(pool['f_dir']):.3f}" if pool['f_dir'] else "-")
+          + f"   (n reads {len(pool['f_mlp'])})")
+        o("        PROBE  mlp " + (f"{np.median(pool['p_mlp']):.3f}" if pool['p_mlp'] else "-")
+          + "  lin " + (f"{np.median(pool['p_lin']):.3f}" if pool['p_lin'] else "-")
+          + "  dir " + (f"{np.median(pool['p_dir']):.3f}" if pool['p_dir'] else "-")
+          + f"   (n reads {len(pool['p_mlp'])})")
+        o("")
+
+    # ------------------------------------------- [J2] the zero-verdict scores [overtone]
+    o("=" * 100)
+    o("[J2] THE ZERO-VERDICT SCORES — what ranks the verdict with no labels at all  [S2]")
+    o("=" * 100)
+    o("    Every column here is read on the SAME held-out rows as the critic's own AUC, and")
+    o("    none of them has ever seen a verdict:")
+    o("")
+    o("      dpz    the DP's per-entry score of the candidate, z-scored over the candidate set")
+    o("             — EXACTLY the prior term the composed chooser sums, in its own units")
+    o("      dp     the same before the z-score (per-block, i.e. divided by the span)")
+    o("      conf   the negative mean entropy of the trunk's next-feature distribution over the")
+    o("             slot's blocks — confidence WHERE it is about to write, candidate-blind")
+    o("      marg   the mean top1-top2 logit margin over the same blocks")
+    o("      crit   the critic, restricted to the rows where the prior is defined, so the")
+    o("             comparison and the increment below share ONE denominator")
+    o("      comb   an OUT-OF-FOLD logistic combination of (dpz, critic logit); `prior` is the")
+    o("             same fit on the prior alone. `incr` = comb - max(prior, crit): the critic's")
+    o("             BEYOND-PRIOR increment, which is the Steenwyk-shaped question")
+    o("")
+    o("    THE TWO DIETS STAY APART, and the asymmetry is DESIGN.md §26's: on FILED rows the")
+    o("    written candidate is usually the DP's own argmax, so `dpz` there reads the prior's")
+    o("    confidence in its OWN choice; on PROBE rows it reads the prior on a substituted")
+    o("    class. They are not the same question and are never pooled.")
+    o("")
+    for arm in list(arms) + list(B):
+        log = (R.get(arm) or B[arm])["log"]
+        got = collections.defaultdict(lambda: collections.defaultdict(list))
+        for v in log["vo"]:
+            if not v:
+                continue
+            for k, q in (v.get("critic") or {}).items():
+                if q.get("free"):
+                    got[("FILED", k)] = got[("FILED", k)] or collections.defaultdict(list)
+                    for nm, x in q["free"].items():
+                        got[("FILED", k)][nm].append(x)
+                pf = (q.get("probe_x") or {}).get("free")
+                if pf:
+                    for nm, x in pf.items():
+                        got[("PROBE", k)][nm].append(x)
+        if not got:
+            o(f"    {arm}: no free scores.")
+            continue
+        o(f"    {arm}:")
+        o("      diet   slot   reads  n_ont(last)   dpz    dp    conf   marg  |  crit  "
+          "prior   comb   incr")
+        for which in ("FILED", "PROBE"):
+            for (w_, k) in sorted([z for z in got if z[0] == which],
+                                  key=lambda z: (int(z[1].split(":")[0]),
+                                                 int(z[1].split(":")[1]))):
+                c = got[(w_, k)]
+
+                def med(nm):
+                    vv = [x for x in c.get(nm, []) if x is not None]
+                    return (f"{np.median(vv):.3f}" if vv else "  -  ")
+
+                def medf(nm):
+                    vv = [x for x in c.get(nm, []) if x is not None]
+                    return (float(np.median(vv)) if vv else None)
+                nont = [x for x in c.get("n_ontable", []) if x is not None]
+                cb, pr, cc = medf("comb_auc"), medf("prior_oof_auc"), medf("auc_ontable")
+                incr = (f"{cb - max(pr, cc):+.3f}"
+                        if (cb is not None and pr is not None and cc is not None) else "  -  ")
+                o(f"      {w_:6} {k:5} {len(c.get('dpz_auc', [])):>6}  "
+                  f"{(nont[-1] if nont else 0):>10}   "
+                  f"{med('dpz_auc')} {med('dp_auc')} {med('conf_auc')} {med('marg_auc')}  |  "
+                  f"{med('auc_ontable')} {med('prior_oof_auc')} {med('comb_auc')}  {incr}")
+        o("")
+
+    # ------------------------------------- [J3] where the probe budget went [overtone S3]
+    o("=" * 100)
+    o("[J3] THE PROBE DRAW — uniform against disagreement, and the AUC read on each  [S3]")
+    o("=" * 100)
+    o("    §26 draws the substituted class uniformly. S3 spends the SAME budget on the")
+    o("    on-table candidate of another class that maximises |z(dp) - z(critic)| at that")
+    o("    context, keeping `ov_probe_unif_frac` of it uniform SO THAT the `unif` column below")
+    o("    stays comparable to the banked uniform twin's probe AUC. The `dis` column is read on")
+    o("    a harder, SELECTED candidate set and is NOT comparable to it — that is the point of")
+    o("    splitting them and the confound the split exists to keep visible.")
+    o("")
+    for arm in list(arms) + list(B):
+        r = R.get(arm) or B[arm]
+        log = r["log"]
+        nd = sum((v or {}).get("n_probe_dis", 0) for v in log["vo"])
+        npb = sum((v or {}).get("n_probe", 0) for v in log["vo"])
+        rows = collections.defaultdict(list)
+        for v in log["vo"]:
+            if not v:
+                continue
+            for k, q in (v.get("critic") or {}).items():
+                px = q.get("probe_x") or {}
+                if px.get("unif_auc") is not None or px.get("dis_auc") is not None:
+                    rows[k].append(px)
+        o(f"    {arm}: probes {npb}, drawn by disagreement {nd} "
+          f"({(nd / npb if npb else 0):.3f} of the budget)")
+        if not rows:
+            o("      (no split read)")
+            o("")
+            continue
+        o("      slot   reads   unif n(last)  unif auc (med/last)   dis n(last)  "
+          "dis auc (med/last)")
+        for k in sorted(rows, key=lambda z: (int(z.split(":")[0]), int(z.split(":")[1]))):
+            qs = rows[k]
+            ua = [q["unif_auc"] for q in qs if q.get("unif_auc") is not None]
+            da = [q["dis_auc"] for q in qs if q.get("dis_auc") is not None]
+            o(f"      {k:5} {len(qs):>6}   {qs[-1].get('unif_n', 0):>11}  "
+              + (f"{np.median(ua):.3f}/{ua[-1]:.3f}" if ua else "     -       ")
+              + f"        {qs[-1].get('dis_n', 0):>10}  "
+              + (f"{np.median(da):.3f}/{da[-1]:.3f}" if da else "     -       "))
+        o("")
+
+    # --------------------------------------- [R] the full-scale identity check [overtone]
+    o("=" * 100)
+    o("[R] GATE R-1 AT FULL SCALE — the shadow-carrying arm against the banked Q3b cell")
+    o("=" * 100)
+    o("    The strongest inertness evidence this round has, and it is free: the re-run that")
+    o("    carries the S1 shadows, the S2 free scores and the row dump must be the banked")
+    o("    `vo_s3b:voi3b_comp_pr_yk` BIT FOR BIT on every behaviour series, including `t_cum`")
+    o("    — the instruments are unpriced, so not even the bill may move. `vo_s3` §31 point 6")
+    o("    is the precedent: a cross-tag identity at full scale is far stronger than the")
+    o("    27-cycle preflight twin the gate is asserted on.")
+    o("")
+    SER = ("e", "succ", "dres", "n_solved", "n_mined", "n_moves", "width", "e_practice",
+           "vloss", "gloss", "t_cum")
+    pairs = [(a_, b_) for a_ in arms for b_ in B
+             if "comp_pr" in b_ and ("_sh" in a_ or a_.endswith("comp_pr_yk"))]
+    if not pairs:
+        o("    (no banked twin supplied — pass --bank vo_s3b:voi3b_comp_pr_yk)")
+    for a_, b_ in pairs:
+        x, y = R[a_], B[b_]
+        worst, wk, first = 0.0, None, None
+        per = {}
+        for k in SER:
+            if k not in x["log"] or k not in y["log"]:
+                continue
+            u = np.asarray(x["log"][k], float)
+            w = np.asarray(y["log"][k], float)
+            n = min(len(u), len(w))
+            d = float(np.abs(u[:n] - w[:n]).max()) if n else 0.0
+            per[k] = d
+            if d > worst:
+                worst, wk = d, k
+                nz = np.nonzero(np.abs(u[:n] - w[:n]) > 0)[0]
+                first = int(nz[0]) if nz.size else None
+        ca = [(e["level"], e["cycle"]) for e in x["events"] if e["kind"] == "commit"]
+        cb = [(e["level"], e["cycle"]) for e in y["events"] if e["kind"] == "commit"]
+        o(f"    {a_}  vs banked  {b_}")
+        o(f"      max|delta| = {worst:.3e}  (worst series {wk}, first differing cycle "
+          f"{first})   commits equal = {ca == cb}")
+        o("      per series: " + "  ".join(f"{k}={v:.1e}" for k, v in per.items()))
+        o(f"      VERDICT: {'PASS — bit-identical' if worst == 0.0 and ca == cb else 'SEE ABOVE'}")
         o("")
 
     # ---------------------------------------------------------------- [K] the explorer
@@ -745,8 +970,8 @@ def main():
     o("    dist    distinct tuples written, `top1` the share of filed writes on one tuple.")
     o("    moved   the composed argmax was not the DP's row (composed arms only).")
     o("")
-    for arm in arms:
-        log = R[arm]["log"]
+    for arm in list(arms) + list(B):
+        log = (R.get(arm) or B[arm])["log"]
         cells = {}
         for v in log["vo"]:
             if not v:
@@ -781,6 +1006,94 @@ def main():
             o(f"      {cell:6} {c['rows']:>6} {c['var_n']:>8}   {rp}  {ct}  "
               f"{c['dist']/max(c['cyc'],1):>5.1f} {c['top1w']/max(c['var_n'],1):>6.3f}   {mv}")
         o("")
+
+    # ------------------------------- [Z2] the same readouts POOLED BY LEVEL [overtone]
+    o("=" * 100)
+    o("[Z2] POOLED BY LEVEL — so a chooser reading is not frontier-only")
+    o("=" * 100)
+    o("    `voicing` Q3c's finding is that the L2/L3 cells REPLICATE across seeds and the")
+    o("    frontier cells do not: at three seeds the composed chooser was +18.5% / +24.5% /")
+    o("    +19.3% relative at L2/L3 and disagreed with itself at L4/L5. So a treatment read")
+    o("    only at the frontier is read where this lineage already knows the measurement is")
+    o("    unstable. These are the same `rep` and `moved` tallies as [E] and [Z], pooled over")
+    o("    the cells of a level and over the run, with one denominator per line.")
+    o("")
+    o("    `rep` is held-out by construction (fresh instances every cycle on the priced beam);")
+    o("    `moved` is over GOVERNED calls only and is n/a on an arm with no critic.")
+    o("")
+    o("    arm                       level   rep  (n)                 moved  (n governed)")
+    Zrows = {}
+    for arm in list(arms) + list(B):
+        log = (R.get(arm) or B[arm])["log"]
+        rep = collections.defaultdict(lambda: [0, 0])
+        mvd = collections.defaultdict(lambda: [0, 0])
+        for v in log["vo"]:
+            if not v:
+                continue
+            for cell, z in (v.get("rep") or {}).items():
+                if not cell[0].isdigit():
+                    continue
+                L = int(cell.split("n")[0])
+                rep[L][0] += z["n"]; rep[L][1] += z["hit"]
+            for cell, z in (v.get("moved") or {}).items():
+                if not cell[0].isdigit():
+                    continue
+                L = int(cell.split("n")[0])
+                mvd[L][0] += z["n"]; mvd[L][1] += z["moved"]
+        Zrows[arm] = (rep, mvd)
+        for L in sorted(set(rep) | set(mvd)):
+            rn, rh = rep.get(L, [0, 0])
+            mn, mm = mvd.get(L, [0, 0])
+            o(f"    {arm:24}  L{L}    "
+              + (f"{rh / rn:.4f} ({rn:>7})" if rn else "   -           ")
+              + "      "
+              + (f"{mm / mn:.4f} ({mn:>9})" if mn else "   n/a"))
+        for nm, Ls in (("L2/L3", (2, 3)), ("L4/L5", (4, 5))):
+            rn = sum(rep.get(L, [0, 0])[0] for L in Ls)
+            rh = sum(rep.get(L, [0, 0])[1] for L in Ls)
+            mn = sum(mvd.get(L, [0, 0])[0] for L in Ls)
+            mm = sum(mvd.get(L, [0, 0])[1] for L in Ls)
+            o(f"    {arm:24}  {nm}  "
+              + (f"{rh / rn:.4f} ({rn:>7})" if rn else "   -           ")
+              + "      "
+              + (f"{mm / mn:.4f} ({mn:>9})" if mn else "   n/a"))
+        o("")
+    o("    TREATED MINUS BANKED, relative, on the pooled cells — `voicing` Q3c's own form.")
+    o("    A relative change is printed because the levels sit at very different base rates;")
+    o("    the absolute pair is above and the denominators are shared within a column.")
+    o("")
+    o("    THE POOLING CONVENTION, stated because two are in use in this lineage and they do")
+    o("    not agree. Every figure here is n-WEIGHTED: the hits and the rows are summed over")
+    o("    the level's cells and the ratio taken once. The other convention — the unweighted")
+    o("    mean of the per-cell relative gains — weights a 400-row L5 cell like a 3,200-row L4")
+    o("    one. On `vo_s3b:voi3b_comp_pr_yk` against the anchor the two read L2/L3 +28.4% and")
+    o("    +30.7%, and L4/L5 +3.9% and +8.2%; `voicing`'s README reports +31.2% and +3.9% for")
+    o("    that arm, so its L4/L5 figure is the n-weighted one and its L2/L3 figure is not.")
+    o("    Nothing here contradicts the banked numbers; one convention is used throughout and")
+    o("    the denominators are printed so either can be recomputed.")
+    o("")
+    banked = [b for b in B]
+    if banked:
+        o("    arm                      " + "  ".join(f"{('vs ' + b)[:26]:>26}" for b in banked))
+        for nm, Ls in (("L2/L3", (2, 3)), ("L4/L5", (4, 5))):
+            for arm in arms:
+                rep = Zrows[arm][0]
+                rn = sum(rep.get(L, [0, 0])[0] for L in Ls)
+                rh = sum(rep.get(L, [0, 0])[1] for L in Ls)
+                if not rn:
+                    continue
+                cells = []
+                for b in banked:
+                    br = Zrows[b][0]
+                    bn = sum(br.get(L, [0, 0])[0] for L in Ls)
+                    bh = sum(br.get(L, [0, 0])[1] for L in Ls)
+                    if not bn:
+                        cells.append(f"{'-':>26}")
+                        continue
+                    a_, b_ = rh / rn, bh / bn
+                    cells.append(f"{(a_ - b_) / b_ * 100:+8.1f}%  ({a_:.4f}/{b_:.4f})")
+                o(f"    {arm:18} {nm}  " + "  ".join(cells))
+            o("")
 
     # ------------------------------------------------------------- [S] the seed table [Q3d]
     if a.seeds:

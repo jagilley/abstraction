@@ -3822,6 +3822,94 @@ ARMS = {
                             "rearm_advance_only": True, "vo_record": True, "vo_critic": True,
                             "vo_critic_govern": True, "vo_govern_mode": "composed",
                             "vo_head_target": "record", "vo_probe": True}},
+    # ---------------------------------------------------------------------------------- #
+    # [overtone] THE READOUT ROUND. Every arm here is `voi3b_comp_pr_yk` — the Q3b cell whose
+    # numbers are banked at seed 0 — with ONE thing changed, so the comparison is against a
+    # bank rather than against a re-run wherever it can be.
+    #
+    #   ovt_comp_pr_sh    voi3b_comp_pr_yk verbatim, CARRYING the S1 shadows, the S2 free
+    #                     scores and the row dump. It must come out BIT-IDENTICAL to the
+    #                     banked arm on every behaviour series (gate R-1, at full scale): the
+    #                     shadows ride the critic's own batch, draw nothing, and step their own
+    #                     optimizer. That identity is what licenses reading the shadows' AUCs
+    #                     as the banked arm's own.
+    #   ovt_comp_pr_dis   + S3: the same probe BUDGET spent where the prior and the critic
+    #                     disagree, with `ov_probe_unif_frac` of it still drawn uniformly so
+    #                     the audit keeps a candidate set comparable to the twin's.
+    #   ovt_comp_pr_lin   + S1's GOVERNING form: a linear readout in the composed chooser's
+    #                     seat (`ov_critic_hidden = 0`), nothing else moved.
+    #
+    # The shadows, the free scores and the dump are RUN-level instruments, so they are absent
+    # from these cfgs and every arm in the tag carries them; `ov_probe_dis` and
+    # `ov_critic_hidden` are chooser knobs and are per-arm, this file's own rule.
+    "ovt_comp_pr_sh": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                    "recert": True, "loop": {"kind": "yoke", "of": "voi3_dp"},
+                    "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                            "dsil_bootstrap": True, "question_mode": "exo", "merge_mode": "ledger",
+                            "open_inventory": True, "ungate_l5": True,
+                            "rearm_advance_only": True, "vo_record": True, "vo_critic": True,
+                            "vo_critic_govern": True, "vo_govern_mode": "composed",
+                            "vo_head_target": "record", "vo_probe": True}},
+    "ovt_comp_pr_dis": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                    "recert": True, "loop": {"kind": "yoke", "of": "voi3_dp"},
+                    "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                            "dsil_bootstrap": True, "question_mode": "exo", "merge_mode": "ledger",
+                            "open_inventory": True, "ungate_l5": True,
+                            "rearm_advance_only": True, "vo_record": True, "vo_critic": True,
+                            "vo_critic_govern": True, "vo_govern_mode": "composed",
+                            "vo_head_target": "record", "vo_probe": True,
+                            "ov_probe_dis": True}},
+    "ovt_comp_pr_lin": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                    "recert": True, "loop": {"kind": "yoke", "of": "voi3_dp"},
+                    "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                            "dsil_bootstrap": True, "question_mode": "exo", "merge_mode": "ledger",
+                            "open_inventory": True, "ungate_l5": True,
+                            "rearm_advance_only": True, "vo_record": True, "vo_critic": True,
+                            "vo_critic_govern": True, "vo_govern_mode": "composed",
+                            "vo_head_target": "record", "vo_probe": True,
+                            "ov_critic_hidden": 0}},
+    # [overtone] THE PREFLIGHT TWINS, all yoked to `voi3b_pf_src` so they run the same path the
+    # Q3b gates ran on. `ovt_pf_comp_pr` and `ovt_pf_noshadow` are GATE R-1's in-substrate
+    # pair: one boolean of INSTRUMENT apart, governance ON in both, and they must be identical
+    # on every behaviour series. `ovt_pf_dis` against `ovt_pf_comp_pr` is gate R-6, the
+    # liveness twin: one boolean of ALLOCATION apart, and they must NOT be.
+    "ovt_pf_comp_pr": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                    "recert": True, "loop": {"kind": "yoke", "of": "voi3b_pf_src"},
+                    "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                            "question_mode": "exo", "merge_mode": "ledger",
+                            "open_inventory": True, "ungate_l5": True,
+                            "rearm_advance_only": True, "vo_record": True, "vo_critic": True,
+                            "vo_critic_govern": True, "vo_govern_mode": "composed",
+                            "vo_head_target": "record", "vo_probe": True}},
+    "ovt_pf_noshadow": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                    "recert": True, "loop": {"kind": "yoke", "of": "voi3b_pf_src"},
+                    "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                            "question_mode": "exo", "merge_mode": "ledger",
+                            "open_inventory": True, "ungate_l5": True,
+                            "rearm_advance_only": True, "vo_record": True, "vo_critic": True,
+                            "vo_critic_govern": True, "vo_govern_mode": "composed",
+                            "vo_head_target": "record", "vo_probe": True,
+                            # the arm cfg overrides the RUN-level instrument flags, which is
+                            # what makes an in-run inertness pair possible at all
+                            "ov_shadow": "", "ov_free": False, "ov_dump": False}},
+    "ovt_pf_dis": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                    "recert": True, "loop": {"kind": "yoke", "of": "voi3b_pf_src"},
+                    "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                            "question_mode": "exo", "merge_mode": "ledger",
+                            "open_inventory": True, "ungate_l5": True,
+                            "rearm_advance_only": True, "vo_record": True, "vo_critic": True,
+                            "vo_critic_govern": True, "vo_govern_mode": "composed",
+                            "vo_head_target": "record", "vo_probe": True,
+                            "ov_probe_dis": True}},
+    "ovt_pf_lin": {"vocab": "earned", "commit": "loop", "prop_k": 4, "span": True,
+                    "recert": True, "loop": {"kind": "yoke", "of": "voi3b_pf_src"},
+                    "cfg": {"span_tau_fire": 0.50, "perf_meter": True,
+                            "question_mode": "exo", "merge_mode": "ledger",
+                            "open_inventory": True, "ungate_l5": True,
+                            "rearm_advance_only": True, "vo_record": True, "vo_critic": True,
+                            "vo_critic_govern": True, "vo_govern_mode": "composed",
+                            "vo_head_target": "record", "vo_probe": True,
+                            "ov_critic_hidden": 0}},
     # [voicing] THE PREFLIGHT TWINS of Q1's 2x2 — `en_pf_ra_on` plus the two voicing knobs,
     # and `commit: "delta_prov"` for the donor's own stated reason: a LOOP arm cannot arm on a
     # forty-step substrate, so a production arm in the sweep would never commit, never mint a
@@ -4299,6 +4387,12 @@ TWIN = {
     "voi3b_pf_src": "enum_live", "voi3b_pf_dp": "enum_live",            # [voicing Q3b] pf
     "voi3b_pf_v4": "enum_live", "voi3b_pf_v4pr": "enum_live",           # [voicing Q3b] pf
     "voi3b_pf_comp": "enum_live", "voi3b_pf_comp_pr": "enum_live",      # [voicing Q3b] pf
+    # [overtone] the readout round. Same stream as every other arm in this lineage, which is
+    # what lets `ovt_comp_pr_sh` be bit-identical to banked `vo_s3b:voi3b_comp_pr_yk`.
+    "ovt_comp_pr_sh": "enum_live", "ovt_comp_pr_dis": "enum_live",      # [overtone]
+    "ovt_comp_pr_lin": "enum_live",                                     # [overtone]
+    "ovt_pf_comp_pr": "enum_live", "ovt_pf_noshadow": "enum_live",      # [overtone] pf
+    "ovt_pf_dis": "enum_live", "ovt_pf_lin": "enum_live",               # [overtone] pf
     "voi2_dp": "enum_live", "voi2_critic": "enum_live",                 # [voicing Q2]
     "voi2_xp_f": "enum_live", "voi2_critic_xp": "enum_live",            # [voicing Q2]
     "voi2_pf_dp": "enum_live", "voi2_pf_v4": "enum_live",               # [voicing Q2] pf
@@ -5306,6 +5400,31 @@ _VO_DEFAULTS = {
     "vo_probe": False,         # THIS ARM babbles off-stream (per-ARM: an arm IS its diet)
     "vo_probe_n": 64,          # filed contexts probed per GOVERNED slot per cycle. Every
                                # probe grading is a grounding on the meter, with its own line.
+    # --- [overtone] HOW MUCH OF THE JUDGE'S JOB IS ALREADY IN THE MAIN MODEL --------------
+    # Every one of these defaults to off/absent; with all of them off the file is `voicing.py`
+    # at Q3b and the anchor replays at 0.000e+00 (gate G-F, and gate R-1 at full scale).
+    #
+    # S1 (`ov_shadow`) and S2 (`ov_free`) are INSTRUMENTS: they are trained and scored and
+    # they never govern, so they are run-level, like every other instrument budget in this
+    # file. S3 (`ov_probe_dis`) and the governing readout's shape (`ov_critic_hidden`) change
+    # what the arm DOES, so they are per-ARM, like every other chooser knob.
+    "ov_shadow": "",           # [S1] comma list of SHADOW readouts trained on the critic's own
+                               # rows and audited on the critic's own held-out split, never
+                               # governing: 'lin' = Linear(dim,1) over the critic's own state |
+                               # 'dir' = Linear(dim,1) over pooled.mean + candidate content
+                               # only (no slot embedding) -- the Steenwyk shape.
+    "ov_free": False,          # [S2] the ZERO-VERDICT scores in the audit: the DP's own score
+                               # of the candidate (raw and z-scored over the candidate set),
+                               # the trunk's entropy and margin at the slot's blocks, and the
+                               # out-of-fold logistic combination of prior and critic.
+    "ov_comb_folds": 2,        # [S2] folds for that out-of-fold combination (by the hold code)
+    "ov_dump": False,          # dump `buf`/`pbuf` (obs, write, verdict, DP score) at end of run
+    "ov_dump_cap": 0,          # rows per slot per buffer in the dump; 0 = the whole buffer
+    "ov_probe_dis": False,     # [S3] spend `vo_probe_n` where the prior and the critic DISAGREE
+    "ov_probe_unif_frac": 0.25,  # [S3] share of the SAME budget still drawn uniformly, so the
+                               # audit keeps a candidate set comparable to the uniform twin's
+    "ov_critic_hidden": -1,    # the GOVERNING critic's hidden_mult; -1 = `span_hidden_mult`
+                               # (the donor's MLP), 0 = a linear readout in the chooser's seat
 }
 
 
@@ -5513,18 +5632,29 @@ def _build_critic():
         what they are asked -- plus a content embedding of the candidate. `max_span` is
         `s**(max_level-1)`, as the head's."""
 
-        def __init__(self, n_slots, v, dim, max_span, hidden_mult=4):
+        def __init__(self, n_slots, v, dim, max_span, hidden_mult=4, ctx_mode="full"):
             super().__init__()
             self.v, self.dim, self.max_span = int(v), int(dim), int(max_span)
+            self.ctx_mode = str(ctx_mode)                         # [overtone]
             self.slot = nn.Embedding(int(n_slots), int(dim))
             self.ctx = nn.Linear(int(dim), int(dim))
             self.in_proj = nn.ModuleList(
                 [nn.Linear(int(dim), int(dim)) for _ in range(int(max_span))])
             self.feat = nn.Embedding(int(v) * int(max_span), int(dim))
             h = int(dim) * int(hidden_mult)
-            self.mlp = nn.Sequential(nn.Linear(int(dim), h), nn.GELU(), nn.Linear(h, 1))
+            # [overtone] `hidden_mult = 0` makes the readout ONE LINEAR MAP over the same
+            # state — the shape `reading/Epistemic State Representations` probes a residual
+            # stream with. Every other value is the donor's MLP verbatim, so the default
+            # (4, and `span_hidden_mult` in a run) is untouched and G-F stays closed.
+            self.mlp = (nn.Sequential(nn.Linear(int(dim), h), nn.GELU(), nn.Linear(h, 1))
+                        if int(hidden_mult) >= 1 else nn.Linear(int(dim), 1))
 
         def ctx_state(self, pooled, blk0, span, slot_id):
+            # [overtone] `ctx_mode = "mean"` is the STEENWYK EXTREME: one direction over the
+            # pooled mean and the candidate's content, with no slot embedding and no per-offset
+            # read of the slot's own blocks. `"full"` is the donor's and is the default.
+            if self.ctx_mode == "mean":
+                return self.ctx(pooled.mean(dim=1))                # (B, dim)
             u = self.ctx(pooled.mean(dim=1)) + self.slot(slot_id)
             for j in range(span):
                 u = u + self.in_proj[j](pooled[:, blk0 + j, :])
@@ -5547,7 +5677,7 @@ def _build_critic():
 _VO_CRITIC = None
 
 
-def build_critic(n_slots, v, dim, max_span, seed, device, hidden_mult=4):
+def build_critic(n_slots, v, dim, max_span, seed, device, hidden_mult=4, ctx_mode="full"):
     """`SN.build_head`'s minting discipline exactly: save the global RNG state, construct,
     restore, then re-initialise every parameter from a dedicated generator — so the critic's
     mere existence costs the shared per-arm stream nothing (gate S-1's property, one organ
@@ -5558,7 +5688,7 @@ def build_critic(n_slots, v, dim, max_span, seed, device, hidden_mult=4):
         _VO_CRITIC = _build_critic()
     st = torch.get_rng_state()
     cst = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
-    cr = _VO_CRITIC(n_slots, v, dim, max_span, hidden_mult=hidden_mult)
+    cr = _VO_CRITIC(n_slots, v, dim, max_span, hidden_mult=hidden_mult, ctx_mode=ctx_mode)
     torch.set_rng_state(st)
     if cst is not None:
         torch.cuda.set_rng_state_all(cst)
@@ -5616,7 +5746,8 @@ def vo_class_groups(quot, move, s, cache):
 
 
 def vo_run_probes(vo, rows, slots, quot, shared, rules, canon, s, device, *, n_probe,
-                  grade_fn, roots_of):
+                  grade_fn, roots_of, dis=False, unif_frac=0.25, critic=None, core=None,
+                  chunk=32):
     """[voicing Q3] BABBLING OFF-STREAM — the critic's counterfactual probe.
 
     For each governed slot, up to `n_probe` filed contexts from the practice beam: take the
@@ -5671,8 +5802,50 @@ def vo_run_probes(vo, rows, slots, quot, shared, rules, canon, s, device, *, n_p
             next((c for c in range(ncl)
                   if (flat_c[rows_by_c[c]] == wsel[j]).all(-1).any()), -1)
             for j in range(take)], dtype=torch.long)
+        # [overtone S3] SPENDING THE SAME BUDGET WHERE THE TWO ORGANS DISAGREE.
+        # §26 draws the substituted class uniformly. `ideas/heterogeneous_graders.md` §9 says
+        # the allocation signal is disagreement, so here the candidate is the on-table row (of
+        # a class other than the one written) that MAXIMISES |z(dp) - z(critic)| at this
+        # context -- the two terms the composed chooser sums, in the chooser's own units.
+        #
+        # THE CONTEXT DRAW IS UNTOUCHED. The same `sel` rows are probed; only the candidate
+        # moves. That keeps the confound to one axis, and it is the axis the idea names.
+        #
+        # A FIXED SHARE (`ov_probe_unif_frac`) IS STILL DRAWN UNIFORMLY and tagged, because
+        # otherwise the round's probe AUC would be read on a harder, selected candidate set
+        # and would not be comparable to `voi3b_comp_pr_yk`'s. The bill is identical either
+        # way: `take` gradings, one per context.
+        #
+        # The allocation reads one extra trunk forward over `take` rows per governed slot per
+        # cycle. It is UNPRICED, like the audit's (which is larger) -- the meter prices
+        # groundings, and this costs none. Said out loud rather than buried.
+        n_unif = take
+        dz = None
+        if dis and critic is not None and core is not None:
+            n_unif = min(take, max(0, int(round(float(unif_frac) * take))))
+            _dst = _rng_snapshot()
+            with torch.no_grad():
+                ob_d = obs.index_select(0, sel).to(device)
+                pooled_d, logits_d = SN.trunk(core, ob_d)
+                sid_d = torch.full((take,), int(info["id"]), dtype=torch.long, device=device)
+                cs_d = vo_critic_scores(critic, pooled_d, move["blk0"], span, sid_d,
+                                        move["flat"], chunk=int(chunk))
+                dp_d = vo_dp_scores_from_logits(logits_d, move, s)
+            _rng_restore(_dst)
+            if dp_d is not None and dp_d.shape[-1] >= 2:
+                dz = (ov_z(dp_d / float(span)) - ov_z(cs_d)).abs().cpu()
+            else:
+                n_unif = take                     # no prior to disagree with: §26's rule
         cand = torch.empty(take, span, dtype=torch.long)
+        uflag = torch.ones(take, dtype=torch.float32)
         for j in range(take):
+            if dz is not None and j >= n_unif:
+                allow = (cid != int(own[j])) if int(own[j]) >= 0 else torch.ones_like(cid,
+                                                                                     dtype=torch.bool)
+                if bool(allow.any()):
+                    cand[j] = flat_c[ov_pick_disagree(dz[j], allow)]
+                    uflag[j] = 0.0
+                    continue
             choices = [c for c in range(ncl) if c != int(own[j]) and rows_by_c[c].numel()]
             if not choices:
                 cand[j] = wsel[j]
@@ -5685,8 +5858,9 @@ def vo_run_probes(vo, rows, slots, quot, shared, rules, canon, s, device, *, n_p
         x2.scatter_(1, pos, canon[cand.to(device)].reshape(take, -1))
         succ2, _ = grade_fn(x2.cpu().numpy(), roots_of(rt.index_select(0, sel)), rules, s)
         n_g += take
+        vo.stat["n_probe_dis"] = vo.stat.get("n_probe_dis", 0) + int((uflag < 0.5).sum())
         out[key].append((obs.index_select(0, sel), cand,
-                         torch.from_numpy((succ2 > 0.5).astype("float32"))))
+                         torch.from_numpy((succ2 > 0.5).astype("float32")), uflag))
         vo.stat["n_probe"] += take
         vo.stat["n_probe_solved"] += int((succ2 > 0.5).sum())
         c = vo.stat.setdefault("probe", {}).setdefault(
@@ -5810,6 +5984,19 @@ class VoRecorder:
         # [Q3] the probe's OWN stream, for the same reason the critic has one.
         self.prng = np.random.default_rng(int(seed) * 15485863 + 11)
         self.pbuf = {}                   # slot -> (obs, cand, y) from the probe channel only
+        # [overtone] the probe rows' DRAW TAG, kept in lockstep with `pbuf` and nowhere else:
+        # 1.0 where the row was drawn UNIFORMLY (§26's rule) and 0.0 where it was drawn by
+        # prior/critic disagreement (S3). The audit reads the uniform subset apart so its
+        # probe AUC stays comparable to the uniform twin's; with `ov_probe_dis` off every row
+        # is tagged 1.0 and the subset IS the whole buffer, so the banked column is unmoved.
+        self.pmask = {}
+        # [overtone] the shadow readouts: trained on the critic's own rows, scored on the
+        # critic's own held-out split, never consulted by any chooser. They draw NOTHING from
+        # any RNG stream (they ride the critic's batch) and step their OWN optimizer, which is
+        # what makes the treated arm bit-identical to its shadow-free twin (gate R-1).
+        self.shadow = {}                 # name -> critic module
+        self.shadow_opt = None           # their own optimizer, never `gopt`
+        self.dp_row_cache = {}           # (table -> {row bytes: index}), `vo_class_groups`' idiom
         # per-slot record buffers: obs (n, length) int64 cpu, write (n, span), y (n,) float
         self.buf = {}
         # per-cycle staging, filled by the executor and consumed by `commit_step`
@@ -5987,12 +6174,20 @@ class VoRecorder:
             o_ = torch.cat([p[0] for p in parts])
             c_ = torch.cat([p[1] for p in parts])
             y_ = torch.cat([p[2] for p in parts]).float()
+            # [overtone] the draw tag rides with the rows. A part that carries no tag (every
+            # caller before this round, and the gate fixtures) is uniform by definition.
+            u_ = torch.cat([(p[3] if len(p) > 3 else torch.ones(int(p[2].shape[0])))
+                            for p in parts]).float()
             if key in self.pbuf:
                 o0, c0, y0 = self.pbuf[key]
                 if c0.shape[1] == c_.shape[1]:
-                    o_, c_, y_ = (torch.cat([o0, o_]), torch.cat([c0, c_]),
-                                  torch.cat([y0, y_]))
+                    u0 = self.pmask.get(key)
+                    if u0 is None or int(u0.shape[0]) != int(y0.shape[0]):
+                        u0 = torch.ones(int(y0.shape[0]))
+                    o_, c_, y_, u_ = (torch.cat([o0, o_]), torch.cat([c0, c_]),
+                                      torch.cat([y0, y_]), torch.cat([u0, u_]))
             self.pbuf[key] = (o_[-self.cap:], c_[-self.cap:], y_[-self.cap:])
+            self.pmask[key] = u_[-self.cap:]
 
     def assemble(self, wpath, traj, succ_bw, slots, s, length, pos_of, canon=None,
                  roots_bw=None):
@@ -6144,6 +6339,7 @@ def vo_critic_terms(core, critic, ex, slots, s, batch, rng, device, *, chunk, tr
     import torch.nn.functional as F
     vo = getattr(ex, "vo", None)
     terms, stat = [], {}
+    sh_terms = collections.defaultdict(list)          # [overtone S1]
     if vo is None:
         return None, stat
     for key, info in slots.items():
@@ -6188,12 +6384,269 @@ def vo_critic_terms(core, critic, ex, slots, s, batch, rng, device, *, chunk, tr
         terms.append(F.binary_cross_entropy_with_logits(lg, y))
         stat[key] = {"n_train": int(tr.numel()), "n_hold": int(hold.sum()),
                      "base_rate": float(y.mean())}
+        # [overtone S1] THE SHADOW READOUTS — the SAME rows, the SAME diet, the SAME context,
+        # differing only in the readout's shape. They ride the critic's own batch, so they draw
+        # nothing from any RNG stream; `pooled` is always detached for them, so their gradient
+        # cannot reach the trunk whatever `vo_critic_trunk` says; and they are stepped by their
+        # OWN optimizer below, so nothing of theirs ever enters the plant's `loss`, the plant's
+        # backward or the plant's optimizer. That is the whole of gate R-1.
+        for nm, sm in (vo.shadow or {}).items():
+            slg = sm(pooled.detach(), move["blk0"], int(move["span"]), sid, cand)
+            sh_terms[nm].append(F.binary_cross_entropy_with_logits(slg, y))
+    # [overtone S1] the shadows' own step, outside the plant's entirely.
+    if sh_terms and vo.shadow_opt is not None:
+        tot = None
+        for nm, ts in sh_terms.items():
+            t_ = sum(ts) / len(ts)
+            c = vo.stat.setdefault("ov_sh", {}).setdefault(nm, {"loss": 0.0, "n": 0})
+            c["loss"] += float(t_.item())
+            c["n"] += 1
+            tot = t_ if tot is None else tot + t_
+        vo.shadow_opt.zero_grad(set_to_none=True)
+        tot.backward()
+        vo.shadow_opt.step()
     if not terms:
         return None, stat
     return sum(terms) / len(terms), stat
 
 
-def vo_critic_audit(core, critic, ex, slots, device, *, chunk, cap=1024):
+# --------------------------------------------------------------------------------------- #
+# [overtone] THE READOUT ROUND — how much of the judge's job is already in the main model
+# --------------------------------------------------------------------------------------- #
+#
+# `voicing` Q3b measured a JUDGE: an MLP over the executor trunk's pooled hiddens plus a
+# candidate's content, gradient confined, trained on the grader's verdict, composed with the
+# trunk's own likelihood. Two readings put a question under it (`reading/emotion_in_cortex.md`;
+# `reading/Epistemic State Representations in Large Language Models.pdf`): the biological value
+# readout sits OUTSIDE cortex and reads a broadcast copy of it, and a next-token model already
+# carries a linearly readable correctness direction that a supervised probe can reach. So:
+#
+#   S1  how much of the judge is in the READOUT'S SHAPE?  A linear twin, same inputs, same
+#       diet, same rows, audited beside the MLP. And one direction over `pooled.mean` plus
+#       candidate content, no slot embedding, as the Steenwyk-shaped extreme.
+#   S2  how much of the judge needs the VERDICT DIET AT ALL?  Two free scores per held-out row
+#       -- the DP's own score of the candidate (the prior the composed chooser already uses)
+#       and the trunk's confidence at the slot's blocks -- ranked against the same verdict on
+#       the same rows, plus an out-of-fold logistic combination so the critic's BEYOND-PRIOR
+#       increment is a number rather than an impression.
+#   S3  can the probe budget be SPENT where the two organs disagree?
+#
+# S1 and S2 are instruments and never govern; S3 changes the arm. Every one of them defaults
+# off, and with them off the file is Q3b's at 0.000e+00.
+
+_OV_SHADOW_SPECS = {
+    # name : (the readout's shape, the context it reads)
+    "lin": {"hidden_mult": 0, "ctx_mode": "full",
+            "what": "Linear(dim,1) over the critic's own state (slot + per-offset pooled)"},
+    "dir": {"hidden_mult": 0, "ctx_mode": "mean",
+            "what": "Linear(dim,1) over pooled.mean + candidate content ONLY (no slot)"},
+}
+
+
+def ov_build_shadows(names, n_slots, v, dim, max_span, seed, device, lr):
+    """[overtone S1] The shadow readouts and their OWN optimizer.
+
+    Minted through `build_critic`, which restores the shared torch stream around the
+    construction (`SN.build_head`'s discipline), so their mere existence costs the arm's draw
+    nothing. Their optimizer is theirs alone and is never `gopt`: a shadow must not be able to
+    move the plant, the head, the critic, or any logged value."""
+    import torch
+    out = {}
+    for i_, nm in enumerate([x.strip() for x in str(names or "").split(",") if x.strip()]):
+        assert nm in _OV_SHADOW_SPECS, (
+            f"unknown shadow readout {nm!r}; known: {sorted(_OV_SHADOW_SPECS)}")
+        sp = _OV_SHADOW_SPECS[nm]
+        out[nm] = build_critic(n_slots, v, dim, max_span, int(seed) + 1_000 * (i_ + 1), device,
+                               hidden_mult=sp["hidden_mult"], ctx_mode=sp["ctx_mode"])
+        for p_ in out[nm].parameters():
+            p_.requires_grad_(True)
+    opt = (torch.optim.Adam([p for mm in out.values() for p in mm.parameters()],
+                            lr=float(lr), weight_decay=1e-4) if out else None)
+    return out, opt
+
+
+def ov_z(x):
+    """z over the candidate set, `vo_compose`'s own standardisation and clamp."""
+    return (x - x.mean(-1, keepdim=True)) / x.std(-1, keepdim=True).clamp_min(1e-6)
+
+
+def ov_pick_disagree(d, allow):
+    """[overtone S3] THE ALLOCATION RULE, in one line: among the rows whose class is not the
+    one that was written, the row where the two organs disagree most.
+
+    Factored out of `vo_run_probes` rather than written inline so gate R-5 can be shown to
+    fail on the rule that picks AGREEMENT — a perturbation that is otherwise unreachable,
+    because negating both z-scores leaves the absolute difference unchanged."""
+    import torch
+    sc = torch.where(allow, d, torch.full_like(d, float("-inf")))
+    return int(sc.argmax())
+
+
+def ov_row_index(move, cand, cache):
+    """(n,) int64 numpy — the row of `move['flat']` each candidate tuple IS, or -1.
+
+    The buffers outlive the table: a row filed before a commit or a merge may spell a class
+    the CURRENT operative table no longer holds, and the DP has no score for a candidate that
+    is not on the table. Those rows are reported as a shortfall against the buffer's own
+    denominator rather than silently dropped. `vo_class_groups`' cache idiom, keyed by the
+    table's own bytes because the table moves every cycle on an open arm."""
+    flat = move["flat"]
+    fnp = np.ascontiguousarray(flat.detach().cpu().numpy().astype(np.int64))
+    key = (int(move["level"]), int(move["node"]),
+           hashlib.blake2b(fnp.tobytes(), digest_size=8).hexdigest())
+    got = cache.get(key)
+    if got is None:
+        got = {}
+        for i_ in range(fnp.shape[0]):
+            got.setdefault(fnp[i_].tobytes(), i_)      # first row wins: ties are the same tuple
+        cache[key] = got
+        if len(cache) > 64:
+            cache.pop(next(iter(cache)))
+    cnp = np.ascontiguousarray(cand.detach().cpu().numpy().astype(np.int64))
+    idx = np.full(cnp.shape[0], -1, np.int64)
+    for j in range(cnp.shape[0]):
+        r_ = got.get(cnp[j].tobytes())
+        if r_ is not None:
+            idx[j] = r_
+    return idx
+
+
+def ov_free_scores(logits, move, s, idx):
+    """[overtone S2] THE ZERO-VERDICT SCORES, per held-out row, all free where they are read.
+
+    `logits` is what `SN.trunk` already returned for those rows, so nothing here costs a
+    forward. Four scores, each oriented so that HIGHER means 'more likely to solve' and an AUC
+    above 0.5 means the score ranks the verdict the right way round:
+
+      dp      the DP's own per-entry score of THE CANDIDATE, divided by the span (the file's
+              convention for this quantity, `vo_compose`'s first line)
+      dpz     the same, z-scored over the candidate set -- which is EXACTLY the prior term the
+              composed chooser sums, so its AUC is the prior's contribution in the chooser's
+              own units
+      conf    the negative mean entropy of the trunk's own next-feature distribution over the
+              slot's blocks: the model's confidence where it is about to write, with no
+              reference to the candidate at all
+      marg    the mean top1-top2 logit margin over the same blocks, the same quantity read
+              without the softmax
+
+    Returned as a dict of (n,) float numpy arrays plus a boolean `ok` for the rows whose
+    candidate is on the current table (`conf`/`marg` are defined for every row)."""
+    import torch
+    blk0, span = int(move["blk0"]), int(move["span"])
+    blk = logits[:, blk0:blk0 + span, :]
+    lp = torch.log_softmax(blk, dim=-1)
+    ent = -(lp.exp() * lp).sum(-1).mean(-1)                       # (B,)
+    t2 = blk.topk(2, dim=-1).values
+    marg = (t2[..., 0] - t2[..., 1]).mean(-1)                     # (B,)
+    out = {"conf": (-ent).cpu().numpy().astype(np.float64),
+           "marg": marg.cpu().numpy().astype(np.float64)}
+    dps = vo_dp_scores_from_logits(logits, move, s)
+    ok = np.asarray(idx) >= 0
+    n = int(logits.shape[0])
+    out["ok"] = ok
+    if dps is None or not ok.any():
+        out["dp"] = np.full(n, np.nan)
+        out["dpz"] = np.full(n, np.nan)
+        return out
+    a = dps / float(span)
+    az = ov_z(a) if a.shape[-1] >= 2 else a
+    ii = torch.from_numpy(np.where(ok, idx, 0)).to(dps.device)[:, None]
+    dp = a.gather(1, ii).squeeze(1).cpu().numpy().astype(np.float64)
+    dz = az.gather(1, ii).squeeze(1).cpu().numpy().astype(np.float64)
+    out["dp"] = np.where(ok, dp, np.nan)
+    out["dpz"] = np.where(ok, dz, np.nan)
+    return out
+
+
+def ov_logit_oof(X, y, code, folds=2, ridge=1e-3, iters=30):
+    """[overtone S2] OUT-OF-FOLD logistic combination of the free prior and the critic's logit.
+
+    The Steenwyk move: if the probe's discrimination is merely the model's own confidence read
+    back, a combination of the two cannot beat the prior alone. Fitting and scoring the same
+    rows would answer a different question -- how well two features can be made to fit 700
+    rows -- so every row is scored by a fit that never saw it. The folds are taken from the
+    audit's own bijective hold code, not a coin flip, for the reason `hold_code` exists.
+
+    IRLS with a small ridge, deterministic, no RNG. Returns (scores, ok) with `ok` false where
+    a fold could not be fitted (one class, or too few rows)."""
+    X = np.asarray(X, np.float64)
+    y = np.asarray(y, np.float64)
+    n = X.shape[0]
+    K = int(max(int(folds), 1))
+    f = np.asarray(code, np.int64) % K
+    out = np.full(n, np.nan)
+    for k in range(K):
+        tr, te = (f != k), (f == k)
+        if int(tr.sum()) < 8 or int(te.sum()) < 1:
+            continue
+        yt = y[tr]
+        if yt.min() == yt.max():
+            continue
+        mu, sd = X[tr].mean(0), X[tr].std(0)
+        sd = np.where(sd < 1e-9, 1.0, sd)
+        A = np.concatenate([(X[tr] - mu) / sd, np.ones((int(tr.sum()), 1))], 1)
+        Bm = np.concatenate([(X[te] - mu) / sd, np.ones((int(te.sum()), 1))], 1)
+        out[te] = Bm @ ov_irls(A, yt, ridge=ridge, iters=iters)
+    return out, ~np.isnan(out)
+
+
+def ov_oof_auc(X, y, code, folds=2, ridge=1e-3, iters=30):
+    """[overtone] THE out-of-fold AUC of a logistic combination — computed PER FOLD and averaged
+    by pair count, never by pooling the folds' scores into one ranking.
+
+    DEFECT #5 OF THIS ROUND, and the reason this function exists. `ov_s0`'s `comb_auc` and
+    `prior_oof_auc` were the AUC of the POOLED out-of-fold scores. Each fold's score is that
+    fold's own affine map of the features, and the folds' INTERCEPTS differ whenever their base
+    rates differ — which they do here, because the held-out set is small and the same contexts
+    recur across cycles. Pooling then ranks fold-membership as much as it ranks the verdict.
+    Measured on synthetic rows with a known single-feature AUC of 0.698: pooled reads 0.482 and
+    per-fold reads 0.720. The single-feature columns (`dpz`, `dp`, `conf`, `marg`, `crit`) were
+    never affected — they are raw scores with no fold structure at all.
+
+    Returns (per-fold weighted AUC, rows used, the pooled figure). The pooled figure is returned
+    rather than dropped so the defect stays visible in the record and `ov_s0`'s numbers remain
+    interpretable as what they were."""
+    s, ok = ov_logit_oof(X, y, code, folds=folds, ridge=ridge, iters=iters)
+    y = np.asarray(y, np.float64)
+    K = int(max(int(folds), 1))
+    f = np.asarray(code, np.int64) % K
+    num = den = 0.0
+    n_used = 0
+    for k in range(K):
+        mm = ok & (f == k)
+        if int(mm.sum()) < 16:
+            continue
+        a = vo_auc(s[mm], y[mm])
+        if a is None:
+            continue
+        w = float((y[mm] > 0.5).sum()) * float((y[mm] <= 0.5).sum())
+        num += a * w
+        den += w
+        n_used += int(mm.sum())
+    pooled = (vo_auc(s[ok], y[ok]) if int(ok.sum()) >= 16 else None)
+    return ((num / den) if den > 0 else None), n_used, pooled
+
+
+def ov_irls(A, y, ridge=1e-3, iters=30):
+    """The logistic fit `ov_logit_oof` uses, factored out so gate R-4 can build the IN-FOLD
+    reference from the same estimator rather than from a second implementation of it."""
+    w = np.zeros(A.shape[1])
+    for _ in range(int(iters)):
+        p = 1.0 / (1.0 + np.exp(-np.clip(A @ w, -30.0, 30.0)))
+        g = A.T @ (p - y) + ridge * w
+        sw = p * (1.0 - p) + 1e-6
+        H = (A * sw[:, None]).T @ A + ridge * np.eye(A.shape[1])
+        try:
+            stp = np.linalg.solve(H, g)
+        except np.linalg.LinAlgError:
+            break
+        w = w - stp
+        if float(np.abs(stp).max()) < 1e-9:
+            break
+    return w
+
+
+def vo_critic_audit(core, critic, ex, slots, device, *, chunk, cap=1024, s=None):
     """[voicing Q2] The critic's HELD-OUT AUC against the verdict, per slot, once per cycle.
     Unpriced instrument: no gradient, no RNG, and the held-out rows never enter the loss.
 
@@ -6211,7 +6664,10 @@ def vo_critic_audit(core, critic, ex, slots, device, *, chunk, cap=1024):
         return out
     thr = int(round(float(vo.cfg.get("vo_critic_hold", 0.1)) * 100))
 
-    def _score(move, sid_id, obs_b, w_b, y_b):
+    free_on = bool(vo.cfg.get("ov_free")) and s is not None          # [overtone S2]
+    folds = int(vo.cfg.get("ov_comb_folds", 2) or 2)                  # [overtone S2]
+
+    def _score(move, sid_id, obs_b, w_b, y_b, umask=None):
         """held-out AUC on one (obs, write, verdict) buffer, or None if too few rows."""
         if obs_b is None or obs_b.shape[0] < 32:
             return None
@@ -6223,12 +6679,60 @@ def vo_critic_audit(core, critic, ex, slots, device, *, chunk, cap=1024):
         sid = torch.full((int(hold.numel()),), sid_id, dtype=torch.long, device=device)
         _ast = _rng_snapshot()                   # the audit is an instrument: see above
         with torch.no_grad():
-            pooled, _ = SN.trunk(core, obs_b[hold].to(device))
-            lg = critic(pooled, move["blk0"], int(move["span"]), sid, w_b[hold].to(device))
+            pooled, logits = SN.trunk(core, obs_b[hold].to(device))
+            cand = w_b[hold].to(device)
+            lg = critic(pooled, move["blk0"], int(move["span"]), sid, cand)
+            # [overtone S1] the shadows are scored on the SAME rows through the SAME context,
+            # so the only thing between their AUC and the critic's is the readout's shape.
+            sh = {nm: sm(pooled, move["blk0"], int(move["span"]), sid, cand)
+                  for nm, sm in (vo.shadow or {}).items()}
         _rng_restore(_ast)
-        return {"n": int(hold.numel()),
-                "auc": vo_auc(lg.cpu().numpy(), y_b[hold].numpy()),
-                "base_rate": float(y_b[hold].mean())}
+        y = y_b[hold].numpy()
+        cl = lg.cpu().numpy().astype(np.float64)
+        rec = {"n": int(hold.numel()), "auc": vo_auc(cl, y),
+               "base_rate": float(y_b[hold].mean())}
+        if sh:
+            rec["sh_auc"] = {nm: vo_auc(t.cpu().numpy().astype(np.float64), y)
+                             for nm, t in sh.items()}
+        # [overtone] the UNIFORM subset of a probe buffer, so the probe AUC stays comparable
+        # to the uniform twin's when the draw has been re-aimed (S3). With `ov_probe_dis` off
+        # every row is tagged uniform and this equals `auc` exactly.
+        if umask is not None:
+            um = umask[hold].numpy() > 0.5
+            rec["unif_n"] = int(um.sum())
+            rec["unif_auc"] = (vo_auc(cl[um], y[um]) if int(um.sum()) >= 16 else None)
+            rec["dis_n"] = int((~um).sum())
+            rec["dis_auc"] = (vo_auc(cl[~um], y[~um]) if int((~um).sum()) >= 16 else None)
+        if free_on:
+            # [overtone S2] THE ZERO-VERDICT SCORES, on these same held-out rows. None of them
+            # has ever seen a verdict: `dp`/`dpz` are the surface model's own ranking of the
+            # candidate and `conf`/`marg` its confidence where it is about to write.
+            idx = ov_row_index(move, w_b[hold], vo.dp_row_cache)
+            fr = ov_free_scores(logits, move, int(s), idx)
+            ok = fr["ok"]
+            rec["free"] = {
+                "n_ontable": int(ok.sum()),
+                "conf_auc": vo_auc(fr["conf"], y),
+                "marg_auc": vo_auc(fr["marg"], y),
+                "dp_auc": (vo_auc(fr["dp"][ok], y[ok]) if int(ok.sum()) >= 16 else None),
+                "dpz_auc": (vo_auc(fr["dpz"][ok], y[ok]) if int(ok.sum()) >= 16 else None),
+                # the critic's AUC on the SAME sub-population the prior is defined on, so the
+                # comparison and the increment below share one denominator
+                "auc_ontable": (vo_auc(cl[ok], y[ok]) if int(ok.sum()) >= 16 else None),
+            }
+            if int(ok.sum()) >= 32:
+                cd = code[hold].numpy()
+                yo = y[ok]
+                # [overtone] PER FOLD, averaged by pair count — see `ov_oof_auc` and defect #5.
+                ca, cn, cp = ov_oof_auc(np.stack([fr["dpz"][ok], cl[ok]], 1), yo, cd[ok],
+                                        folds=folds)
+                pa, _pn, pp = ov_oof_auc(fr["dpz"][ok][:, None], yo, cd[ok], folds=folds)
+                rec["free"]["comb_auc"] = ca
+                rec["free"]["comb_n"] = int(cn)
+                rec["free"]["comb_auc_pooled"] = cp         # the defective form, kept visible
+                rec["free"]["prior_oof_auc"] = pa
+                rec["free"]["prior_oof_auc_pooled"] = pp
+        return rec
 
     for key, info in slots.items():
         if info.get("move") is None:
@@ -6237,13 +6741,20 @@ def vo_critic_audit(core, critic, ex, slots, device, *, chunk, cap=1024):
         got = vo.buf.get(key)
         fil = _score(move, info["id"], *got) if got is not None else None
         pgt = vo.pbuf.get(key)
-        prb = _score(move, info["id"], *pgt) if pgt is not None else None
+        prb = (_score(move, info["id"], *pgt, umask=vo.pmask.get(key))
+               if pgt is not None else None)
         if fil is None and prb is None:
             continue
         rec = dict(fil or {"n": 0, "auc": None, "base_rate": None})
         rec["probe_n"] = (prb or {}).get("n", 0)
         rec["probe_auc"] = (prb or {}).get("auc")
         rec["probe_base_rate"] = (prb or {}).get("base_rate")
+        # [overtone] the probe half's own extra columns, kept under one key so the banked
+        # reduction's reads (`auc`, `probe_auc`, `n`, `probe_n`, `base_rate`) are untouched.
+        if prb is not None:
+            rec["probe_x"] = {k: q for k, q in prb.items()
+                              if k in ("sh_auc", "free", "unif_n", "unif_auc",
+                                       "dis_n", "dis_auc")}
         out[key] = rec
     return out
 
@@ -6833,6 +7344,452 @@ def vo_gate_v6b(a, b, arm_a="", arm_b=""):
     return {"V-6b": rec}
 
 
+_OV_SER = ("e", "succ", "dres", "n_solved", "n_mined", "n_moves", "width",
+           "e_practice", "vloss", "gloss", "t_cum")
+
+
+def ov_series_delta(a, b, series=_OV_SER):
+    """max |Δ| over the behaviour series two arm files share, with the worst series and the
+    first differing cycle beside it. One helper for R-1 and R-6, which are the same
+    measurement read in opposite directions."""
+    worst, wk, first = 0.0, None, None
+    for k in series:
+        if k not in a["log"] or k not in b["log"]:
+            continue
+        x = np.asarray(a["log"][k], float)
+        y = np.asarray(b["log"][k], float)
+        n = min(len(x), len(y))
+        if not n:
+            continue
+        d = np.abs(x[:n] - y[:n])
+        if float(d.max()) > worst:
+            worst, wk = float(d.max()), k
+            nz = np.nonzero(d > 0)[0]
+            first = int(nz[0]) if nz.size else None
+    ca = [(e["level"], e["cycle"]) for e in a["events"] if e["kind"] == "commit"]
+    cb = [(e["level"], e["cycle"]) for e in b["events"] if e["kind"] == "commit"]
+    return {"max_abs_delta": worst, "worst_series": wk,
+            "first_differing_cycle": first, "commits_equal": ca == cb}
+
+
+def ov_gate_r1(a, b, arm_a="", arm_b=""):
+    """[overtone] GATE R-1 — THE SHADOWS ARE INERT, with governance ON.
+
+    An instrument that is trained inside a paid run is not obviously an instrument. The shadow
+    readouts see the critic's own batch, so they consume no draw; their `pooled` is always
+    detached, so no gradient of theirs can reach the trunk; and they step their own optimizer,
+    so nothing of theirs enters the plant's `loss`, the plant's backward or `gopt`. This gate
+    is that claim, ASSERTED on every behaviour series against a twin one instrument-boolean
+    away, WITH THE CRITIC GOVERNING — which is the condition defect #8 taught this lineage to
+    insist on (§30: an inertness gate asserted with governance off cannot see a diet at all).
+
+    Its non-vacuity half is the other side of the same lesson: both arms must have governed,
+    and the shadow arm must actually have TRAINED a shadow (gate R-2 is the CPU dual that says
+    the training moves parameters). A gate that passes because the shadows never ran is the
+    exact failure V-6 exists to prevent."""
+    rec = ov_series_delta(a, b)
+    rec.update({"shadow_arm": arm_a, "bare_arm": arm_b})
+    va = [c for c in a["log"]["vo"] if c]
+    vb = [c for c in b["log"]["vo"] if c]
+    sh = [c.get("ov_sh") for c in va if c.get("ov_sh")]
+    rec["shadow_steps"] = int(sum(q["n"] for c in sh for q in c.values()))
+    rec["shadow_names"] = sorted({nm for c in sh for nm in c})
+    rec["both_governed"] = bool(any(c.get("governed") for c in va)
+                                and any(c.get("governed") for c in vb))
+    rec["bare_has_no_shadow"] = not any(c.get("ov_sh") for c in vb)
+    assert rec["both_governed"], f"R-1 VACUOUS: a twin never governed a slot: {rec}"
+    assert rec["shadow_steps"] > 0 and rec["shadow_names"], (
+        f"R-1 VACUOUS: the shadow arm never trained a shadow: {rec}")
+    assert rec["bare_has_no_shadow"], f"R-1 VACUOUS: the bare twin carries shadows: {rec}"
+    assert rec["max_abs_delta"] == 0.0 and rec["commits_equal"], (
+        f"R-1 FAILED: the shadow readouts moved the run: {rec}")
+    return {"R-1": rec}
+
+
+def ov_gate_r6(a, b, arm_a="", arm_b=""):
+    """[overtone] GATE R-6 — THE DISAGREEMENT DRAW IS LIVE, the dual of R-1.
+
+    `ov_probe_dis` re-aims the probe budget; a knob whose whole purpose is to change what is
+    graded must be shown to change it, and the perturbation it has to fail on is
+    DISCONNECTION (§30's general lesson). Two arms with governance ON, one allocation-boolean
+    apart: the disagreement arm must have drawn rows by the rule (`n_probe_dis > 0`), must
+    have paid the SAME bill per cycle as its uniform twin (the allocation rule may not buy
+    itself more gradings), and the two runs must NOT be identical.
+
+    The SIZE of the difference is measured and never asserted — how much a re-aimed probe diet
+    moves a run is not something a gate may pin."""
+    rec = ov_series_delta(a, b)
+    rec.update({"dis_arm": arm_a, "unif_arm": arm_b})
+    va = [c for c in a["log"]["vo"] if c]
+    vb = [c for c in b["log"]["vo"] if c]
+    rec["n_probe_dis"] = int(sum(c.get("n_probe_dis", 0) for c in va))
+    rec["n_probe_a"] = int(sum(c.get("n_probe", 0) for c in va))
+    rec["n_probe_b"] = int(sum(c.get("n_probe", 0) for c in vb))
+    rec["n_probe_dis_unif_arm"] = int(sum(c.get("n_probe_dis", 0) for c in vb))
+    rec["both_governed"] = bool(any(c.get("governed") for c in va)
+                                and any(c.get("governed") for c in vb))
+    assert rec["both_governed"], f"R-6 VACUOUS: a twin never governed a slot: {rec}"
+    assert rec["n_probe_dis"] > 0, (
+        f"R-6 FAILED: `ov_probe_dis` is on and not one row was drawn by the rule — this is "
+        f"defect #8's shape, one knob over: {rec}")
+    assert rec["n_probe_dis_unif_arm"] == 0, (
+        f"R-6 VACUOUS: the uniform twin drew disagreement rows: {rec}")
+    assert rec["max_abs_delta"] > 0.0, (
+        f"R-6 FAILED: the re-aimed probe diet changed NOTHING with governance ON: {rec}")
+    return {"R-6": rec}
+
+
+def ov_gates_cpu(verbose=True):
+    """[overtone] The round's offline gate table — R-2, R-3, R-4, R-5, R-7, R-8.
+
+    Same discipline as `vo_gates_cpu`: assert an identity only where the substrate is
+    deterministic, measure elsewhere and report the denominator, and let every gate be
+    falsifiable from `overtone/gates/falsify_ov.py` without paying for a preflight."""
+    import torch
+    import torch.nn.functional as F
+    ok, bad = {}, []
+
+    def say(name, good, detail=""):
+        ok[name] = {"pass": bool(good), "detail": detail}
+        if not good:
+            bad.append(name)
+        if verbose:
+            print(f"  [{'PASS' if good else 'FAIL'}] {name}   {detail}")
+
+    v, s, depth, m, level, node = 8, 2, 4, 2, 2, 3
+    L, dev = s ** depth, torch.device("cpu")
+    from rhm.rhm_data import generate_rules_distinct
+    rules = generate_rules_distinct(v, s, depth, m, seed=0)
+    truth = MC.true_tables(rules, depth, s, v, m, level)
+    mv = MC.to_device(MC.make_macro(level, node, s, truth[level]), dev)
+    key = SN.slot_key(level, node)
+    R = int(mv["flat"].shape[0])
+    span, blk0 = int(mv["span"]), int(mv["blk0"])
+
+    # ---- R-7: `hidden_mult = 0` IS a linear readout, and the default is untouched -------- #
+    # ASSERTED on both halves: the donor's default builds the MLP it always built (so G-F and
+    # V-4b are unaffected by this edit), and the zero form is ONE affine map of the same state
+    # — checked against a hand-written `W(u + e) + b` rather than against its own module.
+    import torch.nn as nn
+    cr4 = build_critic(SN.slot_count(s, depth, 3), v, 32, s ** 2, seed=11, device=dev)
+    cr0 = build_critic(SN.slot_count(s, depth, 3), v, 32, s ** 2, seed=11, device=dev,
+                       hidden_mult=0)
+    crd = build_critic(SN.slot_count(s, depth, 3), v, 32, s ** 2, seed=11, device=dev,
+                       hidden_mult=0, ctx_mode="mean")
+    g0 = torch.Generator().manual_seed(1)
+    pooled = torch.randn(6, L // s, 32, generator=g0)
+    sid = torch.zeros(6, dtype=torch.long)
+    cand = mv["flat"][torch.randint(0, R, (6,), generator=g0)]
+    is_lin = isinstance(cr0.mlp, nn.Linear)
+    with torch.no_grad():
+        u0 = cr0.ctx_state(pooled, blk0, span, sid) + cr0.cand_state(cand, span)
+        # the reference is written out by hand rather than taken from the module, so a readout
+        # that is not one affine map fails here instead of agreeing with itself
+        lin = ((u0 @ cr0.mlp.weight.T + cr0.mlp.bias).squeeze(-1) if is_lin
+               else torch.full((u0.shape[0],), float("nan")))
+        got = cr0(pooled, blk0, span, sid, cand)
+        ud = crd.ctx_state(pooled, blk0, span, sid)
+        want_d = crd.ctx(pooled.mean(1))
+    d7 = float((lin - got).abs().max()) if is_lin else float("inf")
+    say("R-7 (hidden_mult=0 is ONE linear map; the default is still the donor's MLP; "
+        "ctx_mode='mean' drops the slot and the per-offset reads)",
+        isinstance(cr4.mlp, nn.Sequential) and is_lin
+        and d7 == 0.0 and float((ud - want_d).abs().max()) == 0.0,
+        f"|delta| linear = {d7:.3e}; default mlp = {type(cr4.mlp).__name__}; "
+        f"zero mlp = {type(cr0.mlp).__name__}")
+
+    # ---- R-3: the free scores are the file's OWN quantities, and they cost no draw -------- #
+    # The DP score the audit reads for a candidate must BE `vo_dp_scores_from_logits`' entry
+    # for that candidate's row — an identity, because it is the same tensor indexed. MEASURED
+    # for `conf`/`marg` against a hand-written entropy and margin (a different summation
+    # order). The RNG-neutrality half is asserted: the audit is an instrument.
+    import rhm.rhm_generative_planner as GP
+    torch.manual_seed(5)
+    core = GP._build_generator()(v, L, s, 32, n_head=2, n_layer=2, root_conditioned=False)
+    core.eval()
+    obs_t = torch.randint(0, v, (24, L), generator=torch.Generator().manual_seed(7))
+    with torch.no_grad():
+        _pl, lgts = SN.trunk(core, obs_t)
+    cand_t = mv["flat"][torch.randint(0, R, (24,), generator=torch.Generator().manual_seed(8))]
+    idx = ov_row_index(mv, cand_t, {})
+    fr = ov_free_scores(lgts, mv, s, idx)
+    with torch.no_grad():
+        dps = vo_dp_scores_from_logits(lgts, mv, s) / float(span)
+        want_dp = dps[torch.arange(24), torch.from_numpy(idx)].numpy()
+        blk = lgts[:, blk0:blk0 + span, :]
+        p = torch.softmax(blk, -1)
+        want_conf = float(0)
+        ent_ref = -(p * torch.log(p.clamp_min(1e-30))).sum(-1).mean(-1)
+        t2 = blk.topk(2, -1).values
+        marg_ref = (t2[..., 0] - t2[..., 1]).mean(-1)
+    d3 = float(np.abs(fr["dp"] - want_dp).max())
+    d3c = float(np.abs(fr["conf"] - (-ent_ref).numpy()).max())
+    d3m = float(np.abs(fr["marg"] - marg_ref.numpy()).max())
+    _r0 = _rng_snapshot()
+    _ref = torch.randn(3).tolist()
+    _rng_restore(_r0)
+    _ = ov_free_scores(lgts, mv, s, idx)
+    _got = torch.randn(3).tolist()
+    _rng_restore(_r0)
+    say("R-3 (the DP score IS the file's own per-entry score at that row; conf/marg are the "
+        "trunk's entropy and margin at the slot's blocks; the read consumes no draw)",
+        d3 == 0.0 and d3c < 1e-5 and d3m < 1e-5 and bool((idx >= 0).all())
+        and _ref == _got,
+        f"dp |delta| = {d3:.3e} (IDENTITY) · conf {d3c:.3e} · marg {d3m:.3e} (MEASURED) · "
+        f"on-table {int((idx >= 0).sum())}/24 · rng-neutral = {_ref == _got}")
+
+    # ---- R-4: the logistic combination is OUT OF FOLD ------------------------------------ #
+    # Two halves. (i) ASSERTED: no row is scored by a fit that saw it — checked by making the
+    # label a pure function of the fold, which an in-fold fit separates perfectly and an
+    # out-of-fold fit cannot beat chance on. (ii) MEASURED: on a set whose label IS a logistic
+    # function of one feature plus noise, the combination recovers a ranking above chance.
+    n_r4, d_r4 = 120, 40
+    rg = np.random.default_rng(0)
+    code_r4 = np.arange(n_r4)
+    Xn = rg.normal(size=(n_r4, d_r4))
+    yn = (rg.random(n_r4) < 0.5).astype(np.float64)     # a fair coin: NOTHING to learn
+    s_oof, ok_oof = ov_logit_oof(Xn, yn, code_r4, folds=2)
+    auc_oof = vo_auc(s_oof[ok_oof], yn[ok_oof])
+    mu_, sd_ = Xn.mean(0), Xn.std(0)
+    A_ = np.concatenate([(Xn - mu_) / np.where(sd_ < 1e-9, 1.0, sd_),
+                         np.ones((n_r4, 1))], 1)
+    auc_in = vo_auc(A_ @ ov_irls(A_, yn), yn)           # the SAME estimator, fit in-fold
+    z_r4 = rg.normal(size=n_r4)
+    y_r4 = (rg.random(n_r4) < 1.0 / (1.0 + np.exp(-2.5 * z_r4))).astype(np.float64)
+    s_r4, ok_r4 = ov_logit_oof(np.stack([z_r4, rg.normal(size=n_r4)], 1), y_r4,
+                               code_r4, folds=2)
+    auc_r4 = vo_auc(s_r4[ok_r4], y_r4[ok_r4])
+    # AND the half added after defect #5: the AUC must be taken PER FOLD. On rows whose folds
+    # carry different base rates, pooling the folds' out-of-fold scores into one ranking ranks
+    # fold membership as much as it ranks the label; the per-fold average does not. This half
+    # goes red if `ov_oof_auc` ever reads the pooled figure again.
+    zp = rg.normal(size=n_r4)
+    yp = (rg.random(n_r4) < 0.2).astype(np.float64)
+    zp = zp + 1.2 * yp
+    cp_ = rg.integers(0, 10, n_r4)
+    yp = np.where((cp_ % 2 == 0) & (rg.random(n_r4) < 0.35), 1.0, yp)   # folds differ in base
+    raw_p = vo_auc(zp, yp)
+    perfold, n_pf, pooled = ov_oof_auc(zp[:, None], yp, cp_, folds=2)
+    say("R-4 (the combination is OUT OF FOLD: 40 noise features over 120 coin flips rank at "
+        "chance out of fold and materially above it in fold; a label that IS a logistic "
+        "function of a feature is still recovered; and the out-of-fold AUC is taken PER FOLD, "
+        "because pooling folds with different base rates ranks fold membership)",
+        auc_oof is not None and abs(auc_oof - 0.5) < 0.15
+        and (auc_in - auc_oof) > 0.20 and auc_r4 > 0.70
+        and perfold is not None and abs(perfold - raw_p) < 0.06
+        and (perfold - pooled) > 0.10,
+        f"noise: out-of-fold AUC = {auc_oof:.3f} vs IN-fold {auc_in:.3f} on {n_r4} rows, "
+        f"{d_r4} features · recoverable-signal AUC = {auc_r4:.3f} "
+        f"on {int(ok_r4.sum())} rows · DEFECT #5: single feature raw {raw_p:.3f}, "
+        f"per-fold {perfold:.3f} ({n_pf} rows), POOLED {pooled:.3f}")
+
+    # ---- R-2: the shadows TRAIN, and they train on the critic's own rows ----------------- #
+    # V-6's shape, one organ over: an instrument that is never stepped is the most inert thing
+    # there is, so the liveness half is a gate and its perturbation is disconnection. Two
+    # steps, one boolean apart: with the shadows wired their parameters must MOVE and the
+    # critic's must not care.
+    def _step(with_shadow):
+        torch.manual_seed(5)
+        core_ = GP._build_generator()(v, L, s, 32, n_head=2, n_layer=2, root_conditioned=False)
+        cr = build_critic(SN.slot_count(s, depth, level + 1), v, 32, s ** level, seed=29,
+                          device=dev, hidden_mult=2)
+        for p_ in cr.parameters():
+            p_.requires_grad_(True)
+        copt = torch.optim.SGD(cr.parameters(), lr=1.0)
+        cfg_ = dict(_VO_DEFAULTS)
+        cfg_.update(vo_record=True, v=v, vo_critic=True)
+        vo = VoRecorder(cfg_, dev, seed=0)
+        vo.on = True
+        vo.quot = MG.LearnedQuotient()
+        vo.critic = cr
+        if with_shadow:
+            vo.shadow, vo.shadow_opt = ov_build_shadows("lin,dir",
+                                                        SN.slot_count(s, depth, level + 1),
+                                                        v, 32, s ** level, 29, dev, 1e-2)
+        g = torch.Generator().manual_seed(3)
+        n = 128
+        obs = torch.randint(0, v, (n, L), generator=g)
+        w = mv["flat"][torch.randint(0, R, (n,), generator=g)]
+        y = (torch.rand(n, generator=g) < 0.4).float()
+        vo.buf[key] = (obs.clone(), w.clone(), y.clone())
+        ex = type("E", (), {"vo": vo})()
+        slots = {key: {"move": mv, "id": 0, "open": True}}
+        before = ({nm: [q.detach().clone() for q in mm.parameters()]
+                   for nm, mm in (vo.shadow or {}).items()})
+        term, st = vo_critic_terms(core_, cr, ex, slots, s, 64, np.random.default_rng(0),
+                                   dev, chunk=16, trunk_grad=False, hold_frac=0.1)
+        # CONTAINMENT, read BEFORE the caller's own backward: the shadows have already been
+        # stepped by the time this returns, so if any of their gradient reached the critic or
+        # the trunk it is sitting on `.grad` right now. It must not be.
+        touched = sum(1 for p_ in list(cr.parameters()) + list(core_.parameters())
+                      if p_.grad is not None)
+        copt.zero_grad()
+        term.backward()
+        copt.step()
+        dsh = {nm: max(float((x_ - y_).abs().max())
+                       for x_, y_ in zip(before[nm],
+                                         [q.detach() for q in vo.shadow[nm].parameters()]))
+               for nm in (vo.shadow or {})}
+        return ([q.detach().clone() for q in cr.parameters()], dsh,
+                {k_: q_["n_train"] for k_, q_ in st.items()}, vo.stat.get("ov_sh"), touched)
+
+    p_off, _, n_off, sh_off, t_off = _step(False)
+    p_on, dsh, n_on, sh_on, t_on = _step(True)
+    d_cr = max(float((x_ - y_).abs().max()) for x_, y_ in zip(p_off, p_on))
+    say("R-2 (the shadows train — their parameters MOVE — on the critic's own rows; their "
+        "gradient reaches neither the critic nor the trunk; and the critic lands where it "
+        "would have landed without them)",
+        bool(dsh) and all(q > 0 for q in dsh.values()) and d_cr == 0.0
+        and n_off == n_on and sh_off is None and bool(sh_on)
+        and t_on == 0 and t_off == 0,
+        f"d_shadow = { {k: round(q, 6) for k, q in dsh.items()} } · "
+        f"d_critic = {d_cr:.3e} (IDENTITY) · n_train {n_off} == {n_on} · "
+        f"critic/trunk params carrying a gradient after the shadow step = {t_on}")
+
+    # ---- R-5: the disagreement draw stays inside §26's own claims ------------------------ #
+    # V-4d's four claims re-asserted under the new rule (on-table, a DIFFERENT class, the filed
+    # buffer untouched, billed row for row) plus the two the rule adds: the chosen row is the
+    # ARGMAX of |z(dp) - z(critic)| among the rows of other classes, checked against a
+    # recomputation; and exactly `round(unif_frac * take)` rows are tagged uniform.
+    canon_g = torch.as_tensor(np.ascontiguousarray(rules[depth - 1][:, 0, :]),
+                              dtype=torch.long)
+    cfg_p = dict(_VO_DEFAULTS)
+    cfg_p.update(vo_record=True, v=v, vo_critic=True, ov_probe_dis=True)
+    vo_p = VoRecorder(cfg_p, dev, seed=0)
+    vo_p.on = True
+    vo_p.quot = MG.LearnedQuotient()
+    vo_p.governed = {key}
+    torch.manual_seed(5)
+    core_p = GP._build_generator()(v, L, s, 32, n_head=2, n_layer=2, root_conditioned=False)
+    core_p.eval()
+    cr_p = build_critic(SN.slot_count(s, depth, level + 1), v, 32, s ** level, seed=29,
+                        device=dev, hidden_mult=2)
+    vo_p.critic = cr_p
+    gp_ = torch.Generator().manual_seed(21)
+    n_p = 16
+    obs_p = torch.randint(0, v, (n_p, L), generator=gp_)
+    fin_p = torch.randint(0, v, (n_p, L), generator=gp_)
+    # EVERY ROW WRITES THE SAME CLASS, V-4d's construction, so "a DIFFERENT class" is a
+    # property of the returned candidates alone and not of a draw the caller cannot see.
+    w_p = mv["flat"][0][None, :].expand(n_p, -1).contiguous()
+    rows_p = {key: [{"fin": fin_p, "obs": obs_p, "w": w_p,
+                     "root": torch.arange(n_p)}]}
+    slots_p = {key: {"move": mv, "id": 0, "open": True}}
+    buf_before = None
+    filed_rows = {}
+    out_p, ng_p = vo_run_probes(
+        vo_p, rows_p, slots_p, vo_p.quot, None, rules, canon_g, s, dev, n_probe=n_p,
+        grade_fn=(lambda x_, r_, ru_, s_: (np.zeros(x_.shape[0], np.float32), None)),
+        roots_of=(lambda t_: t_.numpy()),
+        dis=True, unif_frac=0.25, critic=cr_p, core=core_p, chunk=8)
+    parts_p = out_p[key]
+    cand_p = torch.cat([q[1] for q in parts_p])
+    uflag_p = torch.cat([q[3] for q in parts_p])
+    cidx_p, ncl_p = vo_class_groups(vo_p.quot, mv, s, {})
+    own_c = int(cidx_p[0])
+    on_table = bool((mv["flat"][None, :, :] == cand_p[:, None, :]).all(-1).any(-1).all())
+    diff_class = int(sum(1 for j in range(cand_p.shape[0])
+                         if int(cidx_p[int((mv["flat"] == cand_p[j]).all(-1)
+                                           .nonzero()[0][0])]) == own_c))
+    # THE CONTEXT ORDER IS THE PROBE'S OWN. `vo_run_probes` draws its contexts WITHOUT
+    # REPLACEMENT from `vo.prng` and does not return the selection, so the reference here
+    # replays that stream — which also asserts, as a side effect, that the draw is the one
+    # V-4d's construction assumes (its own stream, without replacement, first use per slot).
+    sel_ref = np.random.default_rng(0 * 15485863 + 11).choice(n_p, size=n_p, replace=False)
+    obs_sel = obs_p.index_select(0, torch.from_numpy(sel_ref))
+    with torch.no_grad():
+        pl_p, lg_p = SN.trunk(core_p, obs_sel)
+        sid_p = torch.zeros(n_p, dtype=torch.long)
+        cs_p = vo_critic_scores(cr_p, pl_p, blk0, span, sid_p, mv["flat"], chunk=8)
+        dp_p = vo_dp_scores_from_logits(lg_p, mv, s)
+    dz_p = (ov_z(dp_p / float(span)) - ov_z(cs_p)).abs()
+    # THE COMPARISON IS ON THE CANDIDATE, NOT THE ROW INDEX, and the reason is a property of
+    # the book: the operative table can hold the SAME level-1 tuple at more than one row, and
+    # the DP's per-entry score is a function of the tuple alone (the chain contracts to a sum
+    # of per-block logits over `flat[r]`), so two duplicate rows tie by construction and
+    # `argmax` breaks the tie by index. VO-6 states the same thing for the sampler.
+    n_match, n_dis_rows = 0, 0
+    for j in range(n_p):
+        if float(uflag_p[j]) > 0.5:
+            continue
+        n_dis_rows += 1
+        allow = (cidx_p != own_c)
+        sc = torch.where(allow, dz_p[j], torch.full_like(dz_p[j], float("-inf")))
+        if bool((mv["flat"][int(sc.argmax())] == cand_p[j]).all()):
+            n_match += 1
+    n_unif_want = min(n_p, max(0, int(round(0.25 * n_p))))
+    say("R-5 (the disagreement draw: every candidate on-table, every candidate a DIFFERENT "
+        "class, the chosen row IS the argmax of |z(dp)-z(critic)| off the written class, "
+        "exactly `unif_frac` of the budget still uniform, billed row for row)",
+        on_table and diff_class == 0 and n_match == n_dis_rows and n_dis_rows > 0
+        and int((uflag_p > 0.5).sum()) == n_unif_want and ng_p == n_p
+        and not vo_p.buf,
+        f"{cand_p.shape[0]} rows, {ng_p} billed · same-class draws = {diff_class} · "
+        f"argmax candidate matches on {n_match}"
+        f"/{n_dis_rows} disagreement rows · uniform tagged "
+        f"{int((uflag_p > 0.5).sum())}/{n_p} (want {n_unif_want}) · filed buffer untouched = "
+        f"{not vo_p.buf}")
+
+    # ---- R-8: the dump round-trips, and its DP column is the audit's ---------------------- #
+    # The dump is the round's one artifact meant to outlive it, so its fidelity is a gate and
+    # not a hope: the int16 cast is asserted lossless (it raises inside `ov_dump_rows`
+    # otherwise) and the stored DP column is re-derived here from the same core and compared.
+    import tempfile
+    vo_d = VoRecorder(dict(_VO_DEFAULTS, vo_record=True, v=v), dev, seed=0)
+    vo_d.on = True
+    vo_d.quot = MG.LearnedQuotient()
+    nd = 40
+    gd = torch.Generator().manual_seed(31)
+    obs_d = torch.randint(0, v, (nd, L), generator=gd)
+    w_d = mv["flat"][torch.randint(0, R, (nd,), generator=gd)]
+    y_d = (torch.rand(nd, generator=gd) < 0.3).float()
+    vo_d.buf[key] = (obs_d, w_d, y_d)
+    vo_d.pbuf[key] = (obs_d.clone(), w_d.clone(), 1.0 - y_d)
+    vo_d.pmask[key] = torch.ones(nd)
+    with tempfile.TemporaryDirectory() as td:
+        pth = os.path.join(td, "x", "vo_rows.npz")
+        info = ov_dump_rows(vo_d, core_p, slots_p, s, dev, pth, cap=0)
+        z = np.load(pth)
+        pre = f"filed:{key}"
+        rt = (bool((z[f"{pre}|obs"] == obs_d.numpy()).all())
+              and bool((z[f"{pre}|write"] == w_d.numpy()).all())
+              and bool((z[f"{pre}|y"] == y_d.numpy().astype(np.int8)).all()))
+        idx_d = ov_row_index(mv, w_d, {})
+        with torch.no_grad():
+            _, lg_d = SN.trunk(core_p, obs_d)
+        want = ov_free_scores(lg_d, mv, s, idx_d)["dp"].astype(np.float32)
+        d8 = float(np.nanmax(np.abs(z[f"{pre}|dp"] - want)))
+        has_probe = f"probe:{key}|unif" in z
+        # the heads, banked beside the rows: reload them into fresh modules and the critic's
+        # scores must come back IDENTICAL, or the bank is not a bank
+        vo_d.critic = cr_p
+        vo_d.shadow, _ = ov_build_shadows("lin", SN.slot_count(s, depth, level + 1), v, 32,
+                                          s ** level, 5, dev, 1e-3)
+        hp = os.path.join(td, "x", "vo_heads.pt")
+        hinfo = ov_dump_heads(vo_d, core_p, hp)
+        blob = torch.load(hp, map_location="cpu", weights_only=True)
+        cr_rl = build_critic(SN.slot_count(s, depth, level + 1), v, 32, s ** level, seed=0,
+                             device=dev, hidden_mult=2)
+        cr_rl.load_state_dict(blob["critic"])
+        with torch.no_grad():
+            a_ = vo_critic_scores(cr_p, pl_p, blk0, span, sid_p, mv["flat"], chunk=8)
+            b_ = vo_critic_scores(cr_rl, pl_p, blk0, span, sid_p, mv["flat"], chunk=8)
+        d8h = float((a_ - b_).abs().max())
+    say("R-8 (the dump round-trips the buffers exactly, its DP column IS the audit's score "
+        "through the same core, and the banked heads reload to the same critic)",
+        rt and d8 == 0.0 and has_probe and info["rows"] == 2 * nd and d8h == 0.0
+        and blob["core"] and sorted(blob["shadow"]) == ["lin"],
+        f"round-trip = {rt} · dp |delta| = {d8:.3e} (IDENTITY) · "
+        f"{info['rows']} rows, {info['n_keys']} keys, {info['bytes']} bytes · "
+        f"heads {hinfo['bytes']} bytes, reloaded critic |delta| = {d8h:.3e} (IDENTITY)")
+
+    ok["ALL"] = not bad
+    if verbose:
+        print(f"\n  [overtone] {len(ok) - 1 - len(bad)}/{len(ok) - 1} offline gates pass"
+              + (f"  FAILED: {bad}" if bad else ""))
+    return ok
+
+
 def vo_compose_inert_check():
     """[voicing Q3] GATE V-4b, THE COMPOSED SCORER'S HALF — on CPU, in milliseconds.
 
@@ -6935,7 +7892,10 @@ def vo_probe_offstream_check():
     flat = mv["flat"]
     on_tab, n_same_class = True, 0
     for k_, parts in out.items():
-        for o_, c_, y_ in parts:
+        for part in parts:
+            # [overtone] the part grew a fourth element (the draw tag); unpack by position so
+            # this gate reads a §26 part and an S3 part alike.
+            o_, c_, y_ = part[0], part[1], part[2]
             hit = (flat[None, :, :] == c_[:, None, :]).all(-1)
             on_tab = on_tab and bool(hit.any(-1).all())
             idx = hit.float().argmax(-1)                       # the row each candidate IS
@@ -7402,9 +8362,13 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
     # and its learning rate is separable from the head's.
     vo_critic = None
     if cfg.get("vo_critic") and use_span:
+        # [overtone] the GOVERNING readout's shape. -1 is the donor's `span_hidden_mult`; 0
+        # puts a single linear map in the chooser's seat (S1's governing form). Nothing else
+        # about the critic moves, so the arm differs from `voi3b_comp_pr_yk` in this one int.
+        _ov_h = int(cfg.get("ov_critic_hidden", -1))
         vo_critic = build_critic(SN.slot_count(s, depth, maxl), v, cfg["state_dim"],
                                  s ** (maxl - 1), cfg["seed"] * 100 + 29, device,
-                                 hidden_mult=cfg["span_hidden_mult"])
+                                 hidden_mult=(cfg["span_hidden_mult"] if _ov_h < 0 else _ov_h))
         for p_ in vo_critic.parameters():
             p_.requires_grad_(True)
         gopt.add_param_group({"params": list(vo_critic.parameters()),
@@ -7412,6 +8376,18 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                               "weight_decay": 1e-4})
         vo_rec.critic = vo_critic
         vo_rec.govern = bool(cfg.get("vo_critic_govern"))
+        # [overtone S1] the shadow readouts, minted beside the critic and stepped by their own
+        # optimizer. Never in `gopt`, never in `loss`, never consulted by a chooser.
+        if cfg.get("ov_shadow"):
+            vo_rec.shadow, vo_rec.shadow_opt = ov_build_shadows(
+                cfg["ov_shadow"], SN.slot_count(s, depth, maxl), v, cfg["state_dim"],
+                s ** (maxl - 1), cfg["seed"] * 100 + 29, device,
+                cfg.get("vo_critic_lr") or cfg["span_lr"])
+            print(f"[overtone] arm={arm} shadows={sorted(vo_rec.shadow)} "
+                  f"(own optimizer; free_scores={bool(cfg.get('ov_free'))} "
+                  f"probe_dis={bool(cfg.get('ov_probe_dis'))} "
+                  f"unif_frac={cfg.get('ov_probe_unif_frac')} "
+                  f"critic_hidden={cfg.get('ov_critic_hidden')})", flush=True)
         print(f"[voicing] arm={arm} critic on  govern={vo_rec.govern} "
               f"min_rows={cfg.get('vo_critic_min')} trunk_grad={cfg.get('vo_critic_trunk')} "
               f"eps={cfg.get('vo_eps')} "
@@ -8733,7 +9709,13 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 _pr_rows, _pr_g = vo_run_probes(
                     vo_rec, rows_vo, slots, quot, shared, rules, canon, s, device,
                     n_probe=int(cfg.get("vo_probe_n", 64)), grade_fn=grade,
-                    roots_of=(lambda t_: np.asarray(r_np)[t_.numpy()]))
+                    roots_of=(lambda t_: np.asarray(r_np)[t_.numpy()]),
+                    # [overtone S3] the allocation rule. Off by default, and with it off this
+                    # call is §26's verbatim (every extra keyword falls through to a no-op).
+                    dis=bool(cfg.get("ov_probe_dis")),
+                    unif_frac=float(cfg.get("ov_probe_unif_frac", 0.25)),
+                    critic=vo_rec.critic, core=generator,
+                    chunk=int(cfg.get("vo_chunk", 32)))
                 vo_rec.push_probe(_pr_rows)
                 counts["ground"] += int(_pr_g)
                 probe_ground += int(_pr_g)
@@ -8746,7 +9728,8 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                     vo_rec.governed = {k for k, n_ in vo_rec.sizes().items() if n_ >= _mn}
                     vo_rec.stat["critic"] = vo_critic_audit(
                         generator, vo_rec.critic, ex, slots, device,
-                        chunk=int(cfg.get("vo_chunk", 32)))
+                        chunk=int(cfg.get("vo_chunk", 32)),
+                        s=s)                       # [overtone S2] the free scores need it
             log["vo"].append(vo_rec.take() if vo_rec.on else None)
 
             # --- (a2) [tacet] THE GATE. Read the two decision-time scalars off what the beam
@@ -10486,8 +11469,24 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
             f"spend {ledger.state()['spend_g']}g; "
             f"obs==G-Y on {len(obs_gy_agree)} cycles: "
             f"{bool(all(obs_gy_agree)) if obs_gy_agree else None}", flush=True)
+    # [overtone] THE OFFLINE SET, written before the arm's own results file so a dump failure
+    # cannot cost the arm. Unpriced, no gradient, RNG-sandboxed; `ov_dump` defaults off.
+    _ov_dump = None
+    if cfg.get("ov_dump") and vo_rec.on and use_span:
+        try:
+            _ov_dump = ov_dump_rows(vo_rec, generator, slots, s, device,
+                                    os.path.join(outdir, arm, "vo_rows.npz"),
+                                    cap=int(cfg.get("ov_dump_cap", 0) or 0))
+            _ov_dump["heads"] = ov_dump_heads(
+                vo_rec, generator, os.path.join(outdir, arm, "vo_heads.pt"))
+            print(f"[overtone] arm={arm} dump: {_ov_dump}", flush=True)
+            volume.commit()
+        except Exception as _e:                      # an instrument may not kill a paid arm
+            _ov_dump = {"error": repr(_e)}
+            print(f"[overtone] arm={arm} dump FAILED: {_e!r}", flush=True)
     write_results(outdir, arm, cfg, eras, refs, log, events, complete=True,
                   extra={"prop_k": prop_k_spec, "span_mode": use_span,
+                         "ov_dump": _ov_dump,                          # [overtone]
                          "twin": TWIN.get(base), "slot_events": slot_events,
                          "gate_events": gate_events, "ablation": ablation,
                          "shadow_cert": _cert_summary(shadow_cert),
@@ -10563,6 +11562,101 @@ def priced(counts, cfg):
     inside the beam. The raw count is logged either way so the reduction can re-price it."""
     return (counts["ground"] * cfg["d_fb"] + counts["mat"] * cfg["c_mat"]
             + counts.get("prop", 0) * cfg.get("c_prop", 0.0))
+
+
+def ov_dump_rows(vo, core, slots, s, device, path, cap=0):
+    """[overtone] THE OFFLINE SET. Write `buf` and `pbuf` to the volume at end of run —
+    (obs, write, verdict) exactly as the critic saw them, plus the DP's own score of that
+    candidate through the FINAL core and the row's held-out code.
+
+    Nothing in this lineage has ever banked these rows, so every question about the critic's
+    diet has needed a fresh 1.3 GPU-h arm. This costs one no-grad forward over the buffers at
+    the end of the run and a few MB, and it is what makes an S1/S2-shaped question answerable
+    on a CPU afterwards.
+
+    THE DP SCORE IS RECOMPUTED THROUGH THE FINAL CORE, not stored at file time, because the
+    trunk moves under the buffer — which is the audit's own convention and is why the audit
+    recomputes `pooled` rather than storing it. The score is `None` (NaN) for a row whose
+    candidate the final operative table no longer holds; `on_table` says which.
+
+    int16 is asserted lossless against the stored values rather than assumed: `v` is 8 here and
+    the mask is -1, but an assert costs nothing and a silent truncation would cost the file."""
+    import torch
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    cols = {}
+    meta = {}
+    for key, info in slots.items():
+        if info.get("move") is None:
+            continue
+        move = info["move"]
+        for which, buf, extra_mask in (("filed", vo.buf.get(key), None),
+                                       ("probe", vo.pbuf.get(key), vo.pmask.get(key))):
+            if buf is None or int(buf[0].shape[0]) == 0:
+                continue
+            obs_b, w_b, y_b = buf
+            n = int(obs_b.shape[0])
+            take = n if not cap else min(n, int(cap))
+            sl = slice(n - take, n)
+            ob, wb, yb = obs_b[sl], w_b[sl], y_b[sl]
+            code = vo.hold_code(ob)
+            idx = ov_row_index(move, wb, vo.dp_row_cache)
+            dp = np.full(take, np.nan)
+            _dst = _rng_snapshot()
+            with torch.no_grad():
+                for a_ in range(0, take, 256):
+                    b_ = min(a_ + 256, take)
+                    _, lgts = SN.trunk(core, ob[a_:b_].to(device))
+                    fr = ov_free_scores(lgts, move, int(s), idx[a_:b_])
+                    dp[a_:b_] = fr["dp"]
+            _rng_restore(_dst)
+            pre = f"{which}:{key}"
+            o16 = ob.numpy().astype(np.int16)
+            w16 = wb.numpy().astype(np.int16)
+            assert (o16 == ob.numpy()).all() and (w16 == wb.numpy()).all(), (
+                f"int16 is lossy for {pre}: the dump would not round-trip")
+            cols[f"{pre}|obs"] = o16
+            cols[f"{pre}|write"] = w16
+            cols[f"{pre}|y"] = yb.numpy().astype(np.int8)
+            cols[f"{pre}|dp"] = dp.astype(np.float32)
+            cols[f"{pre}|code"] = code.numpy().astype(np.int16)
+            if extra_mask is not None:
+                cols[f"{pre}|unif"] = extra_mask[sl].numpy().astype(np.int8)
+            meta[pre] = {"n": int(take), "n_buffer": n, "level": int(move["level"]),
+                         "node": int(move["node"]), "span": int(move["span"]),
+                         "blk0": int(move["blk0"]), "slot_id": int(info["id"]),
+                         "n_on_table": int((idx >= 0).sum()),
+                         "table_rows": int(move["flat"].shape[0])}
+    if not cols:
+        return {"n_keys": 0, "bytes": 0}
+    np.savez_compressed(path, **cols)
+    with open(os.path.splitext(path)[0] + "_meta.json", "w") as fh:
+        json.dump(meta, fh, indent=2, cls=NumpyEncoder)
+    return {"n_keys": len(meta), "bytes": int(os.path.getsize(path)),
+            "rows": int(sum(q["n"] for q in meta.values()))}
+
+
+def ov_dump_heads(vo, core, path):
+    """[overtone] THE HEADS, banked beside the rows. `ov_s0` had to be re-run for one arm
+    because the audit's estimator was wrong (defect #5) and nothing in this lineage had ever
+    saved the critic — so redoing an audit meant paying for the arm again. The critic, the
+    shadow readouts and the trunk they read are a few MB; saving them means the next audit
+    change is a CPU job over `vo_rows.npz` instead of 1.9 GPU-h.
+
+    Written on CPU, no gradient. Gate R-8's second half reloads them and asserts the critic's
+    scores come back identical."""
+    import torch
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    blob = {"critic": {k: t.detach().cpu() for k, t in vo.critic.state_dict().items()}
+            if vo.critic is not None else None,
+            "shadow": {nm: {k: t.detach().cpu() for k, t in mm.state_dict().items()}
+                       for nm, mm in (vo.shadow or {}).items()},
+            "core": {k: t.detach().cpu() for k, t in core.state_dict().items()},
+            "cfg": {k: vo.cfg.get(k) for k in
+                    ("v", "state_dim", "span_hidden_mult", "vo_critic_hold", "vo_w",
+                     "ov_shadow", "ov_critic_hidden", "max_macro_level", "s", "depth")}}
+    torch.save(blob, path)
+    return {"bytes": int(os.path.getsize(path)),
+            "critic": vo.critic is not None, "shadow": sorted(blob["shadow"])}
 
 
 def write_results(outdir, arm, cfg, eras, refs, log, events, complete, extra=None):
@@ -11250,6 +12344,12 @@ def voicing_run(                                           # [voicing]
     # weight on the critic's z-score and how many contexts the probe pays for per governed slot
     # per cycle. Both are logged in `config` so the reduction reads them off the arm file.
     vo_w: float = 1.0, vo_probe_n: int = 64,
+    # [overtone] the readout round's RUN-level knobs: the shadow readouts, the zero-verdict
+    # scores, the row dump and the disagreement draw's uniform share. `ov_probe_dis` and
+    # `ov_critic_hidden` are per-ARM (an arm IS its chooser and its allocation rule) and are
+    # set in `ARMS[...]["cfg"]`. All default off; with them off this file is Q3b's.
+    ov_shadow: str = "", ov_free: bool = False, ov_comb_folds: int = 2,
+    ov_dump: bool = False, ov_dump_cap: int = 0, ov_probe_unif_frac: float = 0.25,
     vo_rec_cap: int = 8192, vo_rec_batch: int = 64, vo_chunk: int = 32,
     vo_readback_n: int = 512, vo_rep_n: int = 64, vo_verify_cycles: int = 8,
     ref_tag: str = "", rule_seed: int = 0, train_seed: int = 1, quick: bool = False,
@@ -11333,6 +12433,10 @@ def voicing_run(                                           # [voicing]
                   vo_critic_hold=vo_critic_hold, vo_critic_trunk=vo_critic_trunk,
                   vo_readback_cell=vo_readback_cell,
                   vo_w=vo_w, vo_probe_n=vo_probe_n,                        # [voicing Q3]
+                  ov_shadow=ov_shadow, ov_free=ov_free,                    # [overtone]
+                  ov_comb_folds=ov_comb_folds, ov_dump=ov_dump,            # [overtone]
+                  ov_dump_cap=ov_dump_cap,                                 # [overtone]
+                  ov_probe_unif_frac=ov_probe_unif_frac,                   # [overtone]
                   vo_push=vo_push, vo_rec_cap=vo_rec_cap, vo_rec_batch=vo_rec_batch,
                   vo_chunk=vo_chunk, vo_readback_n=vo_readback_n, vo_rep_n=vo_rep_n,
                   vo_verify_cycles=vo_verify_cycles,
@@ -11685,6 +12789,17 @@ def voicing_run(                                           # [voicing]
         volume.commit()
 
     summary["elapsed_s"] = time.time() - started
+    # [overtone] PEAK RSS, printed so the next launch's `memory=` request is sized on what the
+    # container actually used rather than inherited. Modal bills the greater of the request and
+    # the use, and this runner's models are tiny; `memory=32768` was the donor's number.
+    try:
+        import resource
+        summary["peak_rss_mb"] = round(
+            resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0, 1)
+        print(f"[rss] peak RSS {summary['peak_rss_mb']:.0f} MB "
+              f"(request is {32768} MB)", flush=True)
+    except Exception:
+        pass
     with open(os.path.join(outdir, "summary.json"), "w") as fh:
         json.dump(summary, fh, indent=2, cls=NumpyEncoder)
     with open(os.path.join(outdir, "done.txt"), "w") as fh:
@@ -12132,7 +13247,11 @@ def voicing_gates():
     """
     r = vo_gates_cpu()
     assert r["ok"], "voicing gates_cpu FAILED"
-    return r
+    # [overtone] the round's own offline table, run beside the node's rather than folded into
+    # it, so `vo_gates_cpu`'s 18/18 stays the number FILES.md records.
+    r2 = ov_gates_cpu()
+    assert r2["ALL"], "overtone ov_gates_cpu FAILED"
+    return {**r, "overtone": r2}
 
 
 @app.function(image=image, timeout=1800, memory=16384)
@@ -12497,6 +13616,10 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
               # so V-1 ASSERTS on every cycle of every arm — a preflight is exactly where an
               # identity should be allowed to stop the run.
               vo_explore_t: float = 0.25,
+              # [overtone] the round's run-level instruments, defaulted ON in the preflight so
+              # their branches are exercised; `ovt_pf_noshadow` turns them off in its own cfg.
+              ov_shadow: str = "lin,dir", ov_free: bool = True, ov_dump: bool = True,
+              ov_probe_unif_frac: float = 0.25,
               # [en_s3] EVERY SWEEP GETS ITS OWN OUTDIR. `_ran(arm)` reads `results.json` out
               # of the preflight dir to decide whether an arm has run, and with one shared dir
               # a stale row from an earlier sweep passes for a fresh one -- which happened
@@ -12593,6 +13716,17 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
                   # and the sweep's wall-clock does not move; the bill share it produces here
                   # is not the run's and the reduction never reads it.
                   vo_probe_n=8, vo_w=1.0,
+                  # [overtone] the round's instruments, ON by default here so every branch they
+                  # add runs before a paid setup: both shadow readouts, the zero-verdict scores
+                  # and their out-of-fold combination, and the row dump. `ovt_pf_noshadow`
+                  # overrides all three to off in its own cfg, which is what makes gate R-1's
+                  # in-substrate pair possible. The uniform share of the disagreement draw is
+                  # the production value so the branch is exercised as the run will take it.
+                  # SAID OUT LOUD, as every round before: preflight checks the code path and
+                  # never a number — no AUC, share or count from here is a measurement.
+                  ov_shadow=ov_shadow, ov_free=bool(ov_free), ov_comb_folds=2,
+                  ov_dump=bool(ov_dump), ov_dump_cap=0,
+                  ov_probe_unif_frac=float(ov_probe_unif_frac),
                   entry_rec=True)
     ers = parse_eras(eras)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -12857,7 +13991,9 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
     if _ran("voi3b_pf_src"):
         _src = json.load(open(f"{outdir}/voi3b_pf_src/results.json"))
         for _yk in ("voi3b_pf_dp", "voi3b_pf_v4", "voi3b_pf_v4pr",
-                    "voi3b_pf_comp", "voi3b_pf_comp_pr"):
+                    "voi3b_pf_comp", "voi3b_pf_comp_pr",
+                    "ovt_pf_comp_pr", "ovt_pf_noshadow",          # [overtone]
+                    "ovt_pf_dis", "ovt_pf_lin"):                  # [overtone]
             if _ran(_yk):
                 ok.update(vo_gate_yoke(_src, json.load(open(f"{outdir}/{_yk}/results.json")),
                                        arm=_yk, src_name="voi3b_pf_src"))
@@ -12874,7 +14010,48 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
                               json.load(open(f"{outdir}/voi3b_pf_comp_pr/results.json")),
                               arm_a="voi3b_pf_comp", arm_b="voi3b_pf_comp_pr"))
 
-    for _a in ("voi3b_pf_dp", "voi3b_pf_v4", "voi3b_pf_v4pr",                  # [Q3b]
+    # ---- [overtone] GATE R-1 (the shadows are inert) and GATE R-6 (the re-aimed probe
+    # budget is live). The pair and its dual, both with governance ON — which is the one
+    # condition defect #8 proved an inertness gate needs on this substrate.
+    if _ran("ovt_pf_comp_pr") and _ran("ovt_pf_noshadow"):
+        ok.update(ov_gate_r1(json.load(open(f"{outdir}/ovt_pf_comp_pr/results.json")),
+                             json.load(open(f"{outdir}/ovt_pf_noshadow/results.json")),
+                             arm_a="ovt_pf_comp_pr", arm_b="ovt_pf_noshadow"))
+    if _ran("ovt_pf_dis") and _ran("ovt_pf_comp_pr"):
+        ok.update(ov_gate_r6(json.load(open(f"{outdir}/ovt_pf_dis/results.json")),
+                             json.load(open(f"{outdir}/ovt_pf_comp_pr/results.json")),
+                             arm_a="ovt_pf_dis", arm_b="ovt_pf_comp_pr"))
+    # the round's readouts must APPEAR at preflight sizes, or a branch is untested. No number
+    # here is a measurement — the denominators are 16-row held-out sets on a forty-step head.
+    for _a in ("ovt_pf_comp_pr", "ovt_pf_dis", "ovt_pf_lin"):
+        if not _ran(_a):
+            continue
+        _r = json.load(open(f"{outdir}/{_a}/results.json"))
+        _v = [c for c in _r["log"]["vo"] if c]
+        _cr = [q for c in _v for q in (c.get("critic") or {}).values()]
+        _sh = [q for q in _cr if q.get("sh_auc")]
+        _fr = [q for q in _cr if q.get("free")]
+        _px = [q for q in _cr if q.get("probe_x")]
+        ok[f"overtone:{_a}:readouts"] = {
+            "critic_reads": len(_cr), "shadow_reads": len(_sh), "free_reads": len(_fr),
+            "probe_x_reads": len(_px),
+            "shadow_names": sorted({nm for q in _sh for nm in q["sh_auc"]}),
+            "comb_reads": sum(1 for q in _fr if q["free"].get("comb_auc") is not None),
+            "dump": _r.get("ov_dump")}
+        if _r["config"].get("ov_shadow"):
+            assert _sh, f"{_a}: names shadow readouts but none reached the audit"
+        if _r["config"].get("ov_free"):
+            assert _fr, f"{_a}: names the free scores but none reached the audit"
+        if _r["config"].get("ov_dump"):
+            assert (_r.get("ov_dump") or {}).get("rows"), f"{_a}: the row dump wrote nothing"
+        if _r["config"].get("ov_probe_dis"):
+            _nd = sum(c.get("n_probe_dis", 0) for c in _v)
+            _nu = sum(q["probe_x"]["unif_n"] for q in _px if q["probe_x"].get("unif_n"))
+            ok[f"overtone:{_a}:probe_dis"] = {"n_dis": int(_nd), "unif_rows_last": int(_nu)}
+            assert _nd > 0, f"{_a}: names ov_probe_dis but no row was drawn by the rule"
+
+    for _a in ("ovt_pf_comp_pr", "ovt_pf_noshadow", "ovt_pf_dis", "ovt_pf_lin",  # [overtone]
+               "voi3b_pf_dp", "voi3b_pf_v4", "voi3b_pf_v4pr",                  # [Q3b]
                "voi3b_pf_comp", "voi3b_pf_comp_pr",
                "voi3_pf_dp", "voi3_pf_v4", "voi3_pf_v4pr", "voi3_pf_comp",     # [Q3]
                "voi3_pf_comp_pr",

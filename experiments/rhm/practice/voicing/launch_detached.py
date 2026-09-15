@@ -22,16 +22,23 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 def main():
     args = sys.argv[1:]
-    tag, fn = "default", "voicing_run"
+    tag, fn, sfx = "default", "voicing_run", ""
     for i, a in enumerate(args):
         if a in ("--tag", "--outdir-tag") and i + 1 < len(args):
             tag = args[i + 1]
         if a == "--fn" and i + 1 < len(args):
             fn = args[i + 1]
+        # [overtone] the log's name only. When several jobs share ONE tag -- which is how this
+        # round spreads a tag's arms across containers -- `launch_<tag>.log` would be opened
+        # "w" by each of them and two of the three launch records would be truncated away.
+        # This is stripped before the args are handed to the CLI and reaches nothing else.
+        if a == "--log-suffix" and i + 1 < len(args):
+            sfx = args[i + 1]
     args = [a for i, a in enumerate(args)
-            if a != "--fn" and not (i > 0 and args[i - 1] == "--fn")]
+            if a not in ("--fn", "--log-suffix")
+            and not (i > 0 and args[i - 1] in ("--fn", "--log-suffix"))]
     os.makedirs(os.path.join(HERE, "results"), exist_ok=True)
-    log_path = os.path.join(HERE, "results", f"launch_{tag}.log")
+    log_path = os.path.join(HERE, "results", f"launch_{tag}{sfx}.log")
     # [voicing] ONE environment fact of this box, stated rather than worked around: the CLI
     # imports `voicing.py` locally before it ships anything, so the interpreter behind `modal`
     # needs numpy. On this image only the SYSTEM `modal` can reach the Modal API (a venv copy

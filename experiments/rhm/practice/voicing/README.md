@@ -4,7 +4,8 @@
 orchestrator's prompt verbatim, with the dated revisions Q1 → Q3d appended) · **Machinery
 record**: [`FILES.md`](FILES.md) (every gate, run, flag and diagnostic, with the run tables) ·
 decisions and every withdrawn diagnosis in [`DESIGN.md`](DESIGN.md) §0–§38 · **Conversation**:
-`CONVERSATION.md`[^private].
+`CONVERSATION.md`[^private] · **Child round**: [`overtone/`](overtone/README.md)
+(the readout round, 2026-09-15).
 **Machinery donors** (untouched, forked or imported): [`../enharmonic/`](../enharmonic/README.md)
 (`voicing.py` forks `enharmonic.py` at its `en_s9` head; `quotient.py` and `merge.py` imported;
 every addition `# [voicing]`-marked, every knob default off; the G-F replay against the donor at
@@ -67,6 +68,23 @@ at L5, so the gate deletes the frontier); used to decide what to pay for, it buy
 ceiling's counterfactual ranking for 36–42% of its bill. The hybrid's chooser and the frontier
 cells do not replicate between seeds and are not claims. Full record:
 [`sotto_voce/README.md`](sotto_voce/README.md).
+
+### [`overtone/`](overtone/README.md) — the readout round: how much of the judge is already in the main model (2026-09-14 → 15, ≈10 GPU-h, seeds 0 and 2)
+
+**Goal**: test the calibration hypothesis that an internal correctness direction in the main
+model could carry the judge's job, with three shapes on this node's machinery — linear twins of
+the critic as shadows and in the seat (S1), the trunk's free scores ranked against the verdict
+with no labels plus an out-of-fold combination (S2), and the probe budget spent where the prior
+and the critic disagree (S3).
+
+**Finding**: at two seeds the trunk's confidence direction reads situation difficulty and is at
+chance on which write is right, while an outcome-trained readout adds 0.10–0.22 AUC beyond the
+free prior on counterfactual rows, where all the candidate-specific signal lives (on filed writes
+every readout sits in one band). An additive readout cannot rank candidates within a context and
+in the seat is worse than the free chooser; a linear probe on the completed state closes about
+half of the random-trunk-to-MLP gap. Disagreement-directed probing beats the anchor at both seeds
+and does not beat uniform probing — the seed-0 frontier gain did not replicate, and its offered
+mechanism was withdrawn. Nothing forward-model-shaped was needed in the judge.
 
 ## The question
 
@@ -328,5 +346,6 @@ nil at the class · the advance owner's dead zone, made scale-free.
 | `launch_detached.py`, `fetch_compact.py` | the launcher and the compact mirror (`--replace`) |
 | `results/RUN_*.sh` | the commands of record |
 | `SPEC.md`, `DESIGN.md`, `FILES.md` | the prompt with its revisions; the decisions and withdrawals; the machinery record |
+| `overtone/` | the readout round (child writeup: [`overtone/README.md`](overtone/README.md)); its analyzer sections [J1] [J2] [J3] [Z2] [R] live in `analyze_voicing.py` |
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

@@ -103,13 +103,14 @@ z = V.vo_probe_offstream_check(); rec("V-4d", "the probe is not billed", not z["
 
 # P3: substitute the class that was WRITTEN (the counterfactual claim)
 def p_same_class(vo, rows, slots, quot, shared, rules, canon, s, device, *, n_probe,
-                 grade_fn, roots_of):
+                 grade_fn, roots_of, **_kw):
     out, n = orig_probes(vo, rows, slots, quot, shared, rules, canon, s, device,
-                         n_probe=n_probe, grade_fn=grade_fn, roots_of=roots_of)
+                         n_probe=n_probe, grade_fn=grade_fn, roots_of=roots_of, **_kw)
     for key, parts in out.items():
         mv = slots[key]["move"]
         w = torch.cat([p["w"] for p in rows[key]])
-        out[key] = [(o_, w[:c_.shape[0]], y_) for (o_, c_, y_) in parts]
+        # [overtone] a part is (obs, cand, y[, draw tag]); keep whatever tail it carries
+        out[key] = [(p_[0], w[:p_[1].shape[0]]) + tuple(p_[2:]) for p_ in parts]
     return out, n
 V.vo_run_probes = p_same_class
 z = V.vo_probe_offstream_check(); rec("V-4d", "the probe re-grades the class that was written",
@@ -119,7 +120,7 @@ z = V.vo_probe_offstream_check(); rec("V-4d", "the probe re-grades the class tha
 def p_offtable(*a, **k):
     out, n = orig_probes(*a, **k)
     for key, parts in out.items():
-        out[key] = [(o_, (c_ + 1) % 999, y_) for (o_, c_, y_) in parts]
+        out[key] = [(p_[0], (p_[1] + 1) % 999) + tuple(p_[2:]) for p_ in parts]
     return out, n
 V.vo_run_probes = p_offtable
 z = V.vo_probe_offstream_check(); rec("V-4d", "an off-table candidate", not z["ok"],

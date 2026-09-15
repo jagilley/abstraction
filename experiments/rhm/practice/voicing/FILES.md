@@ -48,6 +48,7 @@ two forms and V-5 can be falsified without paying for a remote preflight.
 | folder | what | record |
 |---|---|---|
 | [`sotto_voce/`](sotto_voce/README.md) | who grades the babble: an outcome model trained on the learner's own experience (the *mirror*) supplies the probe channel's verdicts in place of the world, alone, as a K=5 committee, and as a hybrid paying the world where the committee disagrees; the world's verdict computed on every probe as an instrument no arm consumes. Seeds 0 and 2, yoked. `sotto_voce.py` forks `voicing.py` and imports nothing from it; this node is untouched. | [`sotto_voce/FILES.md`](sotto_voce/FILES.md), [`sotto_voce/DESIGN.md`](sotto_voce/DESIGN.md), [`sotto_voce/SPEC.md`](sotto_voce/SPEC.md) |
+|  [`overtone/`](overtone/README.md) | the readout round (2026-09-14 → 15): S1 linear twins of the critic as shadows and in the seat, S2 the trunk's zero-verdict scores and the out-of-fold combination, S3 the probe budget by disagreement; `ov_s0`, `ov_s0b`, `ov_s2`; the `# [overtone]` hunks in `voicing.py` and sections [J1] [J2] [J3] [Z2] [R] of `analyze_voicing.py` are its; [`overtone/FILES.md`](overtone/FILES.md) has every knob, gate and app id | [`overtone/FILES.md`](overtone/FILES.md), [`overtone/DESIGN.md`](overtone/DESIGN.md) |
 
 ## Runs
 
