@@ -1,0 +1,51 @@
+==============================================================================
+[sotto] Q0 — the mirror, sized offline. PROXY CORPUS: every number here is a
+statement about the machinery and the shape of the problem, never about the run.
+==============================================================================
+
+[S1] corpus  n=30000  length=64  v=8  s=2  depth=6  m=2
+     experience solve rate      0.2942
+     counterfactual solve rate  0.0865   (ratio 3.40x; `voicing` measured 3.5-4x in run)
+       L2: n=  7586  solve rate 0.0671
+       L3: n=  7450  solve rate 0.0630
+       L4: n=  7464  solve rate 0.0894
+       L5: n=  7500  solve rate 0.1265
+
+[S2] ONE outcome model  dim=64 steps=1500 batch=256 lr=0.001  final loss 0.4103
+     held-out EXPERIENCE     n=  3031  acc 0.8482  AUC 0.913  base 0.3002
+     COUNTERFACTUAL (off-support)  n= 30000  acc 0.8411  AUC 0.7376  base 0.0865
+
+[S3] COMMITTEE K=5 boot=0.8  final loss 0.4173
+     held-out EXPERIENCE     acc 0.8711  AUC 0.9353  mean spread 0.0577
+     COUNTERFACTUAL          acc 0.8534  AUC 0.7472  mean spread 0.0557   (spread ratio 0.97x)
+
+     the agreement rule, at each quantile of the HELD-OUT EXPERIENCE spread:
+      q      thr      filed frac   acc(filed)  acc(dropped)   AUC(filed)
+     0.25   0.0121      0.1999      0.9975       0.8174   0.9985
+     0.50   0.0454      0.4733      0.9244       0.7896   0.8753
+     0.60   0.0568      0.6002      0.9073       0.7726   0.8332
+     0.75   0.0849      0.7836      0.8831       0.7460   0.7902
+     0.90   0.1291      0.9226      0.8614       0.7583   0.7610
+     1.00   0.4361      1.0000      0.8534          nan   0.7472
+
+[S4] does DISAGREEMENT find the model's own error?  (AUC of spread as a detector)
+     on COUNTERFACTUALS   0.6898   error rate 0.1466
+     on held-out EXPERIENCE 0.7591   error rate 0.1289
+     (`committee_head` read 0.716 for disagreement as a reducibility reader; this is
+      the same question one domain over — is the spread sighted where the mean is not)
+
+[S5] WHERE the mirror is wrong, by level and by the substituted row's frequency rank
+      level      n     solve   acc      AUC      spread   det(spread)
+       L2     7586  0.0671  0.7821  0.8263  0.0600  0.6625
+       L3     7450  0.0630  0.8486  0.8000  0.0642  0.7299
+       L4     7464  0.0894  0.9106  0.7995  0.0572  0.7573
+       L5     7500  0.1265  0.8735  0.7496  0.0416  0.6132
+
+      the proxy's `frequently written` axis: the substituted row's index in the true
+      table, bucketed. The real run's axis is the learner's OWN write share at the
+      slot (>= vo_om_freq_share), which this corpus cannot have.
+       rank<4       n=  2340  solve 0.0402  acc 0.7927  AUC 0.7708  spread 0.0626
+       4<=rank<32   n=  9138  solve 0.0662  acc 0.8145  AUC 0.8290  spread 0.0608
+       rank>=32     n= 18522  solve 0.1023  acc 0.8803  AUC 0.7587  spread 0.0524
+
+==============================================================================

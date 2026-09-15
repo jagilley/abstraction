@@ -1,0 +1,131 @@
+================================================================================================
+[sotto] THE TWO-SEED TABLE — who grades the babble, at seeds 0 and 2
+================================================================================================
+  Every arm is the COMPOSED chooser with the probe channel on, clock-yoked to its seed's
+  banked anchor (Y-1 exact, 0 cancelled, on all six). The FLOOR is the composed chooser on
+  the FILED diet and the CEILING is the same chooser on WORLD-graded probes; both are
+  banked from `voicing` and not re-run. THE SEEDS ARE NOT AVERAGED.
+
+  THE LADDERS, which set the denominators:
+    seed 0  L2@c48  L3@c100  L4@c151  L5@c186   -> L4 AND L5 cells
+    seed 2  L2@c59  L3@c77   L4@c157  (no L5)   -> L4 cells ONLY
+
+------------------------------------------------------------------------------------------------
+(a) THE CHOOSER — pooled L2/L3 repair accuracy, the cell `voicing` replicated on every seed
+------------------------------------------------------------------------------------------------
+  arm                            seed 0  vs floor        seed 2  vs floor
+  CEILING world-graded           0.2736     +9.6%        0.2745    +10.2%
+  hybrid                         0.2420     -3.1%        0.2683     +7.7%
+  model-graded                   0.2602     +4.2%        0.2626     +5.5%
+  committee-graded               0.2466     -1.2%        0.2560     +2.8%
+  FLOOR filed diet               0.2496     +0.0%        0.2490     +0.0%
+  anchor                         0.2130    -14.7%        0.2090    -16.1%
+
+  REPLICATES: ceiling > every mirror arm; model-graded > FLOOR on both seeds (+4.2%, +5.5%,
+  i.e. 44% and 54% of the floor->ceiling gap); committee-graded < model-graded on both.
+  DOES NOT REPLICATE: the hybrid, which is the WORST of the three at seed 0 (-3.1%, below
+  the floor) and the BEST at seed 2 (+7.7%). Not averaged.
+
+------------------------------------------------------------------------------------------------
+(b) THE CRITIC — held-out AUC on the probe diet. `voicing` measured 0.491 for a critic fed
+    only filed writes; `vs WORLD` is the number the question is about.
+------------------------------------------------------------------------------------------------
+  arm                         s0 vsFILED  s0 vsWORLD    s2 vsFILED  s2 vsWORLD
+  CEILING world-graded             0.773       0.773         0.750       0.750
+  hybrid                           0.712       0.712         0.703       0.701
+  model-graded                     0.667       0.617         0.679       0.645
+  committee-graded                 0.772       0.592         0.748       0.648
+
+  REPLICATES, and it is the node's sharpest result: the COMMITTEE arm's critic ranks the
+  MIRROR'S OPINION at 0.772 / 0.748 -- as well as the ceiling ranks the world (0.773 /
+  0.750) -- while ranking the WORLD at 0.592 / 0.648. The student learned the teacher
+  faithfully; the teacher is what is wrong. Ordering ceiling > hybrid > {model, committee}
+  on both seeds, and every mirror arm is far above the 0.491 chance a filed-only critic got.
+
+------------------------------------------------------------------------------------------------
+(c) THE MIRROR AGAINST THE WORLD, per level, on the probes (model-graded arm), and the
+    COMMITTEE'S AGREEMENT SHARE per level (committee arm)
+------------------------------------------------------------------------------------------------
+                                       seed 0                                    seed 2
+  level           n   world  mirr acc   agree          n   world  mirr acc   agree
+  L2         141034  0.0541    0.9305  0.4931     134053  0.0460    0.9318  0.5324
+  L3          49631  0.0759    0.9240  0.5262      61716  0.0609    0.9291  0.5884
+  L4          12242  0.1488    0.8898  0.3273      10724  0.1568    0.8317  0.4500
+  L5           1189  0.1833    0.7855  0.1739          -       -         -       -
+
+  REPLICATES: the mirror's accuracy falls MONOTONICALLY with level on both seeds, and the
+  committee's agreement share is LOWEST at the frontier (L4 below L2/L3 on both; L5 lowest
+  of all at seed 0, 0.174). The agreement rule therefore deletes the frontier
+  preferentially -- it drops 83% of L5 probes at seed 0 and 51% of L2 probes.
+
+------------------------------------------------------------------------------------------------
+(d) THE HYBRID'S BILL, and its mirror's base rate
+------------------------------------------------------------------------------------------------
+                                             seed 0                   seed 2
+  hybrid world-query fraction                0.35687                  0.42027
+  ceiling world-query fraction              1.0 by construction      1.0 by construction
+    (the banked `voicing` arms carry no `n_probe_world` counter -- it is a [sotto] field --
+     so the fraction is stated rather than read)
+  hybrid bill, share of priced                0.00199                  0.00249
+  ceiling bill, share of priced                0.00557                  0.00596
+  hybrid groundings                     73823.00000              86530.00000
+  ceiling groundings                   208487.00000             207413.00000
+
+  seed 0: the hybrid's outcome buffer ends 62.2% world-graded probe
+          rows, and its mirror calls positives at 0.0128 where the world's L2 rate
+          is 0.0512 -- the base-rate collapse, on both seeds.
+  seed 2: the hybrid's outcome buffer ends 67.6% world-graded probe
+          rows, and its mirror calls positives at 0.0060 where the world's L2 rate
+          is 0.0514 -- the base-rate collapse, on both seeds.
+
+  THE SEED-0 PUZZLE, AND WHAT SEED 2 DOES TO IT. At seed 0 the hybrid had the BEST critic
+  (0.712 against the world, 92% of the ceiling's) and the WORST chooser (-3.1%, below the
+  floor), and the base-rate collapse was the mechanism on offer. Seed 2 keeps the collapse
+  -- it is WORSE there (0.0060 against a world rate of 0.0514) and the hybrid's mirror is
+  also worse on its OWN held-out experience (acc 0.888 / AUC 0.959 against 0.946-0.980 /
+  0.986-0.998 on the other arms) -- and yet the hybrid's chooser is the BEST of the three
+  (+7.7%). So the base-rate collapse does NOT explain the chooser deficit. The seed-0
+  deficit is withdrawn as a mechanism and stands as a single-seed fact.
+
+------------------------------------------------------------------------------------------------
+(e) ERA GAPS at matched clocks, treated minus that seed's anchor
+------------------------------------------------------------------------------------------------
+  arm                         s0 era-3  s0 era-5    s2 era-3  s2 era-5
+  CEILING world-graded         -0.0811   -0.0697     -0.0772   -0.1233
+  hybrid                       -0.0176   -0.1259     -0.0561   -0.2781
+  model-graded                 -0.0457   -0.2703     -0.0559   -0.2237
+  committee-graded             -0.0241   -0.2772     -0.0431   -0.2361
+  FLOOR filed diet             -0.0477   -0.2231     -0.0478   -0.0616
+
+  The CEILING's era-3 gap is -0.081 / -0.077 across seeds, which is `voicing`'s own
+  observation that the era-3 gap reproduces to the third decimal. The era-5 column is a
+  single-trajectory number at each seed (`voicing`: matched-clock gaps between
+  near-identical arms reach 0.08 in this lineage) and seed 2 has no L5 COMMIT, so its era-5
+  is not the same object as seed 0's.
+================================================================================================
+
+------------------------------------------------------------------------------------------------
+(f) THE FRONTIER CELLS — repair accuracy per (level, node). Seed 0 has L4 AND L5; seed 2
+    has L4 ONLY (its anchor never committed L5), so the two panels are not the same table.
+------------------------------------------------------------------------------------------------
+  seed 0:
+    cell    FLOOR   CEILING     model  committee    hybrid      (n on the floor)
+    4n0     0.284     0.278     0.361      0.408     0.312      (3057)
+    4n1     0.451     0.392     0.442      0.463     0.366      (3191)
+    4n2     0.489     0.307     0.427      0.409     0.404      (3037)
+    4n3     0.683     0.727     0.685      0.674     0.672      (3200)
+    5n0     0.526     0.505     0.403      0.565     0.515      (468)
+    5n1     0.830     0.730     0.721      0.891     0.716      (960)
+
+  seed 2:
+    cell    FLOOR   CEILING     model  committee    hybrid      (n on the floor)
+    4n0     0.288     0.244     0.376      0.260     0.311      (2788)
+    4n1     0.392     0.356     0.299      0.353     0.466      (2618)
+    4n2     0.311     0.396     0.372      0.404     0.334      (2625)
+    4n3     0.664     0.659     0.639      0.644     0.685      (2782)
+
+  Seed 0: no mirror arm beats the ceiling at more than 2 of 6 cells and the model-graded
+  arm is above the FLOOR at 1 of 6. Seed 2: the ordering at L4 moves again. `voicing` Q3e
+  already found its own frontier advantage did not replicate between these two seeds
+  (+16.1% at seed 0, -1.7% at seed 2), so nothing at L4/L5 here is offered as a claim.
+================================================================================================

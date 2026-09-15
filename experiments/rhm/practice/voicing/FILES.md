@@ -43,6 +43,12 @@ log series; the `n_shift_fired` / `n_shift_closed` split; `vo_compose_inert_chec
 `vo_probe_offstream_check` (V-4d); and `vo_gate_v4_v5`, factored **out of** `preflight` so V-4's
 two forms and V-5 can be falsified without paying for a remote preflight.
 
+## Children
+
+| folder | what | record |
+|---|---|---|
+| [`sotto_voce/`](sotto_voce/README.md) | who grades the babble: an outcome model trained on the learner's own experience (the *mirror*) supplies the probe channel's verdicts in place of the world, alone, as a K=5 committee, and as a hybrid paying the world where the committee disagrees; the world's verdict computed on every probe as an instrument no arm consumes. Seeds 0 and 2, yoked. `sotto_voce.py` forks `voicing.py` and imports nothing from it; this node is untouched. | [`sotto_voce/FILES.md`](sotto_voce/FILES.md), [`sotto_voce/DESIGN.md`](sotto_voce/DESIGN.md), [`sotto_voce/SPEC.md`](sotto_voce/SPEC.md) |
+
 ## Runs
 
 | tag | what | status |

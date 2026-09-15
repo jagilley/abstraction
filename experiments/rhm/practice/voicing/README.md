@@ -46,6 +46,28 @@ the composed chooser's advantage at L4/L5 was large on the one seed whose ladder
 absent on the only other seed that reached L4 — and the anchor's ladder itself reaches L5 at one
 seed in four, which makes the pacer's top-rung windows the lineage's critical path.
 
+## Children
+
+### [`sotto_voce/`](sotto_voce/README.md) — who grades the babble: the mirror, the committee and the hybrid (2026-09-14→15)
+
+**Goal**: ask whether the world has to be paid for the probe channel's verdicts. An outcome model
+trained only on the learner's own graded sentences (the *mirror*) grades the off-stream
+counterfactuals instead, alone, as a K=5 committee filing where it agrees, and as a hybrid that
+pays the world where the committee disagrees; every model-graded probe is also graded by the
+world as an instrument no arm consumes. Two seeds, every arm yoked to its seed's anchor.
+
+**Finding**: **the mirror recovers about half the value of paying the world, on both seeds, at
+zero bill** (+4.2% / +5.5% over the filed floor at L2/L3 against the ceiling's +9.6% / +10.2%),
+and it is blind exactly where the type law says: held-out AUC 0.996 on its own support,
+precision and recall ≈0.44 one step off it, degrading monotonically with level. The
+mirror-grader criterion measured twice: a critic taught by the mirror ranks the mirror's opinion
+at 0.77 / 0.75 and the world at 0.59 / 0.65. The committee's disagreement locates the blind
+region between levels and is self-defeating as a filter (agreement falls from ≈0.5 at L2 to 0.17
+at L5, so the gate deletes the frontier); used to decide what to pay for, it buys 92–93% of the
+ceiling's counterfactual ranking for 36–42% of its bill. The hybrid's chooser and the frontier
+cells do not replicate between seeds and are not claims. Full record:
+[`sotto_voce/README.md`](sotto_voce/README.md).
+
 ## The question
 
 `enharmonic` reached L5 on the learner's own evidence and got no value from it: a richer,
