@@ -19,7 +19,6 @@ This is a research monorepo consolidating several projects.
 - `fer/` — Fractured Entangled Representations project
 - `glp/` — Generative Latent Prior project
 - `manim-videos/` — Animated video explainers (Manim CE, conda env: `manim`)
-- `org/` — Org-mode files for research and application tracking
 - `projects/` — Cross-project progress logs
 - `ROADMAP.md` - our working roadmap for the next steps in this line of work. (Don't edit without permission)
 - `ROADMAP_PROGRESS.md` and `QUEUE.md` - place where we put one-liners describing the progress we have made or will make towards the roadmap. Please edit these as appropriate unless instructed otherwise
