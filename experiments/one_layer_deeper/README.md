@@ -386,7 +386,7 @@ entrypoint. Each cut's README carries its exact commands. Modal volume layout:
 
 ## Would the practice arc help here? (2026-08-25 — assessed, not run)
 
-Asked by Jasper against [PR #69](https://github.com/jagilley/research/pull/69) and the
+Asked by Jasper against PR #69[^private] and the
 [practice arc](../rhm/practice/README.md): if the learner may **mint new tokens for the phenomena
 it encounters** and run the standard loop over them — mine units from its own solved trajectories,
 commit, re-read the archive with the climbed vocabulary
@@ -448,3 +448,5 @@ single-stage distribution, then fine-tune terminal-only — does a terminal labe
 decomposition it cannot *discover*? That is the assay's "content is giftable, use is only earnable"
 asked in this substrate's coordinates (~16 L4-hours). It scopes the practice claims; it does not
 crack the atom. Left queued.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

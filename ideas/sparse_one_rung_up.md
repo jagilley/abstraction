@@ -2,7 +2,7 @@
 
 **Status**: idea, 2026-09-02. Nothing new run. Written from Claude Code session
 `session_01Ge2biQyLLGQE6NFkEeMdmf`, a re-read of the Track E/F line against Track A after the
-`tutti` round ([#89](https://github.com/jagilley/research/pull/89)), with one new fact verified
+`tutti` round (#89[^private]), with one new fact verified
 against the banked reductions (§5). Every other number is re-read from an existing node.
 **Conversation record**:
 `conversations/tracks_ef_two_faces_2026-09-02.md`[^private]

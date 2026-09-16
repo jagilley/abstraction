@@ -9,7 +9,7 @@
 > activations concentrate as width grows. See [`rhm/residual_decomposition/README.md`](../rhm/residual_decomposition/README.md) 6.
 
 **Parent experiment**: [README.md](README.md)
-**Grokking comparison**: [fer/experiments/zipfian_grokking/cnb_self_regulation/README.md](../../../../fer/experiments/zipfian_grokking/cnb_self_regulation/README.md)
+**Grokking comparison**: fer/experiments/zipfian_grokking/cnb_self_regulation/README.md[^private]
 **Code**: `model_scale_experiment.py`
 
 ## Goal
@@ -204,3 +204,5 @@ Results saved to `language-reduction-data` volume:
     ├── fwd_model.pt
     └── results.json
 ```
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

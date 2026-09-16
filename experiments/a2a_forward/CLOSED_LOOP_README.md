@@ -2,7 +2,7 @@
 
 **Idea doc**: [ideas/activation_to_activation_forward.md](../../../../ideas/activation_to_activation_forward.md)
 **Open-loop experiments**: [README.md](README.md)
-**Neuroscience conversations**: [conversations/cerebellum/](../../../../conversations/cerebellum/)
+**Neuroscience conversations**: conversations/cerebellum/[^private]
 
 ## Goal
 
@@ -192,3 +192,5 @@ Results saved to `language-reduction-data` volume:
 3. **Directional causal test**: The self-knowledge is directional, not magnitude-based. Steer/patch along residual *direction* clusters to test whether directional self-knowledge is functionally used.
 4. **Looped transformer**: The natural architecture for this — inject at each recurrence step, get adaptive compute for free.
 5. **Scaling**: Larger models where the computation is more complex and the capacity gap between main and forward model is more pronounced.
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

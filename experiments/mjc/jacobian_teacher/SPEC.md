@@ -9,7 +9,7 @@ advantage track the *direction* accuracy of the Jacobian rather than the FM's fo
 **Reading**: Garibbo, Filipe, Aitchison & Costa 2026[^private]
 — the action-gradient framework, eqs. 1–2: reward-based and error-based updates as gradients on
 one policy, the cerebellum supplying the sensitivity derivatives `dy/da`, a weight β mixing the
-two. Also [Baladron et al. 2023](../../../reading/journal.pcbi.1011024.pdf) for the contrasting
+two. Also Baladron et al. 2023[^private] for the contrasting
 dual-policy account and the aiming-error-not-task-error result.
 **Attribution**: the prompt is Jasper's (2026-09-03) — that the record has used the FM's action
 dependence as a *magnitude* (the agency gate) and as a *simulator* (CEM) but never its *direction*
