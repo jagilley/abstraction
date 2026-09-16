@@ -20,3 +20,4 @@
 | folder | summary |
 |---|---|
 | [`altitude/`](altitude/README.md) | The follow-up round (2026-09-16): the `CE − H(q)` identity and a continuous altitude; the frontier read off the entropy profile; the model's predictive as a level-selective null for candidate units; the tonic and entropy-direction controls against exact observers; a noise-trained twin and what the post-violation forecast moves toward (the ε-observer at `k* − 1`). [`FILES.md`](altitude/FILES.md). |
+| [`coeruleus/`](coeruleus/README.md) | A consumer for the state's readout (2026-09-16): the prize after a corrupted token and a gain knob's reach; a self-supervised excess-surprise head; the gain loop (half the prize on an unseen world, nothing on the trained one); the plasticity gate with the `endogenous_teacher` control and oracle arms. [`FILES.md`](coeruleus/FILES.md). |

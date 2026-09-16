@@ -2,9 +2,11 @@
 
 **Up**: [../README.md](../README.md) (rhm) · **Files**: [FILES.md](FILES.md)
 **Date**: 2026-09-15 · **Status**: Part 1 and Part 2 run, including the two follow-up controls
-(same-prefix phasic test, graded legal-vs-legal control). **Child**: [`altitude/`](altitude/README.md)
+(same-prefix phasic test, graded legal-vs-legal control). **Children**: [`altitude/`](altitude/README.md)
 (2026-09-16) — the follow-up round; it revises Part 1's headline (dated note below) and supplies
-Part 2's two missing controls.
+Part 2's two missing controls · [`coeruleus/`](coeruleus/README.md) (2026-09-16) — a consumer for
+what the state carries: the gain and plasticity loops, which pay only on a world the model was not
+trained for.
 **Prompt**: a conversation about whether anything in the brain looks like "reading the logits of
 prediction", and about the value system reading prediction error relative to learned expectations
 (`conversations/Claude-Neural correlates of model confidence and prediction errors-20260915-1302.md`[^private]).
@@ -260,7 +262,11 @@ uncertainty. The model was trained on clean data and has no reason to have learn
 which is exactly what the `eps_train` follow-up would test. **Run in [`altitude/`](altitude/README.md)
 §Q4b–Q5**: the sign does not change under ε-training, a noise-aware observer at the model's own
 altitude goes the other way, and after a violation the model's forecast is that observer's at
-`k* − 1` — the finest reading under which the token was still legal.
+`k* − 1` — the finest reading under which the token was still legal. **Read with
+[`coeruleus/`](coeruleus/README.md)'s reinterpretation**: the `swap` stimuli regrow the edited subtree
+legally, so the one-rung-down reading *predicts* the continuation and the model is genuinely less
+surprised after the violator than after a rare legal twin; "wrong way" is relative to an observer
+whose world contains only single-token glitches.
 
 ## What this establishes, and what it does not
 
@@ -316,6 +322,26 @@ signal belongs to the stimulus. After a violation the model's forecast is the no
 observer's at `k* − 1`, the finest reading under which the token was legal: it reinterprets rather
 than doubts, no Bayesian in either family does that, and ε-training does not change it. Full
 record: [`altitude/README.md`](altitude/README.md).
+
+### [`coeruleus/`](coeruleus/README.md) — a consumer for the state's readout (2026-09-16)
+
+**Goal**: build the thing the state's contents have no consumer for, in the model's own terms.
+Bound the loss the model leaves after a corrupted token and how much a gain knob could reach; train
+a head on the frozen state, with no labels, to predict the model's own excess surprise (realised
+loss minus stated uncertainty) over the next positions; let that head set the temperature; let it
+gate the per-position learning rate during continued training. Venue: the ε-corrupted stream, with
+the ε-trained model on its own distribution and the clean-trained model dropped onto a world it
+never saw.
+
+**Finding**: on the trained distribution the prize is real, small, and unreachable by gain — the
+missing nats are a replacement by the finer reading the state still holds, not a softening of the
+coarser one the output fell to — and the label-free head is a null there. On the unseen world the
+head detects the model's failures at 0.83, separates overconfident-wrong from calibrated-hard at
+0.72, and closing the gain loop with it recovers half the prize and 0.03 nats per token over the
+whole stream, beating a global recalibration and a supervised corruption detector. The plasticity
+gate has measurable consequences in both directions when exact and none when driven by the head.
+The loop is a "which world am I in" organ, load-bearing exactly where the data differs from the
+training data. Full record: [`coeruleus/README.md`](coeruleus/README.md).
 
 ## Reproduction
 
