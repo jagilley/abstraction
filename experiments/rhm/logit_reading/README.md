@@ -2,7 +2,9 @@
 
 **Up**: [../README.md](../README.md) (rhm) · **Files**: [FILES.md](FILES.md)
 **Date**: 2026-09-15 · **Status**: Part 1 and Part 2 run, including the two follow-up controls
-(same-prefix phasic test, graded legal-vs-legal control).
+(same-prefix phasic test, graded legal-vs-legal control). **Child**: [`altitude/`](altitude/README.md)
+(2026-09-16) — the follow-up round; it revises Part 1's headline (dated note below) and supplies
+Part 2's two missing controls.
 **Prompt**: a conversation about whether anything in the brain looks like "reading the logits of
 prediction", and about the value system reading prediction error relative to learned expectations
 (`conversations/Claude-Neural correlates of model confidence and prediction errors-20260915-1302.md`[^private]).
@@ -104,6 +106,17 @@ almost from the start:
 
 > **What training changes is not how well the logits know themselves — that is near-exact from ~2k
 > steps — but which Bayesian they are the posterior of.**
+
+> **Revised 2026-09-16 by [`altitude/`](altitude/README.md).** The first half of that sentence is an
+> identity, not a measurement: `CE − H(q) = ⟨∂CE/∂z, z⟩`, the derivative of the loss along the
+> logit-scaling direction, so any softmax with a free logit scale sits at zero there once trained
+> (`α* = 1.00–1.01` from 2k steps, and within ±0.015 in every context class; checked pointwise to
+> 1e−07). "Calibrated to itself" is what convergence looks like. The second half stands as an
+> *altitude*: a convex interpolation between adjacent observers climbs smoothly `κ* = 0 → 4.9` where
+> the argmin is a staircase, and the fitted observer accounts for 70–89% of the model's residual
+> through `κ* ≈ 2.9` and 32–40% from `κ* ≈ 4.4` (the residual's level-shape is a coarse observer's
+> throughout). So "near-exact posterior of a coarse observer" is a description of the undertrained
+> model; at 64k the best family member is only 1.2× closer to the logits than the truth is.
 
 Caveat worth keeping: the per-position `argmin_k` is noisy (neighbouring observers coincide at many
 positions; the `best_k` histogram at 64k spreads 0.12–0.27 over k=2..6). The mean-KL argmin is the
@@ -244,7 +257,10 @@ decaying over ~4 tokens; on legal rare edits the two are comparable (+0.05 vs +0
 "something's off" signal is held internally (still readable at 0.75 eight tokens later, though that
 reading is confounded by the edited stream continuing) and is **not** converted into output
 uncertainty. The model was trained on clean data and has no reason to have learned such a response,
-which is exactly what the `eps_train` follow-up would test.
+which is exactly what the `eps_train` follow-up would test. **Run in [`altitude/`](altitude/README.md)
+§Q4b–Q5**: the sign does not change under ε-training, a noise-aware observer at the model's own
+altitude goes the other way, and after a violation the model's forecast is that observer's at
+`k* − 1` — the finest reading under which the token was still legal.
 
 ## What this establishes, and what it does not
 
@@ -272,9 +288,34 @@ which is exactly what the `eps_train` follow-up would test.
   part, which needs the violation to cost something toward a goal.
 - That the tonic signal is a *model* property rather than a stimulus property: an exact-Bayes observer's
   running surprisal over the same stretch would also be elevated, and that comparison was not run.
+  **Run in [`altitude/`](altitude/README.md) §Q4a — it is a stimulus property**: on 2b's own pairs the
+  exact observer's running surprisal reads 0.73 at the random-init checkpoint and 0.88 at 64k, above
+  the model at every checkpoint, and ~57% of the model's climb is the pair population shrinking.
 - Generality of the graded result beyond the pairs the matching admits: pairs exist only where the model
   badly misjudges some legal token's probability, which is a selected population.
 - Transfer off `v16 s2 L6 m4`, off this architecture, or to natural language.
+
+## Children
+
+### [`altitude/`](altitude/README.md) — the coarse-observer picture on its own terms (2026-09-16)
+
+**Goal**: five follow-ups on this node, run in its own terms. Is self-calibration a finding or an
+identity, and is the discrete rung the right altitude; can the model locate its frontier from its
+logits alone; does its predictive, used as a null, score candidate next-level units; the two
+controls Part 2 was missing (an exact observer in the tonic design, a noise-aware observer at the
+model's altitude in the entropy-direction design); and does a noise-trained twin change sign.
+
+**Finding**: `CE − H(q)` is the temperature-direction derivative of the loss, zero by construction
+once trained; the "which observer" half survives as a continuous altitude that describes the
+model well while coarse (the fitted observer carries ~80% of the residual) and less well as it
+converges (~35%), with the residual's shape a coarse observer's throughout. The depth-k boundaries
+are recoverable from the entropy profile alone, at the observer's own ceiling through `k = 3`.
+As a null, the model's predictive is level-selective — it prices candidates one rung up and cancels
+once a level is absorbed — and is beaten by model-free counts for "is this a unit". The tonic
+signal belongs to the stimulus. After a violation the model's forecast is the noise-aware
+observer's at `k* − 1`, the finest reading under which the token was legal: it reinterprets rather
+than doubts, no Bayesian in either family does that, and ε-training does not change it. Full
+record: [`altitude/README.md`](altitude/README.md).
 
 ## Reproduction
 

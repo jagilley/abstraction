@@ -14,3 +14,9 @@
 | `violation.py` | **Part 2 readouts against controls from other windows.** `readouts_v2` is current: exact (token, level, window index) cells + nearest-neighbour surprisal matching, tonic-vs-phasic split (state at `t−1`, at `t`, and both), the model's own running surprisal, per-`k*` tables, transfer across `k*`, and `eps`-noise-referenced output persistence. `readouts` (v1) is kept for its recorded numbers only — **its guards failed** (8 quantile surprisal bins leak in the tail, 16-wide position buckets leak position; see README gotchas). Helpers `auc`, `fit_probe`, `nn_match`, `match_strata`. |
 | `phasic.py` | **The two follow-up controls.** `phasic_readouts`: same-prefix twins — the violating token replaced by a legal one at matched model surprisal — so the context, and hence the tonic signal, is identical within a pair (asserted). `legal_gradient_readouts`: two *legal* tokens after the same prefix differing ≥ 2× in true probability, the graded control that shows the signal is likelihood-sensitivity rather than categorical legality. `balance_tokens` (greedy cycle extraction over the violator→twin multigraph) and `balance_ds_sign` pin the token-identity and paired-surprisal guards at 0.50. |
 | `analyze.py` | Local aggregation over a trajectory's per-checkpoint JSONs: Part 1 table, detection-by-`k*`, the matched tables (v1 and v2), the phasic table and the graded control. Reads only JSON — no Modal, no GPU. |
+
+## Children
+
+| folder | summary |
+|---|---|
+| [`altitude/`](altitude/README.md) | The follow-up round (2026-09-16): the `CE − H(q)` identity and a continuous altitude; the frontier read off the entropy profile; the model's predictive as a level-selective null for candidate units; the tonic and entropy-direction controls against exact observers; a noise-trained twin and what the post-violation forecast moves toward (the ε-observer at `k* − 1`). [`FILES.md`](altitude/FILES.md). |
