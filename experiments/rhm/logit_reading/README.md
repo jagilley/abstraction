@@ -2,14 +2,23 @@
 
 **Up**: [../README.md](../README.md) (rhm) · **Files**: [FILES.md](FILES.md)
 **Date**: 2026-09-15 · **Status**: Part 1 and Part 2 run, including the two follow-up controls
-(same-prefix phasic test, graded legal-vs-legal control). **Children**: [`altitude/`](altitude/README.md)
+(same-prefix phasic test, graded legal-vs-legal control); four children as of 2026-09-17. **Children**: [`altitude/`](altitude/README.md)
 (2026-09-16) — the follow-up round; it revises Part 1's headline (dated note below) and supplies
 Part 2's two missing controls · [`coeruleus/`](coeruleus/README.md) (2026-09-16) — a consumer for
 what the state carries: the gain and plasticity loops, which pay only on a world the model was not
-trained for.
+trained for · [`basalis/`](basalis/README.md) (2026-09-17) — the other consumer, hold-and-discount,
+and what can arbitrate between it and reinterpretation · [`striatum/`](striatum/README.md)
+(2026-09-17) — a goal beyond prediction, and an outcome-trained readout that reads a violation's cost
+rather than its structure. The last two are the two organs
+[`ideas/calibration_and_violation_are_one_object.md`](../../../ideas/calibration_and_violation_are_one_object.md)
+§5 says the predictive does not contain, each measured once.
 **Prompt**: a conversation about whether anything in the brain looks like "reading the logits of
 prediction", and about the value system reading prediction error relative to learned expectations
 (`conversations/Claude-Neural correlates of model confidence and prediction errors-20260915-1302.md`[^private]).
+**Idea**: [`ideas/calibration_and_violation_are_one_object.md`](../../../ideas/calibration_and_violation_are_one_object.md)
+(2026-09-16) — the two intuitions behind this node (the logits as a Bayesian posterior; emotion as
+norm violation) mapped term for term against all three rounds, the conditions under which they are
+one object read twice, and the `CE − H(q)` identity read as Yu & Dayan's unexpected uncertainty.
 
 ## Goal
 
@@ -266,7 +275,12 @@ altitude goes the other way, and after a violation the model's forecast is that 
 [`coeruleus/`](coeruleus/README.md)'s reinterpretation**: the `swap` stimuli regrow the edited subtree
 legally, so the one-rung-down reading *predicts* the continuation and the model is genuinely less
 surprised after the violator than after a rare legal twin; "wrong way" is relative to an observer
-whose world contains only single-token glitches.
+whose world contains only single-token glitches. **Tested by an arm in
+[`basalis/`](basalis/README.md)** (2026-09-17): with the hold-and-discount forecast built exactly, the
+optimal weight on it at the flag is zero for every edit wider than one leaf on the ε-trained model and
+0.999 on a single-token glitch at the same position; glitch and edit are the ends of one axis, the
+width of the damaged span, and reinterpretation is the right policy from about two levels up. Under
+full hold the 2e statistic is 0.5 by construction.
 
 ## What this establishes, and what it does not
 
@@ -342,6 +356,43 @@ whole stream, beating a global recalibration and a supervised corruption detecto
 gate has measurable consequences in both directions when exact and none when driven by the head.
 The loop is a "which world am I in" organ, load-bearing exactly where the data differs from the
 training data. Full record: [`coeruleus/README.md`](coeruleus/README.md).
+
+### [`basalis/`](basalis/README.md) — the hold-and-discount consumer, and what can arbitrate (2026-09-17)
+
+**Goal**: build the policy no member of either observer family and no part of the model implements —
+hold the fine reading and discount the token — in the model's own terms; measure what it is worth after
+a structural edit, after a single-token glitch and at a false alarm; and ask whether anything readable
+from the model can arbitrate between it and the model's native reinterpretation, and how fast.
+
+**Finding**: the consumer is exact at 16 forward passes, and a particle filter over the imputed token
+is its best form. It is worth 61–88% of the glitch-world prize a temperature could not touch, and
+nothing on edits wider than one leaf: a one-token repair cannot undo a `2^j`-token edit, so glitch and
+edit are the ends of one axis and reinterpretation is right from about `j = 2` up, now by an arm. The
+worlds are the same event at the token and diverge in the continuation; the model's own log Bayes
+factor is at chance at the flag and separates them at ~0.8 one token later. The state separates them
+earlier, and that is the edited preamble, the parent's tonic signal. Knowing the world is worth 0.03–0.05
+nats per event over a fixed hedge; classifier-shaped state probes lose to their shuffles for a reason
+now pinned (level transfer), and a closed-form ridge on the stake itself is the one state readout that
+gates, for 1–14% of that prize. Full record: [`basalis/README.md`](basalis/README.md).
+
+### [`striatum/`](striatum/README.md) — a goal beyond prediction, and the readout that reads its cost (2026-09-17)
+
+**Goal**: give the frozen trunk a goal that is not prediction — a fixed actor reporting the level-ℓ
+constituent's feature at a query position, right or wrong once per window — so that a violation can
+cost something; define a violation's consequence exactly from the edited generating tree, independent
+of its level and surprisal by construction; and ask whether a critic trained on outcomes alone reads the
+violation's structure or its cost, how much of that exposure to damage buys, and whether the state
+carries which query was compromised.
+
+**Finding**: the cost is real and switches on with the absorbed levels, the goal-side echo of Part 2a.
+Matched on level, position and surprisal, the critic's revision at the violation reads whether the goal
+was missed and its level reads it more strongly, while the structural consequence label the same state
+demonstrably carries is a null for both and an illegal edit and a legal one with the same consequence
+are the same to it. Most of the reading is generalisation from clean data; exposure to damage adds a
+few hundredths to the revision and makes the critic's level subsume the noradrenergic excess readout
+entirely. The state does not carry which query was damaged in a way the per-level revisions expose;
+directionality does not transfer to the value side on this cut. Full record:
+[`striatum/README.md`](striatum/README.md).
 
 ## Reproduction
 
