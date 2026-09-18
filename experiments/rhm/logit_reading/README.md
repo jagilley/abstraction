@@ -1,15 +1,21 @@
 # logit_reading — what a model's logits say about its own knowledge, and what a rule violation looks like from inside
 
-**Up**: [../README.md](../README.md) (rhm) · **Files**: [FILES.md](FILES.md)
+**Up**: [../README.md](../README.md) (rhm) · **Files**: [FILES.md](FILES.md) · **Conversation**:
+CONVERSATION.md[^private] (2026-09-17: the arc read as a whole after #120, and the four rounds it prompted)
 **Date**: 2026-09-15 · **Status**: Part 1 and Part 2 run, including the two follow-up controls
-(same-prefix phasic test, graded legal-vs-legal control); four children as of 2026-09-17. **Children**: [`altitude/`](altitude/README.md)
+(same-prefix phasic test, graded legal-vs-legal control); six children as of 2026-09-17, seven grandchildren. **Children**: [`altitude/`](altitude/README.md)
 (2026-09-16) — the follow-up round; it revises Part 1's headline (dated note below) and supplies
 Part 2's two missing controls · [`coeruleus/`](coeruleus/README.md) (2026-09-16) — a consumer for
 what the state carries: the gain and plasticity loops, which pay only on a world the model was not
 trained for · [`basalis/`](basalis/README.md) (2026-09-17) — the other consumer, hold-and-discount,
 and what can arbitrate between it and reinterpretation · [`striatum/`](striatum/README.md)
 (2026-09-17) — a goal beyond prediction, and an outcome-trained readout that reads a violation's cost
-rather than its structure. The last two are the two organs
+rather than its structure, with [`striatum/junction/`](striatum/junction/README.md) and
+[`striatum/norm/`](striatum/norm/README.md) (2026-09-17) beneath it, the value reader's diet and the value
+side's own norm · [`frontier/`](frontier/README.md) (2026-09-17) — which of the learner's own readings
+locate its frontier, and what a corpus wall looks like from inside · [`orbitofrontal/`](orbitofrontal/README.md)
+(2026-09-17) — the value-side super-node: the norm as a running estimate, what the value reader reads and what consumes
+it, and whether its projection reads the model's belief or its representation. Basalis and striatum are the two organs
 [`ideas/calibration_and_violation_are_one_object.md`](../../../ideas/calibration_and_violation_are_one_object.md)
 §5 says the predictive does not contain, each measured once.
 **Prompt**: a conversation about whether anything in the brain looks like "reading the logits of
@@ -335,7 +341,10 @@ once a level is absorbed — and is beaten by model-free counts for "is this a u
 signal belongs to the stimulus. After a violation the model's forecast is the noise-aware
 observer's at `k* − 1`, the finest reading under which the token was legal: it reinterprets rather
 than doubts, no Bayesian in either family does that, and ε-training does not change it. Full
-record: [`altitude/README.md`](altitude/README.md).
+record: [`altitude/README.md`](altitude/README.md). **Extended 2026-09-17 by
+[`frontier/`](frontier/README.md)**: the per-level excess is ≈ 0 at every level on-distribution, the
+per-level loss trend's argmax never tracks `κ*`, and the entropy period's induced level field replaces the
+oracle's labels below ℓ = 4.
 
 ### [`coeruleus/`](coeruleus/README.md) — a consumer for the state's readout (2026-09-16)
 
@@ -392,7 +401,60 @@ are the same to it. Most of the reading is generalisation from clean data; expos
 few hundredths to the revision and makes the critic's level subsume the noradrenergic excess readout
 entirely. The state does not carry which query was damaged in a way the per-level revisions expose;
 directionality does not transfer to the value side on this cut. Full record:
-[`striatum/README.md`](striatum/README.md).
+[`striatum/README.md`](striatum/README.md). Its child [`junction/`](striatum/junction/README.md)
+(2026-09-17) turns the critic's diet: the indifference to legality survives diets spanning a violation–cost
+association of −1 to +1, and a surprise-gated diet reaches the containment about fifty times later than random.
+Its child [`norm/`](striatum/norm/README.md) (2026-09-17) puts the emotion story's norm on the value side: the
+critic's pre-event level is a learned expectation over outcomes that calibrates to the world (a shift at random
+init, a rescaling once trained), the response to the identical event does not order with the world while the
+outcome surprise does, and on same-prefix twins the critic is more optimistic after the illegal token than after
+its legal twin at the event, in the edit world and a glitch world alike, with the advantage persisting only where
+the continuation belongs to the flagged token.
+
+### [`frontier/`](frontier/README.md) — reading the altitude from the inside, and the wall (2026-09-17)
+
+**Goal**: four readings the learner can compute from its own predictive — the per-level excess, the per-level
+loss trend, the entropy profile's period and Q3's candidate gain — against the oracle's per-level residual, on
+the clean trajectory and with the level labels induced from the model's own entropy instead of the oracle's
+parse; then the same panel logged across `reread/lm`'s corpus wall on held-out and own-corpus venues, to ask
+whether a stalled level is distinguishable from an absorbed one from inside.
+
+**Finding**: the excess is zero on-distribution at every level, the rung being absorbed included, and stays zero
+on a walled learner's own corpus while its held-out excess is nats off — a shift detector at every level and a
+frontier detector at none. The per-level loss trend's argmax is pinned at ℓ = 2 throughout and never tracks
+`κ*`. The period tracks the altitude one level at a time at the observer's own ceiling through `k = 3`,
+template-free within 0.09, and its induced level field replaces the oracle's labels below ℓ = 4 with the rest of
+the panel unchanged. Across the wall the held-out derivative goes quiet as absorption would, the excess and the
+memorisation gap turn one checkpoint earlier on held-out data, and the period goes backwards — on held-out data
+and on the learner's own corpus — where a renewable arm's never drops. Absorption's own silence was not reached
+within the budgets run. Full record: [`frontier/README.md`](frontier/README.md). **Used 2026-09-17 by
+[`rhm/practice/perception/`](../practice/perception/README.md)**, which lives in the practice arc but is this
+node's instrument at work: the practice arc's free `at_support` gauge, recomputed on a grid recovered by this
+detector instead of the grid the substrate hands over, tracks the exact count at 0.98–0.999 over 139 cycles; the
+level grid is cheap, the node needs the depth-6 boundary (0.37 for a reader of the grammar, 0.87 for a reader of
+the learner's own productions, which shows the wall signature above while doing it), and `conductor`'s thermostat
+replayed on the own-production reader lands within a cycle of both commits.
+
+### [`orbitofrontal/`](orbitofrontal/README.md) — the norm is the world model read through a projection the goal's history sets (2026-09-17)
+
+**Goal**: strengthen and generalise the value-side reading that the emotion story's norm is the critic's own learned
+expectation over outcomes ([`striatum/norm/`](striatum/norm/README.md)), and settle whether that expectation can be
+anything other than world-model-based. Six rounds in one session: the norm within-subject across a switch of worlds
+and on the practice learner's own judge; the trunk fine-tuned on the goal; a world where a violation is evidence about
+a hidden state that predicts future cost; an abstain-or-commit consumer; the critic refit on the model's output
+distribution against its state; and the norm round on three trajectory seeds.
+
+**Finding**: the expectation is a running average of recent outcomes that re-calibrates at the rate its memory turns
+over, on a frozen trunk and on a live learner alike, with the response carrying the history on the same clock and the
+outcome surprise firing at a world change and returning. It reads whatever in the state predicts cost: legality stays
+at chance on a trunk shaped by the goal, the hidden regime is read at quiet positions and its revision tracks the exact
+filter's, priced by the prior belief, where a violation predicts cost. Given a choice, the level is the sufficient state
+statistic, worth half the oracle's prize on the stream and the least at the violating token. The norm is public,
+recoverable from the output distribution alone; the response is private, in directions the output layer reads at a fifth
+of chance from 8k on, having started at chance. Three seeds sort the norm round into what reproduces (everything about
+the expectation) and what does not (two selected-pair rows); striatum's across-level tilt is a width artefact. Full
+record: [`orbitofrontal/README.md`](orbitofrontal/README.md); the practice-learner half lives at
+[`rhm/practice/voicing/tessitura/`](../practice/voicing/tessitura/README.md).
 
 ## Reproduction
 

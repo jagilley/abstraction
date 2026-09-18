@@ -61,3 +61,27 @@ def hexcess_ckpt(ckpt: str, stim_tag: str = "swap65k", horizon: int = 8):
     print(f"saved -> {stem}_striatum_{stim_tag}_hexcess.npz  "
           f"finite frac {np.isfinite(he).mean():.3f}", flush=True)
     return {"ckpt": ckpt, "tag": stim_tag, "H": H}
+
+
+@app.function(volumes={DATA_DIR: volume}, timeout=2 * 3600, memory=2048)
+def hexcess_sweep(cells: str = "", horizon: int = 8):
+    """CPU coordinator: `ckpt:stim_tag` cells, comma separated, one container each.
+
+    Added 2026-09-17 for `shaped/`, which needs this column on three fine-tuned trunks x
+    two venues; the single-cell entry point above is unchanged."""
+    import os
+    volume.reload()
+    args = []
+    for c in cells.split(","):
+        if not c.strip():
+            continue
+        ck, tg = (c.split(":") + ["swap65k"])[:2]
+        if not os.path.exists(ck):
+            print(f"MISSING {ck}", flush=True)
+            continue
+        args.append((ck, tg, horizon))
+    print(f"{len(args)} cells: {[(a[0].split('/')[-2:], a[1]) for a in args]}", flush=True)
+    outs = list(hexcess_ckpt.starmap(args, return_exceptions=True))
+    for o in outs:
+        print(str(o)[:300], flush=True)
+    return [str(o)[:300] for o in outs]

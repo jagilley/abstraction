@@ -1,0 +1,50 @@
+========================================================================================================
+[X] THE TWO SEEDS, AS SIGNS — ts_s0, ts_s2
+========================================================================================================
+  Each of §8's headlines restated as a sign. Magnitudes are printed so the reader can see
+  how far apart they are, but the CLAIM is the sign, and a magnitude that moves between
+  seeds is reported as moving rather than averaged away.
+
+  AN EXCLUSION CRITERION, STATED BEFORE THE TABLES AND APPLIED MECHANICALLY. A critic
+  begins governing only once a slot holds `vo_critic_min = 256` filed rows, so an era
+  early enough can contain little but the readout's own INITIALISATION. `build_critic`
+  zeroes every bias and draws the weights at N(0, 0.02), so an untrained critic emits a
+  ~0 logit and reads 0.500 at EVERY candidate — which makes the signature exact and
+  checkable rather than a matter of judgement: a cell is flagged `init` iff
+  |V_w - 0.5| < 0.01 AND V_max - V_tab < 0.005, i.e. the judge cannot tell its
+  candidates apart at all. The separator is not marginal: at seed 2's era 1 that gap is
+  0.000292 on 671 rows, and at its era 2 it is 0.106531 on 309,334. Flagged cells are
+  printed with a `*` and the sign patterns are given BOTH WAYS, with and without them.
+  Nothing is dropped.
+
+  HEADLINE 1 — the norm undershoots a rising world and converges. `V_w - base` per era,
+  on the rows the base rate is read from (filed):
+    tag (seed)              e1         e2         e3         e4         e5   sign pattern
+    ts_s0 (s0)         -0.0323    -0.0251    -0.0008    +0.0072    +0.0023   ---++
+    ts_s2 (s2)        +0.3883*    +0.0019    -0.0109    -0.0330    -0.0273   *+---
+    -> the full per-era sign pattern agrees across the seeds: False
+    -> with `init` cells excluded, the sign pattern agrees: False   {'ts_s0': '---++', 'ts_s2': '+---'}
+    -> the STATE-like form instead — max |V_w - base| over the non-init eras, per seed: {'ts_s0': 0.0323, 'ts_s2': 0.033}
+    -> every seed calibrated to within 0.04 at every non-init era: True
+
+  HEADLINE 2 — on identical rows the judge's level rises with the era it is READ in.
+  Per seed, the panels frozen in era 1 (and in era 2), read across the eras:
+    tag (seed)        frozen    base        e1         e2         e3         e4         e5   drift all / non-init
+    ts_s0 (s0)             1   0.102    0.1430     0.1437     0.2054     0.2454     0.2286   +0.0857 / +0.0857
+    ts_s0 (s0)             2   0.148         -     0.1494     0.1998     0.2440     0.2346   +0.0852 / +0.0852
+    ts_s2 (s2)             1   0.174    0.5001     0.1451     0.2385     0.2644     0.2697   -0.2304 / +0.1245
+    ts_s2 (s2)             2   0.043         -     0.0975     0.1461     0.1595     0.1569   +0.0594 / +0.0594
+    -> sign over EVERY era: {'ts_s0': '+', 'ts_s2': 'mixed'}   agrees: False
+    -> sign over the NON-INIT eras: {'ts_s0': '+', 'ts_s2': '+'}   agrees: True
+
+  HEADLINE 3 — at matched structure the judge is near chance on the cost; at matched
+  cost it reads the structure. Printed as the DIFFERENCE (structure|cost) - (cost|struct)
+  per era, whose sign is the claim:
+    tag (seed)       rows           e1         e2         e3         e4         e5   sign pattern
+    ts_s0 (s0)       filed     +0.0320    -0.0239    +0.0832    +0.1529    +0.1425   +-+++
+    ts_s0 (s0)       probe     -0.0206    +0.0026    +0.0707    +0.0642    +0.0796   -++++
+    ts_s2 (s2)       filed     -0.0030    +0.0328    +0.0915    +0.1692    +0.1805   -++++
+    ts_s2 (s2)       probe           -    -0.0201    -0.0200    +0.0286    +0.0206   .--++
+    -> filed: patterns ['+-+++', '-++++']; agrees over all five eras: False; agrees over eras 3-5 (where the frontier is live and the critic is not warming up): True  ['+++']
+    -> probe: patterns ['-++++', '.--++']; agrees over all five eras: False; agrees over eras 3-5 (where the frontier is live and the critic is not warming up): False  ['+++', '-++']
+

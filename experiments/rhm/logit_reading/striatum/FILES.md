@@ -11,6 +11,14 @@
 | `analyze.py` | Every table in `results/tables.md` and the figure in `figs/`, from the JSONs pulled off the volume. Also holds the local re-matching (position in the strata, sign-balanced surprisal pairs) and the dated addendum (conditional AUCs inside quantile bins of a second score, and out-of-fold two-column combinations). |
 | `addendum.py` | One extra column: the model's realised horizon excess surprise `sum_{u=t}^{t+8}(NLL_u - H(q_u))` on the stimulus windows, written beside the main artefacts. `task.py` stores only the single-position excess at the anchor, which is a different object from the one the banked `coeruleus/` head predicts. |
 
+## Children
+
+| folder | summary |
+|---|---|
+| [`junction/`](junction/README.md) | The value reader's diet (2026-09-17): eleven training diets spanning a violation–cost association of −1 to +1 on fixed held-out rows, the width-free positive control and the oracle legality probe as ceiling; the surprise-gated row ladder against random, position-matched random, bottom-gated and oracle-damage arms with the containment of the banked excess head as the criterion. [`FILES.md`](junction/FILES.md). |
+| [`norm/`](norm/README.md) | The value side's own norm (2026-09-17): diets that move the base rate of outcome or damage with the `(etype, j)` cell histogram pinned bit-identically; the critic's pre-event level and its regression on the banked critic's across worlds; the response and the outcome surprise on fixed rows; the same-prefix twins in outcome currency with the regression-to-the-mean confound cancelled and a token-balance guard; scope by `k*`. [`FILES.md`](norm/FILES.md). |
+| [`../orbitofrontal/regime/`](../orbitofrontal/regime/FILES.md) (moved 2026-09-17 to the `orbitofrontal/` super-node) | A world where a violation predicts cost (2026-09-17): the grammar's stream with a two-state hidden corruption regime (mean dwell 288 clean / 32 noisy, ε = 0.002 / 0.12, marginal 0.0138) against an i.i.d. control at the same marginal rate; one next-token trunk per world; the exact running regime filter as the reference the critic's revision is read against; natural and legal twins at the corrupted token. Tables only — no README, the interpretation waits on a discussion. [`FILES.md`](../orbitofrontal/regime/FILES.md). |
+
 ## Artefacts on the volume
 
 Under `/data/v16_s2_L6_m4_distinct/logit_reading/` (`rhm-scaling-data`, **`chromatic`** workspace):

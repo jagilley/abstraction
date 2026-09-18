@@ -1,0 +1,343 @@
+========================================================================================================
+[tessitura] THE CPU PASS — the judge's level, from the banked rows and heads
+========================================================================================================
+  Two arms banked `vo_heads.pt`; `ov_s0`'s three banked rows only. Every number below is
+  ONE critic (the final one) on the ring-buffer TAIL (~60 filed / ~128 probe cycles).
+  It is a static read of a reader that was trained online, and it is not a time course.
+
+    loaded ov_s0b:ovt_comp_pr_sh (seed 0) — 60 buffers, 424862 rows, filed+probe (uniform), world-graded
+    loaded ov_s2:ovt_comp_pr_dis (seed 2) — 56 buffers, 425920 rows, filed+probe (3/4 disagreement), world-graded
+
+--------------------------------------------------------------------------------------------------------
+[T] THE GATES
+--------------------------------------------------------------------------------------------------------
+  T-2  THE DUMPED BUFFER IS THE BUFFER THE RUN'S LAST AUDIT READ. `vo_critic_audit`
+       scores, once per cycle, the rows with `code < 100*vo_critic_hold`, last 1024, and
+       logs `n` and `base_rate` (and `probe_n` / `probe_base_rate`). At the FINAL cycle
+       those rows are exactly this dump's held-out slice, so both must come back EXACT.
+       This is the gate on the rows and on the hold code, and it is an identity.
+       ov_s0b:ovt_comp_pr_sh  59 buffers, max |dn| = 0, max |dbase| = 1.49e-08  [PASS]
+       ov_s2:ovt_comp_pr_dis  56 buffers, max |dn| = 0, max |dbase| = 2.74e-08  [PASS]
+       FALSIFIED by dropping the last held-out row of every buffer:
+       ov_s0b:ovt_comp_pr_sh  6 of 6 buffers now disagree on `n`  [FAILS AS REQUIRED]
+       ov_s2:ovt_comp_pr_dis  6 of 6 buffers now disagree on `n`  [FAILS AS REQUIRED]
+
+  T-3  THE SCORES CANNOT BE AN IDENTITY, AND THE REASON IS IN THE LOOP'S ORDER.
+       `vo_critic_audit` is called at `voicing.py:9729` and `finetune_generator_span` at
+       `:10010`, so the audit of cycle c is read BEFORE cycle c's optimizer step, while
+       `ov_dump_rows` runs after the loop. The banked core and critic are therefore one
+       step ahead of the last logged audit, and the reloaded AUC must be CLOSE to the
+       logged one without equalling it. Reported, not asserted to zero:
+       ov_s0b:ovt_comp_pr_sh  |dAUC| filed: median 0.0175 max 0.0601 (n 29) · probe: median 0.0090 max 0.0485 (n 29)
+       ov_s2:ovt_comp_pr_dis  |dAUC| filed: median 0.0180 max 0.0721 (n 28) · probe: median 0.0067 max 0.0220 (n 28)
+       FALSIFICATION — the same comparison with the critic's parameters RE-DRAWN from
+       `build_critic`'s own minting discipline at another seed. The criterion is
+       RELATIVE, because a random readout sits at chance and the logged AUCs are ~0.65,
+       so an absolute threshold would only be restating the base rate: the re-drawn
+       residual must exceed the reloaded one by at least 3x on the SAME buffers, and the
+       re-drawn AUC itself must sit at chance.
+       ov_s0b:ovt_comp_pr_sh  re-drawn |dAUC| median 0.0899 vs reloaded 0.0177 (5.1x) · re-drawn AUC max |x-0.5| = 0.074  [FAILS AS REQUIRED]
+       ov_s2:ovt_comp_pr_dis  re-drawn |dAUC| median 0.1907 vs reloaded 0.0164 (11.6x) · re-drawn AUC max |x-0.5| = 0.039  [FAILS AS REQUIRED]
+
+  T-5  THE DEDUPE IS FREE. `Arm.score` runs ONE trunk forward per distinct masked
+       context and fans the result back over the rows that share it. Against the naive
+       per-row path on one buffer that must be an identity.
+       ov_s0b:ovt_comp_pr_sh  filed:2:0  max |dlogit| = 0.000e+00  [PASS]
+       ov_s2:ovt_comp_pr_dis  filed:2:0  max |dlogit| = 0.000e+00  [PASS]
+
+  T-4  THE STRUCTURAL LABEL IS NOT RECOVERABLE OFFLINE — this gate FAILS, and its
+       failure is the finding. `structure.py` reconstructs the root the dump does not
+       carry, by the min-edit cost to each root with the slot's span left free, and
+       reads `consistent_features` under it. The reconstruction is reported in
+       `results/structure.txt`; it is ambiguous on 47-68% of rows (two roots explain the
+       string equally well) and BIASED UPWARD, because a root under which some write
+       repairs is exactly the root that wins a free-span argmin. Q2's structural half
+       therefore needs the label banked at the write, which is what the re-run adds.
+
+--------------------------------------------------------------------------------------------------------
+[N] THE NORM — the judge's own expectation, against the world on the identical rows
+--------------------------------------------------------------------------------------------------------
+  THE DERIVATION IS A CHOICE AND IS REPORTED AS THREE. The judge is Q-shaped,
+  `critic(context, candidate) -> P(solve)`; a state value has to be built from it.
+    V_w    the judge's probability at the candidate that WAS written — the expectation
+           at the write it will make, and the only one of the three the run itself ever
+           consults on a governed slot;
+    V_max  its max over the slot's realised candidate set — the value of the slot under
+           a judge-optimal write;
+    V_mean its mean over that set — the value of the slot under a blind write.
+  `base` is the mean verdict over the SAME rows. On filed rows V_w is the judge's
+  expectation of what it chose; on probe rows it is its expectation of a substitution
+  drawn off-policy, so the two are different objects and never pooled.
+
+  ov_s0b:ovt_comp_pr_sh (seed 0)
+    filed
+      slot         n    base     V_w  V_w-base   V_max  V_mean   nC     AUC
+      2:0       8192   0.334   0.282    -0.052   0.336   0.073   19   0.751
+      2:1       8192   0.289   0.240    -0.049   0.292   0.062   19   0.765
+      2:2       8192   0.370   0.327    -0.043   0.345   0.067   19   0.728
+      2:3       8192   0.294   0.317    +0.022   0.363   0.088   19   0.734
+      2:4       8192   0.287   0.247    -0.040   0.282   0.051   19   0.794
+      2:5       8192   0.391   0.324    -0.067   0.348   0.079   19   0.717
+      2:6       8192   0.413   0.377    -0.035   0.391   0.066   19   0.676
+      2:7       8192   0.376   0.331    -0.045   0.372   0.090   19   0.721
+      2:8       8192   0.310   0.240    -0.069   0.281   0.059   19   0.743
+      2:9       8192   0.267   0.208    -0.060   0.249   0.048   19   0.775
+      2:10      8192   0.317   0.296    -0.021   0.318   0.067   19   0.726
+      2:11      8192   0.225   0.203    -0.022   0.238   0.052   19   0.786
+      2:12      8192   0.299   0.288    -0.011   0.313   0.077   19   0.672
+      2:13      8192   0.319   0.267    -0.052   0.305   0.081   19   0.718
+      2:14      8192   0.294   0.277    -0.017   0.298   0.056   19   0.748
+      2:15      8192   0.268   0.223    -0.045   0.258   0.057   19   0.748
+      3:0       8192   0.355   0.344    -0.011   0.395   0.072   85   0.766
+      3:1       8192   0.296   0.316    +0.020   0.377   0.080   88   0.778
+      3:2       8192   0.407   0.299    -0.108   0.341   0.065   85   0.734
+      3:3       8192   0.282   0.261    -0.022   0.283   0.051   89   0.801
+      3:4       8192   0.335   0.310    -0.025   0.411   0.070   84   0.719
+      3:5       8192   0.335   0.296    -0.039   0.359   0.095   86   0.772
+      3:6       8192   0.270   0.251    -0.019   0.309   0.067   85   0.659
+      3:7       8192   0.302   0.304    +0.002   0.365   0.068   85   0.693
+      4:0       5819   0.368   0.313    -0.054   0.441   0.144  183   0.770
+      4:1       6867   0.453   0.490    +0.036   0.502   0.178  191   0.685
+      4:2       7250   0.352   0.300    -0.052   0.425   0.104  187   0.699
+      4:3       8192   0.476   0.573    +0.097   0.624   0.243  187   0.653
+      5:0        688   0.555   0.643    +0.087   0.761   0.278  110   0.932
+      5:1       4992   0.536   0.524    -0.011   0.576   0.214  124   0.727
+      REGRESSION of the norm on the world across slots: slope +1.225  intercept -0.101  R2 0.857  sd ratio 1.323  n 30
+      POOLED: base 0.346   V_w 0.322   bias -0.023
+
+    probe
+      slot         n    base     V_w  V_w-base   V_max  V_mean   nC     AUC
+      2:0       8192   0.054   0.060    +0.006   0.303   0.065   19   0.898
+      2:1       8192   0.049   0.057    +0.008   0.283   0.060   19   0.912
+      2:2       8192   0.056   0.058    +0.002   0.314   0.062   19   0.909
+      2:3       8192   0.057   0.071    +0.015   0.346   0.081   19   0.910
+      2:4       7774   0.048   0.045    -0.003   0.284   0.051   19   0.910
+      2:5       8192   0.067   0.065    -0.002   0.316   0.070   19   0.914
+      2:6       8192   0.044   0.051    +0.006   0.366   0.061   19   0.920
+      2:7       8192   0.078   0.074    -0.004   0.337   0.079   19   0.891
+      2:8       8192   0.053   0.051    -0.002   0.268   0.056   19   0.899
+      2:9       8192   0.043   0.039    -0.004   0.229   0.044   19   0.895
+      2:10      8192   0.055   0.058    +0.003   0.302   0.063   19   0.904
+      2:11      8192   0.048   0.046    -0.002   0.229   0.050   19   0.875
+      2:12      8192   0.048   0.075    +0.027   0.305   0.077   19   0.880
+      2:13      8192   0.069   0.079    +0.011   0.295   0.080   19   0.846
+      2:14      7986   0.045   0.053    +0.007   0.298   0.055   19   0.899
+      2:15      8192   0.052   0.052    -0.000   0.251   0.055   19   0.865
+      3:0       6268   0.072   0.066    -0.006   0.350   0.062   85   0.894
+      3:1       6259   0.052   0.068    +0.016   0.367   0.078   88   0.856
+      3:2       6298   0.065   0.059    -0.006   0.316   0.062   85   0.879
+      3:3       6339   0.064   0.058    -0.006   0.254   0.046   89   0.906
+      3:4       6345   0.060   0.064    +0.004   0.391   0.065   84   0.873
+      3:5       6311   0.070   0.069    -0.001   0.345   0.090   86   0.832
+      3:6       6400   0.068   0.070    +0.002   0.309   0.072   85   0.841
+      3:7       6345   0.084   0.092    +0.008   0.356   0.068   85   0.886
+      4:0       2993   0.171   0.127    -0.044   0.438   0.144  183   0.777
+      4:1       3059   0.159   0.164    +0.005   0.503   0.178  191   0.846
+      4:2       3039   0.105   0.072    -0.032   0.413   0.100  187   0.786
+      4:3       3095   0.194   0.238    +0.044   0.628   0.245  187   0.794
+      5:0        351   0.311   0.294    -0.016   0.826   0.321  110   0.835
+      5:1        896   0.163   0.181    +0.018   0.575   0.214  124   0.711
+      REGRESSION of the norm on the world across slots: slope +0.961  intercept +0.005  R2 0.930  sd ratio 0.996  n 30
+      POOLED: base 0.083   V_w 0.085   bias +0.002
+
+    RELIABILITY (rows pooled over slots, deciles of V_w):
+      filed  (pred/obs) 0.04/0.06  0.11/0.13  0.16/0.18  0.20/0.23  0.26/0.28  0.31/0.35  0.37/0.41  0.44/0.49  0.53/0.55  0.68/0.67
+      probe  (pred/obs) 0.00/0.00  0.00/0.00  0.01/0.00  0.01/0.01  0.02/0.01  0.03/0.02  0.04/0.03  0.08/0.07  0.15/0.15  0.35/0.35
+
+  ov_s2:ovt_comp_pr_dis (seed 2)
+    filed
+      slot         n    base     V_w  V_w-base   V_max  V_mean   nC     AUC
+      2:0       8192   0.319   0.285    -0.034   0.315   0.079   19   0.720
+      2:1       8192   0.361   0.383    +0.023   0.410   0.112   19   0.775
+      2:2       8192   0.332   0.308    -0.024   0.339   0.069   19   0.771
+      2:3       8192   0.296   0.320    +0.024   0.347   0.091   19   0.752
+      2:4       8192   0.288   0.276    -0.012   0.305   0.069   19   0.771
+      2:5       8192   0.295   0.272    -0.023   0.299   0.067   19   0.754
+      2:6       8192   0.291   0.292    +0.001   0.313   0.059   19   0.738
+      2:7       8192   0.320   0.286    -0.034   0.305   0.076   19   0.767
+      2:8       8192   0.332   0.341    +0.009   0.393   0.096   19   0.750
+      2:9       8192   0.247   0.240    -0.007   0.267   0.067   19   0.723
+      2:10      8192   0.307   0.291    -0.016   0.333   0.070   19   0.773
+      2:11      8192   0.280   0.222    -0.057   0.254   0.067   19   0.760
+      2:12      8192   0.297   0.297    +0.000   0.330   0.088   19   0.729
+      2:13      8192   0.315   0.314    -0.000   0.334   0.089   19   0.693
+      2:14      8192   0.296   0.327    +0.031   0.350   0.077   19   0.744
+      2:15      8192   0.363   0.333    -0.029   0.359   0.095   19   0.761
+      3:0       8192   0.333   0.354    +0.021   0.381   0.076   85   0.781
+      3:1       8192   0.329   0.310    -0.019   0.442   0.055   83   0.787
+      3:2       8192   0.343   0.391    +0.048   0.452   0.121   86   0.749
+      3:3       8192   0.373   0.463    +0.089   0.478   0.074   82   0.693
+      3:4       8192   0.409   0.359    -0.050   0.412   0.076   85   0.719
+      3:5       8192   0.370   0.387    +0.017   0.436   0.104   86   0.749
+      3:6       8192   0.291   0.279    -0.012   0.312   0.086   84   0.721
+      3:7       8192   0.380   0.463    +0.083   0.493   0.074   84   0.715
+      4:0       6387   0.328   0.473    +0.145   0.645   0.236  179   0.742
+      4:1       5607   0.466   0.562    +0.096   0.726   0.201  175   0.775
+      4:2       6982   0.399   0.395    -0.004   0.666   0.184  172   0.776
+      4:3       8192   0.483   0.549    +0.065   0.570   0.212  172   0.722
+      REGRESSION of the norm on the world across slots: slope +1.373  intercept -0.114  R2 0.747  sd ratio 1.588  n 28
+      POOLED: base 0.337   V_w 0.349   bias +0.012
+
+    probe
+      slot         n    base     V_w  V_w-base   V_max  V_mean   nC     AUC
+      2:0       8192   0.016   0.023    +0.007   0.294   0.073   19   0.949
+      2:1       8192   0.016   0.027    +0.011   0.380   0.101   19   0.956
+      2:2       8192   0.015   0.021    +0.006   0.319   0.064   19   0.966
+      2:3       8192   0.016   0.022    +0.006   0.326   0.085   19   0.966
+      2:4       7796   0.019   0.023    +0.004   0.294   0.066   19   0.966
+      2:5       8092   0.014   0.017    +0.004   0.289   0.064   19   0.955
+      2:6       8192   0.018   0.020    +0.002   0.305   0.058   19   0.949
+      2:7       8192   0.013   0.017    +0.005   0.282   0.069   19   0.962
+      2:8       8192   0.020   0.026    +0.006   0.373   0.088   19   0.950
+      2:9       8192   0.014   0.019    +0.006   0.254   0.063   19   0.961
+      2:10      8192   0.021   0.026    +0.005   0.316   0.065   19   0.963
+      2:11      7636   0.013   0.018    +0.005   0.248   0.065   19   0.963
+      2:12      8192   0.019   0.028    +0.009   0.333   0.087   19   0.967
+      2:13      8192   0.014   0.024    +0.010   0.332   0.089   19   0.941
+      2:14      7344   0.018   0.025    +0.007   0.351   0.078   19   0.959
+      2:15      8192   0.016   0.020    +0.004   0.327   0.086   19   0.949
+      3:0       7798   0.015   0.018    +0.003   0.356   0.070   85   0.953
+      3:1       7720   0.018   0.014    -0.004   0.430   0.053   83   0.954
+      3:2       7863   0.014   0.027    +0.013   0.432   0.113   86   0.943
+      3:3       7867   0.012   0.017    +0.005   0.438   0.066   82   0.961
+      3:4       7789   0.012   0.014    +0.001   0.356   0.061   85   0.939
+      3:5       7694   0.015   0.021    +0.006   0.417   0.096   86   0.956
+      3:6       7850   0.015   0.020    +0.005   0.308   0.083   84   0.937
+      3:7       7868   0.006   0.020    +0.014   0.506   0.077   84   0.965
+      4:0       2679   0.035   0.051    +0.015   0.659   0.245  179   0.956
+      4:1       2648   0.048   0.053    +0.005   0.740   0.204  175   0.958
+      4:2       2444   0.030   0.036    +0.006   0.663   0.183  172   0.951
+      4:3       2752   0.041   0.055    +0.014   0.570   0.210  172   0.942
+      REGRESSION of the norm on the world across slots: slope +1.098  intercept +0.005  R2 0.862  sd ratio 1.183  n 28
+      POOLED: base 0.019   V_w 0.025   bias +0.006
+
+    RELIABILITY (rows pooled over slots, deciles of V_w):
+      filed  (pred/obs) 0.06/0.07  0.13/0.14  0.18/0.18  0.24/0.20  0.29/0.28  0.35/0.34  0.41/0.40  0.48/0.48  0.58/0.56  0.73/0.71
+      probe  (pred/obs) 0.00/0.00  0.00/0.00  0.00/0.00  0.00/0.00  0.00/0.00  0.00/0.00  0.00/0.00  0.01/0.00  0.03/0.02  0.19/0.14
+
+--------------------------------------------------------------------------------------------------------
+[C] COST AT MATCHED PRIOR — striatum §2/§5 with the DP prior where surprisal stood
+--------------------------------------------------------------------------------------------------------
+  `crit` is the judge's logit, `dp` the surface model's own score of the same candidate
+  (the prior the composed chooser sums), both against the verdict. `crit | dp` is the
+  judge's AUC inside quintile bins of the prior and back; a readout that carried nothing
+  the other does not would fall to chance under conditioning.
+  THE STRUCTURAL HALF IS ABSENT: see `structure.py` and gate T-4 below.
+
+  ov_s0b:ovt_comp_pr_sh (seed 0)
+    rows            n    base    crit      dp  crit|dp  dp|crit
+    filed      230416   0.336   0.732   0.578    0.720    0.502
+    probe      194446   0.065   0.883   0.705    0.851    0.575
+
+  ov_s2:ovt_comp_pr_dis (seed 2)
+    rows            n    base    crit      dp  crit|dp  dp|crit
+    filed      223776   0.335   0.746   0.587    0.730    0.507
+    probe      202144   0.017   0.955   0.601    0.943    0.732
+
+--------------------------------------------------------------------------------------------------------
+[X] THE TWINS — the substituted class against the written one at an identical context
+--------------------------------------------------------------------------------------------------------
+  Every probe row was drawn from a filed row of the same cycle: the same masked context,
+  a DIFFERENT on-table class (gate V-4d), and a verdict on the SAME trajectory's final
+  configuration with that one slot's content swapped. So the pair is a same-prefix twin
+  by construction, in the outcome as well as in the context — which is more than norm's
+  twins had, where the twin's continuation belonged to the other token.
+  THE JOIN IS ON THE CONTEXT. A masked context recurs across beam rows and cycles, so a
+  context is a GROUP: `y_f` is the mean verdict of the filed rows carrying it and `y_p`
+  the mean of the probe rows. `split` is the share of contexts whose filed verdicts
+  disagree with each other, which is the pairing's own noise and is printed, not hidden.
+  The filed buffer is shorter than the probe buffer in cycles, so only the overlap pairs.
+
+  ov_s0b:ovt_comp_pr_sh (seed 0)
+    slot      ctx   pairs  split    y_f    y_p      dY       dQ   dQ|dDP      dP     dDP   sign  b(dQ~Vm)  b(dQ~Vw)
+    2:0      1856    5374  0.115  0.314  0.060  -0.254   -3.007   -3.007  -0.209  -2.533  0.940    -9.749    -3.760
+    2:1      1838    6200  0.096  0.292  0.051  -0.241   -3.049   -3.048  -0.187  -2.608  0.935    -4.606    -4.799
+    2:2      1880    5044  0.169  0.359  0.059  -0.300   -3.611   -3.611  -0.266  -2.740  0.942    -7.679    -3.726
+    2:3      1690    5550  0.120  0.294  0.063  -0.231   -3.149   -3.149  -0.240  -2.621  0.936    -4.394    -3.936
+    2:4      1778    6856  0.118  0.292  0.049  -0.243   -3.477   -3.476  -0.209  -2.836  0.944   -14.352    -4.303
+    2:5      2001    4560  0.122  0.372  0.082  -0.290   -3.478   -3.478  -0.248  -2.822  0.956    +5.978    -0.268
+    2:6      2224    4018  0.156  0.413  0.052  -0.361   -4.194   -4.194  -0.323  -3.082  0.960   -12.716    -3.531
+    2:7      2059    4464  0.115  0.365  0.085  -0.280   -3.070   -3.070  -0.244  -2.602  0.949    -1.657    -1.996
+    2:8      1848    5869  0.101  0.306  0.057  -0.249   -3.087   -3.087  -0.187  -2.312  0.933   -10.080    -4.493
+    2:9      1835    6108  0.091  0.271  0.045  -0.226   -3.121   -3.121  -0.166  -3.066  0.947   -13.221    -4.517
+    2:10     1816    5864  0.118  0.312  0.055  -0.256   -3.164   -3.163  -0.235  -3.052  0.936    -8.290    -4.036
+    2:11     1727    6490  0.114  0.232  0.049  -0.183   -2.740   -2.740  -0.159  -2.988  0.929   -10.064    -4.650
+    2:12     2720    3147  0.109  0.298  0.048  -0.250   -2.920   -2.920  -0.224  -2.146  0.946   -14.157    -5.195
+    2:13     2610    2866  0.130  0.291  0.070  -0.221   -2.689   -2.688  -0.186  -2.483  0.913    +0.347    -2.938
+    2:14     1853    6557  0.124  0.306  0.046  -0.261   -3.313   -3.313  -0.230  -3.024  0.954   -15.390    -4.393
+    2:15     1618    6203  0.152  0.271  0.053  -0.218   -2.918   -2.918  -0.176  -2.673  0.924    -8.900    -4.581
+    3:0      1441    3752  0.094  0.350  0.086  -0.264   -3.134   -3.134  -0.257  -1.097  0.940    -0.862    -2.431
+    3:1      1295    4370  0.130  0.299  0.053  -0.246   -2.949   -2.948  -0.249  -1.149  0.945    -4.555    -4.023
+    3:2      1361    3629  0.138  0.392  0.067  -0.326   -3.151   -3.150  -0.237  -1.414  0.951    -1.152    -3.546
+    3:3      1472    4175  0.092  0.285  0.071  -0.214   -2.804   -2.802  -0.197  -1.280  0.956   -16.766    -3.417
+    3:4      1347    4468  0.102  0.332  0.060  -0.272   -2.890   -2.889  -0.244  -1.298  0.950    +0.713    -3.668
+    3:5      1499    3267  0.110  0.347  0.081  -0.266   -2.544   -2.544  -0.225  -1.203  0.945    -3.745    -2.927
+    3:6      3016     989  0.106  0.262  0.066  -0.196   -2.720   -2.708  -0.188  -1.535  0.926   -10.349    -4.870
+    3:7      2104    1212  0.097  0.305  0.054  -0.250   -3.042   -3.034  -0.220  -1.922  0.943    -6.249    -3.991
+    4:0       511    2993  0.145  0.374  0.171  -0.203   -1.524   -1.528  -0.186  -0.697  0.854    -0.446    -3.715
+    4:1       585    3059  0.123  0.461  0.159  -0.302   -2.520   -2.517  -0.326  -0.787  0.939    -2.432    -1.297
+    4:2       554    3039  0.140  0.365  0.105  -0.260   -2.183   -2.186  -0.223  -0.631  0.896    -4.305    -4.738
+    4:3       857    2011  0.179  0.491  0.162  -0.329   -2.221   -2.249  -0.355  -1.027  0.932    -2.734    -2.152
+    5:0        27     351  0.046  0.667  0.311  -0.356   -2.974   -2.972  -0.438  -0.557  0.890    -8.136    -4.544
+    5:1       265     896  0.108  0.539  0.163  -0.376   -1.793   -1.789  -0.342  -0.595  0.855    -8.530    -2.931
+    POOLED over slots: pairs 123381  y_f 0.324  y_p 0.069  dY -0.256  dQ -3.0203 +- 0.0069 (-439.4 se)  dP -0.2243  dDP -2.2504
+    POOLED dQ ~ V_mean (context-level): slope -0.415  r -0.010  n 123381
+    POOLED dQ ~ V_w    (CONFOUNDED — `dQ` contains -logit(w) by construction, which is norm §3's regression-to-the-mean, uncancelled here because the twin is a CANDIDATE and not a second row): slope -3.104  r -0.242
+    BY QUINTILE OF dDP (prior diff -> judge diff / world diff / sign agreement): -5.37->-3.93/-0.332/0.992  -2.87->-3.34/-0.277/0.962  -1.69->-3.02/-0.252/0.932  -0.99->-2.59/-0.229/0.912  -0.33->-2.25/-0.188/0.873
+
+  ov_s2:ovt_comp_pr_dis (seed 2)
+    slot      ctx   pairs  split    y_f    y_p      dY       dQ   dQ|dDP      dP     dDP   sign  b(dQ~Vm)  b(dQ~Vw)
+    2:0      1856    5733  0.099  0.323  0.017  -0.306   -7.586   -7.587  -0.264  -2.143  0.987    -5.275    -3.040
+    2:1      2053    4761  0.139  0.354  0.016  -0.339   -8.749   -8.750  -0.352  -1.912  0.987    -3.717    -2.759
+    2:2      1697    5786  0.140  0.337  0.013  -0.324   -7.757   -7.758  -0.291  -2.825  0.985    -6.042    -3.602
+    2:3      1761    5350  0.105  0.294  0.015  -0.279   -8.352   -8.353  -0.301  -1.972  0.984    -5.374    -3.500
+    2:4      1716    6689  0.103  0.283  0.017  -0.266   -7.773   -7.774  -0.255  -2.326  0.977   -10.951    -4.409
+    2:5      1594    6297  0.108  0.295  0.014  -0.281   -8.532   -8.533  -0.257  -2.046  0.985   -10.041    -4.440
+    2:6      1870    6066  0.100  0.293  0.015  -0.278   -8.182   -8.184  -0.281  -2.335  0.981    +2.893    -1.779
+    2:7      1929    4948  0.108  0.322  0.013  -0.309   -8.772   -8.779  -0.262  -1.876  0.991    -8.567    -3.295
+    2:8      1856    5273  0.111  0.342  0.017  -0.324   -8.412   -8.413  -0.319  -2.298  0.980    -0.235    -3.233
+    2:9      1778    5125  0.110  0.247  0.011  -0.236   -7.629   -7.633  -0.225  -2.237  0.984    -5.129    -2.291
+    2:10     1808    5434  0.112  0.302  0.014  -0.288   -7.465   -7.466  -0.268  -3.371  0.987    +3.058    -1.311
+    2:11     1687    6684  0.089  0.275  0.014  -0.261   -7.543   -7.544  -0.206  -1.989  0.982    -8.737    -4.288
+    2:12     2526    3237  0.149  0.299  0.014  -0.285   -7.622   -7.623  -0.279  -1.542  0.982    -7.625    -3.025
+    2:13     1809    5242  0.170  0.316  0.012  -0.304   -8.048   -8.049  -0.295  -1.825  0.990    -9.172    -3.663
+    2:14     1671    7105  0.106  0.303  0.018  -0.285   -6.755   -6.755  -0.307  -2.470  0.983   -12.971    -5.007
+    2:15     1872    4162  0.106  0.375  0.021  -0.354   -8.364   -8.367  -0.320  -2.027  0.985    -1.829    -1.914
+    3:0      1882    3461  0.075  0.333  0.016  -0.317   -8.506   -8.640  -0.349  -0.469  0.991    -0.058    -1.588
+    3:1      1529    4933  0.121  0.324  0.016  -0.307   -8.675   -8.786  -0.297  -0.711  0.982    +2.699    -2.555
+    3:2      2272    2460  0.112  0.350  0.007  -0.344   -7.587   -7.710  -0.366  -0.586  0.990    +1.699    -0.711
+    3:3      2645    1588  0.121  0.376  0.007  -0.369   -8.759   -8.836  -0.447  -0.817  0.997    -2.811    -3.430
+    3:4      1904    2962  0.110  0.404  0.013  -0.391   -9.522   -9.649  -0.342  -0.762  0.993    +0.856    -0.901
+    3:5      1822    2754  0.131  0.378  0.016  -0.362   -8.354   -8.493  -0.363  -0.973  0.987    +4.368    +0.730
+    3:6      3753     893  0.118  0.272  0.007  -0.266   -6.608   -6.699  -0.259  -0.695  0.986    +1.733    -0.955
+    3:7      2632    1305  0.132  0.368  0.004  -0.365   -8.595   -8.697  -0.447  -1.100  0.998    +6.107    -1.985
+    4:0       525    2679  0.122  0.357  0.035  -0.322   -7.938   -9.048  -0.437  -0.387  0.970    -2.834    -2.930
+    4:1       470    2648  0.153  0.493  0.048  -0.444   -6.689   -7.542  -0.540  -0.564  0.983    -6.056    -3.225
+    4:2       533    2444  0.132  0.385  0.030  -0.355   -9.366  -10.592  -0.336  -0.441  0.974    -2.143    -1.930
+    4:3       889    1426  0.179  0.477  0.036  -0.441   -5.936   -6.534  -0.491  -0.885  0.975    -2.780    -2.425
+    POOLED over slots: pairs 117445  y_f 0.324  y_p 0.016  dY -0.308  dQ -8.0126 +- 0.0108 (-741.7 se)  dP -0.3038  dDP -1.8664
+    POOLED dQ ~ V_mean (context-level): slope -2.205  r -0.041  n 117445
+    POOLED dQ ~ V_w    (CONFOUNDED — `dQ` contains -logit(w) by construction, which is norm §3's regression-to-the-mean, uncancelled here because the twin is a CANDIDATE and not a second row): slope -2.476  r -0.133
+    BY QUINTILE OF dDP (prior diff -> judge diff / world diff / sign agreement): -4.99->-5.93/-0.320/0.995  -2.28->-7.82/-0.316/0.986  -1.24->-8.58/-0.299/0.982  -0.65->-8.94/-0.330/0.989  -0.16->-9.18/-0.282/0.978
+
+--------------------------------------------------------------------------------------------------------
+[R] ACROSS ARMS — norm §1's protocol: two critics, one set of rows
+--------------------------------------------------------------------------------------------------------
+  Each arm's critic is scored on the OTHER arm's rows, through its OWN trunk. The
+  grammar is identical at every seed (`rule_seed 0` never moves) and a candidate is
+  content, not an index, so the rows are portable. What is NOT matched, and what
+  norm's frozen trunk did match, is the representation: each critic carries the trunk
+  it was trained on, so this is two whole readers, not two readouts of one state.
+  The two arms also differ in seed AND in probe draw at once, so this is one
+  contrast, not a family.
+
+    rows of ov_s0b:ovt_comp_pr_sh, scored by both critics
+      rows            n    base     own   other  slope(other~own)     R2  sdratio
+      filed      230416   0.336   0.308   0.286             0.477  0.208    1.046
+      probe      194446   0.065   0.068   0.075             0.495  0.231    1.031
+
+    rows of ov_s2:ovt_comp_pr_dis, scored by both critics
+      rows            n    base     own   other  slope(other~own)     R2  sdratio
+      filed      223776   0.335   0.345   0.252             0.366  0.162    0.910
+      probe      202144   0.017   0.023   0.019             0.558  0.404    0.877
+

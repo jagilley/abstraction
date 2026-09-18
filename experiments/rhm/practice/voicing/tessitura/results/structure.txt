@@ -1,0 +1,89 @@
+========================================================================================================
+[tessitura] GATE T-4 — the structural label, reconstructed offline: ov_s0b:ovt_comp_pr_sh
+========================================================================================================
+  [tessitura] THE STRUCTURAL LABEL, RECONSTRUCTED OFFLINE — and the gate that says whether it is.
+  
+  Q2 needs, per dumped row, the label `voicing`'s `rep` instrument reads: does the class that was
+  written hold a feature that would have REPAIRED the instance at that slot
+  (`fourwall/wall.py::consistent_features`)? The run computes it with the true root in hand. The
+  dump (`ov_dump_rows`) banks `obs`, `write`, `y`, `dp`, `code`, `unif` and **not the root**, so
+  the label is not a lookup.
+  
+  WHAT IT NEEDS, EXACTLY. `consistent_features(rules, x, roots, node, level, s, canon, v)` calls
+  `entry_success`, which OVERWRITES the slot's token span and then asks the grammar's possible-set
+  DP whether the result derives the root. Two consequences, and the first is the good news:
+  
+    - the span it overwrites is `[node*s**level, (node+1)*s**level)`, which is EXACTLY the span
+      `VoRecorder.assemble` masks to -1 when it builds `obs`. So the mask is irrelevant: `obs`
+      and the unmasked context give the identical label. Nothing about the context is missing.
+    - the root is missing, and nothing in the dump determines it.
+  
+  THE RECONSTRUCTION. `nearest_derivation_cost` is an exact min-edit DP from leaves to a target
+  root. Re-implemented here with the slot's bottom blocks zeroed after the bottom layer
+  (`free_span_cost`), it answers "how many token edits OUTSIDE the slot would this string need to
+  derive root r, if I am allowed to write any legal unit at the slot". The world drew one root per
+  instance and corrupted it at the era's node with `n_corrupt` tokens, so the true root's cost is
+  at most that corruption and every other root's is typically far larger. `root_hat` is the
+  argmin; `margin` is the gap to the runner-up, and a row with margin 0 is AMBIGUOUS and is
+  reported as such rather than resolved by a tie-break.
+  
+  WHY THIS IS A RECONSTRUCTION AND NOT A MEASUREMENT, said before any number is read off it: the
+  argmin is the root that best explains the string, not the root the world drew. Where the two
+  differ the label is wrong, and nothing offline can see which rows those are. The gate below is
+  what makes the reconstruction usable rather than assumed —
+  
+    GATE T-4. The run logs `rep` per slot per cycle: `hit / n` over 64 evenly-spaced filed rows,
+    computed with the TRUE root. Reconstructing the same label over the dumped filed buffer and
+    pooling must reproduce those rates per slot. They are different subsamples of the same
+    population, so the comparison is a tolerance and not an identity, and the per-slot residuals
+    are printed.
+  
+    T-4 FAILS, and the failure is this node's answer to "is the structural label recoverable from
+    the bank". It is reported as a failure and the reconstruction is not used for any reading. The
+    comparison is shown to be non-vacuous by a third column: the same label under a DELIBERATELY
+    WRONG root (+1 mod v) lands further still, so `rep` and this computation are comparable
+    objects and the residual is measuring the reconstruction rather than a units mismatch.
+
+  slot         n   recon  wrongroot  rep/last30  rep/all   amb%  cost0%  |resid|
+  2:0       4000   0.424      0.103       0.342    0.243   60.0    52.7    0.082
+  2:1       4000   0.388      0.073       0.321    0.230   44.0    47.6    0.067
+  2:10      4000   0.425      0.064       0.370    0.280   43.7    47.1    0.055
+  2:11      4000   0.302      0.058       0.261    0.190   44.2    43.2    0.041
+  2:12      4000   0.320      0.049       0.205    0.343   47.3    41.4    0.115
+  2:13      4000   0.372      0.039       0.249    0.276   41.2    40.2    0.124
+  2:14      4000   0.427      0.037       0.363    0.290   42.6    47.2    0.064
+  2:15      4000   0.384      0.022       0.263    0.245   48.0    45.5    0.121
+  2:2       4000   0.448      0.057       0.382    0.295   51.4    56.9    0.066
+  2:3       4000   0.426      0.072       0.307    0.237   58.1    55.1    0.119
+  2:4       4000   0.391      0.033       0.305    0.265   45.6    44.9    0.086
+  2:5       4000   0.521      0.175       0.374    0.305   58.2    56.6    0.147
+  2:6       4000   0.450      0.014       0.355    0.322   52.7    48.1    0.094
+  2:7       4000   0.492      0.059       0.334    0.289   56.6    52.0    0.158
+  2:8       4000   0.432      0.074       0.345    0.247   49.7    52.9    0.087
+  2:9       4000   0.373      0.077       0.279    0.240   52.0    43.9    0.094
+  3:0       4000   0.368      0.211       0.280    0.257   67.8    54.3    0.088
+  3:1       4000   0.289      0.034       0.204    0.219   50.8    48.7    0.085
+  3:2       4000   0.480      0.140       0.368    0.289   53.0    59.3    0.112
+  3:3       4000   0.350      0.137       0.246    0.200   54.8    52.0    0.104
+  3:4       4000   0.315      0.081       0.349    0.276   48.8    54.4    0.034
+  3:5       4000   0.344      0.077       0.220    0.248   59.1    44.5    0.124
+  3:6       4000   0.417      0.058       0.360    0.510   51.7    54.4    0.057
+  3:7       4000   0.443      0.127       0.254    0.280   53.6    58.4    0.189
+  4:0       4000   0.345      0.115       0.255    0.278   55.0    46.1    0.090
+  4:1       4000   0.551      0.149       0.382    0.392   73.7    57.5    0.169
+  4:2       4000   0.294      0.119       0.321    0.307   51.0    54.4    0.027
+  4:3       4000   0.614      0.118       0.693    0.727   47.3    76.0    0.079
+  5:0        688   0.333      0.074       0.505    0.505   72.5    61.9    0.172
+  5:1       4000   0.418      0.108       0.730    0.730   79.8    90.7    0.312
+
+  VERDICT: mean signed residual against the run's own `rep` over the last 30 cycles = +0.064, median |residual| = 0.092, positive on 25 of 30 slots. Under a deliberately wrong root the median |residual| is 0.236, so the comparison discriminates and the residual above is the reconstruction's own.
+  GATE T-4 FAILS. The reconstruction is biased UPWARD and the bias has a mechanism: the
+  free-span argmin prefers precisely the roots under which SOME write at this slot
+  repairs, because those roots reach cost 0 there. A root the world drew under which
+  NOTHING repairs loses the argmin to one under which something does, so the
+  reconstruction manufactures repair sets. The ambiguity column is the second half of
+  the failure: on roughly half the rows two roots explain the string equally well.
+  THE CONSEQUENCE: Q2's structural side is not answerable from the bank, and the label
+  has to be taken at the write, where the true root is in hand. `voicing`'s own `rep`
+  instrument already computes exactly this, on 64 rows per slot per cycle; what it does
+  not do is emit it PER ROW beside the verdict, the prior and the judge's score.

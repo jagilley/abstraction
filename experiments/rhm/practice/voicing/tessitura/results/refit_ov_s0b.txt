@@ -1,0 +1,150 @@
+========================================================================================================
+[tessitura] THE DIETS — norm §1 on a fixed trunk: ov_s0b:ovt_comp_pr_sh
+========================================================================================================
+  [tessitura] THE DIETS — norm §1's between-subjects design, on voicing's trunk held fixed.
+  
+  `reduce_rows.py`'s [R] scored each banked critic on the other's rows and had to carry a caveat
+  it could not remove: **each critic carries its own trunk**, so that comparison is two whole
+  readers and not two readouts of one state, and the two arms differ in seed AND in probe draw at
+  once. `logit_reading/striatum/norm/` had neither problem — one frozen trunk, one shared set of
+  held-out rows, eleven diets differing only in the outcome distribution they were fed.
+  
+  This file recreates that design here. The trunk is `vo_heads.pt`'s, held FIXED; the rows are the
+  banked buffers; the critic is **re-fitted from scratch** under each diet with the same
+  architecture, the same initialisation, the same optimizer, the same number of steps and the same
+  batch size; and every refit's level is read on the IDENTICAL held-out rows — the run's own
+  bijective hold code (`code < 100 * vo_critic_hold`), which no diet ever trains on.
+  
+  WHAT THE DIETS ARE. Two families, both pinned the way norm pinned its `(etype, j)` cell
+  histogram, which here means pinning the SLOT counts (and therefore the level counts, since a
+  slot has one level) and the SOURCE composition:
+  
+    the SOURCE family     `filed`, `probe`, `both` — the axis `voicing` Q3 built and `overtone`
+                          measured. The three differ enormously in expected outcome (a filed write
+                          solves ~0.34 of the time, a substituted class ~0.07), which is exactly
+                          the manipulation norm's `out` family had to construct by selection.
+    the OUTCOME family    `out_lo`, `out_mid`, `out_hi` — within each slot AND within each source,
+                          three target base rates on a multiplicative ladder (0.6x / 1.0x / 1.4x)
+                          around each cell's OWN natural rate, drawn from that cell's own rows. So the
+                          three diets hold the slot counts, the level counts and the filed:probe
+                          ratio identical and move only E[outcome]. This is norm's "terciles taken
+                          inside each cell with equal counts leave the histogram bit-identical and
+                          only the outcome moves", one substrate over.
+  
+    plus `full` (the whole training pool — the banked diet, and the regression's reference) and a
+    per-diet SHUFFLED-OUTCOME floor.
+  
+  THE RANDOM-INIT TRUNK IS CARRIED, because it is the control that made norm §1 a finding rather
+  than an observation: on a random feature map the diets could only SHIFT the norm, while on the
+  trained trunk they also RESCALED it. The same two columns are here.
+  
+  WHAT THIS STILL IS NOT. The trunk is `voicing`'s trained executor trunk, not a frozen
+  next-token trunk, and it was shaped by the run that produced these rows — so "fixed" means fixed
+  across the diets, not independent of them. And the rows are the ring-buffer tail, as everywhere
+  in this node.
+
+  steps 600 · lr 0.001 · batch 64 per slot per step · init seed 7 (the SAME for every diet) · hold code < 10
+
+  feature cache built for both trunks: 60 buffers
+
+--------------------------------------------------------------------------------------------------------
+[T] THE GATES
+--------------------------------------------------------------------------------------------------------
+  T-6  THE CACHE IS THE TRUNK. `Critic.ctx_state` reads `pooled.mean(1)` and the slot's
+       own `span` blocks and nothing else, so caching those two is sufficient and the
+       trunk never runs again. Against the real forward through the BANKED critic that
+       must be an identity, or every refit below is reading a different state.
+       max |delta| over 6 buffers x 1024 rows = 0.000e+00  [PASS]
+       FALSIFIED: perturbing one cached block vector by 1e-3 must break it —
+       perturbed max |delta| = 3.057e-04  [FAILS AS REQUIRED]
+
+  T-7  THE DIETS ARE PINNED. Every diet inside a family must carry the IDENTICAL number
+       of rows per slot and the IDENTICAL filed:probe ratio, so the only thing that
+       moves is E[outcome] — norm's `(etype, j)` cell histogram, one substrate over.
+       source   family: identical TOTAL rows per slot across ['filed', 'probe', 'both'] = True  (the filed:probe ratio IS the manipulation here)
+       outcome  family: identical (filed, probe) counts per slot across ['out_lo', 'out_mid', 'out_hi'] = True
+
+  T-8  THE HELD-OUT ROWS ARE IDENTICAL AND UNTOUCHED. Every refit is read on
+       `code < thr`; no diet may contain one of those rows.
+       held-out rows 42722 · training rows that leak into a diet = 0  [PASS]
+
+--------------------------------------------------------------------------------------------------------
+[D] THE DIETS — what each was fed (norm's own table)
+--------------------------------------------------------------------------------------------------------
+    diet          rows     filed     probe  E[outcome]  E[y] filed  E[y] probe
+    full        382140    207479    174661      0.2128      0.3370      0.0653
+    filed       174471    174471         0      0.3293      0.3293         nan
+    probe       174471         0    174471      0.0654         nan      0.0654
+    both        174471     87229     87242      0.2076      0.3457      0.0694
+    out_lo      272698    147954    124744      0.1275      0.2020      0.0392
+    out_mid     272698    147954    124744      0.2125      0.3367      0.0653
+    out_hi      272698    147954    124744      0.2976      0.4714      0.0915
+
+--------------------------------------------------------------------------------------------------------
+[N] THE NORM PER DIET, ON THE IDENTICAL HELD-OUT ROWS
+--------------------------------------------------------------------------------------------------------
+  `norm` is the refit's mean predicted P(solve) over every held-out row of every slot —
+  the SAME rows for every diet and every trunk. `AUC` is its ranking on those rows and
+  `floor` the same refit trained on a per-diet SHUFFLE of the outcome, which is the only
+  thing that says whether a diet carried any signal at all.
+
+  TRUNK = trained
+    diet      E[outcome]     norm  norm-E[out]  norm/fil  norm/prb      AUC    floor     loss
+    full          0.2128   0.2061      -0.0067    0.2970    0.1006    0.645    0.532   0.4188
+    filed         0.3293   0.3149      -0.0144    0.3127    0.3173    0.599    0.501   0.5490
+    probe         0.0654   0.0936      +0.0282    0.1225    0.0600    0.595    0.515   0.2206
+    both          0.2076   0.2065      -0.0010    0.2865    0.1137    0.630    0.522   0.4031
+    out_lo        0.1275   0.1271      -0.0004    0.1757    0.0707    0.618    0.506   0.3284
+    out_mid       0.2125   0.2215      +0.0090    0.3138    0.1145    0.643    0.507   0.4163
+    out_hi        0.2976   0.2821      -0.0155    0.4099    0.1338    0.652    0.532   0.4527
+
+  TRUNK = random
+    diet      E[outcome]     norm  norm-E[out]  norm/fil  norm/prb      AUC    floor     loss
+    full          0.2128   0.2186      +0.0057    0.2972    0.1274    0.576    0.520   0.4527
+    filed         0.3293   0.3093      -0.0200    0.3266    0.2891    0.581    0.515   0.6144
+    probe         0.0654   0.0756      +0.0102    0.0951    0.0529    0.576    0.542   0.2378
+    both          0.2076   0.2277      +0.0202    0.3019    0.1417    0.579    0.505   0.4504
+    out_lo        0.1275   0.1193      -0.0082    0.1632    0.0685    0.572    0.501   0.3443
+    out_mid       0.2125   0.2029      -0.0096    0.2728    0.1219    0.577    0.509   0.4493
+    out_hi        0.2976   0.2890      -0.0086    0.3930    0.1683    0.577    0.524   0.5032
+
+--------------------------------------------------------------------------------------------------------
+[S] SHIFT OR RESCALING — norm §1's regression, on the identical rows
+--------------------------------------------------------------------------------------------------------
+  Each diet's per-row norm regressed on `full`'s across the SAME held-out rows. Slope 1
+  with an intercept is a pure LEVEL SHIFT; slope != 1 or sd ratio != 1 is a RESCALING;
+  R^2 < 1 says the map is not exactly affine either. norm found a random-init trunk can
+  only shift and the trained trunk also rescales — this is that comparison.
+
+  TRUNK = trained
+    diet        slope  intercept      R2  sd ratio  mean shift        n
+    full        1.000    -0.0000   1.000     1.000     +0.0000    42711
+    filed       0.396    +0.2332   0.143     1.046     +0.1088    42711
+    probe       0.400    +0.0110   0.499     0.567     -0.1125    42711
+    both        0.834    +0.0346   0.659     1.027     +0.0004    42711
+    out_lo      0.552    +0.0132   0.778     0.626     -0.0790    42711
+    out_mid     0.993    +0.0169   0.869     1.065     +0.0155    42711
+    out_hi      1.188    +0.0373   0.759     1.363     +0.0760    42711
+
+  TRUNK = random
+    diet        slope  intercept      R2  sd ratio  mean shift        n
+    full        1.000    +0.0000   1.000     1.000     +0.0000    42711
+    filed       0.403    +0.2211   0.286     0.754     +0.0907    42711
+    probe       0.384    -0.0083   0.474     0.557     -0.1430    42711
+    both        0.854    +0.0410   0.719     1.007     +0.0092    42711
+    out_lo      0.557    -0.0024   0.938     0.575     -0.0992    42711
+    out_mid     0.871    +0.0125   0.947     0.895     -0.0156    42711
+    out_hi      1.153    +0.0370   0.840     1.258     +0.0704    42711
+
+  RANK ORDER (norm's headline): Spearman rho of the diet's norm against the diet's own
+  E[outcome], inside each family. +1 is the rank-one result norm reported at every
+  level, checkpoint and anchor.
+    trained  source   E[outcome] [0.3293, 0.0654, 0.2076] -> norm [0.3149, 0.0936, 0.2065]   rho = 1.000
+    trained  outcome  E[outcome] [0.1275, 0.2125, 0.2976] -> norm [0.1271, 0.2215, 0.2821]   rho = 1.000
+    random   source   E[outcome] [0.3293, 0.0654, 0.2076] -> norm [0.3093, 0.0756, 0.2277]   rho = 1.000
+    random   outcome  E[outcome] [0.1275, 0.2125, 0.2976] -> norm [0.1193, 0.2029, 0.289]   rho = 1.000
+
+  NON-VACUITY: the diets must actually produce DIFFERENT readers. Max pairwise
+  |delta norm| on the identical rows, per trunk:
+    trained  spread = 0.2213 over 7 diets
+    random   spread = 0.2337 over 7 diets

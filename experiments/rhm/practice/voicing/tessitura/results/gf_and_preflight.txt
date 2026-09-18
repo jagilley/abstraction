@@ -1,0 +1,26 @@
+# [tessitura] the GPU gates
+
+## G-F — the donor replay with every ts_* knob off (tag ts_gf1, app ap-Xm7P6g2jn05xtYxBFlWUu9)
+[gf] depth=6 m=2 cycles/era=4 maxl=4 — voicing vs enharmonic (gate_log + slot_rec ON; every [voicing] knob off)
+[gf] anchor: max|fork-donor| = 0.000e+00  max|donor-donor| = 0.000e+00  commits equal: True
+[gf] given_c1: max|fork-donor| = 0.000e+00  max|donor-donor| = 0.000e+00  commits equal: True
+[gf] === G-F (smoke scale) === max|fork - caesura| = 0.000e+00   control = 0.000e+00
+
+## preflight ts_pf1 — the callsite wiring at dust sizes (app ap-B3LDPvTXnZh7OteTjnaLwT)
+PREFLIGHT OK: 1
+Y-1:ovt_pf_comp_pr: {'arm': 'ovt_pf_comp_pr', 'source': 'voi3b_pf_src', 'commits_planned': [6], 'commits_realised': [6], 'commits_match': True, 'advances_planned': [6, 12, 17, 22, 27], 'advances_realised': [6, 12, 17, 22, 27], 'advances_match': True, 'cancelled': [], 'commit_levels': [[2, 6]]}
+voicing:ovt_pf_comp_pr: {'filed': 508, 'verified': 508, 'verify_bad': 0, 'solved': 0, 'sampled': 14429, 'xp_shift': 14429, 'unnamed': 0, 'shift_fired': 14429, 'shift_closed': 0, 'ontable_shift': 0, 'xp_by_level': {'2n0': {'n': 1502, 'shift': 1502, 'ontable_shift': 1500, 'n_eps': 0, 'eps_shift': 0}, '2n1': {'n': 13, 'shift'
+voicing:ovt_pf_comp_pr:probe: {'n_probe': 116, 'n_ground': 116, 'n_solved': 2, 'solve_rate': 0.017241379310344827, 'bill_share_max': 0.006069434328720563, 'bill_share_mean': 0.002526397191507967, 'cycles_billed': 18, 'buf_rows': {'2:7': 14, '2:12': 13, '2:13': 10, '2:15': 2, '2:2': 4, '2:6': 4, '2:14': 8, '2:8': 12, '2:5': 11, '
+voicing:ovt_pf_comp_pr:composed: {'n': 14429, 'moved': 14429, 'share': 1.0, 'dp_vs_head': 0}
+
+## TS-1 — the paid arm against the banked cell (app ap-5NFh1Z7PTbGYRocP2zHN2v)
+    ovt_comp_pr_sh  vs banked  vo_s3b:voi3b_comp_pr_yk
+      max|delta| = 0.000e+00  (worst series None, first differing cycle None)   commits equal = True
+      per series: e=0.0e+00  succ=0.0e+00  dres=0.0e+00  n_solved=0.0e+00  n_mined=0.0e+00  n_moves=0.0e+00  width=0.0e+00  e_practice=0.0e+00  vloss=0.0e+00  gloss=0.0e+00  t_cum=0.0e+00
+      VERDICT: PASS — bit-identical
+
+## TS-1b — byte identity of the banked dumps against ov_s0b
+8616042469ed593500e6f273ab1e1b5d  ts_s0/ovt_comp_pr_sh/vo_rows.npz
+8616042469ed593500e6f273ab1e1b5d  ov_s0b/ovt_comp_pr_sh/vo_rows.npz
+3c13f650ff9642a87aad7df76c5ad398  ts_s0/ovt_comp_pr_sh/vo_heads.pt
+3c13f650ff9642a87aad7df76c5ad398  ov_s0b/ovt_comp_pr_sh/vo_heads.pt

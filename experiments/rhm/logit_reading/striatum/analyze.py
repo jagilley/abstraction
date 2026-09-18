@@ -415,16 +415,22 @@ def addendum(npz_path, cb, hexcess_path=None, anchor="tv", label="flip", a=0, lm
         y = lab[mm]
         e = {"n": int(len(mm)), "base_rate": float(y.mean()),
              "marginal": {k: _auc(v, y) for k, v in sc.items()}}
+        # `banked` is absent on any checkpoint that has no `coeruleus/` head beside it
+        # (e.g. the fine-tuned trunks of `shaped/`); every banked column is then skipped
+        # and the rest of the table is unchanged.
+        has_b = "banked" in sc
         for tgt in ("R", "R_clean", "V", "R_mlp"):
             if tgt not in sc:
                 continue
-            e[f"{tgt}|banked"] = _cond_auc(sc[tgt], sc["banked"], y, nbin)
-            e[f"banked|{tgt}"] = _cond_auc(sc["banked"], sc[tgt], y, nbin)
-            e[f"oof[banked,{tgt}]"] = _oof_auc(np.stack([sc["banked"], sc[tgt]], 1), y,
-                                               seed=seed)
+            if has_b:
+                e[f"{tgt}|banked"] = _cond_auc(sc[tgt], sc["banked"], y, nbin)
+                e[f"banked|{tgt}"] = _cond_auc(sc["banked"], sc[tgt], y, nbin)
+                e[f"oof[banked,{tgt}]"] = _oof_auc(np.stack([sc["banked"], sc[tgt]], 1), y,
+                                                   seed=seed)
             e[f"oof[{tgt}]"] = _oof_auc(sc[tgt][:, None], y, seed=seed)
-        e["oof[banked]"] = _oof_auc(sc["banked"][:, None], y, seed=seed)
-        if "excess_horizon" in sc:
+        if has_b:
+            e["oof[banked]"] = _oof_auc(sc["banked"][:, None], y, seed=seed)
+        if "excess_horizon" in sc and has_b:
             e["banked|excess_horizon"] = _cond_auc(sc["banked"], sc["excess_horizon"], y, nbin)
             e["excess_horizon|banked"] = _cond_auc(sc["excess_horizon"], sc["banked"], y, nbin)
             e["oof[excess_horizon,banked]"] = _oof_auc(
@@ -461,14 +467,263 @@ def sec_addendum(add, a=0):
     return tbl(rows, ["quantity"] + keys)
 
 
+# ---------------------------------------------------------------------------
+# 2026-09-17 re-read: the across-level contrast on every stored critic
+# ---------------------------------------------------------------------------
+
+def mlp_across(npz_path, cb, lmax=4, min_j=30):
+    """Re-read of the §5 across-level contrast on every critic stored in the `.npz`.
+
+    `task.py::summarize` ran `across_level` on the trained linear critic and on the
+    clean-only critic, but never on the MLP critic, whose per-(window, anchor, a, level)
+    revisions `R_mlp_l{l}_a{a}` are stored on the identical rows. The `.npz` holds only
+    the test rows (`split == 2`), so `te` is all-True here and the `linear` / `clean`
+    columns must reproduce the banked JSON's `across_level` / `across_level_clean` cells
+    exactly -- that identity is the reproduction gate on this re-read.
+    """
+    from rhm.logit_reading.striatum.task import across_level
+    Z = np.load(npz_path)
+    out = {}
+    for an in ("fd", "tv"):
+        pre = f"{an}__"
+        if pre + "t0" not in Z:
+            continue
+        rec = {k[len(pre):]: Z[k] for k in Z.files if k.startswith(pre)}
+        n = len(rec["t0"])
+        te = np.ones(n, bool)
+        cells = {}
+        for name, blk in (("linear", cb), ("mlp", "mlp"), ("clean", "clean")):
+            if f"R_{blk}_l1_a0" not in rec:
+                continue
+            cells[name] = across_level(rec, blk, te, lmax=lmax)
+            byj = {}
+            for jv in range(1, 5):
+                mj = te & (np.asarray(rec["j"]) == jv)
+                if mj.sum() >= min_j:
+                    r = across_level(rec, blk, mj, lmax=lmax)
+                    if r:
+                        byj[f"j{jv}"] = r
+            cells[name + "_by_j"] = byj
+            # 2026-09-17 follow-up: ranks taken inside an exact (j, k*) cell.  `j` fixes
+            # the edit's width and `k*` the depth at which it becomes Bayes-detectable,
+            # and both move the SCALE of the revision; `across_level` ranks within level
+            # but pools across them, so a wide or deep edit's large revisions are ranked
+            # against narrow ones.  This is the width-and-depth-controlled contrast.
+            byjk = {}
+            jj_, kk_ = np.asarray(rec["j"]), np.asarray(rec["k_star"])
+            for jv in range(1, 5):
+                for kv in range(0, 7):
+                    m = te & (jj_ == jv) & (kk_ == kv)
+                    if m.sum() >= min_j:
+                        r = across_level(rec, blk, m, lmax=lmax)
+                        if r:
+                            byjk[f"j{jv}k{kv}"] = r
+            cells[name + "_by_jk"] = byjk
+        out[an] = cells
+    return out
+
+
+def sec_mlp_across(cells, a_list=(0, 1), critics=("linear", "mlp", "clean")):
+    rows = []
+    for cr in critics:
+        t = cells.get(cr, {})
+        for a in a_list:
+            e = t.get(f"a{a}")
+            if e:
+                rows.append([cr, a, e["n"], fmt(e["mean_rank_cons"]),
+                             fmt(e["mean_rank_incons"]), fmt(e["win_rate"]),
+                             fmt(e["scalar_rank_mean"])])
+    return tbl(rows, ["critic", "a", "n", "rank cons", "rank incons", "win rate",
+                      "scalar rank"])
+
+
+def sec_mlp_across_by_j(cells, a=0, critics=("linear", "mlp", "clean")):
+    """Per-`j` breakdown, plus the `n`-weighted mean over the strata -- the pooled row
+    above mixes `j` cells, whose consequence profiles differ (junction's first gotcha),
+    so the stratified mean is the `j`-controlled version of the same contrast."""
+    rows = []
+    for cr in critics:
+        t = cells.get(cr + "_by_j", {})
+        acc = []
+        for jv in sorted(t):
+            e = t[jv].get(f"a{a}")
+            if e:
+                rows.append([cr, jv, e["n"], fmt(e["mean_rank_cons"]),
+                             fmt(e["mean_rank_incons"]), fmt(e["win_rate"])])
+                acc.append((e["n"], e["win_rate"]))
+        if acc:
+            n = sum(x[0] for x in acc)
+            rows.append([cr, "**all j (n-wtd)**", n, "--", "--",
+                         fmt(sum(x[0] * x[1] for x in acc) / n)])
+    return tbl(rows, ["critic", "j", "n", "rank cons", "rank incons", "win rate"])
+
+
+GATE_TOL = 5e-3
+
+
+def sec_mlp_across_by_jk(cells, a=0, critics=("linear", "mlp", "clean")):
+    """Per-`(j, k*)` breakdown with ranks taken inside the cell, plus the `n`-weighted
+    mean over the cells and the coverage those cells retain against the pooled row set."""
+    rows = []
+    for cr in critics:
+        t = cells.get(cr + "_by_jk", {})
+        pooled = cells.get(cr, {}).get(f"a{a}")
+        acc = []
+        for ck in sorted(t, key=lambda x: (int(x.split("k")[0][1:]), int(x.split("k")[1]))):
+            e = t[ck].get(f"a{a}")
+            if e:
+                rows.append([cr, ck, e["n"], fmt(e["mean_rank_cons"]),
+                             fmt(e["mean_rank_incons"]), fmt(e["win_rate"])])
+                acc.append((e["n"], e["win_rate"]))
+        if acc:
+            n = sum(x[0] for x in acc)
+            cov = f"coverage {n / pooled['n']:.2f}" if pooled and pooled["n"] else "--"
+            rows.append([cr, "**all (j, k*) (n-wtd)**", n, cov, "--",
+                         fmt(sum(x[0] * x[1] for x in acc) / n)])
+    return tbl(rows, ["critic", "(j, k*)", "n", "rank cons", "rank incons", "win rate"])
+
+
+def write_mlp_across(args):
+    """`--mlp-across`: writes `tables_mlp_across.md` only; touches no banked table."""
+    dirs = [args.dir] + [d for d in args.extra_dirs.split(",") if d]
+    head = ["# striatum -- the across-level contrast on the MLP critic (re-read, "
+            "2026-09-17)", "",
+            "Pure re-read of banked `stepNNNNNN_striatum_<tag>.npz` artefacts: no model "
+            "is run and nothing is refit. `task.py::across_level` is called on the "
+            "identical held-out rows for the trained **linear** critic (the banked "
+            "`across_level`), the **MLP** critic on the same block (never read this way "
+            "before) and the **clean-only** critic (the banked `across_level_clean`).",
+            "", "Reproduction:", "", "```bash",
+            "cd experiments   # MODAL_PROFILE=chromatic",
+            "D=/v16_s2_L6_m4_distinct/logit_reading",
+            "modal volume get rhm-scaling-data $D/traj_a1_s42 <dir>/traj_a1_s42",
+            "modal volume get rhm-scaling-data $D/traj_eps01_s42 <dir>/traj_eps01_s42",
+            "python -m rhm.logit_reading.striatum.analyze <dir>/traj_a1_s42 "
+            "--mlp-across \\",
+            "    --extra-dirs <dir>/traj_eps01_s42 --tags a1,swap65k \\",
+            "    --out rhm/logit_reading/striatum/results", "```", "",
+            "**Reading.** At a fixed `(window, anchor, a)` the state is identical across "
+            "query levels, so the contrast between the levels whose answer the edit "
+            "changed and the levels whose answer it did not is matched on everything a "
+            "state-only readout can see. Levels are ranked within level (`l <= 4`); "
+            "`win rate` is the fraction of rows whose mean rank over consequential "
+            "levels beats its mean rank over inconsequential levels (0.5 = null, ties "
+            "count 0.5). `scalar rank` is the window's mean rank over all valid levels "
+            "-- the quantity a scalar readout could express.", "",
+            "**Two stratifications.** The pooled row above ranks within level but pools "
+            "across edit widths `j` and detection depths `k*`, both of which move the "
+            "SCALE of the revision, so a wide or deep edit's large revisions are ranked "
+            "against narrow ones. The per-`j` and per-`(j, k*)` tables re-rank inside the "
+            "cell, which removes that between-cell scale difference; the `n`-weighted row "
+            "is the controlled version of the same contrast. Cells below a 30-row floor "
+            "are dropped, so `coverage` reports the share of the pooled row set the "
+            "surviving cells retain.", ""]
+    gate, body, dmax, summ = [], [], [0.0], []
+    for d in dirs:
+        traj = os.path.basename(d.rstrip("/"))
+        for tag in args.tags.split(","):
+            runs = load(d, tag)
+            for st in sorted(runs):
+                npz = os.path.join(d, f"step{st:06d}_striatum_{tag}.npz")
+                if not os.path.exists(npz):
+                    continue
+                cb = runs[st]["critic_block"]
+                res = mlp_across(npz, cb)
+                for an in ("fd", "tv"):
+                    if an not in res:
+                        continue
+                    for nm, bank in (("linear", "across_level"),
+                                     ("clean", "across_level_clean")):
+                        bt = runs[st]["tables"].get(an, {}).get(bank, {})
+                        for a in (0, 1):
+                            x = res[an].get(nm, {}).get(f"a{a}")
+                            y = bt.get(f"a{a}")
+                            if x and y:
+                                dv = abs(x["win_rate"] - y["win_rate"])
+                                dmax[0] = max(dmax[0], dv)
+                                ok = x["n"] == y["n"] and dv < GATE_TOL
+                                gate.append([traj, tag, st, an, f"{nm} a{a}",
+                                             fmt(y["win_rate"]), fmt(x["win_rate"]),
+                                             "OK" if ok else "**MISMATCH**"])
+                    bj = runs[st]["tables"].get(an, {}).get("across_level_by_j", {})
+                    for jv in sorted(bj):
+                        x = res[an].get("linear_by_j", {}).get(jv, {}).get("a0")
+                        y = bj[jv].get("a0")
+                        if x and y:
+                            dv = abs(x["win_rate"] - y["win_rate"])
+                            dmax[0] = max(dmax[0], dv)
+                            ok = x["n"] == y["n"] and dv < GATE_TOL
+                            gate.append([traj, tag, st, an, f"linear {jv} a0",
+                                         fmt(y["win_rate"]), fmt(x["win_rate"]),
+                                         "OK" if ok else "**MISMATCH**"])
+                    anm = ("edit onset (first_diff)" if an == "fd"
+                           else "t_v (Bayesian-detectable violation)")
+                    for cr in ("linear", "mlp", "clean"):
+                        po = res[an].get(cr, {}).get("a0")
+                        if not po:
+                            continue
+                        def _w(sfx):
+                            t = res[an].get(cr + sfx, {})
+                            acc = [(e["n"], e["win_rate"]) for v in t.values()
+                                   for e in [v.get("a0")] if e]
+                            if not acc:
+                                return "--", "--"
+                            n = sum(x[0] for x in acc)
+                            return (fmt(sum(x[0] * x[1] for x in acc) / n),
+                                    f"{n / po['n']:.2f}" if po["n"] else "--")
+                        wj, _ = _w("_by_j")
+                        wjk, cov = _w("_by_jk")
+                        summ.append([traj.replace("traj_", ""), tag, st,
+                                     "t_v" if an == "tv" else "onset", cr, po["n"],
+                                     fmt(po["win_rate"]), wj, wjk, cov])
+                    body += [f"## `{traj}` / venue `{tag}` / step {st} / anchor: {anm}",
+                             "", f"Critic block `{cb}`.", "",
+                             sec_mlp_across(res[an]), "",
+                             "Per-`j` breakdown (a = 0):", "",
+                             sec_mlp_across_by_j(res[an]), "",
+                             "Per-`(j, k*)` breakdown (a = 0) -- ranks taken inside an "
+                             "exact width-and-depth cell:", "",
+                             sec_mlp_across_by_jk(res[an]), ""]
+    md = head + [
+        "## Reproduction gate: banked JSON vs this re-read", "",
+        "Every `linear` and `clean` win rate below is recomputed from the `.npz` and "
+        "compared with the banked `tables.<anchor>.across_level{,_clean}` cell in the "
+        "same run's JSON (`n` must match too). The `.npz` stores the revisions as "
+        "`float32` while the banked JSON ranked them in `float64`, so near-ties can flip "
+        f"a rank in a small stratum; the tolerance is {GATE_TOL} and the largest "
+        f"deviation observed here is **{dmax[0]:.4f}**.", "",
+        tbl(gate, ["traj", "venue", "step", "anchor", "cell", "banked", "re-read", ""]),
+        "",
+        "## Summary: the same contrast under three stratifications", "",
+        "`pooled` ranks within level over the whole held-out set; `by j` re-ranks inside "
+        "each edit width; `by (j, k*)` re-ranks inside each exact (width, "
+        "detection-depth) cell. `j` and `k*` both move the SCALE of the revision, so the "
+        "pooled row ranks a wide or deep edit's large revisions against a narrow one's. "
+        "`cov` is the share of the pooled rows the surviving `(j, k*)` cells retain "
+        "(30-row floor); read only the rows where it is near 1.", "",
+        tbl(summ, ["traj", "venue", "step", "anchor", "critic", "n pooled", "pooled",
+                   "by j", "by (j, k*)", "cov"]), ""] + body
+    open(os.path.join(args.out, "tables_mlp_across.md"), "w").write("\n".join(md) + "\n")
+    print("wrote", os.path.join(args.out, "tables_mlp_across.md"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("dir")
     ap.add_argument("--tags", default="a1,swap65k")
     ap.add_argument("--out", default="rhm/logit_reading/striatum/results")
     ap.add_argument("--figs", default="rhm/logit_reading/striatum/figs")
+    ap.add_argument("--mlp-across", action="store_true",
+                    help="2026-09-17 re-read: write results/tables_mlp_across.md only "
+                         "(the across-level contrast on every stored critic) and exit; "
+                         "the banked tables.md is left untouched.")
+    ap.add_argument("--extra-dirs", default="",
+                    help="comma-separated extra trajectory dirs for --mlp-across")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
+    if args.mlp_across:
+        write_mlp_across(args)
+        return
     md = ["# striatum -- tables", "",
           "Regenerated by `python -m rhm.logit_reading.striatum.analyze <dir>`.", ""]
     first = None

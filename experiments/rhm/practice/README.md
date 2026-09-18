@@ -611,6 +611,26 @@ with the top-rung windows of 12 and 9 cycles deciding it, which makes the pacer'
 lineage's critical path. Every fork bit-identical to its donor with the knobs off, every yoked
 replay exact at every seed, every gate shown to fail before being reported. ≈38 GPU-h.
 
+### [`perception/`](perception/README.md) — the output-face counter without the exact reader (2026-09-17)
+
+**Goal**: `sparse_one_rung_up` §8 made concrete. The outer loop's free gauge, `at_support`, counts next-level
+tuples over the learner's own solved pieces on a grid the substrate hands over aligned; `logit_reading/frontier/`
+showed a next-token reader recovers that grid from its own entropy period. Recompute the gauge on a recovered
+grid, in the thermostat's own feature coordinates, on a bit-identical re-run of `conductor`'s `outer_yield` arm
+with the productions recorded, against the exact count and a shuffled-grid floor; read the reader's climb against
+the gauge's reach; replay the thermostat on the endogenous series yoked cycle for cycle.
+
+**Finding**: the count survives the recovered grid, in level and not only in shape (Pearson 0.98–0.99 for a reader
+of the grammar's corpus, 0.997–0.999 for a reader of the learner's own productions, over 139 cycles; the shuffled
+grid collapses to a few percent of the exact level), with a per-level mechanism for its bias. Two things are bought
+at two prices: the level grid is at ceiling by 2k steps of an ordinary reader, while the node needs the depth-6
+boundary, where the corpus reader tops out at 0.37 and the own-production reader reaches 0.87. The rule replayed
+on the own-production reader lands within one cycle of both commits and the first advance; on the corpus reader
+the L2 commit is lost to right-level-wrong-node inflation. The own-production reader is pooled over the whole run
+(not causal) and shows `frontier/`'s corpus-wall signature on the grammar venue while it resolves the learner's
+pieces — the organ that makes the output face readable is one the diagnostic calls overfit. A live round with an
+online reader is priced at ≈ 2.5–3.5 GPU-h and not run. Full record: [`perception/README.md`](perception/README.md).
+
 ## Reproduce
 
 ```bash

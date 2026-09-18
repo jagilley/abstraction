@@ -86,6 +86,26 @@ half of the random-trunk-to-MLP gap. Disagreement-directed probing beats the anc
 and does not beat uniform probing — the seed-0 frontier gain did not replicate, and its offered
 mechanism was withdrawn. Nothing forward-model-shaped was needed in the judge.
 
+### [`tessitura/`](tessitura/README.md) — the value-reader questions asked of the judge (2026-09-17, ≈3.4 GPU-h, seeds 0 and 2)
+
+**Goal**: ask the judge the three questions [`logit_reading/striatum/norm/`](../../logit_reading/striatum/norm/README.md)
+asked of a critic on a frozen trunk — does its norm calibrate to the world it was fed and on what clock, does it read
+cost or structure at the write, how does it price a substituted class against the written one — under the conditions
+that node lacked: a live learner, priced feedback, agency. Three default-off knobs on `voicing.py` log the judge's level
+per cycle, a fixed per-(slot, era) panel and the structural label per row; G-F 0.000e+00; the instrumented arm's dumps
+byte-identical to the banked arm's.
+
+**Finding**: the judge's level tracks its world in absolute probability, lagging it by about fifty cycles of which the
+reader itself supplies two to five and its ring buffer the rest, at both seeds; on rows frozen early the level drifts
+up with the world while the ranking erodes; the judge contains the free prior (the prior at chance conditioned on the
+judge); with the label logged, structure at matched cost is read above cost at matched structure in eras 3–5 at both
+seeds, on a substrate where a repairing class is close to the proximal cause of a solve; a substituted class is priced
+down to within a few hundredths of the world's own contrast; and a refit under outcome diets on the fixed trunk
+reproduces norm's rank order while a random-init trunk rescales as much as the trained one, so on a sigmoid readout the
+level is cheap and the ranking is what the representation buys. The direction from which the norm approached its world
+was a seed-0 trajectory and is withdrawn. Written up in
+[`logit_reading/orbitofrontal/`](../../logit_reading/orbitofrontal/README.md) §1, §2c and §5.
+
 ## The question
 
 `enharmonic` reached L5 on the learner's own evidence and got no value from it: a richer,
