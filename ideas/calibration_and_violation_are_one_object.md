@@ -1,6 +1,6 @@
 # Calibration and violation are one object read twice: why "the logits are Bayesian" and "emotion is norm violation" are isomorphic, and where they part
 
-**Status**: **§12 (2026-09-18)** restates the whole panel as one table, prediction as the projection whose utility is the belief's own log-probability, the two blindnesses, and where the axis comes from, with every claim tagged measured, restated or inference; **§11 (2026-09-17, after the six value-side rounds of [`orbitofrontal/`](../experiments/rhm/logit_reading/orbitofrontal/README.md))** corrects §5's "organ" to "projection" and the one-liner's placement of the norm, and adds the public/private split; conceptual synthesis (2026-09-16); §5's two organs each measured once on 2026-09-17 (dated note in §5); **§10 (2026-09-17)** reads the whole arc after #120[^private] with its consumers turned on — a *tentative* read, marked as such throughout, with its first two arms measured the same day (dated note at the top of §10). Nothing new run for the synthesis itself. Every number below is re-read from
+**Status**: **§12 (2026-09-18)** restates the whole panel as one table, prediction as the projection whose utility is the belief's own log-probability, the two blindnesses, and where the axis comes from, with every claim tagged measured, restated or inference, and a same-day note in §12.4 on why a candidate has to be fired to be priced and replay is forced by the meter; **§11 (2026-09-17, after the six value-side rounds of [`orbitofrontal/`](../experiments/rhm/logit_reading/orbitofrontal/README.md))** corrects §5's "organ" to "projection" and the one-liner's placement of the norm, and adds the public/private split; conceptual synthesis (2026-09-16); §5's two organs each measured once on 2026-09-17 (dated note in §5); **§10 (2026-09-17)** reads the whole arc after #120[^private] with its consumers turned on — a *tentative* read, marked as such throughout, with its first two arms measured the same day (dated note at the top of §10). Nothing new run for the synthesis itself. Every number below is re-read from
 the three `logit_reading` nodes and their neighbours; what is new is the term-for-term mapping
 between the two intuitions, the three conditions under which it holds, the point at which it stops,
 and the reading of Yu & Dayan's *unexpected uncertainty* through the `CE − H(q)` identity.
@@ -856,6 +856,75 @@ thing [`striatum/`](../experiments/rhm/logit_reading/striatum/README.md)'s actor
 Which projections should exist is outside this document. It is the real open design question for the practice
 arc, and it is where domain-specificity legitimately lives.
 
+> **Added 2026-09-18, later the same day: how a candidate gets priced before it is integrated, and why replay is
+> forced rather than convenient.** Jasper's question was how the complementary-learning-systems picture, with the
+> hippocampus as a buffer for representations not yet integrated into cortex, squares with a cortical picture of
+> value signalling; then whether replay and preplay are core or a nice-to-have, whether taken and untaken
+> trajectories differ, and whether thoughts and motor sequences do. **[inference]** throughout, on anatomy anchored
+> in training knowledge and not read against primary sources this session; §8's caveat applies. The record is in
+> `conversations/one_world_model_many_projections_2026-09-18.md`[^private].
+>
+> - **The readout does not read cortex. It reads a broadcast of everything, and the hippocampus is on it directly.**
+>   The ventral striatum receives a monosynaptic projection from ventral CA1 and the subiculum, the basolateral
+>   amygdala is reciprocally wired with the hippocampus, and ventral hippocampus projects directly to medial
+>   prefrontal and orbitofrontal cortex. In §12.1's terms the state the projection reads is the union. Nothing
+>   needs mirroring into cortex to be priced. And hippocampal representations are used for behaviour immediately,
+>   not only held for later, so they are evaluated the way any state is.
+> - **The hippocampus has its own prediction-row error, and it is wired to the teacher.** CA3's pattern completion
+>   is a prediction, CA1 compares it with entorhinal input, and the mismatch is novelty. Lisman and Grace's loop
+>   (2005) runs it through the accumbens and ventral pallidum to VTA, and dopamine returns to gate lasting storage,
+>   with locus-coeruleus co-release of dopamine in CA1 for novelty (Takeuchi et al. and Kempadoo et al., 2016).
+>   This is the plasticity gate of [coeruleus Q4](../experiments/rhm/logit_reading/coeruleus/README.md) in anatomy,
+>   and the "innate consumption of a free reading" case above.
+> - **Firing is forced by the readout's type.** A linear readout of state can only price what is on the wire. A
+>   candidate that exists as a table entry, a synaptic configuration or a "could" has no price until the world
+>   model is put into the state it implies. That is read 6 of §10.4, judged in consumption and not by inspection,
+>   with a mechanism: inspection would need a reader of weights or of the table, and the value system has none
+>   (Tian et al.: a weighted sum of inputs). The practice arc measured the same thing when provisional commitment
+>   graded in consumption beat every certificate ([ear](../experiments/rhm/practice/ear/README.md),
+>   [recital](../experiments/rhm/practice/recital/README.md)).
+> - **Replay is firing when acting is priced, and it is core in proportion to the meter.** State is
+>   single-occupancy: the world model is in one state at a time and online the world dictates which, so pricing a
+>   candidate means borrowing the state from the world (rest, sleep, the within-theta-cycle interleaving of now and
+>   next). And the informative outcomes are the priced ones ([heterogeneous_graders §4](heterogeneous_graders.md)).
+>   When trials are cheap, acting is the evaluator; when they are dangerous, slow or scarce, offline firing is the
+>   only way to price enough candidates. Offline placement in sleep is a third, separate matter, interleaving
+>   against interference, which is the original complementary-learning-systems argument. Only the first layer is
+>   forced by the readout and the second by the meter. What gets integrated into cortex is already selected by the
+>   projection: replay is coordinated with ventral striatal and VTA reactivation (Lansink et al. 2009; Gomperts et
+>   al. 2015), reverse replay scales with reward (Foster & Wilson 2006; Ambrose et al. 2016), Mattar & Daw (2018)
+>   formalise the priority as gain × need, and the 2016 update of the theory by Kumaran, Hassabis and McClelland
+>   builds reward-weighted replay into consolidation explicitly.
+> - **Taken versus untaken is not the axis. An outcome from outside the world model is.** From the readout's side
+>   replay and preplay are identical, same cells and same sequences, and the projection does not know whether the
+>   sequence came from the sensors or from CA3. The difference is on the learning side: a taken trajectory carries
+>   a realized outcome, so the level and the error are both available; an untaken one carries only the forecast,
+>   which the level already is. Replay trains the projection and preplay queries it, the
+>   [abstain](../experiments/rhm/logit_reading/orbitofrontal/abstain/README.md) split again. A thought is a
+>   trajectory in state space and thinking it is taking it; what a thought lacks is not having been taken but an
+>   outcome from outside the world model. So the motor and cognitive cases run on one channel with one readout and
+>   differ only in how often an external error arrives: every act on the motor side, only at cash-out on the
+>   cognitive side. Cognition is the metered regime by construction, which is why replay is more core for thought
+>   than for movement, and why chain-of-thought is preplay with no external outcome
+>   ([heterogeneous_graders §8](heterogeneous_graders.md)).
+> - **The rider.** A preplayed trajectory priced through the projection inherits both blindnesses of §12.3: the
+>   forecast of an untaken path can be wrong the way [regime](../experiments/rhm/logit_reading/orbitofrontal/regime/README.md)
+>   measured, with no outcome to correct it, and the projection may not value what the path does. Preplay alone is
+>   inspection by simulation, the mirror grader. Biology's hedge fits: replay is biased toward taken-and-rewarded
+>   paths, and preplay for planning sits at choice points where the real outcome arrives soon after.
+> - **One read from the arc's own consumer.** [abstain](../experiments/rhm/logit_reading/orbitofrontal/abstain/README.md)
+>   found the level worth least at the event and most from about five tokens on, once the re-parse has settled. If
+>   pricing a candidate is reading the level of the fired state, the candidate has to be run for a few steps before
+>   the reading is any good, which is a reason replay is sequences rather than snapshots.
+> - **Where the practice arc already has this.** [practice_manufactures_its_own_credit](practice_manufactures_its_own_credit.md)'s
+>   revision of 2026-08-20 assigned the mined table the hippocampal profile on Iwane et al.'s data: an arbitrary
+>   binding stored fast, populated offline by selection over stored traces, expanding on rest-break replay. The
+>   roadmap[^private]'s practice row, a table committed verbatim and consolidated as routing by
+>   self-imitation, is complementary learning systems by construction: the verbatim table is the hippocampus,
+>   routing consolidated on replayed traces is cortex, and the mining step is the value-prioritised replay. The one
+>   piece the arc has not built is replay through the value projection of trajectories never taken, which is
+>   where a directional which-world revision would have a consumer. Noted as a gap, not proposed.
+
 ### 12.5 The homology, and what kind of evidence it is
 
 (The reading is the orchestrator's; that convergence is evidence is Jasper's; both are **[inference]**.)
@@ -913,5 +982,7 @@ Three things not to lean on:
   emotion.
 - Transfer off the RHM substrates. The language-model port in QUEUE[^private] is the test of "forced by the
   problem" against "true of this grammar".
+- The replay note in §12.4: its anatomy is from training knowledge, not primary sources read this session, and
+  hippocampus-as-provisional-commitment is a reading of the complementary-learning-systems picture, not a result.
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
