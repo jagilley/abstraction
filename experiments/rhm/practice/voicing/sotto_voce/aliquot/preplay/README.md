@@ -1,22 +1,24 @@
 # preplay — the level reader prices abstractions and does not rank spellings: the shaped plant's projection, read offline on banked state, at the chooser's cell and at the candidate entry's
 
 **Up**: [`../README.md`](../README.md) (aliquot, the three in-loop rounds this node reads the dumps of) ·
-**Decisions, gates and defects**: [`NOTES.md`](NOTES.md) (pp1 and pp2) · [`NOTES_own.md`](NOTES_own.md) (pp3) ·
+**Decisions, gates and defects**: [`NOTES.md`](NOTES.md) (pp1, pp2, pp4 and pp5) · [`NOTES_own.md`](NOTES_own.md) (pp3) ·
 [`within/NOTES.md`](within/NOTES.md) (the within-context readout) · **Machinery record**: [`FILES.md`](FILES.md) ·
-**Conversation**: `CONVERSATION.md`[^private] (the session behind the four rounds, 2026-09-21) ·
+**Conversation**: `CONVERSATION.md`[^private] (the session behind the six rounds, 2026-09-21) ·
 **Child**: [`within/`](within/README.md) (within-context candidate discrimination on the six soundboard dumps, CPU).
 **Motivation**: [`ideas/calibration_and_violation_are_one_object.md`](../../../../../../../ideas/calibration_and_violation_are_one_object.md)
 §12.4, the replay note: a candidate that exists as a table entry has no price until the world model is put into the
 state it implies and the projection is read there; and the open question the parent left, why a better read did not
 make a better choice.
 **Runs**: 2026-09-21; `wi2` (CPU, three passes of eight containers), `pp1` (0.12 GPU-h), `pp2` (0.14 GPU-h), `pp3`
-(0.09 GPU-h); nothing paid in the loop, every arm read from the six banked soundboard arms and overtone's two frozen
+(0.09 GPU-h), `pp4` (0.14 GPU-h), `pp5` (0.10 GPU-h); nothing paid in the loop, every arm read from the six banked soundboard arms and overtone's two frozen
 plants; seeds 0 and 2 throughout and never averaged. **Ranks, signs, located mechanisms and per-cell counts are the
 claims.**
 **Attribution**: the worry that the lineage's machinery had grown beyond the scope of the question and might be
 confounding it, the ask to move reader questions off the loop, the question whether retiring the in-loop arms would
 add oracle dependence, the go for the selector and for the learner's own entries, the ask to read the code directly,
-and the ask to explain the findings simply are Jasper's. The reading of the nested DP parse against the producer-
+and the ask to explain the findings simply are Jasper's, as are the go for the two consumer rounds and the reading,
+relayed from a side chat, that preplay's role is to feed the value system rather than to be scheduled by it and that
+replacing the oracle's "did the score get worse" with the readout's own level was the point of value all along. The reading of the nested DP parse against the producer-
 versus-reader hypothesis, the design of the two questions and of the fire-once-read-thrice comparison, the two
 controls added to `within` (the never-trained twin and the diet contrast at the projection's own form), and the
 synthesis are the orchestrator's, agreed in discussion. The builds, the gate tables, the exact replay of the
@@ -41,7 +43,13 @@ As a selector it recovers a median 0.65 of the world's advantage over a random d
 0.2, matches the full true table at L3, and fails where a few attractive wrong entries capture the executor's argmax.
 On the learner's own mined entries, replayed exactly from the banked keys and picks, the world itself barely
 separates true from false at L3/L4, and the read tracks the world's price where the executor's own prior prefers the
-false ones. The level reader is the right object for pricing abstractions and the wrong one for choosing spellings.
+false ones. The level reader is the right object for pricing abstractions and the wrong one for choosing spellings. Two consumer
+rounds followed on the loop's own try-and-keep extension gate. **The read is not a scheduler**: with the gate fixed, the
+executor's own score is the fastest order in both settings and the read ties a never-trained trunk. **The read is a
+gate**: with the producer's score as the order and the read's level on the preplayed state in place of the world's
+count of repairs, the table it builds captures 0.27 of the oracle's advantage over no gate at the loop's own budget and
+0.57 at the full walk, while the frozen and twin readouts in that seat are worse than no gate. Order by the producer,
+keep by the value reader: the fully endogenous consumer, at zero world queries.
 
 ## Children
 
@@ -217,6 +225,67 @@ L4 the whole table's audition equals its best single row's on both seeds (0.1875
 executor top-1 find that row while the banked read's does not (0.615 / 0.608). No selector enriches its top-k for true
 rows above the base rate at L3/L4.
 
+## 5. The read is not a scheduler: with the loop's own gate fixed, the executor's score is the fastest order (`pp4`)
+
+The loop's own consumer of candidate entries is `census_extend`: walk the candidates in an order, audition
+base ∪ {candidate} on a fresh pool, admit iff the error does not rise (`extend_tol` 0.0), grow the base on admission,
+one audition per candidate, at most eight per pass, on a pool of 192. pp4 transcribes that gate, asserts it identical
+to the loop's own on real auditions at the cap, at the full walk and at a positive tolerance, holds it fixed, and
+varies only the order: the banked shaped read's price, the world's price, the executor's `dp_top`, the frozen and twin
+readouts, two random permutations, and in setting (b) the operative table's own emission order (the loop's count
+order is not reconstructible; the per-key counts are not banked). Three disjoint pool families, pricing (512), gate
+(192, two repeats) and test (256, three). Setting (a) is a quarter-size random base of the true table with pp1's
+candidates; setting (b) the learner's own operative rows from an empty base. Auditions spent to come within 0.02 of
+the world order's final error, median as a fraction of the full walk, with the share of cells that arrived:
+
+| order | constructed candidates, 16 cells | the learner's own rows, 12 cells |
+|---|---|---|
+| executor's `dp_top` | 0.038 (16/16) | 0.112 (12/12) |
+| the world's price | 0.056 (16/16) | 0.397 (12/12) |
+| frozen readout | 0.104 (14/16) | not run |
+| banked shaped read | 0.188 (15/16) | 0.214 (11/12) |
+| never-trained twin | 0.191 (16/16) | not run |
+| random permutations | 0.291, 0.521 | 0.262, 0.474 |
+| the operative table's emission order | not run | 0.740 (9/12) |
+
+At the loop's own cap of eight auditions on the learner's rows at seed 0 L3, `dp_top` reaches 0.426 where the world's
+order reaches 0.577, the read 0.779 and random 0.576 / 0.707; at sixteen `dp_top` 0.289, the read 0.428, the world
+0.577. The gate's own contribution is separate from the order's: the same read ungated (pp2's top-k) goes 0.329 →
+0.346 → 0.431 → 0.562 as the budget grows at seed 0 L2 while the gated walk stays at 0.276 → 0.281 → 0.293 → 0.294. At
+the full walk the orders' finals agree within about 0.005 in setting (a), since at zero tolerance the gate admits
+nearly everything that does not hurt; the effect lives at small budgets. At a tolerance of 0.01 the final table is
+equal or worse in all 28 cells with more wrong entries admitted, so the loop's zero is right. The mechanism reads
+off the columns: the gate's waste is auditions on entries the executor never uses, and `dp_top` is the executor's own
+score, so the entry it offers first is the entry the executor will write; the read ranks by whether the resulting
+state solves, which says nothing about whether the executor will reach it.
+
+## 6. The read is a gate: its level on the preplayed state in place of the world's verdict (`pp5`)
+
+The same walk with `dp_top` as the order throughout and the gate varied: the world's gate as the reference; the
+banked shaped projection's level over the same fired gate-pool configurations, admit iff its mean does not fall (a
+paired form over the changed instances beside it, and a margin form at the base level's standard error); the same
+level through the frozen core and the twin as controls; and an ungated walk as the floor. Handed the world's error
+as its level, the read gate reproduces the world gate exactly in all three forms (P-2). The world's test-pool error
+of the table each gate built, median over the 28 cells, with capture = (ungated − gate) / (ungated − world):
+
+| gate on the preplayed state | error at the loop's budget of 8 | capture | at the full walk | capture |
+|---|---|---|---|---|
+| the world's count of repairs | 0.418 | 1.000 | 0.331 | 1.000 |
+| the banked shaped read's level | 0.460 | 0.273 | 0.393 | 0.568 |
+| the read with a margin | 0.470 | 0.091 | 0.456 | 0.123 |
+| no gate | 0.475 | 0.000 | 0.474 | 0.000 |
+| the twin's level | 0.568 | −1.614 | 0.548 | −0.514 |
+| the frozen core's level | 0.584 | −1.898 | 0.594 | −0.841 |
+
+The world's gate admits about 95% of what it is offered, so admitting everything agrees with it 95.5% of the time and
+raw agreement is not evidence; the composition of the disagreement is. The read agrees 93.8%, letting in junk on
+0.022 of candidates against the ungated 0.045 and refusing good entries on 0.050; the frozen and twin readouts let in
+the same junk (0.021) and refuse good entries on 0.089 and 0.064, which is why they end below no gate at all. The
+read gate matches the world's exactly in 8 of 28 cells and is clearly worse at L3 on both seeds (0.743 against 0.603,
+0.755 against 0.552 at the full walk). The paired form's admissions are identical to the pooled form's in every cell,
+and necessarily: the pooled difference is the paired difference times the changed share, a positive factor, so the
+two can differ only under a margin, and the margin as built is worse than the strict form at both budgets.
+
 ## The update
 
 1. **The executor question is closed.** The prior reads the same on the shaped and the frozen plant within context,
@@ -234,16 +303,31 @@ rows above the base rate at L3/L4.
 4. **A table's audition is a max, not a sum.** The executor writes the entry it likes most, so a few attractive wrong
    entries capture a table and a single best row can carry a whole level. Selecting by individual price is therefore
    the wrong consumer above L2, and the loop's own incremental tolerance gate, which tries one candidate at a time
-   and keeps what does not hurt, is the right one; the read's natural seat is the order in which candidates are
-   tried, which is §12.4's replay priority. Queued as (vi).
+   and keeps what does not hurt, is the right one. The reading offered at the time, that the read's seat is the
+   order in which candidates are tried, was tested by pp4 and corrected: the order belongs to the producer and the
+   read's seat is the verdict (items 7 and 8).
 5. **On the learner's own entries, correct is not the value.** The world prices the learner's false entries nearly as
    high as its true ones at L3/L4, the executor's own prior prefers them, and the shaped read tracks the world's price
    better than any other read. That is the currency the roadmap's endogenous grader has to read, and it is not the
    grammar's truth.
-6. **Three instrument facts for the lineage.** The loop's composition rule divides the prior by the span and then
+6. **Three instrument facts for the lineage, and two more from the consumer rounds.** The loop's composition rule divides the prior by the span and then
    standardises, so the division is inert; the banked core and readout in `vo_heads.pt` are one plant update out of
    step (0.0005–0.0066 of held-out AUC); and the learner's operative tables are exactly replayable from the banked
-   keys and picks at the last cycle, so no dump line was needed for them.
+   keys and picks at the last cycle, so no dump line was needed for them. A walk gate has to be falsified on a designed
+   sequence, because on a pool where the base is already the minimum every wrong rule coincides with the right one;
+   and the paired form of a level gate is the pooled form at zero threshold by identity.
+7. **The read is not a scheduler, and should not be.** With the loop's own gate fixed, the executor's own score is the
+   fastest order in both settings, twice as fast as the read on the learner's own rows and faster there than the
+   world's own greedy order, and the read ties a never-trained trunk. The gate's waste is auditions on entries the
+   executor never uses, and only the executor's score knows what it will use. Which candidate to preplay first is a
+   question about the producer's search, not about value, and the read was never the right organ for it.
+8. **The read is a gate, and shaping is what makes it one.** Order by the producer's score and keep by the read's
+   level on the preplayed state, and the table captures a quarter of the oracle's advantage over no gate at the loop's
+   own budget and over half at the full walk, with zero world queries, by halving the junk admitted at the price of
+   refusing one good entry in twenty. The unshaped readouts in that seat refuse good entries at nearly twice that rate
+   and end worse than no gate. That is the fully endogenous consumer the arc was after: the producer says what to try,
+   the value reader says what to keep. The remaining gap is the read's noise as a difference of two compressed levels,
+   worst at L3, and the seat inside the loop is untested.
 
 ## What this does not show
 
@@ -255,7 +339,11 @@ not a trajectory, at a measured cost of 0.8–1.4% of repeated cells disagreeing
 candidates are constructed over the grammar's true lower table; `pp3`'s are the learner's own but only at the run's
 last state and only at L2–L4. The frozen comparator is overtone's plant, a different run at the same seed. The
 executor's own DP score, not the projection, is the best selector at L2. L4/L5 held-out cells in `within` are thin
-and carry no weight. Nothing off the RHM practice substrate.
+and carry no weight. pp4's learner-side order is the operative table's emission order, not the loop's count order,
+which is not reconstructible; at zero tolerance and a full walk the order cannot matter, so pp4's effect lives at
+small budgets. pp5's read gate is worst at L3 on both seeds, its margin form is worse than its strict form, and its
+paired form is its pooled form by identity. Neither consumer round ran inside the loop, and the two arms of record
+are the only arms they ran on. Nothing off the RHM practice substrate.
 
 ## Reproduction
 
@@ -276,6 +364,15 @@ modal run --detach rhm/practice/voicing/sotto_voce/aliquot/preplay/own.py::sweep
 python3 rhm/practice/voicing/sotto_voce/aliquot/preplay/reduce_preplay.py --tag pp1 --fetch
 python3 rhm/practice/voicing/sotto_voce/aliquot/preplay/reduce_selector.py --tag pp2 --fetch
 python3 rhm/practice/voicing/sotto_voce/aliquot/preplay/reduce_own.py --tag pp3 --fetch
+# the two consumer rounds: the read as the order (pp4) and as the gate (pp5)
+modal run rhm/practice/voicing/sotto_voce/aliquot/preplay/incremental.py::gates4
+modal run rhm/practice/voicing/sotto_voce/aliquot/preplay/incremental.py::falsify4                # 4/4
+modal run --detach rhm/practice/voicing/sotto_voce/aliquot/preplay/incremental.py::sweep4 --out-tag pp4
+modal run rhm/practice/voicing/sotto_voce/aliquot/preplay/readgate.py::gates5
+modal run rhm/practice/voicing/sotto_voce/aliquot/preplay/readgate.py::falsify5                   # 5/5
+modal run --detach rhm/practice/voicing/sotto_voce/aliquot/preplay/readgate.py::sweep5 --out-tag pp5
+python3 rhm/practice/voicing/sotto_voce/aliquot/preplay/reduce_incremental.py --tag pp4 --fetch
+python3 rhm/practice/voicing/sotto_voce/aliquot/preplay/reduce_readgate.py --tag pp5 --fetch
 ```
 
 The exact entrypoint names and flags per script are in each script's docstring and in `results/`; every tag and app
@@ -285,21 +382,24 @@ id is in [`FILES.md`](FILES.md). Volumes: `rhm-scaling-data:/rhm_practice_within
 
 ## Next steps (queued in `QUEUE.md`[^private], not started)
 
-The read as the order for the loop's own incremental audition, offline on pp2's pools (queue (vi)) · the delta form
-at a smaller base · the chooser's grader seat with a ranker rather than a level reader, a design step · one dump line
-in the next fork for L5's build and the frozen tables' rows, and a `vo_heads.pt` written after a final refresh.
+The read gate inside the loop: `census_extend` with the world's audition replaced by the read's level, on a fork at
+the two arms of record (queue (viii)), after a design step on the paired margin · the delta form at a smaller base ·
+the chooser's grader seat with a ranker rather than a level reader, a design step · one dump line in the next fork for
+L5's build, the frozen tables' rows and the miner's per-key counts, and a `vo_heads.pt` written after a final refresh.
 
 ## Files
 
 | file | purpose |
 |---|---|
-| `README.md` | this writeup, the super-node for `within`, `pp1`, `pp2` and `pp3` |
+| `README.md` | this writeup, the super-node for `within` and `pp1` to `pp5` |
 | `preplay.py`, `pool.py` | the fire-and-read job (pp1): the projection's read re-implemented and gated, the recording DP, the candidate sets, `gates`, `fidelity_gate`, `falsify`, `sweep`; the loop's instance generator copied and gated on text identity |
 | `selector.py`, `reduce_selector.py` | the read in the selector's seat (pp2) and its reducer |
 | `learner_tables.py`, `own.py`, `reduce_own.py` | the exact replay of the learner's operative tables, the pricing and selection over them (pp3), and its reducer |
+| `incremental.py`, `reduce_incremental.py` | the read as the order for the loop's own gate (pp4) and its reducer |
+| `readgate.py`, `reduce_readgate.py` | the read as the gate with the prior as the order (pp5) and its reducer |
 | `reduce_preplay.py` | pp1's reducer and the table of record `figures/preplay_reduction.txt` |
-| `NOTES.md`, `NOTES_own.md` | decisions, gates and defects for pp1/pp2 and for pp3 |
-| `figures/` | the tables of record (`preplay_reduction.txt`, `select_reduction.txt`, `own_reduction.txt`), the per-arm mirrors under `pp1/`, `pp2/`, `pp3/`, the replayed tables `<arm>_operative_tables.json` |
+| `NOTES.md`, `NOTES_own.md` | decisions, gates and defects for pp1, pp2, pp4 and pp5, and for pp3 |
+| `figures/` | the tables of record (`preplay_reduction.txt`, `select_reduction.txt`, `own_reduction.txt`, `incremental_reduction.txt`, `readgate_reduction.txt`), the per-arm mirrors under `pp1/` to `pp5/`, the replayed tables `<arm>_operative_tables.json` |
 | `results/` | the commands of record and launch logs |
 | `within/` | the within-context readout ([`within/README.md`](within/README.md)) |
 

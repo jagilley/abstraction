@@ -93,7 +93,11 @@ the world's 0.89–0.97, frozen and twin at chance, positive within the legal cl
 median 0.65 of the world's advantage over a random draw as a selector, matches the full true table at L3, and fails
 where a few attractive wrong entries capture the executor's argmax; on the learner's own entries the world itself
 barely separates true from false at L3/L4 and the read tracks the world's price where the prior prefers the false
-ones. Full record: [`preplay/README.md`](preplay/README.md).
+ones. Two consumer rounds followed on the loop's own try-and-keep gate (pp4, pp5, 0.24 GPU-h): with the gate fixed
+the executor's own score is the fastest order and the read ties a never-trained trunk, and with that order and the
+read's level on the preplayed state in place of the world's count of repairs, the table captures 0.27 of the oracle's
+advantage over no gate at the loop's budget and 0.57 at the full walk, the frozen and twin readouts in that seat
+worse than no gate. Full record: [`preplay/README.md`](preplay/README.md).
 
 ## The question
 

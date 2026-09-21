@@ -18,3 +18,17 @@ modal run $B/selector.py::sweep2 --out-tag pp2_smoke --arms s0_sv --smoke 1
 modal run --detach $B/selector.py::sweep2 --out-tag pp2 \
     --arms s0_sv,s2_sv,s0_so,s2_so,s0_yd,s2_yd
 python3 $B/reduce_selector.py --tag pp2 --fetch
+
+# --- pp4: the read as the ORDER for the loop's own incremental audition (2026-09-21) ---
+modal run $B/incremental.py::gates4                  # G-1a, G-1b, G-2, G-3
+modal run $B/incremental.py::falsify4                # 4/4 shown to fail
+modal run $B/incremental.py::sweep4 --out-tag pp4_smoke --arms s0_sv --smoke 1
+modal run --detach $B/incremental.py::sweep4 --out-tag pp4 --arms s0_sv,s2_sv
+python3 $B/reduce_incremental.py --tag pp4 --fetch
+
+# --- pp5: the read as the GATE, the prior as the order (2026-09-21) ---
+modal run $B/readgate.py::gates5                     # P-1a, P-1b, P-2, P-3, P-4, P-5
+modal run $B/readgate.py::falsify5                   # 5/5 shown to fail
+modal run $B/readgate.py::sweep5 --out-tag pp5_smoke --arms s0_sv --smoke 1
+modal run --detach $B/readgate.py::sweep5 --out-tag pp5 --arms s0_sv,s2_sv
+python3 $B/reduce_readgate.py --tag pp5 --fetch

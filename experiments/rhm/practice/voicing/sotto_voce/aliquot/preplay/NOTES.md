@@ -8,7 +8,11 @@ results before any writeup.
 **Runs**: 2026-09-21. `pp1` (the read as a RANKING of candidate entries), six arms across six
 containers, app `ap-8LpmDBVCBYSdjcLwHH7qnS`, **0.12 GPU-h**. `pp2` (the read in the
 SELECTOR'S seat), six arms, app `ap-91frINqMJ1rwcOoWyxJH2u`, **0.14 GPU-h** (504 container-
-seconds). Sections 0-6 below are pp1's; section 7 onward is pp2's.
+seconds). `pp4` (the read as the ORDER for the loop's own incremental audition), the two
+arms of record, app `ap-ggxCqmIoQ9rab2FRqtoYEr`, **0.14 GPU-h** (496 container-seconds).
+`pp5` (the read as the GATE, the prior as the order), the two arms of record, app
+`ap-iQYLGGBcORtkHtkHckBOrk`, **0.10 GPU-h** (348 container-seconds).
+Sections 0-6 are pp1's; section 7 is pp2's; section 8 is pp4's; section 9 is pp5's.
 **Volume**: `rhm-scaling-data:/rhm_practice_preplay/pp1/`. Mirrored locally under `figures/pp1/`
 (the per-instance `*_inst.npz` are left on the volume only; everything the reduction reads is in
 the per-arm JSON).
@@ -308,3 +312,209 @@ Files `own.py` and `learner_tables.py` appeared in this directory from another s
 was being built. They are not mine, I have not touched them, and nothing here imports them. My
 files are `preplay.py`, `pool.py`, `reduce_preplay.py`, `selector.py`, `reduce_selector.py`, and
 my tags are `pp1`, `pp_smoke`, `pp2`, `pp2_smoke`.
+
+
+---
+
+# 8. pp4 — the read as the ORDER for the loop's own incremental audition
+
+`preplay/incremental.py`, `preplay/reduce_incremental.py`. Table of record:
+`figures/incremental_reduction.txt`, appended to `figures/preplay_reduction.txt` as section
+**[W4]** (idempotently). Volume `rhm-scaling-data:/rhm_practice_preplay/pp4/`.
+
+## 8.0 The question
+
+pp2 found that a table's audition is set by which entries win the executor's argmax, so the
+top-k by any individual price is the wrong consumer above L2. The loop's ACTUAL consumer is
+`census_extend`: walk the candidates in an order, audition `base + {cand}` on a fresh pool of
+`n_aud = 192`, admit iff `e_x <= best_e + extend_tol` with `extend_tol = 0.0`, grow the base on
+admission, one audition per candidate, `extend_cap = 8` per pass. **With that gate fixed, does
+walking in the read's order reach a given table quality with fewer auditions than a random
+order, and how close to the world's own order?**
+
+## 8.1 Decisions
+
+1. **The gate is the loop's, and is asserted to be** — against a hand-computed synthetic case
+   (G-1b) and against a literal transcription of `census_extend` on real auditions at cap 8, at
+   the full walk, and at tol 0.01 (G-1a). Nothing about the admission rule is this node's; only
+   the ORDER varies between its arms.
+2. **Three disjoint pool families** (G-2, 0 shared instances at every cell): PRICING n = 512
+   (pp2's family) where every candidate's price comes from; **GATE n = 192, the loop's own
+   `n_aud`** (this node's family), one pool per (level, repeat) shared by every order in that
+   repeat, so the orders differ by nothing but the order; TEST n = 256 x3 (pp2's family) where
+   the table's error is reported and on which nothing is ever admitted.
+3. **The full walk, so the loop's cap of 8 is one point on a budget axis** (8 / 16 / 32 / full)
+   rather than the whole experiment. The budget points are evaluated on all three test pools;
+   the CURVE between them is evaluated on test pool 0 only, because at tol 0 the gate admits
+   most candidates and a three-pool curve would triple the round's cost for a series read as a
+   shape. The "auditions to within 0.02" statistic is computed on that one-pool series against
+   the world order's own one-pool final, so both sides carry the same pool and the same noise.
+4. **The ungated top-b by the same price is printed beside every gated order**, at the same
+   budget — pp2's selector on the same pool with the same base — so the gate's own contribution
+   is visible rather than assumed.
+5. **Setting (b) is the learner's own rows** from pp3's `learner_tables.py` replay (18 / 84 /
+   204 operative rows at L2/L3/L4, of which 12 / 29 / 54 are true at seed 0), **base EMPTY** --
+   build the table from nothing by incremental audition, so the walk is the whole story. The
+   empty table is handled as `census`'s own empty case (`soundboard.py` 11172-11176): no move is
+   applied and the pool is graded as it stands. L4's 204 rows are subsampled to 96 with the
+   BUILD ORDER PRESERVED among those taken, so `build` is still the learner's emission order
+   restricted.
+6. **`build` is a learner-side order, not THE learner's order**, and is labelled so everywhere.
+   The loop's `extend_candidates` sorts by `(-count, key)`; the per-key support COUNTS are not
+   in the dump (only `n_at_support` at fixed thresholds), so the loop's actual order is not
+   reconstructible offline. `build` is the operative table's own row order, which is
+   `ClassMiner.build`'s emission order (keys sorted, then the cross-product within each key).
+7. **A tolerance sensitivity pass at `extend_tol = 0.01`** (about two instances of 192), one
+   repeat, two orders, since at tol 0 a single unlucky instance rejects a good entry.
+8. **Two arms, the two of record.** The round came in at 0.14 GPU-h against a 0.3 budget; the
+   four extra arms were not run because the brief asked for the arms of record and the result
+   does not turn on them.
+
+## 8.2 The gates. G-1a, G-1b, G-2, G-3, all closed, all shown to fail (`falsify4`, 4/4).
+
+| gate | what it asserts | closed at | falsified by |
+|---|---|---|---|
+| **G-1b** | the walk reproduces a HAND-COMPUTED case: base 0.50, then 0.40 0.45 0.40 0.50 0.10 0.11 at tol 0 gives admissions `[0, 2, 4]`, 3 rejected, 7 auditions, final 0.10 | exactly | a base that never grows, so `best_e` stays at the base's error |
+| **G-1a** | the walk is IDENTICAL to a literal transcription of `census_extend` on real auditions — admissions, rejections, audition count and final error — at cap 8, at the full walk, and at tol 0.01 | identical on all three | the admission test as `<` instead of the loop's `<=` (a tie is then rejected) |
+| **G-2** | the pricing, gate and test pool families are pairwise disjoint, and the pools within a family are disjoint from each other | 0 shared instances at every level of every cell of every arm | drawing the gate pool on the test family's seed |
+| **G-3** | a constant price reduces the order to the shared tie-break (the random order), and a strictly decreasing price gives the identity order | both exact | a per-order tie-break permutation |
+
+`preplay.py`'s F-1..F-6 and `selector.py`'s S-1..S-5 carry over. The read and the fire are
+IMPORTED from `preplay.py`, so its exact gate F-2 (max|dp| = 0.000e+00 against `VoProjBank`
+itself) covers this node by identity. Setting (b)'s tables carry pp3's 22 reconstruction gates
+(R-0..R-4), re-run and asserted in-container on every arm.
+
+## 8.3 Defects, and their corrections
+
+**Defect 7 — `learner_tables.reconstruct` returns the whole chain INCLUDING level 1.** Level 1
+is `MC.base_table(v)` and has no diag, so keying the setting-(b) levels off `lt_tables` raised
+`KeyError: 1` on the first smoke. The levels of record are the diags', and the level loop now
+keys off those.
+
+**Defect 8 — the first cost-to-quality summary pooled orders that do not run over the same
+cells.** `frozen` and `twin` run only in setting (a) and `build` only in setting (b), so a
+single pooled median put `frozen` at 0.104 against `banked`'s 0.201 over different cell sets.
+Caught on the first reduction; the summary is now split by setting, every order in a block is
+read over the same cells, and the share of cells the order ARRIVED in at all is printed beside
+the median (an order that never arrives has no median to compare).
+
+## 8.4 What the round's own instrument says about itself
+
+- **At `tol = 0` and a full walk the order cannot matter**, because the gate admits nearly
+  every candidate that does not strictly hurt: setting (a)'s full-walk finals agree to about
+  0.005 across all seven orders in most cells. Any effect lives at small budgets, which is what
+  the budget axis is for, and `b = 8` is the loop's own.
+- **The world's price is a much weaker instrument on the learner's own rows than on constructed
+  ones**: its true-vs-wrong AUC is 0.91-1.00 in setting (a) and 0.57-0.90 in setting (b). The
+  learner's false rows are correlated with its own state and many of them repair instances
+  anyway, so "wrong against the grammar's enumeration" and "useless to the executor" are not
+  the same set. That is a fact about the substrate, and it caps every selector in (b).
+- Cells where the base is already good or the outcome is insensitive (s0_sv aL3 rp1, aL4, aL5
+  rp0) have every order arriving at audition 0 and carry no comparison; they are left in the
+  table with their zeros rather than filtered, and the `arrived` counts say how many cells each
+  median rests on.
+
+## 8.5 Reproduction (pp4)
+
+```bash
+cd experiments/            # MODAL_PROFILE=chromatic
+B=rhm/practice/voicing/sotto_voce/aliquot/preplay
+modal run $B/incremental.py::gates4       # G-1a, G-1b, G-2, G-3
+modal run $B/incremental.py::falsify4     # 4/4
+modal run $B/incremental.py::sweep4 --out-tag pp4_smoke --arms s0_sv --smoke 1
+modal run --detach $B/incremental.py::sweep4 --out-tag pp4 --arms s0_sv,s2_sv
+python3 $B/reduce_incremental.py --tag pp4 --fetch
+```
+
+
+---
+
+# 9. pp5 — the read as the GATE, the prior as the order
+
+`preplay/readgate.py`, `preplay/reduce_readgate.py`. Table of record:
+`figures/readgate_reduction.txt`, appended to `figures/preplay_reduction.txt` as section
+**[G5]**. Volume `rhm-scaling-data:/rhm_practice_preplay/pp5/`.
+
+## 9.0 The question
+
+pp4 settled that the executor's own score is the right ORDER and that the value readout is not
+a scheduler. The readout's seat is the other half of `census_extend`: the loop's gate is an
+ORACLE READ — "did the world's error on the gate pool rise?" — and the readout is the thing
+that gets to see the preplayed state and put a number on it. **Can that number stand in for the
+world's verdict?** This is the fully endogenous consumer and the seat where the read replaces
+the oracle.
+
+## 9.1 Decisions
+
+1. **One fire per trial, read by every gate.** The world's error and all three readouts'
+   per-instance levels come from the SAME fired gate-pool configurations. That is what makes
+   the per-candidate agreement a comparison rather than two experiments, and it costs exactly
+   what the loop pays: one audition for the base, one per candidate.
+2. **The world's decision is recorded at every step whatever the gate decides.** Divergent
+   gates visit divergent states, so "the same candidate" has to be pinned to a trial; the
+   confusion counts are therefore over the states each gate actually visited, which is the only
+   sense in which they are comparable at all.
+3. **The margin is measured, not chosen**: `delta` is the standard error of the BASE table's
+   own level on that gate pool (`std(p_base) / sqrt(n_gate)`), computed per cell and repeat and
+   reported beside every row. It is the read's own noise scale on the object it is judging.
+4. **`ungated` is in the table as the floor**, and it is the row that has to be read first
+   (section 9.4).
+5. The order is `dp_top` throughout (pp4's answer), with the world's order and the read's own
+   order as secondary rows at repeat 0 for the `world` and `read` gates, so the gate's standing
+   can be checked not to depend on the order.
+
+## 9.2 The gates. P-1a, P-1b, P-2, P-3, P-4, P-5, all closed, 5/5 falsified (`falsify5`).
+
+| gate | what it asserts | closed at | falsified by |
+|---|---|---|---|
+| **P-1a** | the world gate here is IDENTICAL to pp4's `census_walk` on the same inputs | identical | (see P-1) |
+| **P-1b** | and reproduces pp4's hand-computed sequence: admissions `[0, 2, 4]`, 3 rejected, 7 auditions | exactly | `best_e` pinned at the base, on that sequence: admits everything |
+| **P-2** | THE PLUMBING IDENTITY — handed the world's error as its level, the read gate reproduces the world gate EXACTLY, in all three of its forms (`read`, `read_pair`, `read_m`) | identical on all three | the level as the world's error with the sign not flipped |
+| **P-3** | a constant level admits everything, in every read form and both controls | 26/26 offered, six gates | a strict `>` on the level, which then admits nothing |
+| **P-4** | the pricing, gate and test pool families are pairwise disjoint | 0 shared instances, every level | the gate pool on the test family's seed |
+| **P-5** | the CHANGED set (`trial.entry == len(kept)`) covers every instance whose fired configuration differs, and is NON-VACUOUS | 192/192 flagged, 0 unflagged-but-differ, six candidates | the changed set taken as `entry == 0` |
+
+## 9.3 Defects — both of the same kind: a gate that cannot fail is not a gate
+
+**Defect 9 — P-1's falsification did not trip, twice.** Pinning `best_e` at the base produced
+exactly the reference admissions on the gate block's real pool, and so did a `best_e` that
+tracks every trial rather than only the admitted ones. The reason is the pool, not the rule: on
+that pool the base is already the minimum and the world gate admits every candidate, so three
+different update rules coincide. Fixed by pinning the rule on pp4's DESIGNED error sequence,
+where the correct rule admits `[0, 2, 4]` and a pinned `best_e` admits everything. **The
+general lesson for this lineage: a walk gate has to be falsified on a designed sequence, not on
+whatever pool is to hand, because a pool that admits everything makes most wrong rules right.**
+
+**Defect 10 — P-5 was vacuous.** Against the twelve-row base used elsewhere in the gate block,
+the executor's DP never picked the added row on any instance (`n_differ = 0`, six candidates
+over), so "no row changed unflagged" held trivially and the gate could not fail. Rebuilt on a
+ONE-row base with the six candidates the DP scores highest on that pool — 192/192 instances now
+flagged — and the non-vacuity is itself asserted (`sum(n_flagged) > 0`), so the gate cannot
+quietly go hollow again.
+
+## 9.4 Two things the round says about its own instruments
+
+- **Raw agreement with the world gate is not evidence.** The world gate admits about 95% of
+  the candidates it is offered, so `ungated` — admit everything — already agrees with it 95.5%
+  of the time, MORE than any read gate does (`read` 93.8%). What separates them is the
+  composition: `read` has TF 0.022 / FT 0.050 against `ungated`'s TF 0.045 / FT 0.000, so it
+  halves the junk admitted at the price of refusing 5% of the entries the world would keep.
+  The reduction says this above the agreement table, and the quality table is the decider.
+- **The paired form IS the pooled form at threshold 0, necessarily.** Only the changed
+  instances move, so `pooled_diff = (n_changed / n) * paired_diff` exactly: the two differ by a
+  positive factor and therefore never in sign. Identical admission lists in 28 of 28 cells.
+  The paired form can only separate from the pooled one under a MARGIN, where that factor
+  rescales the threshold — so a paired margin, not the paired level, is the object that would
+  be worth building. `read_m` as built uses the pooled scale and is therefore not that object.
+
+## 9.5 Reproduction (pp5)
+
+```bash
+cd experiments/            # MODAL_PROFILE=chromatic
+B=rhm/practice/voicing/sotto_voce/aliquot/preplay
+modal run $B/readgate.py::gates5        # P-1a, P-1b, P-2, P-3, P-4, P-5
+modal run $B/readgate.py::falsify5      # 5/5
+modal run $B/readgate.py::sweep5 --out-tag pp5_smoke --arms s0_sv --smoke 1
+modal run --detach $B/readgate.py::sweep5 --out-tag pp5 --arms s0_sv,s2_sv
+python3 $B/reduce_readgate.py --tag pp5 --fetch
+```
