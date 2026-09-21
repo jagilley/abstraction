@@ -75,6 +75,26 @@ as well as the mirror's does; the chooser does not move; the no-infill run colla
 0.80; the yield-shaped projection is no better at its own currency. Facts in `soundboard/figures/sb_seedtable.txt`;
 §4 below.
 
+### [`preplay/`](preplay/README.md) — the level reader prices abstractions and does not rank spellings: the projection read offline on banked state (2026-09-21)
+
+**Goal**: the two questions the loop could not pose, on the banked plants, readouts and rows, with nothing paid in
+the loop. Within a fixed context, does the projection rank the candidate spellings as the world does
+([`preplay/within/`](preplay/within/README.md), CPU)? And fired one entry at a time through the shaped executor on
+fresh pools, does its mean level price a candidate table entry as the world's audition does, does it select a better
+table than a random draw, and does it do so on the learner's own mined entries, replayed exactly from the banked
+keys and picks (`pp1`, `pp2`, `pp3`, 0.35 GPU-h)?
+
+**Finding**: the projection does not rank within a context (0.65 / 0.70, below the executor's prior at 0.71 / 0.74),
+the prior reads the same on the shaped and the frozen plant, and the composed chooser ranks at 0.76 / 0.82 above both
+of its organs, so §4's producer-versus-reader reading is withdrawn; a never-trained twin under the same readout ranks
+within 0.03–0.07 of the shaped trunk, the diet is worth +0.03 to +0.05, and the global pooled form is the largest
+axis. The same projection prices a fired candidate entry in the world's order (true from wrong at 0.61–0.75 against
+the world's 0.89–0.97, frozen and twin at chance, positive within the legal class on 23 of 24 cells), recovers a
+median 0.65 of the world's advantage over a random draw as a selector, matches the full true table at L3, and fails
+where a few attractive wrong entries capture the executor's argmax; on the learner's own entries the world itself
+barely separates true from false at L3/L4 and the read tracks the world's price where the prior prefers the false
+ones. Full record: [`preplay/README.md`](preplay/README.md).
+
 ## The question
 
 `sotto_voce` asked whether the world has to be paid for verdicts on the probe channel's counterfactuals, the
@@ -337,6 +357,12 @@ reader uses and leaving the executor's untouched, after the readout says whether
 dissociates solving from next-level yield, a design step before any currency arm · the per-block readout and the
 mirror re-run with the reservoir sample, from aliquot's own queue.
 
+> **2026-09-21.** The first item ran, the second and third were retired, and the round is written up as the child
+> [`preplay/`](preplay/README.md): the within-context readout landed as [`preplay/within/`](preplay/within/README.md) and
+> the abstraction-level question §12.4 poses as `pp1`/`pp2`/`pp3`. The in-loop infill-only control and the reader-copy
+> arm are retired on the nested DP parse (flat within 0.04 under both-loss shaping on both seeds, §4) and on the
+> never-trained twin ranking within 0.03–0.07 of the shaped trunk at the chooser's cell.
+
 ## Files
 
 | file | purpose |
@@ -350,5 +376,6 @@ mirror re-run with the reservoir sample, from aliquot's own queue.
 | `SPEC.md`, `DESIGN.md`, `FILES.md`, `CONVERSATION.md` | the brief; the decisions and withdrawals; the machinery record; the session record |
 | `duplex/` | the shaping step offline ([`duplex/README.md`](duplex/README.md)) |
 | `soundboard/` | the shaping step in the loop ([`soundboard/README.md`](soundboard/README.md)) |
+| `preplay/` | the projection read offline on banked state: within-context discrimination and the candidate entry's price ([`preplay/README.md`](preplay/README.md)) |
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
