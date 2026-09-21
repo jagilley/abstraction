@@ -138,4 +138,10 @@ Volume `rhm-scaling-data:/rhm_practice_sotto/<tag>/`; the yoke sources are read 
 | `figures/so_s1_reduction.txt` | the seed-0 reduction of record — sections [A]–[I], [J]–[O], [P]–[R], [T], [Y], [Z], with the banked floor and ceiling in [Z] and a pooled L2/L3 panel beside it. |
 | `figures/so_q0_reduction.txt` | the Q0 reduction of record — the proxy corpus, one outcome model and the K=5 committee on experience and on counterfactuals, the agreement rule at each quantile, disagreement as an error detector, and the blind region by level. **Proxy corpus: nothing in it is a measurement of the run.** |
 
+## Children
+
+| folder | what |
+|---|---|
+| [`aliquot/`](aliquot/README.md) | the projection in the mirror's seat, its never-trained twin, and the outcome error put into the plant's weights offline (`duplex/`) and in the loop (`soundboard/`); the super-node for the three rounds (2026-09-18 → 20) |
+
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

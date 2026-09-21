@@ -47,6 +47,27 @@ The sharpest single number is the mirror-grader criterion of
 twice: a critic taught by the mirror ranks the mirror's opinion as well as the ceiling ranks the
 world, and ranks the world far below that.
 
+## Children
+
+### [`aliquot/`](aliquot/README.md) — the verdict read off the world model's own state, then the outcome error put into the plant's weights (2026-09-18 → 20)
+
+**Goal**: put §12.4's literal object in the mirror's seat, a ridge-logistic readout of the live practice plant's
+pooled state over the substituted configuration, one readout per root, fit on the mirror's diet alone, with a
+never-trained-trunk twin; then, when it did not read, ask whether the outcome error has to reach the trunk's weights,
+offline on overtone's banked dumps ([`duplex/`](aliquot/duplex/README.md)) and in the loop
+([`soundboard/`](aliquot/soundboard/README.md)). Seeds 0 and 2 throughout, every arm yoked to its anchor.
+
+**Finding**: the projection of the prediction-trained plant does not read the verdict, 0.76 / 0.73 held-out on
+experience against a never-trained trunk's 0.72 / 0.74 and the mirror's 0.99, with a third of the mirror's precision
+on the untaken roads and the worst critic of the mirror family. An outcome head whose gradient reaches the trunk
+beside the infill term makes the verdict linearly available, +0.06 / +0.13 in the loop with the trained-minus-random
+margin positive on both seeds, at +0.008 nats of infill loss offline; with the infill term off the plant leaves the
+observer family and the run collapses, its readout still reading 0.80. The chooser does not follow the read, the
+shaped arms sitting where the frozen-plant projection sat while the shaped plant's block-level parse, which the
+executor's DP scores through, loses fourteen points; a currency arm shaped on next-level yield reads its own currency
+no better than the verdict-shaped one, because the yield label is nested inside solving here. Full record:
+[`aliquot/README.md`](aliquot/README.md).
+
 ## The question
 
 The critic in `voicing` is a small judge that reads a situation and a candidate spelling and

@@ -109,6 +109,20 @@ high-outcome world a compressed one. R² < 1 says the map is not exactly affine 
 > calibration beside a discrimination claim. The level is also *public*: a critic refit on the model's output
 > distribution alone reproduces these rank orders and slopes ([`orbitofrontal/projection/`](../../orbitofrontal/projection/README.md)),
 > while the response of §2–§3 is not.
+>
+> **Re-read 2026-09-19, the discrimination control run** ([`results/tables_discrim_20260919.md`](results/tables_discrim_20260919.md),
+> [`discrim.py`](discrim.py), CPU on the banked cells, three trajectory seeds). Within cells (matched on `k*`, `j` and
+> position, sign-balanced on surprisal) the post-event level's ranking of realised damage at the violation token goes from
+> 0.50–0.63 on the step-0 trunk to 0.54–0.72 at 64k, a gain of +0.05 to +0.14 at ℓ = 2–4 on both venues and mixed at
+> ℓ = 1, on all three seeds; at the edit onset +0.06 to +0.19. So the ridge's random-trunk control is not the sigmoid's
+> shift-only case in discrimination either: the trained representation buys the readout a modest, seed-stable ranking
+> gain, and the random trunk sits near chance within cells. Two limits: the outcome label is the frozen actor's own hit,
+> whose base rate moves with the checkpoint (ℓ = 1: 0.40 → 0.68), so the control holds the rows fixed and not the label;
+> and pooled over cells the pre-event level reads the outcome at 0.66–0.73 at the edit onset from a state that precedes
+> any edited token, so pooled gains carry the query's cell. The grammar's consequence label, which is fixed, reads at or
+> below chance at the violation token at 64k. Motivated by
+> [`practice/voicing/sotto_voce/aliquot/`](../../../practice/voicing/sotto_voce/aliquot/README.md) §2, where a random
+> 2-layer map plus the link function read the practice verdict within 0.03 of the live plant.
 
 ## 2. The response to the identical event does not order with the world
 

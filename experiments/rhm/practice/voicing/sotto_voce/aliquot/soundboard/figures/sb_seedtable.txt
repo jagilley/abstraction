@@ -1,0 +1,457 @@
+====================================================================================================
+[soundboard] THE TWO-SEED TABLE — the outcome error in the plant's own weights, seeds 0 and 2
+====================================================================================================
+  Every arm is the COMPOSED chooser with the probe channel on, clock-yoked to its seed's banked
+  anchor. The FLOOR is the composed chooser on the FILED diet, the CEILING the same chooser on
+  WORLD-graded probes, and the MIRROR / committee / hybrid are `sotto_voce`'s three arms. All of
+  those are banked and NOT re-run, and so are `aliquot`'s two PROJECTION arms — a ridge-logistic
+  readout of `SN.trunk`'s pooled hiddens over the substituted configuration, per root, over the
+  LIVE trunk and over a NEVER-TRAINED one. THE THREE NEW ARMS are that same readout in the same
+  seat with ONE thing added: an outcome head over the plant's pooled hiddens whose gradient
+  reaches the TRUNK in the same optimizer step as the plant's own infill training — on the
+  world's VERDICT, on NEXT-LEVEL YIELD from the learner's own miner, and on the verdict with the
+  plant's own infill term OFF. THE SEEDS ARE NOT AVERAGED.
+
+  THE LADDERS, which set the denominators (the anchors', replayed by every arm):
+    seed 0  L2@c48  L3@c100  L4@c151  L5@c186   -> L4 AND L5 cells
+    seed 2  L2@c59  L3@c77   L4@c157  (no L5)   -> L4 cells ONLY
+
+----------------------------------------------------------------------------------------------------
+(a) THE CHOOSER — pooled L2/L3 repair accuracy on held-out rows, the cell `voicing` replicated
+    on every seed that produced those rungs. Parsed from each tag's own reduction, so the
+    denominators and the floor are the reducer's and not re-derived here.
+----------------------------------------------------------------------------------------------------
+  seed 0
+    arm                        rep (L2/L3 pooled)        n        vs floor
+    vo_s3b:voi3b_comp_pr_yk    0.2736            196590      +9.6%   (banked)
+    so_s1:so_mg_yk             0.2602            193225      +4.2%   (banked)
+    vo_s3b:voi3b_comp_yk       0.2496            196991      +0.0%   (banked)
+    sb_sv_yk                   0.2480            193325      -0.6%
+    al_s1:al_pj_yk             0.2472            194371      -1.0%   (banked)
+    so_s1:so_cg_yk             0.2466            195696      -1.2%   (banked)
+    sb_yd_yk                   0.2440            194682      -2.3%
+    so_s1:so_hy_yk             0.2420            195819      -3.1%   (banked)
+    al_s1:al_rt_yk             0.2290            194928      -8.3%   (banked)
+    vo_s3:voi3_dp              0.2130            196392     -14.7%   (banked)
+    sb_so_yk                   0.0925            187651     -62.9%
+
+  seed 2
+    arm                        rep (L2/L3 pooled)        n        vs floor
+    vo_s3e:voi3b_comp_pr_yk    0.2745            198267     +10.2%   (banked)
+    so_s2:so_hy_yk             0.2683            196661      +7.7%   (banked)
+    al_s2:al_rt_yk             0.2636            194507      +5.9%   (banked)
+    so_s2:so_mg_yk             0.2626            197369      +5.5%   (banked)
+    al_s2:al_pj_yk             0.2617            194980      +5.1%   (banked)
+    sb_yd_yk                   0.2615            195488      +5.0%
+    so_s2:so_cg_yk             0.2560            196644      +2.8%   (banked)
+    vo_s3e:voi3b_comp_yk       0.2490            197768      +0.0%   (banked)
+    sb_sv_yk                   0.2458            194821      -1.3%
+    vo_s3d2:voi3_dp            0.2090            195077     -16.1%   (banked)
+    sb_so_yk                   0.0673            199420     -73.0%
+
+
+----------------------------------------------------------------------------------------------------
+(b) THE CRITIC — held-out AUC on the PROBE diet, median over slots of the median over cycles.
+    `voicing` measured 0.491 for a critic fed only filed writes. `vsWORLD` is the number the
+    question is about: can the critic rank what the WORLD would have said, having been taught
+    by this grader. THE RECIPE IS MINE AND IS APPLIED TO EVERY ARM ALIKE — `sotto_voce`'s own
+    seedtable used an aggregate I could not reproduce exactly (it reports 0.667/0.617 for the
+    seed-0 mirror where this recipe gives 0.675/0.641), so compare WITHIN this table only.
+----------------------------------------------------------------------------------------------------
+  arm                        s0 vsFILED  s0 vsWORLD    s2 vsFILED  s2 vsWORLD    (filed-diet AUC s0/s2)
+  CEILING world-graded            0.795         -           0.784         -      0.652 / 0.655
+  hybrid (banked)                 0.731       0.731         0.745       0.735    0.656 / 0.631
+  MIRROR model-graded             0.675       0.641         0.701       0.661    0.647 / 0.605
+  committee (banked)              0.789       0.630         0.815       0.682    0.655 / 0.642
+  SHAPED on the verdict           0.723       0.654         0.751       0.671    0.654 / 0.700
+  SHAPED on next-level yield      0.686       0.630         0.641       0.651    0.687 / 0.706
+  SHAPED verdict, no infill       0.730       0.688         0.751       0.580    0.725 / 0.708
+  PROJECTION live trunk (banked)      0.630       0.596         0.643       0.617    0.647 / 0.649
+  PROJECTION random trunk (banked)      0.597       0.603         0.613       0.628    0.654 / 0.665
+  FLOOR filed diet                  -           -             -           -      0.662 / 0.653
+  anchor                            -           -             -           -        -   /   -  
+
+----------------------------------------------------------------------------------------------------
+(c) THE GRADER AGAINST THE WORLD, per level, on the probes. `acc` is the thresholded verdict
+    against the world's; `world` is the world's own solve rate there. The world's verdict is
+    computed for EVERY probe on every arm as an instrument no arm consumes (gate M-1).
+----------------------------------------------------------------------------------------------------
+  seed 0
+    arm                        level        n    world    acc      p̄    prec   recall
+    MIRROR model-graded        L2     141034  0.0541  0.9305  0.1533  0.362   0.374
+    MIRROR model-graded        L3      49631  0.0759  0.9240  0.1542  0.499   0.533
+    MIRROR model-graded        L4      12242  0.1488  0.8898  0.2206  0.587   0.879
+    MIRROR model-graded        L5       1189  0.1833  0.7855  0.3664  0.459   0.940
+
+    SHAPED on the verdict      L2     140616  0.0499  0.8878  0.1272  0.136   0.234
+    SHAPED on the verdict      L3      50149  0.0749  0.8929  0.1198  0.228   0.179
+    SHAPED on the verdict      L4      12247  0.1853  0.7708  0.2093  0.292   0.167
+    SHAPED on the verdict      L5       1213  0.2391  0.7040  0.3025  0.357   0.297
+
+    SHAPED on next-level yield L2     141897  0.0515  0.8864  0.1347  0.137   0.227
+    SHAPED on next-level yield L3      50225  0.0508  0.9165  0.1199  0.159   0.150
+    SHAPED on next-level yield L4      12166  0.1697  0.7825  0.2455  0.340   0.298
+    SHAPED on next-level yield L5       1528  0.3665  0.6119  0.4384  0.475   0.550
+
+    SHAPED verdict, no infill  L2     139282  0.0196  0.9660  0.0447  0.084   0.075
+    SHAPED verdict, no infill  L3      45809  0.0217  0.9758  0.0293  0.166   0.028
+    SHAPED verdict, no infill  L4       9885  0.0812  0.9099  0.0777  0.186   0.032
+    SHAPED verdict, no infill  L5        955  0.2346  0.7435  0.2290  0.394   0.174
+
+    PROJECTION live trunk (banked) L2     142069  0.0456  0.8536  0.1677  0.097   0.267
+    PROJECTION live trunk (banked) L3      49742  0.0578  0.8614  0.1720  0.112   0.201
+    PROJECTION live trunk (banked) L4      12176  0.1420  0.7875  0.2267  0.260   0.270
+    PROJECTION live trunk (banked) L5       1465  0.2253  0.7324  0.2826  0.395   0.355
+
+    PROJECTION random trunk (banked) L2     142943  0.0517  0.8834  0.1612  0.109   0.174
+    PROJECTION random trunk (banked) L3      49425  0.0465  0.9132  0.1565  0.109   0.122
+    PROJECTION random trunk (banked) L4      12064  0.1614  0.8049  0.2243  0.330   0.203
+    PROJECTION random trunk (banked) L5        875  0.3463  0.6789  0.3181  0.570   0.297
+
+  seed 2
+    arm                        level        n    world    acc      p̄    prec   recall
+    MIRROR model-graded        L2     134053  0.0460  0.9318  0.1464  0.319   0.424
+    MIRROR model-graded        L3      61716  0.0609  0.9291  0.1357  0.423   0.452
+    MIRROR model-graded        L4      10724  0.1568  0.8317  0.2737  0.479   0.860
+
+    SHAPED on the verdict      L2     132580  0.0482  0.8814  0.1280  0.129   0.253
+    SHAPED on the verdict      L3      60641  0.0604  0.8959  0.1161  0.194   0.230
+    SHAPED on the verdict      L4      10692  0.1352  0.8263  0.1716  0.318   0.248
+
+    SHAPED on next-level yield L2     132781  0.0499  0.8692  0.1630  0.127   0.275
+    SHAPED on next-level yield L3      61107  0.0610  0.8793  0.1574  0.152   0.213
+    SHAPED on next-level yield L4      10777  0.1807  0.8040  0.2244  0.440   0.311
+
+    SHAPED verdict, no infill  L2     136952  0.0134  0.9748  0.0364  0.099   0.109
+    SHAPED verdict, no infill  L3      60932  0.0172  0.9793  0.0241  0.142   0.040
+    SHAPED verdict, no infill  L4       8527  0.0651  0.9207  0.0668  0.224   0.088
+
+    PROJECTION live trunk (banked) L2     131481  0.0523  0.8292  0.1956  0.099   0.279
+    PROJECTION live trunk (banked) L3      61899  0.0543  0.8469  0.1890  0.097   0.218
+    PROJECTION live trunk (banked) L4      10635  0.1462  0.7661  0.2569  0.255   0.311
+
+    PROJECTION random trunk (banked) L2     131148  0.0497  0.8541  0.2016  0.100   0.242
+    PROJECTION random trunk (banked) L3      61759  0.0525  0.8849  0.1909  0.112   0.172
+    PROJECTION random trunk (banked) L4      10893  0.1655  0.7532  0.3054  0.317   0.425
+
+
+----------------------------------------------------------------------------------------------------
+(d) THE BLIND REGION — the same table split by whether the SUBSTITUTED class is one the
+    learner has actually written at that slot (`sup=1`, at >= `vo_om_freq_share` of the
+    writes filed there) or not (`sup=0`). This is where the grader's reach is LOCATED.
+----------------------------------------------------------------------------------------------------
+  seed 0
+    arm                        cell        n    world     acc      p̄
+    MIRROR model-graded        L2s0     116950  0.0513  0.9332  0.1484
+    MIRROR model-graded        L2s1      24084  0.0674  0.9173  0.1773
+    MIRROR model-graded        L3s0      43077  0.0722  0.9268  0.1487
+    MIRROR model-graded        L3s1       6554  0.0999  0.9052  0.1901
+    MIRROR model-graded        L4s0      11858  0.1425  0.8914  0.2136
+    MIRROR model-graded        L4s1        384  0.3411  0.8411  0.4376
+    MIRROR model-graded        L5s0       1171  0.1819  0.7848  0.3655
+    MIRROR model-graded        L5s1         18  0.2778  0.8333  0.4268
+
+    SHAPED on the verdict      L2s0     117106  0.0469  0.8962  0.1178
+    SHAPED on the verdict      L2s1      23510  0.0644  0.8456  0.1740
+    SHAPED on the verdict      L3s0      44465  0.0760  0.8942  0.1159
+    SHAPED on the verdict      L3s1       5684  0.0663  0.8834  0.1505
+    SHAPED on the verdict      L4s0      11509  0.1810  0.7777  0.2042
+    SHAPED on the verdict      L4s1        738  0.2520  0.6640  0.2882
+    SHAPED on the verdict      L5s0        982  0.2189  0.7312  0.2860
+    SHAPED on the verdict      L5s1        231  0.3247  0.5887  0.3728
+
+    SHAPED on next-level yield L2s0     119603  0.0471  0.8908  0.1290
+    SHAPED on next-level yield L2s1      22294  0.0750  0.8629  0.1655
+    SHAPED on next-level yield L3s0      43039  0.0463  0.9235  0.1120
+    SHAPED on next-level yield L3s1       7186  0.0774  0.8745  0.1675
+    SHAPED on next-level yield L4s0      11368  0.1643  0.7906  0.2402
+    SHAPED on next-level yield L4s1        798  0.2469  0.6679  0.3207
+    SHAPED on next-level yield L5s0       1464  0.3798  0.6093  0.4423
+    SHAPED on next-level yield L5s1         64  0.0625  0.6719  0.3496
+
+    SHAPED verdict, no infill  L2s0     117403  0.0182  0.9671  0.0440
+    SHAPED verdict, no infill  L2s1      21879  0.0270  0.9599  0.0486
+    SHAPED verdict, no infill  L3s0      38721  0.0205  0.9768  0.0275
+    SHAPED verdict, no infill  L3s1       7088  0.0285  0.9704  0.0391
+    SHAPED verdict, no infill  L4s0       7613  0.0839  0.9067  0.0765
+    SHAPED verdict, no infill  L4s1       2272  0.0722  0.9203  0.0817
+    SHAPED verdict, no infill  L5s0        920  0.2326  0.7446  0.2306
+    SHAPED verdict, no infill  L5s1         35  0.2857  0.7143  0.1875
+
+    PROJECTION live trunk (banked) L2s0     119724  0.0396  0.8585  0.1626
+    PROJECTION live trunk (banked) L2s1      22345  0.0779  0.8274  0.1947
+    PROJECTION live trunk (banked) L3s0      43961  0.0557  0.8650  0.1683
+    PROJECTION live trunk (banked) L3s1       5781  0.0737  0.8343  0.1998
+    PROJECTION live trunk (banked) L4s0      11700  0.1392  0.7910  0.2250
+    PROJECTION live trunk (banked) L4s1        476  0.2101  0.6996  0.2696
+    PROJECTION live trunk (banked) L5s0       1415  0.2163  0.7364  0.2812
+    PROJECTION live trunk (banked) L5s1         50  0.4800  0.6200  0.3211
+
+    PROJECTION random trunk (banked) L2s0     117513  0.0488  0.8866  0.1575
+    PROJECTION random trunk (banked) L2s1      25430  0.0651  0.8685  0.1786
+    PROJECTION random trunk (banked) L3s0      42007  0.0429  0.9162  0.1550
+    PROJECTION random trunk (banked) L3s1       7418  0.0663  0.8961  0.1649
+    PROJECTION random trunk (banked) L4s0      11643  0.1561  0.8087  0.2222
+    PROJECTION random trunk (banked) L4s1        421  0.3088  0.6983  0.2825
+    PROJECTION random trunk (banked) L5s0        784  0.3355  0.6888  0.3182
+    PROJECTION random trunk (banked) L5s1         91  0.4396  0.5934  0.3174
+
+  seed 2
+    arm                        cell        n    world     acc      p̄
+    MIRROR model-graded        L2s0     110689  0.0432  0.9352  0.1389
+    MIRROR model-graded        L2s1      23364  0.0591  0.9157  0.1821
+    MIRROR model-graded        L3s0      53802  0.0610  0.9301  0.1308
+    MIRROR model-graded        L3s1       7914  0.0603  0.9225  0.1688
+    MIRROR model-graded        L4s0       9181  0.1393  0.8364  0.2544
+    MIRROR model-graded        L4s1       1543  0.2605  0.8036  0.3888
+
+    SHAPED on the verdict      L2s0     107340  0.0462  0.8931  0.1159
+    SHAPED on the verdict      L2s1      25240  0.0565  0.8313  0.1792
+    SHAPED on the verdict      L3s0      52884  0.0595  0.8997  0.1110
+    SHAPED on the verdict      L3s1       7757  0.0668  0.8701  0.1510
+    SHAPED on the verdict      L4s0      10075  0.1288  0.8356  0.1661
+    SHAPED on the verdict      L4s1        617  0.2399  0.6742  0.2615
+
+    SHAPED on next-level yield L2s0     105851  0.0470  0.8732  0.1594
+    SHAPED on next-level yield L2s1      26930  0.0611  0.8537  0.1771
+    SHAPED on next-level yield L3s0      49941  0.0609  0.8820  0.1527
+    SHAPED on next-level yield L3s1      11166  0.0617  0.8671  0.1784
+    SHAPED on next-level yield L4s0      10276  0.1782  0.8053  0.2220
+    SHAPED on next-level yield L4s1        501  0.2315  0.7784  0.2742
+
+    SHAPED verdict, no infill  L2s0     111664  0.0120  0.9755  0.0360
+    SHAPED verdict, no infill  L2s1      25288  0.0193  0.9720  0.0383
+    SHAPED verdict, no infill  L3s0      45686  0.0165  0.9800  0.0230
+    SHAPED verdict, no infill  L3s1      15246  0.0194  0.9773  0.0274
+    SHAPED verdict, no infill  L4s0       7002  0.0654  0.9195  0.0682
+    SHAPED verdict, no infill  L4s1       1525  0.0636  0.9266  0.0601
+
+    PROJECTION live trunk (banked) L2s0     107232  0.0499  0.8314  0.1922
+    PROJECTION live trunk (banked) L2s1      24249  0.0626  0.8195  0.2108
+    PROJECTION live trunk (banked) L3s0      51759  0.0533  0.8515  0.1849
+    PROJECTION live trunk (banked) L3s1      10140  0.0599  0.8232  0.2099
+    PROJECTION live trunk (banked) L4s0      10153  0.1429  0.7693  0.2558
+    PROJECTION live trunk (banked) L4s1        482  0.2158  0.6992  0.2806
+
+    PROJECTION random trunk (banked) L2s0     109055  0.0475  0.8570  0.1987
+    PROJECTION random trunk (banked) L2s1      22093  0.0607  0.8397  0.2163
+    PROJECTION random trunk (banked) L3s0      54625  0.0533  0.8859  0.1888
+    PROJECTION random trunk (banked) L3s1       7134  0.0463  0.8766  0.2067
+    PROJECTION random trunk (banked) L4s0      10464  0.1564  0.7550  0.3048
+    PROJECTION random trunk (banked) L4s1        429  0.3869  0.7110  0.3206
+
+
+----------------------------------------------------------------------------------------------------
+(e) THE READOUT — refits, the ridge, the held-out AUC on EXPERIENCE and its drift between
+    refits, the secondary variants at the same ridge on the same rows, and the trunk's own
+    fingerprint (sum of |parameter|) over the run.
+----------------------------------------------------------------------------------------------------
+  arm                        seed refits skip degen  ridge  nfeat  holdAUC   drift  |  add    mean  nomask | trunk range
+  SHAPED on the verdict         0    151    0     0   32.0   1737  0.8187 0.0114  | 0.8068 0.7961 0.7914 | 248.452637
+  SHAPED on next-level yield    0    151    0     0   32.0   1737  0.7824 0.0110  | 0.7611 0.7646 0.7538 | 235.000900
+  SHAPED verdict, no infill     0    151    0     0 1024.0   1737  0.8005 0.0130  | 0.7960 0.7958 0.7986 | 281.553236
+  PROJECTION live trunk (banked)    0    151    0     0   32.0   1737  0.7591 0.0135  | 0.7249 0.7414 0.7470 | 204.302291
+  PROJECTION random trunk (banked)    0    151    0     0    1.0   1737  0.7158 0.0128  | 0.6869 0.7113 0.6411 | 0.000000
+  SHAPED on the verdict         2    141    0     0   32.0   1737  0.8614 0.0102  | 0.8516 0.8338 0.8419 | 235.872527
+  SHAPED on next-level yield    2    141    0     0   32.0   1737  0.7874 0.0109  | 0.7697 0.7737 0.7726 | 225.416632
+  SHAPED verdict, no infill     2    141    0     0   32.0   1737  0.8001 0.0179  | 0.7847 0.7978 0.7942 | 263.536687
+  PROJECTION live trunk (banked)    2    141    0     0   32.0   1737  0.7282 0.0098  | 0.6799 0.7090 0.7204 | 180.520651
+  PROJECTION random trunk (banked)    2    141    0     0    1.0   1737  0.7403 0.0092  | 0.7207 0.7297 0.6923 | 0.000000
+
+----------------------------------------------------------------------------------------------------
+(f) THE BILL and THE CLOCK YOKE. The projection arms must bill ZERO — the world's verdict on
+    every probe is an instrument and nothing else (gates M-1, M-3).
+----------------------------------------------------------------------------------------------------
+  arm                        seed  probes billed  bill share of priced  commits  cancelled
+  CEILING world-graded          0         208487               0.4059%        4          0
+  hybrid (banked)               0          73823               0.1439%        4          0
+  MIRROR model-graded           0              0               0.0000%        4          0
+  committee (banked)            0              0               0.0000%        4          0
+  SHAPED on the verdict         0              0               0.0000%        4          0
+  SHAPED on next-level yield    0              0               0.0000%        4          0
+  SHAPED verdict, no infill     0              0               0.0000%        4          0
+  PROJECTION live trunk (banked)    0              0               0.0000%        4          0
+  PROJECTION random trunk (banked)    0              0               0.0000%        4          0
+  FLOOR filed diet              0              0               0.0000%        4          0
+  anchor                        0              0               0.0000%        4          0
+
+  CEILING world-graded          2         207413               0.4054%        3          0
+  hybrid (banked)               2          86530               0.1695%        3          0
+  MIRROR model-graded           2              0               0.0000%        3          0
+  committee (banked)            2              0               0.0000%        3          0
+  SHAPED on the verdict         2              0               0.0000%        3          0
+  SHAPED on next-level yield    2              0               0.0000%        3          0
+  SHAPED verdict, no infill     2              0               0.0000%        3          0
+  PROJECTION live trunk (banked)    2              0               0.0000%        3          0
+  PROJECTION random trunk (banked)    2              0               0.0000%        3          0
+  FLOOR filed diet              2              0               0.0000%        3          0
+  anchor                        2              0               0.0000%        3          0
+
+----------------------------------------------------------------------------------------------------
+(g) THE GRADER'S OWN RANKING OF THE WORLD'S VERDICT ON THE PROBES — AUC(p, yw) from the
+    per-probe instrument sample, per level and by in-support. This is the RANKING number;
+    (c)'s accuracy is a CALIBRATION number at a 0.05 base rate and the two can disagree.
+
+    ONE CAVEAT AND IT IS DECISIVE FOR THE COMPARISON. `sotto_voce`'s own README records that
+    its row-level sample filled FRONT-TO-BACK and holds cycles 50-54 only; reservoir sampling
+    shipped for later tags, which these are. So the banked mirror's row below is a reading of a
+    FIVE-CYCLE-OLD mirror over ~4 cycles of probes, and the projection's is a uniform sample of
+    the WHOLE run. The mirror row is printed for completeness and MUST NOT be compared to the
+    projection rows. The mirror-vs-projection comparison runs through (c)'s 2x2, which is
+    whole-run on every arm, and through (b)'s downstream critic AUC.
+----------------------------------------------------------------------------------------------------
+  seed 0
+    arm                        cycles      n   AUC_all      L2         L3         L4         L5
+    MIRROR model-graded        50-54     4000    0.4892  0.4892(4000)      -          -          -    
+    SHAPED on the verdict      50-200    4000    0.7248  0.6996(2762) 0.7368(991) 0.6061(229) 0.8154(18)
+    SHAPED on next-level yield 50-200    4000    0.7080  0.6568(2738) 0.7484(976) 0.7228(258) 0.6417(28)
+    SHAPED verdict, no infill  50-200    4000    0.7183  0.7318(2819) 0.6545(952) 0.6211(211) 0.6562(18)
+    PROJECTION live trunk (banked) 50-200    4000    0.6277  0.6413(2752) 0.5946(979) 0.5219(241) 0.5104(28)
+    PROJECTION random trunk (banked) 50-200    4000    0.6382  0.6222(2773) 0.6040(974) 0.6465(234) 0.8462(19)
+    in-support split, pooled over levels (sup=1: the substituted class is one the learner
+    writes at that slot):
+      MIRROR model-graded        sup0 0.4871 (n=3452)   sup1 0.5100 (n=548)
+      SHAPED on the verdict      sup0 0.7085 (n=3385)   sup1 0.7834 (n=615)
+      SHAPED on next-level yield sup0 0.6885 (n=3397)   sup1 0.7685 (n=603)
+      SHAPED verdict, no infill  sup0 0.7227 (n=3384)   sup1 0.6873 (n=616)
+      PROJECTION live trunk (banked) sup0 0.6102 (n=3455)   sup1 0.6869 (n=545)
+      PROJECTION random trunk (banked) sup0 0.6325 (n=3336)   sup1 0.6556 (n=664)
+
+  seed 2
+    arm                        cycles      n   AUC_all      L2         L3         L4         L5
+    MIRROR model-graded        60-64     4000    0.4402  0.4402(4000)      -          -          -    
+    SHAPED on the verdict      60-200    4000    0.7061  0.6867(2604) 0.7162(1173) 0.7365(223)      -    
+    SHAPED on next-level yield 60-200    4000    0.6808  0.6577(2586) 0.6571(1200) 0.7410(214)      -    
+    SHAPED verdict, no infill  60-200    4000    0.6541  0.6222(2611) 0.6971(1195) 0.5892(194)      -    
+    PROJECTION live trunk (banked) 60-200    4000    0.6533  0.6438(2597) 0.6357(1206) 0.7250(197)      -    
+    PROJECTION random trunk (banked) 60-200    4000    0.6746  0.6784(2575) 0.5798(1213) 0.7393(212)      -    
+    in-support split, pooled over levels (sup=1: the substituted class is one the learner
+    writes at that slot):
+      MIRROR model-graded        sup0 0.4297 (n=3302)   sup1 0.4771 (n=698)
+      SHAPED on the verdict      sup0 0.7170 (n=3366)   sup1 0.6440 (n=634)
+      SHAPED on next-level yield sup0 0.6930 (n=3275)   sup1 0.6337 (n=725)
+      SHAPED verdict, no infill  sup0 0.6453 (n=3196)   sup1 0.6578 (n=804)
+      PROJECTION live trunk (banked) sup0 0.6498 (n=3331)   sup1 0.6725 (n=669)
+      PROJECTION random trunk (banked) sup0 0.6743 (n=3412)   sup1 0.6759 (n=588)
+
+
+----------------------------------------------------------------------------------------------------
+(h) THE SHAPING ITSELF — the outcome head's own within-batch BCE / AUC / base rate, the steps
+    it took, and the PLANT'S OWN FINGERPRINT (sum of |parameter|) over the run. The fingerprint
+    is the number gate S-1r reads: the outcome error reached the trunk iff this moved. The
+    banked `aliquot` arms predate the series and carry none, which is why gate S-4r — the
+    shaped plant against an UNSHAPED twin's, cycle by cycle — is read on the PREFLIGHT.
+----------------------------------------------------------------------------------------------------
+  arm                        seed target infill   steps     rows   BCE first/last  AUC last  base
+  SHAPED on the verdict         0 solve  on        3060   782700   0.5609 / 0.3202    0.9183  0.2539
+  SHAPED on next-level yield    0 yield  on        3060   782700   0.5559 / 0.2932    0.8329  0.1201
+  SHAPED verdict, no infill     0 solve  OFF       3060   782580   0.5873 / 0.1255    0.9177  0.0469
+  SHAPED on the verdict         2 solve  on        2840   725920   0.6156 / 0.4056    0.8658  0.2461
+  SHAPED on next-level yield    2 yield  on        2840   725920   0.6039 / 0.2320    0.8414  0.0781
+  SHAPED verdict, no infill     2 solve  OFF       2840   726380   0.5517 / 0.0817    0.8856  0.0312
+
+  the plant's own fingerprint, sampled over the run (range = max - min):
+    SHAPED on the verdict         0 range 299.331618   19963.72  19984.45  20033.34  20115.80  20159.36  20197.31  20229.59  20259.28
+    SHAPED on next-level yield    0 range 286.099706   19963.72  19984.45  20033.68  20103.07  20149.43  20185.88  20214.54  20244.70
+    SHAPED verdict, no infill     0 range 296.223012   19961.40  19961.40  20000.08  20083.07  20132.82  20175.89  20215.88  20252.90
+    SHAPED on the verdict         2 range 292.493759   19962.51  19985.29  20013.83  20100.55  20154.71  20191.32  20223.32  20251.41
+    SHAPED on next-level yield    2 range 281.914391   19962.51  19985.29  20013.83  20085.35  20126.93  20168.03  20204.03  20239.88
+    SHAPED verdict, no infill     2 range 269.469209   19961.40  19961.40  19961.40  20037.92  20098.33  20151.35  20189.96  20225.36
+
+----------------------------------------------------------------------------------------------------
+(i) THE WORLD-MODEL DIAGNOSTICS — what the shaping cost the plant's PREDICTIVE competence, and
+    whether its grasp of the nested grammar survived. `infill` is the HELD-OUT masked-infill
+    cross-entropy and fill accuracy on FRESH corpus windows at a FIXED window/mask plan drawn
+    once per arm; `parse` is the block head's level-1 parse accuracy against the EXACT features,
+    read with one block masked (`parse_features`' idiom) and unmasked — an oracle instrument;
+    `dpL` is the nested max-sum DP over the TRUE table at that rung, span masked, recovered
+    level-1 features against the exact ones (`duplex` §4.3's altitude instrument), at the arm's
+    LAST read. `duplex`'s offline reference on a frozen trunk: infill_ce 1.418, parse_mask1
+    0.65, dpL2..L5 0.39/0.31/0.30/0.30; a never-trained trunk reads 2.176 / 0.194 /
+    0.15/0.12/0.11/0.11. Those are a DIFFERENT plant (the banked checkpoint) and are quoted as
+    a scale, never as this table's control — the control is the first cycle of each arm.
+----------------------------------------------------------------------------------------------------
+  arm                        seed  infill_ce f/l     infill_acc f/l   parse_mask1 f/l   parse_nomask f/l
+  SHAPED on the verdict         0  1.2124 / 1.2678    0.476 / 0.483      0.674 / 0.529       0.680 / 0.530
+  SHAPED on next-level yield    0  1.2124 / 1.2574    0.476 / 0.483      0.674 / 0.570       0.680 / 0.571
+  SHAPED verdict, no infill     0  1.1668 / 2.9200    0.495 / 0.350      0.673 / 0.376       0.678 / 0.377
+  SHAPED on the verdict         2  1.1916 / 1.2430    0.489 / 0.480      0.685 / 0.538       0.691 / 0.539
+  SHAPED on next-level yield    2  1.1916 / 1.2499    0.489 / 0.480      0.685 / 0.565       0.691 / 0.566
+  SHAPED verdict, no infill     2  1.1668 / 2.8111    0.495 / 0.351      0.673 / 0.374       0.678 / 0.369
+
+  the nested DP parse, FIRST checkpoint and LAST (end of arm):
+  arm                        seed  when      L2      L3      L4      L5
+  SHAPED on the verdict         0  first     0.4053  0.2861  0.2737  0.2811
+  SHAPED on the verdict         0  final     0.4023  0.3213  0.2936  0.2866
+  SHAPED on next-level yield    0  first     0.4053  0.2861  0.2737  0.2811
+  SHAPED on next-level yield    0  final     0.4150  0.3081  0.2942  0.2830
+  SHAPED verdict, no infill     0  first     0.4126  0.3167  0.2948  0.2969
+  SHAPED verdict, no infill     0  final     0.3135  0.2241  0.1632  0.1829
+  SHAPED on the verdict         2  first     0.4160  0.3140  0.2941  0.2966
+  SHAPED on the verdict         2  final     0.4106  0.3184  0.2932  0.2909
+  SHAPED on next-level yield    2  first     0.4160  0.3140  0.2941  0.2966
+  SHAPED on next-level yield    2  final     0.4170  0.3149  0.2943  0.2767
+  SHAPED verdict, no infill     2  first     0.4126  0.3167  0.2948  0.2969
+  SHAPED verdict, no infill     2  final     0.3145  0.2153  0.1859  0.2012
+
+  the held-out infill CE by HOW MANY BLOCKS ARE MASKED, at the arm's last read:
+    SHAPED on the verdict         0  17-32:1.6040  2-4:0.6038  5-8:0.7188  9-16:0.8894
+    SHAPED on next-level yield    0  17-32:1.6013  2-4:0.5738  5-8:0.6953  9-16:0.8717
+    SHAPED verdict, no infill     0  17-32:3.1049  2-4:2.7146  5-8:2.5383  9-16:2.7278
+    SHAPED on the verdict         2  17-32:1.5766  2-4:0.5791  5-8:0.6900  9-16:0.8735
+    SHAPED on next-level yield    2  17-32:1.5912  2-4:0.5779  5-8:0.6930  9-16:0.8651
+    SHAPED verdict, no infill     2  17-32:3.0756  2-4:2.3326  5-8:2.3442  9-16:2.5255
+
+----------------------------------------------------------------------------------------------------
+(j) THE YIELD CURRENCY. The top block is what the `yield` arm's head was TRAINED on: the share
+    of a solved configuration's level-(era+1) spans whose key is at support in the learner's own
+    miner, zero on an unsolved piece, computed at PUSH time from the miner's counts as they
+    stood then. The bottom block is the per-probe instrument, three columns, consumed by
+    nothing: `endo` is the reader's parse of the SUBSTITUTED configuration against the learner's
+    own miner (the currency the head was shaped on), `true` the same parse against the TRUE
+    table, `orc` the EXACT parse against the true table. AUC(p, endo>0) is the grader scored
+    against the currency the plant was shaped on; AUC(p, world) is the same grader scored
+    against the solve verdict it is FIT to. The two are the point of this section.
+----------------------------------------------------------------------------------------------------
+  arm                        seed  target levels     n_label   label mean   label > 0
+  SHAPED on next-level yield    0  [2, 3, 4, 5]        45151   0.0797       7380
+  SHAPED on next-level yield    2  [2, 3, 4, 5]        42996   0.0730       6892
+
+  arm                        seed      n   endo   true    orc   AUC(p,endo>0)  AUC(p,world)
+  SHAPED on the verdict         0   4000  0.0255 0.0231 0.0231        0.7325        0.7248
+  SHAPED on next-level yield    0   4000  0.0282 0.0226 0.0226        0.7100        0.7080
+  SHAPED verdict, no infill     0   4000  0.0064 0.0059 0.0059        0.7466        0.7183
+  SHAPED on the verdict         2   4000  0.0222 0.0164 0.0164        0.7031        0.7061
+  SHAPED on next-level yield    2   4000  0.0180 0.0162 0.0162        0.6845        0.6808
+  SHAPED verdict, no infill     2   4000  0.0041 0.0047 0.0047        0.6499        0.6541
+
+  the same per LEVEL (AUC(p, endo>0); the currency's own level moves with the era, so a
+  per-level split is the only honest cut):
+    SHAPED on the verdict         0  L2:0.713(2762)  L3:0.729(991)  L4:0.616(229)  L5:   -    
+    SHAPED on next-level yield    0  L2:0.654(2738)  L3:0.793(976)  L4:0.731(258)  L5:0.642(28)
+    SHAPED verdict, no infill     0  L2:0.769(2819)  L3:0.628(952)  L4:0.644(211)  L5:   -    
+    SHAPED on the verdict         2  L2:0.679(2604)  L3:0.721(1173)  L4:0.744(223)  L5:   -    
+    SHAPED on next-level yield    2  L2:0.657(2586)  L3:0.662(1200)  L4:0.769(214)  L5:   -    
+    SHAPED verdict, no infill     2  L2:0.637(2611)  L3:0.653(1195)  L4:0.650(194)  L5:   -    
+
+----------------------------------------------------------------------------------------------------
+(k) THE READOUT'S LEVEL, beside its ranking, on the bank's HELD-OUT filed rows — because
+    `duplex` found that most of what shaping buys on filed rows is CONTEXT rather than
+    candidate, and that is a statement about the LEVEL. And THE CROSS-CYCLE DUPLICATE SHARE,
+    the channel `duplex` §2.6 named and could not size: the bank's hold key is a COIN FLIP
+    against a per-cycle dedup, so the same (configuration, root) recurring later straddles the
+    split carrying the same verdict. The draw is KEPT for comparability with the banked arms;
+    what is new is the number. `aliquot`'s banked arms carry no such column.
+----------------------------------------------------------------------------------------------------
+  arm                        seed      p̄    base   Brier     ECE     AUC | dup share  same y
+  SHAPED on the verdict         0  0.2885 0.2881 0.1521  0.0540  0.8187 | 0.0003     1.0000
+  SHAPED on next-level yield    0  0.2656 0.2578 0.1547  0.0332  0.7824 | 0.0013     1.0000
+  SHAPED verdict, no infill     0  0.0572 0.0547 0.0455  0.0087  0.8005 | 0.0000       -   
+  PROJECTION live trunk (banked)    0    -    0.2896   -       -     0.7591 |   -          -   
+  PROJECTION random trunk (banked)    0    -    0.2637   -       -     0.7158 |   -          -   
+  SHAPED on the verdict         2  0.2745 0.2808 0.1332  0.0394  0.8614 | 0.0000       -   
+  SHAPED on next-level yield    2  0.2884 0.2798 0.1573  0.0413  0.7874 | 0.0010     1.0000
+  SHAPED verdict, no infill     2  0.0426 0.0396 0.0375  0.0219  0.8001 | 0.0000       -   
+  PROJECTION live trunk (banked)    2    -    0.2935   -       -     0.7282 |   -          -   
+  PROJECTION random trunk (banked)    2    -    0.2930   -       -     0.7403 |   -          -   
+
