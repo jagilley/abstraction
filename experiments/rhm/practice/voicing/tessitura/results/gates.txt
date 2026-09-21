@@ -1,0 +1,44 @@
+# [tessitura] the offline gate tables and their falsification, as run 2026-09-17
+
+## voicing.py::ts_gates_cpu
+  [PASS] TS-2 (the judge's LEVEL is added beside the audit's own fields and displaces none of them; `mean_p` IS the mean sigmoid of the critic's logit on the audited rows and `mean_pmax` its max over the operative table; the read consumes no draw)   off has no `ts` = True · every other field equal = True · |d mean_p| = 0.000e+00 · |d mean_pmax| = 0.000e+00 · n = 22 · draw neutral = True
+  [PASS] TS-3 (the panel freezes once per (slot, era) and never again; its base rate is a constant while the buffer under it moves; a later era adds a SECOND panel and keeps the first; and the reading moves when and only when the critic does)   base 0.1875 == 0.1875 == 0.1875 (IDENTITY) · panels after era 2 = ['2:3|e1', '2:3|e2'] · |d mean_p| under a different critic = 3.569e-04
+  [PASS] TS-4 (the structural label is invariant to the span mask, because the label's own call overwrites exactly the span `assemble` masked; masking any OTHER span breaks it)   masked == unmasked on 48/48 rows (IDENTITY) · a wrongly masked span agrees on only 0/48
+  [PASS] TS-5 (the structural audit produces the repair-set membership and the verdict on the identical rows, counts its grammar reads in `_EXP_REC['reads']` as `rep` does, and consumes no draw)   base_struct 0.958333 == 0.958333 (IDENTITY) · reads grew by 402 (>= 192) · draw neutral = True · 2x2 sums to 24 · probe branch reproduces the filed branch on the same rows = True
+  [PASS] TS-6 (the probe tuples gain a ROOT element only when `ts_struct` is on, and the probe buffer the critic is fed is bit-identical either way)   tuple widths [4] -> [5] · pbuf identical = True (16 rows)
+
+  [tessitura] 5/5 offline gates pass
+
+## tessitura/gates/falsify_ts.py
+
+TS-2 (the level is added beside the audit's fields, is the mean sigmoid, draws nothing)
+  [as required] TS-2 << the level reported as a mean logit, not a mean probability   off has no `ts` = True · every other field equal = True · |d mean_p| = 1.193e+00 · |d mean_pmax| = 0.000e+00 ·
+  [as required] TS-2 << the level overwrites the audit's own `auc`   off has no `ts` = True · every other field equal = False · |d mean_p| = 0.000e+00 · |d mean_pmax| = 0.000e+00 
+  [as required] TS-2 << the audit consumes a draw   off has no `ts` = True · every other field equal = True · |d mean_p| = 0.000e+00 · |d mean_pmax| = 0.000e+00 ·
+
+TS-3 (the panel freezes once per (slot, era); the reading follows the live critic)
+  [as required] TS-3 << the panel re-freezes from the current buffer on every call   base 0.1875 == 0.8125 == 0.8125 (IDENTITY) · panels after era 2 = ['2:3|e1', '2:3|e2'] · |d mean_p| under a di
+  [as required] TS-3 << the panel scored by a critic frozen at first sight (disconnection)   base 0.1875 == 0.1875 == 0.1875 (IDENTITY) · panels after era 2 = ['2:3|e1', '2:3|e2'] · |d mean_p| under a di
+
+TS-4 (the structural label is invariant to the span mask, and only to that span)
+  [as required] TS-4 << a label that reads the mask instead of overwriting it   masked == unmasked on 0/48 rows (IDENTITY) · a wrongly masked span agrees on only 0/48
+  [GATE IS BLIND] TS-4 << the root permuted (EXPECTED to be invisible here — see T-4 in structure.py)   masked == unmasked on 48/48 rows (IDENTITY) · a wrongly masked span agrees on only 37/48  <- blind by design; the root is T-4's subject, not TS-4's
+
+TS-5 (the audit produces the repair-set membership, counts its reads, draws nothing)
+  [as required] TS-5 << the audit's grammar reads are not counted   base_struct 0.958333 == 0.958333 (IDENTITY) · reads grew by 6 (>= 192) · draw neutral = True · 2x2 sums to 24 
+  [as required] TS-5 << the structural label replaced by the verdict   base_struct 0.291667 == 0.958333 (IDENTITY) · reads grew by 402 (>= 192) · draw neutral = True · 2x2 sums to 2
+  [as required] TS-5 << the audit consumes a draw   base_struct 0.958333 == 0.958333 (IDENTITY) · reads grew by 402 (>= 192) · draw neutral = False · 2x2 sums to 
+
+TS-6 (the root rides the probe tuples only when the knob is on; the buffer is inert)
+  [as required] TS-6 << the root appended unconditionally   tuple widths [5] -> [5] · pbuf identical = True (16 rows)
+  [as required] TS-6 << `push_probe` reads the fifth element into the verdict   tuple widths [4] -> [5] · pbuf identical = False (16 rows)
+
+[tessitura] 11/12 perturbations turn their gate red; 1 of the remainder are blind BY DESIGN and named as such
+[tessitura] falsification harness: OK
+
+## the inherited tables, re-run after the edits
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  d2 = float((mine - donor).abs())
+
+[gates_cpu] ALL PASS (18/18)
+ov_gates_cpu ALL = True

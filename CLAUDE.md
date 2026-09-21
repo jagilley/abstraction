@@ -35,6 +35,7 @@ Each project subdirectory has its own CLAUDE.md with setup instructions and conv
 - Please always discuss results with me before writing a new README or idea doc. These things can be difficult to interpret sometimes.
 - Don't get discouraged. If something didn't work, there's a reason for it, and we should understand what that reason is before we update our priors on why we wanted to try that thing in the first place.
 - We should edit documentation whenever appropriate to persist learnings.
+- The `AskUserQuestion` tool is fantastic, when appropriate.
 - Running quick tests to ensure code works before kicking off longer training jobs is usually a good idea.
 - I hold my intuitive priors strongly, but hold priors about the metrics used to measure them weakly.
 - Don't hyperfixate on negative results. If we run something, we'll document it because it's a data point we generated that we should persist. Usually, a negative result just means that we had a slightly misdirected intuition; it's bad practice to view that as epistemically significant.

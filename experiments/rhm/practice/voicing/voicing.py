@@ -5425,6 +5425,29 @@ _VO_DEFAULTS = {
                                # audit keeps a candidate set comparable to the uniform twin's
     "ov_critic_hidden": -1,    # the GOVERNING critic's hidden_mult; -1 = `span_hidden_mult`
                                # (the donor's MLP), 0 = a linear readout in the chooser's seat
+    # --- [tessitura] THE JUDGE'S OWN LEVEL, ITS DRIFT, AND WHAT IT READS AT THE WRITE -----
+    # Three RUN-LEVEL INSTRUMENTS, every one default off and none of them able to reach a
+    # decision: with all three off this file is `overtone`'s and the anchor replays at
+    # 0.000e+00 (gate G-F; gate TS-1 is the full-scale form, the banked `ov_s0b` arm).
+    #
+    # WHY THEY EXIST. `logit_reading/striatum/norm/` measured a critic's pre-event LEVEL and
+    # found it calibrates to the world it was fed. Nothing in this lineage ever logged this
+    # judge's level: `vo_critic_audit` reports a rank statistic and `vo_critic_terms`' per-slot
+    # `cstat` is discarded at the call site. So the norm is reconstructable only from a banked
+    # dump, statically, with the FINAL critic — which cannot answer the within-subject question
+    # the era ladder makes available and the frozen trunk could not ask.
+    "ts_norm": False,          # the judge's mean predicted P(solve) per slot per cycle, beside
+                               # the base rate already logged: at the candidate the row carries,
+                               # and max / mean over the operative table at the same contexts.
+    "ts_panel": 0,             # rows in a FIXED PANEL per (slot, era), frozen once and scored
+                               # by the LIVE critic every cycle after — norm's identical-rows
+                               # protocol, which is what separates the reader drifting from the
+                               # world moving. 0 = no panel.
+    "ts_struct": 0,            # rows per slot per cycle on which the STRUCTURAL label is taken
+                               # with the true root (`fourwall.consistent_features`, the `rep`
+                               # instrument's own call) and scored against the judge and the
+                               # prior — striatum §2's cost-versus-structure question, which
+                               # needs the label joined per row to the verdict. 0 = off.
 }
 
 
@@ -5859,8 +5882,15 @@ def vo_run_probes(vo, rows, slots, quot, shared, rules, canon, s, device, *, n_p
         succ2, _ = grade_fn(x2.cpu().numpy(), roots_of(rt.index_select(0, sel)), rules, s)
         n_g += take
         vo.stat["n_probe_dis"] = vo.stat.get("n_probe_dis", 0) + int((uflag < 0.5).sum())
+        # [tessitura] the ROOT rides along as a FIFTH element when `ts_struct` is on, and only
+        # then, so `ts_struct_audit` can take the structural label on probe rows with the true
+        # root. `push_probe` reads `p[0..3]` by index and already tolerates a longer tuple
+        # (its `len(p) > 3` guard), so nothing downstream sees it.
+        _ts_extra = ((rt.index_select(0, sel),)
+                     if int(vo.cfg.get("ts_struct", 0) or 0) > 0 else ())
         out[key].append((obs.index_select(0, sel), cand,
-                         torch.from_numpy((succ2 > 0.5).astype("float32")), uflag))
+                         torch.from_numpy((succ2 > 0.5).astype("float32")), uflag)
+                        + _ts_extra)
         vo.stat["n_probe"] += take
         vo.stat["n_probe_solved"] += int((succ2 > 0.5).sum())
         c = vo.stat.setdefault("probe", {}).setdefault(
@@ -6686,11 +6716,31 @@ def vo_critic_audit(core, critic, ex, slots, device, *, chunk, cap=1024, s=None)
             # so the only thing between their AUC and the critic's is the readout's shape.
             sh = {nm: sm(pooled, move["blk0"], int(move["span"]), sid, cand)
                   for nm, sm in (vo.shadow or {}).items()}
+            # [tessitura] THE JUDGE'S OWN LEVEL, on the rows the base rate is read from.
+            # `mean_p` is its expectation at the candidate the row carries — on a filed row
+            # the write it made, on a probe row a substitution it did not. `mean_pmax` and
+            # `mean_ptab` are its max and mean over the OPERATIVE TABLE at the same contexts,
+            # which are the two other ways a state value can be derived from a Q. The max over
+            # table rows IS the max over classes (a class's value is the max over its
+            # spellings, `vo_class_max`); the mean over table rows is not the mean over
+            # classes and is labelled `ptab` for that reason. One (B, R) MLP over a state the
+            # audit has already computed: no trunk forward, no gradient, no draw.
+            ts_lvl = None
+            if bool(vo.cfg.get("ts_norm")):
+                cs_t = vo_critic_scores(critic, pooled, move["blk0"], int(move["span"]),
+                                        sid, move["flat"], chunk=int(chunk))
+                pa_t = torch.sigmoid(cs_t)
+                ts_lvl = {"mean_p": float(torch.sigmoid(lg).mean()),
+                          "mean_pmax": float(pa_t.max(1).values.mean()),
+                          "mean_ptab": float(pa_t.mean()),
+                          "table_rows": int(move["flat"].shape[0])}
         _rng_restore(_ast)
         y = y_b[hold].numpy()
         cl = lg.cpu().numpy().astype(np.float64)
         rec = {"n": int(hold.numel()), "auc": vo_auc(cl, y),
                "base_rate": float(y_b[hold].mean())}
+        if ts_lvl is not None:
+            rec["ts"] = ts_lvl                                    # [tessitura]
         if sh:
             rec["sh_auc"] = {nm: vo_auc(t.cpu().numpy().astype(np.float64), y)
                              for nm, t in sh.items()}
@@ -6754,8 +6804,223 @@ def vo_critic_audit(core, critic, ex, slots, device, *, chunk, cap=1024, s=None)
         if prb is not None:
             rec["probe_x"] = {k: q for k, q in prb.items()
                               if k in ("sh_auc", "free", "unif_n", "unif_auc",
-                                       "dis_n", "dis_auc")}
+                                       "dis_n", "dis_auc",
+                                       "ts")}                  # [tessitura]
         out[key] = rec
+    return out
+
+
+# --------------------------------------------------------------------------------------- #
+# [tessitura] THE JUDGE AS A VALUE READER — its level over time, and what it reads at the write
+# --------------------------------------------------------------------------------------- #
+#
+# `logit_reading/striatum/norm/` asked three things of an outcome-trained critic on a FROZEN
+# trunk, a fixed world, dense free feedback and no agency. This judge is the same kind of
+# object under the opposite conditions, and two of the three questions need something the
+# lineage never logged.
+#
+#   THE NORM'S TIME COURSE. `vo_critic_audit` reports the judge's RANK quality and the world's
+#   base rate; it has never reported the judge's LEVEL. `ts_norm` adds it (above). But a level
+#   read on the buffer's own rows moves for two reasons at once — the reader changed and the
+#   rows changed — and separating them is exactly what norm's identical held-out rows did.
+#   `ts_panel` freezes a panel per (slot, era) and scores it with the LIVE critic every cycle
+#   after, so the panel's base rate is a constant and every movement in `mean_p` is the
+#   reader's. THE TRUNK STILL MOVES UNDER IT, and that is said here rather than discovered: on
+#   this substrate the reader is critic + trunk and only the two together can be frozen, which
+#   a live learner does not permit.
+#
+#   COST VERSUS STRUCTURE. striatum §2 separated "did the goal fail" from "what did the world
+#   do", and found the outcome-trained readout on the cost. The structural label here is the
+#   `rep` instrument's: does the written class hold a feature that would have REPAIRED the
+#   instance at that slot (`fourwall.consistent_features`). `rep` already computes it and
+#   throws away everything but a tally; `ts_struct` keeps it PER ROW and scores the judge and
+#   the prior against BOTH labels on the identical rows, with each held fixed in turn.
+#
+# Both are UNPRICED INSTRUMENTS in this file's established sense: no gradient, no decision, the
+# RNG sandboxed, and the oracle calls counted in `_EXP_REC["reads"]` exactly as `rep`'s are and
+# never in `counts["ground"]`.
+
+
+def ts_panel_audit(core, critic, vo, slots, device, *, era, cap, chunk):
+    """[tessitura] THE FIXED PANEL — norm's identical-rows protocol on a live learner.
+
+    One panel per (slot, era): the first cycle in that era at which the slot's filed buffer
+    holds `cap` rows, the LAST `cap` of them are frozen — context, the candidate that was
+    written, and the verdict — and never touched again. Every cycle after, every frozen panel
+    is scored by the critic as it is NOW. The panel's base rate is a constant by construction,
+    so `mean_p` drifting is the reader and not the world; `auc` beside it says whether the
+    ranking drifts too.
+
+    Returns {"slot|eN": {...}} for every panel that exists, including the ones frozen in
+    earlier eras — which is the whole point, since a panel frozen in era 2 and read in era 5
+    is the same question Xiang's design asks.
+    """
+    import torch
+    out = {}
+    if vo is None or critic is None or int(cap) <= 0:
+        return out
+    if not hasattr(vo, "ts_panel"):
+        vo.ts_panel = {}
+    # freeze what is freezable, this era
+    for key, info in slots.items():
+        if info.get("move") is None:
+            continue
+        pk = f"{key}|e{int(era)}"
+        if pk in vo.ts_panel:
+            continue
+        got = vo.buf.get(key)
+        if got is None or int(got[0].shape[0]) < int(cap):
+            continue
+        obs_b, w_b, y_b = got
+        vo.ts_panel[pk] = {"obs": obs_b[-int(cap):].clone(), "w": w_b[-int(cap):].clone(),
+                           "y": y_b[-int(cap):].clone(), "slot": key,
+                           "blk0": int(info["move"]["blk0"]), "span": int(info["move"]["span"]),
+                           "sid": int(info["id"]), "era": int(era),
+                           "cycle": int(vo.n_cycles)}
+    # score every panel with the critic as it is NOW
+    _pst = _rng_snapshot()
+    with torch.no_grad():
+        for pk, pn in vo.ts_panel.items():
+            lgs = []
+            for a_ in range(0, int(pn["obs"].shape[0]), int(chunk) * 8):
+                ob = pn["obs"][a_:a_ + int(chunk) * 8].to(device)
+                pooled, _ = SN.trunk(core, ob)
+                sid = torch.full((ob.shape[0],), pn["sid"], dtype=torch.long, device=device)
+                lgs.append(critic(pooled, pn["blk0"], pn["span"], sid,
+                                  pn["w"][a_:a_ + int(chunk) * 8].to(device)).cpu())
+            lg = torch.cat(lgs)
+            y = pn["y"].numpy().astype(np.float64)
+            out[pk] = {"n": int(lg.shape[0]), "base": float(pn["y"].mean()),
+                       "mean_p": float(torch.sigmoid(lg).mean()),
+                       "auc": vo_auc(lg.numpy().astype(np.float64), y),
+                       "frozen_era": int(pn["era"]), "frozen_cycle": int(pn["cycle"])}
+    _rng_restore(_pst)
+    return out
+
+
+def _ts_auc_within(x, y, by):
+    """AUC of `x` against `y` inside each level of a BINARY `by`, pooled by pair count. This
+    is striatum §2's 'matched on the other label' read, and a binary conditioner needs no
+    quantile bins."""
+    num = den = 0.0
+    for b in (0.0, 1.0):
+        m = (np.asarray(by, np.float64) > 0.5) == (b > 0.5)
+        if int(m.sum()) < 16:
+            continue
+        a = vo_auc(np.asarray(x)[m], np.asarray(y)[m])
+        if a is None:
+            continue
+        w = float((np.asarray(y)[m] > 0.5).sum()) * float((np.asarray(y)[m] <= 0.5).sum())
+        num += a * w
+        den += w
+    return (num / den) if den > 0 else None
+
+
+def ts_struct_audit(core, critic, vo, rows, pr_rows, slots, rules, canon_np, r_np, s, depth,
+                    v, device, *, cap, quot, tok_cache, chunk):
+    """[tessitura] COST VERSUS STRUCTURE AT THE WRITE — striatum §2 on this substrate.
+
+    Per slot, up to `cap` evenly spaced rows of THIS cycle's filed writes and of this cycle's
+    probe substitutions. Two labels on the identical rows:
+
+      the COST label   the verdict `y` the critic is trained on;
+      the STRUCTURAL label  does the written (or substituted) class hold a feature that would
+                       have REPAIRED the instance at that slot — `fourwall.consistent_features`
+                       under the TRUE root, which is `vo_instruments`' `rep` computed per row
+                       instead of tallied.
+
+    and three scorers: the judge's logit, the surface model's own score of the same candidate
+    (`dp`, the prior the composed chooser sums) and, for reference, the repair set's size. Each
+    scorer is read against each label marginally and with the OTHER label held fixed, which is
+    the only form in which "reads the cost, not the structure" is a claim rather than a
+    correlation.
+
+    The oracle calls go to `_EXP_REC["reads"]`, never to `counts["ground"]` — `rep`'s own
+    accounting, one instrument over.
+    """
+    import torch
+    from rhm.practice.fourwall import wall as W
+    out = {}
+    if vo is None or critic is None or quot is None or int(cap) <= 0:
+        return out
+    _sst = _rng_snapshot()
+    for which in ("filed", "probe"):
+        src = rows if which == "filed" else (pr_rows or {})
+        for key, parts in (src or {}).items():
+            info = slots.get(key)
+            if info is None or info.get("move") is None:
+                continue
+            move = info["move"]
+            lvl, node, span = int(move["level"]), int(move["node"]), int(move["span"])
+            if not (0 <= node < s ** (depth - lvl)):
+                continue
+            if which == "filed":
+                obs_a = torch.cat([p["obs"] for p in parts])
+                wr_a = torch.cat([p["w"] for p in parts]).numpy()
+                y_a = torch.cat([p["y"] for p in parts]).numpy().astype(np.float64)
+                rt_a = np.asarray(r_np)[torch.cat([p["b"] for p in parts]).numpy()]
+            else:
+                # the probe channel's parts are (obs, cand, y, uflag, root) — the fifth
+                # element rides only when this instrument is on (`vo_run_probes`)
+                if any(len(p) < 5 for p in parts):
+                    continue
+                obs_a = torch.cat([p[0] for p in parts])
+                wr_a = torch.cat([p[1] for p in parts]).numpy()
+                y_a = torch.cat([p[2] for p in parts]).numpy().astype(np.float64)
+                rt_a = np.asarray(r_np)[torch.cat([p[4] for p in parts]).numpy()]
+            n = int(obs_a.shape[0])
+            if n < 16:
+                continue
+            take = min(int(cap), n)
+            sel = np.linspace(0, n - 1, take).astype(np.int64)
+            obs = obs_a[torch.from_numpy(sel)]
+            wr = wr_a[sel]
+            yy = y_a[sel]
+            # THE STRUCTURAL LABEL. `consistent_features` overwrites the slot's token span
+            # before it parses, and that span is exactly what `assemble` masked, so the masked
+            # `obs` and the unmasked context give the identical answer.
+            mask, n_grad = W.consistent_features(rules, obs.numpy(), rt_a[sel], node, lvl, s,
+                                                 canon_np, v)
+            _EXP_REC["reads"] += int(n_grad)
+            tups = [tuple(int(z) for z in r) for r in wr]
+            tcs = vo_token_class(rules, sorted(set(tups)), lvl, canon_np, v, s, depth,
+                                 tok_cache)
+            tmap = dict(zip(sorted(set(tups)), tcs))
+            st = np.array([1.0 if any(bool(mask[j, f]) for f in tmap[t]) else 0.0
+                           for j, t in enumerate(tups)], np.float64)
+            rsz = mask.sum(1).astype(np.float64)
+            # THE TWO SCORERS, on the identical rows
+            with torch.no_grad():
+                ob = obs.to(device)
+                pooled, lgts = SN.trunk(core, ob)
+                sid = torch.full((take,), int(info["id"]), dtype=torch.long, device=device)
+                cl = critic(pooled, int(move["blk0"]), span, sid,
+                            torch.from_numpy(wr).long().to(device)).cpu().numpy().astype(
+                                np.float64)
+                idx = ov_row_index(move, torch.from_numpy(wr).long(), vo.dp_row_cache)
+                dp = ov_free_scores(lgts, move, int(s), idx)["dp"]
+            ok = np.isfinite(dp)
+            rec = {"n": int(take), "base_y": float(yy.mean()),
+                   "base_struct": float(st.mean()), "n_dp": int(ok.sum()),
+                   "rep_set": float(rsz.mean()),
+                   # the joint, so the two labels' own association is visible and never
+                   # inferred from the AUCs
+                   "cell": [int(((st < 0.5) & (yy < 0.5)).sum()),
+                            int(((st < 0.5) & (yy > 0.5)).sum()),
+                            int(((st > 0.5) & (yy < 0.5)).sum()),
+                            int(((st > 0.5) & (yy > 0.5)).sum())],
+                   "crit_y": vo_auc(cl, yy), "crit_st": vo_auc(cl, st),
+                   "dp_y": (vo_auc(dp[ok], yy[ok]) if int(ok.sum()) >= 16 else None),
+                   "dp_st": (vo_auc(dp[ok], st[ok]) if int(ok.sum()) >= 16 else None),
+                   # each label with the OTHER held fixed
+                   "crit_y_g_st": _ts_auc_within(cl, yy, st),
+                   "crit_st_g_y": _ts_auc_within(cl, st, yy),
+                   "dp_y_g_st": (_ts_auc_within(dp[ok], yy[ok], st[ok])
+                                 if int(ok.sum()) >= 32 else None),
+                   "dp_st_g_y": (_ts_auc_within(dp[ok], st[ok], yy[ok])
+                                 if int(ok.sum()) >= 32 else None)}
+            out[f"{which}:{key}"] = rec
+    _rng_restore(_sst)
     return out
 
 
@@ -7786,6 +8051,274 @@ def ov_gates_cpu(verbose=True):
     ok["ALL"] = not bad
     if verbose:
         print(f"\n  [overtone] {len(ok) - 1 - len(bad)}/{len(ok) - 1} offline gates pass"
+              + (f"  FAILED: {bad}" if bad else ""))
+    return ok
+
+
+def ts_gates_cpu(verbose=True):
+    """[tessitura] The round's offline gate table — TS-2 … TS-6, on a CPU in seconds.
+
+    Same discipline as `vo_gates_cpu` and `ov_gates_cpu`: assert an identity only where the
+    substrate is deterministic, measure elsewhere and print the denominator, and let every gate
+    be falsifiable from `tessitura/gates/falsify_ts.py` without paying for a preflight. A gate
+    is not reported here until it has been shown to fail on a deliberate perturbation of what
+    it protects — this arc's rule, and `falsify_ts.py` is where the perturbations live.
+
+    TS-1 (the full-scale inertness twin: the paid arm must be bit-identical to banked
+    `ov_s0b:ovt_comp_pr_sh` on every behaviour series) and G-F (the donor replay at 0.000e+00)
+    are not here; they need a GPU and a volume and are in `tessitura/results/`.
+    """
+    import torch
+    ok, bad = {}, []
+
+    def say(name, good, detail=""):
+        ok[name] = {"pass": bool(good), "detail": detail}
+        if not good:
+            bad.append(name)
+        if verbose:
+            print(f"  [{'PASS' if good else 'FAIL'}] {name}   {detail}")
+
+    import rhm.rhm_generative_planner as GP
+    from rhm.rhm_data import generate_rules_distinct
+    from rhm.practice.fourwall import wall as W
+
+    v, s, depth, m, level, node = 8, 2, 4, 2, 2, 3
+    L, dev = s ** depth, torch.device("cpu")
+    rules = generate_rules_distinct(v, s, depth, m, seed=0)
+    canon_np = np.ascontiguousarray(rules[depth - 1][:, 0, :])
+    canon_g = torch.as_tensor(canon_np, dtype=torch.long)
+    truth = MC.true_tables(rules, depth, s, v, m, level)
+    mv = MC.to_device(MC.make_macro(level, node, s, truth[level]), dev)
+    key = SN.slot_key(level, node)
+    R, span, blk0 = int(mv["flat"].shape[0]), int(mv["span"]), int(mv["blk0"])
+    slots = {key: {"move": mv, "id": 0, "open": True}}
+
+    torch.manual_seed(5)
+    core = GP._build_generator()(v, L, s, 32, n_head=2, n_layer=2, root_conditioned=False)
+    core.eval()
+    cr = build_critic(SN.slot_count(s, depth, level + 1), v, 32, s ** level, seed=29,
+                      device=dev, hidden_mult=2)
+    cr2 = build_critic(SN.slot_count(s, depth, level + 1), v, 32, s ** level, seed=77,
+                       device=dev, hidden_mult=2)
+    gq = torch.Generator().manual_seed(3)
+    n0 = 96
+    obs0 = torch.randint(0, v, (n0, L), generator=gq)
+    w0 = mv["flat"][torch.randint(0, R, (n0,), generator=gq)]
+    y0 = (torch.rand(n0, generator=gq) < 0.35).float()
+
+    def _rec(ts_norm):
+        c = dict(_VO_DEFAULTS)
+        c.update(vo_record=True, v=v, vo_critic=True, vo_critic_hold=0.2, ts_norm=ts_norm)
+        r_ = VoRecorder(c, dev, seed=0)
+        r_.on = True
+        r_.quot = MG.LearnedQuotient()
+        r_.critic = cr
+        r_.buf[key] = (obs0, w0, y0)
+        return r_
+
+    # ---- TS-2: the level is an ADDITION, and it is the quantity it says it is ------------- #
+    # Two claims. INERTNESS: with `ts_norm` off the audit's record is what it was, key for key
+    # and value for value, and with it on every pre-existing field is UNCHANGED — the level is
+    # added beside them and displaces nothing. IDENTITY: `mean_p` is the mean sigmoid of the
+    # critic's own logit on the audited rows, checked against a hand-written recomputation
+    # rather than against the audit's own intermediate; `mean_pmax` is the max over the
+    # OPERATIVE TABLE, checked the same way. Plus the file's standing requirement for an
+    # instrument: it consumes no draw.
+    class _Ex:
+        pass
+    ex_off, ex_on = _Ex(), _Ex()
+    ex_off.vo, ex_on.vo = _rec(False), _rec(True)
+    _r0 = _rng_snapshot()
+    # the reference is taken WITHOUT the call, not with a second call — two calls that draw
+    # the same amount agree with each other and say nothing about drawing
+    _ref_draw = torch.randn(3).tolist()
+    _rng_restore(_r0)
+    a_off = vo_critic_audit(core, cr, ex_off, slots, dev, chunk=8, s=s)
+    a_on = vo_critic_audit(core, cr, ex_on, slots, dev, chunk=8, s=s)
+    _got_draw = torch.randn(3).tolist()
+    _rng_restore(_r0)
+    r_off, r_on = a_off[key], a_on[key]
+    same = all(r_off[k] == r_on[k] for k in r_off if k != "ts")
+    thr_ = 20
+    code_ = ex_on.vo.hold_code(obs0)
+    hold_ = (code_ < thr_).nonzero(as_tuple=True)[0][-1024:]
+    with torch.no_grad():
+        pl_, _ = SN.trunk(core, obs0[hold_])
+        sid_ = torch.zeros(int(hold_.numel()), dtype=torch.long)
+        want_p = float(torch.sigmoid(cr(pl_, blk0, span, sid_, w0[hold_])).mean())
+        want_mx = float(torch.sigmoid(
+            vo_critic_scores(cr, pl_, blk0, span, sid_, mv["flat"], chunk=8)
+        ).max(1).values.mean())
+    d2 = abs(r_on["ts"]["mean_p"] - want_p)
+    d2m = abs(r_on["ts"]["mean_pmax"] - want_mx)
+    say("TS-2 (the judge's LEVEL is added beside the audit's own fields and displaces none of "
+        "them; `mean_p` IS the mean sigmoid of the critic's logit on the audited rows and "
+        "`mean_pmax` its max over the operative table; the read consumes no draw)",
+        ("ts" not in r_off) and ("ts" in r_on) and same and d2 < 1e-6 and d2m < 1e-6
+        and _ref_draw == _got_draw and int(r_on["n"]) >= 16,
+        f"off has no `ts` = {'ts' not in r_off} · every other field equal = {same} · "
+        f"|d mean_p| = {d2:.3e} · |d mean_pmax| = {d2m:.3e} · n = {r_on['n']} · "
+        f"draw neutral = {_ref_draw == _got_draw}")
+
+    # ---- TS-3: the panel is FROZEN in its rows and LIVE in its reader --------------------- #
+    # The whole point of norm's identical rows is that the world stops moving so the reader's
+    # drift is legible. Three claims, all identities: re-running inside the same era does not
+    # re-freeze (the base rate is a constant); a NEW era freezes a SECOND panel from the rows
+    # the buffer now holds; and scoring the same frozen panel with a DIFFERENT critic moves
+    # `mean_p` while scoring it twice with the same critic does not.
+    vo_p = _rec(True)
+    p1 = ts_panel_audit(core, cr, vo_p, slots, dev, era=1, cap=32, chunk=8)
+    vo_p.buf[key] = (obs0.flip(0), w0.flip(0), 1.0 - y0)      # the world moves under it
+    p1b = ts_panel_audit(core, cr, vo_p, slots, dev, era=1, cap=32, chunk=8)
+    p2 = ts_panel_audit(core, cr, vo_p, slots, dev, era=2, cap=32, chunk=8)
+    p1c = ts_panel_audit(core, cr2, vo_p, slots, dev, era=2, cap=32, chunk=8)
+    k1, k2 = f"{key}|e1", f"{key}|e2"
+    frozen = (p1[k1]["base"] == p1b[k1]["base"] == p2[k1]["base"]
+              and p1[k1]["mean_p"] == p1b[k1]["mean_p"])
+    grew = (k2 in p2) and (k2 not in p1) and (k1 in p2)
+    moved = abs(p1c[k1]["mean_p"] - p2[k1]["mean_p"]) > 1e-6
+    say("TS-3 (the panel freezes once per (slot, era) and never again; its base rate is a "
+        "constant while the buffer under it moves; a later era adds a SECOND panel and keeps "
+        "the first; and the reading moves when and only when the critic does)",
+        frozen and grew and moved and p1[k1]["n"] == 32,
+        f"base {p1[k1]['base']:.4f} == {p1b[k1]['base']:.4f} == {p2[k1]['base']:.4f} "
+        f"(IDENTITY) · panels after era 2 = {sorted(p2)} · "
+        f"|d mean_p| under a different critic = {abs(p1c[k1]['mean_p'] - p2[k1]['mean_p']):.3e}")
+
+    # ---- TS-4: the MASK does not matter, which is what makes the label readable at all ----- #
+    # `consistent_features` overwrites the slot's token span before it parses, and that span is
+    # exactly what `VoRecorder.assemble` masks to -1. So the structural label taken on the
+    # MASKED context must equal the one taken on the UNMASKED context, exactly. This is the
+    # claim `tessitura/structure.py` rests on and it is asserted, not assumed. The perturbation
+    # half is here rather than in the falsifier because it is one line: masking a DIFFERENT
+    # span must break the equality.
+    # THE FIXTURE IS REAL DERIVATIONS, not noise: on a random string nothing repairs anywhere
+    # and both halves of this gate would pass vacuously. `sample_pool_latent` hands back the
+    # generating latents with the leaves, so the repair set at this node is known to be
+    # non-empty and the WRITE can be chosen to hit it or miss it on purpose.
+    roots_t, leaves_t, trace_t = W.sample_pool_latent(rules, 48, s, seed=13)
+    ctxt = torch.from_numpy(np.asarray(leaves_t, np.int64))
+    roots_t = np.asarray(roots_t, np.int64)
+    feat_t = W.latents_at(trace_t, depth, level)[:, node]      # the latent the world used
+    # one table row per feature, by the row's own token class — the executor's own key
+    _tups = [tuple(int(z) for z in r) for r in mv["flat"].numpy()]
+    _tc = vo_token_class(rules, sorted(set(_tups)), level, canon_np, v, s, depth, {})
+    _tmap = dict(zip(sorted(set(_tups)), _tc))
+    _by_feat = {}
+    for r_i, t_ in enumerate(_tups):
+        for f_ in _tmap[t_]:
+            _by_feat.setdefault(int(f_), r_i)
+    w_hit = torch.stack([mv["flat"][_by_feat.get(int(f_), 0)] for f_ in feat_t])
+    w_miss = torch.stack([mv["flat"][_by_feat.get(int((f_ + 1) % v), 0)] for f_ in feat_t])
+    w_mix = torch.where((torch.arange(48) % 2 == 0)[:, None], w_hit, w_miss)
+    pos_t = SN.span_positions(mv, 48, s, dev)
+    obs_t = ctxt.clone().scatter_(1, pos_t, torch.full_like(pos_t, -1))
+    other = mv.copy()
+    other["blk0"] = (blk0 + span) % (L // s)
+    pos_o = SN.span_positions(other, 48, s, dev)
+    obs_o = ctxt.clone().scatter_(1, pos_o, torch.full_like(pos_o, -1))
+    mk_c, _ = W.consistent_features(rules, ctxt.numpy(), roots_t, node, level, s, canon_np, v)
+    mk_m, _ = W.consistent_features(rules, obs_t.numpy(), roots_t, node, level, s, canon_np, v)
+    mk_b, _ = W.consistent_features(rules, obs_o.numpy(), roots_t, node, level, s, canon_np, v)
+    say("TS-4 (the structural label is invariant to the span mask, because the label's own "
+        "call overwrites exactly the span `assemble` masked; masking any OTHER span breaks it)",
+        bool((mk_c == mk_m).all()) and not bool((mk_c == mk_b).all()),
+        f"masked == unmasked on {int((mk_c == mk_m).all(1).sum())}/48 rows (IDENTITY) · "
+        f"a wrongly masked span agrees on only "
+        f"{int((mk_c == mk_b).all(1).sum())}/48")
+
+    # ---- TS-5: the structural audit is an INSTRUMENT ------------------------------------- #
+    # It reads the grammar, so it is an oracle read and is counted as one — in
+    # `_EXP_REC["reads"]`, which `rep` uses, and never in `counts["ground"]`, which is the
+    # meter. It also must consume no draw and produce the two labels it claims: `base_struct`
+    # equals the repair-set membership recomputed by hand, and `base_y` the mean verdict.
+    vo_s = _rec(True)
+    vo_s.cfg["ts_struct"] = 24
+    rows_s = {key: [{"obs": obs_t, "w": w_mix, "y": y0[:48],
+                     "b": torch.arange(48), "ctx": ctxt,
+                     "fin": ctxt, "root": torch.arange(48)}]}
+    r_before = int(_EXP_REC["reads"])
+    _r5 = _rng_snapshot()
+    st_out = ts_struct_audit(core, cr, vo_s, rows_s, None, slots, rules, canon_np, roots_t,
+                             s, depth, v, dev, cap=24, quot=vo_s.quot,
+                             tok_cache={}, chunk=8)
+    _got5 = torch.randn(3).tolist()
+    _rng_restore(_r5)
+    _ref5 = torch.randn(3).tolist()
+    _rng_restore(_r5)
+    # THE PROBE BRANCH, on the tuples `vo_run_probes` actually returns (five elements, the
+    # fifth the root), because its unpacking is by index and is the one path the filed branch
+    # cannot exercise.
+    pr5 = {key: [(obs_t, w_mix, y0[:48], torch.ones(48), torch.arange(48))]}
+    st_pr = ts_struct_audit(core, cr, vo_s, {}, pr5, slots, rules, canon_np, roots_t,
+                            s, depth, v, dev, cap=24, quot=vo_s.quot, tok_cache={}, chunk=8)
+    rec5p = st_pr.get(f"probe:{key}")
+    rec5 = st_out.get(f"filed:{key}")
+    sel5 = np.linspace(0, 47, 24).astype(np.int64)
+    mk5, ng5 = W.consistent_features(rules, obs_t.numpy()[sel5], roots_t[sel5], node, level,
+                                     s, canon_np, v)
+    tups5 = [tuple(int(z) for z in r) for r in w_mix.numpy()[sel5]]
+    tcs5 = vo_token_class(rules, sorted(set(tups5)), level, canon_np, v, s, depth, {})
+    tm5 = dict(zip(sorted(set(tups5)), tcs5))
+    want_st = float(np.mean([1.0 if any(bool(mk5[j, f]) for f in tm5[t]) else 0.0
+                             for j, t in enumerate(tups5)]))
+    grew_reads = int(_EXP_REC["reads"]) - r_before
+    say("TS-5 (the structural audit produces the repair-set membership and the verdict on the "
+        "identical rows, counts its grammar reads in `_EXP_REC['reads']` as `rep` does, and "
+        "consumes no draw)",
+        rec5 is not None and abs(rec5["base_struct"] - want_st) < 1e-9
+        and abs(rec5["base_y"] - float(y0[:48].numpy()[sel5].mean())) < 1e-6
+        and grew_reads >= ng5 and _ref5 == _got5 and sum(rec5["cell"]) == 24
+        and 0.0 < rec5["base_struct"] < 1.0
+        # the probe branch reads the SAME rows through `vo_run_probes`' tuple layout, so its
+        # two labels must come back identical to the filed branch's on this fixture
+        and rec5p is not None
+        and abs(rec5p["base_struct"] - rec5["base_struct"]) < 1e-9
+        and abs(rec5p["base_y"] - rec5["base_y"]) < 1e-9,
+        f"base_struct {rec5['base_struct']:.6f} == {want_st:.6f} (IDENTITY) · "
+        f"reads grew by {grew_reads} (>= {ng5}) · draw neutral = {_ref5 == _got5} · "
+        f"2x2 sums to {sum(rec5['cell'])} · probe branch reproduces the filed branch on the "
+        f"same rows = {rec5p is not None and abs(rec5p['base_struct'] - rec5['base_struct']) < 1e-9}")
+
+    # ---- TS-6: the probe channel's fifth element rides ONLY when the knob is on ----------- #
+    # `vo_run_probes` gains one element on the tuples it returns so the structural label can be
+    # taken on probe rows under the TRUE root. `push_probe` reads `p[0..3]` by index, so the
+    # claim to gate is that the probe BUFFER is bit-identical either way and that the element
+    # is absent with the knob off. Both halves asserted, on the same RNG stream.
+    def _probe(ts_struct):
+        c = dict(_VO_DEFAULTS)
+        c.update(vo_record=True, v=v, vo_critic=True, ts_struct=int(ts_struct))
+        r_ = VoRecorder(c, dev, seed=0)
+        r_.on = True
+        r_.quot = MG.LearnedQuotient()
+        r_.governed = {key}
+        r_.critic = cr
+        gpp = torch.Generator().manual_seed(21)
+        n_p = 16
+        obs_p = torch.randint(0, v, (n_p, L), generator=gpp)
+        fin_p = torch.randint(0, v, (n_p, L), generator=gpp)
+        w_p = mv["flat"][0][None, :].expand(n_p, -1).contiguous()
+        rows_p = {key: [{"fin": fin_p, "obs": obs_p, "w": w_p, "root": torch.arange(n_p)}]}
+        out_p, _ = vo_run_probes(
+            r_, rows_p, slots, r_.quot, None, rules, canon_g, s, dev, n_probe=n_p,
+            grade_fn=(lambda x_, rr_, ru_, s_: (np.zeros(x_.shape[0], np.float32), None)),
+            roots_of=(lambda t_: t_.numpy()), dis=False, unif_frac=0.25,
+            critic=cr, core=core, chunk=8)
+        r_.push_probe(out_p)
+        return out_p[key], r_.pbuf[key], r_.pmask[key]
+    pa_, ba_, ma_ = _probe(0)
+    pb_, bb_, mb_ = _probe(24)
+    same_buf = all(bool((x_ == y_).all()) for x_, y_ in zip(ba_, bb_)) \
+        and bool((ma_ == mb_).all())
+    say("TS-6 (the probe tuples gain a ROOT element only when `ts_struct` is on, and the probe "
+        "buffer the critic is fed is bit-identical either way)",
+        all(len(q) == 4 for q in pa_) and all(len(q) == 5 for q in pb_) and same_buf,
+        f"tuple widths {sorted({len(q) for q in pa_})} -> {sorted({len(q) for q in pb_})} · "
+        f"pbuf identical = {same_buf} ({int(ba_[0].shape[0])} rows)")
+
+    ok["ALL"] = not bad
+    if verbose:
+        print(f"\n  [tessitura] {len(ok) - 1 - len(bad)}/{len(ok) - 1} offline gates pass"
               + (f"  FAILED: {bad}" if bad else ""))
     return ok
 
@@ -9702,6 +10235,7 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                 vo_instruments(vo_rec, rows_vo, out, succ_bw, cl_np, r_np, x_np, quot,
                                slots, shared, rules, canon_np, cfg, s, depth, v, m, device,
                                _vo_tok_cache, _latents_at)
+            _pr_rows = None                              # [tessitura] see the audit below
             if vo_rec.on and cfg.get("vo_probe") and vo_rec.governed:
                 # [voicing Q3] BABBLING OFF-STREAM, and it is PRICED. Every probe grading is a
                 # grounding on the meter, with its own line; nothing it produces reaches the
@@ -9730,6 +10264,24 @@ def run_arm(label, base, overrides, shared, cfg, eras, refs, outdir, device):
                         generator, vo_rec.critic, ex, slots, device,
                         chunk=int(cfg.get("vo_chunk", 32)),
                         s=s)                       # [overtone S2] the free scores need it
+                    # [tessitura] the two value-reader instruments. Both default off; both
+                    # unpriced, RNG-sandboxed and unable to reach a decision. THE PANEL is
+                    # norm's identical-rows protocol (the world held constant, the reader
+                    # free to drift); THE STRUCTURAL AUDIT is striatum §2's cost-versus-
+                    # structure read with the label taken per row under the true root.
+                    if int(cfg.get("ts_panel", 0) or 0) > 0:
+                        vo_rec.stat["ts_panel"] = ts_panel_audit(
+                            generator, vo_rec.critic, vo_rec, slots, device,
+                            era=int(era_i + 1), cap=int(cfg.get("ts_panel")),
+                            chunk=int(cfg.get("vo_chunk", 32)))
+                    if int(cfg.get("ts_struct", 0) or 0) > 0:
+                        vo_rec.stat["ts_struct"] = ts_struct_audit(
+                            generator, vo_rec.critic, vo_rec, rows_vo,
+                            (_pr_rows if cfg.get("vo_probe") else None), slots,
+                            rules, canon_np, r_np, s, depth, v, device,
+                            cap=int(cfg.get("ts_struct")), quot=quot,
+                            tok_cache=_vo_tok_cache,
+                            chunk=int(cfg.get("vo_chunk", 32)))
             log["vo"].append(vo_rec.take() if vo_rec.on else None)
 
             # --- (a2) [tacet] THE GATE. Read the two decision-time scalars off what the beam
@@ -12207,7 +12759,19 @@ FB_S1_ARMS = "given_cat_tok_open_yk,given_cat_tok_open_ung5_yk"
 TUTTI_TOL_DSIL = 0.0046
 
 
-@app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=36000, memory=32768)
+# [tessitura] THE MEMORY REQUEST, SIZED ON A MEASUREMENT INSTEAD OF INHERITED. `overtone` added
+# the peak-RSS print for exactly this and nothing had yet acted on it: `ts_s0` — the longest arm
+# this lineage runs, carrying every instrument of `overtone` AND this node's three — peaked at
+# **7048 MB** against the donor's `memory=32768`. Modal bills the greater of the request and the
+# use, so the inherited reservation was paying for ~25 GB nobody touched; at L4 prices that is
+# roughly a third of the GPU. 16384 halves it and still leaves 2.3x headroom over the only
+# measurement, which is the margin to keep on a SHARED path where another node's arm may behave
+# differently. The constant is used by the decorator and by the print, so the log reports the
+# request it actually ran under rather than a literal that can drift away from it.
+VO_MEMORY_MB = 16384
+
+
+@app.function(volumes={DATA_DIR: volume}, gpu="L4", timeout=36000, memory=VO_MEMORY_MB)
 def voicing_run(                                           # [voicing]
     tag: str = "en_s0",
     arms: str = ENH_ARMS,
@@ -12350,6 +12914,11 @@ def voicing_run(                                           # [voicing]
     # set in `ARMS[...]["cfg"]`. All default off; with them off this file is Q3b's.
     ov_shadow: str = "", ov_free: bool = False, ov_comb_folds: int = 2,
     ov_dump: bool = False, ov_dump_cap: int = 0, ov_probe_unif_frac: float = 0.25,
+    # [tessitura] the value-reader instruments, all RUN-level and all default off: the judge's
+    # own level in the audit, the fixed per-(slot, era) panel, and the per-row structural label
+    # beside the verdict. None of them can reach a decision; with all three off this file is
+    # `overtone`'s (gate G-F, and gate TS-1 at full scale against banked `ov_s0b`).
+    ts_norm: bool = False, ts_panel: int = 0, ts_struct: int = 0,
     vo_rec_cap: int = 8192, vo_rec_batch: int = 64, vo_chunk: int = 32,
     vo_readback_n: int = 512, vo_rep_n: int = 64, vo_verify_cycles: int = 8,
     ref_tag: str = "", rule_seed: int = 0, train_seed: int = 1, quick: bool = False,
@@ -12437,6 +13006,8 @@ def voicing_run(                                           # [voicing]
                   ov_comb_folds=ov_comb_folds, ov_dump=ov_dump,            # [overtone]
                   ov_dump_cap=ov_dump_cap,                                 # [overtone]
                   ov_probe_unif_frac=ov_probe_unif_frac,                   # [overtone]
+                  ts_norm=bool(ts_norm), ts_panel=int(ts_panel),           # [tessitura]
+                  ts_struct=int(ts_struct),                                # [tessitura]
                   vo_push=vo_push, vo_rec_cap=vo_rec_cap, vo_rec_batch=vo_rec_batch,
                   vo_chunk=vo_chunk, vo_readback_n=vo_readback_n, vo_rep_n=vo_rep_n,
                   vo_verify_cycles=vo_verify_cycles,
@@ -12797,7 +13368,7 @@ def voicing_run(                                           # [voicing]
         summary["peak_rss_mb"] = round(
             resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0, 1)
         print(f"[rss] peak RSS {summary['peak_rss_mb']:.0f} MB "
-              f"(request is {32768} MB)", flush=True)
+              f"(request is {VO_MEMORY_MB} MB)", flush=True)   # [tessitura] the constant
     except Exception:
         pass
     with open(os.path.join(outdir, "summary.json"), "w") as fh:
@@ -13620,6 +14191,10 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
               # their branches are exercised; `ovt_pf_noshadow` turns them off in its own cfg.
               ov_shadow: str = "lin,dir", ov_free: bool = True, ov_dump: bool = True,
               ov_probe_unif_frac: float = 0.25,
+              # [tessitura] ON by default in the preflight, at DUST budgets, so every branch
+              # the three instruments add runs before a paid setup. SAID OUT LOUD, as every
+              # round before: preflight checks the code path and never a number.
+              ts_norm: bool = True, ts_panel: int = 8, ts_struct: int = 8,
               # [en_s3] EVERY SWEEP GETS ITS OWN OUTDIR. `_ran(arm)` reads `results.json` out
               # of the preflight dir to decide whether an arm has run, and with one shared dir
               # a stale row from an earlier sweep passes for a fresh one -- which happened
@@ -13727,6 +14302,8 @@ def preflight(cycles: int = 2, eras: str = "1:25:6,2:12:6,3:6:5,4:3:5,5:1:5",
                   ov_shadow=ov_shadow, ov_free=bool(ov_free), ov_comb_folds=2,
                   ov_dump=bool(ov_dump), ov_dump_cap=0,
                   ov_probe_unif_frac=float(ov_probe_unif_frac),
+                  ts_norm=bool(ts_norm), ts_panel=int(ts_panel),          # [tessitura]
+                  ts_struct=int(ts_struct),                               # [tessitura]
                   entry_rec=True)
     ers = parse_eras(eras)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
