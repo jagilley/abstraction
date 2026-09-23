@@ -160,15 +160,18 @@ def clean_answers(fs, phase, T1, L, s, n_seq):
 @app.function(volumes={DATA_DIR: volume}, timeout=3600, memory=16384, cpu=2.0)
 def build_parse(v: int = 16, s: int = 2, depth: int = 6, m: int = 4, rule_seed: int = 0,
                 alpha: float = 1.0, weight_seed: int = 1, n: int = 16384, seed: int = 2026,
-                tag: str = "a1", swap_only: bool = False):
+                tag: str = "a1", swap_only: bool = False, frac: str = ""):
+    """`frac`: the same optional "swap,rare,none" string `stimuli.build_stimuli` was
+    given; empty keeps the banked behaviour exactly."""
     from rhm.rhm_data import generate_rules_distinct
     from rhm.logit_reading.grammar import synonym_weights
     volume.reload()
     L = depth
     rules = generate_rules_distinct(v, s, L, m, seed=rule_seed)
     rule_w = None if alpha <= 0 else synonym_weights(v, L, m, alpha, weight_seed)
-    st = make_edits_parsed(rules, rule_w, n, seed,
-                           **({"frac": (1.0, 0.0, 0.0)} if swap_only else {}))
+    fr = (tuple(float(x) for x in frac.split(",")) if frac else
+          (1.0, 0.0, 0.0) if swap_only else None)
+    st = make_edits_parsed(rules, rule_w, n, seed, **({"frac": fr} if fr is not None else {}))
 
     key = tb_key(v, s, L, m)
     out_dir = f"{DATA_DIR}/{key}/logit_reading"

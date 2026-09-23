@@ -94,11 +94,15 @@ def make_edits(rules, rule_w, n, seed, e_lo=16, e_hi=36, j_max=4, frac=(0.5, 0.2
 def build_stimuli(v: int = 16, s: int = 2, depth: int = 6, m: int = 4, rule_seed: int = 0,
                   alpha: float = 1.0, weight_seed: int = 1, n: int = 16384, seed: int = 2026,
                   noise_eps: float = 0.01, chunk: int = 8, tag: str = "a1",
-                  swap_only: bool = False, with_reference: bool = True):
+                  swap_only: bool = False, with_reference: bool = True, frac: str = ""):
     """swap_only: every window is a swap edit (the phasic test uses nothing else).
     with_reference: also compute p_L on the original windows and the eps-noise observer on
     both (Part 2 persistence); off for the phasic stimulus sets, which only need p_L on the
-    edited windows and the observer ladder."""
+    edited windows and the observer ladder.
+    frac: optional "swap,rare,none" shares (e.g. "0.5,0.5,0.0"), passed to `make_edits`.
+    Empty (the default) keeps the banked behaviour exactly: (1, 0, 0) under `swap_only`,
+    else `make_edits`' own default (0.5, 0.25, 0.25).  `striatum/parse.py`'s `build_parse`
+    takes the same flag and must be given the same value to replay the RNG."""
     import torch
     from rhm.rhm_data import generate_rules_distinct
     from rhm.logit_reading.grammar import synonym_weights
@@ -108,7 +112,9 @@ def build_stimuli(v: int = 16, s: int = 2, depth: int = 6, m: int = 4, rule_seed
     rules = generate_rules_distinct(v, s, L, m, seed=rule_seed)
     rule_w = None if alpha <= 0 else synonym_weights(v, L, m, alpha, weight_seed)
     t0 = time.time()
-    st = make_edits(rules, rule_w, n, seed, **({"frac": (1.0, 0.0, 0.0)} if swap_only else {}))
+    fr = (tuple(float(x) for x in frac.split(",")) if frac else
+          (1.0, 0.0, 0.0) if swap_only else None)
+    st = make_edits(rules, rule_w, n, seed, **({"frac": fr} if fr is not None else {}))
     print(f"edits built {time.time() - t0:.1f}s  types {np.bincount(st['etype'])}", flush=True)
     We, Wo = st["windows_edit"], st["windows_orig"]
     T1 = We.shape[1]
@@ -158,7 +164,7 @@ def build_stimuli(v: int = 16, s: int = 2, depth: int = 6, m: int = 4, rule_seed
         "delay_tv_minus_e_by_kstar": {int(k): float((t_v - st["e"])[k_star == k].mean())
                                       for k in range(L + 1) if (k_star == k).any()},
         "min_legal_prob": float(ok_orig.min()) if with_reference else None,
-        "swap_only": swap_only, "with_reference": with_reference,
+        "swap_only": swap_only, "with_reference": with_reference, "frac": frac,
     }
     print(json.dumps(summary, indent=1), flush=True)
 

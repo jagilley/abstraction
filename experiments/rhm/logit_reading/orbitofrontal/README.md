@@ -160,6 +160,15 @@ those same rows erodes slowly, at both seeds.
 > it. The outcome surprise fires when the world changes and goes quiet once the norm has caught up, so a system
 > watching only the surprise could not tell it had been re-calibrated; the history lives in the level, silently.**
 
+> **Re-read 2026-09-22 by [`striatum/norm/precision/rereads/clock/`](../striatum/norm/precision/rereads/clock/README.md), on readers with more
+> of the belief than the ridge** (`+log q`, `ln_f(state)`, `+H(q)`; both order seeds). Every reading above holds on every reader: the gap tracks the
+> mechanical null, the half-times sit at the null's, the deviation's sign agreement across orderings is at chance, the excursion fires, returns and
+> stays out of the controls identically; the response carries the history on the same clock and is about 1.8× larger and readable in nearly twice as
+> many cells on the belief-appended reader, with the same cell pattern (r ≈ 0.9). Two corrections: the sentence "the shift and the rescaling of the
+> norm close in lockstep … within 0.05" has no reduction behind it in `adaptation/analyze.py`, and under three explicit definitions it holds in
+> 12–22 of 80 cells per seed on every reader, the ridge included (near a level of 0.9 a change in slope and a change in intercept are hard to
+> separate); and the headline row's 200-window entry reads **−0.004** in the banked files, not +0.004.
+
 ## 2. What the value reader reads
 
 ### 2a. Shaping the trunk on the goal sharpens the cost reading and leaves legality alone
@@ -369,6 +378,17 @@ world it is in is not in the logits.
 > the public part; it is where the learning went. This is paper 2[^private]'s
 > re-derivation boundary landing on the value side, with the boundary running between the norm and the response,
 > and the sixth instance of the arc's directional-not-scalar pattern with the geometry explicit.**
+
+> **Re-read 2026-09-22 by [`striatum/norm/precision/rereads/public/`](../striatum/norm/precision/rereads/public/README.md), three seeds.** The
+> level is public for a linear and a nonlinear public reader alike (an MLP on the sixteen log-probabilities reproduces the norm's calibration and
+> rescaling). **"The response is private" is a statement about linear public readers**: the belief-only MLP gives more response amplitude, a better
+> damage reading at ℓ=1–2 (0.67 against the state ridge's 0.61) and a stronger twin optimism than the linear state critic, while the state still
+> wins at ℓ=3–4 and nonlinear state readers stay above it at every level; the honest phrasing is that the level is linearly public, the shallow-level
+> response is public to a nonlinear read of the belief, and the deep-level response needs the state. The ridge's overlap with the output row space
+> reproduces on three seeds (0.04–0.05); a critic handed the belief moves its state block to 0.09–0.10, still under half of chance, at cosine
+> 0.73–0.88 to the ridge's direction, so part of the anti-alignment above is the linear reader compensating for what it cannot read from the belief.
+> Two single-seed rows do not replicate on `s43` / `s44`: the `a1` ℓ=3 "below a random slice" damage comparison (state 0.556 / 0.520 / 0.481
+> against the public ridge's 0.531 / 0.471 / 0.481) and the sign of "the readable part carries the mean event effect".
 
 ## 5. What held under seeds, and a rule for reading the rest
 
