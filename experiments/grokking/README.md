@@ -1,8 +1,9 @@
-# grokking — symbolic minting on vanilla grokking: the basis mints itself from the net's own function, the kept count is the norm-affordable minimum, and a fresh learner over it solves at 34× less compute
+# grokking — symbolic minting on vanilla grokking: the basis mints itself from the net's own function, the kept count is the norm-affordable minimum, and a fresh learner over it solves at 34× less compute; whittled in its own minted coordinates under a count price, the same net collapses to the one-frequency closed form in 18 numbers
 
 **Up**: [`experiments/`](../CLAUDE.md) · **Files**: [`FILES.md`](FILES.md) · **Decisions, gates, falsifiers and defects**:
-[`NOTES.md`](NOTES.md), [`basis/NOTES.md`](basis/NOTES.md) · **Child**: [`basis/`](basis/README.md) (the endogenous basis
-mint, written up in §2 below) · **Conversation**: `CONVERSATION.md`[^private].
+[`NOTES.md`](NOTES.md), [`basis/NOTES.md`](basis/NOTES.md) · **Children**: [`basis/`](basis/README.md) (the endogenous basis
+mint, written up in §2 below), [`whittle/`](whittle/README.md) (the continuing learner whittled to the closed form, its own
+writeup, headlined in §4 below) · **Conversation**: `CONVERSATION.md`[^private].
 **Motivation**: Jasper's ask (2026-09-22): the repo's abstraction-creation work falls under the practice lineage
 ([`rhm/practice/`](../rhm/practice/README.md)) and the value side ([`rhm/logit_reading/`](../rhm/logit_reading/README.md)),
 and months ago it did substantial work on modular-arithmetic grokking
@@ -234,6 +235,27 @@ One cross-recipe number, not a like-for-like comparison:
 | minted 13, bilinear | wd 1.0 | 7,845 | 5.0e11 |
 | minted 1 (frequency 30), bilinear width 4 | wd 0.01 | 501 | 6.7e10 |
 
+## 4. Whittle (`w1`, `w2`): the same net, in its own minted coordinates, told to keep its answers and shed weight, collapses to the one-frequency closed form
+
+Written up in full at [`whittle/README.md`](whittle/README.md) (2026-09-23, after the sections above). **Goal**: replace Rung's
+fresh learner with the learner that found the solution. Rewrite the grokked net's first layer (and, in one arm, its head) in
+the coordinates Basis read off its own behaviour, then change the objective from "learn modular addition" to "keep your
+modular addition and zero out as many weights as you can": a prune-and-retrain walk at weight decay 0, priced on weight
+*count* rather than magnitude, gated only on 100% agreement with the net's own former train answers, held-out logged and never
+consumed. **Finding**: the change of basis is what lets a count price find the generalizing solution. The same walk on the
+one-hot net keeps its train answers and falls to 8% held-out at 7,085 weights, because a wave costs 97 scalars there and one
+2-vector in minted coordinates; the basis-committed net reaches 817 weights at 99.2%, and with the head minted too 162 weights
+(230 parameters) at 99.8%, 235× under the original 53,985. The whittled wiring is the equation's block structure: every
+surviving first-layer unit reads one minted symbol, the same on both operands, and the middle units read and write one
+symbol each. From the full 48-symbol rotation the walk keeps 14 symbols, 11 of them the gate's 13. With a move that removes a
+whole frequency at once, the product net whittles to **one frequency: 3 product units, 18 weights, no biases, every one of
+the 9,409 pairs correct**, and the three units' tensor fits A·Re(e^{iψ} z_a z_b z̄_c) at 0.6% residual with the frame phase
+cancelled, which is cos ω(a+b−c) as Gauss's three real multiplications; any of the three surviving frequencies carries the
+task alone, at amplitudes 27–146 (the "about 500" of §3 was the price of an exact product under weight decay 1.0). The ReLU
+net stops at two frequencies and 76 numbers under three optimizers, a floor for that sparse net since the walk cannot
+regrow. No cosine, no 97 and no template were given; the gifts are the eigendecomposition, the output-class identification,
+the count-price machinery and, for the 18-number result, multiplication.
+
 ## The update
 
 1. **The vanilla MLP is Fourier**, spread over 13–15 frequencies, and the repo's earlier claim to the contrary was a top-5
@@ -305,13 +327,15 @@ keep the old path.
 
 ## Next steps (not started; to be discussed)
 
-- **The twenty-number compile, learned**: the 501-parameter net with its readout also expressed in the recovered basis, both
+- **The twenty-number compile, learned** → done, and below twenty: [`whittle/`](whittle/README.md) §2 reaches 18 numbers with nothing
+  trained from scratch. As originally posed: the 501-parameter net with its readout also expressed in the recovered basis, both
   sides minted, at weight decay off; and the data sweep for the 501-parameter net, since a net that cannot memorize should solve
   from far fewer than 1,881 pairs, which is the renewable-extraction number this substrate can actually give.
 - **A second piece**, which is what would separate this from feature extraction: three-term addition on the same modulus (the
   same characters, one more angle addition), and a different modulus, where the net's sampled waves do not transfer but the
   operator-diagonalization procedure does.
-- **The same learner continuing**, rather than a fresh one: the grokked net with its layer 0 committed to the minted basis
+- **The same learner continuing**, rather than a fresh one → done on the same piece in [`whittle/`](whittle/README.md); still open
+  on a second piece. As originally posed: the grokked net with its layer 0 committed to the minted basis
   (form C as the init) carried onto the second piece, against the unrestricted net.
 - **Minting the template**: the readout is the one ingredient still hand-written; whether the projection onto the recovered
   basis can be read from the net's head rows the way the basis was read from its function.

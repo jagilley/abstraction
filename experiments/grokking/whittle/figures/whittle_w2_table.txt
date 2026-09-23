@@ -1,0 +1,312 @@
+# grokking / whittle -- tag w2; seed 42; wd 0 everywhere; CPU; one container per arm; 846 s wall
+# channel move and plant retrain: cap 20000 epochs, stop once train agreement has held 100 epochs; group moves (weights and biases): cap 500, settle 100 (w1's)
+# gate: 0 of 2,822 train pairs disagree with the original net's train argmax; held-out (6,587) logged only
+# counts: scalars (weights / biases / total) and groups (symbol connections in minted layers, scalars elsewhere; bias groups per unit, per symbol in minted heads). Scalar zeros inside a 2-vector depend on the arbitrary rotation within the subspace; the group count is the claim.
+# k = DFT match of a minted symbol (oracle, logged only)
+
+## Gates (whittle2_gates)
+  G5_bilinear_both: weights 54 (w1 54), disagreements 0, held-out 1.0000 (w1 1.0000), channels [4, 9, 13], pass True
+  G5_both_sides: weights 162 (w1 162), disagreements 0, held-out 0.9979 (w1 0.9979), channels [2, 4, 6, 7, 8, 9], pass True
+  G6a bilinear remove s4: units 9 -> 6 (removed [2, 12, 18]), max |logit - (before - channel terms)| 5.7e-06
+  G6a bilinear remove s9: units 9 -> 6 (removed [14, 31, 51]), max |logit - (before - channel terms)| 5.2e-06
+  G6a bilinear remove s13: units 9 -> 6 (removed [6, 9, 46]), max |logit - (before - channel terms)| 3.8e-06
+  G6b MLP remove s2: max |logit - hand-zeroed| 0.0e+00; units L0/L1 [28, 13] -> [25, 12]; weights -> 145
+  G6b MLP remove s4: max |logit - hand-zeroed| 0.0e+00; units L0/L1 [28, 13] -> [23, 10]; weights -> 135
+  G6b MLP remove s6: max |logit - hand-zeroed| 1.1e-05; units L0/L1 [28, 13] -> [27, 13]; weights -> 159
+  G6b MLP remove s7: max |logit - hand-zeroed| 0.0e+00; units L0/L1 [28, 13] -> [22, 11]; weights -> 128
+  G6b MLP remove s8: max |logit - hand-zeroed| 0.0e+00; units L0/L1 [28, 13] -> [22, 11]; weights -> 128
+  G6b MLP remove s9: max |logit - hand-zeroed| 0.0e+00; units L0/L1 [28, 13] -> [20, 8]; weights -> 112
+  G6c fold into a pruned head bias: max |dlogit| 1.5e-05, bias entries revived 4
+  G7 plant s4 (k 38): units 3, weights 18, biases 0, pass True; train agreement at the plant 0.1219
+  G7 plant s9 (k 18): units 3, weights 18, biases 0, pass True; train agreement at the plant 0.2874
+  G7 plant s13 (k 24): units 3, weights 18, biases 0, pass True; train agreement at the plant 0.1899
+  G8 zero-prune 20k retrain bil_channel_adamw_lr0.001: 2500:0/1.0000/11.3, 7500:0/1.0000/14.5, 12500:0/1.0000/16.8, 17500:0/1.0000/17.1, 20000:0/1.0000/17.1   (epochs: disagreements / held-out / gbar margin)
+  G8 zero-prune 20k retrain bil_channel_adamw_lr0.01: 2500:0/1.0000/15.1, 7500:0/1.0000/17.0, 12500:0/1.0000/17.1, 17500:0/1.0000/17.2, 20000:0/1.0000/17.2   (epochs: disagreements / held-out / gbar margin)
+  G8 zero-prune 20k retrain mlp_channel_adamw_lr0.001: 2500:0/1.0000/24.5, 7500:0/1.0000/31.6, 12500:0/1.0000/36.0, 17500:0/1.0000/38.6, 20000:0/1.0000/39.6   (epochs: disagreements / held-out / gbar margin)
+  G8 zero-prune 20k retrain mlp_channel_sgd_lr0.1: 2500:0/1.0000/18.7, 7500:0/1.0000/19.7, 12500:0/1.0000/20.3, 17500:0/1.0000/20.8, 20000:0/1.0000/21.0   (epochs: disagreements / held-out / gbar margin)
+  G9 walk2 designed case: channels left [2, 3], pruned 25, tries [[3, False], [1, True], [3, False], [2, False], [3, False], [2, False]], pass True
+
+## Final state per arm
+                arm | weights w grp bias s b grp | total s total g |                 channels (k)   units | held-out  gbar_m m_tr min m_te min | ch a/r  gr a/r   sec
+        bil_channel |      18     9      0     0 |      18       9 |                     [9] (18)     3/- |   1.0000   0.306    0.217    0.214 |  2/0     4/42     94
+      bil_plant1_s4 |      18     9      0     0 |      18       9 |                     [4] (38)     3/- |   1.0000   0.101    0.007    0.007 |  0/0     0/21    143
+      bil_plant1_s9 |      18     9      0     0 |      18       9 |                     [9] (18)     3/- |   1.0000   0.052    0.006    0.006 |  0/0     0/21     42
+     bil_plant1_s13 |      18     9      0     0 |      18       9 |                    [13] (24)     3/- |   1.0000   0.100    0.005    0.005 |  0/0     0/21     32
+     bil_from_start |      36    18      0     0 |      36      18 |                     [4] (38)     6/- |   1.0000   0.137    0.037    0.036 | 12/0     8/42     60
+        mlp_channel |      68    40     15    13 |      83      53 |               [7, 8] (39,47)    12/4 |   0.9979   3.802    0.024   -0.694 |  4/4     4/84    836
+    mlp_channel_sgd |      68    40      9     6 |      77      46 |               [7, 8] (39,47)    12/4 |   0.9995   4.512    0.115   -0.419 |  4/4     7/70    795
+ mlp_channel_lr1e-2 |      68    40      8     6 |      76      46 |               [7, 8] (39,47)    12/4 |   0.9994   5.607    0.006   -0.212 |  4/4     6/70    772
+  (bilinear units = product units; MLP units = layer-0 / layer-1)
+
+## Start of each walk (after the plant, if any)
+        bil_channel: weights 54 (groups 27), biases 27 (groups 14), channels [4, 9, 13] (k [38, 18, 24]), train dis 0, held-out 1.0000
+      bil_plant1_s4: weights 18 (groups 9), biases 0 (groups 0), channels [4] (k [38]), train dis 0, held-out 1.0000
+      bil_plant1_s9: weights 18 (groups 9), biases 0 (groups 0), channels [9] (k [18]), train dis 0, held-out 1.0000
+     bil_plant1_s13: weights 18 (groups 9), biases 0 (groups 0), channels [13] (k [24]), train dis 0, held-out 1.0000
+     bil_from_start: weights 4108 (groups 2080), biases 27 (groups 14), channels [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] (k [30, 45, 10, 38, 44, 36, 39, 47, 18, 46, 11, 33, 24]), train dis 0, held-out 1.0000
+        mlp_channel: weights 162 (groups 96), biases 68 (groups 55), channels [2, 4, 6, 7, 8, 9] (k [45, 38, 36, 39, 47, 18]), train dis 0, held-out 0.9979
+    mlp_channel_sgd: weights 162 (groups 96), biases 68 (groups 55), channels [2, 4, 6, 7, 8, 9] (k [45, 38, 36, 39, 47, 18]), train dis 0, held-out 0.9979
+ mlp_channel_lr1e-2: weights 162 (groups 96), biases 68 (groups 55), channels [2, 4, 6, 7, 8, 9] (k [45, 38, 36, 39, 47, 18]), train dis 0, held-out 0.9979
+
+## Plants: only one channel's 3 units, every bias zero, one long retrain
+      bil_plant1_s4: s4 (k 38): at the plant 3 units / 18 weights / 0 biases, train dis 2478 (agreement 0.1219); retrain 2057 epochs (first 100% at 1958); after: dis 0, held-out 1.0000, admitted True; amplitude alpha_k 51.956, gbar margin 0.1006, margin min tr/te 0.0069/0.0071
+      bil_plant1_s9: s9 (k 18): at the plant 3 units / 18 weights / 0 biases, train dis 2011 (agreement 0.2874); retrain 1125 epochs (first 100% at 1026); after: dis 0, held-out 1.0000, admitted True; amplitude alpha_k 27.377, gbar margin 0.0524, margin min tr/te 0.0059/0.0057
+     bil_plant1_s13: s13 (k 24): at the plant 3 units / 18 weights / 0 biases, train dis 2286 (agreement 0.1899); retrain 2057 epochs (first 100% at 1958); after: dis 0, held-out 1.0000, admitted True; amplitude alpha_k 49.795, gbar margin 0.0997, margin min tr/te 0.0048/0.0047
+
+## Channel moves (every attempt; amplitude = diagonal cosine coefficient alpha_k of the logit table, an oracle-DFT read; margins from the probe)
+### bil_channel
+round  sym   k  ch norm admit epochs    ok@   dis held-out | gbar_m before/after  m_tr min before/after | amplitudes of the channels before -> after
+    1    4  38     6.20   yes    446    347     0   1.0000 |         5.739/0.647            2.467/0.099 | k [38, 24, 18]: 6.10,6.63,7.63 -> 11.97,13.58
+    2   13  24     7.66   yes   2846   2747     0   1.0000 |         0.647/0.251            0.099/0.015 | k [24, 18]: 11.97,13.58 -> 120.21
+
+### bil_from_start
+round  sym   k  ch norm admit epochs    ok@   dis held-out | gbar_m before/after  m_tr min before/after | amplitudes of the channels before -> after
+    1    3  10     1.66   yes     99      0     0   1.0000 |         7.588/9.437            2.771/5.937 | k [10, 47, 33, 44, 46, 18, 24, 45, 39, 11, 30, 38, 36]: 0.09,0.46,0.57,0.58,0.48,0.82,1.00,1.05,0.99,0.91,1.03,1.19,1.23 -> 0.60,0.72,0.76,0.62,1.05,1.26,1.32,1.26,1.21,1.28,1.52,1.58
+    2    8  47     3.12   yes     99      0     0   1.0000 |        9.437/11.342            5.937/7.632 | k [47, 33, 46, 44, 18, 24, 45, 39, 30, 11, 38, 36]: 0.60,0.72,0.62,0.76,1.05,1.26,1.32,1.26,1.28,1.21,1.52,1.58 -> 0.88,0.78,0.98,1.32,1.54,1.64,1.57,1.57,1.57,1.92,1.97
+    3   12  33     3.60   yes     99      0     0   1.0000 |       11.342/12.355            7.632/8.964 | k [33, 46, 44, 18, 24, 45, 30, 39, 11, 38, 36]: 0.88,0.78,0.98,1.32,1.54,1.64,1.57,1.57,1.57,1.92,1.97 -> 0.96,1.22,1.62,1.83,1.97,1.87,1.90,1.98,2.36,2.40
+    4   10  46     3.91   yes     99      0     0   1.0000 |       12.355/14.217           8.964/10.133 | k [46, 44, 18, 24, 45, 30, 39, 11, 38, 36]: 0.96,1.22,1.62,1.83,1.97,1.87,1.90,1.98,2.36,2.40 -> 1.50,1.94,2.18,2.33,2.21,2.28,2.44,2.86,2.87
+    5    5  44     4.32   yes     99      0     0   1.0000 |       14.217/13.652           10.133/9.800 | k [44, 18, 24, 45, 30, 39, 11, 38, 36]: 1.50,1.94,2.18,2.33,2.21,2.28,2.44,2.86,2.87 -> 2.27,2.60,2.76,2.62,2.78,2.97,3.45,3.40
+    6    9  18     5.12   yes     99      0     0   1.0000 |       13.652/14.618           9.800/10.393 | k [18, 24, 45, 30, 39, 11, 36, 38]: 2.27,2.60,2.76,2.62,2.78,2.97,3.40,3.45 -> 3.01,3.23,3.05,3.32,3.58,4.00,4.12
+    7   13  24     5.70   yes     99      0     0   1.0000 |       14.618/12.008           10.393/8.981 | k [24, 45, 30, 39, 11, 36, 38]: 3.01,3.23,3.05,3.32,3.58,4.00,4.12 -> 3.85,3.63,4.00,4.18,4.67,4.95
+    8    2  45     6.18   yes     99      0     0   1.0000 |       12.008/10.201            8.981/7.599 | k [45, 30, 39, 11, 36, 38]: 3.85,3.63,4.00,4.18,4.67,4.95 -> 4.34,4.64,5.08,5.63,6.05
+    9    1  30     6.75   yes     99      0     0   1.0000 |        10.201/8.042            7.599/5.707 | k [30, 39, 11, 36, 38]: 4.34,4.64,5.08,5.63,6.05 -> 5.72,6.06,6.69,7.39
+   10    7  39     7.75   yes     99      0     0   1.0000 |         8.042/4.423            5.707/3.514 | k [39, 11, 36, 38]: 5.72,6.06,6.69,7.39 -> 7.17,7.44,9.44
+   11    6  36     8.57   yes     99      0     0   1.0000 |         4.423/0.925            3.514/0.650 | k [36, 11, 38]: 7.44,7.17,9.44 -> 9.30,12.34
+   12   11  11     9.68   yes    242    143     0   1.0000 |         0.925/0.048            0.650/0.011 | k [11, 38]: 9.30,12.34 -> 23.58
+
+### mlp_channel
+round  sym   k  ch norm admit epochs    ok@   dis held-out | gbar_m before/after  m_tr min before/after | amplitudes of the channels before -> after
+    1    6  36     4.47   yes    487    388     0   0.9967 |       17.674/17.688            1.369/0.398 | k [36, 45, 38, 39, 18, 47]: 0.00,3.16,4.22,9.14,20.15,9.68 -> 3.02,4.70,9.79,19.99,10.72
+    2    2  45     7.56   yes    268    169     0   0.9991 |       17.688/12.309            0.398/0.376 | k [45, 38, 39, 18, 47]: 3.02,4.70,9.79,19.99,10.72 -> 4.21,9.44,19.66,10.22
+    3    4  38     7.95   yes    529    430     0   0.9995 |        12.309/5.280            0.376/0.159 | k [38, 18, 39, 47]: 4.21,19.66,9.44,10.22 -> 21.09,9.91,11.02
+    4    9  18    11.96   yes  15516  15408     0   0.9976 |         5.280/3.718            0.159/0.016 | k [18, 39, 47]: 21.09,9.91,11.02 -> 27.72,27.89
+    5    7  39    30.87    no  20000   None  1963   0.2898 |             3.718/-                0.016/- | k [39, 47]: 27.72,27.89 -> -
+    6    8  47    31.15    no  20000   None  2021   0.2690 |             3.718/-                0.016/- | k [39, 47]: 27.72,27.89 -> -
+   53    7  39    31.68    no  20000   None  2056   0.2807 |             3.802/-                0.024/- | k [39, 47]: 28.35,28.72 -> -
+   54    8  47    31.98    no  20000   None  2101   0.2654 |             3.802/-                0.024/- | k [39, 47]: 28.35,28.72 -> -
+
+### mlp_channel_sgd
+round  sym   k  ch norm admit epochs    ok@   dis held-out | gbar_m before/after  m_tr min before/after | amplitudes of the channels before -> after
+    1    6  36     4.47   yes    119     20     0   0.9995 |       17.674/17.188            1.369/1.491 | k [36, 45, 38, 39, 18, 47]: 0.00,3.16,4.22,9.14,20.15,9.68 -> 3.04,4.22,9.03,18.68,10.14
+    2    2  45     7.45   yes    130     31     0   0.9995 |       17.188/11.720            1.491/0.664 | k [45, 38, 39, 18, 47]: 3.04,4.22,9.03,18.68,10.14 -> 3.91,8.88,19.12,9.93
+    3    4  38     7.71   yes    172     73     0   0.9998 |        11.720/5.344            0.664/0.521 | k [38, 39, 18, 47]: 3.91,8.88,19.12,9.93 -> 10.36,19.66,10.30
+    4    9  18    11.73   yes   3937   3838     0   0.9985 |         5.344/4.589            0.521/0.017 | k [18, 39, 47]: 19.66,10.36,10.30 -> 36.32,27.60
+    5    8  47    30.46    no  20000   None  1951   0.2954 |             4.589/-                0.017/- | k [47, 39]: 27.60,36.32 -> -
+    6    7  39    40.44    no  20000   None  1842   0.3288 |             4.589/-                0.017/- | k [47, 39]: 27.60,36.32 -> -
+   49    8  47    33.66    no  20000   None  1963   0.2903 |             4.512/-                0.115/- | k [47, 39]: 16.48,39.51 -> -
+   50    7  39    44.57    no  20000   None  1808   0.3467 |             4.512/-                0.115/- | k [47, 39]: 16.48,39.51 -> -
+
+### mlp_channel_lr1e-2
+round  sym   k  ch norm admit epochs    ok@   dis held-out | gbar_m before/after  m_tr min before/after | amplitudes of the channels before -> after
+    1    6  36     4.47   yes    134     35     0   0.9995 |       17.674/17.690            1.369/2.047 | k [36, 45, 38, 39, 18, 47]: 0.00,3.16,4.22,9.14,20.15,9.68 -> 3.14,4.64,9.86,19.51,11.06
+    2    2  45     7.68   yes    111     12     0   1.0000 |       17.690/13.409            2.047/1.913 | k [45, 38, 18, 39, 47]: 3.14,4.64,19.51,9.86,11.06 -> 4.10,22.28,10.82,11.50
+    3    4  38     7.98   yes    100      1     0   1.0000 |        13.409/6.325            1.913/1.321 | k [38, 18, 39, 47]: 4.10,22.28,10.82,11.50 -> 25.88,11.98,12.81
+    4    9  18    13.06   yes   2215   2053     0   0.9974 |         6.325/4.013            1.321/0.050 | k [18, 39, 47]: 25.88,11.98,12.81 -> 30.39,28.36
+    5    8  47    31.50    no  20000   None  1958   0.3124 |             4.013/-                0.050/- | k [47, 39]: 28.36,30.39 -> -
+    6    7  39    34.15    no  20000   None  1758   0.3545 |             4.013/-                0.050/- | k [47, 39]: 28.36,30.39 -> -
+   48    8  47    45.52    no  20000   None  1997   0.3077 |             5.607/-                0.006/- | k [47, 39]: 39.91,42.53 -> -
+   49    7  39    48.59    no  20000   None  1912   0.3143 |             5.607/-                0.006/- | k [47, 39]: 39.91,42.53 -> -
+
+## One-channel bilinear finals, written out (U, V on the symbol's 2 input coordinates, W on its 2 head rows; T = sum_i U_i x V_i x W_i; fit T ~ A Re(e^{i psi} z_a z_b conj z_c))
+### bil_channel: channels [9]; DC head row alive False; head-bias entries alive 0 (norm 0)
+  margins on all 9409 pairs: min 0.2143 (train 0.2171, held-out 0.2143), q01/q50/q99 [0.2235, 0.2778, 0.3126], max 0.3185, non-positive 0
+  symbol s9 (candidate 47; eigenvalue phase at g_ref 3.109205 = 2 pi x 48.00000 / 97; DFT k 18 [oracle]); units [14, 31, 51]
+    unit  14: U [-4.86797, 4.10733]  V [-5.4023, 1.62273]  W [-4.82124, 1.87378]  W_DC 0.0
+    unit  31: U [-5.32678, -2.79514]  V [4.2599, 5.25716]  W [-0.11882, 4.79061]  W_DC 0.0
+    unit  51: U [-0.79177, -5.69772]  V [-1.55251, 5.66021]  W [-5.00371, -3.80464]  W_DC -0.0
+    T = [[[-130.24458, -64.10576], [63.83671, -131.90585]], [[64.13184, -132.274], [130.98304, 64.79401]]]
+    fit: A = 146.2093, psi = -2.68687; relative residual 0.0059; frame phase at e_hat 2.68672 (psi + frame phase = -0.00015); predicted margin A (1 - cos 2pi/97) = 0.3066; coordinate radius [0.99948, 1.00033]
+
+### bil_plant1_s4: channels [4]; DC head row alive False; head-bias entries alive 0 (norm 0)
+  margins on all 9409 pairs: min 0.0069 (train 0.0069, held-out 0.0071), q01/q50/q99 [0.014, 0.0763, 0.1311], max 0.1418, non-positive 0
+  symbol s4 (candidate 27; eigenvalue phase at g_ref 1.813701 = 2 pi x 27.99997 / 97; DFT k 38 [oracle]); units [2, 12, 18]
+    unit   2: U [3.3674, -3.67707]  V [-1.61319, -3.35537]  W [-3.52748, 1.44826]  W_DC 0.0
+    unit  12: U [-4.4283, 0.02566]  V [1.61365, -3.92499]  W [-1.61426, 4.4166]  W_DC -0.0
+    unit  18: U [-2.74579, -3.56817]  V [-3.4465, 0.86288]  W [2.27924, 3.44894]  W_DC 0.0
+    T = [[[52.26661, -6.78859], [6.39885, 52.22992]], [[7.03826, 51.18775], [-50.37686, 6.80481]]]
+    fit: A = 51.9566, psi = -0.13043; relative residual 0.0158; frame phase at e_hat 0.12787 (psi + frame phase = -0.00256); predicted margin A (1 - cos 2pi/97) = 0.1090; coordinate radius [0.99961, 1.00042]
+
+### bil_plant1_s9: channels [9]; DC head row alive False; head-bias entries alive 0 (norm 0)
+  margins on all 9409 pairs: min 0.0057 (train 0.0059, held-out 0.0057), q01/q50/q99 [0.0084, 0.0309, 0.0576], max 0.0628, non-positive 0
+  symbol s9 (candidate 47; eigenvalue phase at g_ref 3.109205 = 2 pi x 48.00000 / 97; DFT k 18 [oracle]); units [14, 31, 51]
+    unit  14: U [-2.53804, 3.09942]  V [-3.22348, -0.2289]  W [-2.69273, 0.28146]  W_DC 0.0
+    unit  31: U [-3.33009, -1.25001]  V [0.99108, 3.28216]  W [-0.75276, 2.80843]  W_DC 0.0
+    unit  51: U [-0.83865, -3.0779]  V [-2.36095, 2.97147]  W [-2.19176, -2.61583]  W_DC -0.0
+    T = [[[-23.88531, -12.14556], [12.12517, -24.01357]], [[11.90837, -25.29988], [25.04436, 12.20211]]]
+    fit: A = 27.3775, psi = -2.68399; relative residual 0.0230; frame phase at e_hat 2.68672 (psi + frame phase = 0.00273); predicted margin A (1 - cos 2pi/97) = 0.0574; coordinate radius [0.99948, 1.00033]
+
+### bil_plant1_s13: channels [13]; DC head row alive False; head-bias entries alive 0 (norm 0)
+  margins on all 9409 pairs: min 0.0047 (train 0.0048, held-out 0.0047), q01/q50/q99 [0.0147, 0.0746, 0.1357], max 0.1475, non-positive 0
+  symbol s13 (candidate 32; eigenvalue phase at g_ref 2.137579 = 2 pi x 33.00001 / 97; DFT k 24 [oracle]); units [6, 9, 46]
+    unit   6: U [3.6535, 0.26807]  V [-3.20875, -3.56174]  W [3.81074, 0.64565]  W_DC 0.0
+    unit   9: U [-3.22652, 3.11363]  V [-4.08349, -0.04303]  W [2.49223, 3.93193]  W_DC 0.0
+    unit  46: U [0.4032, 3.41364]  V [-3.17507, 3.98183]  W [1.26886, -3.39359]  W_DC -0.0
+    T = [[[-13.46195, 48.58036], [-47.20534, -13.30413]], [[-48.71782, -13.76618], [13.27463, -47.27068]]]
+    fit: A = 49.7949, psi = 1.84434; relative residual 0.0147; frame phase at e_hat -1.84296 (psi + frame phase = 0.00137); predicted margin A (1 - cos 2pi/97) = 0.1044; coordinate radius [0.99951, 1.00048]
+
+### bil_from_start: channels [4]; DC head row alive False; head-bias entries alive 0 (norm 0)
+  margins on all 9409 pairs: min 0.0359 (train 0.0368, held-out 0.0359), q01/q50/q99 [0.0473, 0.1154, 0.1725], max 0.1839, non-positive 0
+  symbol s4 (candidate 27; eigenvalue phase at g_ref 1.813701 = 2 pi x 27.99997 / 97; DFT k 38 [oracle]); units [2, 12, 17, 18, 29, 32]
+    unit   2: U [3.4799, -3.20948]  V [-3.05613, -1.6443]  W [-3.13318, 1.60572]  W_DC 0.0
+    unit  12: U [-3.40431, 0.1852]  V [2.36779, -2.38996]  W [-1.93894, 2.65226]  W_DC -0.0
+    unit  17: U [-2.01463, -3.13558]  V [-2.15599, 2.87413]  W [3.0129, -0.0417]  W_DC 0.0
+    unit  18: U [-3.12849, -2.8712]  V [-2.62478, -2.85451]  W [-0.78119, 2.80019]  W_DC -0.0
+    unit  29: U [3.46843, 0.69172]  V [2.51845, 2.53215]  W [2.3968, 2.07028]  W_DC -0.0
+    unit  32: U [-1.37009, 3.25031]  V [-3.26399, 3.21539]  W [-2.0529, -2.40436]  W_DC 0.0
+    T = [[[67.3782, -8.31111], [7.82454, 66.41377]], [[8.85303, 66.84826], [-66.48847, 9.12395]]]
+    fit: A = 67.3245, psi = -0.12701; relative residual 0.0093; frame phase at e_hat 0.12787 (psi + frame phase = 0.00086); predicted margin A (1 - cos 2pi/97) = 0.1412; coordinate radius [0.99961, 1.00042]
+
+## MLP finals: surviving structure
+### mlp_channel: L0 units 12, L1 units 4; single-symbol L0 12 / 12; symbols read [7, 8] (k [39, 47]); written [7, 8] (k [39, 47])
+    L0 unit  21: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit  27: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit  44: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit  46: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit  47: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit  56: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit  84: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit 104: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit 108: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit 110: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit 114: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit 120: a [7] | b [7]   k: a [39] | b [39]
+    L1 unit  22: fan-in 3 in_syms [7] writes [7]
+    L1 unit  55: fan-in 3 in_syms [8] writes [8]
+    L1 unit  87: fan-in 3 in_syms [8] writes [8]
+    L1 unit 108: fan-in 3 in_syms [7] writes [7]
+
+### mlp_channel_sgd: L0 units 12, L1 units 4; single-symbol L0 12 / 12; symbols read [7, 8] (k [39, 47]); written [7, 8] (k [39, 47])
+    L0 unit  21: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit  27: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit  44: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit  46: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit  47: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit  56: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit  84: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit 104: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit 108: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit 110: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit 114: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit 120: a [7] | b [7]   k: a [39] | b [39]
+    L1 unit  22: fan-in 3 in_syms [7] writes [7]
+    L1 unit  55: fan-in 3 in_syms [8] writes [8]
+    L1 unit  87: fan-in 3 in_syms [8] writes [8]
+    L1 unit 108: fan-in 3 in_syms [7] writes [7]
+
+### mlp_channel_lr1e-2: L0 units 12, L1 units 4; single-symbol L0 12 / 12; symbols read [7, 8] (k [39, 47]); written [7, 8] (k [39, 47])
+    L0 unit  21: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit  27: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit  44: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit  46: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit  47: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit  56: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit  84: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit 104: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit 108: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit 110: a [8] | b [8]   k: a [47] | b [47]
+    L0 unit 114: a [7] | b [7]   k: a [39] | b [39]
+    L0 unit 120: a [7] | b [7]   k: a [39] | b [39]
+    L1 unit  22: fan-in 3 in_syms [7] writes [7]
+    L1 unit  55: fan-in 3 in_syms [8] writes [8]
+    L1 unit  87: fan-in 3 in_syms [8] writes [8]
+    L1 unit 108: fan-in 3 in_syms [7] writes [7]
+
+## Drift twins (the walk's start, nothing pruned, the admitted rounds' epoch counts replayed with the arm's optimizer)
+        bil_channel: 6 chunks, 3771 epochs; held-out min 1.0000 median 1.0000 final 1.0000; max train disagreements 0
+      bil_plant1_s4: no admitted rounds
+      bil_plant1_s9: no admitted rounds
+     bil_plant1_s13: no admitted rounds
+     bil_from_start: 20 chunks, 3299 epochs; held-out min 1.0000 median 1.0000 final 1.0000; max train disagreements 0
+        mlp_channel: 8 chunks, 17398 epochs; held-out min 0.9997 median 1.0000 final 1.0000; max train disagreements 0
+    mlp_channel_sgd: 11 chunks, 5491 epochs; held-out min 0.9997 median 1.0000 final 1.0000; max train disagreements 0
+ mlp_channel_lr1e-2: 10 chunks, 3692 epochs; held-out min 1.0000 median 1.0000 final 1.0000; max train disagreements 0
+
+## Logit-table energy at the end (DFT read, oracle): diagonal / DC / n90 / top k
+        bil_channel: 1.0000 / 0.0000 / 1 / [18, 43, 7, 4, 32, 8]
+      bil_plant1_s4: 0.9998 / 0.0000 / 1 / [38, 2, 23, 34, 13, 44]
+      bil_plant1_s9: 0.9995 / 0.0000 / 1 / [18, 43, 7, 4, 21, 15]
+     bil_plant1_s13: 0.9998 / 0.0000 / 1 / [24, 37, 12, 48, 1, 36]
+     bil_from_start: 0.9999 / 0.0000 / 1 / [38, 2, 23, 34, 13, 37]
+        mlp_channel: 0.9874 / 0.0001 / 2 / [47, 39, 44, 20, 38, 6]
+    mlp_channel_sgd: 0.9872 / 0.0033 / 2 / [39, 47, 3, 19, 38, 20]
+ mlp_channel_lr1e-2: 0.9883 / 0.0012 / 2 / [39, 47, 19, 3, 38, 44]
+
+## Admitted rounds: bil_channel
+  r  0   start            weights    54  total groups    41  total scalars    81  channels  3  held-out 1.0000
+  r  1 channel       ch4  weights    36  total groups    31  total scalars    61  channels  2  held-out 1.0000
+  r  2 channel      ch13  weights    18  total groups    21  total scalars    41  channels  1  held-out 1.0000
+  r  6   group       b:W  weights    18  total groups    15  total scalars    29  channels  1  held-out 1.0000
+  r 10   group       b:W  weights    18  total groups    12  total scalars    23  channels  1  held-out 1.0000
+  r 14   group       b:W  weights    18  total groups    10  total scalars    20  channels  1  held-out 1.0000
+  r 18   group       b:W  weights    18  total groups     9  total scalars    18  channels  1  held-out 1.0000
+
+## Admitted rounds: bil_plant1_s4
+  r  0   start            weights    18  total groups     9  total scalars    18  channels  1  held-out 1.0000
+
+## Admitted rounds: bil_plant1_s9
+  r  0   start            weights    18  total groups     9  total scalars    18  channels  1  held-out 1.0000
+
+## Admitted rounds: bil_plant1_s13
+  r  0   start            weights    18  total groups     9  total scalars    18  channels  1  held-out 1.0000
+
+## Admitted rounds: bil_from_start
+  r  0   start            weights  4108  total groups  2094  total scalars  4135  channels 13  held-out 1.0000
+  r  1 channel       ch3  weights  3796  total groups  1937  total scalars  3821  channels 12  held-out 1.0000
+  r  2 channel       ch8  weights  3484  total groups  1780  total scalars  3507  channels 11  held-out 1.0000
+  r  3 channel      ch12  weights  3172  total groups  1623  total scalars  3193  channels 10  held-out 1.0000
+  r  4 channel      ch10  weights  2860  total groups  1466  total scalars  2879  channels  9  held-out 1.0000
+  r  5 channel       ch5  weights  2548  total groups  1309  total scalars  2565  channels  8  held-out 1.0000
+  r  6 channel       ch9  weights  2236  total groups  1152  total scalars  2251  channels  7  held-out 1.0000
+  r  7 channel      ch13  weights  1924  total groups   995  total scalars  1937  channels  6  held-out 1.0000
+  r  8 channel       ch2  weights  1612  total groups   838  total scalars  1623  channels  5  held-out 1.0000
+  r  9 channel       ch1  weights  1300  total groups   681  total scalars  1309  channels  4  held-out 1.0000
+  r 10 channel       ch7  weights   988  total groups   524  total scalars   995  channels  3  held-out 1.0000
+  r 11 channel       ch6  weights   676  total groups   367  total scalars   681  channels  2  held-out 1.0000
+  r 12 channel      ch11  weights   364  total groups   210  total scalars   367  channels  1  held-out 1.0000
+  r 13   group         U  weights   182  total groups   106  total scalars   185  channels  1  held-out 1.0000
+  r 14   group         V  weights    91  total groups    54  total scalars    94  channels  1  held-out 1.0000
+  r 15   group         W  weights    73  total groups    39  total scalars    76  channels  1  held-out 1.0000
+  r 16   group       b:W  weights    73  total groups    38  total scalars    74  channels  1  held-out 1.0000
+  r 20   group       b:W  weights    73  total groups    37  total scalars    73  channels  1  held-out 1.0000
+  r 21   group         U  weights    55  total groups    28  total scalars    55  channels  1  held-out 1.0000
+  r 23   group         W  weights    42  total groups    21  total scalars    42  channels  1  held-out 1.0000
+  r 25   group         V  weights    36  total groups    18  total scalars    36  channels  1  held-out 1.0000
+
+## Admitted rounds: mlp_channel
+  r  0   start            weights   162  total groups   151  total scalars   230  channels  6  held-out 0.9979
+  r  1 channel       ch6  weights   159  total groups   147  total scalars   224  channels  5  held-out 0.9967
+  r  2 channel       ch2  weights   142  total groups   132  total scalars   201  channels  4  held-out 0.9991
+  r  3 channel       ch4  weights   115  total groups   107  total scalars   164  channels  3  held-out 0.9995
+  r  4 channel       ch9  weights    68  total groups    66  total scalars   103  channels  2  held-out 0.9976
+  r 12   group    b:head  weights    68  total groups    61  total scalars    93  channels  2  held-out 0.9974
+  r 16   group  b:layer0  weights    68  total groups    58  total scalars    90  channels  2  held-out 0.9980
+  r 18   group    b:head  weights    68  total groups    55  total scalars    85  channels  2  held-out 0.9980
+  r 28   group  b:layer0  weights    68  total groups    53  total scalars    83  channels  2  held-out 0.9979
+
+## Admitted rounds: mlp_channel_sgd
+  r  0   start            weights   162  total groups   151  total scalars   230  channels  6  held-out 0.9979
+  r  1 channel       ch6  weights   159  total groups   147  total scalars   224  channels  5  held-out 0.9995
+  r  2 channel       ch2  weights   142  total groups   132  total scalars   201  channels  4  held-out 0.9995
+  r  3 channel       ch4  weights   115  total groups   107  total scalars   164  channels  3  held-out 0.9998
+  r  4 channel       ch9  weights    68  total groups    66  total scalars   103  channels  2  held-out 0.9985
+  r 10   group  b:layer0  weights    68  total groups    60  total scalars    97  channels  2  held-out 0.9986
+  r 11   group  b:layer1  weights    68  total groups    58  total scalars    95  channels  2  held-out 0.9992
+  r 12   group    b:head  weights    68  total groups    53  total scalars    85  channels  2  held-out 0.9994
+  r 16   group  b:layer0  weights    68  total groups    50  total scalars    82  channels  2  held-out 0.9994
+  r 22   group  b:layer0  weights    68  total groups    48  total scalars    80  channels  2  held-out 0.9995
+  r 28   group  b:layer0  weights    68  total groups    47  total scalars    79  channels  2  held-out 0.9995
+  r 30   group    b:head  weights    68  total groups    46  total scalars    77  channels  2  held-out 0.9995
+
+## Admitted rounds: mlp_channel_lr1e-2
+  r  0   start            weights   162  total groups   151  total scalars   230  channels  6  held-out 0.9979
+  r  1 channel       ch6  weights   159  total groups   147  total scalars   224  channels  5  held-out 0.9995
+  r  2 channel       ch2  weights   142  total groups   132  total scalars   201  channels  4  held-out 1.0000
+  r  3 channel       ch4  weights   115  total groups   107  total scalars   164  channels  3  held-out 1.0000
+  r  4 channel       ch9  weights    68  total groups    66  total scalars   103  channels  2  held-out 0.9974
+  r 10   group  b:layer0  weights    68  total groups    60  total scalars    97  channels  2  held-out 0.9979
+  r 12   group    b:head  weights    68  total groups    55  total scalars    87  channels  2  held-out 0.9988
+  r 16   group  b:layer0  weights    68  total groups    52  total scalars    84  channels  2  held-out 0.9991
+  r 18   group    b:head  weights    68  total groups    49  total scalars    79  channels  2  held-out 0.9988
+  r 22   group  b:layer0  weights    68  total groups    47  total scalars    77  channels  2  held-out 0.9989
+  r 28   group  b:layer0  weights    68  total groups    46  total scalars    76  channels  2  held-out 0.9994
+
