@@ -99,11 +99,20 @@ def decide(gate, cur, tri, n_kept, tol, delta):
 
 
 def gated_walk(stats_fn, base_child, cand_child, order_idx, gate, tol, delta,
-               budget=None, on_change=None):
+               budget=None, on_change=None, groups=False):
     """`census_extend`'s loop with the ADMISSION TEST swapped. Identical to
     `incremental.census_walk` when `gate == "world"` (gate P-1). One audition for the base and
     one per candidate offered, which is what the loop pays; the world's decision on the same
-    trial is recorded at every step whatever the gate decides."""
+    trial is recorded at every step whatever the gate decides.
+
+    [sostenuto] `groups=True` makes each entry of `cand_child` a GROUP of rows rather than one
+    row, which is what an admission unit is in the loop: a `ClassMiner` at-support KEY emits the
+    capped cross product of its half-classes' lower rows, and the loop admits or refuses the key.
+    DEFAULT OFF, so pp4/pp5 are unchanged (their candidates are single rows), and `read_pair` is
+    refused under it because its changed-set test `entry == len(kept)` assumes one added row."""
+    if groups:
+        assert gate in ("world", "read", "read_m", "ungated"), (
+            f"gate {gate!r} is not defined over candidate GROUPS")
     cur = stats_fn(base_child)
     n_aud = 1
     kept = [list(map(int, r_)) for r_ in base_child]
@@ -113,7 +122,9 @@ def gated_walk(stats_fn, base_child, cand_child, order_idx, gate, tol, delta,
         on_change(n_aud, kept)
     walk = order_idx if budget is None else order_idx[:int(budget)]
     for ci in walk:
-        tri = stats_fn(kept + [list(map(int, cand_child[ci]))])
+        add = ([list(map(int, r_)) for r_ in cand_child[ci]] if groups
+               else [list(map(int, cand_child[ci]))])                       # [sostenuto]
+        tri = stats_fn(kept + add)
         n_aud += 1
         a_g, why = decide(gate, cur, tri, len(kept), tol, delta)
         a_w = bool(tri["e"] <= cur["e"] + tol)
@@ -122,7 +133,7 @@ def gated_walk(stats_fn, base_child, cand_child, order_idx, gate, tol, delta,
         if a_g and not a_w:
             rec["cost_rows"].append(float(tri["e"] - cur["e"]))
         if a_g:
-            kept = kept + [list(map(int, cand_child[ci]))]
+            kept = kept + add                                               # [sostenuto]
             rec["admitted"].append(int(ci))
             cur = tri
         else:

@@ -99,6 +99,29 @@ read's level on the preplayed state in place of the world's count of repairs, th
 advantage over no gate at the loop's budget and 0.57 at the full walk, the frozen and twin readouts in that seat
 worse than no gate. Full record: [`preplay/README.md`](preplay/README.md).
 
+### [`sostenuto/`](sostenuto/README.md) — the value reader's gate on the miner's live build, in the loop (2026-09-21 → 23)
+
+**Goal**: put pp5's seat inside the loop, on the arms of record. The first design step found those arms have no table
+gate at all: the census extension op pp4 and pp5 transcribed never ran on them (`recert` on, `extend` off, open
+inventory, zero extension events; its candidate lister is inert under the class miner), and their operative table is
+the miner's live support-count build. So the seat is an admission set on the live build, walked at the loop's own
+cadence, cap and pool in count order, with the gate as the one knob: the world's error, the read's strict pooled level,
+nothing (round 1, two seeds), then the fired state's next-level share at support in the learner's own miner times the
+read's level, and the miner's own demand from above with no fire (round 2, the yield gate at two seeds).
+
+**Finding**: the seat works mechanically at zero world queries and costs seconds; the read gate admits less junk than
+no gate on both seeds and refuses good entries at three to eight times its offline rate; any gate in this seat decides
+on a median of one to five changed instances of 192, so it is starved; and a refusal at one level is paid at the next
+for both organs (the world's L2 refusals block seven of the ungated arm's L3 keys on each seed, the read's L3 refusals
+block three of nine and eight of twenty-two L4 keys), while the deep-era task-error ordering inverts across seeds. The
+next-level currency is empty at the frontier by construction, since the level above holds nothing at support until the
+keys below are served, so the round-2 gates are silent at the top of the ladder and prune hardest where they act early
+on thin evidence (fifteen of twenty-four L3 keys blocked at seed 2, seventeen of nineteen for the demand gate, two
+commits cancelled on empty builds). The op's order is what is wrong, not its organ: a next-level currency's evidence
+arrives after admission, so the op it wants is admit-then-grade, provisional admission with revocation on positive
+evidence, the arc's provisional-commitment finding recurring in the value seat. Full record:
+[`sostenuto/README.md`](sostenuto/README.md).
+
 ## The question
 
 `sotto_voce` asked whether the world has to be paid for verdicts on the probe channel's counterfactuals, the
@@ -367,6 +390,10 @@ mirror re-run with the reservoir sample, from aliquot's own queue.
 > arm are retired on the nested DP parse (flat within 0.04 under both-loss shaping on both seeds, §4) and on the
 > never-trained twin ranking within 0.03–0.07 of the shaped trunk at the chooser's cell.
 
+> **2026-09-23.** pp5's seat went into the loop as the child [`sostenuto/`](sostenuto/README.md), re-aimed at the
+> miner's live build once the census op was found never to have run on the arms of record; five gates over two rounds
+> and two seeds, and the conclusion that the currency wants admit-then-grade.
+
 ## Files
 
 | file | purpose |
@@ -381,5 +408,6 @@ mirror re-run with the reservoir sample, from aliquot's own queue.
 | `duplex/` | the shaping step offline ([`duplex/README.md`](duplex/README.md)) |
 | `soundboard/` | the shaping step in the loop ([`soundboard/README.md`](soundboard/README.md)) |
 | `preplay/` | the projection read offline on banked state: within-context discrimination and the candidate entry's price ([`preplay/README.md`](preplay/README.md)) |
+| `sostenuto/` | the value reader's gate on the miner's live build, in the loop: five gates, two seeds, and the admit-then-grade conclusion ([`sostenuto/README.md`](sostenuto/README.md)) |
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

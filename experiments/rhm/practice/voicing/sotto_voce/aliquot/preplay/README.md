@@ -345,6 +345,15 @@ small budgets. pp5's read gate is worst at L3 on both seeds, its margin form is 
 paired form is its pooled form by identity. Neither consumer round ran inside the loop, and the two arms of record
 are the only arms they ran on. Nothing off the RHM practice substrate.
 
+**Correction, 2026-09-21, later the same day.** §5 and §6 call `census_extend` "the loop's own consumer of candidate
+entries". It is the census lineage's op over a frozen committed table, and the arms of record never ran it: `sb_sv_yk`
+at both seeds carries `recert` but not `extend`, runs `open_inventory`, and logged zero extension events. On those arms
+the operative table is the miner's live support-count build over the operative lower table, rebuilt on 157 of 201
+cycles at seed 0, and no decision consumes a world audition of the table (the commit is by clock yoke with its audition
+logged only; the recert is measured and never acted on). pp4 and pp5 therefore transcribe an op these plants did not
+run, in the setting those plants' tables are in (setting (b), the learner's own rows from an empty base). The in-loop
+test is an admission set on the live build ([`../sostenuto/`](../sostenuto/README.md)).
+
 ## Reproduction
 
 ```bash
@@ -382,8 +391,9 @@ id is in [`FILES.md`](FILES.md). Volumes: `rhm-scaling-data:/rhm_practice_within
 
 ## Next steps (queued in `QUEUE.md`[^private], not started)
 
-The read gate inside the loop: `census_extend` with the world's audition replaced by the read's level, on a fork at
-the two arms of record (queue (viii)), after a design step on the paired margin · the delta form at a smaller base ·
+The read gate inside the loop, re-aimed (queue (viii), in flight as [`../sostenuto/`](../sostenuto/README.md)): an
+admission set on the live build the arms of record actually run, gated by the world, the read's strict pooled level, or
+nothing; see the correction below · the delta form at a smaller base ·
 the chooser's grader seat with a ranker rather than a level reader, a design step · one dump line in the next fork for
 L5's build, the frozen tables' rows and the miner's per-key counts, and a `vo_heads.pt` written after a final refresh.
 

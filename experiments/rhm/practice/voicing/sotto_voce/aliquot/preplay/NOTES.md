@@ -440,7 +440,11 @@ python3 $B/reduce_incremental.py --tag pp4 --fetch
 pp4 settled that the executor's own score is the right ORDER and that the value readout is not
 a scheduler. The readout's seat is the other half of `census_extend`: the loop's gate is an
 ORACLE READ — "did the world's error on the gate pool rise?" — and the readout is the thing
-that gets to see the preplayed state and put a number on it. **Can that number stand in for the
+that gets to see the preplayed state and put a number on it. *(Correction, later the same day:
+`census_extend` is the census lineage's op and never ran on the arms of record, which carry
+`recert` but not `extend` and run open inventory with zero extension events; their live
+consumer is the miner's support-count build with no gate. See the README's correction note and
+`../sostenuto/README.md`.)* **Can that number stand in for the
 world's verdict?** This is the fully endogenous consumer and the seat where the read replaces
 the oracle.
 
