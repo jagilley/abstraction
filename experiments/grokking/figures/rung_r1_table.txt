@@ -1,0 +1,52 @@
+# grokking / rung -- tag r1; K from mint m1 (B/lt1), k=13: K=[10, 11, 18, 24, 30, 33, 36, 38, 39, 44, 45, 46, 47]
+# K is the top-13 of the mint producer order: True; producer order [30, 45, 10, 38, 44, 36, 39, 47, 18, 46, 11, 33, 24, 13, 22, 12, 7, 41, 20, 43, 25, 17, 35, 2, 31, 9, 4, 26, 19, 42, 27, 1, 14, 48, 23, 21, 37, 29, 34, 5, 40, 28, 32, 3, 16, 6, 15, 8]
+# lowE = [8, 15, 6, 16, 3, 32, 28, 40, 5, 34, 29, 37, 21];  top1 = 30 (== the ALS/m3 kept K: True)
+# recipe {'lr': 0.001, 'wd': 1.0, 'seed': 42, 'eval_every': 10}; epochs = first eval epoch (every 10) with test acc >= thr; runs stop at test 1.0 or the cap; '-' = not reached within cap
+# par*ep = params x (epochs+1); flops100 = 6 x params x n_train x (e100+1). Bilinear: logits = W((U x_a) * (V x_b)) + b, width m. peak_te on the stored 100-epoch curve grid.
+
+## Main arms (train fraction 0.3)
+                     arm   alph  learner    m  frac  n_tr    D  params    e99   e100    cap final_te final_tr    peak_te@ep  par*ep99 par*ep100  flops100   sec
+       main_raw_bilinear    raw bilinear   52   0.3  2822  194   15229   5240  16740  40000   1.0000   1.0000  1.000@16740   79815189 254948689 4316791202148    53
+            main_raw_mlp    raw      mlp    -   0.3  2822  194   53985  16040  18520  40000   1.0000   1.0000  1.000@18520  865973385 999856185 16929564924420   111
+    main_minted_bilinear minted bilinear   52   0.3  2822   52    7845   2630   3760  40000   1.0000   1.0000  1.000@3760    20640195  29505045 499579421940    11
+         main_minted_mlp minted      mlp    -   0.3  2822   52   35809   4570   9520  40000   1.0000   1.0000  1.000@9520   163682939 340937489 5772753563748    68
+     main_all48_bilinear  all48 bilinear   52   0.3  2822  192   15125      -      -  40000   0.0038   1.0000  0.010@0              -         -         -   160
+          main_all48_mlp  all48      mlp    -   0.3  2822  192   53729      -      -  40000   0.0006   1.0000  0.011@0              -         -         -   200
+      main_lowE_bilinear   lowE bilinear   52   0.3  2822   52    7845   2810   3390  40000   1.0000   1.0000  1.000@3390    22052295  26602395 450431752140    14
+           main_lowE_mlp   lowE      mlp    -   0.3  2822   52   35809   4450   6520  40000   1.0000   1.0000  1.000@6520   159385859 233510489 3953799599748    28
+      main_top1_bilinear   top1 bilinear   52   0.3  2822    4    5349      -      -  40000   0.3349   0.4529  0.337@33100          -         -         -   115
+   main_top1_bilinear_m4   top1 bilinear    4   0.3  2822    4     501      -      -  40000   0.0982   0.1541  0.127@26800          -         -         -    88
+           main_top1_mlp   top1      mlp    -   0.3  2822    4   29665      -      -  40000   0.5458   0.8838  0.714@8300           -         -         -   283
+
+## Sweep (mlp): all arms by train fraction (0.3 rows are the main arms)
+                     arm   alph  learner    m  frac  n_tr    D  params    e99   e100    cap final_te final_tr    peak_te@ep  par*ep99 par*ep100  flops100   sec
+            main_raw_mlp    raw      mlp    -   0.3  2822  194   53985  16040  18520  40000   1.0000   1.0000  1.000@18520  865973385 999856185 16929564924420   111
+         main_minted_mlp minted      mlp    -   0.3  2822   52   35809   4570   9520  40000   1.0000   1.0000  1.000@9520   163682939 340937489 5772753563748    68
+           main_top1_mlp   top1      mlp    -   0.3  2822    4   29665      -      -  40000   0.5458   0.8838  0.714@8300           -         -         -   283
+          sweep_raw_f0.2    raw      mlp    -   0.2  1881  194   53985      -      - 150000   0.0003   1.0000  0.010@0              -         -         -   722
+       sweep_minted_f0.2 minted      mlp    -   0.2  1881   52   35809   7660   8830 150000   1.0000   1.0000  1.000@8830   274332749 316229279 3568963642794    57
+         sweep_top1_f0.2   top1      mlp    -   0.2  1881    4   29665      -      - 150000   0.4624   0.9527  0.517@16900          -         -         -   922
+          sweep_raw_f0.1    raw      mlp    -   0.1   940  194   53985      -      - 150000   0.0000   1.0000  0.009@0              -         -         -   865
+       sweep_minted_f0.1 minted      mlp    -   0.1   940   52   35809      -      - 150000   0.0157   1.0000  0.020@13800          -         -         -   494
+         sweep_top1_f0.1   top1      mlp    -   0.1   940    4   29665      -      - 150000   0.2425   1.0000  0.266@9100           -         -         -   804
+         sweep_raw_f0.05    raw      mlp    -  0.05   470  194   53985      -      - 150000   0.0008   1.0000  0.010@0              -         -         -   945
+      sweep_minted_f0.05 minted      mlp    -  0.05   470   52   35809      -      - 150000   0.0068   1.0000  0.009@99300          -         -         -   756
+        sweep_top1_f0.05   top1      mlp    -  0.05   470    4   29665      -      - 150000   0.1553   1.0000  0.160@6400           -         -         -   653
+         sweep_raw_f0.02    raw      mlp    -  0.02   188  194   53985      -      - 150000   0.0016   1.0000  0.010@0              -         -         -   617
+      sweep_minted_f0.02 minted      mlp    -  0.02   188   52   35809      -      - 150000   0.0081   1.0000  0.011@84600          -         -         -   372
+        sweep_top1_f0.02   top1      mlp    -  0.02   188    4   29665      -      - 150000   0.0894   1.0000  0.096@2100           -         -         -   709
+
+## Sweep summary: epochs to 0.99 / 1.0 test (final test acc), mlp
+ frac  n_tr |                      raw |                   minted |                     top1
+  0.3  2822 |   16040 /  18520 (1.000) |    4570 /   9520 (1.000) |       - /      - (0.546)
+  0.2  1881 |       - /      - (0.000) |    7660 /   8830 (1.000) |       - /      - (0.462)
+  0.1   940 |       - /      - (0.000) |       - /      - (0.016) |       - /      - (0.243)
+ 0.05   470 |       - /      - (0.001) |       - /      - (0.007) |       - /      - (0.155)
+ 0.02   188 |       - /      - (0.002) |       - /      - (0.008) |       - /      - (0.089)
+
+## Control arms added after r1 (tag r1ctrl, merged via --extra-tags): all48n = all48 scaled by sqrt(k/48), per-input norm equal to minted's
+                     arm   alph  learner    m  frac  n_tr    D  params    e99   e100    cap final_te final_tr    peak_te@ep  par*ep99 par*ep100  flops100   sec
+         ctrl_all48n_mlp all48n      mlp    -   0.3  2822  192   53729      -      -  40000   0.0006   1.0000  0.011@0              -         -         -   231
+    ctrl_all48n_bilinear all48n bilinear   52   0.3  2822  192   15125      -      -  40000   0.0044   1.0000  0.012@0              -         -         -   128
+
+# consistency: main_raw_mlp is the mint net's recipe (seed 42, same split): first test>=0.99 / 1.0 at 16040 / 18520 (mint m1, 50-epoch grid: 16050 / 18550)

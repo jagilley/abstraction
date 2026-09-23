@@ -1,0 +1,61 @@
+# grokking / rung controls -- tag r2; seed 42, train fraction 0.3, CPU
+# e99/e100 = first eval epoch (every 10) with test acc >= thr ('-' = never within cap); peak on the stored 100-epoch grid
+# probe on all p^2 pairs: gbar = diagonal-averaged row-centred logit, gbar_margin = gbar(0) - max_{d!=0} gbar(d); margin = logit[true] - max other; alpha_w = cosine coefficient of gbar
+
+equal-amplitude margins of sum_{w in K} cos(2 pi w d/p) (peak minus runner-up), computed exactly: top1 {30}: 0.002097; K13: 9.958; all 48: 48.50
+
+## Control A: all-48 WITH DC (square, F = s*Q, Q orthogonal) as a reparameterization of one-hot, MLP
+                   arm      feat        init                    opt init|dlogit|    e99   e100    cap final_te final_tr    peak_te@ep gbar_margin diag_frac
+      A1_f_transported all48dc_f transported      adamw lr0.001 wd1     4.47e-08      -      -  40000   0.0003   1.0000  0.009@0            5.248     0.005
+          A1_q_default all48dc_q     default      adamw lr0.001 wd1            -      -      -  40000   0.0005   1.0000  0.010@0            4.671     0.004
+      A1_q_transported all48dc_q transported      adamw lr0.001 wd1     4.47e-08      -      -  40000   0.0005   1.0000  0.010@0            4.782     0.004
+A2_q_transported_sgd_lr0.1_wd0.001_m0.9 all48dc_q transported sgd lr0.1 wd0.001 m0.9     4.47e-08  28060      - 100000   0.9989   1.0000  1.000@65500        5.798     0.443
+A2_q_transported_sgd_lr0.3_wd0.0003333_m0.9 all48dc_q transported sgd lr0.3 wd0.0003333 m0.9     4.47e-08  22210      - 100000   0.9998   1.0000  1.000@27900        6.642     0.510
+A2_q_transported_sgd_lr1_wd0.0001_m0.9 all48dc_q transported  sgd lr1 wd0.0001 m0.9     4.47e-08  34650  53530 100000   1.0000   1.0000  1.000@53530        7.644     0.483
+A2_raw_sgd_lr0.1_wd0.001_m0.9       raw     default sgd lr0.1 wd0.001 m0.9            -  27850      - 100000   0.9985   1.0000  1.000@81800        5.787     0.443
+A2_raw_sgd_lr0.3_wd0.0003333_m0.9       raw     default sgd lr0.3 wd0.0003333 m0.9            -  25140      - 100000   0.9951   1.0000  0.999@32800        6.522     0.549
+A2_raw_sgd_lr1_wd0.0001_m0.9       raw     default  sgd lr1 wd0.0001 m0.9            -  42350      - 100000   0.9994   1.0000  0.999@94700        8.466     0.441
+A2_raw_sgd_lr1_wd0.001_m0.9       raw     default   sgd lr1 wd0.001 m0.9            -      -      - 100000   0.0083   0.0149  0.219@2300    -2.053e-18     0.000
+  reference (r1): raw one-hot MLP e99/e100 = 16040/18520; all48 (no DC, cos/sin scale) and all48n never solve (test <= 0.0044).
+  A2 trajectory match lr0.1_wd0.001_m0.9 (raw vs q-transported, SGD, 1001 shared evals on the 100-epoch grid): max |d test| 0.203, max |d train| 0.0078, max |d loss| 0.0121; first epoch with relative |d loss| > 1e-4: 2000, |d test| > 0.01: 14700
+  A2 trajectory match lr0.3_wd0.0003333_m0.9 (raw vs q-transported, SGD, 1001 shared evals on the 100-epoch grid): max |d test| 0.16, max |d train| 0.272, max |d loss| 0.303; first epoch with relative |d loss| > 1e-4: 600, |d test| > 0.01: 11900
+  A2 trajectory match lr1_wd0.0001_m0.9 (raw vs q-transported, SGD, 536 shared evals on the 100-epoch grid): max |d test| 0.43, max |d train| 0.25, max |d loss| 1.64; first epoch with relative |d loss| > 1e-4: 200, |d test| > 0.01: 18000
+
+## Control B1: bilinear m=4 top1 with the exact one-frequency solution planted (amplitude A = t^3, U = V = t*selector, W = t*base), then the recipe (AdamW lr 1e-3 wd 1.0), no early stop, 20k epochs
+     A |  test acc at epoch  init / 500 / 1k / 5k / 10k / 20k | min test |    alpha_30 at init / 1k / 20k |   gbar_margin init / 20k | te margin min 20k |  wnorm init/20k
+     1 |        1.000 / 0.103 / 0.104 / 0.116 / 0.109 / 0.106 |    0.098 |              1 / 1.828 / 2.746 |   0.002097 / 0.003863    |            -1.052 |   14.2/19.8   
+    10 |        1.000 / 0.205 / 0.139 / 0.121 / 0.112 / 0.107 |    0.092 |             10 / 4.651 / 2.641 |    0.02097 / 0.003163    |            -1.144 |   30.6/19.5   
+   100 |        1.000 / 0.344 / 0.276 / 0.122 / 0.117 / 0.112 |    0.091 |            100 / 15.44 / 2.952 |     0.2097 / 0.004097    |            -1.172 |     66/20.7   
+  1000 |        1.000 / 0.894 / 0.506 / 0.133 / 0.117 / 0.113 |    0.090 |           1000 / 79.82 / 3.067 |      2.097 / 0.004105    |            -1.187 |    142/21.4   
+ 10000 |        1.000 / 1.000 / 1.000 / 0.152 / 0.122 / 0.098 |    0.098 |          1e+04 / 690.4 / 2.411 |      20.97 / -0.001326   |             -1.15 |    306/18     
+
+## Control B2: weight-decay sweep from random init, top1 alphabet, AdamW lr 1e-3, cap 40k, stop at 1.0
+     learner    wd params |    e99   e100 final_te final_tr    peak_te@ep |  alpha_30 gbar_margin te_margin_mean   wnorm
+bilinear m=4   1.0    501 |      -      -   0.0982   0.1541  0.127@26800  |     2.647    0.005407        -0.3561    22.2
+bilinear m=4   0.1    501 |  12300  14550   1.0000   1.0000  1.000@14550  |     522.2       1.094         0.9782    79.6
+bilinear m=4  0.01    501 |   7560   7940   1.0000   1.0000  1.000@7940   |     517.4       1.081         0.9675    87.7
+bilinear m=4   0.0    501 |   7290   7640   1.0000   1.0000  1.000@7640   |     517.2        1.08         0.9668    87.8
+         mlp   1.0  29665 |      -      -   0.5458   0.8838  0.714@8300   |     86.91      0.5498       -0.02997    71.3
+         mlp   0.1  29665 |      -      -   0.9838   1.0000  0.989@20200  |     374.4       8.923          7.884     127
+         mlp  0.01  29665 |      -      -   0.9851   1.0000  0.985@39900  |     831.4       12.84          11.32     135
+         mlp   0.0  29665 |      -      -   0.9736   1.0000  0.974@39200  |      1248       15.14           12.8     150
+  reference (r1, wd 1.0): top1 mlp final 0.546 (peak 0.714), top1 bilinear m=4 final 0.098
+
+## Control B3: r1's minted-13 bilinear arm (m=52, 7845 params) re-run with probes
+B3_minted13_bil_40k: e99 2630 e100 3760 (r1: 2630 / 3760), epochs run 40000, final test 1.0000
+   epoch     -1: test 0.0105 | alpha over K13 min/mean/max -0.001/0.000/0.001 sum 0.001 | gbar_margin -0.002856 (gbar0 0.0006226) | margin test min/mean -0.8622/-0.3026 train min/mean -0.8535/-0.303 | diag_frac 0.000 | wnorm 8.2 | top5 alpha [[0.00089, 46], [0.0008, 18], [0.00035, 10], [0.00013, 11], [0.0001, 39]]
+   epoch   1000: test 0.2314 | alpha over K13 min/mean/max 0.420/0.691/1.003 sum 8.982 | gbar_margin 6.456 (gbar0 8.982) | margin test min/mean -21.61/-2.88 train min/mean 0.4304/3.175 | diag_frac 0.161 | wnorm 32.6 | top5 alpha [[1.00326, 30], [0.91141, 11], [0.85613, 44], [0.84116, 18], [0.79275, 24]]
+   epoch   2000: test 0.8694 | alpha over K13 min/mean/max 0.303/0.742/1.213 sum 9.645 | gbar_margin 6.631 (gbar0 9.645) | margin test min/mean -8.027/2.325 train min/mean 2.617/4.754 | diag_frac 0.419 | wnorm 31.8 | top5 alpha [[1.21285, 30], [1.11387, 38], [1.07612, 11], [1.00538, 44], [0.91351, 39]]
+   epoch   3000: test 0.9986 | alpha over K13 min/mean/max 0.154/0.768/1.126 sum 9.984 | gbar_margin 7.046 (gbar0 9.984) | margin test min/mean -1.966/4.366 train min/mean 3.18/5.648 | diag_frac 0.596 | wnorm 33 | top5 alpha [[1.12595, 38], [1.10287, 39], [1.0709, 30], [1.00073, 11], [0.88656, 36]]
+   epoch  10000: test 1.0000 | alpha over K13 min/mean/max 0.033/1.106/1.680 sum 14.381 | gbar_margin 9.766 (gbar0 14.38) | margin test min/mean 1.183/7.468 train min/mean 6.536/8.522 | diag_frac 0.712 | wnorm 32.8 | top5 alpha [[1.67974, 39], [1.64593, 11], [1.37691, 47], [1.35773, 10], [1.33579, 18]]
+   epoch  20000: test 1.0000 | alpha over K13 min/mean/max 0.582/1.470/2.850 sum 19.106 | gbar_margin 13.66 (gbar0 19.11) | margin test min/mean 4.387/10.67 train min/mean 9.831/12.06 | diag_frac 0.766 | wnorm 36.8 | top5 alpha [[2.84978, 46], [2.17721, 10], [1.90195, 45], [1.84054, 38], [1.76624, 30]]
+   epoch  30000: test 1.0000 | alpha over K13 min/mean/max 0.310/1.592/2.399 sum 20.691 | gbar_margin 15.84 (gbar0 20.69) | margin test min/mean 7.532/12.83 train min/mean 12.22/14.13 | diag_frac 0.811 | wnorm 40.2 | top5 alpha [[2.39947, 38], [2.3033, 45], [2.10173, 33], [1.879, 24], [1.7912, 44]]
+   epoch  39999: test 1.0000 | alpha over K13 min/mean/max 1.047/1.497/1.873 sum 19.459 | gbar_margin 15.21 (gbar0 19.46) | margin test min/mean 10.64/13.99 train min/mean 13.27/14.81 | diag_frac 0.937 | wnorm 41.9 | top5 alpha [[1.87262, 33], [1.65416, 36], [1.61297, 45], [1.60029, 38], [1.55873, 10]]
+   alpha per w at the last probe: {'10': 1.558733, '11': 1.351675, '18': 1.046929, '24': 1.550515, '30': 1.529981, '33': 1.872624, '36': 1.654161, '38': 1.600294, '39': 1.341443, '44': 1.408426, '45': 1.612974, '46': 1.506843, '47': 1.424193}
+B3_minted13_bil_stop: e99 2630 e100 3760 (r1: 2630 / 3760), epochs run 3761, final test 1.0000
+   epoch     -1: test 0.0105 | alpha over K13 min/mean/max -0.001/0.000/0.001 sum 0.001 | gbar_margin -0.002856 (gbar0 0.0006226) | margin test min/mean -0.8622/-0.3026 train min/mean -0.8535/-0.303 | diag_frac 0.000 | wnorm 8.2 | top5 alpha [[0.00089, 46], [0.0008, 18], [0.00035, 10], [0.00013, 11], [0.0001, 39]]
+   epoch   1000: test 0.2314 | alpha over K13 min/mean/max 0.420/0.691/1.003 sum 8.982 | gbar_margin 6.456 (gbar0 8.982) | margin test min/mean -21.61/-2.88 train min/mean 0.4304/3.175 | diag_frac 0.161 | wnorm 32.6 | top5 alpha [[1.00326, 30], [0.91141, 11], [0.85613, 44], [0.84116, 18], [0.79275, 24]]
+   epoch   2000: test 0.8694 | alpha over K13 min/mean/max 0.303/0.742/1.213 sum 9.645 | gbar_margin 6.631 (gbar0 9.645) | margin test min/mean -8.027/2.325 train min/mean 2.617/4.754 | diag_frac 0.419 | wnorm 31.8 | top5 alpha [[1.21285, 30], [1.11387, 38], [1.07612, 11], [1.00538, 44], [0.91351, 39]]
+   epoch   3000: test 0.9986 | alpha over K13 min/mean/max 0.154/0.768/1.126 sum 9.984 | gbar_margin 7.046 (gbar0 9.984) | margin test min/mean -1.966/4.366 train min/mean 3.18/5.648 | diag_frac 0.596 | wnorm 33 | top5 alpha [[1.12595, 38], [1.10287, 39], [1.0709, 30], [1.00073, 11], [0.88656, 36]]
+   epoch   3760: test 1.0000 | alpha over K13 min/mean/max 0.094/0.800/1.233 sum 10.398 | gbar_margin 7.588 (gbar0 10.4) | margin test min/mean 0.04415/4.983 train min/mean 3.641/6.017 | diag_frac 0.649 | wnorm 33.7 | top5 alpha [[1.23281, 36], [1.18778, 38], [1.04717, 45], [1.02643, 30], [1.0003, 24]]
+   alpha per w at the last probe: {'10': 0.094422, '11': 0.909927, '18': 0.819692, '24': 1.000296, '30': 1.026433, '33': 0.565829, '36': 1.232806, '38': 1.187776, '39': 0.989863, '44': 0.581373, '45': 1.047169, '46': 0.479547, '47': 0.462885}
