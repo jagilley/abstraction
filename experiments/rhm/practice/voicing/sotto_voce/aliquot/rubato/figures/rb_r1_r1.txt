@@ -1,0 +1,27 @@
+# GATE R-1  rb_r1  arm st_pf_gn  (preflight substrate)
+
+plan: 27 cycles, era boundaries (advances) at [6, 12, 17, 22, 27]
+saved at c12 (an era boundary) and c14 (mid-era); every run continued to c24
+
+containers (MODAL_TASK_ID): {'A': 'ta-01M37YV25H1Y18WASM2ZMTEFXR', 'B1': 'ta-01M380B1MSDC349AJRH0WDJ49R', 'B2': 'ta-01M380B3735YGM393V4400ZEVR', 'F1': 'ta-01M380B3P29RJ5HDQX2RWERFMR', 'F2': 'ta-01M380B373JGVZ9CE4EP0W5KWR', 'A2': 'ta-01M37YV8MNTWC3YVG8D4P5WCXR'}
+errors: none
+
+run  digest=   state   file first div   max|de|  resumed from / R-2
+A2   False         4      0      None         0  uninterrupted
+       state paths: ['/env/ex/vo/cfg', '/env/vo_rec/cfg/rb_ck_every', '/env/vo_rec/cfg/rb_ck_era', '/rng/python/1']
+B1   True          0      0      None         0  c12 (era_last=True) R-2 PASS falsify=[]
+B2   False         1      1      None         0  c14 (era_last=False) R-2 PASS falsify=[]
+       state paths: ['/env/log/vo_om']
+       file paths:  ['/log/vo_om[19]/w_norm: 4.9126548857360515 vs 4.912654885736052']
+F1   False        40     40        13         0  c12 (era_last=True) R-2 PASS falsify=['rng:torch_cpu']
+       state paths: ['/env/_adm/passes', '/env/generator/_modules/token_embedding', '/env/generator/_modules/position_embedding', '/env/generator/_modules/encoder', '/env/generator/_modules/final_norm', '/env/generator/_modules/feature_head']
+       file paths:  ['/log/vloss[13]: 0.11369594931602478 vs 0.11369594186544418', '/log/vloss[14]: 0.031020287424325943 vs 0.031020281836390495', '/log/vloss[15]: 0.0589938759803772 vs 0.058994218707084656', '/log/vloss[16]: 0.0448371060192585 vs 0.0448371022939682']
+F2   False        40     40        13         0  c12 (era_last=True) R-2 PASS falsify=['local:grng']
+       state paths: ['/env/_adm/passes', '/env/generator/_modules/token_embedding', '/env/generator/_modules/position_embedding', '/env/generator/_modules/encoder', '/env/generator/_modules/final_norm', '/env/generator/_modules/feature_head']
+       file paths:  ['/log/vloss[13]: 0.11369594931602478 vs 0.11369594186544418', '/log/vloss[14]: 0.031020287424325943 vs 0.031020281836390495', '/log/vloss[15]: 0.0589938759803772 vs 0.058994218707084656', '/log/vloss[16]: 0.0448371060192585 vs 0.0448371022939682']
+
+donor st_pf_gn (sostenuto.run_arm) vs A2 on A2's substrate: {'series_max_abs': {'e': 0.0, 'succ': 0.0, 'dres': 0.0, 't_cum': 0.0, 'n_moves': 0.0, 'width': 0.0, 'g_per_solve': 0.0, 'e_practice': 0.0, 'vloss': 0.0, 'gloss': 0.0, 'n_solved': 0.0, 'n_mined': 0.0, 'm_per_solve': 0.0}, 'commits_equal': True, 'n': 24, 'log_keys_differing': ['entry'], 't_s': 754.2}
+
+saves in A (cycle, bytes, s): [[1, 21405597, 7.568], [2, 26121440, 9.253], [3, 30828046, 12.321], [4, 43799446, 17.507], [5, 52738381, 20.975], [6, 60462322, 25.005], [7, 69976134, 28.509], [8, 76443162, 32.132], [9, 83420131, 34.507], [10, 89363168, 36.74], [11, 95739433, 40.211], [12, 99375029, 43.05], [13, 104358232, 45.202], [14, 109344220, 51.09], [15, 114501534, 49.495], [16, 118627647, 62.694], [17, 123190507, 52.748], [18, 127692699, 54.878], [19, 131890193, 57.587], [20, 136238937, 61.454], [21, 140281222, 58.083], [22, 144394265, 59.827], [23, 148550733, 62.164], [24, 151865755, 63.505]]
+
+VERDICT: {"floor_A_vs_A2_bit_exact": false, "R1_B1_era_boundary": true, "R1_B2_mid_era": false, "falsify_F1_torch_cpu_RED": true, "falsify_F2_grng_RED": true, "tasks_distinct": true, "donor_series_zero": true, "ALL": false}

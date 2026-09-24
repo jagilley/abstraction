@@ -337,6 +337,10 @@ response's sign and interaction, and layer norm does neither. The law holds at m
 This node's calibration, adaptation's clock and projection's public level hold on every reader; "the response is private" holds against linear public
 readers and not a nonlinear one at the shallow levels. Full record: [`precision/README.md`](precision/README.md).
 
+> **2026-09-23.** The `+logits` arm ran ([`precision/README.md`](precision/README.md) §8a): what the ridge lacks is one scalar of the
+> logits' absolute level (the log-partition or the max logit), not the belief's directions; the directions alone buy nothing on any column, seed or
+> venue, and the layer-normed state plus that scalar reproduces `+log q` column for column.
+
 ## Reproduction
 
 ```bash

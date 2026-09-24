@@ -1,0 +1,952 @@
+[sostenuto] rb_g2 — THE ADMISSION SET ON THE LIVE BUILD
+  arms ['st_gw_yk', 'st_gr_yk', 'st_gn_yk', 'st_gy_yk', 'rb_gw_yk', 'rb_gr_yk']   no-walk reference sb_s2/sb_sv_yk
+  read from: st_gw_yk<-st_s2  st_gr_yk<-st_s2  st_gn_yk<-st_s2  st_gy_yk<-st2_s2  rb_gw_yk<-rb_g2  rb_gr_yk<-rb_g2
+
+====================================================================================================
+[A] THE GATES, RUN-LEVEL, OFF THE ARM FILES
+====================================================================================================
+    st_gw_yk   PASS
+      A-1r:n_passes                                21
+      A-1r:n_offered                               50
+      A-2r:conf                                    {'TT': 45, 'TF': 0, 'FT': 0, 'FF': 5}
+      A-4r:max_pool_overlap                        0
+      A-9r:n_world_billed                          15552
+      A-1c(repro vs readgate.gated_walk)           True
+      A-4(read handed the world's level)           True
+      A-5(a constant level admits everything)      True
+      n_unfit                                      13
+      n_pending_serve                              {'2': 43, '3': 495, '4': 505, '5': 133}
+      n_admitted_empty                             {}
+      n_empty_fallback                             {}
+      n_rekey_collide                              0
+      counterfactual on the repro pass: world: adm 5/6 e 0.1406  read: adm 6/6 e 0.1458  none: adm 6/6 e 0.1458
+    st_gr_yk   PASS
+      A-1r:n_passes                                18
+      A-1r:n_offered                               50
+      A-2r:conf                                    {'TT': 30, 'TF': 4, 'FT': 14, 'FF': 2}
+      A-4r:max_pool_overlap                        0
+      A-9r:n_world_billed                          0
+      A-1c(repro vs readgate.gated_walk)           True
+      A-4(read handed the world's level)           True
+      A-5(a constant level admits everything)      True
+      n_unfit                                      13
+      n_pending_serve                              {'2': 43, '3': 495, '4': 505, '5': 127}
+      n_admitted_empty                             {}
+      n_empty_fallback                             {}
+      n_rekey_collide                              5
+      counterfactual on the repro pass: world: adm 5/6 e 0.1406  read: adm 6/6 e 0.1458  none: adm 6/6 e 0.1458
+    st_gn_yk   PASS
+      A-1r:n_passes                                27
+      A-1r:n_offered                               73
+      A-2r:conf                                    {'TT': 65, 'TF': 8, 'FT': 0, 'FF': 0}
+      A-4r:max_pool_overlap                        0
+      A-9r:n_world_billed                          0
+      A-1c(repro vs readgate.gated_walk)           True
+      A-4(read handed the world's level)           True
+      A-5(a constant level admits everything)      True
+      n_unfit                                      13
+      n_pending_serve                              {'2': 43, '3': 495, '4': 505, '5': 172}
+      n_admitted_empty                             {}
+      n_empty_fallback                             {}
+      n_rekey_collide                              0
+      counterfactual on the repro pass: world: adm 5/6 e 0.1406  read: adm 6/6 e 0.1458  none: adm 6/6 e 0.1458
+    st_gy_yk   FAIL — A-3r FAILED: st_gy_yk cancelled a commit for an empty admitted build
+    rb_gw_yk   PASS
+      A-1r:n_passes                                27
+      A-1r:n_offered                               64
+      A-2r:conf                                    {'TT': 60, 'TF': 4, 'FT': 0, 'FF': 0}
+      A-4r:max_pool_overlap                        0
+      A-9r:n_world_billed                          0
+      A-1c(repro vs readgate.gated_walk)           True
+      A-4(read handed the world's level)           True
+      A-5(a constant level admits everything)      True
+      n_unfit                                      14
+      n_pending_serve                              {'2': 43, '3': 495, '4': 505, '5': 138}
+      n_admitted_empty                             {}
+      n_empty_fallback                             {}
+      n_rekey_collide                              0
+      counterfactual on the repro pass: world: adm 5/6 e 0.1406  read: adm 6/6 e 0.1458  none: adm 6/6 e 0.1458
+    rb_gr_yk   PASS
+      A-1r:n_passes                                25
+      A-1r:n_offered                               79
+      A-2r:conf                                    {'TT': 73, 'TF': 6, 'FT': 0, 'FF': 0}
+      A-4r:max_pool_overlap                        0
+      A-9r:n_world_billed                          0
+      A-1c(repro vs readgate.gated_walk)           True
+      A-4(read handed the world's level)           True
+      A-5(a constant level admits everything)      True
+      n_unfit                                      13
+      n_pending_serve                              {'2': 43, '3': 495, '4': 505, '5': 138}
+      n_admitted_empty                             {}
+      n_empty_fallback                             {}
+      n_rekey_collide                              0
+      counterfactual on the repro pass: world: adm 5/6 e 0.1406  read: adm 6/6 e 0.1458  none: adm 6/6 e 0.1458
+
+====================================================================================================
+[B] THE ADMITTED TABLE'S TEST-POOL ERROR — PAIRED, and INSIDE THE LEVEL'S OWN ERA
+====================================================================================================
+    The gate and test pools are drawn on the ERA'S OWN CELL, so a level-l macro's
+    audition is only comparable with another pass's inside the era whose cell is
+    at level l. Pooling over eras reads the CELL MOVING UP as the table getting
+    worse: the late-pass rises to 0.8-0.97 are a level-2 macro being auditioned on
+    an era-4 cell, not a level-2 table that has decayed. The comparison of record
+    is therefore PAIRED and WITHIN-PASS: `admitted - live` is the same plant, the
+    same pool and the same cycle, so it isolates the gate.
+
+    st_gw_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+    st_gr_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+    st_gn_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+    st_gy_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+    rb_gw_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+    rb_gr_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+
+    arm         L  era    window   n  adm-live    median  <0  =0  >0  e_test(adm)   e(live)
+    st_gw_yk    2    2    61-110   3   +0.0273   +0.0312   1   0   2       0.3346    0.3073
+    st_gw_yk    2  all    c1-end  11   +0.0099   +0.0039   4   1   6       0.4432    0.4332
+    st_gw_yk    3    3   111-180   3   +0.0000   +0.0000   0   3   0       0.3945    0.3945
+    st_gw_yk    3  all    c1-end  10   +0.0000   +0.0000   0  10   0       0.4969    0.4969
+    st_gw_yk    4    4         —   0  (no pass in that era)
+    st_gw_yk    4  all    c1-end   6   +0.0000   +0.0000   0   6   0       0.1647    0.1647
+    st_gw_yk    5    5   193-201   1   +0.0000   +0.0000   0   1   0       0.0938    0.0938
+    st_gw_yk    5  all    c1-end   4   +0.0000   +0.0000   0   4   0       0.3994    0.3994
+
+    st_gr_yk    2    2    61-110   3   +0.0000   +0.0000   0   3   0       0.2878    0.2878
+    st_gr_yk    2  all    c1-end  10   +0.0000   +0.0000   0  10   0       0.3895    0.3895
+    st_gr_yk    3    3   111-180   3   +0.2135   +0.1758   0   0   3       0.5391    0.3255
+    st_gr_yk    3  all    c1-end  11   +0.1715   +0.1797   0   1  10       0.5852    0.4137
+    st_gr_yk    4    4         —   0  (no pass in that era)
+    st_gr_yk    4  all    c1-end   5   -0.0008   +0.0000   1   4   0       0.3055    0.3063
+    st_gr_yk    5    5         —   0  (no pass in that era)
+    st_gr_yk    5  all    c1-end   1   +0.0000   +0.0000   0   1   0       0.6172    0.6172
+
+    st_gn_yk    2    2    61-110   2   +0.0000   +0.0000   0   2   0       0.2930    0.2930
+    st_gn_yk    2  all    c1-end   9   +0.0000   +0.0000   0   9   0       0.4028    0.4028
+    st_gn_yk    3    3   111-180   2   +0.0000   +0.0000   0   2   0       0.3340    0.3340
+    st_gn_yk    3  all    c1-end  10   +0.0000   +0.0000   0  10   0       0.4277    0.4277
+    st_gn_yk    4    4         —   0  (no pass in that era)
+    st_gn_yk    4  all    c1-end  11   +0.0000   +0.0000   0  11   0       0.4322    0.4322
+    st_gn_yk    5    5   193-201   1   +0.0000   +0.0000   0   1   0       0.0938    0.0938
+    st_gn_yk    5  all    c1-end   7   +0.0000   +0.0000   0   7   0       0.5731    0.5731
+
+    st_gy_yk    2    2    61-110   1   +0.2656   +0.2656   0   0   1       0.5547    0.2891
+    st_gy_yk    2  all    c1-end   9   +0.1033   +0.1094   0   0   9       0.5681    0.4648
+    st_gy_yk    3    3   111-180   2   -0.0273   -0.0273   1   1   0       0.7773    0.8047
+    st_gy_yk    3  all    c1-end   6   -0.0117   +0.0000   2   4   0       0.8359    0.8477
+
+    rb_gw_yk    2    2    61-110   4   +0.0000   +0.0000   0   4   0       0.2969    0.2969
+    rb_gw_yk    2  all    c1-end  13   +0.0000   +0.0000   0  13   0       0.4056    0.4056
+    rb_gw_yk    3    3   111-180   4   +0.0000   +0.0000   0   4   0       0.3174    0.3174
+    rb_gw_yk    3  all    c1-end  13   +0.0000   +0.0000   0  13   0       0.4204    0.4204
+    rb_gw_yk    4    4   181-192   1   +0.0000   +0.0000   0   1   0       0.2109    0.2109
+    rb_gw_yk    4  all    c1-end  11   -0.0011   +0.0000   1  10   0       0.2301    0.2312
+    rb_gw_yk    5    5   193-201   1   +0.0000   +0.0000   0   1   0       0.0938    0.0938
+    rb_gw_yk    5  all    c1-end   6   +0.0000   +0.0000   0   6   0       0.4336    0.4336
+
+    rb_gr_yk    2    2    61-110   4   +0.0596   +0.0742   0   1   3       0.2979    0.2383
+    rb_gr_yk    2  all    c1-end  13   +0.0204   +0.0000   1   8   4       0.4525    0.4321
+    rb_gr_yk    3    3   111-180   7   +0.0123   +0.0000   1   5   1       0.3728    0.3605
+    rb_gr_yk    3  all    c1-end  13   +0.0066   +0.0000   1  11   1       0.4372    0.4306
+    rb_gr_yk    4    4   181-192   1   +0.0000   +0.0000   0   1   0       0.1328    0.1328
+    rb_gr_yk    4  all    c1-end  13   -0.0003   +0.0000   1  12   0       0.2145    0.2148
+    rb_gr_yk    5    5         —   0  (no pass in that era)
+    rb_gr_yk    5  all    c1-end   3   +0.0000   +0.0000   0   3   0       0.4766    0.4766
+
+    `none` is identically 0.0000 in every cell by construction — its admitted
+    table IS the live build — which is the reduction's own consistency check.
+
+====================================================================================================
+[B2] THE SAME ROWS AT MATCHED CYCLES, across arms
+====================================================================================================
+    A pass fires only where a level has an undecided at-support key, so the arms
+    run passes on different cycles. These are the (cycle, level) cells where at
+    least two arms both ran one: the plants have diverged by then, but the pool
+    is drawn on the same seed family and the cycle is the same.
+
+     cyc  L    world gate adm/live     read gate adm/live       no gate adm/live    yield gate adm/live graded, world adm/live  graded, read adm/live
+       5  2    0.2227/0.2266 (5/6)    0.2266/0.2266 (6/6)    0.2266/0.2266 (6/6)    0.4102/0.2266 (4/6)    0.2266/0.2266 (6/6)    0.2266/0.2266 (6/6)
+      10  2   0.2070/0.2422 (6/10)  0.2422/0.2422 (10/10)  0.2422/0.2422 (10/10)   0.3633/0.2422 (5/10)  0.2422/0.2422 (10/10)  0.2422/0.2422 (10/10)
+      20  2   0.3086/0.2695 (7/11)  0.2695/0.2695 (11/11)  0.2695/0.2695 (11/11)   0.3438/0.2695 (5/11)  0.2695/0.2695 (11/11)  0.2695/0.2695 (11/11)
+      25  2   0.2422/0.2266 (8/12)  0.2266/0.2266 (12/12)  0.2266/0.2266 (12/12)   0.3555/0.2266 (5/12)  0.2266/0.2266 (12/12)  0.2266/0.2266 (12/12)
+      30  2   0.2422/0.2266 (9/13)  0.2266/0.2266 (13/13)  0.2266/0.2266 (13/13)   0.3359/0.2266 (5/13)  0.2266/0.2266 (13/13)  0.2266/0.2266 (13/13)
+      65  2   0.3750/0.3086 (9/14)                      —                      —   0.5547/0.2891 (7/15)  0.2969/0.2969 (13/14)                      —
+      65  3    0.5547/0.5547 (1/1)    0.5547/0.5547 (1/1)    0.5547/0.5547 (1/1)                      —    0.4492/0.4492 (2/2)    0.5547/0.5547 (1/1)
+      70  2                      —  0.2773/0.2773 (14/14)  0.2773/0.2773 (14/14)                      —                      —                      —
+      70  3  0.4648/0.4648 (16/16)   0.5938/0.3984 (4/34)  0.3984/0.3984 (34/34)                      —  0.4062/0.4062 (37/37)  0.3555/0.3555 (24/24)
+      75  2                      —                      —                      —                      —  0.3164/0.3164 (14/14)  0.2227/0.2227 (12/13)
+      75  3                      —   0.5312/0.3633 (5/45)  0.3633/0.3633 (45/45)    0.7969/0.7969 (2/2)  0.3281/0.3281 (39/39)  0.4414/0.4414 (28/28)
+      80  3  0.4414/0.4414 (20/20)                      —                      —                      —  0.3320/0.3320 (50/50)                      —
+      85  3                      —   0.5273/0.2656 (5/62)  0.2812/0.2812 (60/60)    0.8164/0.8164 (7/7)  0.2695/0.2695 (53/53)  0.3359/0.3359 (24/24)
+      95  2  0.3359/0.3047 (10/15)  0.3047/0.3047 (16/16)                      —                      —                      —                      —
+      95  3  0.4180/0.4180 (24/24)   0.5117/0.3242 (5/64)                      —                      —                      —                      —
+     100  3                      —   0.5391/0.3594 (7/68)  0.3516/0.3516 (62/62)                      —                      —  0.4141/0.4141 (26/26)
+     105  2  0.2930/0.3086 (11/16)                      —  0.3086/0.3086 (15/15)                      —  0.2773/0.2773 (13/15)  0.3398/0.2500 (10/14)
+     105  3  0.4688/0.4688 (26/26)                      —  0.3320/0.3320 (66/66)                      —  0.2891/0.2891 (53/53)                      —
+     110  2                      —                      —                      —                      —  0.2969/0.2969 (14/15)  0.3086/0.2461 (11/14)
+     110  3                      —   0.5742/0.3281 (9/70)  0.3516/0.3516 (67/67)                      —  0.3281/0.3281 (48/57)                      —
+     115  3                      —   0.6328/0.2930 (9/72)                      —    0.7617/0.8164 (7/8)                      —  0.4023/0.4023 (32/32)
+     115  4    0.1562/0.1562 (2/2)    0.1562/0.1562 (1/1)    0.5938/0.5938 (1/1)                      —    0.1562/0.1562 (1/1)    0.1562/0.1562 (1/1)
+     120  4                      —                      —  0.6953/0.6953 (16/16)                      —  0.2109/0.2109 (24/24)  0.2109/0.2109 (20/20)
+     125  3                      —                      —                      —                      —  0.3125/0.3125 (46/55)  0.4492/0.3594 (40/55)
+     125  4  0.1719/0.1719 (24/24)                      —  0.5781/0.5781 (31/31)                      —  0.1719/0.1719 (48/48)  0.1719/0.1719 (24/24)
+     125  5                      —                      —                      —                      —    0.6016/0.6016 (1/1)    0.6016/0.6016 (1/1)
+     130  2  0.8438/0.8516 (12/17)  0.8438/0.8438 (17/17)                      —                      —                      —                      —
+     130  3  0.3750/0.3750 (28/28)  0.5430/0.3672 (14/77)                      —                      —                      —  0.3633/0.3672 (40/55)
+     130  4                      —                      — 0.4141/0.4141 (108/108)                      —  0.1875/0.1875 (56/56)  0.1875/0.1875 (40/40)
+     135  3                      —                      —                      —                      —  0.2812/0.2812 (55/55)  0.3789/0.3789 (46/55)
+     135  4  0.1758/0.1758 (48/48)  0.1758/0.1758 (32/32) 0.4258/0.4258 (136/136)                      —  0.1758/0.1758 (60/60)  0.1758/0.1758 (44/44)
+     140  4  0.1562/0.1562 (64/64)                      — 0.3320/0.3320 (168/168)                      —                      —                      —
+     145  4  0.1992/0.1992 (80/80)                      — 0.2500/0.2500 (184/184)                      —  0.2227/0.2227 (88/88)  0.1992/0.1992 (56/56)
+     150  4                      —  0.1562/0.1562 (40/40) 0.2539/0.2539 (200/200)                      —                      —  0.1602/0.1602 (60/68)
+     155  2                      —                      —                      —                      —  0.8320/0.8320 (14/16)  0.8125/0.8164 (14/16)
+     155  4                      —                      — 0.3125/0.3125 (204/204)                      —                      —  0.1797/0.1797 (64/72)
+     155  5                      —                      —    0.7031/0.7031 (4/4)                      —                      —  0.6055/0.6055 (32/32)
+     160  2  0.8125/0.8086 (13/18)                      —                      —   0.8594/0.8242 (9/17)                      —                      —
+     160  3  0.4102/0.4102 (34/34)                      —  0.3906/0.3906 (74/74)  0.7930/0.7930 (17/18)                      —  0.3867/0.3867 (53/55)
+     160  4                      —                      — 0.1445/0.1445 (208/208)                      —                      — 0.1406/0.1406 (92/108)
+     160  5  0.3320/0.3320 (48/48)                      —  0.4961/0.4961 (48/48)                      —                      —                      —
+     165  4                      —  0.1484/0.1523 (40/56)                      —                      — 0.1602/0.1602 (108/108)                      —
+     165  5                      —                      —  0.7891/0.7891 (64/64)                      —  0.6289/0.6289 (52/52)                      —
+     170  4 0.1289/0.1289 (100/100)                      —                      —                      — 0.1328/0.1328 (104/128)                      —
+     170  5  0.5586/0.5586 (52/52)                      —  0.7227/0.7227 (80/80)                      —                      —                      —
+     180  4                      —                      —                      —                      — 0.1484/0.1602 (120/144) 0.1484/0.1484 (68/104)
+     185  3                      —                      —                      —  0.8516/0.8672 (20/21)  0.8164/0.8164 (63/63)                      —
+     190  5                      —                      — 0.6406/0.6406 (128/128)                      —  0.3789/0.3789 (96/96)                      —
+     197  2  0.9922/0.9922 (14/19)  0.9961/0.9961 (18/19)  0.9922/0.9922 (18/18)  0.9961/0.9922 (10/19)  0.9922/0.9922 (14/17)  0.9961/0.9961 (16/19)
+     197  3  0.9648/0.9648 (43/43)  0.9883/0.9805 (44/96)  0.9766/0.9766 (85/85)  0.9961/0.9961 (20/22)  0.9766/0.9766 (65/65)  0.9727/0.9727 (75/77)
+     197  4                      —  0.8906/0.8906 (44/60) 0.7539/0.7539 (224/224)                      — 0.7539/0.7539 (120/144) 0.7617/0.7617 (104/152)
+     197  5  0.0938/0.0938 (68/68)                      — 0.0938/0.0938 (144/144)                      — 0.0938/0.0938 (112/112)                      —
+    52 shared (cycle, level) cells of 77 distinct cells over the three arms
+
+====================================================================================================
+[C] WHAT THE ADMITTED TABLE HOLDS — precision, recall, junk share
+====================================================================================================
+    arm         L rows(adm) rows(live)  share   prec   junk  recall keys adm keys rej
+    st_gw_yk    2        14         19   0.74  0.714  0.286   0.714       14        5
+    st_gw_yk    3        43         43   1.00  0.372  0.628   0.286       10        0
+    st_gw_yk    4       100        100   1.00  0.120  0.880   0.015        7        0
+    st_gw_yk    5        68         68   1.00  0.309  0.691   0.000        4        0
+    st_gr_yk    2        18         19   0.95  0.667  0.333   0.857       18        1
+    st_gr_yk    3        44         96   0.46  0.318  0.682   0.250       10       10
+    st_gr_yk    4        44         60   0.73  0.045  0.955   0.002        4        0
+    st_gr_yk    5         1          1   1.00  1.000  0.000   0.000        1        0
+    st_gn_yk    2        18         18   1.00  0.667  0.333   0.857       18        0
+    st_gn_yk    3        85         85   1.00  0.282  0.718   0.429       21        0
+    st_gn_yk    4       224        224   1.00  0.103  0.897   0.028       11        0
+    st_gn_yk    5       144        144   1.00  0.007  0.993   0.000        9        0
+    st_gy_yk    2        10         19   0.53  0.600  0.400   0.429       10        9
+    st_gy_yk    3        20         22   0.91  0.450  0.550   0.161        4        1
+    rb_gw_yk    2        14         17   0.82  0.786  0.214   0.786       14        0
+    rb_gw_yk    3        65         65   1.00  0.323  0.677   0.375       14        0
+    rb_gw_yk    4       120        144   0.83  0.200  0.800   0.029        7        0
+    rb_gw_yk    5       112        112   1.00  0.241  0.759   0.000        7        0
+    rb_gr_yk    2        16         19   0.84  0.812  0.188   0.929       13        0
+    rb_gr_yk    3        75         77   0.97  0.440  0.560   0.589       15        0
+    rb_gr_yk    4       104        152   0.68  0.221  0.779   0.028        9        0
+    rb_gr_yk    5        48         48   1.00  0.042  0.958   0.000        3        0
+
+====================================================================================================
+[D] THE PER-CANDIDATE CONFUSION AGAINST THE WORLD GATE (pp5's table)
+====================================================================================================
+    TT admitted and the world agrees · TF admitted where the world would refuse
+       (THE JUNK LET IN) · FT refused where the world would admit (THE GOOD
+       ENTRIES REFUSED) · FF refused and the world agrees.
+    pp5, offline, at the loop's budget: world admits ~95% of what it is offered,
+    so raw agreement is not evidence; the composition is. `read` there: TF 0.022
+    FT 0.050 against ungated's TF 0.045 FT 0.000.
+
+
+    THE READOUT IS NOT FIT BEFORE ITS FIRST REFIT (`vo_om_min` 512 filed rows).
+    Until then `VoProjBank.predict` answers 0.5 for every row, the pooled
+    difference is exactly 0 and the strict rule admits — so those trials are the
+    NO-GATE arm's decisions and a read-vs-world comparison on them is vacuous.
+    They are marked `[unfit]` and the read's confusion is restated without them.
+
+    arm          L     n    TT    TF    FT    FF  agree  TF rate  FT rate  unfit
+    st_gw_yk     2    19    14     0     0     5  1.000    0.000    0.000     13
+    st_gw_yk     3    13    13     0     0     0  1.000    0.000    0.000      0
+    st_gw_yk     4    13    13     0     0     0  1.000    0.000    0.000      0
+    st_gw_yk     5     5     5     0     0     0  1.000    0.000    0.000      0
+    st_gw_yk   all    50    45     0     0     5  1.000    0.000    0.000     13
+    st_gw_yk   fit    37    36     0     0     1  1.000    0.000    0.000      0
+    st_gw_yk   deep    31    31     0     0     0  1.000    0.000    0.000      0
+
+    st_gr_yk     2    19    14     4     1     0  0.737    0.211    0.053     13
+    st_gr_yk     3    24    10     0    12     2  0.500    0.000    0.500      0
+    st_gr_yk     4     6     5     0     1     0  0.833    0.000    0.167      0
+    st_gr_yk     5     1     1     0     0     0  1.000    0.000    0.000      0
+    st_gr_yk   all    50    30     4    14     2  0.640    0.080    0.280     13
+    st_gr_yk   fit    37    21     0    14     2  0.622    0.000    0.378      0
+    st_gr_yk   deep    31    16     0    13     2  0.581    0.000    0.419      0
+
+    st_gn_yk     2    18    14     4     0     0  0.778    0.222    0.000     13
+    st_gn_yk     3    24    24     0     0     0  1.000    0.000    0.000      0
+    st_gn_yk     4    22    20     2     0     0  0.909    0.091    0.000      0
+    st_gn_yk     5     9     7     2     0     0  0.778    0.222    0.000      0
+    st_gn_yk   all    73    65     8     0     0  0.890    0.110    0.000     13
+    st_gn_yk   fit    60    56     4     0     0  0.933    0.067    0.000      0
+    st_gn_yk   deep    55    51     4     0     0  0.927    0.073    0.000      0
+
+    st_gy_yk     2    19     9     1     5     4  0.684    0.053    0.263     13
+    st_gy_yk     3     8     6     0     1     1  0.875    0.000    0.125      0
+    st_gy_yk   all    27    15     1     6     5  0.741    0.037    0.222     13
+    st_gy_yk   fit    14    10     1     2     1  0.786    0.071    0.143      0
+    st_gy_yk   deep     8     6     0     1     1  0.875    0.000    0.125      0
+
+    rb_gw_yk     2    21    17     4     0     0  0.810    0.190    0.000     14
+    rb_gw_yk     3    19    19     0     0     0  1.000    0.000    0.000      0
+    rb_gw_yk     4    17    17     0     0     0  1.000    0.000    0.000      0
+    rb_gw_yk     5     7     7     0     0     0  1.000    0.000    0.000      0
+    rb_gw_yk   all    64    60     4     0     0  0.938    0.062    0.000     14
+    rb_gw_yk   fit    50    50     0     0     0  1.000    0.000    0.000      0
+    rb_gw_yk   deep    43    43     0     0     0  1.000    0.000    0.000      0
+
+    rb_gr_yk     2    24    20     4     0     0  0.833    0.167    0.000     13
+    rb_gr_yk     3    26    25     1     0     0  0.962    0.038    0.000      0
+    rb_gr_yk     4    26    25     1     0     0  0.962    0.038    0.000      0
+    rb_gr_yk     5     3     3     0     0     0  1.000    0.000    0.000      0
+    rb_gr_yk   all    79    73     6     0     0  0.924    0.076    0.000     13
+    rb_gr_yk   fit    66    64     2     0     0  0.970    0.030    0.000      0
+    rb_gr_yk   deep    55    53     2     0     0  0.964    0.036    0.000      0
+
+    row `fit`  = every trial the readout was fit for (includes 4 late L2 ones);
+    row `deep` = L3-L5 alone, which is where the read gate ever had a live
+                 decision, since L2 was decided before the readout's first fit.
+    The `world` arm's agreement is 1.000 by construction — it IS the world gate —
+    and its FF column is the only informative one there (what the oracle refused).
+
+====================================================================================================
+[D2] THE READ GATE'S OWN SIGNAL, on the trials where it had one
+====================================================================================================
+    `p_trial - p_cur` is a difference of two pooled levels over the SAME fired
+    gate pool. A candidate the executor's DP never picks changes no instance, so
+    the difference is exactly 0 and the strict rule admits — which is the world
+    gate's own behaviour on an invisible candidate (`e_trial == e_cur`, test `<=`).
+
+    arm         n(fit)   d=0   d>0   d<0     min d     max d  median |d|  median n_changed
+    st_gw_yk        37    25     6     6  -0.08108  +0.40084     0.00000               0.0
+    st_gr_yk        37    14     7    16  -0.06682  +0.32584     0.00099               5.0
+    st_gn_yk        60    38    10    12  -0.44383  +0.16212     0.00000               0.0
+    st_gy_yk        14     4     5     5  -0.03490  +0.10170     0.00525              13.0
+    rb_gw_yk        50    39     6     5  -0.03475  +0.36543     0.00000               0.0
+    rb_gr_yk        66    44     8    14  -0.10013  +0.36236     0.00000               0.0
+
+====================================================================================================
+[E] THE TASK ERROR, CYCLE FOR CYCLE, against the banked no-walk reference
+====================================================================================================
+    arm           era1    era2    era3    era4    era5  cycles
+    st_gw_yk    0.4688  0.6118  0.5846  0.5896  0.6250     201
+    st_gr_yk    0.4693  0.6102  0.6108  0.6042  0.7590     201
+    st_gn_yk    0.4693  0.6142  0.5945  0.5760  0.5686     201
+    st_gy_yk    0.4687  0.6278  0.6711  0.8368  0.9245     201
+    rb_gw_yk    0.4687  0.5815  0.5926  0.5924  0.5770     201
+    rb_gr_yk    0.4693  0.6399  0.6039  0.6046  0.6609     201
+    sb_sv_yk (bank)  0.4693  0.6099  0.5807  0.5840  0.6542     201
+
+    delta against the reference, per era (negative = the walk arm is better)
+    st_gw_yk   -0.0005 +0.0019 +0.0039 +0.0056 -0.0292
+    st_gr_yk   +0.0000 +0.0002 +0.0300 +0.0202 +0.1047
+    st_gn_yk   +0.0000 +0.0043 +0.0137 -0.0080 -0.0856
+    st_gy_yk   -0.0006 +0.0179 +0.0904 +0.2528 +0.2703
+    rb_gw_yk   -0.0006 -0.0285 +0.0119 +0.0085 -0.0773
+    rb_gr_yk   +0.0000 +0.0299 +0.0232 +0.0206 +0.0067
+
+    delta against the NONE arm (st_gn_yk), per era — the gate net of the op's
+    own footprint (negative = the gate arm is better than admitting everything)
+    st_gw_yk   -0.0005 -0.0024 -0.0098 +0.0137 +0.0564
+    st_gr_yk   +0.0000 -0.0041 +0.0163 +0.0282 +0.1904
+    st_gy_yk   -0.0006 +0.0136 +0.0767 +0.2609 +0.3559
+    rb_gw_yk   -0.0006 -0.0328 -0.0019 +0.0165 +0.0084
+    rb_gr_yk   +0.0000 +0.0257 +0.0095 +0.0286 +0.0923
+
+====================================================================================================
+[F] THE READOUT'S HELD-OUT SERIES (the organ the `read` arm gates with)
+====================================================================================================
+    arm                  first refit hold_auc@end  mean(last 50)  ECE@end  n_refit
+    st_gw_yk                      61       0.8498         0.8306    0.021      140
+    st_gr_yk                      60       0.8555         0.8354    0.040      141
+    st_gn_yk                      60       0.8291         0.8117    0.056      141
+    st_gy_yk                      61       0.8570         0.8529    0.041      140
+    rb_gw_yk                      60       0.8545         0.8373    0.056      141
+    rb_gr_yk                      60       0.8216         0.8037    0.056      141
+    sb_sv_yk (bank)               60       0.8614         0.8322    0.039      141
+
+====================================================================================================
+[G] THE BILL, THE FALLBACKS, AND THE WORLD READS BILLED TO THE DECISIONS
+====================================================================================================
+    arm          gate  offered  admit  reject  auditions  world billed  pending  adm-empty  fallback  rekey        t_cum
+    st_gw_yk    world       50     45       5         81         15552     1176          0         0      0     50872829
+    st_gr_yk     read       50     34      16         77             0     1170          0         0      5     50805440
+    st_gn_yk     none       73     73       0        110             0     1215          0         0      0     51026957
+    st_gy_yk    yield       27     16      11         42             0     1748          0         0      1     50302835
+    rb_gw_yk     none       64     64       0        107             0     1181          0         0      0     51330016
+    rb_gr_yk     none       79     79       0        121             0     1181          0         0      0     50869376
+    sb_sv_yk (bank)      —        —      —       —          —             —        —          —         —      —     50957389
+
+====================================================================================================
+[H] WHERE THE WALL CLOCK WENT
+====================================================================================================
+    arm         container s   s/cycle  walk t_s  passes  walk share  peak RSS MiB
+    st_gw_yk              —         —       9.5      21         nan             —
+    st_gr_yk              —         —       5.6      18         nan             —
+    st_gn_yk              —         —      14.8      27         nan             —
+    st_gy_yk              —         —       2.8      13         nan             —
+    rb_gw_yk           7899     35.84      44.6      27     0.00564          7063
+    rb_gr_yk           7820     35.45      33.1      25     0.00423          7006
+    sb_s2:sb_sv_yk         7876     35.70         —       —           —          6998
+    sb_s2:sb_yd_yk         6350     28.17         —       —           —          6953
+    sb_s2:sb_so_yk         8142     36.93         —       —           —          7075
+
+    sweep wall clock 7917 s against the longest arm's 7899 s. A `*` marks a container time
+    ESTIMATED as s/cycle x cycles because a `--merge-only` re-merge cannot recover
+    the live call's own elapsed; it is the cycle loop alone and excludes the
+    ~500 s shared setup. Where both are real, the gap between the sweep's wall
+    clock and the longest arm is Modal's container scheduling (the arms are
+    `.starmap`ed and do not all start at once), not work. The walk's own is the
+    `walk t_s` column and is a ten-thousandth of the arm; what the op actually
+    costs is in `s/cycle`, because the served table changes the beam's and the
+    DP's work every cycle. The per-era head dumps are 5 x 2.1 MB written five
+    times per arm and the final refit is one solve, both far below a second.
+
+====================================================================================================
+[I] THE COVERAGE TRACE — every key offered, and the demand-blindness test
+====================================================================================================
+    arm         L  era  offered  admitted  refused   refused keys (count at decision)
+    st_gw_yk    2    1       13         9        4                          [3,6,5,3]
+    st_gw_yk    2    2        3         2        1                                [4]
+    st_gw_yk    2    3        2         2        0                                   
+    st_gw_yk    2    5        1         1        0                                   
+    st_gw_yk    3    2        9         9        0                                   
+    st_gw_yk    3    3        3         3        0                                   
+    st_gw_yk    3    5        1         1        0                                   
+    st_gw_yk    4    3       13        13        0                                   
+    st_gw_yk    5    3        4         4        0                                   
+    st_gw_yk    5    5        1         1        0                                   
+    st_gr_yk    2    1       13        13        0                                   
+    st_gr_yk    2    2        3         3        0                                   
+    st_gr_yk    2    3        1         1        0                                   
+    st_gr_yk    2    5        2         1        1                               [10]
+    st_gr_yk    3    2       17         4       13       [6,4,4,4,4,4,4,3,4,3,3,10,3]
+    st_gr_yk    3    3        4         3        1                                [4]
+    st_gr_yk    3    5        3         3        0                                   
+    st_gr_yk    4    3        5         4        1                                [3]
+    st_gr_yk    4    5        1         1        0                                   
+    st_gr_yk    5    3        1         1        0                                   
+    st_gn_yk    2    1       13        13        0                                   
+    st_gn_yk    2    2        2         2        0                                   
+    st_gn_yk    2    3        1         1        0                                   
+    st_gn_yk    2    5        2         2        0                                   
+    st_gn_yk    3    2       16        16        0                                   
+    st_gn_yk    3    3        3         3        0                                   
+    st_gn_yk    3    5        5         5        0                                   
+    st_gn_yk    4    3       18        18        0                                   
+    st_gn_yk    4    5        4         4        0                                   
+    st_gn_yk    5    3        7         7        0                                   
+    st_gn_yk    5    4        1         1        0                                   
+    st_gn_yk    5    5        1         1        0                                   
+    st_gy_yk    2    1       13         5        8                  [4,3,6,5,3,3,3,3]
+    st_gy_yk    2    2        2         2        0                                   
+    st_gy_yk    2    3        2         2        0                                   
+    st_gy_yk    2    5        2         1        1                                [4]
+    st_gy_yk    3    2        3         3        0                                   
+    st_gy_yk    3    3        3         2        1                                [3]
+    st_gy_yk    3    4        1         1        0                                   
+    st_gy_yk    3    5        1         0        1                                [6]
+    rb_gw_yk    2    1       12        12        0                                   
+    rb_gw_yk    2    2        2         2        0                                   
+    rb_gw_yk    2    3        2         2        0                                   
+    rb_gw_yk    2    5        1         1        0                                   
+    rb_gw_yk    3    2       12        12        0                                   
+    rb_gw_yk    3    3        4         4        0                                   
+    rb_gw_yk    3    4        1         1        0                                   
+    rb_gw_yk    3    5        1         1        0                                   
+    rb_gw_yk    4    3       14        14        0                                   
+    rb_gw_yk    4    4        1         1        0                                   
+    rb_gw_yk    4    5        1         1        0                                   
+    rb_gw_yk    5    3        4         4        0                                   
+    rb_gw_yk    5    4        2         2        0                                   
+    rb_gw_yk    5    5        1         1        0                                   
+    rb_gr_yk    2    1        9         9        0                                   
+    rb_gr_yk    2    2        3         3        0                                   
+    rb_gr_yk    2    3        4         4        0                                   
+    rb_gr_yk    2    5        3         3        0                                   
+    rb_gr_yk    3    2        6         6        0                                   
+    rb_gr_yk    3    3        9         9        0                                   
+    rb_gr_yk    3    5        8         8        0                                   
+    rb_gr_yk    4    3       17        17        0                                   
+    rb_gr_yk    4    4        1         1        0                                   
+    rb_gr_yk    4    5        8         8        0                                   
+    rb_gr_yk    5    3        3         3        0                                   
+
+    THE DEMAND-BLINDNESS TEST. `spiral`/`census` found a gate that prices a
+    candidate by PRESENT demand removes the halves the level above will need.
+    For every L3-L5 key that the ungated arm ever supported, is at least one of
+    its two halves a key the GATE arm REFUSED at the level below?
+
+    gate arm    L  none-arm keys  half refused  half never offered  half admitted
+    st_gw_yk    3             24             7                   0             17
+    st_gw_yk    4             22             0                  21              1
+    st_gw_yk    5              9             0                   9              0
+    st_gr_yk    3             24             1                   0             23
+    st_gr_yk    4             22             8                  14              0
+    st_gr_yk    5              9             0                   9              0
+    st_gy_yk    3             24            15                   0              9
+    st_gy_yk    4             22             2                  20              0
+    st_gy_yk    5              9             0                   9              0
+    rb_gw_yk    3             24             0                   2             22
+    rb_gw_yk    4             22             0                  21              1
+    rb_gw_yk    5              9             0                   9              0
+    rb_gr_yk    3             24             0                   0             24
+    rb_gr_yk    4             22             0                  20              2
+    rb_gr_yk    5              9             0                   9              0
+
+    `half never offered` means the half was not an at-support key on the gate
+    arm at all — the arms diverge, so a half can be absent rather than refused,
+    and that column is the honest residual of this test rather than evidence.
+
+====================================================================================================
+[J] THE DEEP-ERA WINDOW, CYCLE FOR CYCLE
+====================================================================================================
+    st_gw_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+    st_gr_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+    st_gn_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+    st_gy_yk   commits [(59, 2), (77, 3)]  advances [60, 110, 180, 192, 201]
+    rb_gw_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+    rb_gr_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+    sb_sv_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+
+     cyc  era    st_gw_yk    st_gr_yk    st_gn_yk    st_gy_yk    rb_gw_yk    rb_gr_yk    sb_sv_yk
+     175    3      0.5156      0.4948      0.5130      0.5859      0.5286      0.5052      0.4844
+     176    3      0.5078      0.4974      0.5339      0.5729      0.5234      0.4792      0.4948
+     177    3      0.5260      0.4870      0.5182      0.5286      0.5000      0.5078      0.5234
+     178    3      0.4896      0.4974      0.5260      0.5807      0.5260      0.4844      0.4714
+     179    3      0.5052      0.4766      0.5156      0.5859      0.4870      0.5000      0.5000
+     180    3      0.4583      0.4948      0.5078      0.6120      0.5208      0.5026      0.4818
+     181    4      0.6250      0.6589      0.6250      0.8724      0.6589      0.6719      0.6328
+     182    4      0.6198      0.6302      0.6120      0.8568      0.6042      0.6641      0.6641
+     183    4      0.6120      0.6120      0.6016      0.8932      0.6042      0.6380      0.6380
+     184    4      0.6302      0.6250      0.6120      0.8776      0.6380      0.6432      0.6406
+     185    4      0.6146      0.5964      0.5859      0.8698      0.5651      0.6354      0.5990
+     186    4      0.6016      0.6016      0.5859      0.8464      0.5833      0.6224      0.6068
+     187    4      0.5651      0.5833      0.5729      0.8411      0.5833      0.5938      0.5599
+     188    4      0.5729      0.5807      0.5417      0.8073      0.6146      0.6042      0.5365
+     189    4      0.5625      0.5833      0.5599      0.8203      0.5729      0.5573      0.5260
+     190    4      0.5703      0.5911      0.5625      0.7917      0.5781      0.5599      0.5365
+     191    4      0.5781      0.5990      0.5234      0.7839      0.5599      0.5312      0.5312
+     192    4      0.5234      0.5885      0.5286      0.7812      0.5469      0.5339      0.5365
+     193    5      0.7552      0.7682      0.7057      0.9375      0.6406      0.7370      0.7214
+     194    5      0.6719      0.7578      0.5911      0.9271      0.6120      0.7214      0.6875
+     195    5      0.6328      0.7708      0.5990      0.9219      0.5859      0.7161      0.6641
+     196    5      0.6172      0.7552      0.5729      0.9167      0.5677      0.7031      0.6354
+     197    5      0.6042      0.7578      0.5573      0.9323      0.6849      0.6120      0.6641
+     198    5      0.6172      0.8229      0.5547      0.9271      0.5573      0.6536      0.6458
+     199    5      0.5911      0.7552      0.5573      0.9245      0.5156      0.6016      0.6484
+     200    5      0.5781      0.7188      0.4922      0.9115      0.5208      0.6068      0.6094
+     201    5      0.5573      0.7240      0.4870      0.9219      0.5078      0.5964      0.6120
+
+    L5 keys: the cycle each was OFFERED (within one cadence tick of reaching
+    support — the cadence is `recert_every` 5, and the miner's per-key arrival
+    cycle is not banked, so the offer cycle is the tightest honest reconstruction)
+    arm        offers (cycle, count, decision)
+    st_gw_yk   L4: [(115, 3, 'adm'), (115, 5, 'adm'), (125, 4, 'adm'), (135, 3, 'adm'), (135, 4, 'adm'), (135, 5, 'adm'), (140, 3, 'adm'), (145, 4, 'adm'), (170, 3, 'adm'), (170, 3, 'adm'), (170, 5, 'adm'), (170, 7, 'adm'), (170, 9, 'adm')]
+    st_gw_yk   L5: [(120, 3, 'adm'), (160, 4, 'adm'), (160, 6, 'adm'), (170, 3, 'adm'), (197, 9, 'adm')]
+    st_gr_yk   L4: [(115, 8, 'adm'), (135, 5, 'adm'), (150, 4, 'adm'), (150, 7, 'adm'), (165, 3, 'REF'), (197, 5, 'adm')]
+    st_gr_yk   L5: [(115, 3, 'adm')]
+    st_gn_yk   L4: [(115, 4, 'adm'), (120, 3, 'adm'), (120, 4, 'adm'), (120, 4, 'adm'), (125, 3, 'adm'), (125, 3, 'adm'), (125, 3, 'adm'), (125, 4, 'adm'), (130, 5, 'adm'), (130, 5, 'adm'), (135, 3, 'adm'), (135, 3, 'adm'), (140, 3, 'adm'), (140, 3, 'adm'), (145, 3, 'adm'), (150, 3, 'adm'), (155, 3, 'adm'), (160, 3, 'adm'), (197, 3, 'adm'), (197, 3, 'adm'), (197, 3, 'adm'), (197, 5, 'adm')]
+    st_gn_yk   L5: [(155, 3, 'adm'), (160, 3, 'adm'), (160, 3, 'adm'), (165, 4, 'adm'), (170, 3, 'adm'), (180, 3, 'adm'), (180, 4, 'adm'), (190, 3, 'adm'), (197, 3, 'adm')]
+    rb_gw_yk   L4: [(115, 7, 'adm'), (120, 3, 'adm'), (125, 3, 'adm'), (125, 3, 'adm'), (125, 4, 'adm'), (130, 4, 'adm'), (135, 3, 'adm'), (165, 4, 'adm'), (165, 4, 'adm'), (165, 7, 'adm'), (165, 9, 'adm'), (165, 14, 'adm'), (170, 3, 'adm'), (180, 3, 'adm'), (190, 23, 'adm'), (197, 4, 'adm')]
+    rb_gw_yk   L5: [(125, 3, 'adm'), (135, 3, 'adm'), (145, 3, 'adm'), (165, 3, 'adm'), (190, 3, 'adm'), (190, 4, 'adm'), (197, 3, 'adm')]
+    rb_gr_yk   L4: [(115, 7, 'adm'), (120, 3, 'adm'), (125, 5, 'adm'), (130, 4, 'adm'), (135, 4, 'adm'), (145, 3, 'adm'), (145, 3, 'adm'), (145, 4, 'adm'), (145, 5, 'adm'), (150, 3, 'adm'), (150, 3, 'adm'), (150, 4, 'adm'), (155, 3, 'adm'), (160, 4, 'adm'), (160, 4, 'adm'), (175, 3, 'adm'), (180, 3, 'adm'), (185, 3, 'adm'), (197, 4, 'adm'), (197, 4, 'adm'), (197, 5, 'adm'), (197, 6, 'adm'), (197, 8, 'adm'), (197, 9, 'adm'), (197, 10, 'adm'), (197, 15, 'adm')]
+    rb_gr_yk   L5: [(125, 3, 'adm'), (155, 3, 'adm'), (175, 3, 'adm')]
+
+====================================================================================================
+[K] ROUND 2 — THE GATE IN THE NEXT LEVEL'S CURRENCY: the instruments
+====================================================================================================
+  (K1) TWIN-PREFIX FIDELITY. Both round-2 arms share `st_gn_yk`'s stream key, their
+       fires draw no RNG and the reader parse is sandboxed, so each must replay the
+       none arm bit for bit until its first refusal takes effect.
+       st_gy_yk   first refusal c5  first divergence from st_gn_yk c8   PASS
+
+  (K2) THE DEMAND RECORD on every offered key (both round-2 arms log it). `value` is
+       the sum over next-level keys AT SUPPORT having the candidate's class as a half
+       (the gate's currency); `raw` the brief's literal sum over all next-level keys.
+       `raw>=own` is DESIGN §9.3's Fact 1 (the literal form is the none arm).
+       arm         L    n silent no nxt val>=1  val=0  med val  max val  raw>=own  med raw  refused
+       st_gy_yk    2   19      0      0     12      7      5.0       52     19/19      8.0        9
+       st_gy_yk    3    8      0      0      6      2      3.0        6       8/8     16.0        2
+
+  (K3) THE YIELD SIGNAL, `d_yield = mean(share x level)_trial - mean(...)_cur`, on
+       every trial of both round-2 arms; `unfit` = before the readout's first fit,
+       where the level is the constant 0.5 and the gate compares shares alone.
+       arm         L   fit    n   d=0   d>0   d<0     min d     max d  mean share
+       st_gy_yk    2 unfit   13     3     2     8  -0.00716  +0.01563      0.1339
+       st_gy_yk    2   fit    6     2     3     1  -0.00492  +0.01409      0.5626
+       st_gy_yk    3   fit    8     3     3     2  -0.00094  +0.01796      0.0532
+
+  (K4) EVERY GATE'S VERDICT ON THE SAME TRIALS. On each round-2 arm's own trials
+       (same base, same fire), what world / read / yield / demand would each have
+       decided. Per-trial, not a counterfactual walk: the base is the arm's own.
+       arm          L    n   ref world    ref read   ref yield  ref demand   yield=world demand=world yield=demand
+       st_gy_yk     2   19           5           1           9           7            13           11           13
+       st_gy_yk   3-5    8           1           4           2           2             7            5            4
+       st_gy_yk   all   27           6           5          11           9            20           16           17
+
+  (K5) THE EXPORT GATES E-Y / E-D, off the exported passes, in this process
+       st_gy_yk   unfit (no export)
+       st_gy_yk   fit   (no export)
+
+====================================================================================================
+[L] THE GRADE — admit-then-grade (DESIGN §10)
+====================================================================================================
+
+--- rb_gw_yk: grade=world window=160 obs margin=0.0 cap=4  restored from c20 of st_gn_yk (R-2 PASS, schema added 21, overlay {})
+  first revocation c45; revoked 15 (no consumer 7, worthless 8); re-offered 7; kept 655; graded 670; young 190; silent-level key-passes 3; fires 2058; world billed 395136; merged-away revoked 1; commits cancelled 0
+  container segments: from c20 of st_gn_yk on unknown avx512=True
+  G-I identity with the ungated arm by hash, before the first revocation: 2 saves equal [30, 40]; 0 differ []
+  G-I off the log: restored after c20; first cycle any log series differs from the ungated arm: (45, 'quot'); first revocation c45 (OK)
+  G-I off the records, events before c45: 33 | ungated 33; first differing record none
+  G-I off the records, merge_events before c45: 28 | ungated 28; first differing record none
+  first PRICED key-pass (kept or worthless) per level: {2: 'c30', 3: 'c95', 4: 'c145'}; diet off (silent for the diet 0 key-passes)
+  G-W {'cycle': 30, 'level': 3, 'e_fire': 0.6875, 'e_base': 1.0, 'e_audition': 0.6875, 'n_inst_differ': 0, 'equal': True, 'falsify_node': False}; G-S red None
+  level  graded   kept  rev:none  rev:worth  unpriced  noreader  nodiet  young  silent   (key-passes)
+      2     423    416         0          7         0         0       0     38       0
+      3     208    194         3          1        10         0       0     73       0
+      4      39     35         4          0         0         0       0     79       2
+  revocations (cycle, level): [(45, 2), (60, 2), (85, 2), (90, 2), (105, 3), (110, 2), (165, 4), (165, 4), (175, 2), (175, 2), (175, 3), (175, 3), (175, 3), (190, 4), (190, 4)]
+  re-offers   (cycle, level): [(55, 2), (70, 2), (105, 2), (130, 3), (170, 2), (185, 4), (190, 4)]
+  this arm's decision vs the other currency's on the same fires (KK/KR/RK/RR = this/other keep K or revoke R), per level: {2: {'KK': 399, 'RK': 5, 'KR': 17, 'RR': 2}, 3: {'KR': 29, 'KK': 165, 'RK': 1}, 4: {'KK': 35}}
+  gain quantiles (10/25/50/75/90%), world: +0.1719 +0.2344 +0.3125 +0.4427 +0.5521 (n 653)
+  gain quantiles (10/25/50/75/90%), read:  +0.0000 +0.0320 +0.1139 +0.1904 +0.2912 (n 653)
+  served keys per level at every pass (this arm | ungated):
+    c  5 L2 6|6
+    c 20 L2 11|11
+    c 30 L2 13|13
+    c 65 L2 13|—  L3 2|1
+    c 75 L2 14|—  L3 7|10
+    c 85 L3 10|12
+    c110 L2 14|—  L3 12|16
+    c120 L4 2|4
+    c130 L4 6|7
+    c145 L4 7|12  L5 3|—
+    c165 L3 16|—  L4 12|—  L5 4|4
+    c175 L2 15|—
+    c185 L3 14|—
+    c197 L2 14|18  L3 15|24  L4 9|19  L5 7|9
+  era 1: mean task error 0.4687  ungated 0.4693  (60 cycles)
+  era 2: mean task error 0.5815  ungated 0.6142  (50 cycles)
+  era 3: mean task error 0.5926  ungated 0.5945  (70 cycles)
+  era 4: mean task error 0.5924  ungated 0.5760  (12 cycles)
+  era 5: mean task error 0.5770  ungated 0.5686  (9 cycles)
+
+--- rb_gr_yk: grade=read window=160 obs margin=0.0 cap=4  restored from c20 of st_gn_yk (R-2 PASS, schema added 21, overlay {})
+  first revocation c65; revoked 21 (no consumer 6, worthless 15); re-offered 10; kept 542; graded 563; young 189; silent-level key-passes 3; fires 1669; world billed 0; merged-away revoked 3; commits cancelled 0
+  container segments: from c20 of st_gn_yk on unknown avx512=True
+  G-I identity with the ungated arm by hash, before the first revocation: 4 saves equal [30, 40, 50, 60]; 0 differ []
+  G-I off the log: restored after c20; first cycle any log series differs from the ungated arm: (65, 'quot'); first revocation c65 (OK)
+  G-I off the records, events before c65: 47 | ungated 47; first differing record none
+  G-I off the records, merge_events before c65: 40 | ungated 40; first differing record none
+  first PRICED key-pass (kept or worthless) per level: {2: 'c65', 3: 'c100', 4: 'c155'}; diet off (silent for the diet 0 key-passes)
+  G-W {'cycle': 30, 'level': 3, 'e_fire': 0.6875, 'e_base': 1.0, 'e_audition': 0.6875, 'n_inst_differ': 0, 'equal': True, 'falsify_node': False}; G-S red None
+  level  graded   kept  rev:none  rev:worth  unpriced  noreader  nodiet  young  silent   (key-passes)
+      2     394    301         0         11         0        82       0     38       0
+      3     152    136         1          4        11         0       0     72       0
+      4      17     12         5          0         0         0       0     79       2
+  revocations (cycle, level): [(65, 2), (65, 2), (75, 2), (75, 2), (75, 2), (80, 2), (120, 3), (120, 3), (125, 3), (135, 2), (145, 3), (145, 4), (145, 4), (160, 4), (170, 4), (175, 2), (180, 4), (197, 2), (197, 2), (197, 2), (197, 3)]
+  re-offers   (cycle, level): [(70, 2), (95, 2), (105, 2), (120, 2), (120, 2), (125, 3), (130, 3), (155, 3), (197, 3), (197, 4)]
+  this arm's decision vs the other currency's on the same fires (KK/KR/RK/RR = this/other keep K or revoke R), per level: {2: {'KK': 281, 'RR': 5, 'RK': 6, 'KR': 20}, 3: {'KK': 122, 'RK': 4, 'KR': 14}, 4: {'KK': 12}}
+  gain quantiles (10/25/50/75/90%), world: +0.0781 +0.2135 +0.2812 +0.4167 +0.5000 (n 546)
+  gain quantiles (10/25/50/75/90%), read:  +0.0000 +0.0358 +0.1076 +0.1532 +0.2245 (n 546)
+  served keys per level at every pass (this arm | ungated):
+    c  5 L2 6|6
+    c 20 L2 11|11
+    c 30 L2 13|13
+    c 70 L3 5|6
+    c 85 L3 8|12
+    c105 L2 10|15
+    c115 L2 12|—  L3 11|—  L4 1|1
+    c125 L2 14|—  L3 9|—  L4 3|8  L5 1|—
+    c135 L3 10|—  L4 5|9
+    c150 L4 10|13
+    c160 L3 11|19  L4 9|15
+    c180 L4 7|—
+    c197 L2 16|18  L3 20|24  L4 14|19
+  era 1: mean task error 0.4693  ungated 0.4693  (60 cycles)
+  era 2: mean task error 0.6399  ungated 0.6142  (50 cycles)
+  era 3: mean task error 0.6039  ungated 0.5945  (70 cycles)
+  era 4: mean task error 0.6046  ungated 0.5760  (12 cycles)
+  era 5: mean task error 0.6609  ungated 0.5686  (9 cycles)
+
+====================================================================================================
+[M] THE GRADE'S RECORD, RE-READ: the dial, persistence, the diet at the seam, re-offers, the bill
+====================================================================================================
+
+M-1 THE DIAL FROM DATA. Keep iff the best consumer's gain > margin, swept over each arm's RECORDED
+    per-fire gains in its own currency; the other currency's decision at margin 0 on the SAME fires is
+    the split (KK/KR/RK/RR = this arm at the margin / the other at 0, keep K or revoke R). Key-passes
+    that are margin-free are held as recorded: `no_consumer` revokes; `unpriced`, `no_reader`, `no_cell`
+    keep. COUNTERFACTUAL ON THE RECORDED PASSES ONLY: a key the arm actually revoked was not graded
+    again until re-offered, so a margin can only turn a recorded decision around, not replay the run.
+    'L3 both' / 'L4 both' = of st_gn_yk's walked L3 (L4) keys, how many have NEITHER half revoked on any
+    recorded pass at this margin (re-offers not simulated). Margin 0 reproduces the arm's own record.
+
+  rb_gw_yk (world gains; split by the read's decision at 0), 670 graded key-passes:
+     margin    KK    KR    RK    RR  revoked  keys rev  L2 keys  L3 keys  L3 both  L4 both
+     -0.200   605    48     0     0        7         7        0        3    24/24    22/22
+     -0.150   605    48     0     0        7         7        0        3    24/24    22/22
+     -0.100   605    48     0     0        7         7        0        3    24/24    22/22
+     -0.075   605    48     0     0        7         7        0        3    24/24    22/22
+     -0.050   605    48     0     0        7         7        0        3    24/24    22/22
+     -0.040   605    48     0     0        7         7        0        3    24/24    22/22
+     -0.030   605    48     0     0        7         7        0        3    24/24    22/22
+     -0.020   605    48     0     0        7         7        0        3    24/24    22/22
+     -0.010   605    48     0     0        7         7        0        3    24/24    22/22
+     -0.005   605    48     0     0        7         7        0        3    24/24    22/22
+     +0.000   599    46     6     2       15        11        3        4    17/24    21/22
+     +0.010   599    46     6     2       15        11        3        4    17/24    21/22
+     +0.020   599    46     6     2       15        11        3        4    17/24    21/22
+     +0.050   599    46     6     2       15        11        3        4    17/24    21/22
+     +0.100   596    26     9    22       38        15        4        7    13/24    16/22
+     +0.200   553    14    52    34       93        26       14        8     1/24    16/22
+     +0.300   323    12   282    36      325        29       15       10     1/24    16/22
+
+  rb_gr_yk (read gains; split by the world's decision at 0), 563 graded key-passes:
+     margin    KK    KR    RK    RR  revoked  keys rev  L2 keys  L3 keys  L3 both  L4 both
+     -0.200   425    39     0     0        6         5        0        1    24/24    22/22
+     -0.150   425    39     0     0        6         5        0        1    24/24    22/22
+     -0.100   425    39     0     0        6         5        0        1    24/24    22/22
+     -0.075   425    38     0     1        7         6        1        1    21/24    22/22
+     -0.050   424    38     1     1        8         7        2        1    21/24    22/22
+     -0.040   422    38     3     1       10         9        3        2    21/24    21/22
+     -0.030   420    37     5     2       13        12        4        4    17/24    16/22
+     -0.020   418    36     7     3       16        14        6        4    10/24    16/22
+     -0.010   416    35     9     4       19        17        8        5     8/24    16/22
+     -0.005   415    35    10     4       20        17        8        5     8/24    16/22
+     +0.000   415    34    10     5       21        17        8        5     8/24    16/22
+     +0.010   409    33    16     6       28        20       10        6     4/24    15/22
+     +0.020   407    30    18     9       33        21       10        7     4/24    15/22
+     +0.050   360    23    65    16       87        29       16        9     0/24    15/22
+     +0.100   290     9   135    30      171        31       16       10     0/24    14/22
+     +0.200    85     0   340    39      385        34       16       13     0/24     7/22
+     +0.300    32     0   393    39      438        35       16       13     0/24     7/22
+
+M-2 PERSISTENCE. Every 'worthless' revocation: the key's graded passes before it (gain in this arm's
+    currency | the world's), and the run of CONSECUTIVE non-positive passes ending at the revocation
+    (inclusive), counted over the key's PRICED passes (`kept`/`worthless`; a `no_reader`/`unpriced` pass
+    neither extends nor breaks it). Under 'revoke only after k consecutive non-positive passes' the
+    revocation still fires at that pass iff the run >= k. (The key's later passes under such a rule are
+    not in the record: the arm had revoked it.)
+
+  rb_gw_yk: 8 worthless revocations
+    cycle lvl key         true n graded before  run  gain now (world|world)   earlier priced gains (world|world), oldest first
+       45   2 [4, 1]      junk               0    1  +0.0000|+0.000   
+       60   2 [4, 1]      junk               1    2  +0.0000|+0.000   c45:+0.000|+0.00
+       85   2 [4, 1]      junk               2    3  +0.0000|+0.000   c45:+0.000|+0.00 c60:+0.000|+0.00
+       90   2 [7, 4]      junk               0    1  +0.0000|+0.000   
+      110   2 [7, 4]      junk               1    2  +0.0000|+0.000   c90:+0.000|+0.00
+      175   2 [1, 4]      junk               0    1  +0.0000|+0.000   
+      175   2 [7, 4]      junk               2    3  +0.0000|+0.000   c90:+0.000|+0.00 c110:+0.000|+0.00
+      175   3 [3, 0, 7, 4]     —               0    1  +0.0000|+0.000   
+    k=2: 4 of 8 revocations still fire at their pass; 4 do not (of those, the read kept 2 on the same fires)
+    k=3: 2 of 8 revocations still fire at their pass; 6 do not (of those, the read kept 4 on the same fires)
+    k=4: 0 of 8 revocations still fire at their pass; 8 do not (of those, the read kept 6 on the same fires)
+
+  rb_gr_yk: 15 worthless revocations
+    cycle lvl key         true n graded before  run  gain now (read|world)   earlier priced gains (read|world), oldest first
+       65   2 [4, 1]      junk               4    1  -0.0990|+0.000   
+       65   2 [5, 7]      junk               7    1  -0.0526|+0.292   
+       75   2 [3, 0]         T               9    1  -0.0288|+0.240   c65:+0.081|+0.16 c70:+0.040|+0.24
+       75   2 [4, 1]      junk               5    2  -0.0279|+0.000   c65:-0.099|+0.00
+       75   2 [5, 0]         T               9    1  -0.0288|+0.240   c65:+0.106|+0.26 c70:+0.040|+0.24
+       80   2 [0, 7]         T              10    1  -0.0054|+0.276   c65:+0.108|+0.29 c70:+0.139|+0.29 c75:+0.117|+0.36
+      120   3 [1, 6, 2, 6]     —               4    1  -0.0393|+0.120   
+      120   3 [2, 5, 2, 5]     —               4    1  -0.0393|+0.120   
+      125   3 [1, 6, 3, 0]     —               0    1  -0.0186|+0.094   
+      135   2 [4, 1]      junk              13    1  -0.0041|+0.000   c65:-0.099|+0.00 c75:-0.028|+0.00 c100:+0.065|+0.00 c105:+0.042|+0.00 c110:+0.021|+0.00 c115:+0.075|+0.00 c120:+0.016|+0.00 c125:+0.037|+0.00 c130:+0.018|+0.00
+      175   2 [1, 4]      junk               0    1  -0.0187|+0.000   
+      197   2 [0, 7]         T              28    1  -0.0115|+0.177   c65:+0.108|+0.29 c70:+0.139|+0.29 c75:+0.117|+0.36 c80:-0.005|+0.28 c110:+0.055|+0.29 c115:+0.016|+0.27 c120:+0.042|+0.32 c125:+0.051|+0.32 c130:+0.059|+0.30 c135:+0.046|+0.31 c140:+0.106|+0.31 c145:+0.068|+0.28 c150:+0.141|+0.28 c155:+0.164|+0.29 c160:+0.070|+0.27 c165:+0.070|+0.35 c170:+0.116|+0.29 c175:+0.108|+0.27 c180:+0.094|+0.32 c185:+0.108|+0.28 c190:+0.113|+0.36
+      197   2 [1, 1]         T              31    1  -0.0404|+0.193   c65:+0.027|+0.44 c70:+0.069|+0.40 c75:+0.134|+0.49 c80:+0.095|+0.42 c85:+0.109|+0.52 c90:+0.132|+0.47 c95:+0.059|+0.45 c100:+0.192|+0.46 c105:+0.151|+0.41 c110:+0.104|+0.45 c115:+0.217|+0.40 c120:+0.155|+0.45 c125:+0.154|+0.49 c130:+0.240|+0.41 c135:+0.065|+0.46 c140:+0.103|+0.45 c145:+0.162|+0.38 c150:+0.169|+0.44 c155:+0.187|+0.47 c160:+0.139|+0.37 c165:+0.098|+0.49 c170:+0.117|+0.42 c175:+0.091|+0.43 c180:+0.036|+0.46 c185:+0.085|+0.41 c190:+0.141|+0.48
+      197   2 [7, 4]      junk              13    1  -0.0382|+0.000   c130:+0.113|+0.00 c135:+0.029|+0.00 c140:+0.062|+0.00 c145:+0.067|+0.00 c150:+0.179|+0.00 c155:+0.121|+0.00 c160:+0.084|+0.00 c165:+0.057|+0.00 c170:+0.052|+0.00 c175:+0.062|+0.00 c180:+0.037|+0.00 c185:+0.096|+0.00 c190:+0.092|+0.00
+      197   3 [3, 0, 0, 7]     —               5    1  -0.0462|+0.396   c170:+0.202|+0.41 c175:+0.159|+0.41 c180:+0.136|+0.38 c185:+0.103|+0.48 c190:+0.049|+0.42
+    k=2: 1 of 15 revocations still fire at their pass; 14 do not (of those, the world kept 10 on the same fires)
+    k=3: 0 of 15 revocations still fire at their pass; 15 do not (of those, the world kept 10 on the same fires)
+    k=4: 0 of 15 revocations still fire at their pass; 15 do not (of those, the world kept 10 on the same fires)
+
+M-3 THE DIET AT THE SEAM. The readout's row buffer by SPAN at the saves bracketing each revocation
+    (L2 rows span 2, L3 rows span 4, L4 span 8, L5 span 16; the fit draws up to 8192 of the trainable
+    rows at random). An L2 key is graded on its L3 consumers' fires, which the readout reads at span 4.
+
+  rb_gw_yk: the buffer at every save (cycle: total | span2 span4 span8 span16 | span-4 positives)
+    c 30:      0 |      0      0      0      0 |     0
+    c 40:      0 |      0      0      0      0 |     0
+    c 50:      0 |      0      0      0      0 |     0
+    c 60:    221 |    221      0      0      0 |     0
+    c 70:   3533 |   3533      0      0      0 |     0
+    c 80:   6536 |   6088    448      0      0 |    54
+    c 90:   9861 |   8446   1415      0      0 |   190
+    c100:  13201 |  10982   2219      0      0 |   341
+    c110:  16581 |  13497   3084      0      0 |   470
+    c120:  19903 |  16167   3736      0      0 |   572
+    c130:  23147 |  18590   4557      0      0 |   736
+    c140:  26360 |  21078   5282      0      0 |   911
+    c150:  29413 |  23282   6131      0      0 |  1133
+    c160:  30000 |  22926   6989     85      0 |  1372
+    c170:  30000 |  21918   7888    194      0 |  1618
+    c180:  30000 |  21747   7932    321      0 |  1733
+    c190:  30000 |  21455   7998    547      0 |  1857
+    c192:  30000 |  21294   8102    604      0 |  1910
+    c200:  30000 |  20946   8255    799      0 |  1982
+    c201:  30000 |  20941   8249    810      0 |  1988
+  rb_gw_yk: rows at the CONSUMERS' span (L2 key: span 4; L3 key: span 8) in the buffer at the saves bracketing each worthless revocation (the read's decision on the same fires):
+    c 45 L2 [4, 1]     span-4 rows: c40 0 .. c50 0   read KEEP (read gain +0.000)
+    c 60 L2 [4, 1]     span-4 rows: c60 0 .. c60 0   read KEEP (read gain +0.000)
+    c 85 L2 [4, 1]     span-4 rows: c80 448 .. c90 1415   read KEEP (read gain +0.064)
+    c 90 L2 [7, 4]     span-4 rows: c90 1415 .. c90 1415   read revoke (read gain -0.012)
+    c110 L2 [7, 4]     span-4 rows: c110 3084 .. c110 3084   read KEEP (read gain +0.092)
+    c175 L2 [1, 4]     span-4 rows: c170 7888 .. c180 7932   read revoke (read gain -0.057)
+    c175 L2 [7, 4]     span-4 rows: c170 7888 .. c180 7932   read KEEP (read gain +0.040)
+    c175 L3 [3, 0, 7, 4] span-8 rows: c170 194 .. c180 321   read KEEP (read gain +0.015)
+    at a pass whose LATER bracketing save held FEWER THAN 512 rows (all rows, hold included) at the consumers' span: 3 of 8 (3 of them kept by the read)
+    at a pass whose LATER bracketing save still held NO row at the consumers' span: 2 of 8 worthless revocations (2 of them kept by the read); with rows there: 6 (4 kept by the read)
+    L2 priced key-passes with NO span-4 row in the buffer: 104, revoked 2 (0.019), of which the read kept 2; WITH span-4 rows: 319, revoked 5 (0.016), of which the read kept 3
+
+  rb_gr_yk: the buffer at every save (cycle: total | span2 span4 span8 span16 | span-4 positives)
+    c 30:      0 |      0      0      0      0 |     0
+    c 40:      0 |      0      0      0      0 |     0
+    c 50:      0 |      0      0      0      0 |     0
+    c 60:    218 |    218      0      0      0 |     0
+    c 70:   3596 |   3596      0      0      0 |     0
+    c 80:   6789 |   6253    536      0      0 |    22
+    c 90:  10055 |   8591   1464      0      0 |   132
+    c100:  13285 |  10874   2411      0      0 |   284
+    c110:  16435 |  13102   3333      0      0 |   463
+    c120:  19828 |  15603   4225      0      0 |   606
+    c130:  23044 |  17703   5341      0      0 |   768
+    c140:  26288 |  19911   6377      0      0 |   963
+    c150:  29462 |  22097   7365      0      0 |  1210
+    c160:  30000 |  21606   8290    104      0 |  1427
+    c170:  30000 |  20680   9115    205      0 |  1690
+    c180:  30000 |  20327   9337    336      0 |  1996
+    c190:  30000 |  20145   9357    498      0 |  2058
+    c192:  30000 |  20140   9324    536      0 |  2084
+    c200:  30000 |  19787   9480    733      0 |  2195
+    c201:  30000 |  19740   9499    761      0 |  2228
+  rb_gr_yk: rows at the CONSUMERS' span (L2 key: span 4; L3 key: span 8) in the buffer at the saves bracketing each worthless revocation (the world's decision on the same fires):
+    c 65 L2 [4, 1]     span-4 rows: c60 0 .. c70 0   world revoke (world gain +0.000)
+    c 65 L2 [5, 7]     span-4 rows: c60 0 .. c70 0   world KEEP (world gain +0.292)
+    c 75 L2 [3, 0]     span-4 rows: c70 0 .. c80 536   world KEEP (world gain +0.240)
+    c 75 L2 [4, 1]     span-4 rows: c70 0 .. c80 536   world revoke (world gain +0.000)
+    c 75 L2 [5, 0]     span-4 rows: c70 0 .. c80 536   world KEEP (world gain +0.240)
+    c 80 L2 [0, 7]     span-4 rows: c80 536 .. c80 536   world KEEP (world gain +0.276)
+    c120 L3 [1, 6, 2, 6] span-8 rows: c120 0 .. c120 0   world KEEP (world gain +0.120)
+    c120 L3 [2, 5, 2, 5] span-8 rows: c120 0 .. c120 0   world KEEP (world gain +0.120)
+    c125 L3 [1, 6, 3, 0] span-8 rows: c120 0 .. c130 0   world KEEP (world gain +0.094)
+    c135 L2 [4, 1]     span-4 rows: c130 5341 .. c140 6377   world revoke (world gain +0.000)
+    c175 L2 [1, 4]     span-4 rows: c170 9115 .. c180 9337   world revoke (world gain +0.000)
+    c197 L2 [0, 7]     span-4 rows: c192 9324 .. c200 9480   world KEEP (world gain +0.177)
+    c197 L2 [1, 1]     span-4 rows: c192 9324 .. c200 9480   world KEEP (world gain +0.193)
+    c197 L2 [7, 4]     span-4 rows: c192 9324 .. c200 9480   world revoke (world gain +0.000)
+    c197 L3 [3, 0, 0, 7] span-8 rows: c192 536 .. c200 733   world KEEP (world gain +0.396)
+    at a pass whose LATER bracketing save held FEWER THAN 512 rows (all rows, hold included) at the consumers' span: 5 of 15 (4 of them kept by the world)
+    at a pass whose LATER bracketing save still held NO row at the consumers' span: 5 of 15 worthless revocations (4 of them kept by the world); with rows there: 10 (6 kept by the world)
+    L2 priced key-passes with NO span-4 row in the buffer: 24, revoked 2 (0.083), of which the world kept 1; WITH span-4 rows: 288, revoked 9 (0.031), of which the world kept 5
+
+  the cycle histogram of the worthless revocations, by era (era: cycles):
+    rb_gw_yk: era1 (c1-60): 2 [other currency keeps 2]  era2 (c61-110): 3 [other currency keeps 2]  era3 (c111-180): 3 [other currency keeps 2]  era4 (c181-192): 0 [other currency keeps 0]  era5 (c193-201): 0 [other currency keeps 0]
+    rb_gr_yk: era1 (c1-60): 0 [other currency keeps 0]  era2 (c61-110): 6 [other currency keeps 4]  era3 (c111-180): 5 [other currency keeps 3]  era4 (c181-192): 0 [other currency keeps 0]  era5 (c193-201): 4 [other currency keeps 3]
+
+M-4 RE-OFFERS. Every revocation, whether and when the key came back, and — for a key that never came
+    back — its state at every later save (`rb_consumer_survey --which revoked` over the arm's own saves):
+    a re-offer is CHECKED only where the key is in the live build that pass, and fires only on a consumer
+    at support that was NOT among its consumers at the revocation.
+
+  rb_gw_yk: 15 revocations of 11 keys; 7 re-offers  (why: worth = worthless, no_co = no consumer; read keeps? Y/N on the same fires)
+    L2 [4, 1]                     revoked c45 (worth, Y), c60 (worth, Y), c85 (worth, Y) re-offered c55 (+1 new), c70 (+1 new)
+        still revoked at the end: 3 consumers at c85; at the 14 later saves buildable at 14, consumers there [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]; consumers never seen at the revocation: 0 []
+    L2 [7, 4]                     revoked c90 (worth, N), c110 (worth, Y), c175 (worth, Y) re-offered c105 (+1 new), c170 (+1 new)
+        still revoked at the end: 4 consumers at c175; at the 5 later saves buildable at 5, consumers there [4, 4, 4, 4, 4]; consumers never seen at the revocation: 0 []
+    L3 [2, 5, 1, 6]               revoked c105 (no_co, N)                              re-offered c130 (+1 new)
+    L4 [1, 1, 2, 6, 0, 7, 2, 5]   revoked c165 (no_co, N)                              re-offered c185 (+1 new)
+    L4 [2, 5, 3, 7, 3, 0, 0, 7]   revoked c165 (no_co, N)                              re-offered c190 (+1 new)
+    L2 [1, 4]                     revoked c175 (worth, N)                              re-offered never
+        still revoked at the end: 1 consumers at c175; at the 5 later saves buildable at 5, consumers there [1, 1, 1, 1, 1]; consumers never seen at the revocation: 0 []
+    L3 [1, 1, 1, 4]               revoked c175 (no_co, N)                              re-offered never
+        still revoked at the end: 0 consumers at c175; at the 5 later saves buildable at 0, consumers there []; consumers never seen at the revocation: 0 []
+    L3 [3, 0, 7, 4]               revoked c175 (worth, Y)                              re-offered never
+        still revoked at the end: 4 consumers at c175; at the 5 later saves buildable at 0, consumers there []; consumers never seen at the revocation: 0 []
+    L3 [7, 4, 2, 6]               revoked c175 (no_co, N)                              re-offered never
+        still revoked at the end: 0 consumers at c175; at the 5 later saves buildable at 0, consumers there []; consumers never seen at the revocation: 0 []
+    L4 [0, 7, 2, 5, 2, 6, 4, 6]   revoked c190 (no_co, N)                              re-offered never
+        still revoked at the end: 0 consumers at c190; at the 1 later saves buildable at 1, consumers there [0]; consumers never seen at the revocation: 0 []
+    L4 [2, 5, 2, 5, 2, 6, 3, 7]   revoked c190 (no_co, N)                              re-offered never
+        still revoked at the end: 0 consumers at c190; at the 3 later saves buildable at 3, consumers there [0, 4, 4]; consumers never seen at the revocation: 4 [[0, 7, 7, 1, 5, 0, 4, 6, 0, 7, 2, 5, 1, 1, 2, 6], [1, 6, 2, 6, 3, 0, 3, 7, 0, 7, 2, 5, 1, 1, 2, 6], [2, 5, 7, 1, 1, 1, 2, 6, 0, 7, 2, 5, 1, 1, 2, 6], [6, 1, 7, 6, 5, 0, 7, 1, 0, 7, 2, 5, 1, 1, 2, 6]]
+    re-offers that released a revocation the read would have KEPT: 3 of 7
+    worthless revocations the read would have kept: 6 (of 3 keys); later re-offered: 3; never: 3 — keys still revoked at the end, their last revocation one the read would have kept: [(2, [4, 1], 85), (2, [7, 4], 175), (3, [3, 0, 7, 4], 175)]
+
+  rb_gr_yk: 21 revocations of 17 keys; 10 re-offers  (why: worth = worthless, no_co = no consumer; world keeps? Y/N on the same fires)
+    L2 [4, 1]                     revoked c65 (worth, N), c75 (worth, N), c135 (worth, N) re-offered c70 (+1 new), c95 (+1 new)
+        still revoked at the end: 4 consumers at c135; at the 9 later saves buildable at 9, consumers there [4, 4, 4, 4, 4, 4, 4, 4, 4]; consumers never seen at the revocation: 0 []
+    L2 [5, 7]                     revoked c65 (worth, Y)                               re-offered never
+        still revoked at the end: 8 consumers at c65; at the 16 later saves buildable at 16, consumers there [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]; consumers never seen at the revocation: 0 []
+    L2 [3, 0]                     revoked c75 (worth, Y)                               re-offered c120 (+1 new)
+    L2 [5, 0]                     revoked c75 (worth, Y)                               re-offered c120 (+1 new)
+    L2 [0, 7]                     revoked c80 (worth, Y), c197 (worth, Y)              re-offered c105 (+1 new)
+        still revoked at the end: 6 consumers at c197; at the 2 later saves buildable at 2, consumers there [6, 6]; consumers never seen at the revocation: 0 []
+    L3 [1, 6, 2, 6]               revoked c120 (worth, Y)                              re-offered c125 (+5 new)
+    L3 [2, 5, 2, 5]               revoked c120 (worth, Y)                              re-offered c155 (+1 new)
+    L3 [1, 6, 3, 0]               revoked c125 (worth, Y)                              re-offered c130 (+2 new)
+    L3 [7, 4, 2, 6]               revoked c145 (no_co, N)                              re-offered c197 (+1 new)
+    L4 [2, 6, 2, 6, 0, 7, 2, 5]   revoked c145 (no_co, N), c160 (no_co, N)             re-offered never
+        still revoked at the end: 0 consumers at c160; at the 2 later saves buildable at 2, consumers there [0, 0]; consumers never seen at the revocation: 0 []
+    L4 [7, 6, 7, 5, 2, 6, 2, 6]   revoked c145 (no_co, N)                              re-offered never
+        still revoked at the end: 0 consumers at c145; at the 1 later saves buildable at 1, consumers there [0]; consumers never seen at the revocation: 0 []
+    L4 [1, 6, 2, 6, 5, 0, 7, 4]   revoked c170 (no_co, N)                              re-offered c197 (+1 new)
+    L2 [1, 4]                     revoked c175 (worth, N)                              re-offered never
+        still revoked at the end: 1 consumers at c175; at the 5 later saves buildable at 5, consumers there [1, 1, 1, 1, 1]; consumers never seen at the revocation: 0 []
+    L4 [2, 5, 2, 5, 3, 0, 0, 7]   revoked c180 (no_co, N)                              re-offered never
+        still revoked at the end: 0 consumers at c180; at the 4 later saves buildable at 2, consumers there [0, 0]; consumers never seen at the revocation: 0 []
+    L2 [1, 1]                     revoked c197 (worth, Y)                              re-offered never
+        still revoked at the end: 6 consumers at c197; at the 2 later saves buildable at 2, consumers there [6, 6]; consumers never seen at the revocation: 0 []
+    L2 [7, 4]                     revoked c197 (worth, N)                              re-offered never
+        still revoked at the end: 4 consumers at c197; at the 2 later saves buildable at 2, consumers there [4, 4]; consumers never seen at the revocation: 0 []
+    L3 [3, 0, 0, 7]               revoked c197 (worth, Y)                              re-offered never
+        still revoked at the end: 7 consumers at c197; at the 2 later saves buildable at 0, consumers there []; consumers never seen at the revocation: 0 []
+    re-offers that released a revocation the world would have KEPT: 6 of 10
+    worthless revocations the world would have kept: 10 (of 9 keys); later re-offered: 6; never: 4 — keys still revoked at the end, their last revocation one the world would have kept: [(2, [5, 7], 65), (2, [0, 7], 197), (2, [1, 1], 197), (3, [3, 0, 0, 7], 197)]
+
+M-6 THE NO-CONSUMER REVOCATIONS, AGAINST THE UNGATED ARM. Every revocation for want of a consumer (the
+    window elapsed with nothing at support one level up): which of st_gn_yk's walked keys one level up
+    have the revoked key as a half, and the revoked key's own consumers IN st_gn_yk at every save
+    (`rb_consumer_survey` over the ungated arm's saves, `<ref tag>_consumer_survey.json`): the first save
+    at which st_gn_yk held a consumer for it, and the key's age then in the panel's observations (the
+    window is 160). 'none by c201' = no consumer at any save.
+
+  rb_gw_yk: 7 no-consumer revocations
+    c105 L3 [2, 5, 1, 6]               age 190 obs; half of 0 of st_gn_yk's walked L4 keys []; first consumer in st_gn_yk at the c120 save (3 consumers, key age 260 obs — past the 160-obs window; AFTER this revocation at c105); re-offered later here: yes
+    c165 L4 [1, 1, 2, 6, 0, 7, 2, 5]   age 160 obs; half of 0 of st_gn_yk's walked L5 keys []; not admitted in st_gn_yk at any surveyed save; re-offered later here: yes
+    c165 L4 [2, 5, 3, 7, 3, 0, 0, 7]   age 160 obs; half of 0 of st_gn_yk's walked L5 keys []; not admitted in st_gn_yk at any surveyed save; re-offered later here: yes
+    c175 L3 [1, 1, 1, 4]               age 160 obs; half of 0 of st_gn_yk's walked L4 keys []; not admitted in st_gn_yk at any surveyed save; re-offered later here: no
+    c175 L3 [7, 4, 2, 6]               age 510 obs; half of 0 of st_gn_yk's walked L4 keys []; no consumer at any of st_gn_yk's 7 saves (c160–c201); re-offered later here: no
+    c190 L4 [0, 7, 2, 5, 2, 6, 4, 6]   age 160 obs; half of 0 of st_gn_yk's walked L5 keys []; not admitted in st_gn_yk at any surveyed save; re-offered later here: no
+    c190 L4 [2, 5, 2, 5, 2, 6, 3, 7]   age 160 obs; half of 0 of st_gn_yk's walked L5 keys []; first consumer in st_gn_yk at the c150 save (1 consumers, key age None obs; by this revocation at c190); re-offered later here: no
+    summary: 7 no-consumer revocations; consumed in st_gn_yk by the revocation: 1; first consumed in st_gn_yk after it: 1; never consumed in st_gn_yk: 1; not admitted in st_gn_yk: 4
+    of them halves of st_gn_yk's walked keys one level up: 0 [], covering 0 of its keys
+    st_gn_yk's walked L3 keys with a half held revoked at the END, by that revocation's reason: {'worthless': 7} (of 24)
+    st_gn_yk's walked L4 keys with a half held revoked at the END, by that revocation's reason: {'worthless': 1} (of 22)
+    st_gn_yk's walked L5 keys with a half held revoked at the END, by that revocation's reason: none (of 9)
+
+  rb_gr_yk: 6 no-consumer revocations
+    c145 L3 [7, 4, 2, 6]               age 160 obs; half of 0 of st_gn_yk's walked L4 keys []; no consumer at any of st_gn_yk's 7 saves (c160–c201); re-offered later here: yes
+    c145 L4 [2, 6, 2, 6, 0, 7, 2, 5]   age 195 obs; half of 0 of st_gn_yk's walked L5 keys []; no consumer at any of st_gn_yk's 8 saves (c130–c192); re-offered later here: no
+    c145 L4 [7, 6, 7, 5, 2, 6, 2, 6]   age 160 obs; half of 0 of st_gn_yk's walked L5 keys []; not admitted in st_gn_yk at any surveyed save; re-offered later here: no
+    c160 L4 [2, 6, 2, 6, 0, 7, 2, 5]   age 312 obs; half of 0 of st_gn_yk's walked L5 keys []; no consumer at any of st_gn_yk's 8 saves (c130–c192); re-offered later here: no
+    c170 L4 [1, 6, 2, 6, 5, 0, 7, 4]   age 197 obs; half of 0 of st_gn_yk's walked L5 keys []; not admitted in st_gn_yk at any surveyed save; re-offered later here: yes
+    c180 L4 [2, 5, 2, 5, 3, 0, 0, 7]   age 160 obs; half of 0 of st_gn_yk's walked L5 keys []; no consumer at any of st_gn_yk's 1 saves (c120–c120); re-offered later here: no
+    summary: 6 no-consumer revocations; never consumed in st_gn_yk: 4; not admitted in st_gn_yk: 2
+    of them halves of st_gn_yk's walked keys one level up: 0 [], covering 0 of its keys
+    st_gn_yk's walked L3 keys with a half held revoked at the END, by that revocation's reason: {'worthless': 10} (of 24)
+    st_gn_yk's walked L4 keys with a half held revoked at the END, by that revocation's reason: {'worthless': 1} (of 22)
+    st_gn_yk's walked L5 keys with a half held revoked at the END, by that revocation's reason: none (of 9)
+
+M-5 THE BILL'S SCALE (per arm): fires include one unfired base pool per level per pass; every fire is
+    one pool of `n_aud` instances; the world arm bills each fire's pool.
+  rb_gw_yk: passes 35 (from c25); fires 2058 (= 58.8 a pass, 11.63 a cycle over c25-c201); graded key-passes 670 (3.07 fires each), priced 653; world queries billed to the grade 395,136 (192 a fire, 2,232 a cycle); the walk's own world bill 0
+  rb_gr_yk: passes 35 (from c25); fires 1669 (= 47.7 a pass, 9.43 a cycle over c25-c201); graded key-passes 563 (2.96 fires each), priced 464; world queries billed to the grade 0 (0 a fire, 0 a cycle); the walk's own world bill 0

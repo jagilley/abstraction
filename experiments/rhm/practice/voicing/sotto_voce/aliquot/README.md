@@ -122,6 +122,31 @@ arrives after admission, so the op it wants is admit-then-grade, provisional adm
 evidence, the arc's provisional-commitment finding recurring in the value seat. Full record:
 [`sostenuto/README.md`](sostenuto/README.md).
 
+### [`rubato/`](rubato/README.md) — the value reader's form and its diet: one confidence scalar, shaping as the route to it, admit-then-grade at zero world queries, and the loop made resumable (2026-09-23 → 24)
+
+**Goal**: metabolise PRs 129–133 together. Does precision's finding, that the linear value reader misses a nonlinear
+function of the world model's belief, touch the practice arc's live results; how far do those stand from an
+oracle-free loop; and put pp5's seat in the loop in the order sostenuto said the currency wants. Three rounds under
+one writeup: precision's `+logits` arm on the logit trunk, [`preplay/timbre/`](preplay/timbre/README.md) (pp1, pp3
+and pp5 re-read on richer reader forms, offline), and `rubato/` itself (the loop made resumable, then admit-then-grade
+with the world's success and the read's level as the two grades, both seeds, and a diet-gated read arm).
+
+**Finding**: on the logit trunk the missing thing is one scalar, the belief's absolute level (its log-partition or max
+logit): the sixteen directions alone buy nothing, the layer-normed state plus that scalar reproduces the
+belief-appended reader column for column, three seeds. On the practice plant the shaped read is form-invariant in
+both of preplay's seats and the block logits are linear in the pooled state, so the belief arm adds exactly that
+scalar; the unshaped control is what moves, lifted off chance by a richer reader at seed 0 and not at seed 2, so
+shaping is the reliable route to the read and not the only one. In the loop, admit-then-grade runs at zero world
+queries where the oracle version bills about 2,300 queries a cycle; the read's wrong revocations are its diet (at
+seed 0 twenty of twenty-four priced while the readout held no row at the consumers' span), a per-span diet rule
+halves them, and the remainder is single-pass noise a hair below zero that a two-consecutive rule or a margin near
+−0.05 removes on both seeds. No graded arm beats the ungated arm at depth on either seed, the oracle's included: the
+miner mines only from solves, so frequency and value are nearly one number here, there is almost no value-junk, key
+arrival is the budget, and the oracle's one large loss came from its no-consumer window. The loop is resumable (full
+state at every tenth cycle and every era boundary, bit-identical within a host type, one ulp of numpy's
+transcendentals across types; both reference arms banked with states). Full record:
+[`rubato/README.md`](rubato/README.md).
+
 ## The question
 
 `sotto_voce` asked whether the world has to be paid for verdicts on the probe channel's counterfactuals, the
@@ -393,6 +418,11 @@ mirror re-run with the reservoir sample, from aliquot's own queue.
 > **2026-09-23.** pp5's seat went into the loop as the child [`sostenuto/`](sostenuto/README.md), re-aimed at the
 > miner's live build once the census op was found never to have run on the arms of record; five gates over two rounds
 > and two seeds, and the conclusion that the currency wants admit-then-grade.
+
+> **2026-09-24.** Admit-then-grade ran as the child [`rubato/`](rubato/README.md), on a loop made resumable first; the
+> read grades at zero world queries and its errors are its diet, not its form; no grade helps on this substrate, because
+> the miner already filters on payoff and key arrival is the budget. The reader-form question is closed by
+> [`preplay/timbre/`](preplay/timbre/README.md) and precision's `+logits` arm, written up in the same node.
 
 ## Files
 

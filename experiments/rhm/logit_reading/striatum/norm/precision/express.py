@@ -49,6 +49,25 @@ features.  The state columns and the bias are untouched, so arm 0 is the banked 
   - on the twins, arm 0's `V` at offsets 0 and -1 equals the banked `tw__V_viol` /
     `tw__V_twin` to float32.
 
+**Follow-up 6 (2026-09-23), `--logit-arms`**: does the linear reader lack the belief's
+LOG-PARTITION, or does its shrinkage under-use the belief's directions inside 256 normalised
+dimensions?  The logits are `W_U ln_f(s)` exactly (`lm_head` has no bias), so a ridge on
+`ln_f(s)` already spans every linear function of them, and `log q = z - logsumexp(z)`.  The
+arms (a SEPARATE appended block with its own Grams, so every committed arm and column is
+untouched; each appended column standardised through the Gram to the base block's
+per-dimension RMS exactly as above, coefficients mapped back):
+  arm Z   `fullZ`   state + the 16 raw logits z_t: the belief's directions handed over as
+                    sixteen columns, without the log-partition
+  arm LE  `fullLE`  ln_f(s) in place + logsumexp(z_t): the log-partition handed over, the
+                    directions left inside the 256 normalised dimensions
+  arm LX  `fullLX`  ln_f(s) in place + max(z_t): the confirming scalar
+  arm E   `fullE`   state + logsumexp(z_t): the one scalar on the raw basis (the analogue of
+                    arm H)
+  arm ZE  `fullZE`  state + z_t + logsumexp(z_t): spans `fullQ`'s features exactly, plus
+                    one more direction (the closing arm on the raw basis)
+`--check-sfx` compares every column the cell shares with the named committed cells (the
+refitted `fullH` / `fullQ` / `fullL` / `fullLp` and the base columns) and gates on it.
+
 Run:
   modal run -m rhm.logit_reading.striatum.norm.precision.express::express_ckpt \
       --ckpt /data/.../traj_a1_s42/step064000.pt --stim-tag swap65k
@@ -91,6 +110,23 @@ AUG = (["H"] + [f"logq{i}" for i in range(16)] + ["norm", "tanh", "Hm1", "s", "H
 K = len(AUG)
 ARMS = {"H": [0], "Q": list(range(1, 17)), "N": [17], "T": [18], "P": [0, 19, 20, 21]}
 MLP_DD = (0, 1)
+# follow-up 6: the belief's raw logits, their log-partition and their max, in a SEPARATE
+# appended block (own Grams), so the committed block above and its Gram are untouched
+ZAUG = [f"z{i}" for i in range(16)] + ["lse", "zmax"]
+KZ = len(ZAUG)
+ZARMS = {"Z": list(range(16)), "ZE": list(range(17)), "E": [16]}   # on the raw state
+LZARMS = {"LE": [16], "LX": [17]}                                   # on ln_f(s), in place
+
+
+def _z_cols(lg):
+    """The KZ logit features from the raw logits `lg[..., 16]`: the logits, logsumexp and
+    max, computed in float64 and stored float32.  One function for the fit rows, the anchors
+    and the twins, so the three agree exactly."""
+    z = np.asarray(lg, np.float64)
+    assert z.shape[-1] == 16, z.shape
+    m = z.max(-1, keepdims=True)
+    lse = m[..., 0] + np.log(np.exp(z - m).sum(-1))
+    return np.concatenate([z, lse[..., None], m], -1).astype(np.float32)
 
 
 def _aug_cols(Hq, nll, lsm_at, st_at, u, sdz, pos, ww):
@@ -180,6 +216,52 @@ def _fit_map_arms(Am, Cm, As, Cs, Xv, LXv, SXv, Yv, d, n_rows, arms, lams):
     return out
 
 
+def _fit_logit_arms(Az, Cz, Alz, Clz, Xv, LXv, Zv, Yv, d, n_rows, arms_z, arms_lz, lams):
+    """Follow-up 6.  `Az`/`Cz` is the Gram of [s, z (16), lse, zmax, 1] and `Alz`/`Clz` of
+    [ln_f(s), lse, zmax, 1] on the same training rows.  The appended columns of each are
+    standardised through the Gram to that Gram's base block's per-dimension RMS
+    (`_standardiser`, exactly as the committed arms), each arm fitted on its sub-block with
+    `norm/task.py`'s per-column held-out lambda selection, and the coefficients mapped back to
+    the raw basis.  Also returns the SPAN diagnostic: held-out R2 of lse, zmax and each logit
+    regressed (same ladder, same selection) on [s], [s, z] and [ln_f(s)] -- how far each
+    appended feature already lies in each base span on these rows.
+    Returns ({arm: (beta raw, R2 per column, cols, "zcols" | "lzcols")}, span)."""
+    out, span = {}, {}
+    one = np.ones((len(Xv), 1))
+    Dz = d + KZ + 1
+    Tz = _standardiser(Az, d, n_rows)
+    Azs, Czs = Tz.T @ Az @ Tz, Tz.T @ Cz
+    Fvz = np.concatenate([Xv, Zv, one], 1) @ Tz
+    for arm in arms_z:
+        cc = list(range(d)) + [d + c for c in ZARMS[arm]]
+        B, r2 = _fit_arm(Azs, Czs, Fvz, Yv, cc, lams)
+        full_b = np.zeros((Dz, Cz.shape[1]))
+        full_b[cc + [Dz - 1]] = B
+        out[arm] = ((Tz @ full_b)[cc + [Dz - 1]], r2, cc, "zcols")
+    Tl = _standardiser(Alz, d, n_rows)
+    Als, Cls = Tl.T @ Alz @ Tl, Tl.T @ Clz
+    Fvl = np.concatenate([LXv, Zv[:, 16:], one], 1) @ Tl
+    for arm in arms_lz:
+        cc = list(range(d)) + [d + c - 16 for c in LZARMS[arm]]
+        B, r2 = _fit_arm(Als, Cls, Fvl, Yv, cc, lams)
+        full_b = np.zeros((d + 3, Clz.shape[1]))
+        full_b[cc + [d + 2]] = B
+        out[arm] = ((Tl @ full_b)[cc + [d + 2]], r2, cc, "lzcols")
+    # the span diagnostic: targets are the RAW appended columns
+    tz = list(range(d, d + KZ))
+    Cy = (Tz.T @ Az)[:, tz]
+    _, r_s = _fit_arm(Azs, Cy, Fvz, Zv, list(range(d)), lams)
+    _, r_sz = _fit_arm(Azs, Cy[:, 16:], Fvz, Zv[:, 16:], list(range(d + 16)), lams)
+    Cyl = (Tl.T @ Alz)[:, [d, d + 1]]
+    _, r_l = _fit_arm(Als, Cyl, Fvl, Zv[:, 16:], list(range(d)), lams)
+    span = {"lse": {"on_s": float(r_s[16]), "on_s_z": float(r_sz[0]), "on_ln": float(r_l[0])},
+            "zmax": {"on_s": float(r_s[17]), "on_s_z": float(r_sz[1]), "on_ln": float(r_l[1])},
+            "z_on_s": [float(x) for x in r_s[:16]],
+            "sd": {"lse": float(Zv[:, 16].std()), "zmax": float(Zv[:, 17].std()),
+                   "z_mean_sd": float(Zv[:, :16].std(0).mean())}}
+    return out, span
+
+
 def _probe(Xab, y, tr, va, lams):
     """junction/task.py's legality ceiling recipe: ridge on the anchor state (with bias),
     fitted on the training split, lambda picked on the validation split."""
@@ -203,7 +285,8 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
                  chunk: int = 512, do_mlp: bool = True, mlp_steps: int = 2000,
                  do_twins: bool = True, tol: float = 5e-5, u_seed: int = 4242,
                  arm_set: str = "H,Q,N,T,P", map_arms: str = "", out_sfx: str = "_express",
-                 bank_tag: str = "", do_probes: bool = False):
+                 bank_tag: str = "", do_probes: bool = False, logit_arms: str = "",
+                 check_sfx: str = ""):
     """Defaults reproduce the committed `_express` cells exactly.  Follow-up 4 adds
     `map_arms` ("L,Lp,S"); follow-up 5 runs a venue with no banked `norm/` cell, where
     `bank_tag` names the banked venue whose json supplies the actor's clean accuracy (the
@@ -228,6 +311,12 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
     arms_aug = {a: ARMS[a] for a in arm_set.split(",") if a}
     arms_map = [a for a in map_arms.split(",") if a]
     assert all(a in ("L", "Lp", "S") for a in arms_map), arms_map
+    lg_arms = [a for a in logit_arms.split(",") if a]
+    assert all(a in ZARMS or a in LZARMS for a in lg_arms), lg_arms
+    arms_z = [a for a in lg_arms if a in ZARMS]
+    arms_lz = [a for a in lg_arms if a in LZARMS]
+    use_z = bool(lg_arms)
+    need_ln = bool(arms_map) or use_z          # the span diagnostic reads ln_f(s) too
     lnf = model.transformer.ln_f
     print(f"loaded {ckpt} step {cfg.get('step')} d={d} T={T}", flush=True)
 
@@ -309,6 +398,8 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
         Hq = np.zeros((len(W), T), np.float32)
         anc = np.zeros((len(W), 4, d), np.float32)
         lsm_anc = np.zeros((len(W), 4, v), np.float32)
+        lg_anc = np.zeros((len(W), 4, v), np.float32)
+        zaux = np.zeros((len(cache_idx), R_, KZ), np.float32) if (want_cache and use_z) else None
         emb_anc = np.zeros((len(W), 4, d), np.float32) if (do_probes and want_cache) else None
         cache = np.zeros((len(cache_idx), R_, d), np.float16) if want_cache else None
         aug = np.zeros((len(cache_idx), R_, K), np.float32) if want_cache else None
@@ -330,6 +421,7 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
                 ar = torch.arange(x.shape[0], device=dev)[:, None]
                 anc[sl] = inter[prim][ar, ap].float().cpu().numpy()
                 lsm_anc[sl] = lsm[ar, ap].cpu().numpy()
+                lg_anc[sl] = lg[ar, ap].float().cpu().numpy()
                 if emb_anc is not None:
                     emb_anc[sl] = inter["post_embed"][ar, ap].float().cpu().numpy()
                 if want_cache:
@@ -345,11 +437,14 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
                                             inter[prim][kt][:, rows].float().cpu().numpy(),
                                             u, sdz, np.broadcast_to(rows[None, :], (nb, R_)),
                                             np.broadcast_to((c0 + kk)[:, None], (nb, R_)))
-        return o, nll, Hq, anc, lsm_anc, cache, aug, emb_anc
+                        if zaux is not None:
+                            zaux[ci] = _z_cols(lg[kt][:, rows].float().cpu().numpy())
+        return o, nll, Hq, anc, lsm_anc, cache, aug, emb_anc, lg_anc, zaux
 
     t0 = time.time()
-    o_o, nll_o, H_o, st_o, lsm_ao, _, _, _ = run(Wo, y_orig)
-    o_e, nll_e, H_e, st_e, lsm_ae, cache, aug_c, emb_ae = run(We, y_edit, want_cache=True)
+    o_o, nll_o, H_o, st_o, lsm_ao, _, _, _, lg_ao, _ = run(Wo, y_orig)
+    (o_e, nll_e, H_e, st_e, lsm_ae, cache, aug_c, emb_ae, lg_ae,
+     zaux_c) = run(We, y_edit, want_cache=True)
     print(f"passes {time.time() - t0:.1f}s  cache {cache.nbytes / 1e9:.2f} GB", flush=True)
 
     # ---- Grams for `full`: arm 0 exactly as norm/task.py, and the augmented one ------------
@@ -366,6 +461,11 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
         Cm = torch.zeros(2 * d + 1, n_tgt, dtype=torch.float64, device=dev)
         Asd = torch.zeros(d + 1, d + 1, dtype=torch.float64, device=dev)
         Csd = torch.zeros(d + 1, n_tgt, dtype=torch.float64, device=dev)
+    if use_z:
+        Az = torch.zeros(d + KZ + 1, d + KZ + 1, dtype=torch.float64, device=dev)
+        Cz = torch.zeros(d + KZ + 1, n_tgt, dtype=torch.float64, device=dev)
+        Alz = torch.zeros(d + 3, d + 3, dtype=torch.float64, device=dev)
+        Clz = torch.zeros(d + 3, n_tgt, dtype=torch.float64, device=dev)
     shuf = np.random.default_rng(seed + 3).permutation(len(tr_idx))
     t0 = time.time()
     n_rows_tr = 0
@@ -400,6 +500,17 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
             Asd += Fs.T @ Fs
             Csd += Fs.T @ Y
             del Xf, LX, SX, Fm, Fs
+        if use_z:
+            Zt = torch.as_tensor(zaux_c[sl].reshape(-1, KZ), device=dev).double()
+            Fz = torch.cat([X, Zt, ones], 1)
+            Az += Fz.T @ Fz
+            Cz += Fz.T @ Y
+            with torch.no_grad():
+                LXz = lnf(X.float()).double()
+            Flz = torch.cat([LXz, Zt[:, 16:], ones], 1)
+            Alz += Flz.T @ Flz
+            Clz += Flz.T @ Y
+            del Zt, Fz, LXz, Flz
         n_rows_tr += len(X)
         del X, X1, F, G, Y
     print(f"grams {time.time() - t0:.1f}s", flush=True)
@@ -407,6 +518,7 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
     # held-out rows for lambda selection (norm/task.py's)
     Xv = cache[len(tr_idx):].reshape(-1, d).astype(np.float64)
     Gv = aug_c[len(tr_idx):].reshape(-1, K).astype(np.float64)
+    Zv = zaux_c[len(tr_idx):].reshape(-1, KZ).astype(np.float64) if use_z else None
     Yv = np.stack([o_e[li][np.ix_(va_idx, rows + dd)].astype(np.float64).reshape(-1)
                    for li in range(len(LEVELS)) for dd in DD_LIST], -1)
     Yv = np.concatenate([Yv, Yv], 1)
@@ -448,7 +560,7 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
 
     def maps_np(X32):
         """ln_f(s) and the affine-free standardisation of s, float64, on the GPU."""
-        if not arms_map:
+        if not need_ln:
             return None, None
         Lz, Sz = [], []
         with torch.no_grad():
@@ -469,6 +581,18 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
             val_r2[f"full{arm}"] = {names[i]: float(r2[i]) for i in range(n_tgt)}
             scale_info[f"full{arm}"] = info
         del Am, Cm, Asd, Csd, LXv, SXv
+    span = {}
+    if use_z:
+        LXv_z = maps_np(Xv)[0]
+        fz, sp = _fit_logit_arms(Az.cpu().numpy(), Cz.cpu().numpy(), Alz.cpu().numpy(),
+                                 Clz.cpu().numpy(), Xv, LXv_z, Zv, Yv, d, n_rows_tr,
+                                 arms_z, arms_lz, LAMS)
+        for arm, (B, r2, cc, kind) in fz.items():
+            beta[f"full{arm}"] = B
+            beta[f"full{arm}__{kind}"] = cc
+            val_r2[f"full{arm}"] = {names[i]: float(r2[i]) for i in range(n_tgt)}
+        span["full"] = sp
+        del Az, Cz, Alz, Clz, LXv_z
     del Aa, Ca, A0, C0
     torch.cuda.empty_cache()
     print(f"solves {time.time() - t0:.1f}s  l1_d0 R2: " + "  ".join(
@@ -515,6 +639,12 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
         Cmc = torch.zeros(2 * d + 1, n_real, dtype=torch.float64, device=dev)
         Asc_ = torch.zeros(d + 1, d + 1, dtype=torch.float64, device=dev)
         Csc_ = torch.zeros(d + 1, n_real, dtype=torch.float64, device=dev)
+    if use_z:
+        Acz = torch.zeros(d + KZ + 1, d + KZ + 1, dtype=torch.float64, device=dev)
+        Ccz = torch.zeros(d + KZ + 1, n_real, dtype=torch.float64, device=dev)
+        Aclz = torch.zeros(d + 3, d + 3, dtype=torch.float64, device=dev)
+        Cclz = torch.zeros(d + 3, n_real, dtype=torch.float64, device=dev)
+        Zcc_va = np.zeros((n_cc_va, R_, KZ), np.float32)
     n_cc_rows = 0
     with torch.no_grad():
         for c0 in range(0, n_clean_crit, 256):
@@ -537,6 +667,7 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
             G_b = _aug_cols(H_b, nll_b, lsm_r, f32, u, sdz,
                             np.broadcast_to(rows[None, :], (nb, R_)),
                             np.broadcast_to(np.arange(nb)[:, None], (nb, R_)))
+            Z_b = _z_cols(lg[:, rows].float().cpu().numpy()) if use_z else None
             kk = np.where(ii < n_cc_tr)[0]
             if len(kk):
                 kt = torch.as_tensor(kk, device=dev)
@@ -563,12 +694,23 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
                     Fsb = torch.cat([SXb, ones], 1)
                     Asc_ += Fsb.T @ Fsb
                     Csc_ += Fsb.T @ Yb
+                if use_z:
+                    Ztc = torch.as_tensor(Z_b[kk].reshape(-1, KZ), device=dev).double()
+                    Fzb = torch.cat([Xb, Ztc, ones], 1)
+                    Acz += Fzb.T @ Fzb
+                    Ccz += Fzb.T @ Yb
+                    LXbz = lnf(inter[prim][kt][:, rows].float().reshape(-1, d)).double()
+                    Flzb = torch.cat([LXbz, Ztc[:, 16:], ones], 1)
+                    Aclz += Flzb.T @ Flzb
+                    Cclz += Flzb.T @ Yb
                 n_cc_rows += len(Xb)
             vk = np.where(ii >= n_cc_tr)[0]
             if len(vk):
                 Xcc_va[ii[vk] - n_cc_tr] = \
                     inter[prim][torch.as_tensor(vk, device=dev)][:, rows].float().cpu().numpy()
                 Gcc_va[ii[vk] - n_cc_tr] = G_b[vk]
+                if use_z:
+                    Zcc_va[ii[vk] - n_cc_tr] = Z_b[vk]
     Xvc = torch.as_tensor(Xcc_va.reshape(-1, d), device=dev).double()
     Xvc = torch.cat([Xvc, torch.ones(len(Xvc), 1, dtype=torch.float64, device=dev)], 1)
     Yvc = torch.stack([torch.as_tensor(
@@ -614,6 +756,19 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
             val_r2[f"clean{arm}"] = {real_names[i]: float(r2[i]) for i in range(n_real)}
             scale_info[f"clean{arm}"] = info
         del Amc, Cmc, Asc_, Csc_
+    if use_z:
+        Xvcc = Xcc_va.reshape(-1, d).astype(np.float64)
+        LXvc_z = maps_np(Xcc_va.reshape(-1, d))[0]
+        fzc, spc = _fit_logit_arms(Acz.cpu().numpy(), Ccz.cpu().numpy(), Aclz.cpu().numpy(),
+                                   Cclz.cpu().numpy(), Xvcc, LXvc_z,
+                                   Zcc_va.reshape(-1, KZ).astype(np.float64), Yvc_n, d,
+                                   n_cc_rows, arms_z, arms_lz, LAMS)
+        for arm, (B, r2, cc, kind) in fzc.items():
+            beta[f"clean{arm}"] = B
+            beta[f"clean{arm}__{kind}"] = cc
+            val_r2[f"clean{arm}"] = {real_names[i]: float(r2[i]) for i in range(n_real)}
+        span["clean"] = spc
+        del Acz, Ccz, Aclz, Cclz, LXvc_z
     del Acc, Ccc, Aca, Cca, Xvc, Yvc, cache, aug_c
     torch.cuda.empty_cache()
     print(f"clean critics {time.time() - t0:.1f}s  l1_d0: " + "  ".join(
@@ -622,27 +777,38 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
 
     # ---- prediction on raw features ----------------------------------------------------
     arm_names = (["full"] + [f"full{a}" for a in arms_aug] + [f"full{a}" for a in arms_map]
+                 + [f"full{a}" for a in lg_arms]
                  + ["clean"] + [f"clean{a}" for a in arms_aug]
-                 + [f"clean{a}" for a in arms_map])
+                 + [f"clean{a}" for a in arms_map] + [f"clean{a}" for a in lg_arms])
 
     def colidx(nm, name):
         return (names.index(name) if not nm.startswith("clean") else real_names.index(name))
 
-    def lin(nm, name, Xs, Gs, Ls=None, Ss=None):
-        b = beta[nm][:, colidx(nm, name)]
+    def feat(nm, Xs, Gs, Ls=None, Ss=None, Zs=None):
+        """The arm's raw feature matrix (no bias column).  Built once per stream and reused
+        across every target column (2026-09-23: the same array, so every number is
+        bit-identical to building it per column as before; only the time changes)."""
         if nm in ("full", "clean"):
-            return Xs @ b[:-1] + b[-1]
+            return Xs
         mp = beta.get(f"{nm}__map")
+        if f"{nm}__zcols" in beta:
+            return np.concatenate([Xs, Zs], 1)[:, beta[f"{nm}__zcols"]]
+        if f"{nm}__lzcols" in beta:
+            return np.concatenate([Ls, Zs[:, 16:]], 1)[:, beta[f"{nm}__lzcols"]]
         if mp == "L":
-            F = Ls
-        elif mp == "Lp":
-            F = np.concatenate([Xs, Ls], 1)
-        elif mp == "S":
-            F = Ss
-        else:
-            cc = beta[f"{nm}__cols"]
-            F = np.concatenate([Xs, Gs], 1)[:, cc]
+            return Ls
+        if mp == "Lp":
+            return np.concatenate([Xs, Ls], 1)
+        if mp == "S":
+            return Ss
+        return np.concatenate([Xs, Gs], 1)[:, beta[f"{nm}__cols"]]
+
+    def vcol(nm, name, F):
+        b = beta[nm][:, colidx(nm, name)]
         return F @ b[:-1] + b[-1]
+
+    def lin(nm, name, Xs, Gs, Ls=None, Ss=None, Zs=None):
+        return vcol(nm, name, feat(nm, Xs, Gs, Ls, Ss, Zs))
 
     def mlp_pred(name, Xs):
         return mlp[name](Xs.astype(np.float32)).astype(np.float64)
@@ -662,6 +828,7 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
                                                   - bank["clean_critic_val_r2"][nm_])
     save = {}
     for an, t0a in anchors.items():
+        t_an = time.time()
         ok = anchor_ok[an]
         w = np.where(ok)[0]
         if len(w) < 50:
@@ -691,21 +858,25 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
         Lb, Sb = maps_np(st_e[w, ib])
         Lao, Sao = maps_np(st_o[w, ia])
         Lbo, Sbo = maps_np(st_o[w, ib])
+        Za, Zb_ = _z_cols(lg_ae[w, ia]), _z_cols(lg_ae[w, ib])
+        Zao, Zbo = _z_cols(lg_ao[w, ia]), _z_cols(lg_ao[w, ib])
         for nm in arm_names:
+            Fa_, Fb_ = feat(nm, Xa, Ga, La, Sa, Za), feat(nm, Xb_, Gb, Lb, Sb, Zb_)
+            Fao_, Fbo_ = feat(nm, Xao, Gao, Lao, Sao, Zao), feat(nm, Xbo, Gbo, Lbo, Sbo, Zbo)
             for l in L_STORE:
                 for a in A_STORE:
                     n0, n1 = f"l{l}_d{a}", f"l{l}_d{a + 1}"
-                    Va, Vb = lin(nm, n0, Xa, Ga, La, Sa), lin(nm, n1, Xb_, Gb, Lb, Sb)
-                    Vao, Vbo = (lin(nm, n0, Xao, Gao, Lao, Sao),
-                                lin(nm, n1, Xbo, Gbo, Lbo, Sbo))
+                    Va, Vb = vcol(nm, n0, Fa_), vcol(nm, n1, Fb_)
+                    Vao, Vbo = vcol(nm, n0, Fao_), vcol(nm, n1, Fbo_)
                     rec[f"R_{nm}_l{l}_a{a}"] = Va - Vb
                     rec[f"Ro_{nm}_l{l}_a{a}"] = Vao - Vbo
                     rec[f"V_{nm}_l{l}_a{a}"] = Va
                     rec[f"Vpre_{nm}_l{l}_a{a}"] = Vb
                     rec[f"Vpreo_{nm}_l{l}_a{a}"] = Vbo
                     if not nm.startswith("clean"):
-                        rec[f"Rsh_{nm}_l{l}_a{a}"] = (lin(nm, f"sh_{n0}", Xa, Ga, La, Sa)
-                                                      - lin(nm, f"sh_{n1}", Xb_, Gb, Lb, Sb))
+                        rec[f"Rsh_{nm}_l{l}_a{a}"] = (vcol(nm, f"sh_{n0}", Fa_)
+                                                      - vcol(nm, f"sh_{n1}", Fb_))
+            del Fa_, Fb_, Fao_, Fbo_
         if mlp:
             for l in L_STORE:
                 Va, Vb = mlp_pred(f"l{l}_d0", Xa), mlp_pred(f"l{l}_d1", Xb_)
@@ -787,7 +958,7 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
         print(f"{an}: {int(tem.sum())} test rows  gates rows {g[f'{an}/w']} "
               f"{g[f'{an}/t0']} labels {lab_ok}  nll {g[f'{an}/nll_e']:.1e}  "
               f"H {g[f'{an}/H_pre']:.1e}  full {cg[f'{an}/full']:.2e}  "
-              f"clean {cg[f'{an}/clean']:.2e}", flush=True)
+              f"clean {cg[f'{an}/clean']:.2e}  ({time.time() - t_an:.0f}s)", flush=True)
 
     # ---- the twins: every arm's V at offsets 0 and -1, for both members --------------------
     if do_twins and own_bank and "tw__w" in bank_npz.files:
@@ -808,6 +979,7 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
             nls = np.zeros((len(w), T), np.float32)
             st2 = np.zeros((len(w), 2, d), np.float32)
             ls2 = np.zeros((len(w), 2, v), np.float32)
+            lg2 = np.zeros((len(w), 2, v), np.float32)
             with torch.no_grad():
                 for c0 in range(0, len(w), 512):
                     sl = slice(c0, min(c0 + 512, len(w)))
@@ -821,15 +993,17 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
                     ar = torch.arange(x.shape[0], device=dev)[:, None]
                     st2[sl] = inter[prim][ar, tt].float().cpu().numpy()
                     ls2[sl] = lsm[ar, tt].cpu().numpy()
+                    lg2[sl] = lg[ar, tt].float().cpu().numpy()
             for k_, (slot, p_) in {"pre": (0, tvp - 1), "ev": (1, tvp)}.items():
                 G_ = _aug_cols(Hs, nls, ls2[:, slot], st2[:, slot], u, sdz, p_, ar_)
                 L_, S_ = maps_np(st2[:, slot])
+                Z_ = _z_cols(lg2[:, slot])
                 Xs_ = st2[:, slot].astype(np.float64)
                 for nm in arm_names:
                     for l in L_STORE:
                         dd = 1 if k_ == "pre" else 0
                         out_t[f"tw_{k_}_{nm}_l{l}_{side}"] = lin(nm, f"l{l}_d{dd}", Xs_, G_,
-                                                                  L_, S_)
+                                                                  L_, S_, Z_)
                 if mlp:
                     for l in L_STORE:
                         dd = 1 if k_ == "pre" else 0
@@ -849,6 +1023,29 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
         print(f"twins {time.time() - t0:.1f}s  {len(w)} pairs  arm-0 gate {worst:.2e}",
               flush=True)
 
+    # ---- follow-up 6: every column shared with a committed cell must reproduce it ----------
+    for sx in [x for x in check_sfx.split(",") if x]:
+        pth = f"{stem}_norm_{stim_tag}{sx}.npz"
+        if not os.path.exists(pth):
+            gates.setdefault("shared", {})[sx] = {"n": 0, "worst": float("nan"),
+                                                  "missing": True}
+            continue
+        Zc = np.load(pth)
+        shared = [k_ for k_ in Zc.files if k_ != "meta" and k_ in save]
+        worst, wk = 0.0, ""
+        for k_ in shared:
+            a_, b_ = np.asarray(save[k_]), np.asarray(Zc[k_])
+            if a_.shape != b_.shape:
+                worst, wk = float("inf"), k_
+                break
+            dv = float(np.abs(a_.astype(np.float64) - b_.astype(np.float64)).max()) \
+                if a_.size else 0.0
+            if dv > worst:
+                worst, wk = dv, k_
+        gates.setdefault("shared", {})[sx] = {"n": len(shared), "worst": worst,
+                                              "worst_key": wk}
+        print(f"shared with {sx}: {len(shared)} columns, worst {worst:.2e} ({wk})", flush=True)
+
     # ---- verdict, save --------------------------------------------------------------------
     fails = []
     fails += [k_ for k_, x in gates["actor"].items() if x > 1e-9]
@@ -856,6 +1053,8 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
     fails += [k_ for k_, x in gates["rows"].items() if (x is False) or
               (not isinstance(x, bool) and x > tol)]
     fails += [k_ for k_, x in gates["cols"].items() if x > tol]
+    fails += [f"shared{k_}" for k_, x in gates.get("shared", {}).items()
+              if x.get("missing") or not (x["worst"] <= tol) or x["n"] == 0]
     res = {"ckpt": ckpt, "step": cfg.get("step"), "stim_tag": stim_tag, "n": n,
            "actor_clean_acc": actor_tab, "val_r2": val_r2, "gates": gates,
            "gate_fails": fails, "arms": {"H": "state + H(q_t)", "Q": "state + log q_t",
@@ -865,9 +1064,15 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
                                          "M": "MLP on the state (l1-4, a = 0)",
                                          "L": "ln_f(s) in place of the state",
                                          "Lp": "state + ln_f(s), ln block scaled as a block",
-                                         "S": "affine-free per-row standardisation, in place"},
+                                         "S": "affine-free per-row standardisation, in place",
+                                         "Z": "state + the 16 raw logits z_t",
+                                         "ZE": "state + z_t + logsumexp(z_t)",
+                                         "E": "state + logsumexp(z_t)",
+                                         "LE": "ln_f(s) in place + logsumexp(z_t)",
+                                         "LX": "ln_f(s) in place + max(z_t)"},
            "arm_set": arm_set, "map_arms": map_arms, "bank_tag": bank_tag,
-           "own_bank": own_bank, "do_probes": do_probes,
+           "own_bank": own_bank, "do_probes": do_probes, "logit_arms": logit_arms,
+           "check_sfx": check_sfx, "zaug_cols": ZAUG, "span": span,
            "aug_cols": AUG, "scale": scale_info, "u_seed": u_seed, "sdz": sdz,
            "mlp_steps": mlp_steps if do_mlp else 0}
     sfx = f"_norm_{stim_tag}{out_sfx}"
@@ -889,7 +1094,8 @@ def express_ckpt(ckpt: str, stim_tag: str = "swap65k", n_clean: int = 6144,
 def express_sweep(seeds: str = "42,43,44", steps: str = "0,8000,64000",
                   tags: str = "swap65k,a1", do_mlp: bool = True, arm_set: str = "H,Q,N,T,P",
                   map_arms: str = "", out_sfx: str = "_express", bank_tag: str = "",
-                  do_probes: bool = False, do_twins: bool = True):
+                  do_probes: bool = False, do_twins: bool = True, logit_arms: str = "",
+                  check_sfx: str = ""):
     """One container per (checkpoint, venue), fanned out from this CPU coordinator.  The
     defaults reproduce the committed `_express` sweep."""
     volume.reload()
@@ -905,10 +1111,11 @@ def express_sweep(seeds: str = "42,43,44", steps: str = "0,8000,64000",
                     continue
                 # (ckpt, stim_tag, n_clean, n_clean_val, seed, actor_steps, eval_seed,
                 #  n_clean_crit, prim_block, n_val_windows, chunk, do_mlp, mlp_steps,
-                #  do_twins, tol, u_seed, arm_set, map_arms, out_sfx, bank_tag, do_probes)
+                #  do_twins, tol, u_seed, arm_set, map_arms, out_sfx, bank_tag, do_probes,
+                #  logit_arms, check_sfx)
                 args.append((ck, tg, 6144, 2048, 11, 3000, 5150, 8192, "post_block7", 1500,
                              512, do_mlp, 2000, do_twins, 5e-5, 4242, arm_set, map_arms,
-                             out_sfx, bank_tag, do_probes))
+                             out_sfx, bank_tag, do_probes, logit_arms, check_sfx))
     print(f"{len(args)} cells", flush=True)
     outs = list(express_ckpt.starmap(args, return_exceptions=True))
     for a, o in zip(args, outs):

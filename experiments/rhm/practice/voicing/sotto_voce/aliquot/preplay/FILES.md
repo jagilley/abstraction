@@ -62,3 +62,4 @@ pp3's reconstruction is gated against; `entry.json.gz` is not on the volume.
 | folder | summary |
 |---|---|
 | [`within/`](within/FILES.md) | within-context candidate discrimination on the six soundboard dumps and overtone's two: the grader's filed probability, the prior, the critic, the composed chooser and five fitted controls, on pairs inside one context only. Decisions in [`within/NOTES.md`](within/NOTES.md) |
+| [`timbre/`](timbre/FILES.md) | pp1, pp3 and pp5 re-read on richer reader forms of the same pooled state (the belief appended, an MLP on the state, an MLP on the belief alone, a per-slot ridge at L2/L3), refit on pp1's shared bank subsample through the shaped, frozen and twin trunks, the banked reductions run unchanged; arm 0 bit-identical to the banked pp1/pp3/pp5 columns. Facts in `timbre/figures/timbre_reduction.txt`; decisions in [`timbre/NOTES.md`](timbre/NOTES.md). No README yet (2026-09-23) |

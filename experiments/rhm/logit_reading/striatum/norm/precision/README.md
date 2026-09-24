@@ -200,8 +200,8 @@ Every arm refit on the same rows, gated; `swap65k` `t_v`, ℓ=1, 64k, three seed
   loses fit at ℓ=3–4 (the raw stream's scale carries something about deep levels); `+ln` recovers about 70% of `+log q`'s fit gain and none of its
   containment. The logits are linear in `ln_f(s)`, so a ridge on `ln_f(s)` already spans every linear function of them; `log q` differs from the
   logits by one number per row, the log-partition. The candidates left are that scalar, or the ridge's shrinkage under-using the belief's
-  directions when they sit inside 256 normalised dimensions and using them when handed over as sixteen columns. A `+logits` arm separates them and
-  was not run.
+  directions when they sit inside 256 normalised dimensions and using them when handed over as sixteen columns. A `+logits` arm separates them; it ran
+  2026-09-23 (§8a below).
 - **What no reader fixes**: the 64k ℓ=1 under-adjustment of the norm along the axis (§4). The same arms move the twin optimism of norm §3 up
   three-fold (`+log q`) and five-fold (`MLP`).
 - **Fit at random init moves only under the MLP** (+0.03); the augmented linear arms add nothing there because the belief is near-uniform.
@@ -210,6 +210,36 @@ Every arm refit on the same rows, gated; `swap65k` `t_v`, ℓ=1, 64k, three seed
 > the entropy is not that function and normalisation is not the missing operation. The sign of the response's surprise-by-entropy interaction
 > belongs to the reader's form on this record, not to the world or the target: readers with the belief in hand agree with each other and disagree
 > with the ridge.**
+
+### 8a. Addendum 2026-09-23: the missing thing is one scalar of the logits' absolute level, not the ridge's shrinkage
+
+The arms §8 designed, run on the banked express cells (three seeds, both venues, 0 / 8k / 64k; every shared column reproduces `_express` and
+`_express_ln` to 6e−08; facts in [`results/tables_logits_20260923.md`](results/tables_logits_20260923.md), sections H, S and E1–E5). `swap65k` `t_v`,
+ℓ=1, 64k:
+
+| reader | held-out fit gain | `H_pre`'s damage reading left outside (marginal 0.62) | `R ~ H_pre` | `z(s)·z(H)` | `AUC(−R, flip)` |
+|---|---|---|---|---|---|
+| `+logits` (`s` + the 16 raw logits: the directions, no log-partition) | +0.004 / +0.003 / +0.004 | 0.607 / 0.621 / 0.608 | +0.032 / +0.034 / +0.028 | +0.011 / +0.011 / +0.015 | 0.611 / 0.583 / 0.601 |
+| `ln +lse` (`ln_f(s)` + the log-partition) | +0.029 / +0.027 / +0.023 | 0.534 / 0.566 / 0.545 | −0.023 / −0.015 / −0.024 | −0.021 / −0.012 / −0.019 | 0.682 / 0.649 / 0.664 |
+| `ln +max` (`ln_f(s)` + `max(z)`) | +0.034 / +0.031 / +0.027 | 0.541 / 0.569 / 0.549 | −0.020 / −0.009 / −0.019 | −0.021 / −0.011 / −0.019 | 0.678 / 0.646 / 0.662 |
+| `+lse` (`s` + the one scalar, the analogue of `+H`) | +0.019 / +0.021 / +0.020 | 0.570 / 0.587 / 0.570 | −0.002 / +0.002 / −0.004 | −0.016 / −0.009 / −0.011 | 0.664 / 0.639 / 0.661 |
+| `+logits +lse` (contains `+log q`'s features) | +0.030 / +0.028 / +0.028 | 0.546 / 0.562 / 0.547 | −0.025 / −0.018 / −0.023 | −0.027 / −0.019 / −0.020 | 0.677 / 0.653 / 0.673 |
+
+- **The log-partition candidate wins, cleanly.** The directions handed over without the scalar behave like `+ln` on every column, seed, venue and
+  level; one scalar on the normalised basis behaves like `+log q` on all five columns; `+logits +lse` equals `+log q` column for column. The span
+  diagnostic (section S): each logit is 98% linear in the raw state and `lse` 95–97% linear in `[s]`, `[s, z]` and `ln_f(s)`, so the arms differ
+  only through a few percent of nonlinear residual, which carries the whole effect.
+- **Which scalar is less settled.** `ln +max` does as well as `ln +lse`, so the record identifies a scalar of the logits' absolute level rather than
+  the log-partition as such; `+H`, a nonlinear scalar of the belief invariant to shifting the logits, gives fit and no containment (§8). At 8k the
+  scalar arms contain more than `+log q` (0.578 / 0.571 / 0.590 against 0.600 / 0.586 / 0.608) and leave the slope near zero. On the clean-only
+  critic `ln +lse` is the strongest arm of any (0.509 / 0.544 / 0.531). The `ln`-based arms carry `ln`'s fit loss at ℓ=3–4 (to −0.010); `+lse` and
+  `+logits +lse` keep `+log q`'s deep-level gain. Twins at ℓ=1, 64k: `+logits` equals the ridge (+0.009 / +0.009 / +0.011) and `ln +lse` sits near
+  `+log q` (+0.021 / +0.021 / +0.023 against +0.023 / +0.026 / +0.027).
+- A four-arm follow-up on `swap65k` (`ln +H`, `ln + log q_max`, `+max`, `ln + ||z||`, ~25 L4-min) would separate `lse` from `max`; designed, not run.
+- **Read across substrates**: on the practice plant the block logits are linear in the pooled state, so a belief-appended reader there adds only
+  this scalar, and on the outcome-shaped plant it adds nothing to the read ([`aliquot/rubato/README.md`](../../../../practice/voicing/sotto_voce/aliquot/rubato/README.md) §2).
+
+> **What the ridge on the raw state lacks is how peaked the belief is, one number; the belief's directions it already has.**
 
 ## 9. The law survives a reader that sees the belief
 
@@ -283,7 +313,7 @@ and anchors, every reproduction gate against the banked cells exact):
 
 **Does not establish:**
 
-- Whether the missing scalar is the log-partition or the ridge's shrinkage under-using the belief's directions (the `+logits` arm).
+- ~~Whether the missing scalar is the log-partition or the ridge's shrinkage under-using the belief's directions (the `+logits` arm).~~ *Settled 2026-09-23 (§8a): the scalar; whether it is the log-partition or the max logit is not separated.*
 - What the 64k ℓ=1 under-adjustment of the norm along the axis is a property of; no reader form closes it, so it is about what the pre-event state
   can know, not who reads it.
 - Which part of `+log q`'s response carries what; the split is exact but weakly identified.

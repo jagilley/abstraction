@@ -35,7 +35,10 @@ LABEL = {"full": "ridge (banked)", "fullH": "+H", "fullQ": "+log q", "fullN": "+
          "fullL": "ln (in place)", "fullLp": "+ln", "fullS": "std (in place)",
          "clean": "clean ridge", "cleanH": "clean +H", "cleanQ": "clean +log q",
          "cleanN": "clean +norm", "cleanT": "clean +tanh", "cleanP": "clean +precision",
-         "cleanL": "clean ln", "cleanLp": "clean +ln", "cleanS": "clean std"}
+         "cleanL": "clean ln", "cleanLp": "clean +ln", "cleanS": "clean std",
+         "fullZ": "+logits", "fullLE": "ln +lse", "fullLX": "ln +max", "fullE": "+lse",
+         "fullZE": "+logits +lse", "cleanZ": "clean +logits", "cleanLE": "clean ln +lse",
+         "cleanLX": "clean ln +max", "cleanE": "clean +lse", "cleanZE": "clean +logits +lse"}
 SFX = "_express"          # `--sfx _express_ln` reads follow-up 4's cells
 
 
@@ -505,6 +508,163 @@ def sec_matched_identity(dirs, names, tags, ancs):
 
 
 # ---------------------------------------------------------------------------
+# follow-up 6 (2026-09-23): the headline in README section 8's columns, the span diagnostic,
+# and the shared-column gate against the committed cells
+# ---------------------------------------------------------------------------
+
+_JS = {}
+
+
+def _json(p):
+    if p not in _JS:
+        _JS[p] = json.load(open(p)) if os.path.exists(p) else None
+    return _JS[p]
+
+
+def sec_headline(dirs, names, tag, an, arms, steps=(64000, 8000), levels=(1, 2), a=0,
+                 kind="flip"):
+    """README section 8's five columns, one row per (step, level, arm), seeds side by side:
+    held-out fit gain over arm 0 (`val_r2` of `V[l, 0]`), `AUC(H_pre, flip)` inside five
+    quantile bins of the arm's post-event level (E4 `H given V`), `R ~ H_pre` at matched
+    surprisal without `V_pre` times sd of `H_pre` (E3), the `z(s) x z(H)` coefficient (E3),
+    and `AUC(-R, flip)` pooled (E3).  The same functions as the full sections below, on the
+    same matched rows; three decimals, as in the README."""
+    rows = []
+
+    def ctx(d, st, l, arm):
+        p = xp(d, tag, st)
+        if not os.path.exists(p):
+            return None
+        C = cell_of(p, an)
+        if not has(C, arm, l, a):
+            return None
+        Rw, mm = matched_sets(p, an, kind, a)
+        if Rw is None or l not in mm:
+            return None
+        i, lab = mm[l]
+        return C, i, lab[i]
+
+    for st in steps:
+        for l in levels:
+            def marg(d):
+                got = ctx(d, st, l, "full")
+                return "--" if got is None else fmt(_auc(got[0].H[got[1]], got[2]))
+            rows.append([st, l, "(marginal `AUC(H_pre, flip)`)", "",
+                         per_seed(dirs, marg), "", "", ""])
+            for arm in arms:
+                def gain(d, arm=arm):
+                    r = _json(xj(d, tag, st))
+                    if r is None or arm not in r["val_r2"]:
+                        return "--"
+                    if arm == "full":
+                        return "--"
+                    return f"{r['val_r2'][arm][f'l{l}_d0'] - r['val_r2']['full'][f'l{l}_d0']:+.3f}"
+
+                def hv(d, arm=arm):
+                    got = ctx(d, st, l, arm)
+                    if got is None:
+                        return "--"
+                    C, i, y = got
+                    return fmt(_cond_auc(C.H[i], C.V(arm, l, a)[i], y, 5))
+
+                def slope(d, arm=arm):
+                    got = ctx(d, st, l, arm)
+                    if got is None:
+                        return "--"
+                    C, i, y = got
+                    b, se, _ = _partial(C.R(arm, l, a)[i], C.H[i], C.ctrl(idx=i))
+                    return f"{b * float(C.H[i].std()):+.3f}"
+
+                def inter(d, arm=arm):
+                    got = ctx(d, st, l, arm)
+                    if got is None:
+                        return "--"
+                    C, i, y = got
+                    zs, zh = _z(C.s[i]), _z(C.H[i])
+                    X = np.stack([zs, zh, zs * zh, C.ks[i].astype(float),
+                                  C.jj[i].astype(float), C.t0[i].astype(float)], 1)
+                    cf, se, _ = _ols_multi(C.R(arm, l, a)[i], X)
+                    return f"{cf[2]:+.3f}"
+
+                def aucr(d, arm=arm):
+                    got = ctx(d, st, l, arm)
+                    if got is None:
+                        return "--"
+                    C, i, y = got
+                    return fmt(_auc(-C.R(arm, l, a)[i], y))
+
+                rows.append([st, l, LABEL[arm], per_seed(dirs, gain), per_seed(dirs, hv),
+                             per_seed(dirs, slope), per_seed(dirs, inter), per_seed(dirs, aucr)])
+    return "\n".join([
+        f"**README section 8's columns — {tag}, anchor {an}, a = {a}, matched `{kind}` rows; "
+        f"{' / '.join(names)} side by side.**  Held-out fit gain is `R2` of `V[l, 0]` minus "
+        f"arm 0's; `H_pre` left outside is `AUC(H_pre, {kind})` inside 5 quantile bins of the "
+        f"arm's post-event `V` (E4 `H given V`; the marginal is the first row of each block); "
+        f"`R ~ H_pre` is the partial slope on `(k*, j, t0, nll_e)` times sd of `H_pre` (E3, "
+        f"without `V_pre`); `z(s) z(H)` the interaction coefficient (E3); `AUC(-R)` pooled "
+        f"(E3).  The `(t)` of every slope is in the full sections below.", "",
+        tbl(rows, ["step", "l", "reader", "held-out fit gain", "`H_pre` left outside",
+                   "`R ~ H_pre`", "`z(s) z(H)`", "`AUC(-R, flip)`"]), ""])
+
+
+def sec_span(dirs, names, tags):
+    rows = []
+    for d, nm in zip(dirs, names):
+        for tag in tags:
+            for st in STEPS:
+                r = _json(xj(d, tag, st))
+                if r is None or not r.get("span"):
+                    continue
+                for crit in ("full", "clean"):
+                    sp = r["span"].get(crit)
+                    if not sp:
+                        continue
+                    rows.append([nm, tag, st, crit,
+                                 fmt(float(np.mean(sp["z_on_s"])), 4)
+                                 + f" ({min(sp['z_on_s']):.4f})",
+                                 fmt(sp["lse"]["on_s"], 4), fmt(sp["lse"]["on_s_z"], 4),
+                                 fmt(sp["lse"]["on_ln"], 4), fmt(sp["zmax"]["on_s"], 4),
+                                 fmt(sp["zmax"]["on_ln"], 4), fmt(sp["sd"]["lse"], 3),
+                                 fmt(sp["sd"]["z_mean_sd"], 3)])
+    return "\n".join([
+        "**How far each appended feature already lies in each base span** (in-container, on "
+        "the critic's own training Gram and held-out validation rows, the same lambda ladder "
+        "and per-column selection as the arms).  Held-out `R2` of: each raw logit `z_i` on "
+        "the raw state `[s]` (mean over the 16, min in brackets); the log-partition "
+        "`lse = logsumexp(z)` on `[s]`, on `[s, z]` and on `ln_f(s)`; `max(z)` on `[s]` and "
+        "on `ln_f(s)`; the sd of `lse` and the mean sd of a logit, in nats.  An arm can only "
+        "differ from its base reader through the part of its appended column outside the "
+        "base span, or through how the shared penalty treats it.", "",
+        tbl(rows, ["seed", "venue", "step", "critic", "z_i on s", "lse on s", "lse on s,z",
+                   "lse on ln", "max on s", "max on ln", "sd lse", "sd z_i"]), ""])
+
+
+def sec_shared(dirs, names, tags):
+    rows = []
+    for d, nm in zip(dirs, names):
+        for tag in tags:
+            for st in STEPS:
+                r = _json(xj(d, tag, st))
+                if r is None or "shared" not in r["gates"]:
+                    continue
+                cells = [nm, tag, st]
+                for sx, g in sorted(r["gates"]["shared"].items()):
+                    cells.append(f"{sx}: {g['n']} cols, worst {g['worst']:.1e}")
+                rows.append(cells)
+    if not rows:
+        return ""
+    w = max(len(x) for x in rows)
+    rows = [x + [""] * (w - len(x)) for x in rows]
+    return "\n".join([
+        "**Every column this cell shares with the committed cells reproduces them** "
+        "(in-container, before the cell is written: the base columns, arm 0, and the "
+        "refitted references `+H`, `+log q` against `_express` and `ln`, `+ln` against "
+        "`_express_ln`, on both anchors and on the twins; gated at 5e-05).", "",
+        tbl(rows, ["seed", "venue", "step"] + [f"check {k + 1}" for k in range(w - 3)]),
+        ""])
+
+
+# ---------------------------------------------------------------------------
 # figures
 # ---------------------------------------------------------------------------
 
@@ -517,7 +677,8 @@ def _mpl():
 
 COLS = {"full": "#444444", "fullH": "#d62728", "fullQ": "#1f77b4", "fullN": "#aaaaaa",
         "fullT": "#cccccc", "fullP": "#9467bd", "fullM": "#2ca02c", "fullL": "#ff7f0e",
-        "fullLp": "#8c564b", "fullS": "#e377c2"}
+        "fullLp": "#8c564b", "fullS": "#e377c2", "fullZ": "#17becf", "fullLE": "#bcbd22",
+        "fullLX": "#7f7f7f", "fullE": "#e377c2", "fullZE": "#9edae5"}
 
 
 def fig_fit(dirs, names, tag, path):
@@ -663,6 +824,46 @@ close and are both reported.
 """
 
 
+PRE_LOGITS = """# precision E-logits — the log-partition, or the ridge's shrinkage?
+
+Facts only; interpretation is discussed with Jasper and lives nowhere in this folder.
+Generated by [`express_read.py`](../express_read.py) `--sfx _express_logits --preamble logits`
+from [`express.py`](../express.py)'s follow-up-6 refits (`--logit-arms`).  An addendum to
+[`tables_express_20260922.md`](tables_express_20260922.md) and
+[`tables_express_ln_20260922.md`](tables_express_ln_20260922.md), which it does not rewrite.
+Three trajectory seeds side by side, **never averaged**.
+
+**The question.**  `lm_head` has no bias, so the logits are `z = W_U ln_f(s)` exactly and a
+ridge on `ln_f(s)` already spans every linear function of them; `log q = z - lse` with
+`lse = logsumexp(z)`, one number per row.  `ln` and `+ln` recovered fit and none of `+log q`'s
+containment.  Two candidates were left: `+log q` supplies the log-partition, a nonlinear
+scalar no linear map of the state forms; or the ridge's single penalty under-uses the
+belief's sixteen directions when they sit inside 256 normalised dimensions and uses them when
+they are handed over as sixteen columns.
+
+**Arms** (same trunk, `full` rows, split, lambda ladder and selection as `norm/task.py`; arm
+0 refitted and gated against the bank; every appended column standardised through the Gram
+to its base block's per-dimension RMS, coefficients mapped back; the references are refitted
+in the same cell and gated against the committed cells column for column):
+
+| arm | reader | spans |
+|---|---|---|
+| `ridge (banked)` | the raw state `s` at `post_block7` | -- |
+| `+H` | `s` + `H(q_t)` (reference) | -- |
+| `+log q` | `s` + `log q_t` (reference) | `[s, z - lse]` |
+| `ln (in place)` | `ln_f(s)` (reference) | every linear function of `z` |
+| `+ln` | `[s, ln_f(s)]`, ln block scaled as a block (reference) | `[s, z]` and more |
+| `+logits` | `s` + the 16 raw logits `z_t` -- **the directions handed over, no log-partition** | `[s, z]` |
+| `ln +lse` | `ln_f(s)` + `lse` -- **the log-partition handed over, the directions left inside 256 dims** | `[z, lse]`, hence `log q` |
+| `ln +max` | `ln_f(s)` + `max(z_t)` -- the confirming scalar | `[z, max z]` |
+| `+lse` | `s` + `lse` -- the one scalar on the raw basis, the analogue of `+H` | `[s, lse]` |
+| `+logits +lse` | `s` + `z_t` + `lse` -- contains `+log q`'s features exactly, plus one direction | `[s, z, lse]` |
+
+Spans nest (`+ln` contains `+logits`; `+logits +lse` contains `+log q`), so a difference
+between nested arms is the penalty's, not the span's.
+"""
+
+
 def main():
     global SFX, ARMS, CLEAN
     ap = argparse.ArgumentParser()
@@ -677,7 +878,7 @@ def main():
     ap.add_argument("--clean-arms", default=",".join(CLEAN))
     ap.add_argument("--outname", default="")
     ap.add_argument("--figprefix", default="prec_express")
-    ap.add_argument("--preamble", default="express", choices=["express", "ln"])
+    ap.add_argument("--preamble", default="express", choices=["express", "ln", "logits"])
     args = ap.parse_args()
     SFX = args.sfx
     ARMS = [a for a in args.arms.split(",") if a]
@@ -687,9 +888,17 @@ def main():
     tags = [t for t in args.tags.split(",") if t]
     ancs = [t for t in args.anchors.split(",") if t]
 
-    P = [PRE if args.preamble == "express" else PRE_LN,
-         "\n---\n\n## E0. Gates\n", sec_gates(dirs, names, tags),
+    pre = {"express": PRE, "ln": PRE_LN, "logits": PRE_LOGITS}[args.preamble]
+    P = [pre, "\n---\n\n## E0. Gates\n", sec_gates(dirs, names, tags),
          sec_matched_identity(dirs, names, tags, ancs)]
+    if args.preamble == "logits":
+        P.append(sec_shared(dirs, names, tags))
+        P.append("\n---\n\n## H. README section 8's table with the new arms\n")
+        for tag in tags:
+            for an in ancs:
+                P.append(sec_headline(dirs, names, tag, an, ARMS))
+        P.append("\n## S. The span diagnostic\n")
+        P.append(sec_span(dirs, names, tags))
     for tag in tags:
         P.append(f"\n---\n\n# {tag}\n")
         P.append("## E1. The held-out fit\n")

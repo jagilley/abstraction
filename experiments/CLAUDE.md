@@ -13,6 +13,8 @@ Iterating fast on our ideas is the most important goal. This means:
     - *then* you should autonomously launch multiple seed-experiments in parallel.
 I, personally, don't want to have to think about seed-dependence, as it's a non-substantive low-level implementation detail. This is something that you should manage.
 - Subagents may NOT run multi-seeded or high-DoP experiments without authorization from their supervisor agent.
+- **Long loops must be resumable.** Any training loop that runs longer than about half an hour saves its full state (weights, optimizers, readouts, tables, buffers, counters, every random generator, and any replay/yoke position) at every era boundary and at a fixed cadence, and carries a resume-identity gate: saved at cycle c and restored in a fresh container, the run must match the uninterrupted one. Small retroactive changes then start from the saved cycle instead of from cycle one. Record the host CPU type with every run: Modal L4 containers land on AVX-512 and non-AVX-512 hosts, and numpy 1.26 dispatches `log`/`exp` to SVML on the former, one ulp off libm, so resume identity is bit-exact within a host type and one ulp across types (`NPY_DISABLE_CPU_FEATURES` pins it, but only for a fresh lineage, since it changes numerics against banked arms). The reference implementation is `rhm/practice/voicing/sotto_voce/aliquot/rubato/` (gates R-0/R-1/R-2 in its `DESIGN.md`). Added 2026-09-23 after the practice arc paid full re-runs for gate changes that took effect at cycle 50–60.
+
 
 ## Canonical experiment-README format
 

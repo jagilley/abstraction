@@ -66,6 +66,22 @@ the projection reads 0.66 / 0.70 where the critic taught by the world reads 0.87
 per-slot readout ranks at 0.80 / 0.79 against the shaped trunk's 0.83 / 0.85; the filed diet carries no within-context
 contrast at all. Facts in [`within/figures/within_reduction.txt`](within/figures/within_reduction.txt); §1 below.
 
+### [`timbre/`](timbre/README.md) — pp1, pp3 and pp5 re-read on richer reader forms (offline, 2026-09-23)
+
+**Goal**: pp1's "shaped above frozen above twin, frozen and twin at chance" and pp5's "the frozen and twin levels in
+the gate's seat are worse than no gate" were measured with the linear readout only. Refit the belief-appended ridge,
+an MLP on the pooled state, an MLP on the belief alone, a belief-only ridge and a per-slot ridge on pp1's shared bank
+subsample through the shaped, frozen and twin trunks, and run this node's reductions unchanged on each reader's
+columns; arm 0 bit-identical to the banked pp1, pp3 and pp5 columns in-container.
+
+**Finding**: the shaped read is the same on every form in both seats (pp1's prices, pp5's gate tables and their
+wins and losses against no gate); what moves is the unshaped control, lifted off chance at pp1's cell (0.53–0.67
+against the ridge's 0.49–0.61, still below shaped on 7 of 8 cells) and carrying pp5's gate at the shaped read's rate at
+seed 0 and not at seed 2; the twin has nothing under any form. The plant's block logits are linear in its pooled
+state, so the belief arm adds only the log-partition scalars. Facts in
+[`timbre/figures/timbre_reduction.txt`](timbre/figures/timbre_reduction.txt); written up in
+[`../rubato/README.md`](../rubato/README.md) §2.
+
 ## The question
 
 The parent's three rounds (`aliquot`, `duplex`, `soundboard`) established that a prediction-trained plant's projection
@@ -158,7 +174,7 @@ from wrong entries, seed 0 / seed 2:
 | L4 | 0.941 / 0.953 | 0.680 / 0.630 | 0.535 / 0.607 | 0.535 / 0.482 | 0.678 / 0.640 |
 | L5 | 0.969 / 0.953 | 0.645 / 0.609 | 0.568 / 0.601 | 0.515 / 0.516 | 0.588 / 0.601 |
 
-Shaped above frozen above twin on 8 of 8 cells. Spearman of the read's price against the world's over candidates:
+Shaped above frozen above twin on 8 of 8 cells. *(Correction 2026-09-23, [`timbre/`](timbre/README.md): the strict order shaped > frozen > twin holds on 6 of 8, since frozen is below twin at L2 on both seeds; shaped above both controls is the 8 of 8.)* Spearman of the read's price against the world's over candidates:
 shaped 0.17–0.53, frozen 0.03–0.29, twin −0.07–0.12. Within the true class alone, where every candidate is legal
 and only its fit to what the cell's instances wanted differs, the shaped read's correlation is positive on 23 of 24
 cells across all six arms (seed 0 0.24 / 0.45 / 0.47 / 0.58, seed 2 0.71 / 0.32 / 0.26 / 0.09), and it beats the
@@ -285,6 +301,12 @@ read gate matches the world's exactly in 8 of 28 cells and is clearly worse at L
 0.755 against 0.552 at the full walk). The paired form's admissions are identical to the pooled form's in every cell,
 and necessarily: the pooled difference is the paired difference times the changed share, a positive factor, so the
 two can differ only under a margin, and the margin as built is worse than the strict form at both budgets.
+
+> **Correction 2026-09-23** ([`timbre/`](timbre/README.md), which re-walked these cells): the pooled capture of 0.27 / 0.57 is a median over
+> both seeds' 14 cells each, and the seeds split: 0.58 / 0.93 at seed 0 and 0.14 / 0.03 at seed 2, where the ratio sits on a 0.018 median gap between
+> no gate and the world's gate and is not meaningful; per (cell, repeat) pair the banked gate beats no gate on 7 and 8 of 14 at seed 0 and 10 and 8 of
+> 14 at seed 2 (budget 8; full walk). The refit ridge in the same seat admits junk on 0.005 of candidates against the banked readout's 0.022, the
+> one-update-out-of-step readout (update item 6) in the gate's favour.
 
 ## The update
 
