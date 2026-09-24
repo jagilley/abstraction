@@ -452,6 +452,10 @@ the window: a consumer's absence read against the level above's growth rather th
 scalar" follow-up on the logit trunk · the idea-doc clauses (the third blindness now with a practice-side instance;
 "shaping is required" qualified; the confidence scalar) and the beliefs pass, held for discussion.
 
+> **2026-09-24, later.** The first item ran as the sibling [`../scordatura/`](../scordatura/README.md): the failures
+> appended to the miner at the batch's own proportion; the seat has work there, the oracle in it buys depth for the
+> first time, and the read carries it at one seed, bound by its diet.
+
 ## Files
 
 | file | purpose |

@@ -147,6 +147,28 @@ state at every tenth cycle and every era boundary, bit-identical within a host t
 transcendentals across types; both reference arms banked with states). Full record:
 [`rubato/README.md`](rubato/README.md).
 
+### [`scordatura/`](scordatura/README.md) — the miner mines the failures too: the value seat on a substrate where the learner's own recurring mistakes enter the table (2026-09-24)
+
+**Goal**: rubato found no grader in the value seat, the oracle's included, beats the ungated arm at depth, because the
+miner mints vocabulary only from the learner's solved answers and so already filters on payoff. Remove that filter
+with one knob: keep the solved draw exactly as the reference arm makes it and append the cycle's unsolved chosen
+answers at the batch's own proportion, the panel observing the same rows, so the reinforced diet is held fixed and
+every difference is the junk. Run the ungated floor, the world grade as the ceiling and the diet-gated read with a
+persistence dial as the claim, both seeds, against the solve-filtered reference.
+
+**Finding**: the junk is the learner's own recurring wrong patches, mostly value-junk (single-entry world gain exactly
+zero on 28 of 29 and 30 of 30 junk-only false L2 keys at c40), and the regime is quality-limited on both seeds: the
+ungated table is three to nine times the reference's at a third of its precision and the loop loses about a quarter
+of its accuracy at the last era. The oracle in the seat buys something for the first time in the lineage: the world's
+grade beats the junk floor on three or four of the four deep eras at both seeds, never revokes a true key across 542
+revocations, and rebuilds the reference's L2 table (fourteen true keys at 0.70) from a junk-fed miner at about five
+thousand queries a cycle. The read carries the seat at seed 2 era for era at zero queries and half-carries it at
+seed 0; its deficit is its diet, whose clock the junk does not move (first priced L2 pass c105 / c80, L3 c197, L4
+never), so the read arm is the floor plus the count rule while junk enters fastest, and once priced it makes half
+the world's catches at a tenth to a fifth wrong. Both grades lose the reference at the last era on both seeds, with
+the mechanism open; the seed-0 era-4 loss is the window's, the same +.18 as on the clean substrate. Full record:
+[`scordatura/README.md`](scordatura/README.md).
+
 ## The question
 
 `sotto_voce` asked whether the world has to be paid for verdicts on the probe channel's counterfactuals, the
@@ -423,6 +445,10 @@ mirror re-run with the reservoir sample, from aliquot's own queue.
 > read grades at zero world queries and its errors are its diet, not its form; no grade helps on this substrate, because
 > the miner already filters on payoff and key arrival is the budget. The reader-form question is closed by
 > [`preplay/timbre/`](preplay/timbre/README.md) and precision's `+logits` arm, written up in the same node.
+
+> **2026-09-24, later.** The junk regime ran as the child [`scordatura/`](scordatura/README.md): with the learner's
+> unsolved answers appended to the miner, the seat has work on both seeds, the world's grade beats the junk floor at
+> depth and never revokes a true key, and the read carries the seat at one seed at zero queries, bound by its diet.
 
 ## Files
 
