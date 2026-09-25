@@ -631,6 +631,29 @@ the L2 commit is lost to right-level-wrong-node inflation. The own-production re
 pieces — the organ that makes the output face readable is one the diagnostic calls overfit. A live round with an
 online reader is priced at ≈ 2.5–3.5 GPU-h and not run. Full record: [`perception/README.md`](perception/README.md).
 
+### `lead_sheet/`[^private] — the practice loop as a skeleton with seams: the demo's 25k-line fork chain rebuilt as 4,700 lines with every organ a plug, the same loop to the bit (2026-09-24→25)
+
+**Goal**: PR 136's demonstration of the miner and the value seat working in concert ran on the twelfth fork of a
+chain, 24,913 lines of knobs that default off, and every specificity of the demo (the exact world re-queried on
+fresh pools, the aligned grid, the yoked clock, the hand-built actor, the Monte Carlo value fits) is also buried
+complexity. Before going through those one at a time, write the loop down as a skeleton whose cycle reads as a
+table, put every organ behind a seam with the organ as built as its given plug, and prove it is the same loop by
+reproducing scordatura's four arms at both seeds.
+
+**Finding**: **it is the same loop to the bit.** On all four arms of record at both seeds, over all 201 cycles,
+every priced series, every merge verdict and the admission set's end state equal the banked arms, and scordatura's
+two-seed table re-reads identically in all 58 rows (ranks 5 of 5 eras, signs 25 of 25 cells at each seed), through
+four preemption resumes and across host types. Five gates each shown to fail first: the symbolic organs on the
+compact mirrors, on the banked saves, the donor's own code side by side at smoke scale, a banked state replayed
+for ten cycles, and the arms from cycle 0. Everything the fork chain carried beyond the 4,700 lines was inert on
+these arms except two instruments' side effects (the shadow audition's random draws, the probe beams' captures),
+carried as such and each shown to send a replay off within a cycle or two if removed. The consumed loop costs the
+same on the floor, the world arm and the read arm, the grade itself under a second, so the fork chain's ten and
+twenty-three extra seconds a cycle on its graded arms were instruments; an arm runs in 1.3 L4-hours against 2.2 to
+2.5. A defect in the re-offer rule (a revoked key's consumers stored truncated to sixteen, compared against all) and
+nine accidents are located on PR 136's record and kept for identity. No plug is swapped; the seam ladder that
+follows runs as children of this node. Full record: `lead_sheet/README.md`[^private].
+
 ## Reproduce
 
 ```bash
@@ -656,3 +679,5 @@ Full commands, calibrations and volume layout: [`crystallize/README.md`](crystal
 seed-triple convention), [`tall/README.md`](tall/README.md),
 [`transpose/FILES.md`](transpose/FILES.md), [`setlist/FILES.md`](setlist/FILES.md)
 (joint findings: [`typed_gaps/README.md`](typed_gaps/README.md)).
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.
