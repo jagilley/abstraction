@@ -652,7 +652,12 @@ same on the floor, the world arm and the read arm, the grade itself under a seco
 twenty-three extra seconds a cycle on its graded arms were instruments; an arm runs in 1.3 L4-hours against 2.2 to
 2.5. A defect in the re-offer rule (a revoked key's consumers stored truncated to sixteen, compared against all) and
 nine accidents are located on PR 136's record and kept for identity. No plug is swapped; the seam ladder that
-follows runs as children of this node. Full record: `lead_sheet/README.md`[^private].
+follows runs as children of this node. Its first three rungs ran the same night (2026-09-25, `urtext/`, `ripieno/`,
+`ad_libitum/`): the identity stubs dropped, which re-orders the arms in most eras and fixes the perturbation band every
+later rung is read against; the miner made blind to the verdict, cap and dose, under which the world's grade still
+rebuilds the reference's L2 table and beats the blind floor in every era at both seeds; and the anchor's commit rule
+run live, which does not transfer off the panel its floors were measured on, so the clock stays a given. Full record:
+`lead_sheet/README.md`[^private].
 
 ## Reproduce
 

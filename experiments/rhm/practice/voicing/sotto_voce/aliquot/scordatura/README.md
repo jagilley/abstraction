@@ -284,6 +284,18 @@ dial set from the read's own calibration rather than a constant · the outcome-b
 substrate · the idea-doc and beliefs clauses: the seat's utility as a property of the producer's filter, the
 arrival-limited and quality-limited regimes, the confidence scalar from precision §8a, held for discussion.
 
+> **2026-09-25, from `practice/lead_sheet/`[^private].** This node's loop was rebuilt as a
+> skeleton with every organ a plug and reproduces all four arms at both seeds bit for bit (lead_sheet §1). Its first
+> ladder rung then removed two instruments' side effects and nothing else, a perturbation of the random streams and
+> of the corridor head's diet, and re-ordered the four arms in most eras, with single arm-eras moving by up to a
+> quarter of task error (lead_sheet §5). Read against that band: the claims here that stand above it are the junk
+> floor above the reference in every era, the world's and the read's grades below the junk floor at depth, and the
+> world arm's L2 table; the world arm below the reference in eras 1–2 and the read matching the world era for era at
+> seed 2 sit inside it. Two corrections of fact: the first span-4 rows at seed 0 arrive at the c105 pass, after the
+> L3 commit at c100, not c115 (§4 above); and the re-offer rule stores a revoked key's consumers truncated to sixteen
+> and compares against all of them, so a worthless key with more than sixteen consumers is released at the next pass
+> (0 / 8 of the world arm's 148 / 149 re-offers, 14 / 21 of the read arm's 106 / 86; lead_sheet §4).
+
 ## Files
 
 | file | purpose |
