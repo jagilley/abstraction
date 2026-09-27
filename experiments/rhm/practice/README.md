@@ -631,7 +631,7 @@ the L2 commit is lost to right-level-wrong-node inflation. The own-production re
 pieces — the organ that makes the output face readable is one the diagnostic calls overfit. A live round with an
 online reader is priced at ≈ 2.5–3.5 GPU-h and not run. Full record: [`perception/README.md`](perception/README.md).
 
-### `lead_sheet/`[^private] — the practice loop as a skeleton with seams: the demo's 25k-line fork chain rebuilt as 4,700 lines with every organ a plug, the same loop to the bit (2026-09-24→25)
+### `lead_sheet/`[^private] — the practice loop as a skeleton with seams: the demo's 25k-line fork chain rebuilt as 4,700 lines with every organ a plug, the same loop to the bit; then the seam ladder, ten rungs to a loop that calls one net and asks the world only for the verdict on its own answers (2026-09-24→26)
 
 **Goal**: PR 136's demonstration of the miner and the value seat working in concert ran on the twelfth fork of a
 chain, 24,913 lines of knobs that default off, and every specificity of the demo (the exact world re-queried on
@@ -656,8 +656,32 @@ follows runs as children of this node. Its first three rungs ran the same night 
 `ad_libitum/`): the identity stubs dropped, which re-orders the arms in most eras and fixes the perturbation band every
 later rung is read against; the miner made blind to the verdict, cap and dose, under which the world's grade still
 rebuilds the reference's L2 table and beats the blind floor in every era at both seeds; and the anchor's commit rule
-run live, which does not transfer off the panel its floors were measured on, so the clock stays a given. Full record:
-`lead_sheet/README.md`[^private].
+run live, which does not transfer off the panel its floors were measured on, so the clock stays a given.
+**The second batch (2026-09-26, seven more rungs, about 60 L4-hours, both seeds):** the frozen controller under V
+and π, the frozen reader under the miner's parse and the controller's replay data are retired (`unison/`,
+`solfege/`, `vocalise/`), so the loop calls one net; the merge's world audit, the re-offer truncation and the grade's
+timer go (`senza/`, `da_capo/`, `fermata/`), so on the floor and the read arm the only world query is the verdict on
+the learner's own answers; the join (`stretto/`) composes them, every rung the rung below to the bit with its change
+off. Reading the projections off the live world model makes the actor worse before the L4 commit and, after it,
+one arm per seed locks into L4-macro routing and reaches depth errors nothing on the old base approaches (.175,
+.40, .176 / .200), which arm being chance, so ranks and signs stop being the instrument there; the plant's untaught
+parse, right on whole L5 spans a tenth of the time, serves the proposer as the exact reader did, while teaching
+the plant to parse by copying visible rows collapses the loop, the diet and not the parse; and the merge licensed
+by the read with its diet gate is oracle-free and inert above L2 with nothing lost. Full record:
+`lead_sheet/README.md`[^private] (§5, §6).
+
+### `fair_copy/`[^private] — the reference implementation: the ladder's join written out as one loop, the same loop to the bit (2026-09-26→27)
+
+**Goal**: after ten rungs the consolidated loop existed only as a class inheriting ten others over the old organs;
+write it out once, the skeleton with the consolidated organs as its given plugs and the retired ones gone, and prove
+it is the join.
+
+**Finding**: **it is the join to the bit.** 5,224 lines against the join's 7,527; the join's c70 saves at both seeds
+replayed here match on every priced series and the whole state; from cycle 0 at both seeds every priced series over
+201 cycles, every merge verdict, the admission set and every organ at every save equal the join's, the only
+differences two unconsumed recorded losses one ulp off from torch's host-dependent float64 dispatch. One net; on the
+floor and the read arm the only world query is the verdict on the learner's own answers; the hooks are the seams the
+next batch swaps through. Full record: `fair_copy/README.md`[^private].
 
 ## Reproduce
 
