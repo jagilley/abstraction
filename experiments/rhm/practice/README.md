@@ -681,7 +681,10 @@ replayed here match on every priced series and the whole state; from cycle 0 at 
 201 cycles, every merge verdict, the admission set and every organ at every save equal the join's, the only
 differences two unconsumed recorded losses one ulp off from torch's host-dependent float64 dispatch. One net; on the
 floor and the read arm the only world query is the verdict on the learner's own answers; the hooks are the seams the
-next batch swaps through. Full record: `fair_copy/README.md`[^private].
+next batch swaps through. Its first child `scat/` (2026-09-28) collects V's first diet by random babbling over the base
+moves, so no controller is built anywhere: random babbling solves .13 of its episodes against the controller's .15, era 1
+is better on every arm at both seeds, and from era 2 on the numbers ride the lock-in as everything above rung 4 does.
+Full record: `fair_copy/README.md`[^private] (§4 for `scat/`).
 
 ## Reproduce
 
