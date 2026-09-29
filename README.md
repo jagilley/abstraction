@@ -48,7 +48,7 @@ Apologies in advance for the Claudish prose!
 Consider several known open questions in the field of AI. My view is that each of these phenomena is an instance of what it looks like to form model abstractions passively, based on the data and verifiers the model sees during the training process.
 
 - Q: why do the models [seem to generalize](https://www.dwarkesh.com/p/ilya-sutskever-2) much worse than humans?
-    - A: under the current model training paradigm, generalization, for example, is a property of the particular distribution of data a model sees during training. If the model only forms abstractions with respect to the data it sees during training, it must rely upon transfer learning over the geometry of the data to generalize to inputs it has never seen.
+    - A: under the current model training paradigm generalization is a property of the particular distribution of data a model sees during training. If the model only forms abstractions with respect to the data it sees during training, it must rely upon transfer learning over the geometry of the data to generalize to inputs it has never seen.
 - Q: why can the models easily achieve superhuman capabilities on tasks like competitive programming but not those like open-ended research?
     - A: because competitive programming requires skillful deployment of existing abstractions rather than the invention of new ones
 - Q: why does finetuning the models on domain-specific data [not produce gains outside that domain](https://arxiv.org/abs/2507.00432), when for humans it is possible to learn things that generalize from seemingly specific domains?

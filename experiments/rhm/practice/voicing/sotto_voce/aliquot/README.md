@@ -75,6 +75,100 @@ as well as the mirror's does; the chooser does not move; the no-infill run colla
 0.80; the yield-shaped projection is no better at its own currency. Facts in `soundboard/figures/sb_seedtable.txt`;
 §4 below.
 
+### [`preplay/`](preplay/README.md) — the level reader prices abstractions and does not rank spellings: the projection read offline on banked state (2026-09-21)
+
+**Goal**: the two questions the loop could not pose, on the banked plants, readouts and rows, with nothing paid in
+the loop. Within a fixed context, does the projection rank the candidate spellings as the world does
+([`preplay/within/`](preplay/within/README.md), CPU)? And fired one entry at a time through the shaped executor on
+fresh pools, does its mean level price a candidate table entry as the world's audition does, does it select a better
+table than a random draw, and does it do so on the learner's own mined entries, replayed exactly from the banked
+keys and picks (`pp1`, `pp2`, `pp3`, 0.35 GPU-h)?
+
+**Finding**: the projection does not rank within a context (0.65 / 0.70, below the executor's prior at 0.71 / 0.74),
+the prior reads the same on the shaped and the frozen plant, and the composed chooser ranks at 0.76 / 0.82 above both
+of its organs, so §4's producer-versus-reader reading is withdrawn; a never-trained twin under the same readout ranks
+within 0.03–0.07 of the shaped trunk, the diet is worth +0.03 to +0.05, and the global pooled form is the largest
+axis. The same projection prices a fired candidate entry in the world's order (true from wrong at 0.61–0.75 against
+the world's 0.89–0.97, frozen and twin at chance, positive within the legal class on 23 of 24 cells), recovers a
+median 0.65 of the world's advantage over a random draw as a selector, matches the full true table at L3, and fails
+where a few attractive wrong entries capture the executor's argmax; on the learner's own entries the world itself
+barely separates true from false at L3/L4 and the read tracks the world's price where the prior prefers the false
+ones. Two consumer rounds followed on the loop's own try-and-keep gate (pp4, pp5, 0.24 GPU-h): with the gate fixed
+the executor's own score is the fastest order and the read ties a never-trained trunk, and with that order and the
+read's level on the preplayed state in place of the world's count of repairs, the table captures 0.27 of the oracle's
+advantage over no gate at the loop's budget and 0.57 at the full walk, the frozen and twin readouts in that seat
+worse than no gate. Full record: [`preplay/README.md`](preplay/README.md).
+
+### [`sostenuto/`](sostenuto/README.md) — the value reader's gate on the miner's live build, in the loop (2026-09-21 → 23)
+
+**Goal**: put pp5's seat inside the loop, on the arms of record. The first design step found those arms have no table
+gate at all: the census extension op pp4 and pp5 transcribed never ran on them (`recert` on, `extend` off, open
+inventory, zero extension events; its candidate lister is inert under the class miner), and their operative table is
+the miner's live support-count build. So the seat is an admission set on the live build, walked at the loop's own
+cadence, cap and pool in count order, with the gate as the one knob: the world's error, the read's strict pooled level,
+nothing (round 1, two seeds), then the fired state's next-level share at support in the learner's own miner times the
+read's level, and the miner's own demand from above with no fire (round 2, the yield gate at two seeds).
+
+**Finding**: the seat works mechanically at zero world queries and costs seconds; the read gate admits less junk than
+no gate on both seeds and refuses good entries at three to eight times its offline rate; any gate in this seat decides
+on a median of one to five changed instances of 192, so it is starved; and a refusal at one level is paid at the next
+for both organs (the world's L2 refusals block seven of the ungated arm's L3 keys on each seed, the read's L3 refusals
+block three of nine and eight of twenty-two L4 keys), while the deep-era task-error ordering inverts across seeds. The
+next-level currency is empty at the frontier by construction, since the level above holds nothing at support until the
+keys below are served, so the round-2 gates are silent at the top of the ladder and prune hardest where they act early
+on thin evidence (fifteen of twenty-four L3 keys blocked at seed 2, seventeen of nineteen for the demand gate, two
+commits cancelled on empty builds). The op's order is what is wrong, not its organ: a next-level currency's evidence
+arrives after admission, so the op it wants is admit-then-grade, provisional admission with revocation on positive
+evidence, the arc's provisional-commitment finding recurring in the value seat. Full record:
+[`sostenuto/README.md`](sostenuto/README.md).
+
+### [`rubato/`](rubato/README.md) — the value reader's form and its diet: one confidence scalar, shaping as the route to it, admit-then-grade at zero world queries, and the loop made resumable (2026-09-23 → 24)
+
+**Goal**: metabolise PRs 129–133 together. Does precision's finding, that the linear value reader misses a nonlinear
+function of the world model's belief, touch the practice arc's live results; how far do those stand from an
+oracle-free loop; and put pp5's seat in the loop in the order sostenuto said the currency wants. Three rounds under
+one writeup: precision's `+logits` arm on the logit trunk, [`preplay/timbre/`](preplay/timbre/README.md) (pp1, pp3
+and pp5 re-read on richer reader forms, offline), and `rubato/` itself (the loop made resumable, then admit-then-grade
+with the world's success and the read's level as the two grades, both seeds, and a diet-gated read arm).
+
+**Finding**: on the logit trunk the missing thing is one scalar, the belief's absolute level (its log-partition or max
+logit): the sixteen directions alone buy nothing, the layer-normed state plus that scalar reproduces the
+belief-appended reader column for column, three seeds. On the practice plant the shaped read is form-invariant in
+both of preplay's seats and the block logits are linear in the pooled state, so the belief arm adds exactly that
+scalar; the unshaped control is what moves, lifted off chance by a richer reader at seed 0 and not at seed 2, so
+shaping is the reliable route to the read and not the only one. In the loop, admit-then-grade runs at zero world
+queries where the oracle version bills about 2,300 queries a cycle; the read's wrong revocations are its diet (at
+seed 0 twenty of twenty-four priced while the readout held no row at the consumers' span), a per-span diet rule
+halves them, and the remainder is single-pass noise a hair below zero that a two-consecutive rule or a margin near
+−0.05 removes on both seeds. No graded arm beats the ungated arm at depth on either seed, the oracle's included: the
+miner mines only from solves, so frequency and value are nearly one number here, there is almost no value-junk, key
+arrival is the budget, and the oracle's one large loss came from its no-consumer window. The loop is resumable (full
+state at every tenth cycle and every era boundary, bit-identical within a host type, one ulp of numpy's
+transcendentals across types; both reference arms banked with states). Full record:
+[`rubato/README.md`](rubato/README.md).
+
+### [`scordatura/`](scordatura/README.md) — the miner mines the failures too: the value seat on a substrate where the learner's own recurring mistakes enter the table (2026-09-24)
+
+**Goal**: rubato found no grader in the value seat, the oracle's included, beats the ungated arm at depth, because the
+miner mints vocabulary only from the learner's solved answers and so already filters on payoff. Remove that filter
+with one knob: keep the solved draw exactly as the reference arm makes it and append the cycle's unsolved chosen
+answers at the batch's own proportion, the panel observing the same rows, so the reinforced diet is held fixed and
+every difference is the junk. Run the ungated floor, the world grade as the ceiling and the diet-gated read with a
+persistence dial as the claim, both seeds, against the solve-filtered reference.
+
+**Finding**: the junk is the learner's own recurring wrong patches, mostly value-junk (single-entry world gain exactly
+zero on 28 of 29 and 30 of 30 junk-only false L2 keys at c40), and the regime is quality-limited on both seeds: the
+ungated table is three to nine times the reference's at a third of its precision and the loop loses about a quarter
+of its accuracy at the last era. The oracle in the seat buys something for the first time in the lineage: the world's
+grade beats the junk floor on three or four of the four deep eras at both seeds, never revokes a true key across 542
+revocations, and rebuilds the reference's L2 table (fourteen true keys at 0.70) from a junk-fed miner at about five
+thousand queries a cycle. The read carries the seat at seed 2 era for era at zero queries and half-carries it at
+seed 0; its deficit is its diet, whose clock the junk does not move (first priced L2 pass c105 / c80, L3 c197, L4
+never), so the read arm is the floor plus the count rule while junk enters fastest, and once priced it makes half
+the world's catches at a tenth to a fifth wrong. Both grades lose the reference at the last era on both seeds, with
+the mechanism open; the seed-0 era-4 loss is the window's, the same +.18 as on the clean substrate. Full record:
+[`scordatura/README.md`](scordatura/README.md).
+
 ## The question
 
 `sotto_voce` asked whether the world has to be paid for verdicts on the probe channel's counterfactuals, the
@@ -337,6 +431,25 @@ reader uses and leaving the executor's untouched, after the readout says whether
 dissociates solving from next-level yield, a design step before any currency arm · the per-block readout and the
 mirror re-run with the reservoir sample, from aliquot's own queue.
 
+> **2026-09-21.** The first item ran, the second and third were retired, and the round is written up as the child
+> [`preplay/`](preplay/README.md): the within-context readout landed as [`preplay/within/`](preplay/within/README.md) and
+> the abstraction-level question §12.4 poses as `pp1`/`pp2`/`pp3`. The in-loop infill-only control and the reader-copy
+> arm are retired on the nested DP parse (flat within 0.04 under both-loss shaping on both seeds, §4) and on the
+> never-trained twin ranking within 0.03–0.07 of the shaped trunk at the chooser's cell.
+
+> **2026-09-23.** pp5's seat went into the loop as the child [`sostenuto/`](sostenuto/README.md), re-aimed at the
+> miner's live build once the census op was found never to have run on the arms of record; five gates over two rounds
+> and two seeds, and the conclusion that the currency wants admit-then-grade.
+
+> **2026-09-24.** Admit-then-grade ran as the child [`rubato/`](rubato/README.md), on a loop made resumable first; the
+> read grades at zero world queries and its errors are its diet, not its form; no grade helps on this substrate, because
+> the miner already filters on payoff and key arrival is the budget. The reader-form question is closed by
+> [`preplay/timbre/`](preplay/timbre/README.md) and precision's `+logits` arm, written up in the same node.
+
+> **2026-09-24, later.** The junk regime ran as the child [`scordatura/`](scordatura/README.md): with the learner's
+> unsolved answers appended to the miner, the seat has work on both seeds, the world's grade beats the junk floor at
+> depth and never revokes a true key, and the read carries the seat at one seed at zero queries, bound by its diet.
+
 ## Files
 
 | file | purpose |
@@ -350,5 +463,7 @@ mirror re-run with the reservoir sample, from aliquot's own queue.
 | `SPEC.md`, `DESIGN.md`, `FILES.md`, `CONVERSATION.md` | the brief; the decisions and withdrawals; the machinery record; the session record |
 | `duplex/` | the shaping step offline ([`duplex/README.md`](duplex/README.md)) |
 | `soundboard/` | the shaping step in the loop ([`soundboard/README.md`](soundboard/README.md)) |
+| `preplay/` | the projection read offline on banked state: within-context discrimination and the candidate entry's price ([`preplay/README.md`](preplay/README.md)) |
+| `sostenuto/` | the value reader's gate on the miner's live build, in the loop: five gates, two seeds, and the admit-then-grade conclusion ([`sostenuto/README.md`](sostenuto/README.md)) |
 
 [^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

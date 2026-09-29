@@ -1,0 +1,581 @@
+============================================================================================================================================
+[G5] THE READ AS THE GATE, THE PRIOR AS THE ORDER — tag v5_belief
+    pp4 settled that the executor's own score is the right ORDER for the loop's
+    try-and-keep extension. The readout's seat is the other half of `census_extend`:
+    the loop's gate is an ORACLE READ — 'did the world's error on the gate pool rise?'
+    — and the readout is the thing that gets to see the preplayed state and put a
+    number on it. Can that number stand in for the world's verdict?
+    ORDER = `dp_top` throughout. GATE varies. arms: s0_sv, s2_sv
+    pricing n = 512 | gate n = 192 (the loop's `n_aud`) x2 | test n = 256 x3, disjoint.
+
+    world      admit iff the world's error does not rise           pp4's, THE REFERENCE
+    read       admit iff the banked shaped projection's LEVEL over the same fired
+               gate-pool configurations does not fall (pooled mean p)    UNDER TEST
+    read_pair  the same, PAIRED over the instances the candidate actually changed
+    read_m     the pooled form with a margin delta = se of the base's own level
+    frozen / twin   the pooled form through an unshaped / never-trained trunk  CONTROLS
+    ungated    admit everything                                      THE FLOOR
+============================================================================================================================================
+
+[G50] THE GATES — all closed in `readgate.py::gates5`, all falsified in `::falsify5` (5/5)
+      P-1a  the world gate here is IDENTICAL to pp4's `census_walk` on the same inputs
+      P-1b  and reproduces pp4's hand-computed sequence (admissions [0, 2, 4])
+      P-2   THE PLUMBING IDENTITY: handed the world's error as its level, the read gate
+            reproduces the world gate exactly, in all three of its forms
+      P-3   a constant level admits everything, in every read form and both controls
+      P-4   the pricing, gate and test pool families are pairwise disjoint
+      P-5   the CHANGED set (`trial.entry == len(kept)`) covers every instance whose
+            fired configuration differs — asserted non-vacuous (192/192 flagged)
+
+      arm       F-2b |d|    band   P-4 max shared instances, per cell
+      s0_sv       0.0035  0.0475   aL2:0  aL3:0  aL4:0  aL5:0  bL2:0  bL3:0  bL4:0
+      s2_sv       0.0012  0.0227   aL2:0  aL3:0  aL4:0  aL5:0  bL2:0  bL3:0  bL4:0
+
+============================================================================================================================================
+[G51] THE TABLE OF RECORD — the world's TEST-pool error of the table each GATE built.
+      Order is `dp_top` for every row. b = 8 is the loop's own `extend_cap`; `full` is
+      the whole walk. k = entries kept, w = wrong entries admitted. LOWER e IS BETTER.
+
+  s0_sv aL2 repeat 0 — base 3 rows at e 0.652 (level 0.142), 36 candidates (16T/24W), delta 0.0150
+    gate                    b=8             b=16             b=32             b=36  admitted  rejected
+    world        0.302 k9  w2     0.302 k10 w3     0.294 k21 w10    0.294 k25 w13         22        14
+    read         0.302 k7  w1     0.324 k10 w4     0.327 k15 w7     0.329 k19 w10         16        20
+    read_pair    0.302 k7  w1     0.324 k10 w4     0.327 k15 w7     0.329 k19 w10         16        20
+    read_m       0.350 k11 w3     0.415 k18 w8     0.445 k34 w20    0.443 k38 w23         35         1
+    frozen       0.314 k9  w2     0.501 k14 w6     0.526 k27 w16    0.523 k31 w19         28         8
+    twin         0.331 k9  w1     0.366 k13 w4     0.400 k25 w13    0.397 k29 w16         26        10
+    ungated      0.350 k11 w3     0.538 k19 w9     0.565 k35 w21    0.562 k39 w24         36         0
+
+  s0_sv aL2 repeat 1 — base 3 rows at e 0.398 (level 0.131), 35 candidates (16T/24W), delta 0.0137
+    gate                    b=8             b=16             b=32             b=35  admitted  rejected
+    world        0.328 k7  w1     0.320 k10 w3     0.294 k20 w9     0.294 k23 w11         20        15
+    read         0.387 k9  w3     0.401 k14 w7     0.400 k23 w13    0.401 k25 w15         22        13
+    read_pair    0.387 k9  w3     0.401 k14 w7     0.400 k23 w13    0.401 k25 w15         22        13
+    read_m       0.507 k11 w4     0.551 k19 w10    0.565 k35 w22    0.562 k38 w24         35         0
+    frozen       0.454 k7  w1     0.497 k9  w3     0.508 k21 w11    0.508 k22 w12         19        16
+    twin         0.462 k7  w2     0.470 k9  w4     0.520 k21 w14    0.457 k23 w15         20        15
+    ungated      0.507 k11 w4     0.551 k19 w10    0.565 k35 w22    0.562 k38 w24         35         0
+
+  s0_sv aL3 repeat 0 — base 15 rows at e 0.747 (level 0.281), 41 candidates (24T/24W), delta 0.0184
+    gate                    b=8             b=16             b=32             b=41  admitted  rejected
+    world        0.603 k18 w1     0.602 k26 w5     0.602 k42 w14    0.602 k51 w20         36         5
+    read         0.788 k19 w3     0.785 k26 w6     0.785 k41 w14    0.785 k50 w20         35         6
+    read_pair    0.788 k19 w3     0.785 k26 w6     0.785 k41 w14    0.785 k50 w20         35         6
+    read_m       0.788 k19 w3     0.789 k27 w7     0.790 k43 w16    0.790 k52 w22         37         4
+    frozen       0.607 k18 w2     0.605 k26 w6     0.605 k42 w15    0.605 k51 w21         36         5
+    twin         0.792 k17 w2     0.788 k24 w5     0.788 k39 w13    0.788 k48 w19         33         8
+    ungated      0.647 k23 w5     0.647 k31 w9     0.647 k47 w18    0.647 k56 w24         41         0
+
+  s0_sv aL3 repeat 1 — base 15 rows at e 0.388 (level 0.211), 43 candidates (24T/24W), delta 0.0170
+    gate                    b=8             b=16             b=32             b=43  admitted  rejected
+    world        0.391 k16 w1     0.384 k23 w4     0.391 k39 w11    0.391 k50 w19         35         8
+    read         0.604 k19 w3     0.603 k27 w7     0.603 k41 w13    0.603 k52 w21         37         6
+    read_pair    0.604 k19 w3     0.603 k27 w7     0.603 k41 w13    0.603 k52 w21         37         6
+    read_m       0.647 k23 w5     0.647 k31 w9     0.647 k47 w16    0.647 k58 w24         43         0
+    frozen       0.628 k20 w2     0.628 k28 w6     0.628 k44 w13    0.628 k55 w21         40         3
+    twin         0.647 k23 w5     0.647 k31 w9     0.647 k47 w16    0.647 k58 w24         43         0
+    ungated      0.647 k23 w5     0.647 k31 w9     0.647 k47 w16    0.647 k58 w24         43         0
+
+  s0_sv aL4 repeat 0 — base 22 rows at e 0.973 (level 0.093), 45 candidates (24T/24W), delta 0.0081
+    gate                    b=8             b=16             b=32             b=45  admitted  rejected
+    world        0.973 k29 w3     0.973 k37 w5     0.973 k53 w15    0.973 k66 w23         44         1
+    read         0.973 k29 w3     0.973 k37 w5     0.973 k53 w15    0.973 k66 w23         44         1
+    read_pair    0.973 k29 w3     0.973 k37 w5     0.973 k53 w15    0.973 k66 w23         44         1
+    read_m       0.973 k29 w3     0.973 k37 w5     0.973 k53 w15    0.973 k66 w23         44         1
+    frozen       0.973 k29 w3     0.973 k37 w5     0.973 k53 w15    0.973 k66 w23         44         1
+    twin         0.973 k29 w3     0.973 k37 w5     0.973 k53 w15    0.973 k66 w23         44         1
+    ungated      0.997 k30 w4     0.997 k38 w6     0.997 k54 w16    0.997 k67 w24         45         0
+
+  s0_sv aL4 repeat 1 — base 22 rows at e 0.173 (level 0.393), 47 candidates (24T/24W), delta 0.0167
+    gate                    b=8             b=16             b=32             b=47  admitted  rejected
+    world        0.186 k28 w2     0.186 k36 w4     0.186 k52 w13    0.186 k67 w23         45         2
+    read         0.174 k26 w1     0.174 k34 w3     0.174 k50 w12    0.174 k65 w22         43         4
+    read_pair    0.174 k26 w1     0.174 k34 w3     0.174 k50 w12    0.174 k65 w22         43         4
+    read_m       0.190 k29 w2     0.190 k37 w4     0.190 k53 w13    0.190 k68 w23         46         1
+    frozen       0.174 k26 w1     0.174 k34 w3     0.174 k50 w12    0.174 k65 w22         43         4
+    twin         0.189 k28 w2     0.189 k36 w4     0.189 k52 w13    0.189 k67 w23         45         2
+    ungated      0.624 k30 w3     0.624 k38 w5     0.624 k54 w14    0.624 k69 w24         47         0
+
+  s0_sv aL5 repeat 0 — base 16 rows at e 0.691 (level 0.171), 48 candidates (24T/24W), delta 0.0116
+    gate                    b=8             b=16             b=32             b=48  admitted  rejected
+    world        0.693 k23 w3     0.693 k31 w7     0.693 k47 w18    0.693 k63 w24         47         1
+    read         0.691 k22 w3     0.691 k30 w7     0.691 k46 w18    0.691 k62 w24         46         2
+    read_pair    0.691 k22 w3     0.691 k30 w7     0.691 k46 w18    0.691 k62 w24         46         2
+    read_m       0.693 k23 w3     0.693 k31 w7     0.693 k47 w18    0.693 k63 w24         47         1
+    frozen       0.682 k24 w3     0.682 k32 w7     0.682 k48 w18    0.682 k64 w24         48         0
+    twin         0.682 k24 w3     0.682 k32 w7     0.682 k48 w18    0.682 k64 w24         48         0
+    ungated      0.682 k24 w3     0.682 k32 w7     0.682 k48 w18    0.682 k64 w24         48         0
+
+  s0_sv aL5 repeat 1 — base 16 rows at e 0.719 (level 0.516), 48 candidates (24T/24W), delta 0.0235
+    gate                    b=8             b=16             b=32             b=48  admitted  rejected
+    world        0.672 k24 w3     0.672 k32 w7     0.672 k48 w18    0.672 k64 w24         48         0
+    read         0.719 k16 w0     0.719 k24 w4     0.719 k40 w15    0.719 k56 w21         40         8
+    read_pair    0.719 k16 w0     0.719 k24 w4     0.719 k40 w15    0.719 k56 w21         40         8
+    read_m       0.719 k16 w0     0.719 k24 w4     0.719 k40 w15    0.719 k56 w21         40         8
+    frozen       0.672 k24 w3     0.672 k32 w7     0.672 k48 w18    0.672 k64 w24         48         0
+    twin         0.672 k24 w3     0.672 k32 w7     0.672 k48 w18    0.672 k64 w24         48         0
+    ungated      0.672 k24 w3     0.672 k32 w7     0.672 k48 w18    0.672 k64 w24         48         0
+
+  s0_sv bL2 repeat 0 — base 0 rows at e 1.000 (level 0.070), 18 candidates (12T/6W), delta 0.0104
+    gate                    b=8             b=16             b=18             b=32  admitted  rejected
+    world        0.251 k6  w2     0.243 k10 w4     0.243 k12 w4     0.243 k12 w4          12         6
+    read         0.251 k6  w2     0.258 k8  w3     0.258 k9  w3     0.258 k9  w3           9         9
+    read_pair    0.251 k6  w2     0.258 k8  w3     0.258 k9  w3     0.258 k9  w3           9         9
+    read_m       0.268 k8  w3     0.262 k15 w6     0.262 k17 w6     0.262 k17 w6          17         1
+    frozen       0.251 k6  w2     0.253 k8  w2     0.253 k9  w2     0.253 k9  w2           9         9
+    twin         0.983 k1  w0     0.983 k1  w0     0.857 k2  w0     0.857 k2  w0           2        16
+    ungated      0.268 k8  w3     0.296 k16 w6     0.294 k18 w6     0.294 k18 w6          18         0
+
+  s0_sv bL2 repeat 1 — base 0 rows at e 1.000 (level 0.099), 18 candidates (12T/6W), delta 0.0128
+    gate                    b=8             b=16             b=18             b=32  admitted  rejected
+    world        0.251 k6  w2     0.242 k11 w4     0.242 k12 w4     0.242 k12 w4          12         6
+    read         0.251 k6  w2     0.258 k8  w3     0.258 k9  w3     0.258 k9  w3           9         9
+    read_pair    0.251 k6  w2     0.258 k8  w3     0.258 k9  w3     0.258 k9  w3           9         9
+    read_m       0.266 k7  w2     0.296 k15 w5     0.294 k17 w5     0.294 k17 w5          17         1
+    frozen       0.251 k5  w1     0.249 k8  w2     0.249 k9  w2     0.249 k9  w2           9         9
+    twin         0.983 k1  w0     0.983 k1  w0     0.983 k1  w0     0.983 k1  w0           1        17
+    ungated      0.268 k8  w3     0.296 k16 w6     0.294 k18 w6     0.294 k18 w6          18         0
+
+  s0_sv bL3 repeat 0 — base 0 rows at e 1.000 (level 0.080), 84 candidates (29T/55W), delta 0.0110
+    gate                    b=8             b=16             b=32             b=84  admitted  rejected
+    world        0.426 k4  w2     0.289 k10 w7     0.286 k26 w17    0.288 k78 w50         78         6
+    read         0.436 k6  w4     0.301 k12 w9     0.301 k28 w19    0.301 k79 w51         79         5
+    read_pair    0.436 k6  w4     0.301 k12 w9     0.301 k28 w19    0.301 k79 w51         79         5
+    read_m       0.453 k7  w4     0.324 k15 w11    0.324 k31 w21    0.324 k83 w54         83         1
+    frozen       0.513 k4  w3     0.477 k8  w7     0.471 k20 w15    0.470 k64 w45         64        20
+    twin         0.562 k3  w2     0.562 k5  w4     0.556 k13 w9     0.529 k53 w35         53        31
+    ungated      0.462 k8  w5     0.331 k16 w12    0.331 k32 w22    0.331 k84 w55         84         0
+
+  s0_sv bL3 repeat 1 — base 0 rows at e 1.000 (level 0.065), 84 candidates (29T/55W), delta 0.0106
+    gate                    b=8             b=16             b=32             b=84  admitted  rejected
+    world        0.441 k5  w3     0.314 k12 w9     0.311 k28 w19    0.312 k80 w52         80         4
+    read         0.441 k5  w3     0.322 k9  w7     0.322 k17 w12    0.324 k58 w41         58        26
+    read_pair    0.441 k5  w3     0.322 k9  w7     0.322 k17 w12    0.324 k58 w41         58        26
+    read_m       0.453 k7  w4     0.324 k15 w11    0.324 k31 w21    0.324 k83 w54         83         1
+    frozen       0.434 k6  w4     0.432 k10 w8     0.432 k20 w14    0.422 k67 w45         67        17
+    twin         0.577 k2  w1     0.577 k4  w3     0.578 k7  w6     0.549 k23 w16         23        61
+    ungated      0.462 k8  w5     0.331 k16 w12    0.331 k32 w22    0.331 k84 w55         84         0
+
+  s0_sv bL4 repeat 0 — base 0 rows at e 1.000 (level 0.041), 96 candidates (29T/67W), delta 0.0052
+    gate                    b=8             b=16             b=32             b=96  admitted  rejected
+    world        0.168 k8  w4     0.168 k15 w8     0.168 k30 w19    0.168 k94 w65         94         2
+    read         0.168 k7  w3     0.168 k14 w8     0.168 k30 w20    0.168 k94 w66         94         2
+    read_pair    0.168 k7  w3     0.168 k14 w8     0.168 k30 w20    0.168 k94 w66         94         2
+    read_m       0.168 k8  w4     0.168 k16 w9     0.168 k32 w21    0.168 k96 w67         96         0
+    frozen       0.168 k7  w3     0.168 k12 w6     0.168 k23 w14    0.168 k87 w60         87         9
+    twin         0.168 k7  w3     0.168 k12 w6     0.168 k23 w14    0.168 k87 w60         87         9
+    ungated      0.168 k8  w4     0.168 k16 w9     0.168 k32 w21    0.168 k96 w67         96         0
+
+  s0_sv bL4 repeat 1 — base 0 rows at e 1.000 (level 0.049), 96 candidates (29T/67W), delta 0.0075
+    gate                    b=8             b=16             b=32             b=96  admitted  rejected
+    world        0.168 k8  w4     0.168 k15 w8     0.168 k31 w20    0.168 k95 w66         95         1
+    read         0.168 k7  w3     0.168 k14 w8     0.168 k30 w20    0.168 k94 w66         94         2
+    read_pair    0.168 k7  w3     0.168 k14 w8     0.168 k30 w20    0.168 k94 w66         94         2
+    read_m       0.168 k8  w4     0.168 k16 w9     0.168 k32 w21    0.168 k96 w67         96         0
+    frozen       0.168 k7  w3     0.168 k13 w7     0.168 k28 w18    0.168 k92 w64         92         4
+    twin         0.168 k7  w3     0.168 k13 w7     0.168 k28 w18    0.168 k92 w64         92         4
+    ungated      0.168 k8  w4     0.168 k16 w9     0.168 k32 w21    0.168 k96 w67         96         0
+
+  s2_sv aL2 repeat 0 — base 3 rows at e 0.562 (level 0.114), 37 candidates (16T/24W), delta 0.0145
+    gate                    b=8             b=16             b=32             b=37  admitted  rejected
+    world        0.410 k8  w1     0.342 k12 w4     0.320 k19 w8     0.311 k23 w11         20        17
+    read         0.474 k8  w2     0.482 k14 w7     0.466 k22 w13    0.471 k26 w17         23        14
+    read_pair    0.474 k8  w2     0.482 k14 w7     0.466 k22 w13    0.471 k26 w17         23        14
+    read_m       0.495 k11 w3     0.518 k19 w9     0.497 k35 w20    0.478 k40 w24         37         0
+    frozen       0.689 k4  w0     0.784 k6  w1     0.815 k8  w3     0.728 k13 w7          10        27
+    twin         0.465 k6  w1     0.395 k9  w3     0.392 k15 w7     0.392 k19 w11         16        21
+    ungated      0.495 k11 w3     0.518 k19 w9     0.497 k35 w20    0.478 k40 w24         37         0
+
+  s2_sv aL2 repeat 1 — base 3 rows at e 0.724 (level 0.139), 36 candidates (16T/24W), delta 0.0172
+    gate                    b=8             b=16             b=32             b=36  admitted  rejected
+    world        0.382 k8  w2     0.393 k13 w5     0.375 k27 w14    0.354 k31 w17         28         8
+    read         0.401 k8  w2     0.510 k12 w4     0.507 k24 w12    0.486 k28 w15         25        11
+    read_pair    0.401 k8  w2     0.510 k12 w4     0.507 k24 w12    0.486 k28 w15         25        11
+    read_m       0.413 k11 w4     0.522 k19 w10    0.500 k35 w21    0.478 k39 w24         36         0
+    frozen       0.401 k8  w2     0.510 k12 w4     0.508 k26 w14    0.487 k30 w17         27         9
+    twin         0.435 k8  w2     0.426 k11 w3     0.427 k20 w9     0.427 k23 w12         20        16
+    ungated      0.413 k11 w4     0.522 k19 w10    0.500 k35 w21    0.478 k39 w24         36         0
+
+  s2_sv aL3 repeat 0 — base 12 rows at e 0.621 (level 0.166), 41 candidates (24T/24W), delta 0.0165
+    gate                    b=8             b=16             b=32             b=41  admitted  rejected
+    world        0.552 k15 w2     0.533 k19 w3     0.525 k32 w10    0.525 k41 w15         29        12
+    read         0.755 k17 w3     0.760 k22 w6     0.758 k38 w16    0.758 k47 w21         35         6
+    read_pair    0.755 k17 w3     0.760 k22 w6     0.758 k38 w16    0.758 k47 w21         35         6
+    read_m       0.755 k18 w3     0.758 k26 w7     0.753 k42 w17    0.753 k51 w22         39         2
+    frozen       0.889 k16 w2     0.888 k21 w5     0.874 k37 w15    0.874 k46 w20         34         7
+    twin         0.589 k13 w1     0.645 k16 w3     0.646 k29 w11    0.646 k38 w16         26        15
+    ungated      0.872 k20 w5     0.875 k28 w9     0.859 k44 w19    0.859 k53 w24         41         0
+
+  s2_sv aL3 repeat 1 — base 12 rows at e 0.750 (level 0.119), 44 candidates (24T/24W), delta 0.0150
+    gate                    b=8             b=16             b=32             b=44  admitted  rejected
+    world        0.757 k17 w4     0.684 k25 w7     0.684 k40 w15    0.684 k52 w21         40         4
+    read         0.753 k18 w4     0.686 k26 w7     0.686 k41 w15    0.686 k53 w21         41         3
+    read_pair    0.753 k18 w4     0.686 k26 w7     0.686 k41 w15    0.686 k53 w21         41         3
+    read_m       0.781 k20 w6     0.727 k28 w9     0.728 k44 w18    0.728 k56 w24         44         0
+    frozen       0.779 k19 w5     0.723 k26 w8     0.723 k41 w16    0.723 k53 w22         41         3
+    twin         0.755 k19 w5     0.688 k25 w8     0.688 k40 w16    0.688 k52 w22         40         4
+    ungated      0.781 k20 w6     0.727 k28 w9     0.728 k44 w18    0.728 k56 w24         44         0
+
+  s2_sv aL4 repeat 0 — base 29 rows at e 0.383 (level 0.342), 48 candidates (24T/24W), delta 0.0229
+    gate                    b=8             b=16             b=32             b=48  admitted  rejected
+    world        0.169 k35 w1     0.169 k43 w3     0.169 k59 w12    0.169 k75 w22         46         2
+    read         0.383 k34 w1     0.383 k42 w3     0.383 k58 w12    0.383 k74 w22         45         3
+    read_pair    0.383 k34 w1     0.383 k42 w3     0.383 k58 w12    0.383 k74 w22         45         3
+    read_m       0.393 k35 w2     0.393 k43 w4     0.393 k59 w13    0.393 k75 w23         46         2
+    frozen       0.651 k36 w3     0.651 k44 w5     0.651 k60 w14    0.651 k76 w24         47         1
+    twin         0.383 k34 w1     0.383 k41 w3     0.383 k57 w12    0.383 k73 w22         44         4
+    ungated      0.279 k37 w3     0.279 k45 w5     0.279 k61 w14    0.279 k77 w24         48         0
+
+  s2_sv aL4 repeat 1 — base 29 rows at e 0.880 (level 0.113), 48 candidates (24T/24W), delta 0.0129
+    gate                    b=8             b=16             b=32             b=48  admitted  rejected
+    world        0.169 k35 w1     0.169 k43 w3     0.169 k59 w12    0.169 k75 w22         46         2
+    read         0.169 k36 w2     0.169 k44 w4     0.169 k60 w13    0.169 k76 w23         47         1
+    read_pair    0.169 k36 w2     0.169 k44 w4     0.169 k60 w13    0.169 k76 w23         47         1
+    read_m       0.169 k36 w2     0.169 k44 w4     0.169 k60 w13    0.169 k76 w23         47         1
+    frozen       0.970 k35 w3     0.970 k43 w5     0.970 k59 w14    0.970 k75 w24         46         2
+    twin         1.000 k35 w3     1.000 k43 w5     1.000 k59 w14    1.000 k75 w24         46         2
+    ungated      0.279 k37 w3     0.279 k45 w5     0.279 k61 w14    0.279 k77 w24         48         0
+
+  s2_sv aL5 repeat 0 — base 16 rows at e 0.771 (level 0.071), 48 candidates (24T/24W), delta 0.0070
+    gate                    b=8             b=16             b=32             b=48  admitted  rejected
+    world        0.589 k20 w1     0.589 k28 w5     0.589 k44 w12    0.589 k60 w20         44         4
+    read         0.589 k20 w1     0.589 k28 w5     0.589 k44 w12    0.589 k60 w20         44         4
+    read_pair    0.589 k20 w1     0.589 k28 w5     0.589 k44 w12    0.589 k60 w20         44         4
+    read_m       0.596 k21 w2     0.596 k29 w6     0.596 k45 w13    0.596 k61 w21         45         3
+    frozen       0.771 k19 w1     0.771 k27 w5     0.771 k43 w12    0.771 k59 w20         43         5
+    twin         0.888 k24 w5     0.888 k32 w9     0.888 k48 w16    0.888 k64 w24         48         0
+    ungated      0.888 k24 w5     0.888 k32 w9     0.888 k48 w16    0.888 k64 w24         48         0
+
+  s2_sv aL5 repeat 1 — base 16 rows at e 0.758 (level 0.088), 48 candidates (24T/24W), delta 0.0083
+    gate                    b=8             b=16             b=32             b=48  admitted  rejected
+    world        0.573 k20 w1     0.573 k28 w5     0.573 k44 w12    0.573 k60 w20         44         4
+    read         0.573 k20 w1     0.573 k28 w5     0.573 k44 w12    0.573 k60 w20         44         4
+    read_pair    0.573 k20 w1     0.573 k28 w5     0.573 k44 w12    0.573 k60 w20         44         4
+    read_m       0.581 k21 w2     0.581 k29 w6     0.581 k45 w13    0.581 k61 w21         45         3
+    frozen       0.573 k20 w1     0.573 k28 w5     0.573 k44 w12    0.573 k60 w20         44         4
+    twin         1.000 k22 w4     1.000 k30 w8     1.000 k46 w15    1.000 k62 w23         46         2
+    ungated      0.888 k24 w5     0.888 k32 w9     0.888 k48 w16    0.888 k64 w24         48         0
+
+  s2_sv bL2 repeat 0 — base 0 rows at e 1.000 (level 0.096), 19 candidates (13T/6W), delta 0.0137
+    gate                    b=8             b=16             b=19             b=32  admitted  rejected
+    world        0.363 k5  w2     0.311 k8  w2     0.302 k11 w2     0.302 k11 w2          11         8
+    read         0.363 k5  w2     0.311 k8  w2     0.307 k9  w2     0.307 k9  w2           9        10
+    read_pair    0.363 k5  w2     0.311 k8  w2     0.307 k9  w2     0.307 k9  w2           9        10
+    read_m       0.413 k8  w3     0.384 k16 w6     0.372 k19 w6     0.372 k19 w6          19         0
+    frozen       1.000 k0  w0     0.790 k1  w0     0.600 k2  w0     0.600 k2  w0           2        17
+    twin         0.573 k3  w1     0.573 k4  w1     0.573 k4  w1     0.573 k4  w1           4        15
+    ungated      0.413 k8  w3     0.384 k16 w6     0.372 k19 w6     0.372 k19 w6          19         0
+
+  s2_sv bL2 repeat 1 — base 0 rows at e 1.000 (level 0.071), 19 candidates (13T/6W), delta 0.0118
+    gate                    b=8             b=16             b=19             b=32  admitted  rejected
+    world        0.361 k5  w2     0.299 k7  w2     0.288 k10 w2     0.288 k10 w2          10         9
+    read         0.408 k6  w3     0.303 k8  w3     0.303 k8  w3     0.303 k8  w3           8        11
+    read_pair    0.408 k6  w3     0.303 k8  w3     0.303 k8  w3     0.303 k8  w3           8        11
+    read_m       0.413 k8  w3     0.384 k16 w6     0.372 k19 w6     0.372 k19 w6          19         0
+    frozen       0.482 k4  w2     0.387 k8  w3     0.339 k10 w3     0.339 k10 w3          10         9
+    twin         0.549 k2  w1     0.414 k4  w1     0.414 k4  w1     0.414 k4  w1           4        15
+    ungated      0.413 k8  w3     0.384 k16 w6     0.372 k19 w6     0.372 k19 w6          19         0
+
+  s2_sv bL3 repeat 0 — base 0 rows at e 1.000 (level 0.062), 96 candidates (33T/63W), delta 0.0087
+    gate                    b=8             b=16             b=32             b=96  admitted  rejected
+    world        0.467 k7  w4     0.357 k14 w8     0.353 k30 w20    0.349 k94 w61         94         2
+    read         0.486 k5  w3     0.367 k13 w8     0.362 k27 w19    0.358 k90 w59         90         6
+    read_pair    0.486 k5  w3     0.367 k13 w8     0.362 k27 w19    0.358 k90 w59         90         6
+    read_m       0.480 k8  w5     0.368 k16 w10    0.363 k32 w22    0.359 k96 w63         96         0
+    frozen       0.484 k7  w5     0.366 k14 w10    0.366 k27 w20    0.362 k91 w61         91         5
+    twin         0.553 k4  w3     0.555 k8  w6     0.555 k13 w10    0.478 k60 w40         60        36
+    ungated      0.480 k8  w5     0.368 k16 w10    0.363 k32 w22    0.359 k96 w63         96         0
+
+  s2_sv bL3 repeat 1 — base 0 rows at e 1.000 (level 0.045), 96 candidates (33T/63W), delta 0.0074
+    gate                    b=8             b=16             b=32             b=96  admitted  rejected
+    world        0.467 k7  w4     0.359 k13 w8     0.353 k29 w20    0.349 k93 w61         93         3
+    read         0.487 k6  w4     0.366 k12 w8     0.361 k26 w19    0.358 k88 w59         88         8
+    read_pair    0.487 k6  w4     0.366 k12 w8     0.361 k26 w19    0.358 k88 w59         88         8
+    read_m       0.483 k7  w4     0.370 k15 w9     0.363 k31 w21    0.359 k95 w62         95         1
+    frozen       0.487 k6  w4     0.366 k12 w8     0.363 k25 w18    0.359 k87 w57         87         9
+    twin         0.573 k3  w2     0.573 k5  w4     0.570 k12 w9     0.566 k41 w27         41        55
+    ungated      0.480 k8  w5     0.368 k16 w10    0.363 k32 w22    0.359 k96 w63         96         0
+
+  s2_sv bL4 repeat 0 — base 0 rows at e 1.000 (level 0.069), 96 candidates (9T/87W), delta 0.0096
+    gate                    b=8             b=16             b=32             b=96  admitted  rejected
+    world        0.457 k7  w6     0.457 k15 w14    0.457 k31 w30    0.457 k95 w86         95         1
+    read         0.461 k6  w5     0.461 k14 w13    0.461 k30 w29    0.461 k94 w85         94         2
+    read_pair    0.461 k6  w5     0.461 k14 w13    0.461 k30 w29    0.461 k94 w85         94         2
+    read_m       0.470 k8  w7     0.470 k16 w15    0.470 k32 w31    0.470 k96 w87         96         0
+    frozen       0.471 k5  w4     0.471 k13 w12    0.471 k29 w28    0.471 k93 w84         93         3
+    twin         0.457 k7  w6     0.457 k15 w14    0.457 k31 w30    0.457 k95 w86         95         1
+    ungated      0.470 k8  w7     0.470 k16 w15    0.470 k32 w31    0.470 k96 w87         96         0
+
+  s2_sv bL4 repeat 1 — base 0 rows at e 1.000 (level 0.057), 96 candidates (9T/87W), delta 0.0088
+    gate                    b=8             b=16             b=32             b=96  admitted  rejected
+    world        0.457 k7  w6     0.457 k15 w14    0.457 k31 w30    0.457 k95 w86         95         1
+    read         0.471 k4  w3     0.471 k12 w11    0.471 k28 w27    0.471 k92 w83         92         4
+    read_pair    0.471 k4  w3     0.471 k12 w11    0.471 k28 w27    0.471 k92 w83         92         4
+    read_m       0.470 k8  w7     0.470 k16 w15    0.470 k32 w31    0.470 k96 w87         96         0
+    frozen       0.487 k6  w5     0.487 k14 w13    0.487 k30 w29    0.487 k94 w85         94         2
+    twin         0.461 k5  w4     0.461 k13 w12    0.461 k29 w28    0.461 k93 w84         93         3
+    ungated      0.470 k8  w7     0.470 k16 w15    0.470 k32 w31    0.470 k96 w87         96         0
+
+============================================================================================================================================
+[G52] THE DIRECT MEASURE — per-candidate agreement with the WORLD gate's decision on
+      the SAME trial (the world's verdict is recorded at every step whatever the gate
+      decides, from the same fire). TT = both admit, FF = both reject, TF = the gate
+      admits where the world rejects (the junk it lets in), FT = the gate rejects where
+      the world admits (what it refuses). `cost` is the world's mean error CHANGE on
+      the TF candidates — what each wrongly-admitted entry actually cost on the gate
+      pool — and `cost_sum` their total. `agree` = (TT + FF) / n.
+
+      arm        cell rp gate          n   TT   FF   TF   FT  agree    cost  cost_sum
+      s0_sv       aL2  0 world        36   22   14    0    0  1.000      --    0.0000
+      s0_sv       aL2  0 read         36   13   14    3    6  0.750  0.0156    0.0469
+      s0_sv       aL2  0 read_pair    36   13   14    3    6  0.750  0.0156    0.0469
+      s0_sv       aL2  0 read_m       36   26    1    9    0  0.750  0.0150    0.1354
+      s0_sv       aL2  0 frozen       36   22    6    6    2  0.778  0.0295    0.1771
+      s0_sv       aL2  0 twin         36   22    8    4    2  0.833  0.0195    0.0781
+      s0_sv       aL2  0 ungated      36   27    0    9    0  0.750  0.0255    0.2292
+      s0_sv       aL2  1 world        35   20   15    0    0  1.000      --    0.0000
+      s0_sv       aL2  1 read         35   17    5    5    8  0.629  0.0167    0.0833
+      s0_sv       aL2  1 read_pair    35   17    5    5    8  0.629  0.0167    0.0833
+      s0_sv       aL2  1 read_m       35   25    0   10    0  0.714  0.0229    0.2292
+      s0_sv       aL2  1 frozen       35   14    9    5    7  0.657  0.0333    0.1667
+      s0_sv       aL2  1 twin         35   14    7    6    8  0.600  0.0217    0.1302
+      s0_sv       aL2  1 ungated      35   25    0   10    0  0.714  0.0229    0.2292
+      s0_sv       aL3  0 world        41   36    5    0    0  1.000      --    0.0000
+      s0_sv       aL3  0 read         41   33    4    2    2  0.902  0.0208    0.0417
+      s0_sv       aL3  0 read_pair    41   33    4    2    2  0.902  0.0208    0.0417
+      s0_sv       aL3  0 read_m       41   34    3    3    1  0.902  0.0156    0.0469
+      s0_sv       aL3  0 frozen       41   36    4    0    1  0.976      --    0.0000
+      s0_sv       aL3  0 twin         41   32    5    1    3  0.902  0.0312    0.0312
+      s0_sv       aL3  0 ungated      41   39    0    2    0  0.951  0.0208    0.0417
+      s0_sv       aL3  1 world        43   35    8    0    0  1.000      --    0.0000
+      s0_sv       aL3  1 read         43   35    2    2    4  0.860  0.0859    0.1719
+      s0_sv       aL3  1 read_pair    43   35    2    2    4  0.860  0.0859    0.1719
+      s0_sv       aL3  1 read_m       43   40    0    3    0  0.930  0.0972    0.2917
+      s0_sv       aL3  1 frozen       43   38    1    2    2  0.907  0.1354    0.2708
+      s0_sv       aL3  1 twin         43   40    0    3    0  0.930  0.0972    0.2917
+      s0_sv       aL3  1 ungated      43   40    0    3    0  0.930  0.0972    0.2917
+      s0_sv       aL4  0 world        45   44    1    0    0  1.000      --    0.0000
+      s0_sv       aL4  0 read         45   44    1    0    0  1.000      --    0.0000
+      s0_sv       aL4  0 read_pair    45   44    1    0    0  1.000      --    0.0000
+      s0_sv       aL4  0 read_m       45   44    1    0    0  1.000      --    0.0000
+      s0_sv       aL4  0 frozen       45   44    1    0    0  1.000      --    0.0000
+      s0_sv       aL4  0 twin         45   44    1    0    0  1.000      --    0.0000
+      s0_sv       aL4  0 ungated      45   44    0    1    0  0.978  0.0260    0.0260
+      s0_sv       aL4  1 world        47   45    2    0    0  1.000      --    0.0000
+      s0_sv       aL4  1 read         47   43    2    0    2  0.957      --    0.0000
+      s0_sv       aL4  1 read_pair    47   43    2    0    2  0.957      --    0.0000
+      s0_sv       aL4  1 read_m       47   45    1    1    0  0.979  0.0052    0.0052
+      s0_sv       aL4  1 frozen       47   43    2    0    2  0.957      --    0.0000
+      s0_sv       aL4  1 twin         47   44    1    1    1  0.957  0.0052    0.0052
+      s0_sv       aL4  1 ungated      47   46    0    1    0  0.979  0.4531    0.4531
+      s0_sv       aL5  0 world        48   47    1    0    0  1.000      --    0.0000
+      s0_sv       aL5  0 read         48   46    1    0    1  0.979      --    0.0000
+      s0_sv       aL5  0 read_pair    48   46    1    0    1  0.979      --    0.0000
+      s0_sv       aL5  0 read_m       48   47    1    0    0  1.000      --    0.0000
+      s0_sv       aL5  0 frozen       48   47    0    1    0  0.979  0.0208    0.0208
+      s0_sv       aL5  0 twin         48   47    0    1    0  0.979  0.0208    0.0208
+      s0_sv       aL5  0 ungated      48   47    0    1    0  0.979  0.0208    0.0208
+      s0_sv       aL5  1 world        48   48    0    0    0  1.000      --    0.0000
+      s0_sv       aL5  1 read         48   40    5    0    3  0.938      --    0.0000
+      s0_sv       aL5  1 read_pair    48   40    5    0    3  0.938      --    0.0000
+      s0_sv       aL5  1 read_m       48   40    5    0    3  0.938      --    0.0000
+      s0_sv       aL5  1 frozen       48   48    0    0    0  1.000      --    0.0000
+      s0_sv       aL5  1 twin         48   48    0    0    0  1.000      --    0.0000
+      s0_sv       aL5  1 ungated      48   48    0    0    0  1.000      --    0.0000
+      s0_sv       bL2  0 world        18   12    6    0    0  1.000      --    0.0000
+      s0_sv       bL2  0 read         18    8    5    1    4  0.722  0.0052    0.0052
+      s0_sv       bL2  0 read_pair    18    8    5    1    4  0.722  0.0052    0.0052
+      s0_sv       bL2  0 read_m       18   14    1    3    0  0.833  0.0260    0.0781
+      s0_sv       bL2  0 frozen       18    8    5    1    4  0.722  0.0052    0.0052
+      s0_sv       bL2  0 twin         18    2    1    0   15  0.167      --    0.0000
+      s0_sv       bL2  0 ungated      18   14    0    4    0  0.778  0.0260    0.1042
+      s0_sv       bL2  1 world        18   12    6    0    0  1.000      --    0.0000
+      s0_sv       bL2  1 read         18    8    5    1    4  0.722  0.0052    0.0052
+      s0_sv       bL2  1 read_pair    18    8    5    1    4  0.722  0.0052    0.0052
+      s0_sv       bL2  1 read_m       18   15    1    2    0  0.889  0.0312    0.0625
+      s0_sv       bL2  1 frozen       18    9    7    0    2  0.889      --    0.0000
+      s0_sv       bL2  1 twin         18    1    1    0   16  0.111      --    0.0000
+      s0_sv       bL2  1 ungated      18   15    0    3    0  0.833  0.0295    0.0885
+      s0_sv       bL3  0 world        84   78    6    0    0  1.000      --    0.0000
+      s0_sv       bL3  0 read         84   78    3    1    2  0.964  0.0052    0.0052
+      s0_sv       bL3  0 read_pair    84   78    3    1    2  0.964  0.0052    0.0052
+      s0_sv       bL3  0 read_m       84   80    1    3    0  0.964  0.0069    0.0208
+      s0_sv       bL3  0 frozen       84   63    8    1   12  0.845  0.0052    0.0052
+      s0_sv       bL3  0 twin         84   53    5    0   26  0.690      --    0.0000
+      s0_sv       bL3  0 ungated      84   80    0    4    0  0.952  0.0091    0.0365
+      s0_sv       bL3  1 world        84   80    4    0    0  1.000      --    0.0000
+      s0_sv       bL3  1 read         84   58    7    0   19  0.774      --    0.0000
+      s0_sv       bL3  1 read_pair    84   58    7    0   19  0.774      --    0.0000
+      s0_sv       bL3  1 read_m       84   80    1    3    0  0.964  0.0243    0.0729
+      s0_sv       bL3  1 frozen       84   66    3    1   14  0.821  0.0260    0.0260
+      s0_sv       bL3  1 twin         84   22   12    1   49  0.405  0.0052    0.0052
+      s0_sv       bL3  1 ungated      84   80    0    4    0  0.952  0.0182    0.0729
+      s0_sv       bL4  0 world        96   94    2    0    0  1.000      --    0.0000
+      s0_sv       bL4  0 read         96   94    0    0    2  0.979      --    0.0000
+      s0_sv       bL4  0 read_pair    96   94    0    0    2  0.979      --    0.0000
+      s0_sv       bL4  0 read_m       96   95    0    1    0  0.990  0.0052    0.0052
+      s0_sv       bL4  0 frozen       96   87    0    0    9  0.906      --    0.0000
+      s0_sv       bL4  0 twin         96   87    0    0    9  0.906      --    0.0000
+      s0_sv       bL4  0 ungated      96   95    0    1    0  0.990  0.0052    0.0052
+      s0_sv       bL4  1 world        96   95    1    0    0  1.000      --    0.0000
+      s0_sv       bL4  1 read         96   93    1    1    1  0.979  0.0052    0.0052
+      s0_sv       bL4  1 read_pair    96   93    1    1    1  0.979  0.0052    0.0052
+      s0_sv       bL4  1 read_m       96   95    0    1    0  0.990  0.0052    0.0052
+      s0_sv       bL4  1 frozen       96   92    2    0    2  0.979      --    0.0000
+      s0_sv       bL4  1 twin         96   92    2    0    2  0.979      --    0.0000
+      s0_sv       bL4  1 ungated      96   95    0    1    0  0.990  0.0052    0.0052
+      s2_sv       aL2  0 world        37   20   17    0    0  1.000      --    0.0000
+      s2_sv       aL2  0 read         37   18   10    5    4  0.757  0.0417    0.2083
+      s2_sv       aL2  0 read_pair    37   18   10    5    4  0.757  0.0417    0.2083
+      s2_sv       aL2  0 read_m       37   25    0   12    0  0.676  0.0221    0.2656
+      s2_sv       aL2  0 frozen       37    7   10    3   17  0.459  0.0885    0.2656
+      s2_sv       aL2  0 twin         37   13   15    3    6  0.757  0.0052    0.0156
+      s2_sv       aL2  0 ungated      37   25    0   12    0  0.676  0.0221    0.2656
+      s2_sv       aL2  1 world        36   28    8    0    0  1.000      --    0.0000
+      s2_sv       aL2  1 read         36   22    4    3    7  0.722  0.0417    0.1250
+      s2_sv       aL2  1 read_pair    36   22    4    3    7  0.722  0.0417    0.1250
+      s2_sv       aL2  1 read_m       36   29    0    7    0  0.806  0.0216    0.1510
+      s2_sv       aL2  1 frozen       36   24    4    3    5  0.778  0.0382    0.1146
+      s2_sv       aL2  1 twin         36   18    6    2   10  0.667  0.0156    0.0312
+      s2_sv       aL2  1 ungated      36   29    0    7    0  0.806  0.0216    0.1510
+      s2_sv       aL3  0 world        41   29   12    0    0  1.000      --    0.0000
+      s2_sv       aL3  0 read         41   33    5    2    1  0.927  0.0885    0.1771
+      s2_sv       aL3  0 read_pair    41   33    5    2    1  0.927  0.0885    0.1771
+      s2_sv       aL3  0 read_m       41   34    2    5    0  0.878  0.0406    0.2031
+      s2_sv       aL3  0 frozen       41   31    4    3    3  0.854  0.0903    0.2708
+      s2_sv       aL3  0 twin         41   24    7    2    8  0.756  0.0391    0.0781
+      s2_sv       aL3  0 ungated      41   36    0    5    0  0.878  0.0490    0.2448
+      s2_sv       aL3  1 world        44   40    4    0    0  1.000      --    0.0000
+      s2_sv       aL3  1 read         44   40    3    1    0  0.977  0.0104    0.0104
+      s2_sv       aL3  1 read_pair    44   40    3    1    0  0.977  0.0104    0.0104
+      s2_sv       aL3  1 read_m       44   40    0    4    0  0.909  0.0104    0.0417
+      s2_sv       aL3  1 frozen       44   39    2    2    1  0.932  0.0156    0.0313
+      s2_sv       aL3  1 twin         44   38    2    2    2  0.909  0.0078    0.0156
+      s2_sv       aL3  1 ungated      44   40    0    4    0  0.909  0.0104    0.0417
+      s2_sv       aL4  0 world        48   46    2    0    0  1.000      --    0.0000
+      s2_sv       aL4  0 read         48   45    2    0    1  0.979      --    0.0000
+      s2_sv       aL4  0 read_pair    48   45    2    0    1  0.979      --    0.0000
+      s2_sv       aL4  0 read_m       48   45    1    1    1  0.958  0.0104    0.0104
+      s2_sv       aL4  0 frozen       48   46    0    1    1  0.958  0.2344    0.2344
+      s2_sv       aL4  0 twin         48   44    2    0    2  0.958      --    0.0000
+      s2_sv       aL4  0 ungated      48   47    0    1    0  0.979  0.0833    0.0833
+      s2_sv       aL4  1 world        48   46    2    0    0  1.000      --    0.0000
+      s2_sv       aL4  1 read         48   46    1    1    0  0.979  0.0104    0.0104
+      s2_sv       aL4  1 read_pair    48   46    1    1    0  0.979  0.0104    0.0104
+      s2_sv       aL4  1 read_m       48   46    1    1    0  0.979  0.0104    0.0104
+      s2_sv       aL4  1 frozen       48   45    0    1    2  0.938  0.1354    0.1354
+      s2_sv       aL4  1 twin         48   45    0    1    2  0.938  0.1354    0.1354
+      s2_sv       aL4  1 ungated      48   47    0    1    0  0.979  0.1250    0.1250
+      s2_sv       aL5  0 world        48   44    4    0    0  1.000      --    0.0000
+      s2_sv       aL5  0 read         48   44    4    0    0  1.000      --    0.0000
+      s2_sv       aL5  0 read_pair    48   44    4    0    0  1.000      --    0.0000
+      s2_sv       aL5  0 read_m       48   44    3    1    0  0.979  0.0052    0.0052
+      s2_sv       aL5  0 frozen       48   43    4    0    1  0.979      --    0.0000
+      s2_sv       aL5  0 twin         48   46    0    2    0  0.958  0.1354    0.2708
+      s2_sv       aL5  0 ungated      48   46    0    2    0  0.958  0.1354    0.2708
+      s2_sv       aL5  1 world        48   44    4    0    0  1.000      --    0.0000
+      s2_sv       aL5  1 read         48   44    4    0    0  1.000      --    0.0000
+      s2_sv       aL5  1 read_pair    48   44    4    0    0  1.000      --    0.0000
+      s2_sv       aL5  1 read_m       48   44    3    1    0  0.979  0.0156    0.0156
+      s2_sv       aL5  1 frozen       48   44    4    0    0  1.000      --    0.0000
+      s2_sv       aL5  1 twin         48   45    0    1    2  0.938  0.2552    0.2552
+      s2_sv       aL5  1 ungated      48   47    0    1    0  0.979  0.2552    0.2552
+      s2_sv       bL2  0 world        19   11    8    0    0  1.000      --    0.0000
+      s2_sv       bL2  0 read         19    9    8    0    2  0.895      --    0.0000
+      s2_sv       bL2  0 read_pair    19    9    8    0    2  0.895      --    0.0000
+      s2_sv       bL2  0 read_m       19   13    0    6    0  0.684  0.0182    0.1094
+      s2_sv       bL2  0 frozen       19    2    1    0   16  0.158      --    0.0000
+      s2_sv       bL2  0 twin         19    2    3    2   12  0.263  0.0156    0.0312
+      s2_sv       bL2  0 ungated      19   13    0    6    0  0.684  0.0182    0.1094
+      s2_sv       bL2  1 world        19   10    9    0    0  1.000      --    0.0000
+      s2_sv       bL2  1 read         19    7    8    1    3  0.789  0.0156    0.0156
+      s2_sv       bL2  1 read_pair    19    7    8    1    3  0.789  0.0156    0.0156
+      s2_sv       bL2  1 read_m       19   12    0    7    0  0.632  0.0171    0.1198
+      s2_sv       bL2  1 frozen       19    6    5    4    4  0.579  0.0130    0.0521
+      s2_sv       bL2  1 twin         19    3    6    1    9  0.474  0.0208    0.0208
+      s2_sv       bL2  1 ungated      19   12    0    7    0  0.632  0.0171    0.1198
+      s2_sv       bL3  0 world        96   94    2    0    0  1.000      --    0.0000
+      s2_sv       bL3  0 read         96   90    0    0    6  0.938      --    0.0000
+      s2_sv       bL3  0 read_pair    96   90    0    0    6  0.938      --    0.0000
+      s2_sv       bL3  0 read_m       96   95    0    1    0  0.990  0.0208    0.0208
+      s2_sv       bL3  0 frozen       96   91    0    0    5  0.948      --    0.0000
+      s2_sv       bL3  0 twin         96   60    3    0   33  0.656      --    0.0000
+      s2_sv       bL3  0 ungated      96   95    0    1    0  0.990  0.0208    0.0208
+      s2_sv       bL3  1 world        96   93    3    0    0  1.000      --    0.0000
+      s2_sv       bL3  1 read         96   88    3    0    5  0.948      --    0.0000
+      s2_sv       bL3  1 read_pair    96   88    3    0    5  0.948      --    0.0000
+      s2_sv       bL3  1 read_m       96   92    0    3    1  0.958  0.0052    0.0156
+      s2_sv       bL3  1 frozen       96   87    3    0    6  0.938      --    0.0000
+      s2_sv       bL3  1 twin         96   40    3    1   52  0.448  0.0052    0.0052
+      s2_sv       bL3  1 ungated      96   93    0    3    0  0.969  0.0052    0.0156
+      s2_sv       bL4  0 world        96   95    1    0    0  1.000      --    0.0000
+      s2_sv       bL4  0 read         96   94    1    0    1  0.990      --    0.0000
+      s2_sv       bL4  0 read_pair    96   94    1    0    1  0.990      --    0.0000
+      s2_sv       bL4  0 read_m       96   95    0    1    0  0.990  0.0104    0.0104
+      s2_sv       bL4  0 frozen       96   93    1    0    2  0.979      --    0.0000
+      s2_sv       bL4  0 twin         96   95    1    0    0  1.000      --    0.0000
+      s2_sv       bL4  0 ungated      96   95    0    1    0  0.990  0.0104    0.0104
+      s2_sv       bL4  1 world        96   95    1    0    0  1.000      --    0.0000
+      s2_sv       bL4  1 read         96   92    1    0    3  0.969      --    0.0000
+      s2_sv       bL4  1 read_pair    96   92    1    0    3  0.969      --    0.0000
+      s2_sv       bL4  1 read_m       96   95    0    1    0  0.990  0.0052    0.0052
+      s2_sv       bL4  1 frozen       96   93    0    1    2  0.969  0.0052    0.0052
+      s2_sv       bL4  1 twin         96   93    1    0    2  0.979      --    0.0000
+      s2_sv       bL4  1 ungated      96   95    0    1    0  0.990  0.0052    0.0052
+
+      READ THE `ungated` ROW FIRST. The world gate itself admits about 95% of the
+      candidates it is offered, so 'admit everything' already agrees with it ~95% of
+      the time — MORE than any read gate does. Raw agreement is therefore not evidence
+      for a gate; what separates them is the COMPOSITION of the disagreement (TF, the
+      junk let in, against FT, the good entries refused) and, in the end, the table
+      quality in [G51].
+
+      Pooled over every (arm, cell, repeat) — a summary; the rows above are the record:
+      gate        n cells  agree (med)   TF share   FT share  cost (med)
+      world            28        1.000      0.000      0.000          --
+      read             28        0.943      0.005      0.046      0.0156
+      read_pair        28        0.943      0.005      0.046      0.0156
+      read_m           28        0.958      0.033      0.000      0.0156
+      frozen           28        0.935      0.011      0.049      0.0295
+      twin             28        0.904      0.021      0.064      0.0208
+      ungated          28        0.955      0.045      0.000      0.0216
+
+============================================================================================================================================
+
+============================================================================================================================================
+[G51s] THE TABLE OF RECORD, POOLED — median over all (arm, cell, repeat) of the test
+       error at the loop's own budget and at the full walk. The two anchors are `world`
+       (the oracle the gate is meant to replace) and `ungated` (the floor: no gate at
+       all). `capture` is (ungated - gate) / (ungated - world): 1.0 = the oracle, 0.0 =
+       no better than no gate, negative = worse than no gate.
+
+       gate         e @ b=8  capture  e @ full  capture  k (med)  w (med)
+       world          0.418    1.000     0.331    1.000     61.5     21.5
+       read           0.451    0.420     0.392    0.573     59.0     21.0
+       read_pair      0.451    0.420     0.392    0.573     59.0     21.0
+       read_m         0.470    0.091     0.456    0.123     61.0     23.5
+       frozen         0.500   -0.432     0.516   -0.291     62.0     22.0
+       twin           0.573   -1.705     0.558   -0.586     55.5     23.0
+       ungated        0.475    0.000     0.474    0.000     64.0     24.0
+
+       THE PAIRED FORM IS THE POOLED FORM, at threshold 0: identical admission lists
+       in 28 of 28 cells, and necessarily so. Only the changed instances move,
+       so `pooled_diff = (n_changed / n) * paired_diff` exactly; the two differ by a
+       positive factor and therefore never in sign. The paired form can only separate
+       from the pooled one under a MARGIN, where that factor rescales the threshold —
+       which is what `read_m` would have to be built on to be a different object.
+
+============================================================================================================================================
+[G53] THE SECONDARY ORDERS (repeat 0 only) — the world's own order and the read's own
+      order beside `dp_top`, for the world gate and the read gate. pp4 found the order
+      matters at small budgets; this says whether the gate's standing depends on it.
+
+      arm        cell    order   gate      b=8     b=16     full    k    w
+
+============================================================================================================================================
+[G54] THE BILL
+    arm       auditions      sec  peak RSS MB  peak GPU MB
+    s0_sv          9102    466.4         5078          991
+    s2_sv         10179    504.5         5088          991
+    TOTAL                  970.9   (0.27 GPU-h over 2 containers)
+

@@ -1,0 +1,67 @@
+[scordatura] THE DOSE READ: sc_p2/sc_gn_yk (seed 2) against rb_s2/st_gn_yk at the same cycles. Facts only.
+
+[D1] THE JUNK MINED, per cycle (instances posed 64; `take` = the donor's solved rows, `junk` = unsolved rows appended)
+    era cycles   solved/cycle q0/25/50/75/100           take                   junk junk:take
+      1     40                  6/16/19/24/31      6/8/8/8/8          9/13/19/24/58      2.83
+    total over c1..c40: 317 solved rows, 897 junk rows (2.83 junk per solved row)
+    in-run checks: J1 40/40, J2 40/40, J3 40/40, J4 40/40
+    junk rows seen / dropped by the class map (no legal class for a half), cumulative at c40: L2 897/0  L5 897/0  | panel L3 897/0  L4 897/0  L5 897/0  L6 897/0
+
+[D2] KEYS AT SUPPORT, per cycle: the committable miner (what the walk offers) and the panel (what defines a key's consumers)
+    here = this arm's miner; shadow = the same arm's solve-fed shadow (the solve-filtered rule on this arm's own history); st_gn_yk = the reference arm's miner at the same cycle; jo = junk-only (at support here, not in the shadow); T/F = the true-table mask (tf 1 / tf 0)
+       c                         L2 min                         L3 pan                         L4 pan                         L5 pan                         L5 min
+         here(T/F) shadow jo(T/F) st_gn_yk here(T/F) shadow jo(T/F) st_gn_yk here(T/F) shadow jo(T/F) st_gn_yk here(T/F) shadow jo(T/F) st_gn_yk here(T/F) shadow jo(T/F) st_gn_yk
+       1              7(4/3) 1 6(3/3) 1              1(1/0) 0 1(1/0) 0              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0
+       5         25(12/13) 6 19(9/10) 6          24(7/17) 5 19(7/12) 5              2(1/1) 0 2(1/1) 0              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0
+      10       32(13/19) 10 22(6/16) 10         46(11/35) 9 37(8/29) 9              2(1/1) 0 2(1/1) 0              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0
+      15       39(14/25) 10 29(7/22) 10      59(15/44) 15 44(11/33) 15              4(1/3) 0 4(1/3) 0              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0
+      20       43(14/29) 11 32(6/26) 11      69(20/49) 18 51(15/36) 18              8(2/6) 2 6(2/4) 2              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0
+      25       44(14/30) 12 32(6/26) 12      76(22/54) 24 52(13/39) 24           14(3/11) 2 12(3/9) 2              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0
+      30       46(14/32) 13 33(5/28) 13      80(23/57) 29 51(13/38) 29          24(5/19) 4 20(4/16) 4              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0
+      35       47(14/33) 13 34(5/29) 13      85(25/60) 34 51(13/38) 34          29(6/23) 5 24(4/20) 5              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0
+      40       48(14/34) 13 35(5/30) 13      87(25/62) 38 49(13/36) 38          38(9/29) 5 33(7/26) 5              0(0/0) 0 0(0/0) 0              0(0/0) 0 0(0/0) 0
+
+[D3] THE WALK (admission, `none`): every pass, per level — offered (cap 8), pending (at support, undecided, buildable), whether the cap bound, and the junk-only keys among them; the admitted table's size and row precision; `st_gn_yk`'s pass at the same cycle beside it
+       c  L offer  pend  cap offer_jo pend_jo keys adm   prec | ref offer ref pend ref keys ref prec
+       5  2     8    25  yes        4      19        8  0.625 |         6        6        6    0.500
+      10  2     8    24  yes        5      21       16  0.688 |         4        4       10    0.700
+      15  2     8    23  yes        8      23       24  0.500 |         —        —        —        —
+      20  2     8    19  yes        8      19       32  0.438 |         1        1       11    0.727
+      25  2     8    12  yes        7      11       40  0.350 |         1        1       12    0.667
+      30  2     6     6   no        6       6       46  0.304 |         1        1       13    0.692
+      35  2     1     1   no        1       1       47  0.298 |         —        —        —        —
+      40  2     1     1   no        1       1       48  0.292 |         —        —        —        —
+    passes at which the offer cap of 8 bound: 5
+    admitted keys at the stop, per walked level: L2 47 (junk-only now 34, T 14 / F 33)
+
+[D3b] THE WALK'S OWN FIRES, base-plus-one on the gate pool (192 of the era's cell): world delta = e_base - e_trial (> 0 helps, < 0 HARMS), per offered key by class
+    jo = junk-only at its offer, sv = at support in the shadow too; T/F = true mask
+     L class true   n  world -/0/+                    delta q0/25/50/75/100
+     2    jo    F  30   10/20/0                        -0.0729/-0.0104/0/0/0
+     2    jo    T  10    0/9/1                               0/0/0/0/0.0052
+     2    sv    F   4    0/2/2                     0/0/0.0729/0.0729/0.1406
+     2    sv    T   4    1/1/2               -0.0104/0/0.1615/0.1615/0.4896
+    st_gn_yk through c40: L2 13 offered, world -/0/+ 4/4/5, delta -0.0156/-0.0052/0/0.0677/0.4479
+
+[D4] THE FIRE SURVEY at the stop: every at-support key fired SINGLE-ENTRY at its own level's cell (pp1's fire), world gain = success fired - success unfired on the same pool, read gain = the shaped projection's level likewise
+    c40 era 1, cap 48 per class per source and level, 2.2 s
+    L2 node 12: base success 0.0, base read 0.5; at support: miner 48 (junk-only 35), panel None (junk-only None)
+        src class true   n unbuild  world -/0/+         world gain q0/25/50/75/100  read -/0/+ served
+      miner    jo    F  30       0    0/30/0                              0/0/0/0/0   0/30/0         30
+      miner    jo    T   5       0    0/0/5     0.0156/0.0156/0.1406/0.1823/0.1823   0/5/0          5
+      miner    sv    F   4       0    0/1/3          0/0.1406/0.1406/0.1406/0.1823   0/4/0          4
+      miner    sv    T   9       0    0/0/9     0.1406/0.1823/0.2135/0.2448/0.4531   0/9/0          9
+    L3 node 6: base success 0.0, base read 0.5; at support: miner 0 (junk-only 0), panel 87 (junk-only 49)
+        src class true   n unbuild  world -/0/+         world gain q0/25/50/75/100  read -/0/+ served
+      panel    jo    F  35       2    0/23/10                   0/0/0/0.0312/0.2969   0/33/0          0
+      panel    jo    T  13       0    0/0/13    0.1406/0.2135/0.2344/0.2969/0.4323   0/13/0          0
+      panel    sv    F  26       0    0/5/21         0/0.0885/0.2135/0.2969/0.2969   0/26/0          0
+      panel    sv    T  12       0    0/0/12    0.0469/0.1406/0.2135/0.2344/0.4323   0/12/0          0
+    L4 node 3: base success None, base read None; at support: miner 0 (junk-only 0), panel 38 (junk-only 33)
+        src class true   n unbuild  world -/0/+         world gain q0/25/50/75/100  read -/0/+ served
+      panel    jo    F  26      26    0/0/0                                      —   0/0/0          0
+      panel    jo    T   7       7    0/0/0                                      —   0/0/0          0
+      panel    sv    F   3       3    0/0/0                                      —   0/0/0          0
+      panel    sv    T   2       2    0/0/0                                      —   0/0/0          0
+    L5 node 1: base success None, base read None; at support: miner 0 (junk-only 0), panel 0 (junk-only 0)
+        src class true   n unbuild  world -/0/+         world gain q0/25/50/75/100  read -/0/+ served

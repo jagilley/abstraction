@@ -1,0 +1,460 @@
+[sostenuto] st2_s2 — THE ADMISSION SET ON THE LIVE BUILD
+  arms ['st_gw_yk', 'st_gr_yk', 'st_gn_yk', 'st_gy_yk']   no-walk reference sb_s2/sb_sv_yk
+  read from: st_gw_yk<-st_s2  st_gr_yk<-st_s2  st_gn_yk<-st_s2  st_gy_yk<-st2_s2
+
+====================================================================================================
+[A] THE GATES, RUN-LEVEL, OFF THE ARM FILES
+====================================================================================================
+    st_gw_yk   PASS
+      A-1r:n_passes                                21
+      A-1r:n_offered                               50
+      A-2r:conf                                    {'TT': 45, 'TF': 0, 'FT': 0, 'FF': 5}
+      A-4r:max_pool_overlap                        0
+      A-9r:n_world_billed                          15552
+      A-1c(repro vs readgate.gated_walk)           True
+      A-4(read handed the world's level)           True
+      A-5(a constant level admits everything)      True
+      n_unfit                                      13
+      n_pending_serve                              {'2': 43, '3': 495, '4': 505, '5': 133}
+      n_admitted_empty                             {}
+      n_empty_fallback                             {}
+      n_rekey_collide                              0
+      counterfactual on the repro pass: world: adm 5/6 e 0.1406  read: adm 6/6 e 0.1458  none: adm 6/6 e 0.1458
+    st_gr_yk   PASS
+      A-1r:n_passes                                18
+      A-1r:n_offered                               50
+      A-2r:conf                                    {'TT': 30, 'TF': 4, 'FT': 14, 'FF': 2}
+      A-4r:max_pool_overlap                        0
+      A-9r:n_world_billed                          0
+      A-1c(repro vs readgate.gated_walk)           True
+      A-4(read handed the world's level)           True
+      A-5(a constant level admits everything)      True
+      n_unfit                                      13
+      n_pending_serve                              {'2': 43, '3': 495, '4': 505, '5': 127}
+      n_admitted_empty                             {}
+      n_empty_fallback                             {}
+      n_rekey_collide                              5
+      counterfactual on the repro pass: world: adm 5/6 e 0.1406  read: adm 6/6 e 0.1458  none: adm 6/6 e 0.1458
+    st_gn_yk   PASS
+      A-1r:n_passes                                27
+      A-1r:n_offered                               73
+      A-2r:conf                                    {'TT': 65, 'TF': 8, 'FT': 0, 'FF': 0}
+      A-4r:max_pool_overlap                        0
+      A-9r:n_world_billed                          0
+      A-1c(repro vs readgate.gated_walk)           True
+      A-4(read handed the world's level)           True
+      A-5(a constant level admits everything)      True
+      n_unfit                                      13
+      n_pending_serve                              {'2': 43, '3': 495, '4': 505, '5': 172}
+      n_admitted_empty                             {}
+      n_empty_fallback                             {}
+      n_rekey_collide                              0
+      counterfactual on the repro pass: world: adm 5/6 e 0.1406  read: adm 6/6 e 0.1458  none: adm 6/6 e 0.1458
+    st_gy_yk   FAIL — A-3r FAILED: st_gy_yk cancelled a commit for an empty admitted build
+
+====================================================================================================
+[B] THE ADMITTED TABLE'S TEST-POOL ERROR — PAIRED, and INSIDE THE LEVEL'S OWN ERA
+====================================================================================================
+    The gate and test pools are drawn on the ERA'S OWN CELL, so a level-l macro's
+    audition is only comparable with another pass's inside the era whose cell is
+    at level l. Pooling over eras reads the CELL MOVING UP as the table getting
+    worse: the late-pass rises to 0.8-0.97 are a level-2 macro being auditioned on
+    an era-4 cell, not a level-2 table that has decayed. The comparison of record
+    is therefore PAIRED and WITHIN-PASS: `admitted - live` is the same plant, the
+    same pool and the same cycle, so it isolates the gate.
+
+    st_gw_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+    st_gr_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+    st_gn_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+    st_gy_yk  era windows e1[1-60]L1n25  e2[61-110]L2n12  e3[111-180]L3n6  e4[181-192]L4n3  e5[193-201]L5n1
+
+    arm         L  era    window   n  adm-live    median  <0  =0  >0  e_test(adm)   e(live)
+    st_gw_yk    2    2    61-110   3   +0.0273   +0.0312   1   0   2       0.3346    0.3073
+    st_gw_yk    2  all    c1-end  11   +0.0099   +0.0039   4   1   6       0.4432    0.4332
+    st_gw_yk    3    3   111-180   3   +0.0000   +0.0000   0   3   0       0.3945    0.3945
+    st_gw_yk    3  all    c1-end  10   +0.0000   +0.0000   0  10   0       0.4969    0.4969
+    st_gw_yk    4    4         —   0  (no pass in that era)
+    st_gw_yk    4  all    c1-end   6   +0.0000   +0.0000   0   6   0       0.1647    0.1647
+    st_gw_yk    5    5   193-201   1   +0.0000   +0.0000   0   1   0       0.0938    0.0938
+    st_gw_yk    5  all    c1-end   4   +0.0000   +0.0000   0   4   0       0.3994    0.3994
+
+    st_gr_yk    2    2    61-110   3   +0.0000   +0.0000   0   3   0       0.2878    0.2878
+    st_gr_yk    2  all    c1-end  10   +0.0000   +0.0000   0  10   0       0.3895    0.3895
+    st_gr_yk    3    3   111-180   3   +0.2135   +0.1758   0   0   3       0.5391    0.3255
+    st_gr_yk    3  all    c1-end  11   +0.1715   +0.1797   0   1  10       0.5852    0.4137
+    st_gr_yk    4    4         —   0  (no pass in that era)
+    st_gr_yk    4  all    c1-end   5   -0.0008   +0.0000   1   4   0       0.3055    0.3063
+    st_gr_yk    5    5         —   0  (no pass in that era)
+    st_gr_yk    5  all    c1-end   1   +0.0000   +0.0000   0   1   0       0.6172    0.6172
+
+    st_gn_yk    2    2    61-110   2   +0.0000   +0.0000   0   2   0       0.2930    0.2930
+    st_gn_yk    2  all    c1-end   9   +0.0000   +0.0000   0   9   0       0.4028    0.4028
+    st_gn_yk    3    3   111-180   2   +0.0000   +0.0000   0   2   0       0.3340    0.3340
+    st_gn_yk    3  all    c1-end  10   +0.0000   +0.0000   0  10   0       0.4277    0.4277
+    st_gn_yk    4    4         —   0  (no pass in that era)
+    st_gn_yk    4  all    c1-end  11   +0.0000   +0.0000   0  11   0       0.4322    0.4322
+    st_gn_yk    5    5   193-201   1   +0.0000   +0.0000   0   1   0       0.0938    0.0938
+    st_gn_yk    5  all    c1-end   7   +0.0000   +0.0000   0   7   0       0.5731    0.5731
+
+    st_gy_yk    2    2    61-110   1   +0.2656   +0.2656   0   0   1       0.5547    0.2891
+    st_gy_yk    2  all    c1-end   9   +0.1033   +0.1094   0   0   9       0.5681    0.4648
+    st_gy_yk    3    3   111-180   2   -0.0273   -0.0273   1   1   0       0.7773    0.8047
+    st_gy_yk    3  all    c1-end   6   -0.0117   +0.0000   2   4   0       0.8359    0.8477
+
+    `none` is identically 0.0000 in every cell by construction — its admitted
+    table IS the live build — which is the reduction's own consistency check.
+
+====================================================================================================
+[B2] THE SAME ROWS AT MATCHED CYCLES, across arms
+====================================================================================================
+    A pass fires only where a level has an undecided at-support key, so the arms
+    run passes on different cycles. These are the (cycle, level) cells where at
+    least two arms both ran one: the plants have diverged by then, but the pool
+    is drawn on the same seed family and the cycle is the same.
+
+     cyc  L    world gate adm/live     read gate adm/live       no gate adm/live    yield gate adm/live
+       5  2    0.2227/0.2266 (5/6)    0.2266/0.2266 (6/6)    0.2266/0.2266 (6/6)    0.4102/0.2266 (4/6)
+      10  2   0.2070/0.2422 (6/10)  0.2422/0.2422 (10/10)  0.2422/0.2422 (10/10)   0.3633/0.2422 (5/10)
+      20  2   0.3086/0.2695 (7/11)  0.2695/0.2695 (11/11)  0.2695/0.2695 (11/11)   0.3438/0.2695 (5/11)
+      25  2   0.2422/0.2266 (8/12)  0.2266/0.2266 (12/12)  0.2266/0.2266 (12/12)   0.3555/0.2266 (5/12)
+      30  2   0.2422/0.2266 (9/13)  0.2266/0.2266 (13/13)  0.2266/0.2266 (13/13)   0.3359/0.2266 (5/13)
+      65  2   0.3750/0.3086 (9/14)                      —                      —   0.5547/0.2891 (7/15)
+      65  3    0.5547/0.5547 (1/1)    0.5547/0.5547 (1/1)    0.5547/0.5547 (1/1)                      —
+      70  2                      —  0.2773/0.2773 (14/14)  0.2773/0.2773 (14/14)                      —
+      70  3  0.4648/0.4648 (16/16)   0.5938/0.3984 (4/34)  0.3984/0.3984 (34/34)                      —
+      75  3                      —   0.5312/0.3633 (5/45)  0.3633/0.3633 (45/45)    0.7969/0.7969 (2/2)
+      85  3                      —   0.5273/0.2656 (5/62)  0.2812/0.2812 (60/60)    0.8164/0.8164 (7/7)
+      95  2  0.3359/0.3047 (10/15)  0.3047/0.3047 (16/16)                      —                      —
+      95  3  0.4180/0.4180 (24/24)   0.5117/0.3242 (5/64)                      —                      —
+     100  3                      —   0.5391/0.3594 (7/68)  0.3516/0.3516 (62/62)                      —
+     105  2  0.2930/0.3086 (11/16)                      —  0.3086/0.3086 (15/15)                      —
+     105  3  0.4688/0.4688 (26/26)                      —  0.3320/0.3320 (66/66)                      —
+     110  3                      —   0.5742/0.3281 (9/70)  0.3516/0.3516 (67/67)                      —
+     115  3                      —   0.6328/0.2930 (9/72)                      —    0.7617/0.8164 (7/8)
+     115  4    0.1562/0.1562 (2/2)    0.1562/0.1562 (1/1)    0.5938/0.5938 (1/1)                      —
+     125  4  0.1719/0.1719 (24/24)                      —  0.5781/0.5781 (31/31)                      —
+     130  2  0.8438/0.8516 (12/17)  0.8438/0.8438 (17/17)                      —                      —
+     130  3  0.3750/0.3750 (28/28)  0.5430/0.3672 (14/77)                      —                      —
+     135  4  0.1758/0.1758 (48/48)  0.1758/0.1758 (32/32) 0.4258/0.4258 (136/136)                      —
+     140  4  0.1562/0.1562 (64/64)                      — 0.3320/0.3320 (168/168)                      —
+     145  4  0.1992/0.1992 (80/80)                      — 0.2500/0.2500 (184/184)                      —
+     150  4                      —  0.1562/0.1562 (40/40) 0.2539/0.2539 (200/200)                      —
+     160  2  0.8125/0.8086 (13/18)                      —                      —   0.8594/0.8242 (9/17)
+     160  3  0.4102/0.4102 (34/34)                      —  0.3906/0.3906 (74/74)  0.7930/0.7930 (17/18)
+     160  5  0.3320/0.3320 (48/48)                      —  0.4961/0.4961 (48/48)                      —
+     170  5  0.5586/0.5586 (52/52)                      —  0.7227/0.7227 (80/80)                      —
+     197  2  0.9922/0.9922 (14/19)  0.9961/0.9961 (18/19)  0.9922/0.9922 (18/18)  0.9961/0.9922 (10/19)
+     197  3  0.9648/0.9648 (43/43)  0.9883/0.9805 (44/96)  0.9766/0.9766 (85/85)  0.9961/0.9961 (20/22)
+     197  4                      —  0.8906/0.8906 (44/60) 0.7539/0.7539 (224/224)                      —
+     197  5  0.0938/0.0938 (68/68)                      — 0.0938/0.0938 (144/144)                      —
+    34 shared (cycle, level) cells of 55 distinct cells over the three arms
+
+====================================================================================================
+[C] WHAT THE ADMITTED TABLE HOLDS — precision, recall, junk share
+====================================================================================================
+    arm         L rows(adm) rows(live)  share   prec   junk  recall keys adm keys rej
+    st_gw_yk    2        14         19   0.74  0.714  0.286   0.714       14        5
+    st_gw_yk    3        43         43   1.00  0.372  0.628   0.286       10        0
+    st_gw_yk    4       100        100   1.00  0.120  0.880   0.015        7        0
+    st_gw_yk    5        68         68   1.00  0.309  0.691   0.000        4        0
+    st_gr_yk    2        18         19   0.95  0.667  0.333   0.857       18        1
+    st_gr_yk    3        44         96   0.46  0.318  0.682   0.250       10       10
+    st_gr_yk    4        44         60   0.73  0.045  0.955   0.002        4        0
+    st_gr_yk    5         1          1   1.00  1.000  0.000   0.000        1        0
+    st_gn_yk    2        18         18   1.00  0.667  0.333   0.857       18        0
+    st_gn_yk    3        85         85   1.00  0.282  0.718   0.429       21        0
+    st_gn_yk    4       224        224   1.00  0.103  0.897   0.028       11        0
+    st_gn_yk    5       144        144   1.00  0.007  0.993   0.000        9        0
+    st_gy_yk    2        10         19   0.53  0.600  0.400   0.429       10        9
+    st_gy_yk    3        20         22   0.91  0.450  0.550   0.161        4        1
+
+====================================================================================================
+[D] THE PER-CANDIDATE CONFUSION AGAINST THE WORLD GATE (pp5's table)
+====================================================================================================
+    TT admitted and the world agrees · TF admitted where the world would refuse
+       (THE JUNK LET IN) · FT refused where the world would admit (THE GOOD
+       ENTRIES REFUSED) · FF refused and the world agrees.
+    pp5, offline, at the loop's budget: world admits ~95% of what it is offered,
+    so raw agreement is not evidence; the composition is. `read` there: TF 0.022
+    FT 0.050 against ungated's TF 0.045 FT 0.000.
+
+
+    THE READOUT IS NOT FIT BEFORE ITS FIRST REFIT (`vo_om_min` 512 filed rows).
+    Until then `VoProjBank.predict` answers 0.5 for every row, the pooled
+    difference is exactly 0 and the strict rule admits — so those trials are the
+    NO-GATE arm's decisions and a read-vs-world comparison on them is vacuous.
+    They are marked `[unfit]` and the read's confusion is restated without them.
+
+    arm          L     n    TT    TF    FT    FF  agree  TF rate  FT rate  unfit
+    st_gw_yk     2    19    14     0     0     5  1.000    0.000    0.000     13
+    st_gw_yk     3    13    13     0     0     0  1.000    0.000    0.000      0
+    st_gw_yk     4    13    13     0     0     0  1.000    0.000    0.000      0
+    st_gw_yk     5     5     5     0     0     0  1.000    0.000    0.000      0
+    st_gw_yk   all    50    45     0     0     5  1.000    0.000    0.000     13
+    st_gw_yk   fit    37    36     0     0     1  1.000    0.000    0.000      0
+    st_gw_yk   deep    31    31     0     0     0  1.000    0.000    0.000      0
+
+    st_gr_yk     2    19    14     4     1     0  0.737    0.211    0.053     13
+    st_gr_yk     3    24    10     0    12     2  0.500    0.000    0.500      0
+    st_gr_yk     4     6     5     0     1     0  0.833    0.000    0.167      0
+    st_gr_yk     5     1     1     0     0     0  1.000    0.000    0.000      0
+    st_gr_yk   all    50    30     4    14     2  0.640    0.080    0.280     13
+    st_gr_yk   fit    37    21     0    14     2  0.622    0.000    0.378      0
+    st_gr_yk   deep    31    16     0    13     2  0.581    0.000    0.419      0
+
+    st_gn_yk     2    18    14     4     0     0  0.778    0.222    0.000     13
+    st_gn_yk     3    24    24     0     0     0  1.000    0.000    0.000      0
+    st_gn_yk     4    22    20     2     0     0  0.909    0.091    0.000      0
+    st_gn_yk     5     9     7     2     0     0  0.778    0.222    0.000      0
+    st_gn_yk   all    73    65     8     0     0  0.890    0.110    0.000     13
+    st_gn_yk   fit    60    56     4     0     0  0.933    0.067    0.000      0
+    st_gn_yk   deep    55    51     4     0     0  0.927    0.073    0.000      0
+
+    st_gy_yk     2    19     9     1     5     4  0.684    0.053    0.263     13
+    st_gy_yk     3     8     6     0     1     1  0.875    0.000    0.125      0
+    st_gy_yk   all    27    15     1     6     5  0.741    0.037    0.222     13
+    st_gy_yk   fit    14    10     1     2     1  0.786    0.071    0.143      0
+    st_gy_yk   deep     8     6     0     1     1  0.875    0.000    0.125      0
+
+    row `fit`  = every trial the readout was fit for (includes 4 late L2 ones);
+    row `deep` = L3-L5 alone, which is where the read gate ever had a live
+                 decision, since L2 was decided before the readout's first fit.
+    The `world` arm's agreement is 1.000 by construction — it IS the world gate —
+    and its FF column is the only informative one there (what the oracle refused).
+
+====================================================================================================
+[D2] THE READ GATE'S OWN SIGNAL, on the trials where it had one
+====================================================================================================
+    `p_trial - p_cur` is a difference of two pooled levels over the SAME fired
+    gate pool. A candidate the executor's DP never picks changes no instance, so
+    the difference is exactly 0 and the strict rule admits — which is the world
+    gate's own behaviour on an invisible candidate (`e_trial == e_cur`, test `<=`).
+
+    arm         n(fit)   d=0   d>0   d<0     min d     max d  median |d|  median n_changed
+    st_gw_yk        37    25     6     6  -0.08108  +0.40084     0.00000               0.0
+    st_gr_yk        37    14     7    16  -0.06682  +0.32584     0.00099               5.0
+    st_gn_yk        60    38    10    12  -0.44383  +0.16212     0.00000               0.0
+    st_gy_yk        14     4     5     5  -0.03490  +0.10170     0.00525              13.0
+
+====================================================================================================
+[E] THE TASK ERROR, CYCLE FOR CYCLE, against the banked no-walk reference
+====================================================================================================
+    arm           era1    era2    era3    era4    era5  cycles
+    st_gw_yk    0.4688  0.6118  0.5846  0.5896  0.6250     201
+    st_gr_yk    0.4693  0.6102  0.6108  0.6042  0.7590     201
+    st_gn_yk    0.4693  0.6142  0.5945  0.5760  0.5686     201
+    st_gy_yk    0.4687  0.6278  0.6711  0.8368  0.9245     201
+    sb_sv_yk (bank)  0.4693  0.6099  0.5807  0.5840  0.6542     201
+
+    delta against the reference, per era (negative = the walk arm is better)
+    st_gw_yk   -0.0005 +0.0019 +0.0039 +0.0056 -0.0292
+    st_gr_yk   +0.0000 +0.0002 +0.0300 +0.0202 +0.1047
+    st_gn_yk   +0.0000 +0.0043 +0.0137 -0.0080 -0.0856
+    st_gy_yk   -0.0006 +0.0179 +0.0904 +0.2528 +0.2703
+
+    delta against the NONE arm (st_gn_yk), per era — the gate net of the op's
+    own footprint (negative = the gate arm is better than admitting everything)
+    st_gw_yk   -0.0005 -0.0024 -0.0098 +0.0137 +0.0564
+    st_gr_yk   +0.0000 -0.0041 +0.0163 +0.0282 +0.1904
+    st_gy_yk   -0.0006 +0.0136 +0.0767 +0.2609 +0.3559
+
+====================================================================================================
+[F] THE READOUT'S HELD-OUT SERIES (the organ the `read` arm gates with)
+====================================================================================================
+    arm                  first refit hold_auc@end  mean(last 50)  ECE@end  n_refit
+    st_gw_yk                      61       0.8498         0.8306    0.021      140
+    st_gr_yk                      60       0.8555         0.8354    0.040      141
+    st_gn_yk                      60       0.8291         0.8117    0.056      141
+    st_gy_yk                      61       0.8570         0.8529    0.041      140
+    sb_sv_yk (bank)               60       0.8614         0.8322    0.039      141
+
+====================================================================================================
+[G] THE BILL, THE FALLBACKS, AND THE WORLD READS BILLED TO THE DECISIONS
+====================================================================================================
+    arm          gate  offered  admit  reject  auditions  world billed  pending  adm-empty  fallback  rekey        t_cum
+    st_gw_yk    world       50     45       5         81         15552     1176          0         0      0     50872829
+    st_gr_yk     read       50     34      16         77             0     1170          0         0      5     50805440
+    st_gn_yk     none       73     73       0        110             0     1215          0         0      0     51026957
+    st_gy_yk    yield       27     16      11         42             0     1748          0         0      1     50302835
+    sb_sv_yk (bank)      —        —      —       —          —             —        —          —         —      —     50957389
+
+====================================================================================================
+[H] WHERE THE WALL CLOCK WENT
+====================================================================================================
+    arm         container s   s/cycle  walk t_s  passes  walk share  peak RSS MiB
+    st_gw_yk          7027*     34.96       9.5      21     0.00136          6966
+    st_gr_yk          7746*     38.54       5.6      18     0.00072          7005
+    st_gn_yk          7342*     36.53      14.8      27     0.00201          7080
+    st_gy_yk           7163     32.16       2.8      13     0.00038          6919
+    sb_s2:sb_sv_yk         7876     35.70         —       —           —          6998
+    sb_s2:sb_yd_yk         6350     28.17         —       —           —          6953
+    sb_s2:sb_so_yk         8142     36.93         —       —           —          7075
+
+    sweep wall clock 7178 s against the longest arm's 7163 s. A `*` marks a container time
+    ESTIMATED as s/cycle x cycles because a `--merge-only` re-merge cannot recover
+    the live call's own elapsed; it is the cycle loop alone and excludes the
+    ~500 s shared setup. Where both are real, the gap between the sweep's wall
+    clock and the longest arm is Modal's container scheduling (the arms are
+    `.starmap`ed and do not all start at once), not work. The walk's own is the
+    `walk t_s` column and is a ten-thousandth of the arm; what the op actually
+    costs is in `s/cycle`, because the served table changes the beam's and the
+    DP's work every cycle. The per-era head dumps are 5 x 2.1 MB written five
+    times per arm and the final refit is one solve, both far below a second.
+
+====================================================================================================
+[I] THE COVERAGE TRACE — every key offered, and the demand-blindness test
+====================================================================================================
+    arm         L  era  offered  admitted  refused   refused keys (count at decision)
+    st_gw_yk    2    1       13         9        4                          [3,6,5,3]
+    st_gw_yk    2    2        3         2        1                                [4]
+    st_gw_yk    2    3        2         2        0                                   
+    st_gw_yk    2    5        1         1        0                                   
+    st_gw_yk    3    2        9         9        0                                   
+    st_gw_yk    3    3        3         3        0                                   
+    st_gw_yk    3    5        1         1        0                                   
+    st_gw_yk    4    3       13        13        0                                   
+    st_gw_yk    5    3        4         4        0                                   
+    st_gw_yk    5    5        1         1        0                                   
+    st_gr_yk    2    1       13        13        0                                   
+    st_gr_yk    2    2        3         3        0                                   
+    st_gr_yk    2    3        1         1        0                                   
+    st_gr_yk    2    5        2         1        1                               [10]
+    st_gr_yk    3    2       17         4       13       [6,4,4,4,4,4,4,3,4,3,3,10,3]
+    st_gr_yk    3    3        4         3        1                                [4]
+    st_gr_yk    3    5        3         3        0                                   
+    st_gr_yk    4    3        5         4        1                                [3]
+    st_gr_yk    4    5        1         1        0                                   
+    st_gr_yk    5    3        1         1        0                                   
+    st_gn_yk    2    1       13        13        0                                   
+    st_gn_yk    2    2        2         2        0                                   
+    st_gn_yk    2    3        1         1        0                                   
+    st_gn_yk    2    5        2         2        0                                   
+    st_gn_yk    3    2       16        16        0                                   
+    st_gn_yk    3    3        3         3        0                                   
+    st_gn_yk    3    5        5         5        0                                   
+    st_gn_yk    4    3       18        18        0                                   
+    st_gn_yk    4    5        4         4        0                                   
+    st_gn_yk    5    3        7         7        0                                   
+    st_gn_yk    5    4        1         1        0                                   
+    st_gn_yk    5    5        1         1        0                                   
+    st_gy_yk    2    1       13         5        8                  [4,3,6,5,3,3,3,3]
+    st_gy_yk    2    2        2         2        0                                   
+    st_gy_yk    2    3        2         2        0                                   
+    st_gy_yk    2    5        2         1        1                                [4]
+    st_gy_yk    3    2        3         3        0                                   
+    st_gy_yk    3    3        3         2        1                                [3]
+    st_gy_yk    3    4        1         1        0                                   
+    st_gy_yk    3    5        1         0        1                                [6]
+
+    THE DEMAND-BLINDNESS TEST. `spiral`/`census` found a gate that prices a
+    candidate by PRESENT demand removes the halves the level above will need.
+    For every L3-L5 key that the ungated arm ever supported, is at least one of
+    its two halves a key the GATE arm REFUSED at the level below?
+
+    gate arm    L  none-arm keys  half refused  half never offered  half admitted
+    st_gw_yk    3             24             7                   0             17
+    st_gw_yk    4             22             0                  21              1
+    st_gw_yk    5              9             0                   9              0
+    st_gr_yk    3             24             1                   0             23
+    st_gr_yk    4             22             8                  14              0
+    st_gr_yk    5              9             0                   9              0
+    st_gy_yk    3             24            15                   0              9
+    st_gy_yk    4             22             2                  20              0
+    st_gy_yk    5              9             0                   9              0
+
+    `half never offered` means the half was not an at-support key on the gate
+    arm at all — the arms diverge, so a half can be absent rather than refused,
+    and that column is the honest residual of this test rather than evidence.
+
+====================================================================================================
+[J] THE DEEP-ERA WINDOW, CYCLE FOR CYCLE
+====================================================================================================
+    st_gw_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+    st_gr_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+    st_gn_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+    st_gy_yk   commits [(59, 2), (77, 3)]  advances [60, 110, 180, 192, 201]
+    sb_sv_yk   commits [(59, 2), (77, 3), (157, 4)]  advances [60, 110, 180, 192, 201]
+
+     cyc  era    st_gw_yk    st_gr_yk    st_gn_yk    st_gy_yk    sb_sv_yk
+     175    3      0.5156      0.4948      0.5130      0.5859      0.4844
+     176    3      0.5078      0.4974      0.5339      0.5729      0.4948
+     177    3      0.5260      0.4870      0.5182      0.5286      0.5234
+     178    3      0.4896      0.4974      0.5260      0.5807      0.4714
+     179    3      0.5052      0.4766      0.5156      0.5859      0.5000
+     180    3      0.4583      0.4948      0.5078      0.6120      0.4818
+     181    4      0.6250      0.6589      0.6250      0.8724      0.6328
+     182    4      0.6198      0.6302      0.6120      0.8568      0.6641
+     183    4      0.6120      0.6120      0.6016      0.8932      0.6380
+     184    4      0.6302      0.6250      0.6120      0.8776      0.6406
+     185    4      0.6146      0.5964      0.5859      0.8698      0.5990
+     186    4      0.6016      0.6016      0.5859      0.8464      0.6068
+     187    4      0.5651      0.5833      0.5729      0.8411      0.5599
+     188    4      0.5729      0.5807      0.5417      0.8073      0.5365
+     189    4      0.5625      0.5833      0.5599      0.8203      0.5260
+     190    4      0.5703      0.5911      0.5625      0.7917      0.5365
+     191    4      0.5781      0.5990      0.5234      0.7839      0.5312
+     192    4      0.5234      0.5885      0.5286      0.7812      0.5365
+     193    5      0.7552      0.7682      0.7057      0.9375      0.7214
+     194    5      0.6719      0.7578      0.5911      0.9271      0.6875
+     195    5      0.6328      0.7708      0.5990      0.9219      0.6641
+     196    5      0.6172      0.7552      0.5729      0.9167      0.6354
+     197    5      0.6042      0.7578      0.5573      0.9323      0.6641
+     198    5      0.6172      0.8229      0.5547      0.9271      0.6458
+     199    5      0.5911      0.7552      0.5573      0.9245      0.6484
+     200    5      0.5781      0.7188      0.4922      0.9115      0.6094
+     201    5      0.5573      0.7240      0.4870      0.9219      0.6120
+
+    L5 keys: the cycle each was OFFERED (within one cadence tick of reaching
+    support — the cadence is `recert_every` 5, and the miner's per-key arrival
+    cycle is not banked, so the offer cycle is the tightest honest reconstruction)
+    arm        offers (cycle, count, decision)
+    st_gw_yk   L4: [(115, 3, 'adm'), (115, 5, 'adm'), (125, 4, 'adm'), (135, 3, 'adm'), (135, 4, 'adm'), (135, 5, 'adm'), (140, 3, 'adm'), (145, 4, 'adm'), (170, 3, 'adm'), (170, 3, 'adm'), (170, 5, 'adm'), (170, 7, 'adm'), (170, 9, 'adm')]
+    st_gw_yk   L5: [(120, 3, 'adm'), (160, 4, 'adm'), (160, 6, 'adm'), (170, 3, 'adm'), (197, 9, 'adm')]
+    st_gr_yk   L4: [(115, 8, 'adm'), (135, 5, 'adm'), (150, 4, 'adm'), (150, 7, 'adm'), (165, 3, 'REF'), (197, 5, 'adm')]
+    st_gr_yk   L5: [(115, 3, 'adm')]
+    st_gn_yk   L4: [(115, 4, 'adm'), (120, 3, 'adm'), (120, 4, 'adm'), (120, 4, 'adm'), (125, 3, 'adm'), (125, 3, 'adm'), (125, 3, 'adm'), (125, 4, 'adm'), (130, 5, 'adm'), (130, 5, 'adm'), (135, 3, 'adm'), (135, 3, 'adm'), (140, 3, 'adm'), (140, 3, 'adm'), (145, 3, 'adm'), (150, 3, 'adm'), (155, 3, 'adm'), (160, 3, 'adm'), (197, 3, 'adm'), (197, 3, 'adm'), (197, 3, 'adm'), (197, 5, 'adm')]
+    st_gn_yk   L5: [(155, 3, 'adm'), (160, 3, 'adm'), (160, 3, 'adm'), (165, 4, 'adm'), (170, 3, 'adm'), (180, 3, 'adm'), (180, 4, 'adm'), (190, 3, 'adm'), (197, 3, 'adm')]
+
+====================================================================================================
+[K] ROUND 2 — THE GATE IN THE NEXT LEVEL'S CURRENCY: the instruments
+====================================================================================================
+  (K1) TWIN-PREFIX FIDELITY. Both round-2 arms share `st_gn_yk`'s stream key, their
+       fires draw no RNG and the reader parse is sandboxed, so each must replay the
+       none arm bit for bit until its first refusal takes effect.
+       st_gy_yk   first refusal c5  first divergence from st_gn_yk c8   PASS
+
+  (K2) THE DEMAND RECORD on every offered key (both round-2 arms log it). `value` is
+       the sum over next-level keys AT SUPPORT having the candidate's class as a half
+       (the gate's currency); `raw` the brief's literal sum over all next-level keys.
+       `raw>=own` is DESIGN §9.3's Fact 1 (the literal form is the none arm).
+       arm         L    n silent no nxt val>=1  val=0  med val  max val  raw>=own  med raw  refused
+       st_gy_yk    2   19      0      0     12      7      5.0       52     19/19      8.0        9
+       st_gy_yk    3    8      0      0      6      2      3.0        6       8/8     16.0        2
+
+  (K3) THE YIELD SIGNAL, `d_yield = mean(share x level)_trial - mean(...)_cur`, on
+       every trial of both round-2 arms; `unfit` = before the readout's first fit,
+       where the level is the constant 0.5 and the gate compares shares alone.
+       arm         L   fit    n   d=0   d>0   d<0     min d     max d  mean share
+       st_gy_yk    2 unfit   13     3     2     8  -0.00716  +0.01563      0.1339
+       st_gy_yk    2   fit    6     2     3     1  -0.00492  +0.01409      0.5626
+       st_gy_yk    3   fit    8     3     3     2  -0.00094  +0.01796      0.0532
+
+  (K4) EVERY GATE'S VERDICT ON THE SAME TRIALS. On each round-2 arm's own trials
+       (same base, same fire), what world / read / yield / demand would each have
+       decided. Per-trial, not a counterfactual walk: the base is the arm's own.
+       arm          L    n   ref world    ref read   ref yield  ref demand   yield=world demand=world yield=demand
+       st_gy_yk     2   19           5           1           9           7            13           11           13
+       st_gy_yk   3-5    8           1           4           2           2             7            5            4
+       st_gy_yk   all   27           6           5          11           9            20           16           17
+
+  (K5) THE EXPORT GATES E-Y / E-D, off the exported passes, in this process
+       st_gy_yk   unfit c5 L2 fires=7 cands=6 next-keys=24  E-Y True (share>0 on 595 instance-fires, weight const True) walk True  E-D True
+           E-Y: next-level miner taken at the candidate's level RED (good)
+           E-Y: the parse shifted by one block                  RED (good)
+           E-D: only the first half matched                     RED (good)
+           E-D: the floor dropped                               RED (good)
+       st_gy_yk   fit   c65 L2 fires=3 cands=2 next-keys=88  E-Y True (share>0 on 576 instance-fires, weight const False) walk True  E-D True
+           E-Y: next-level miner taken at the candidate's level RED (good)
+           E-Y: the parse shifted by one block                  RED (good)
+           E-D: only the first half matched                     RED (good)
+           E-D: the floor dropped                               RED (good)

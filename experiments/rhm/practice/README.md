@@ -631,6 +631,61 @@ the L2 commit is lost to right-level-wrong-node inflation. The own-production re
 pieces — the organ that makes the output face readable is one the diagnostic calls overfit. A live round with an
 online reader is priced at ≈ 2.5–3.5 GPU-h and not run. Full record: [`perception/README.md`](perception/README.md).
 
+### `lead_sheet/`[^private] — the practice loop as a skeleton with seams: the demo's 25k-line fork chain rebuilt as 4,700 lines with every organ a plug, the same loop to the bit; then the seam ladder, ten rungs to a loop that calls one net and asks the world only for the verdict on its own answers (2026-09-24→26)
+
+**Goal**: PR 136's demonstration of the miner and the value seat working in concert ran on the twelfth fork of a
+chain, 24,913 lines of knobs that default off, and every specificity of the demo (the exact world re-queried on
+fresh pools, the aligned grid, the yoked clock, the hand-built actor, the Monte Carlo value fits) is also buried
+complexity. Before going through those one at a time, write the loop down as a skeleton whose cycle reads as a
+table, put every organ behind a seam with the organ as built as its given plug, and prove it is the same loop by
+reproducing scordatura's four arms at both seeds.
+
+**Finding**: **it is the same loop to the bit.** On all four arms of record at both seeds, over all 201 cycles,
+every priced series, every merge verdict and the admission set's end state equal the banked arms, and scordatura's
+two-seed table re-reads identically in all 58 rows (ranks 5 of 5 eras, signs 25 of 25 cells at each seed), through
+four preemption resumes and across host types. Five gates each shown to fail first: the symbolic organs on the
+compact mirrors, on the banked saves, the donor's own code side by side at smoke scale, a banked state replayed
+for ten cycles, and the arms from cycle 0. Everything the fork chain carried beyond the 4,700 lines was inert on
+these arms except two instruments' side effects (the shadow audition's random draws, the probe beams' captures),
+carried as such and each shown to send a replay off within a cycle or two if removed. The consumed loop costs the
+same on the floor, the world arm and the read arm, the grade itself under a second, so the fork chain's ten and
+twenty-three extra seconds a cycle on its graded arms were instruments; an arm runs in 1.3 L4-hours against 2.2 to
+2.5. A defect in the re-offer rule (a revoked key's consumers stored truncated to sixteen, compared against all) and
+nine accidents are located on PR 136's record and kept for identity. No plug is swapped; the seam ladder that
+follows runs as children of this node. Its first three rungs ran the same night (2026-09-25, `urtext/`, `ripieno/`,
+`ad_libitum/`): the identity stubs dropped, which re-orders the arms in most eras and fixes the perturbation band every
+later rung is read against; the miner made blind to the verdict, cap and dose, under which the world's grade still
+rebuilds the reference's L2 table and beats the blind floor in every era at both seeds; and the anchor's commit rule
+run live, which does not transfer off the panel its floors were measured on, so the clock stays a given.
+**The second batch (2026-09-26, seven more rungs, about 60 L4-hours, both seeds):** the frozen controller under V
+and π, the frozen reader under the miner's parse and the controller's replay data are retired (`unison/`,
+`solfege/`, `vocalise/`), so the loop calls one net; the merge's world audit, the re-offer truncation and the grade's
+timer go (`senza/`, `da_capo/`, `fermata/`), so on the floor and the read arm the only world query is the verdict on
+the learner's own answers; the join (`stretto/`) composes them, every rung the rung below to the bit with its change
+off. Reading the projections off the live world model makes the actor worse before the L4 commit and, after it,
+one arm per seed locks into L4-macro routing and reaches depth errors nothing on the old base approaches (.175,
+.40, .176 / .200), which arm being chance, so ranks and signs stop being the instrument there; the plant's untaught
+parse, right on whole L5 spans a tenth of the time, serves the proposer as the exact reader did, while teaching
+the plant to parse by copying visible rows collapses the loop, the diet and not the parse; and the merge licensed
+by the read with its diet gate is oracle-free and inert above L2 with nothing lost. Full record:
+`lead_sheet/README.md`[^private] (§5, §6).
+
+### `fair_copy/`[^private] — the reference implementation: the ladder's join written out as one loop, the same loop to the bit (2026-09-26→27)
+
+**Goal**: after ten rungs the consolidated loop existed only as a class inheriting ten others over the old organs;
+write it out once, the skeleton with the consolidated organs as its given plugs and the retired ones gone, and prove
+it is the join.
+
+**Finding**: **it is the join to the bit.** 5,224 lines against the join's 7,527; the join's c70 saves at both seeds
+replayed here match on every priced series and the whole state; from cycle 0 at both seeds every priced series over
+201 cycles, every merge verdict, the admission set and every organ at every save equal the join's, the only
+differences two unconsumed recorded losses one ulp off from torch's host-dependent float64 dispatch. One net; on the
+floor and the read arm the only world query is the verdict on the learner's own answers; the hooks are the seams the
+next batch swaps through. Its first child `scat/` (2026-09-28) collects V's first diet by random babbling over the base
+moves, so no controller is built anywhere: random babbling solves .13 of its episodes against the controller's .15, era 1
+is better on every arm at both seeds, and from era 2 on the numbers ride the lock-in as everything above rung 4 does.
+Full record: `fair_copy/README.md`[^private] (§4 for `scat/`).
+
 ## Reproduce
 
 ```bash
@@ -656,3 +711,5 @@ Full commands, calibrations and volume layout: [`crystallize/README.md`](crystal
 seed-triple convention), [`tall/README.md`](tall/README.md),
 [`transpose/FILES.md`](transpose/FILES.md), [`setlist/FILES.md`](setlist/FILES.md)
 (joint findings: [`typed_gaps/README.md`](typed_gaps/README.md)).
+
+[^private]: Not mirrored: this link points to a document in the private lab repo (the roadmap, the queue, an unrun spec, reading notes, or a conversation). See the top-level README for what is held back and why.

@@ -1,0 +1,236 @@
+[scordatura] THE GRADED ARMS ON THE JUNK FLOOR, seed 0. Facts only.
+  junk arms: ['sc_gn_yk', 'sc_gw_yk', 'sc_grd_yk']; rubato's, on the solve-fed substrate: ['st_gn_yk', 'rb_gw_yk', 'rb_grd_yk', 'rb_gr_yk']
+
+[G1] PROVENANCE AND IDENTITY
+  sc_gn_yk: 201 cycles; segments: from c0 of (fresh) avx512=False; from c5 of sc_gn_yk R-2 PASS (auto) avx512=False; from c40 of sc_gn_yk R-2 PASS avx512=True; from c170 of sc_gn_yk R-2 PASS (auto) avx512=True
+      J1-J4 [201, 201, 201, 201] red []; junk rows 8446 beside 1367 solved rows; G-I equal at [], differ at []; first revocation cNone; G-W —; G-S red —
+  sc_gw_yk: 201 cycles; segments: from c0 of (fresh) avx512=False; from c5 of sc_gn_yk R-2 PASS (auto) avx512=False; from c10 of sc_gn_yk R-2 PASS avx512=False
+      J1-J4 [201, 201, 201, 201] red []; junk rows 5849 beside 1565 solved rows; G-I equal at [], differ at []; first revocation c15; G-W True; G-S red None
+  sc_grd_yk: 201 cycles; segments: from c0 of (fresh) avx512=False; from c5 of sc_gn_yk R-2 PASS (auto) avx512=False; from c10 of sc_gn_yk R-2 PASS avx512=True
+      J1-J4 [201, 201, 201, 201] red []; junk rows 8668 beside 1298 solved rows; G-I equal at [], differ at []; first revocation c15; G-W True; G-S red None
+  sc_gw_yk: restored after c0; first cycle a log series differs from the floor: (15, 'open'); first revocation c15 (OK)
+  sc_grd_yk: restored after c0; first cycle a log series differs from the floor: (15, 'open'); first revocation c15 (OK)
+
+[G2] TASK ERROR BY ERA (mean over the era's cycles), and each arm minus st_gn_yk and minus the junk floor
+           arm    era 1    era 2    era 3    era 4    era 5   | minus st_gn_yk, eras 1..5                 | minus the junk floor
+      st_gn_yk   0.5016   0.6339   0.5756   0.4588   0.5347   | +0.000 +0.000 +0.000 +0.000 +0.000 | -0.002 -0.041 -0.118 -0.176 -0.240
+      rb_gw_yk   0.4980   0.6320   0.6103   0.6350   0.5880   | -0.004 -0.002 +0.035 +0.176 +0.053 | -0.005 -0.043 -0.083 +0.000 -0.187
+     rb_grd_yk   0.5016   0.6360   0.6048   0.5393   0.7613   | +0.000 +0.002 +0.029 +0.081 +0.227 | -0.002 -0.038 -0.088 -0.096 -0.014
+      rb_gr_yk   0.5007   0.6246   0.6526   0.6491   0.7737   | -0.001 -0.009 +0.077 +0.190 +0.239 | -0.003 -0.050 -0.041 +0.014 -0.001
+      sc_gn_yk   0.5034   0.6745   0.6932   0.6350   0.7749   | +0.002 +0.041 +0.118 +0.176 +0.240 | +0.000 +0.000 +0.000 +0.000 +0.000
+      sc_gw_yk   0.4989   0.6039   0.5905   0.6391   0.7703   | -0.003 -0.030 +0.015 +0.180 +0.236 | -0.004 -0.071 -0.103 +0.004 -0.005
+     sc_grd_yk   0.5005   0.6521   0.6971   0.7198   0.6667   | -0.001 +0.018 +0.122 +0.261 +0.132 | -0.003 -0.022 +0.004 +0.085 -0.108
+
+[G3] COVERAGE. The walk's keys (every key ever offered = admitted under `none`), the last pass per level (keys admitted | rows kept / live | row precision), and, on a graded arm, the floor's walked keys one level up with a half held revoked at the end
+    st_gn_yk: L2 walked 17, c115: 17 | 17/17 | 0.65; L3 walked 19, c185: 16 | 71/71 | 0.31; L4 walked 9, c185: 9 | 96/96 | 0.21; L5 walked 7, c197: 7 | 88/88 | 0.40
+    rb_gw_yk: L2 walked 16, c145: 14 | 14/16 | 0.71; L3 walked 20, c197: 16 | 62/65 | 0.34; L4 walked 12, c197: 10 | 104/136 | 0.41; L5 walked 5, c197: 5 | 80/80 | 0.55
+             of st_gn_yk's 19 walked L3 keys, a half held revoked at the end: 4
+             of st_gn_yk's 9 walked L4 keys, a half held revoked at the end: 5
+             of st_gn_yk's 7 walked L5 keys, a half held revoked at the end: 0
+             revoked at the end: L2 3 L3 4 L4 1 L5 0
+   rb_grd_yk: L2 walked 17, c197: 9 | 9/17 | 0.78; L3 walked 16, c197: 11 | 6/24 | 0.50; L4 walked 3, c145: 3 | 40/40 | 0.23; L5 walked 2, c160: 2 | 32/32 | 0.12
+             of st_gn_yk's 19 walked L3 keys, a half held revoked at the end: 11
+             of st_gn_yk's 9 walked L4 keys, a half held revoked at the end: 0
+             of st_gn_yk's 7 walked L5 keys, a half held revoked at the end: 0
+             revoked at the end: L2 7 L3 1 L4 0 L5 0
+    rb_gr_yk: L2 walked 18, c197: 7 | 7/18 | 1.00; L3 walked 20, c197: 20 | 9/9 | 0.56; L4 walked 1, c115: 1 | 1/1 | 1.00; L5 walked 1, c115: 1 | 1/1 | 1.00
+             of st_gn_yk's 19 walked L3 keys, a half held revoked at the end: 18
+             of st_gn_yk's 9 walked L4 keys, a half held revoked at the end: 0
+             of st_gn_yk's 7 walked L5 keys, a half held revoked at the end: 0
+             revoked at the end: L2 11 L3 0 L4 0 L5 0
+    sc_gn_yk: L2 walked 61, c125: 61 | 61/61 | 0.23; L3 walked 171, c197: 153 | 554/554 | 0.09; L4 walked 133, c197: 130 | 1108/1256 | 0.06; L5 walked 38, c197: 38 | 488/488 | 0.12
+    sc_gw_yk: L2 walked 60, c197: 20 | 20/60 | 0.70; L3 walked 90, c190: 38 | 137/249 | 0.35; L4 walked 72, c197: 21 | 180/712 | 0.25; L5 walked 19, c197: 19 | 304/304 | 0.21
+             of the floor's 171 walked L3 keys, a half held revoked at the end: 104
+             of the floor's 133 walked L4 keys, a half held revoked at the end: 4
+             of the floor's 38 walked L5 keys, a half held revoked at the end: 0
+             revoked at the end: L2 40 L3 37 L4 37 L5 0
+   sc_grd_yk: L2 walked 61, c185: 30 | 30/61 | 0.47; L3 walked 134, c197: 93 | 253/299 | 0.17; L4 walked 131, c197: 32 | 232/888 | 0.11; L5 walked 26, c197: 25 | 372/372 | 0.04
+             of the floor's 171 walked L3 keys, a half held revoked at the end: 77
+             of the floor's 133 walked L4 keys, a half held revoked at the end: 0
+             of the floor's 38 walked L5 keys, a half held revoked at the end: 0
+             revoked at the end: L2 32 L3 35 L4 73 L5 0
+
+[G4] THE SERVED TABLE OVER CYCLES (walked levels): keys admitted and not revoked (junk-only now; true / false by the mask), from the per-cycle junk record
+  sc_gn_yk:
+    c 20: L2 24 (jo 11; T 11 / F 13)
+    c 40: L2 45 (jo 29; T 13 / F 32)
+    c 60: L2 56 (jo 40; T 14 / F 42)
+    c 80: L2 58 (jo 42; T 14 / F 44); L3 24 (jo 13; T 4 / F 13)
+    c100: L2 60 (jo 44; T 14 / F 46); L3 43 (jo 26; T 1 / F 25)
+    c120: L2 60 (jo 44; T 14 / F 46); L3 70 (jo 51; T 1 / F 51); L4 5 (jo 4; T 0 / F 3)
+    c140: L2 61 (jo 44; T 14 / F 47); L3 102 (jo 83; T 1 / F 82); L4 34 (jo 23; T 0 / F 24); L5 13 (jo 10; T 1 / F 5)
+    c160: L2 61 (jo 44; T 14 / F 47); L3 134 (jo 115; T 1 / F 114); L4 66 (jo 48; T 0 / F 53); L5 25 (jo 16; T 0 / F 9)
+    c180: L2 61 (jo 44; T 14 / F 47); L3 146 (jo 126; T 1 / F 126); L4 98 (jo 76; T 0 / F 85); L5 28 (jo 14; T 0 / F 12)
+    c200: L2 61 (jo 43; T 14 / F 47); L3 153 (jo 132; T 1 / F 133); L4 130 (jo 105; T 0 / F 116); L5 38 (jo 23; T 0 / F 19)
+    c201: L2 61 (jo 43; T 14 / F 47); L3 153 (jo 132; T 1 / F 133); L4 130 (jo 105; T 0 / F 116); L5 38 (jo 23; T 0 / F 19)
+  sc_gw_yk:
+    c 20: L2 19 (jo 7; T 11 / F 8)
+    c 40: L2 17 (jo 3; T 13 / F 4)
+    c 60: L2 18 (jo 4; T 14 / F 4)
+    c 80: L2 18 (jo 4; T 14 / F 4); L3 16 (jo 7; T 1 / F 4)
+    c100: L2 21 (jo 7; T 14 / F 7); L3 34 (jo 21; T 1 / F 16)
+    c120: L2 19 (jo 5; T 14 / F 5); L3 37 (jo 23; T 1 / F 18); L4 4 (jo 2; T 1 / F 1); L5 1 (jo 0; T 1 / F 0)
+    c140: L2 19 (jo 5; T 14 / F 5); L3 38 (jo 26; T 1 / F 19); L4 15 (jo 8; T 0 / F 10); L5 4 (jo 3; T 1 / F 1)
+    c160: L2 19 (jo 5; T 14 / F 5); L3 35 (jo 23; T 1 / F 16); L4 16 (jo 7; T 0 / F 12); L5 13 (jo 9; T 1 / F 6)
+    c180: L2 19 (jo 4; T 14 / F 5); L3 36 (jo 24; T 1 / F 17); L4 16 (jo 5; T 0 / F 11); L5 17 (jo 12; T 1 / F 9)
+    c200: L2 19 (jo 3; T 14 / F 5); L3 36 (jo 24; T 1 / F 17); L4 19 (jo 8; T 0 / F 14); L5 19 (jo 13; T 1 / F 10)
+    c201: L2 19 (jo 3; T 14 / F 5); L3 36 (jo 23; T 1 / F 17); L4 19 (jo 8; T 0 / F 14); L5 19 (jo 13; T 1 / F 10)
+  sc_grd_yk:
+    c 20: L2 22 (jo 9; T 11 / F 11)
+    c 40: L2 27 (jo 11; T 13 / F 14)
+    c 60: L2 39 (jo 23; T 14 / F 25)
+    c 80: L2 47 (jo 30; T 14 / F 33); L3 17 (jo 9; T 1 / F 5)
+    c100: L2 56 (jo 39; T 14 / F 42); L3 32 (jo 21; T 0 / F 16)
+    c120: L2 28 (jo 14; T 10 / F 18); L3 49 (jo 36; T 0 / F 31); L4 3 (jo 2; T 0 / F 1)
+    c140: L2 34 (jo 17; T 14 / F 20); L3 62 (jo 47; T 1 / F 43); L4 23 (jo 15; T 0 / F 18); L5 1 (jo 1; T 1 / F 0)
+    c160: L2 30 (jo 13; T 14 / F 16); L3 83 (jo 67; T 1 / F 64); L4 15 (jo 7; T 0 / F 13); L5 4 (jo 3; T 1 / F 2)
+    c180: L2 30 (jo 13; T 14 / F 16); L3 91 (jo 74; T 1 / F 71); L4 22 (jo 9; T 0 / F 19); L5 14 (jo 13; T 1 / F 12)
+    c200: L2 26 (jo 10; T 12 / F 14); L3 93 (jo 76; T 1 / F 73); L4 27 (jo 13; T 0 / F 21); L5 25 (jo 16; T 1 / F 23)
+    c201: L2 26 (jo 10; T 12 / F 14); L3 93 (jo 76; T 1 / F 73); L4 27 (jo 13; T 0 / F 21); L5 25 (jo 15; T 1 / F 23)
+
+[G5] REVOCATIONS BY KIND AND BY JUNK-ONLY STATUS at the revoking pass (jo = at support in the miner, not in its shadow; sv = at support in the shadow too; T/F the true mask); re-offers; what each arm holds revoked at the end
+  sc_gw_yk: 271 revocations (no consumer 104, worthless 167), re-offers 148, held passes —
+    L2 no_consumer  jo F: 30
+    L2 worthless    jo F: 98
+    L2 worthless    sv F: 16
+    L3 no_consumer  jo F: 26
+    L3 no_consumer  jo M: 1
+    L3 worthless    jo F: 38
+    L3 worthless    jo M: 2
+    L3 worthless    sv F: 9
+    L4 no_consumer  jo F: 31
+    L4 no_consumer  jo M: 9
+    L4 no_consumer  sv F: 5
+    L4 no_consumer  sv M: 2
+    L4 worthless    jo F: 1
+    L4 worthless    jo M: 1
+    L4 worthless    sv F: 2
+    held revoked at the end: L2 no_consumer joF 2, L2 worthless joF 36, L2 worthless svF 2, L3 no_consumer joF 15, L3 worthless joF 18, L3 worthless joM 1, L3 worthless svF 3, L4 no_consumer joF 29, L4 no_consumer joM 5, L4 no_consumer svF 2, L4 no_consumer svM 1
+  sc_grd_yk: 263 revocations (no consumer 202, worthless 61), re-offers 106, held passes 128
+    L2 no_consumer  jo F: 35
+    L2 worthless    jo F: 47
+    L2 worthless    jo T: 4
+    L2 worthless    sv T: 10
+    L3 no_consumer  jo F: 66
+    L3 no_consumer  jo M: 2
+    L3 no_consumer  jo T: 1
+    L4 no_consumer  jo F: 79
+    L4 no_consumer  jo M: 8
+    L4 no_consumer  sv F: 10
+    L4 no_consumer  sv M: 1
+    held revoked at the end: L2 no_consumer joF 2, L2 worthless joF 30, L3 no_consumer joF 35, L4 no_consumer joF 70, L4 no_consumer joM 2, L4 no_consumer svF 1
+
+[G6] THE TWO CURRENCIES ON THE SAME FIRES. Every PRICED key-pass (verdict kept or worthless): this arm's verdict against the other currency's decision at margin 0 on the same fires (KK/KR/RK/RR = this verdict / other: keep K, revoke R), by level and by the key's class; then the gains' signs (world, read) by class
+  sc_gw_yk (world): key-passes by verdict {(2, 'kept'): 660, (2, 'no_consumer'): 30, (2, 'worthless'): 114, (3, 'kept'): 430, (3, 'no_consumer'): 27, (3, 'unpriced'): 3, (3, 'worthless'): 49, (4, 'kept'): 81, (4, 'no_consumer'): 47, (4, 'worthless'): 4}
+     L cls  T   KK   KR   RK   RR   world gain -/0/+   read gain -/0/+
+     2  jo  F   39    9   62   36      0/98/48       45/23/78    
+     2  jo  T   91    4    0    0      0/0/95        4/14/77    
+     2  sv  F  107    4   15    1      0/16/111       5/28/94    
+     2  sv  T  372   34    0    0      0/0/406      34/81/291   
+     3  jo  F    1    0   21   17      0/38/1        17/0/22    
+     3  jo  M  123   10    2    0      0/2/133      10/0/125   
+     3  jo  T   16    8    0    0      0/0/24        8/0/16    
+     3  sv  F    2    0    2    7      0/9/2         7/0/4     
+     3  sv  M  259    8    0    0      0/0/267       8/0/259   
+     3  sv  T    2    1    0    0      0/0/3         1/0/2     
+     4  jo  F    0    0    1    0      0/1/0         0/0/1     
+     4  jo  M    4    0    1    0      0/1/4         0/0/5     
+     4  sv  F   36    0    2    0      0/2/36        0/0/38    
+     4  sv  M   38    0    0    0      0/0/38        0/0/38    
+     4  sv  T    3    0    0    0      0/0/3         0/0/3     
+  sc_grd_yk (read): key-passes by verdict {(2, 'kept'): 486, (2, 'no_consumer'): 35, (2, 'no_diet'): 480, (2, 'no_reader'): 197, (2, 'worthless'): 61, (2, 'worthless+held'): 100, (3, 'kept'): 21, (3, 'no_consumer'): 69, (3, 'no_diet'): 933, (3, 'unpriced'): 5, (3, 'worthless+held'): 28, (4, 'no_consumer'): 98, (4, 'no_diet'): 81}
+     L cls  T   KK   KR   RK   RR   world gain -/0/+   read gain -/0/+
+     2  jo  F   38  139    0  123      0/262/38      123/0/177   
+     2  jo  T   25    0    9    0      0/0/34        9/0/25    
+     2  sv  F   57   34    0    4      0/38/57        4/0/91    
+     2  sv  T  193    0   25    0      0/0/218      25/0/193   
+     3  jo  F    0    7    0   23      0/30/0        23/0/7     
+     3  jo  M    4    0    0    1      0/1/4         1/0/4     
+     3  sv  F    0    0    0    2      0/2/0         2/0/0     
+     3  sv  M    9    0    2    0      0/0/11        2/0/9     
+     3  sv  T    1    0    0    0      0/0/1         0/0/1     
+
+[G7] THE DIET AT THE SEAM. The read arm's readout buffer, FIT rows by span, at its grade passes (every few), beside rubato's diet arm at the same cycle where it exists; the first priced pass per level; and the bank over cycles on every arm (rows, positive base rate of the held-out rows, held-out AUC)
+  sc_grd_yk first priced pass per level: {2: 105, 3: 197}; rb_grd_yk's: {2: 105, 3: 190}
+    c 15: s2=    0 s4=    0 s8=    0 s16=    0  L2:off                 | rb_grd_yk: —
+    c 35: s2=    0 s4=    0 s8=    0 s16=    0  L2:off                 | rb_grd_yk: —
+    c 55: s2= 1889 s4=    0 s8=    0 s16=    0  L2:off                 | rb_grd_yk: s2= 1884 s4=    0 s8=    0 s16=    0
+    c 75: s2= 8156 s4=    0 s8=    0 s16=    0  L2:off L3:off          | rb_grd_yk: s2= 7260 s4=    0 s8=    0 s16=    0
+    c 95: s2=14236 s4=    0 s8=    0 s16=    0  L2:off L3:off          | rb_grd_yk: s2=12767 s4=    0 s8=    0 s16=    0
+    c115: s2=19139 s4= 1156 s8=    0 s16=    0  L2:on L3:off           | rb_grd_yk: s2=17261 s4= 1294 s8=    0 s16=    0
+    c135: s2=24219 s4= 2556 s8=    0 s16=    0  L2:on L3:off L4:off    | rb_grd_yk: s2=21641 s4= 2651 s8=    0 s16=    0
+    c155: s2=22593 s4= 4219 s8=  120 s16=    0  L2:on L3:off L4:off    | rb_grd_yk: s2=22403 s4= 4397 s8=   89 s16=    0
+    c175: s2=20805 s4= 5810 s8=  286 s16=    0  L2:on L3:off L4:off    | rb_grd_yk: s2=20472 s4= 6178 s8=  286 s16=    0
+    c197: s2=19587 s4= 6752 s8=  553 s16=   23  L2:on L3:on L4:off     | rb_grd_yk: s2=18226 s4= 7909 s8=  748 s16=   12
+  the bank (readout buffer) at cycle: rows | held-out positive rate | held-out AUC
+      st_gn_yk: c60 3555|0.115|0.815  c100 15800|0.147|0.801  c140 28755|0.171|0.796  c180 30000|0.250|0.826  c201 30000|0.300|0.826
+      sc_gn_yk: c60 3766|0.051|0.847  c100 16936|0.080|0.809  c140 29966|0.107|0.803  c180 30000|0.161|0.833  c201 30000|0.173|0.852
+      sc_gw_yk: c60 3716|0.121|0.857  c100 16654|0.173|0.839  c140 29385|0.202|0.813  c180 30000|0.254|0.839  c201 30000|0.263|0.861
+     sc_grd_yk: c60 3893|0.065|0.925  c100 17434|0.080|0.840  c140 30000|0.088|0.796  c180 30000|0.142|0.827  c201 30000|0.171|0.857
+
+[G8] PERSISTENCE, RE-READ OFF THE RECORD. Every HELD pass (worthless, run 1 of 2): the world's decision on the same fires, and what the key's NEXT priced pass said; and the revocations k = 1 and k = 3 would have made on the recorded passes (a key revoked earlier than it was is not graded again, so this reads the record, not a replay)
+  sc_grd_yk: 128 held passes; 61 worthless revocations at run 2
+    on the held passes the world {'world keeps': 22, 'world revokes': 106}; the key's next priced pass: {'next kept (the run broke)': 30, 'no later priced pass': 37, 'next worthless (revoked at run 2)': 61}
+    k = 1 on the recorded passes would have revoked at every one of the 128 held passes (and the 61 run-2 revocations would then not have been reached as such); k = 3: of the 61 run-2 revocations, those whose next pass exists cannot be read (the arm revoked them); runs >= 3 on the record: 0
+
+[G9] THE BILL. Fires (one unfired base pool per level per pass included) and the world queries billed to the grade
+    sc_gw_yk: passes 37 from c15; fires 4853 (26.0 a cycle); world queries billed to the grade 931,776 (4,983 a cycle)
+   sc_grd_yk: passes 37 from c15; fires 7427 (39.7 a cycle); world queries billed to the grade 0 (0 a cycle)
+    rb_gw_yk: passes 35 from c25; fires 2153 (12.2 a cycle); world queries billed to the grade 413,376 (2,335 a cycle)
+   rb_grd_yk: passes 29 from c55; fires 1051 (7.1 a cycle); world queries billed to the grade 0 (0 a cycle)
+    rb_gr_yk: passes 35 from c25; fires 679 (3.8 a cycle); world queries billed to the grade 0 (0 a cycle)
+
+[G10] THE FIRE SURVEYS on the floor (single-entry at the key's own cell)
+  sc_p1 (the stop at c40): c40 era 1
+    L2 node 12: base success 0.0, base read 0.5; at support miner 47 (jo 31), panel None (jo None)
+      miner jo F n  29 (unbuildable 0, served 29): world -/0/+ 0/28/1 gain 0/0/0/0/0.2604; read -/0/+ 0/29/0
+      miner jo T n   2 (unbuildable 0, served 2): world -/0/+ 0/0/2 gain 0.0156/0.0156/0.0156/0.2083/0.2083; read -/0/+ 0/2/0
+      miner sv F n   5 (unbuildable 0, served 5): world -/0/+ 0/2/3 gain 0/0/0.1667/0.1667/0.2083; read -/0/+ 0/5/0
+      miner sv T n  11 (unbuildable 0, served 11): world -/0/+ 0/0/11 gain 0.0156/0.1823/0.2083/0.2604/0.4427; read -/0/+ 0/11/0
+    L3 node 6: base success 0.0, base read 0.5; at support miner 0 (jo 0), panel 104 (jo 66)
+      panel jo F n  38 (unbuildable 3, served 0): world -/0/+ 0/25/10 gain 0/0/0/0.0573/0.3125; read -/0/+ 0/35/0
+      panel jo T n  10 (unbuildable 2, served 0): world -/0/+ 0/0/8 gain 0.0781/0.1979/0.1979/0.2552/0.4688; read -/0/+ 0/8/0
+      panel sv F n  24 (unbuildable 1, served 0): world -/0/+ 0/6/17 gain 0/0.0781/0.1979/0.2552/0.3125; read -/0/+ 0/23/0
+      panel sv T n  14 (unbuildable 0, served 0): world -/0/+ 0/0/14 gain 0.0573/0.1562/0.2552/0.3125/0.4688; read -/0/+ 0/14/0
+    L4 node 3: base success None, base read None; at support miner 0 (jo 0), panel 47 (jo 41)
+      panel jo F n  36 (unbuildable 36, served 0): world -/0/+ 0/0/0 gain —; read -/0/+ 0/0/0
+      panel jo T n   5 (unbuildable 5, served 0): world -/0/+ 0/0/0 gain —; read -/0/+ 0/0/0
+      panel sv F n   3 (unbuildable 3, served 0): world -/0/+ 0/0/0 gain —; read -/0/+ 0/0/0
+      panel sv T n   3 (unbuildable 3, served 0): world -/0/+ 0/0/0 gain —; read -/0/+ 0/0/0
+    L5 node 1: base success None, base read None; at support miner 0 (jo 0), panel 0 (jo 0)
+  sc_s1 (the arm's end): c201 era 5
+    L2 node 8: base success 0.0, base read 0.11; at support miner 61 (jo 43), panel None (jo None)
+      miner jo F n  42 (unbuildable 0, served 42): world -/0/+ 0/40/2 gain 0/0/0/0/0.2812; read -/0/+ 41/0/1
+      miner jo T n   1 (unbuildable 0, served 1): world -/0/+ 0/0/1 gain 0.0417/0.0417/0.0417/0.0417/0.0417; read -/0/+ 1/0/0
+      miner sv F n   5 (unbuildable 0, served 5): world -/0/+ 0/2/3 gain 0/0/0.2188/0.2188/0.2812; read -/0/+ 5/0/0
+      miner sv T n  13 (unbuildable 0, served 13): world -/0/+ 0/0/13 gain 0.0417/0.1927/0.2188/0.2812/0.2812; read -/0/+ 9/0/4
+    L3 node 4: base success 0.0, base read 0.0906; at support miner 155 (jo 134), panel 198 (jo 167)
+      miner jo F n  41 (unbuildable 0, served 41): world -/0/+ 0/41/0 gain 0/0/0/0/0; read -/0/+ 38/0/3
+      miner jo M n   7 (unbuildable 0, served 7): world -/0/+ 0/0/7 gain 0.0625/0.0677/0.1927/0.1979/0.2604; read -/0/+ 5/0/2
+      miner sv F n   8 (unbuildable 0, served 8): world -/0/+ 0/8/0 gain 0/0/0/0/0; read -/0/+ 8/0/0
+      miner sv M n  12 (unbuildable 0, served 12): world -/0/+ 0/0/12 gain 0.0729/0.099/0.151/0.1927/0.5208; read -/0/+ 11/0/1
+      miner sv T n   1 (unbuildable 0, served 1): world -/0/+ 0/0/1 gain 0.1927/0.1927/0.1927/0.1927/0.1927; read -/0/+ 0/0/1
+      panel jo F n  45 (unbuildable 0, served 43): world -/0/+ 0/45/0 gain 0/0/0/0/0; read -/0/+ 42/0/3
+      panel jo M n   3 (unbuildable 0, served 3): world -/0/+ 0/0/3 gain 0.0625/0.0625/0.0677/0.1979/0.1979; read -/0/+ 3/0/0
+      panel sv F n  14 (unbuildable 0, served 13): world -/0/+ 0/14/0 gain 0/0/0/0/0; read -/0/+ 14/0/0
+      panel sv M n  16 (unbuildable 0, served 16): world -/0/+ 0/0/16 gain 0.0625/0.099/0.1927/0.1979/0.5208; read -/0/+ 13/0/3
+      panel sv T n   1 (unbuildable 0, served 1): world -/0/+ 0/0/1 gain 0.1927/0.1927/0.1927/0.1927/0.1927; read -/0/+ 0/0/1
+    L4 node 2: base success 0.0, base read 0.0764; at support miner 199 (jo 171), panel 428 (jo 371)
+      miner jo F n  43 (unbuildable 2, served 41): world -/0/+ 0/40/1 gain 0/0/0/0/0.0104; read -/0/+ 33/0/8
+      miner jo M n   5 (unbuildable 1, served 4): world -/0/+ 0/1/3 gain 0/0.1094/0.1094/0.1094/0.3385; read -/0/+ 2/0/2
+      miner sv F n  18 (unbuildable 3, served 15): world -/0/+ 0/9/6 gain 0/0/0/0.1198/0.2969; read -/0/+ 10/0/5
+      miner sv M n  10 (unbuildable 0, served 10): world -/0/+ 0/1/9 gain 0/0.125/0.1979/0.4219/0.6875; read -/0/+ 8/0/2
+      panel jo F n  46 (unbuildable 3, served 38): world -/0/+ 0/42/1 gain 0/0/0/0/0.0156; read -/0/+ 36/0/7
+      panel jo M n   2 (unbuildable 0, served 2): world -/0/+ 0/0/2 gain 0.1094/0.1094/0.1094/0.3385/0.3385; read -/0/+ 0/0/2
+      panel sv F n  35 (unbuildable 4, served 25): world -/0/+ 0/25/6 gain 0/0/0/0/0.2969; read -/0/+ 26/0/5
+      panel sv M n  12 (unbuildable 1, served 11): world -/0/+ 0/2/9 gain 0/0.1094/0.125/0.3542/0.6875; read -/0/+ 10/0/1
+      panel sv T n   1 (unbuildable 0, served 1): world -/0/+ 0/0/1 gain 0.4219/0.4219/0.4219/0.4219/0.4219; read -/0/+ 0/0/1
+    L5 node 1: base success 0.0, base read 0.0588; at support miner 60 (jo 44), panel 60 (jo 44)
+      miner jo F n  34 (unbuildable 17, served 17): world -/0/+ 0/13/4 gain 0/0/0/0/0.4219; read -/0/+ 1/0/16
+      miner jo M n  10 (unbuildable 4, served 6): world -/0/+ 0/0/6 gain 0.0781/0.1458/0.1562/0.4427/0.8542; read -/0/+ 1/0/5
+      miner sv F n   2 (unbuildable 0, served 2): world -/0/+ 0/0/2 gain 0.1458/0.1458/0.1458/0.3802/0.3802; read -/0/+ 0/0/2
+      miner sv M n  14 (unbuildable 1, served 13): world -/0/+ 0/0/13 gain 0.1458/0.1458/0.3021/0.3333/0.4219; read -/0/+ 0/0/13
+      panel jo F n  34 (unbuildable 17, served 17): world -/0/+ 0/13/4 gain 0/0/0/0/0.4219; read -/0/+ 1/0/16
+      panel jo M n  10 (unbuildable 4, served 6): world -/0/+ 0/0/6 gain 0.0781/0.1458/0.1562/0.4427/0.8542; read -/0/+ 1/0/5
+      panel sv F n   2 (unbuildable 0, served 2): world -/0/+ 0/0/2 gain 0.1458/0.1458/0.1458/0.3802/0.3802; read -/0/+ 0/0/2
+      panel sv M n  14 (unbuildable 1, served 13): world -/0/+ 0/0/13 gain 0.1458/0.1458/0.3021/0.3333/0.4219; read -/0/+ 0/0/13

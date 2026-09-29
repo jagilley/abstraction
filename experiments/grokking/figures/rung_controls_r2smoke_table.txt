@@ -1,0 +1,45 @@
+# grokking / rung controls -- tag r2smoke; seed 42, train fraction 0.3, CPU
+# e99/e100 = first eval epoch (every 10) with test acc >= thr ('-' = never within cap); peak on the stored 100-epoch grid
+# probe on all p^2 pairs: gbar = diagonal-averaged row-centred logit, gbar_margin = gbar(0) - max_{d!=0} gbar(d); margin = logit[true] - max other; alpha_w = cosine coefficient of gbar
+
+equal-amplitude margins of sum_{w in K} cos(2 pi w d/p) (peak minus runner-up), computed exactly: top1 {30}: 0.002097; K13: 9.958; all 48: 48.50
+
+## Control A: all-48 WITH DC (square, F = s*Q, Q orthogonal) as a reparameterization of one-hot, MLP
+                   arm      feat        init                    opt init|dlogit|    e99   e100    cap final_te final_tr    peak_te@ep gbar_margin diag_frac
+      A1_f_transported all48dc_f transported      adamw lr0.001 wd1     4.47e-08      -      -   1000   0.0003   1.0000  0.009@0            2.107     0.002
+          A1_q_default all48dc_q     default      adamw lr0.001 wd1            -      -      -   1000   0.0000   1.0000  0.010@0            1.642     0.001
+      A1_q_transported all48dc_q transported      adamw lr0.001 wd1     4.47e-08      -      -   1000   0.0002   1.0000  0.010@0            1.673     0.001
+  A2_q_transported_sgd all48dc_q transported sgd lr0.1 wd0.001 m0.9     4.47e-08      -      -   1000   0.0032   0.0255  0.011@0        0.0002245     0.000
+            A2_raw_sgd       raw     default sgd lr0.1 wd0.001 m0.9            -      -      -   1000   0.0032   0.0255  0.011@0        0.0002243     0.000
+  reference (r1): raw one-hot MLP e99/e100 = 16040/18520; all48 (no DC, cos/sin scale) and all48n never solve (test <= 0.0044).
+  A2 trajectory match (raw vs q-transported, SGD): max |d test acc| 0.0001518, max |d train acc| 0, max |d loss| 1.67e-05 over 12 stored evals
+
+## Control B1: bilinear m=4 top1 with the exact one-frequency solution planted (amplitude A = t^3, U = V = t*selector, W = t*base), then the recipe (AdamW lr 1e-3 wd 1.0), no early stop, 20k epochs
+     A |  test acc at epoch  init / 500 / 1k / 5k / 10k / 20k | min test |    alpha_30 at init / 1k / 20k |   gbar_margin init / 20k | te margin min 20k |  wnorm init/20k
+     1 |        1.000 / 0.103 / 0.104 / 0.104 / 0.104 / 0.104 |    0.100 |              1 / 1.828 / 1.828 |   0.002097 / 0.003751    |            -1.166 |   14.2/16.4   
+    10 |        1.000 / 0.205 / 0.139 / 0.139 / 0.139 / 0.139 |    0.139 |             10 / 4.653 / 4.653 |    0.02097 / 0.009316    |            -1.271 |   30.6/22.5   
+   100 |        1.000 / 0.344 / 0.277 / 0.277 / 0.277 / 0.277 |    0.277 |            100 / 15.46 / 15.46 |     0.2097 / 0.03242     |            -1.393 |     66/32.3   
+  1000 |        1.000 / 0.894 / 0.506 / 0.506 / 0.506 / 0.506 |    0.506 |           1000 / 79.99 / 79.99 |      2.097 / 0.1677      |            -1.156 |    142/56     
+ 10000 |        1.000 / 1.000 / 1.000 / 1.000 / 1.000 / 1.000 |    1.000 |          1e+04 / 692.2 / 692.2 |      20.97 / 1.452       |            0.4852 |    306/114    
+
+## Control B2: weight-decay sweep from random init, top1 alphabet, AdamW lr 1e-3, cap 40k, stop at 1.0
+     learner    wd params |    e99   e100 final_te final_tr    peak_te@ep |  alpha_30 gbar_margin te_margin_mean   wnorm
+bilinear m=4   1.0    501 |      -      -   0.0683   0.1120  0.068@999    |     1.644   -0.001866        -0.3252    13.8
+bilinear m=4   0.1    501 |      -      -   0.1309   0.2077  0.131@999    |     4.543    0.004595        -0.3649    17.7
+bilinear m=4  0.01    501 |      -      -   0.1365   0.2119  0.136@999    |     5.039     0.00567         -0.364    18.1
+bilinear m=4   0.0    501 |      -      -   0.1366   0.2119  0.137@999    |     5.096    0.005791        -0.3639    18.2
+         mlp   1.0  29665 |      -      -   0.5142   0.8133  0.514@999    |      58.6      0.4416        -0.0748    54.5
+         mlp   0.1  29665 |      -      -   0.7225   0.9635  0.722@999    |     178.7      0.9962         0.3865    69.2
+         mlp  0.01  29665 |      -      -   0.7331   0.9720  0.733@999    |     204.6       1.094         0.4413    71.7
+         mlp   0.0  29665 |      -      -   0.7392   0.9720  0.739@999    |     208.2       1.101          0.447    71.9
+  reference (r1, wd 1.0): top1 mlp final 0.546 (peak 0.714), top1 bilinear m=4 final 0.098
+
+## Control B3: r1's minted-13 bilinear arm (m=52, 7845 params) re-run with probes
+B3_minted13_bil_40k: e99 None e100 None (r1: 2630 / 3760), epochs run 1000, final test 0.2309
+   epoch     -1: test 0.0105 | alpha over K13 min/mean/max -0.001/0.000/0.001 sum 0.001 | gbar_margin -0.002856 (gbar0 0.0006226) | margin test min/mean -0.8622/-0.3026 train min/mean -0.8535/-0.303 | diag_frac 0.000 | wnorm 8.2 | top5 alpha [[0.00089, 46], [0.0008, 18], [0.00035, 10], [0.00013, 11], [0.0001, 39]]
+   epoch    999: test 0.2309 | alpha over K13 min/mean/max 0.420/0.691/1.003 sum 8.980 | gbar_margin 6.455 (gbar0 8.98) | margin test min/mean -21.61/-2.885 train min/mean 0.4267/3.173 | diag_frac 0.161 | wnorm 32.6 | top5 alpha [[1.00256, 30], [0.91127, 11], [0.85576, 44], [0.8411, 18], [0.79259, 24]]
+   alpha per w at the last probe: {'10': 0.594434, '11': 0.911274, '18': 0.841101, '24': 0.792585, '30': 1.00256, '33': 0.477339, '36': 0.420555, '38': 0.732755, '39': 0.711449, '44': 0.855762, '45': 0.420309, '46': 0.541301, '47': 0.678628}
+B3_minted13_bil_stop: e99 None e100 None (r1: 2630 / 3760), epochs run 1000, final test 0.2309
+   epoch     -1: test 0.0105 | alpha over K13 min/mean/max -0.001/0.000/0.001 sum 0.001 | gbar_margin -0.002856 (gbar0 0.0006226) | margin test min/mean -0.8622/-0.3026 train min/mean -0.8535/-0.303 | diag_frac 0.000 | wnorm 8.2 | top5 alpha [[0.00089, 46], [0.0008, 18], [0.00035, 10], [0.00013, 11], [0.0001, 39]]
+   epoch    999: test 0.2309 | alpha over K13 min/mean/max 0.420/0.691/1.003 sum 8.980 | gbar_margin 6.455 (gbar0 8.98) | margin test min/mean -21.61/-2.885 train min/mean 0.4267/3.173 | diag_frac 0.161 | wnorm 32.6 | top5 alpha [[1.00256, 30], [0.91127, 11], [0.85576, 44], [0.8411, 18], [0.79258, 24]]
+   alpha per w at the last probe: {'10': 0.594434, '11': 0.911274, '18': 0.841101, '24': 0.792584, '30': 1.002559, '33': 0.477339, '36': 0.420555, '38': 0.732755, '39': 0.711449, '44': 0.855762, '45': 0.420309, '46': 0.541302, '47': 0.678628}

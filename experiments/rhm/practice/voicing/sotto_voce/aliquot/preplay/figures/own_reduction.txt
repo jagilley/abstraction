@@ -1,0 +1,474 @@
+======================================================================================================================
+[own] tag pp3 — the LEARNER'S OWN mined entries, priced, and the read as their
+      selector.   arms: s0_sv, s2_sv, s0_so, s2_so, s0_yd, s2_yd   (arms of record: s0_sv, s2_sv)
+======================================================================================================================
+
+  The object is the arm's own OPERATIVE table at the last cycle, reconstructed offline
+  from `results.json` (`learner_tables.py`): the rows its own miner built, over its own
+  lower vocabulary, at its own at-support class-pair keys, capped by its own spell_cap.
+  Its FALSE rows are the ones the learner itself produced -- not random pairs of true
+  lower rows, which is what `preplay` (pp1) priced. L5 is NOT reconstructible: its last
+  build has n_keys_built = 0 while the operative table holds 128 rows from an earlier
+  build whose keys and picks are not in the dump. The FROZEN committed tables are not
+  reconstructible either -- only their sizes and truth masks are banked.
+
+======================================================================================================================
+[G] THE GATES
+    F-1   the recording DP (`fire_rec`) reproduces `MC.apply_any` BIT FOR BIT, on the
+          first fire of every level of every arm -- so the free-signal instrument
+          (`dp_top`) cannot move a fired state. pp1's gate, re-run here.
+    F-2b  the re-implemented read scored against the arm's BANKED hold AUC. It cannot
+          match exactly: the loop trains the plant AFTER the readout's refresh in the
+          same cycle, so `vo_heads.pt`'s core is one plant update newer than the core
+          the logged AUC was measured through (pp1 NOTES defect 1). Band = 2x the
+          readout's own |drift| p90.
+    R-*   the step-1 reconstruction gates, asserted inside every paid container.
+          R-3 (the per-row truth vector against the banked `operative_mask`, row for
+          row) can only be closed LOCALLY: `entry.json.gz` is not on the volume. R-4
+          carries that closure into the containers as a digest of the exact table R-3
+          was closed on, and it is the gate that fires there.
+
+    arm     hold AUC banked   re-read     |d|    band   F-1          R-1/R-1b/R-1c/R-2   R-4 (digest)  R-3 here
+    s0_sv         0.8187    0.8223  0.0035  0.0475   PASS L2,L3,L4 PASS (19/19)        PASS (3/3)     not on volume
+    s2_sv         0.8614    0.8602  0.0012  0.0227   PASS L2,L3,L4 PASS (19/19)        PASS (3/3)     not on volume
+    s0_so         0.8005    0.8012  0.0008  0.0407   PASS L2,L3,L4 PASS (19/19)        PASS (3/3)     not on volume
+    s2_so         0.8001    0.8067  0.0066  0.0707   PASS L2,L3,L4 PASS (19/19)        PASS (3/3)     not on volume
+    s0_yd         0.7824    0.7829  0.0005  0.0272   PASS L2,L3,L4 PASS (19/19)        PASS (3/3)     not on volume
+    s2_yd         0.7874    0.7857  0.0017  0.0498   PASS L2,L3,L4 PASS (19/19)        PASS (3/3)     not on volume
+
+    arm         shaped     frozen (overtone)   twin (never trained)   trunk fingerprints
+    s0_sv       20263.048          20193.127              16198.119
+    s2_sv       20255.008          20197.466              16198.119
+    s0_so       20257.626          20193.127              16198.119
+    s2_so       20230.872          20197.466              16198.119
+    s0_yd       20249.816          20193.127              16198.119
+    s2_yd       20244.429          20197.466              16198.119
+
+======================================================================================================================
+[T] THE LEARNER'S OWN OPERATIVE TABLES (reconstructed; L5 out of reach)
+    `rows` is the operative table's size; `TRUE` counts rows whose level-1 spelling is a
+    legal derivation; `prec` is `MC.grade_table`'s distinct-flat precision, the number
+    the loop itself logs. `lower` is the reconstructed level-(l-1) table it stands on.
+    `k_big` is the arm's own FROZEN COMMITTED size at that level -- the k step 3 uses.
+    The pool seed is a function of the arm's SEED only, so the three arms of a seed are
+    priced and auditioned on IDENTICAL pools: within a seed the arms are paired, and the
+    oracle `e:world` at k = 1 is literally the same number across them.
+
+    arm      L    cell     rows   TRUE  FALSE    prec   lower  k_big  k_small   boot succ   pool seed
+    s0_sv    2  L2n12      18     12      6  0.6667      8     13        4      0.0000   8402000
+    s0_sv    3  L3n6       84     29     55  0.3452     18     59       20      0.0000   8403000
+    s0_sv    4  L4n3      204     54    150  0.2647     84     88       29      0.0000   8404000
+    s2_sv    2  L2n12      19     13      6  0.6842      8     13        4      0.0000   8402002
+    s2_sv    3  L3n6       99     34     65  0.3434     19     48       16      0.0000   8403002
+    s2_sv    4  L4n3      176     21    155  0.1193     99    116       39      0.0000   8404002
+    s0_so    2  L2n12      18     13      5  0.7222      8     16        5      0.0000   8402000
+    s0_so    3  L3n6       80     26     54  0.3250     18     46       15      0.0000   8403000
+    s0_so    4  L4n3      152     16    136  0.1053     80     88       29      0.0000   8404000
+    s2_so    2  L2n12      17     12      5  0.7059      8     17        6      0.0000   8402002
+    s2_so    3  L3n6       72     25     47  0.3472     17     24        8      0.0000   8403002
+    s2_so    4  L4n3       88     12     76  0.1364     72     64       21      0.0000   8404002
+    s0_yd    2  L2n12      18     11      7  0.6111      8     13        4      0.0000   8402000
+    s0_yd    3  L3n6       87     26     61  0.2989     18     57       19      0.0000   8403000
+    s0_yd    4  L4n3      176     26    150  0.1477     87    108       36      0.0000   8404000
+    s2_yd    2  L2n12      17     11      6  0.6471      8     13        4      0.0000   8402002
+    s2_yd    3  L3n6       66     19     47  0.2879     17     25        8      0.0000   8403002
+    s2_yd    4  L4n3       80     26     54  0.3250     66     80       27      0.0000   8404002
+
+======================================================================================================================
+[H] THE READOUT ON THE ARM'S OWN EXPERIENCE (held-out AUC on the bank's hold split)
+    The three refits share one train/validation subsample -- pp1's own, at the same
+    `FIT_SEED_BASE` -- so they differ only by the trunk, and the frozen and twin columns
+    here are the same objects pp1 read.
+
+    arm        banked  shaped refit   frozen     twin   lam(shaped) lam(frozen) lam(twin)
+    s0_sv       0.8223        0.8234   0.7495   0.7300            32           1         1
+    s2_sv       0.8602        0.8535   0.7121   0.7139          1024          32         1
+    s0_so       0.8012        0.8130   0.7797   0.7461            32           1         1
+    s2_so       0.8067        0.7832   0.7473   0.7425          1024           1         1
+    s0_yd       0.7829        0.7768   0.7356   0.7270            32           1         1
+    s2_yd       0.7857        0.7910   0.7520   0.7076            32           1         1
+
+======================================================================================================================
+[P] STEP 2 — THE TABLE OF RECORD. Each operative ROW alone as a one-row table over the
+    learner's own lower table, fired through the arm's SHAPED executor on a fresh pool
+    of the level's era cell (n_score = 256), world-graded, and read on the SAME fired
+    configurations.
+
+    sep    = AUC separating the learner's TRUE rows from its FALSE ones (0.5 = none).
+    W(sep) = the world's own price doing the same job -- the instrument, not a read.
+    On a ONE-ROW table the DP's `lse` and `marg` are identically zero by construction,
+    so the executor's free-signal column is `dp_top` (pp1 decision 9).
+
+    arm      L   n(T/F)     W(sep)   sep:banked sep:shaped_r  sep:frozen    sep:twin  sep:dp_top
+    s0_sv    2   12/6         0.868        0.611        0.514       0.597       0.681       0.403
+    s0_sv    3   29/55        0.583        0.544        0.527       0.566       0.507       0.448
+    s0_sv    4   54/150       0.540        0.584        0.596       0.583       0.491       0.514
+    s2_sv    2   13/6         0.885        0.660        0.647       0.660       0.647       0.359
+    s2_sv    3   34/65        0.613        0.587        0.600       0.587       0.472       0.399
+    s2_sv    4   21/155       0.641        0.643        0.648       0.621       0.503       0.464
+    s0_so    2   13/5         0.823        0.623        0.638       0.392       0.669       0.446
+    s0_so    3   26/54        0.589        0.528        0.516       0.433       0.462       0.526
+    s0_so    4   16/136       0.410        0.319        0.335       0.405       0.301       0.757
+    s2_so    2   12/5         0.883        0.450        0.400       0.433       0.300       0.550
+    s2_so    3   25/47        0.511        0.519        0.522       0.511       0.337       0.516
+    s2_so    4   12/76        0.486        0.542        0.566       0.771       0.361       0.375
+    s0_yd    2   11/7         0.864        0.610        0.571       0.714       0.675       0.416
+    s0_yd    3   26/61        0.624        0.563        0.572       0.533       0.625       0.446
+    s0_yd    4   26/150       0.541        0.654        0.654       0.450       0.554       0.531
+    s2_yd    2   11/6         0.902        0.614        0.583       0.523       0.492       0.409
+    s2_yd    3   19/47        0.567        0.479        0.489       0.445       0.456       0.408
+    s2_yd    4   26/54        0.540        0.483        0.489       0.553       0.601       0.424
+
+    rho = Spearman of the read's price against the WORLD's price, over the learner's own
+          rows. `all` is over every row; `true` is within the TRUE rows alone (where the
+          question is no longer true-vs-false but how well a legal row repairs).
+
+    arm      L   rho:banked  rho:shaped_r  rho:frozen    rho:twin  rho:dp_top  |  rho_true: banked shaped_r  frozen    twin  dp_top
+    s0_sv    2       0.119         0.031       0.260       0.128       0.083  |           -0.230    0.011  -0.091  -0.284   0.258
+    s0_sv    3       0.434         0.487       0.355       0.190       0.288  |            0.486    0.540  -0.010   0.189   0.135
+    s0_sv    4       0.336         0.326       0.242       0.085       0.101  |            0.326    0.316   0.240   0.028   0.026
+    s2_sv    2       0.497         0.505       0.377       0.458       0.066  |            0.558    0.527   0.098   0.289   0.341
+    s2_sv    3       0.557         0.573       0.492       0.232       0.220  |            0.107    0.126   0.058  -0.041   0.149
+    s2_sv    4       0.566         0.591       0.402       0.226       0.365  |            0.770    0.848   0.518   0.132   0.127
+    s0_so    2       0.461         0.589      -0.065       0.312       0.052  |            0.381    0.497  -0.131   0.287  -0.179
+    s0_so    3       0.795         0.823       0.524       0.301      -0.363  |            0.633    0.667   0.571   0.281  -0.618
+    s0_so    4       0.770         0.784       0.555       0.523      -0.377  |            0.691    0.776   0.790   0.312  -0.464
+    s2_so    2       0.332         0.240       0.180      -0.373       0.422  |            0.376    0.344   0.140  -0.318   0.489
+    s2_so    3       0.571         0.536      -0.157       0.224       0.050  |            0.414    0.419   0.112   0.346  -0.092
+    s2_so    4       0.547         0.509       0.169       0.409      -0.107  |            0.839    0.648   0.295   0.184   0.191
+    s0_yd    2       0.284         0.211       0.478       0.062       0.178  |            0.319    0.190   0.190  -0.458   0.425
+    s0_yd    3       0.617         0.604       0.539       0.534       0.278  |            0.600    0.564   0.430   0.542   0.216
+    s0_yd    4       0.580         0.594       0.373       0.646       0.220  |            0.433    0.427   0.285   0.521   0.261
+    s2_yd    2       0.325         0.212       0.329       0.304       0.110  |            0.346    0.268   0.342   0.217   0.207
+    s2_yd    3       0.559         0.513       0.508       0.283       0.236  |            0.389    0.364   0.513   0.367   0.534
+    s2_yd    4       0.546         0.586       0.492       0.205       0.400  |            0.468    0.528   0.305   0.084   0.482
+
+    The mean LEVEL of each read on the learner's TRUE rows and on its FALSE ones, with
+    the world's beside them. A read can separate (sep > 0.5) while sitting at the same
+    absolute level on both, and the loop's chooser reads the level, not the rank.
+
+    arm      L   W:true  W:false |  banked T/F        shaped_r T/F      frozen T/F        twin T/F          dp_top T/F
+    s0_sv    2   0.232   0.084 |  0.148/0.136       0.096/0.096       0.140/0.123       0.200/0.172       -0.129/0.066    
+    s0_sv    3   0.190   0.153 |  0.192/0.180       0.123/0.123       0.194/0.179       0.209/0.208       0.109/0.179     
+    s0_sv    4   0.337   0.280 |  0.309/0.260       0.209/0.169       0.177/0.163       0.193/0.195       0.562/0.539     
+    s2_sv    2   0.218   0.079 |  0.088/0.059       0.089/0.069       0.160/0.135       0.159/0.127       -0.190/0.094    
+    s2_sv    3   0.203   0.150 |  0.109/0.092       0.127/0.105       0.203/0.194       0.203/0.208       0.001/0.127     
+    s2_sv    4   0.203   0.142 |  0.165/0.127       0.170/0.133       0.196/0.169       0.207/0.204       0.430/0.475     
+    s0_so    2   0.225   0.101 |  0.025/0.022       0.028/0.022       0.044/0.049       0.044/0.036       0.496/0.544     
+    s0_so    3   0.197   0.164 |  0.032/0.031       0.040/0.040       0.052/0.059       0.059/0.061       0.995/0.831     
+    s0_so    4   0.233   0.325 |  0.042/0.070       0.060/0.104       0.071/0.088       0.041/0.055       1.708/0.871     
+    s2_so    2   0.224   0.095 |  0.026/0.033       0.030/0.037       0.104/0.123       0.070/0.099       0.457/0.164     
+    s2_so    3   0.183   0.173 |  0.054/0.046       0.055/0.047       0.090/0.093       0.061/0.072       0.560/0.513     
+    s2_so    4   0.315   0.289 |  0.074/0.064       0.076/0.066       0.072/0.054       0.024/0.028       1.038/1.395     
+    s0_yd    2   0.227   0.072 |  0.139/0.120       0.116/0.100       0.177/0.126       0.193/0.159       -0.108/0.041    
+    s0_yd    3   0.199   0.148 |  0.157/0.139       0.134/0.115       0.149/0.140       0.185/0.160       0.118/0.194     
+    s0_yd    4   0.392   0.333 |  0.243/0.202       0.239/0.191       0.188/0.199       0.222/0.207       0.724/0.671     
+    s2_yd    2   0.229   0.079 |  0.178/0.153       0.155/0.140       0.147/0.143       0.160/0.159       -0.224/0.010    
+    s2_yd    3   0.206   0.167 |  0.172/0.175       0.138/0.142       0.191/0.211       0.204/0.211       0.126/0.292     
+    s2_yd    4   0.267   0.203 |  0.218/0.226       0.166/0.173       0.181/0.170       0.221/0.198       0.394/0.504     
+
+======================================================================================================================
+[Q] WHAT THE READ ADDS OVER WHAT WAS ALREADY THERE. pp1 carried forward that the
+    executor's own prior already separated its CONSTRUCTED true from wrong entries at
+    0.54-0.68, so the question is the MARGIN of the banked read over the executor's own
+    `dp_top`, over the unshaped frozen trunk and over the never-trained twin -- not
+    whether the read is above chance. Positive = the banked read separates better.
+    `W-banked` is how far the banked read is from the WORLD's own price, the ceiling.
+
+    arm      L   sep:banked  -dp_top   -frozen     -twin  |  W(sep)  W-banked
+    s0_sv    2       0.611   +0.208    +0.014    -0.069  |   0.868    +0.257
+    s0_sv    3       0.544   +0.096    -0.022    +0.036  |   0.583    +0.040
+    s0_sv    4       0.584   +0.069    +0.000    +0.093  |   0.540    -0.044
+    s2_sv    2       0.660   +0.301    +0.000    +0.013  |   0.885    +0.224
+    s2_sv    3       0.587   +0.188    +0.000    +0.115  |   0.613    +0.026
+    s2_sv    4       0.643   +0.179    +0.022    +0.139  |   0.641    -0.002
+    s0_so    2       0.623   +0.177    +0.231    -0.046  |   0.823    +0.200
+    s0_so    3       0.528   +0.002    +0.095    +0.066  |   0.589    +0.061
+    s0_so    4       0.319   -0.437    -0.085    +0.018  |   0.410    +0.091
+    s2_so    2       0.450   -0.100    +0.017    +0.150  |   0.883    +0.433
+    s2_so    3       0.519   +0.003    +0.008    +0.182  |   0.511    -0.008
+    s2_so    4       0.542   +0.167    -0.229    +0.181  |   0.486    -0.056
+    s0_yd    2       0.610   +0.195    -0.104    -0.065  |   0.864    +0.253
+    s0_yd    3       0.563   +0.117    +0.030    -0.062  |   0.624    +0.060
+    s0_yd    4       0.654   +0.123    +0.204    +0.100  |   0.541    -0.113
+    s2_yd    2       0.614   +0.205    +0.091    +0.121  |   0.902    +0.288
+    s2_yd    3       0.479   +0.071    +0.034    +0.022  |   0.567    +0.088
+    s2_yd    4       0.483   +0.059    -0.071    -0.118  |   0.540    +0.057
+
+======================================================================================================================
+[S] STEP 3 — THE READ AS THE SELECTOR. The top-k rows of the operative table by each
+    selector, as a table, auditioned by the WORLD on DISJOINT test pools (their own seed
+    family), mean over the pools. `world` and `true_only` are ORACLE selectors and are
+    the ceiling, not competitors. `all_rows` is the whole operative table -- what the
+    executor actually ran on -- and `random` is a uniform draw at matched count, mean
+    and sd over its draws.
+
+    --- s0_sv   (4 test pools, n_score 256, 5 random draws) ---
+    L   k      e:world  e:banked e:shaped_r e:frozen  e:twin  e:dp_top  e:random(sd)   e:all_rows e:true_only
+    2   13b   0.2988   0.2852   0.2900   0.2822   0.3594   0.2979  0.3846(0.116)   0.3076     0.2988
+    2    4s   0.5156   0.7920   0.8193   0.5928   0.8975   0.3291  0.6617(0.237)   0.3076     0.2988
+    2    1o   0.5137   0.8379   0.8438   0.8438   0.9883   0.5137  0.8463(0.078)   0.3076     0.2988
+    3   59b   0.2773   0.2910   0.2910   0.3115   0.3125   0.3125  0.3652(0.061)   0.3125     0.3096
+    3   20s   0.5049   0.2773   0.2773   0.3857   0.5166   0.3135  0.5582(0.080)   0.3125     0.3096
+    3    1o   0.5840   1.0000   1.0000   0.7510   1.0000   0.5840  0.8883(0.098)   0.3125     0.3096
+    4   88b   0.1895   0.1895   0.1895   0.1895   0.1895   0.1895  0.4410(0.241)   0.1895     0.1885
+    4   29s   0.1875   0.1895   0.1875   0.1875   0.1875   0.1895  0.6605(0.166)   0.1895     0.1885
+    4    1o   0.1875   0.6152   0.6152   0.1875   0.1875   0.1875  0.4574(0.263)   0.1895     0.1885
+
+    Row tags: b = k_big (the arm's own FROZEN COMMITTED size at that level),
+    s = k_small (= round(k_big/3)), o = k = 1, the top row alone. * = k equals the
+    whole operative table, so that row is the table, not a choice. The `random`
+    column is the mean and sd over its draws; those draws changed between this tag's
+    two passes because the rng now draws three k's instead of two -- every
+    DETERMINISTIC column is identical across the passes.
+
+    HOW DIFFERENTLY THE SELECTORS CHOOSE. `jac` is the Jaccard overlap of each
+    selector's top-k with the WORLD's top-k at k_big. `w_max` is the best SINGLE
+    row's own world price at that level and `rank@sel` is that row's rank under each
+    selector (1 = first). Read these BESIDE the error table above: where the errors
+    coincide while `jac` is far from 1, the audition is not distinguishing the reads
+    however differently they order the table. No mechanism is claimed here.
+    L    w_max  best row  rank: world banked shaped_r frozen   twin dp_top  |  jac vs world: banked shaped_r frozen   twin dp_top
+    2    0.488  #5            1     11      8      8     10      8  |                0.733  0.625  0.733  0.625  0.529
+    3    0.422  #3            1     42     41     82     80     71  |                0.662  0.639  0.595  0.513  0.616
+    4    0.852  #32           1     93     80    196    201    203  |                0.419  0.408  0.364  0.344  0.354
+
+    FALSE rows admitted by each selector (of the level's own false count), and the
+    TRUE rows it keeps:
+    L   k      world     banked   shaped_r   frozen     twin     dp_top   | false/rows
+    2   13     2F/11T     4F/9T     4F/9T     4F/9T    3F/10T     5F/8T  | 6/18
+    2    4      0F/4T     1F/3T     2F/2T     1F/3T     1F/3T     2F/2T  | 6/18
+    2    1      0F/1T     0F/1T     0F/1T     0F/1T     0F/1T     0F/1T  | 6/18
+    3   59    36F/23T   37F/22T   38F/21T   36F/23T   37F/22T   42F/17T  | 55/84
+    3   20     14F/6T    13F/7T    13F/7T    12F/8T    14F/6T    13F/7T  | 55/84
+    3    1      0F/1T     1F/0T     1F/0T     1F/0T     1F/0T     0F/1T  | 55/84
+    4   88    62F/26T   64F/24T   62F/26T   59F/29T   66F/22T   63F/25T  | 150/204
+    4   29    17F/12T   17F/12T   18F/11T   15F/14T    22F/7T   17F/12T  | 150/204
+    4    1      0F/1T     0F/1T     0F/1T     0F/1T     1F/0T     0F/1T  | 150/204
+
+    --- s2_sv   (4 test pools, n_score 256, 5 random draws) ---
+    L   k      e:world  e:banked e:shaped_r e:frozen  e:twin  e:dp_top  e:random(sd)   e:all_rows e:true_only
+    2   13b   0.3379   0.3438   0.3291   0.3652   0.3818   0.3574  0.4273(0.093)   0.3467     0.3398
+    2    4s   0.4180   0.4072   0.4482   0.4707   0.3936   0.4912  0.5918(0.063)   0.3467     0.3398
+    2    1o   0.5332   0.5332   0.5332   0.8184   0.8057   0.5332  0.8912(0.083)   0.3467     0.3398
+    3   48b   0.3887   0.3252   0.3252   0.3281   0.4434   0.3369  0.4600(0.102)   0.3320     0.3213
+    3   16s   0.5430   0.4619   0.4414   0.3965   0.5479   0.3369  0.5605(0.129)   0.3320     0.3213
+    3    1o   0.5430   0.7959   0.7959   0.9521   0.8594   0.5430  0.8531(0.107)   0.3320     0.3213
+    4  116b   0.1768   0.1768   0.1768   0.1768   0.1768   0.1768  0.3172(0.172)   0.1768     0.1768
+    4   39s   0.1768   0.1768   0.1768   0.1768   0.1768   0.1768  0.4510(0.243)   0.1768     0.1768
+    4    1o   0.1768   0.6084   0.6084   0.1768   0.1768   0.1768  0.8018(0.195)   0.1768     0.1768
+
+    Row tags: b = k_big (the arm's own FROZEN COMMITTED size at that level),
+    s = k_small (= round(k_big/3)), o = k = 1, the top row alone. * = k equals the
+    whole operative table, so that row is the table, not a choice. The `random`
+    column is the mean and sd over its draws; those draws changed between this tag's
+    two passes because the rng now draws three k's instead of two -- every
+    DETERMINISTIC column is identical across the passes.
+
+    HOW DIFFERENTLY THE SELECTORS CHOOSE. `jac` is the Jaccard overlap of each
+    selector's top-k with the WORLD's top-k at k_big. `w_max` is the best SINGLE
+    row's own world price at that level and `rank@sel` is that row's rank under each
+    selector (1 = first). Read these BESIDE the error table above: where the errors
+    coincide while `jac` is far from 1, the audition is not distinguishing the reads
+    however differently they order the table. No mechanism is claimed here.
+    L    w_max  best row  rank: world banked shaped_r frozen   twin dp_top  |  jac vs world: banked shaped_r frozen   twin dp_top
+    2    0.473  #5            1      1      1      6      4     10  |                0.625  0.733  0.625  0.625  0.444
+    3    0.438  #4            1     89     80     99     95     79  |                0.500  0.500  0.524  0.455  0.352
+    4    0.816  #15           1      5      3      1      1      1  |                0.589  0.600  0.568  0.578  0.557
+
+    FALSE rows admitted by each selector (of the level's own false count), and the
+    TRUE rows it keeps:
+    L   k      world     banked   shaped_r   frozen     twin     dp_top   | false/rows
+    2   13     1F/12T    3F/10T    3F/10T    3F/10T    3F/10T     5F/8T  | 6/19
+    2    4      0F/4T     0F/4T     1F/3T     1F/3T     1F/3T     2F/2T  | 6/19
+    2    1      0F/1T     0F/1T     0F/1T     0F/1T     0F/1T     0F/1T  | 6/19
+    3   48    30F/18T   27F/21T   28F/20T   30F/18T   33F/15T   34F/14T  | 65/99
+    3   16      9F/7T    12F/4T    11F/5T     7F/9T    11F/5T    10F/6T  | 65/99
+    3    1      0F/1T     0F/1T     0F/1T     0F/1T     0F/1T     0F/1T  | 65/99
+    4  116    97F/19T   99F/17T   98F/18T   99F/17T  102F/14T  102F/14T  | 155/176
+    4   39     34F/5T    34F/5T    32F/7T    33F/6T    36F/3T    34F/5T  | 155/176
+    4    1      0F/1T     1F/0T     1F/0T     0F/1T     0F/1T     0F/1T  | 155/176
+
+    --- s0_so   (4 test pools, n_score 256, 5 random draws) ---
+    L   k      e:world  e:banked e:shaped_r e:frozen  e:twin  e:dp_top  e:random(sd)   e:all_rows e:true_only
+    2   16b   0.5625   0.4365   0.5635   0.5684   0.5635   0.5664  0.5740(0.011)   0.5654     0.5664
+    2    5s   0.7705   0.4980   0.5391   0.6406   0.6357   0.7334  0.6203(0.108)   0.5654     0.5664
+    2    1o   0.5137   0.5137   0.5137   0.8438   0.7529   0.8438  0.8855(0.090)   0.5654     0.5664
+    3   46b   0.6211   0.6055   0.6016   0.6709   0.8467   0.8447  0.8512(0.021)   0.8447     0.7832
+    3   15s   0.5850   0.4746   0.5850   0.6621   0.7529   0.8760  0.8197(0.069)   0.8447     0.7832
+    3    1o   0.5840   0.7080   0.7080   1.0000   0.8730   0.9404  0.9271(0.099)   0.8447     0.7832
+    4   88b   0.6074   0.8164   0.8164   0.8447   0.6719   0.8770  0.8750(0.009)   0.8770     0.9131
+    4   29s   0.2363   0.5615   0.4189   0.5088   0.5312   0.8770  0.8650(0.035)   0.8770     0.9131
+    4    1o   0.1875   0.4824   0.4824   0.1875   0.1875   0.8965  0.7906(0.144)   0.8770     0.9131
+
+    Row tags: b = k_big (the arm's own FROZEN COMMITTED size at that level),
+    s = k_small (= round(k_big/3)), o = k = 1, the top row alone. * = k equals the
+    whole operative table, so that row is the table, not a choice. The `random`
+    column is the mean and sd over its draws; those draws changed between this tag's
+    two passes because the rng now draws three k's instead of two -- every
+    DETERMINISTIC column is identical across the passes.
+
+    HOW DIFFERENTLY THE SELECTORS CHOOSE. `jac` is the Jaccard overlap of each
+    selector's top-k with the WORLD's top-k at k_big. `w_max` is the best SINGLE
+    row's own world price at that level and `rank@sel` is that row's rank under each
+    selector (1 = first). Read these BESIDE the error table above: where the errors
+    coincide while `jac` is far from 1, the audition is not distinguishing the reads
+    however differently they order the table. No mechanism is claimed here.
+    L    w_max  best row  rank: world banked shaped_r frozen   twin dp_top  |  jac vs world: banked shaped_r frozen   twin dp_top
+    2    0.488  #4            1      1      1     10      2     10  |                0.778  0.882  0.778  0.882  0.778
+    3    0.422  #60           1      7      5      2      3     38  |                0.736  0.804  0.559  0.460  0.260
+    4    0.852  #112          1     13      5      1      1    147  |                0.853  0.778  0.586  0.517  0.285
+
+    FALSE rows admitted by each selector (of the level's own false count), and the
+    TRUE rows it keeps:
+    L   k      world     banked   shaped_r   frozen     twin     dp_top   | false/rows
+    2   16     3F/13T    5F/11T    4F/12T    4F/12T    4F/12T    5F/11T  | 5/18
+    2    5      0F/5T     0F/5T     1F/4T     2F/3T     0F/5T     2F/3T  | 5/18
+    2    1      0F/1T     0F/1T     0F/1T     0F/1T     0F/1T     1F/0T  | 5/18
+    3   46    30F/16T   28F/18T   29F/17T   31F/15T   31F/15T   31F/15T  | 54/80
+    3   15     10F/5T    10F/5T    10F/5T    13F/2T    11F/4T     9F/6T  | 54/80
+    3    1      1F/0T     0F/1T     0F/1T     1F/0T     0F/1T     1F/0T  | 54/80
+    4   88     82F/6T    82F/6T    83F/5T    81F/7T    83F/5T   72F/16T  | 136/152
+    4   29     28F/1T    27F/2T    27F/2T    27F/2T    28F/1T    23F/6T  | 136/152
+    4    1      1F/0T     1F/0T     1F/0T     1F/0T     1F/0T     1F/0T  | 136/152
+
+    --- s2_so   (4 test pools, n_score 256, 5 random draws) ---
+    L   k      e:world  e:banked e:shaped_r e:frozen  e:twin  e:dp_top  e:random(sd)   e:all_rows e:true_only
+    2   17b*  0.5010   0.5010   0.5010   0.5010   0.5010   0.5010  0.5010(0.000)   0.5010     0.4883
+    2    6s   0.5215   0.5088   0.5400   0.6670   0.7314   0.4951  0.5838(0.077)   0.5010     0.4883
+    2    1o   0.5332   0.8486   0.8486   0.8057   1.0000   0.5332  0.8375(0.087)   0.5010     0.4883
+    3   24b   0.6816   0.6787   0.6855   0.7021   0.6484   0.6299  0.6895(0.053)   0.6270     0.6494
+    3    8s   0.5869   0.7949   0.7949   0.7900   0.7168   0.6367  0.7764(0.105)   0.6270     0.6494
+    3    1o   0.5430   0.8936   0.8936   0.7900   0.7959   0.7959  0.8959(0.093)   0.6270     0.6494
+    4   64b   0.5820   0.7275   0.5820   0.7900   0.6768   0.7510  0.7463(0.048)   0.7510     0.6084
+    4   21s   0.6084   0.6055   0.6055   0.7100   0.5781   0.7510  0.7105(0.122)   0.7510     0.6084
+    4    1o   0.1768   0.6084   0.6084   0.6084   0.4639   0.9043  0.7859(0.145)   0.7510     0.6084
+
+    Row tags: b = k_big (the arm's own FROZEN COMMITTED size at that level),
+    s = k_small (= round(k_big/3)), o = k = 1, the top row alone. * = k equals the
+    whole operative table, so that row is the table, not a choice. The `random`
+    column is the mean and sd over its draws; those draws changed between this tag's
+    two passes because the rng now draws three k's instead of two -- every
+    DETERMINISTIC column is identical across the passes.
+
+    HOW DIFFERENTLY THE SELECTORS CHOOSE. `jac` is the Jaccard overlap of each
+    selector's top-k with the WORLD's top-k at k_big. `w_max` is the best SINGLE
+    row's own world price at that level and `rank@sel` is that row's rank under each
+    selector (1 = first). Read these BESIDE the error table above: where the errors
+    coincide while `jac` is far from 1, the audition is not distinguishing the reads
+    however differently they order the table. No mechanism is claimed here.
+    L    w_max  best row  rank: world banked shaped_r frozen   twin dp_top  |  jac vs world: banked shaped_r frozen   twin dp_top
+    2    0.473  #5            1      5      6     11     11      3  |                1.000  1.000  1.000  1.000  1.000
+    3    0.438  #54           1     13     14     33     38     41  |                0.412  0.371  0.263  0.371  0.200
+    4    0.816  #15           1      8      5      3      3     70  |                0.778  0.753  0.641  0.707  0.580
+
+    FALSE rows admitted by each selector (of the level's own false count), and the
+    TRUE rows it keeps:
+    L   k      world     banked   shaped_r   frozen     twin     dp_top   | false/rows
+    2   17     5F/12T    5F/12T    5F/12T    5F/12T    5F/12T    5F/12T  | 5/17
+    2    6      0F/6T     2F/4T     2F/4T     3F/3T     3F/3T     2F/4T  | 5/17
+    2    1      0F/1T     1F/0T     1F/0T     0F/1T     1F/0T     0F/1T  | 5/17
+    3   24     16F/8T   14F/10T   14F/10T   14F/10T    18F/6T    15F/9T  | 47/72
+    3    8      5F/3T     4F/4T     4F/4T     6F/2T     6F/2T     7F/1T  | 47/72
+    3    1      1F/0T     1F/0T     1F/0T     1F/0T     1F/0T     1F/0T  | 47/72
+    4   64     55F/9T    55F/9T    55F/9T   52F/12T    58F/6T    56F/8T  | 76/88
+    4   21     19F/2T    18F/3T    18F/3T    16F/5T    18F/3T    20F/1T  | 76/88
+    4    1      0F/1T     1F/0T     1F/0T     0F/1T     1F/0T     1F/0T  | 76/88
+
+    --- s0_yd   (4 test pools, n_score 256, 5 random draws) ---
+    L   k      e:world  e:banked e:shaped_r e:frozen  e:twin  e:dp_top  e:random(sd)   e:all_rows e:true_only
+    2   13b   0.2783   0.2598   0.2715   0.2471   0.2900   0.2969  0.3879(0.117)   0.2891     0.3076
+    2    4s   0.5283   0.6182   0.6377   0.4922   0.6611   0.4814  0.6270(0.237)   0.2891     0.3076
+    2    1o   0.5137   0.7979   0.7607   0.7529   0.7529   0.5137  0.8959(0.086)   0.2891     0.3076
+    3   57b   0.3486   0.3477   0.3486   0.3799   0.3730   0.3740  0.5158(0.117)   0.3740     0.3330
+    3   19s   0.5957   0.3623   0.3496   0.4268   0.5283   0.3770  0.5836(0.127)   0.3740     0.3330
+    3    1o   0.5840   0.7979   0.7979   0.7080   0.8848   0.5840  0.7812(0.174)   0.3740     0.3330
+    4  108b   0.2148   0.2148   0.2148   0.2148   0.2148   0.2148  0.2643(0.135)   0.2148     0.1885
+    4   36s   0.2119   0.2119   0.2129   0.2119   0.2139   0.2148  0.4889(0.156)   0.2148     0.1885
+    4    1o   0.1875   0.1875   0.6152   0.1875   0.1875   0.1875  0.5621(0.065)   0.2148     0.1885
+
+    Row tags: b = k_big (the arm's own FROZEN COMMITTED size at that level),
+    s = k_small (= round(k_big/3)), o = k = 1, the top row alone. * = k equals the
+    whole operative table, so that row is the table, not a choice. The `random`
+    column is the mean and sd over its draws; those draws changed between this tag's
+    two passes because the rng now draws three k's instead of two -- every
+    DETERMINISTIC column is identical across the passes.
+
+    HOW DIFFERENTLY THE SELECTORS CHOOSE. `jac` is the Jaccard overlap of each
+    selector's top-k with the WORLD's top-k at k_big. `w_max` is the best SINGLE
+    row's own world price at that level and `rank@sel` is that row's rank under each
+    selector (1 = first). Read these BESIDE the error table above: where the errors
+    coincide while `jac` is far from 1, the audition is not distinguishing the reads
+    however differently they order the table. No mechanism is claimed here.
+    L    w_max  best row  rank: world banked shaped_r frozen   twin dp_top  |  jac vs world: banked shaped_r frozen   twin dp_top
+    2    0.488  #5            1      7      9      6     10     12  |                0.733  0.733  0.857  0.733  0.529
+    3    0.422  #6            1     20     16     57     13     64  |                0.701  0.727  0.652  0.629  0.541
+    4    0.852  #88           1     90     81    122     23    172  |                0.728  0.674  0.543  0.701  0.479
+
+    FALSE rows admitted by each selector (of the level's own false count), and the
+    TRUE rows it keeps:
+    L   k      world     banked   shaped_r   frozen     twin     dp_top   | false/rows
+    2   13     3F/10T     4F/9T     5F/8T     4F/9T    3F/10T     6F/7T  | 7/18
+    2    4      0F/4T     1F/3T     1F/3T     1F/3T     2F/2T     1F/3T  | 7/18
+    2    1      0F/1T     0F/1T     0F/1T     0F/1T     0F/1T     0F/1T  | 7/18
+    3   57    37F/20T   38F/19T   37F/20T   40F/17T   38F/19T   41F/16T  | 61/87
+    3   19     13F/6T    13F/6T    12F/7T    13F/6T    12F/7T    14F/5T  | 61/87
+    3    1      1F/0T     0F/1T     0F/1T     0F/1T     0F/1T     0F/1T  | 61/87
+    4  108    88F/20T   86F/22T   87F/21T   95F/13T   90F/18T   92F/16T  | 150/176
+    4   36     32F/4T    31F/5T    30F/6T    33F/3T    32F/4T    30F/6T  | 150/176
+    4    1      1F/0T     1F/0T     1F/0T     1F/0T     1F/0T     0F/1T  | 150/176
+
+    --- s2_yd   (4 test pools, n_score 256, 5 random draws) ---
+    L   k      e:world  e:banked e:shaped_r e:frozen  e:twin  e:dp_top  e:random(sd)   e:all_rows e:true_only
+    2   13b   0.3018   0.3096   0.3105   0.3057   0.3018   0.3105  0.3520(0.056)   0.3066     0.3076
+    2    4s   0.4170   0.4541   0.6758   0.4492   0.5869   0.3711  0.7115(0.100)   0.3066     0.3076
+    2    1o   0.5332   0.8486   0.8486   0.8057   0.8057   0.5332  0.8764(0.106)   0.3066     0.3076
+    3   25b   0.4863   0.4150   0.4033   0.4033   0.4277   0.3701  0.4553(0.027)   0.3633     0.3652
+    3    8s   0.5430   0.4004   0.4004   0.5439   0.4980   0.4941  0.6781(0.181)   0.3633     0.3652
+    3    1o   0.5430   0.7959   0.7959   0.5430   0.7900   0.5430  0.8092(0.103)   0.3633     0.3652
+    4   80b*  0.1777   0.1777   0.1777   0.1777   0.1777   0.1777  0.1777(0.000)   0.1777     0.1768
+    4   27s   0.1777   0.1777   0.1777   0.1777   0.1777   0.1777  0.4535(0.229)   0.1777     0.1768
+    4    1o   0.1768   0.6084   0.5293   0.1768   0.1768   0.1768  0.9318(0.022)   0.1777     0.1768
+
+    Row tags: b = k_big (the arm's own FROZEN COMMITTED size at that level),
+    s = k_small (= round(k_big/3)), o = k = 1, the top row alone. * = k equals the
+    whole operative table, so that row is the table, not a choice. The `random`
+    column is the mean and sd over its draws; those draws changed between this tag's
+    two passes because the rng now draws three k's instead of two -- every
+    DETERMINISTIC column is identical across the passes.
+
+    HOW DIFFERENTLY THE SELECTORS CHOOSE. `jac` is the Jaccard overlap of each
+    selector's top-k with the WORLD's top-k at k_big. `w_max` is the best SINGLE
+    row's own world price at that level and `rank@sel` is that row's rank under each
+    selector (1 = first). Read these BESIDE the error table above: where the errors
+    coincide while `jac` is far from 1, the audition is not distinguishing the reads
+    however differently they order the table. No mechanism is claimed here.
+    L    w_max  best row  rank: world banked shaped_r frozen   twin dp_top  |  jac vs world: banked shaped_r frozen   twin dp_top
+    2    0.473  #5            1      3      4      3      6     10  |                0.733  0.733  0.733  0.733  0.625
+    3    0.438  #3            1     43     41     51     22     54  |                0.351  0.351  0.429  0.471  0.316
+    4    0.816  #5            1     43     46     61     18     32  |                1.000  1.000  1.000  1.000  1.000
+
+    FALSE rows admitted by each selector (of the level's own false count), and the
+    TRUE rows it keeps:
+    L   k      world     banked   shaped_r   frozen     twin     dp_top   | false/rows
+    2   13     3F/10T     4F/9T     4F/9T     5F/8T     5F/8T     5F/8T  | 6/17
+    2    4      0F/4T     1F/3T     2F/2T     0F/4T     1F/3T     2F/2T  | 6/17
+    2    1      0F/1T     0F/1T     0F/1T     0F/1T     1F/0T     0F/1T  | 6/17
+    3   25     16F/9T    18F/7T    18F/7T    18F/7T    18F/7T    18F/7T  | 47/66
+    3    8      5F/3T     6F/2T     6F/2T     6F/2T     5F/3T     5F/3T  | 47/66
+    3    1      1F/0T     1F/0T     1F/0T     1F/0T     1F/0T     0F/1T  | 47/66
+    4   80    54F/26T   54F/26T   54F/26T   54F/26T   54F/26T   54F/26T  | 54/80
+    4   27     18F/9T    20F/7T    19F/8T    19F/8T   14F/13T    20F/7T  | 54/80
+    4    1      0F/1T     1F/0T     1F/0T     0F/1T     0F/1T     0F/1T  | 54/80
+
+======================================================================================================================
+[C] THE BILL
+    arm       auditions      sec  peak RSS MB  peak GPU MB
+    s0_sv           706     26.4         4782          978
+    s2_sv           682     30.9         4786          978
+    s0_so           642     28.2         4758          978
+    s2_so           533     25.4         4761          978
+    s0_yd           681     40.8         4782          978
+    s2_yd           511     24.0         4958          978
+    TOTAL                      175.8   (0.049 GPU-h over 6 containers)
+
