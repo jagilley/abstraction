@@ -1,29 +1,310 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>abstraction</title>
-<meta name="description" content="Open superintelligence research.">
-<style>
-  :root { --bg: #fbfaf7; --fg: #1d1c1a; --muted: #6b6862; --link: #1d1c1a; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #161513; --fg: #ece9e3; --muted: #9a968e; --link: #ece9e3; }
-  }
-  html { background: var(--bg); color: var(--fg); }
-  body {
-    margin: 0 auto; max-width: 36rem; padding: 18vh 16px 4rem;
-    font: 18px/1.6 ui-serif, Georgia, "Times New Roman", serif;
-  }
-  h1 { font-weight: 500; font-size: 2rem; margin: 0 0 0.25rem; letter-spacing: -0.01em; }
-  p { margin: 0 0 1rem; }
-  .muted { color: var(--muted); }
-  a { color: var(--link); text-underline-offset: 3px; }
-</style>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Open research into how learners create their own abstractions, and why current models can't." />
+  <title>Abstraction Research</title>
+
+  <meta property="og:url" content="https://jagilley.github.io/abstraction/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Abstraction Research" />
+  <meta property="og:description" content="Open research into how learners create their own abstractions, and why current models can't." />
+  <meta property="og:site_name" content="Abstraction Research" />
+  <meta property="og:image" content="https://jagilley.github.io/resources/abstraction-research-og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Abstraction Research: supervised learning (learns from external data) and reinforcement learning (learns with respect to an external verifier) both feed into abstraction creation. github.com/jagilley/abstraction." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://jagilley.github.io/resources/abstraction-research-og.png" />
+  <meta name="twitter:site" content="@0xjasper" />
+  <link rel="canonical" href="https://jagilley.github.io/abstraction/" />
+  <link rel="shortcut icon" type="image/x-icon" href="https://jagilley.github.io/favicon.ico" />
+
+  <!-- Dark is the default; a saved choice of light is applied before first paint. -->
+  <script>
+    try {
+      if (localStorage.getItem('abstraction-theme') === 'light') {
+        document.documentElement.dataset.theme = 'light';
+      }
+    } catch (e) {}
+  </script>
+
+  <link rel="stylesheet" href="https://latex.vercel.app/style.css">
+  <style>
+    /* Theme tokens. The --body-*, --link-* and --pre-* names are latex.css's own. */
+    :root {
+      color-scheme: dark;
+      --body-bg-color: #161513;
+      --body-color: #dcd8d0;
+      --heading: #f1eee8;
+      --muted: #9a968e;
+      --link-visited: #79b8ff;
+      --link-focus-outline: #79b8ff;
+      --pre-bg-color: #23221f;
+      --rule: #34322e;
+      --box-bg: #1f1e1b;
+      --box-border: #5a5752;
+      --box-text: #c4c0b8;
+      --quote-text: #b5b1a9;
+      --quote-border: #4a4843;
+    }
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --body-bg-color: #f0f0f0;
+      --body-color: #333;
+      --heading: #111;
+      --muted: #666;
+      --link-visited: #0366d6;
+      --link-focus-outline: #0366d6;
+      --pre-bg-color: #e4e4e4;
+      --rule: #ccc;
+      --box-bg: #e8e8e8;
+      --box-border: #888;
+      --box-text: #444;
+      --quote-text: #555;
+      --quote-border: #bbb;
+    }
+
+    body {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      font-size: 1.1rem;
+    }
+    h1, h2, h3 {
+      color: var(--heading);
+    }
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 2rem 0;
+    }
+
+    /* --- masthead --- */
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .masthead h1 {
+      text-align: left;
+      margin: 0;
+    }
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: none;
+    }
+    .site-nav a,
+    .site-nav button {
+      display: inline-flex;
+      padding: 0.35rem;
+      border: none;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+    .site-nav a:hover,
+    .site-nav button:hover {
+      color: var(--heading);
+    }
+    .site-nav svg {
+      width: 20px;
+      height: 20px;
+    }
+    .icon-moon { display: none; }
+    :root[data-theme="light"] .icon-sun { display: none; }
+    :root[data-theme="light"] .icon-moon { display: block; }
+    .tagline {
+      margin: 0.75rem 0 0;
+      font-size: 1.25rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .abstract {
+      background-color: var(--box-bg);
+      border-left: 4px solid var(--box-border);
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--box-text);
+    }
+
+    /* --- the observation --- */
+    blockquote {
+      margin: 1.5rem 0;
+      padding: 0 0 0 1.5rem;
+      border-left: 3px solid var(--quote-border);
+      color: var(--quote-text);
+      font-style: italic;
+    }
+
+    /* --- papers --- */
+    .paper {
+      margin: 1.25rem 0 1.5rem;
+    }
+    .paper .paper-title {
+      font-weight: bold;
+      color: var(--heading);
+      margin: 0;
+    }
+    .paper .paper-meta {
+      margin: 0.2rem 0 0;
+      color: var(--muted);
+    }
+    .paper .paper-links {
+      margin: 0.4rem 0 0;
+    }
+    .paper .paper-links a {
+      margin-right: 0.9rem;
+    }
+    .paper .abstract {
+      margin: 0.9rem 0 0;
+      font-size: 0.95rem;
+      text-align: justify;
+    }
+
+    .site-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--rule);
+      font-variant: small-caps;
+      color: var(--muted);
+    }
+    .site-footer p {
+      margin: 0;
+    }
+
+    code {
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .masthead h1 { font-size: 2rem; line-height: 2.5rem; }
+    }
+  </style>
 </head>
 <body>
-  <h1>abstraction</h1>
-  <p class="muted">Open superintelligence research.</p>
-  <p><a href="https://github.com/jagilley/abstraction">The lab notebook on GitHub</a></p>
+<header class="masthead">
+  <h1>Abstraction Research</h1>
+  <nav class="site-nav">
+    <a href="https://github.com/jagilley/abstraction" aria-label="GitHub" title="GitHub">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.69-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 2.9-.39c.98 0 1.97.13 2.9.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.8 1.19 1.83 1.19 3.09 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.07.78 2.16 0 1.56-.02 2.82-.02 3.2 0 .31.21.68.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
+    </a>
+    <button id="theme-toggle" type="button" aria-label="Switch to light theme" title="Toggle theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11Z"/></svg>
+    </button>
+  </nav>
+</header>
+<p class="tagline">Researching how biological learners create their own abstractions, and how artificial learners can also.</p>
+
+<hr class="divider">
+
+<p>This work exists to investigate the following observation:</p>
+<blockquote>
+<p>There is a very specific sense in which current LLMs are not AGI. If you define “general” as “capable of representing a general assortment of inputs”, then they are general. But if you define “general” as “capable of learning a general assortment of data-limited domains”, then they are not general, because they cannot endogenously explore and learn complex domains.</p>
+</blockquote>
+<p>Supervised learning learns robustly from external data, but can't mint its own knowledge. RL learns everything for itself, but learns with specific regard to an external verifier, and thus <a href="https://jagilley.github.io/rl-is-not-enough.html">can't navigate great complexity</a>. The process of creating new abstractions requires a synthesis of both.</p>
+<p>Other forms this problem statement may take:</p>
+<ul>
+<li>Sample efficiency ("how do you learn more from limited data?")</li>
+<li>Continual learning ("how can the things you know today influence the way in which you learn new things tomorrow?")</li>
+<li>Interpretability ("how do you judge the quality of your own thoughts before you have supervision on them?")</li>
+<li>Taste/style/originality ("how do you create abstractions which are both endogenous and coherent?")</li>
+</ul>
+<p>Ideas which are related but subtly different:</p>
+<ul>
+<li>Meta-learning (learning over the class of abstractions rather than the class of data is the right idea, but traditional meta-learning still creates abstractions passively with respect to the data it sees)</li>
+</ul>
+<p>The research happens in the open. The lab notebook, with the experiments and the idea docs used to reason about their results, is public at <a href="https://github.com/jagilley/abstraction">github.com/jagilley/abstraction</a> and updated weekly.</p>
+
+<h2>FAQs</h2>
+<p><strong>Why is abstraction creation an important problem?</strong></p>
+<p>Consider several known open questions in the field of AI. My view is that each of these phenomena is an instance of what it looks like to form model abstractions passively, based on the data and verifiers the model sees during the training process.</p>
+<ul>
+<li>Q: why do the models <a href="https://www.dwarkesh.com/p/ilya-sutskever-2">seem to generalize</a> much worse than humans?
+<ul>
+<li>A: under the current model training paradigm, generalization, for example, is a property of the particular distribution of data a model sees during training. If the model only forms abstractions with respect to the data it sees during training, it must rely upon transfer learning over the geometry of the data to generalize to inputs it has never seen.</li>
+</ul></li>
+<li>Q: why can the models easily achieve superhuman capabilities on tasks like competitive programming but not those like open-ended research?
+<ul>
+<li>A: because competitive programming requires skillful deployment of existing abstractions rather than the invention of new ones</li>
+</ul></li>
+<li>Q: why does finetuning the models on domain-specific data <a href="https://arxiv.org/abs/2507.00432">not produce gains outside that domain</a>, when for humans it is possible to learn things that generalize from seemingly specific domains?
+<ul>
+<li>A: because models adapt during fine-tuning by treating the fine-tuning domain as the new ground truth against which abstractions must earn their worth</li>
+</ul></li>
+<li>Q: why are superhuman Go engines trained by self-play <a href="https://arxiv.org/abs/2211.00241">vulnerable to adversarial policies</a>?
+<ul>
+<li>A: because self-play only creates abstractions passively, in regions it has visited</li>
+</ul></li>
+<li>Q: why do <a href="https://cocosci.princeton.edu/tom/papers/iteratedcogsci.pdf">models collapse</a> when recursively trained on their own outputs?
+<ul>
+<li>A: because they have no need to form new abstractions passively to represent data already generated by their policy</li>
+</ul></li>
+</ul>
+<p><strong>Why do you think frontier research can be done on non-LLMs?</strong></p>
+<p>I think there are two questions bundled together here:</p>
+<ol type="1">
+<li>Can non-LLM research currently be frontier-level useful?</li>
+<li>Do LLMs work the same way as other types of AI models, in a learning-theory sense?</li>
+</ol>
+<p>To the first question, I would agree with the scaling-maximalist consensus that the answer is "no", and I find the fact that the answer is "no" to be thought-provoking. To my mind, this fact would seem to imply something about the data on which we train LLMs: <em>what is it about human-generated textual data that makes it uniquely useful</em>? I suspect the answer has something to do with the directness with which our language encodes the abstraction byproducts of our cognitive processes.</p>
+<p>To the second question, I would say "yes", and I don't think many would disagree. Whatever it is that makes training a transformer on exabytes of pure language more useful than training a transformer on exabytes of pure images seems like it ought to be downstream of the language data itself, and the model representations required to be a good next token predictor over it.</p>
+<p>Biological learners seem to be <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC13540421/">capable of building abstractions over non-linguistic data</a>, and the language data which makes LLMs so powerful comes from biological learners. So it seems like the default position ought to be that non-language data <em>can</em> be fertile ground for frontier research, until proven otherwise.</p>
+<p><strong>What's the research strategy?</strong></p>
+<p>This work is generally guided by investigating how the human/mammalian brain works, and building models that functionally approximate its biology and how it handles various realistic tasks.</p>
+<p><strong>What's the relationship between abstractions and superintelligence?</strong></p>
+<p>I define "superintelligence" as capabilities which are nontrivially in excess of those of current AI models. My belief is that abstraction creation is an acute deficit in current model capabilities. Therefore, "superintelligence" is one word you could use to refer to this research program.</p>
+<p>That being said, it's pretty robustly established that biological learners - even some which are surprisingly phylogenetically distant to humans - do not have this same deficit. So I would argue that intelligence (super- or otherwise) is likely better thought of as a vector than a scalar.</p>
+
+<h2>Papers</h2>
+<div class="paper">
+  <p class="paper-title">Forward Self-Models Learn an Empirical Approximation of Neural Network Computation</p>
+  <p class="paper-meta">Jasper Gilley. <em>MOSS Workshop, COLM 2026.</em></p>
+  <p class="paper-links">
+    <a href="https://openreview.net/forum?id=7oJ0uFmSPx">OpenReview</a>
+    <a href="https://github.com/jagilley/forward-self-models">Code</a>
+    <a href="https://jagilley.github.io/forward-self-models.html">Blog post</a>
+  </p>
+  <p class="abstract">
+    We introduce <em>forward self-models</em>: small networks trained to predict a neural network's later-layer activations from its earlier-layer activations, learning an empirical approximation of the computational function that the intervening layers implement. We train forward self-models of 1-3% of main model parameters on models from 30M to 1B parameters, achieving up to 97% cosine similarity with target activations and up to 94% KL recovery of a layer's contribution to the output distribution. Prediction errors are interpretably structured and track computational complexity rather than prediction difficulty. At Llama 3.2 1B scale, a 2.1%-parameter forward model recovers a meaningful decomposition in which prediction error concentrates in the MLP rather than the attention heads.
+  </p>
+</div>
+
+<footer class="site-footer">
+  <p>Abstraction Research</p>
+  <p><a href="https://github.com/jagilley/abstraction">github</a></p>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var toggle = document.getElementById('theme-toggle');
+    function label() {
+      toggle.setAttribute('aria-label', root.dataset.theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+    }
+    label();
+    toggle.addEventListener('click', function () {
+      var next = root.dataset.theme === 'light' ? 'dark' : 'light';
+      root.dataset.theme = next;
+      try { localStorage.setItem('abstraction-theme', next); } catch (e) {}
+      label();
+    });
+  })();
+</script>
+
 </body>
 </html>
