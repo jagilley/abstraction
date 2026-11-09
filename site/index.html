@@ -127,6 +127,75 @@
       color: var(--muted);
     }
 
+    /* --- quote ticker --- */
+    /* The footer's top rule closes the strip from below. */
+    .ticker {
+      margin: 2rem 0 0;
+      border-top: 1px solid var(--rule);
+    }
+    .ticker + .site-footer {
+      margin-top: 0;
+    }
+    .ticker-window {
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 0.7rem 0;
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 3rem, #000 calc(100% - 3rem), transparent);
+      mask-image: linear-gradient(to right, transparent, #000 3rem, #000 calc(100% - 3rem), transparent);
+    }
+    .ticker-window::-webkit-scrollbar { display: none; }
+    .ticker.is-running .ticker-window { overflow: hidden; }
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      transform: translateX(var(--ticker-lead, 0px));
+    }
+    .ticker.is-running .ticker-track {
+      animation:
+        ticker-intro var(--ticker-intro, 0s) linear,
+        ticker-scroll var(--ticker-duration, 240s) linear var(--ticker-intro, 0s) infinite;
+    }
+    .ticker:hover .ticker-track {
+      animation-play-state: paused;
+    }
+    @keyframes ticker-intro {
+      from { transform: translateX(var(--ticker-lead, 0px)); }
+      to { transform: translateX(0); }
+    }
+    @keyframes ticker-scroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .ticker-list {
+      display: flex;
+      flex: none;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .ticker-list li {
+      margin: 0;
+      white-space: nowrap;
+      font-size: 1rem;
+      color: var(--quote-text);
+    }
+    .ticker-list li::after {
+      content: "◆";
+      margin: 0 1.75rem;
+      font-size: 0.55em;
+      vertical-align: 0.25em;
+      color: var(--box-border);
+    }
+    .ticker-list q {
+      font-style: italic;
+      quotes: "“" "”" "‘" "’";
+    }
+    .ticker-who {
+      margin-left: 0.5rem;
+      font-variant: small-caps;
+      color: var(--muted);
+    }
+
     .abstract {
       background-color: var(--box-bg);
       border-left: 4px solid var(--box-border);
@@ -146,7 +215,7 @@
       font-style: italic;
     }
 
-    /* --- papers --- */
+    /* --- published work --- */
     .paper {
       margin: 1.25rem 0 1.5rem;
     }
@@ -270,7 +339,15 @@
 <p>I define "superintelligence" as capabilities which are nontrivially in excess of those of current AI models. My belief is that abstraction creation is an acute deficit in current model capabilities. Therefore, "superintelligence" is one word you could use to refer to this research program.</p>
 <p>That being said, it's pretty robustly established that biological learners - even some which are surprisingly phylogenetically distant to humans - do not have this same deficit. So I would argue that intelligence (super- or otherwise) is likely better thought of as a vector than a scalar.</p>
 
-<h2>Papers</h2>
+<h2>Published Work</h2>
+<div class="paper">
+  <p class="paper-title">pre-ARC: a pretraining corpus for ARC-AGI</p>
+  <p class="paper-meta">Jasper Gilley. <em>Dataset, 2026.</em></p>
+  <p class="paper-links">
+    <a href="https://github.com/jagilley/pre-arc">Code</a>
+    <a href="https://jagilley.github.io/pre-arc/">Data viewer</a>
+  </p>
+</div>
 <div class="paper">
   <p class="paper-title">Forward Self-Models Learn an Empirical Approximation of Neural Network Computation</p>
   <p class="paper-meta">Jasper Gilley. <em>MOSS Workshop, COLM 2026.</em></p>
@@ -283,6 +360,25 @@
     We introduce <em>forward self-models</em>: small networks trained to predict a neural network's later-layer activations from its earlier-layer activations, learning an empirical approximation of the computational function that the intervening layers implement. We train forward self-models of 1-3% of main model parameters on models from 30M to 1B parameters, achieving up to 97% cosine similarity with target activations and up to 94% KL recovery of a layer's contribution to the output distribution. Prediction errors are interpretably structured and track computational complexity rather than prediction difficulty. At Llama 3.2 1B scale, a 2.1%-parameter forward model recovers a meaningful decomposition in which prediction error concentrates in the MLP rather than the attention heads.
   </p>
 </div>
+
+<!-- The quote wall from the repo's top-level CLAUDE.md; keep the two in sync. Shuffled and set scrolling by the script below. -->
+<section class="ticker" aria-label="Quotes">
+  <div class="ticker-window">
+    <div class="ticker-track">
+      <ul class="ticker-list">
+        <li><q>It’s not helpful to think of problems as of ‘hard’. It’s better to think that we merely don’t know how to solve them yet.</q><span class="ticker-who">— Ilya Sutskever</span></li>
+        <li><q>Creativity is an inverse problem</q><span class="ticker-who">— Ilya Sutskever</span></li>
+        <li><q>Creativity = novelty + value</q><span class="ticker-who">— Ilya Sutskever</span></li>
+        <li><q>If an explanation is long, there’s a high chance that it’s wrong</q><span class="ticker-who">— Ilya Sutskever</span></li>
+        <li><q>psychology should become more and more applicable to AI as it gets smarter</q><span class="ticker-who">— Ilya Sutskever</span></li>
+        <li><q>The art of doing mathematics consists in finding that special case which contains all the germs of generality.</q><span class="ticker-who">— David Hilbert</span></li>
+        <li><q>The whole idea of Science is, simply, reflective reasoning about a more reliable process for making the contents of your mind mirror the contents of the world.</q><span class="ticker-who">— Eliezer Yudkowsky</span></li>
+        <li><q>Music is your own experience, your own thoughts, your wisdom. If you don’t live it, it won’t come out of your horn. They teach you there’s a boundary line to music. But, man, there’s no boundary line to art.</q><span class="ticker-who">— Charlie Parker</span></li>
+        <li><q>It’s a beautiful thing when a person who doesn’t know how to play an instrument plays it. They always find something beautiful because they don’t know what they’re not supposed to do.</q><span class="ticker-who">— Ornette Coleman</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
 
 <footer class="site-footer">
   <p>Abstraction Research</p>
@@ -303,6 +399,43 @@
       try { localStorage.setItem('abstraction-theme', next); } catch (e) {}
       label();
     });
+  })();
+
+  (function () {
+    var PX_PER_SECOND = 40;
+    var ticker = document.querySelector('.ticker');
+    var track = ticker.querySelector('.ticker-track');
+    var list = track.querySelector('.ticker-list');
+    var items = Array.prototype.slice.call(list.children);
+    for (var i = items.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = items[i]; items[i] = items[j]; items[j] = t;
+    }
+    items.forEach(function (li) { list.appendChild(li); });
+
+    // Reduced motion leaves the shuffled strip still, to be scrolled by hand.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // A second copy makes the loop seamless: the track slides left by exactly one copy's width.
+    var copy = list.cloneNode(true);
+    copy.setAttribute('aria-hidden', 'true');
+    track.appendChild(copy);
+
+    // The first quote starts a little in from the left edge rather than flush against it.
+    var lead = 30;
+    ticker.style.setProperty('--ticker-lead', lead + 'px');
+    ticker.style.setProperty('--ticker-intro', (lead / PX_PER_SECOND) + 's');
+
+    function start() {
+      ticker.style.setProperty('--ticker-duration', (list.offsetWidth / PX_PER_SECOND) + 's');
+      ticker.classList.add('is-running');
+    }
+    // Wait for the web fonts, since they set the strip's width and so the speed.
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(start);
+    } else {
+      start();
+    }
   })();
 </script>
 
